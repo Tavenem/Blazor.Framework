@@ -1,0 +1,71 @@
+﻿.tavenem-framework {
+	display: flex;
+	flex-direction: column;
+	flex: 1 0;
+	height: 100%;
+	width: 100%;
+}
+
+.appbar {
+	display: flex;
+	align-content: center;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 4em;
+	z-index: 1200;
+}
+	.appbar.sticky {
+		position: sticky;
+	}
+	.dense .appbar {
+		min-height: 3em;
+	}
+@media (min-width: 768px) and (orientation: landscape) {
+	.appbar {
+		min-height: 3em;
+	}
+}
+
+.sidedrawer {
+	max-width: 15em;
+	z-index: 1100;
+}
+.sidedrawer.open {
+	height: 100%;
+	transition: width 0ms 400ms;
+}
+.sidedrawer.closed {
+	height: 100%;
+	overflow: hidden;
+	transition: width 0ms 400ms;
+	width: 0;
+}
+.sidedrawer.condensed {
+	width: 3.5em;
+}
+	.sidedrawer.condensed * {
+		overflow: hidden;
+	}
+.bottomdrawer {
+	max-height: 20em;
+	z-index: 1100;
+}
+.bottomdrawer.open {
+	transition: height 0ms 400ms;
+	width: 100%;
+}
+.bottomdrawer.closed {
+	height: 0;
+	overflow: hidden;
+	transition: height 0ms 400ms;
+	width: 100%;
+}
+
+.framework-center {
+	display: flex;
+	flex: 1 0;
+}
+
+main {
+	flex: 1 0;
+}

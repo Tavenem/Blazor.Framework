@@ -1,0 +1,43 @@
+﻿<div class="tavenem-framework @(Dense ? "dense" : null)">
+    <div class="appbar @(AppBarIsSticky ? "sticky" : null)">
+        @AppBar
+    </div>
+    <div class="framework-center">
+        @if (LeftDrawer is not null)
+        {
+            <div class="sidedrawer leftdrawer @(LeftDrawerCondensed ? "condensed" : null) @(LeftDrawerVisible ? "open" : "closed")">
+                @LeftDrawer
+            </div>
+        }
+        <main>
+            @ChildContent
+        </main>
+        @if (RightDrawer is not null)
+        {
+            <div class="sidedrawer rightdrawer @(RightDrawerCondensed ? "condensed" : null) @(RightDrawerVisible ? "open" : "closed")">
+                @RightDrawer
+            </div>
+        }
+    </div>
+    @if (BottomDrawer is not null)
+    {
+        <div class="bottomdrawer @(BottomDrawerVisible ? "open" : "closed")">
+            @BottomDrawer
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? AppBar { get; set; }
+    [Parameter] public bool AppBarIsSticky { get; set; }
+    [Parameter] public RenderFragment? BottomDrawer { get; set; }
+    [Parameter] public bool BottomDrawerVisible { get; set; } = true;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Dense { get; set; }
+    [Parameter] public RenderFragment? LeftDrawer { get; set; }
+    [Parameter] public bool LeftDrawerCondensed { get; set; }
+    [Parameter] public bool LeftDrawerVisible { get; set; } = true;
+    [Parameter] public RenderFragment? RightDrawer { get; set; }
+    [Parameter] public bool RightDrawerCondensed { get; set; }
+    [Parameter] public bool RightDrawerVisible { get; set; } = true;
+}

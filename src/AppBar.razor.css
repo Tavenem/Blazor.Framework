@@ -1,0 +1,11 @@
+﻿.appbar {
+	height: var(--tavenem-toolbar-height);
+}
+	.dense .appbar {
+		height: var(--tavenem-toolbar-height-dense);
+	}
+@media (min-width: 768px) and (orientation: landscape) {
+	.appbar {
+		height: var(--tavenem-toolbar-height-dense);
+	}
+}

@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31911.260
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework", "Tavenem.Blazor.Framework.csproj", "{3096E815-6FC5-4F94-9586-4FBD82201C8B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9A34FBEB-5D77-4DCB-9FE4-190C0F853417}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
+		..\docs\CHANGELOG.md = ..\docs\CHANGELOG.md
+		..\docs\CODE_OF_CONDUCT.md = ..\docs\CODE_OF_CONDUCT.md
+		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
+		..\LICENSE = ..\LICENSE
+		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Docs", "..\docs\docsite\Tavenem.Blazor.Framework.Docs.csproj", "{E7FCBDF3-6FB8-4977-9B7B-614715E0E2AB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3096E815-6FC5-4F94-9586-4FBD82201C8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3096E815-6FC5-4F94-9586-4FBD82201C8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3096E815-6FC5-4F94-9586-4FBD82201C8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3096E815-6FC5-4F94-9586-4FBD82201C8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7FCBDF3-6FB8-4977-9B7B-614715E0E2AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7FCBDF3-6FB8-4977-9B7B-614715E0E2AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7FCBDF3-6FB8-4977-9B7B-614715E0E2AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7FCBDF3-6FB8-4977-9B7B-614715E0E2AB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E2ABEE5-905B-4D05-83E3-71680AC5A75A}
+	EndGlobalSection
+EndGlobal
