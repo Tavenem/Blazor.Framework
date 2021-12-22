@@ -1,14 +1,28 @@
+﻿interface IFramework {
+    _manualColorTheme: boolean;
+    _theme: number;
+}
+
+interface ITavenem {
+    framework: IFramework
+}
+
+declare global {
+    interface Window { tavenem: ITavenem; }
+}
+
 window.tavenem = window.tavenem || {};
 window.tavenem.framework = window.tavenem.framework || {};
 
-export function getPreferredColorScheme() {
+export function getPreferredColorScheme(): number {
     if (window.tavenem.framework._manualColorTheme
         && window.tavenem.framework._theme) {
         return window.tavenem.framework._theme;
     }
 
-    if (localStorage.getItem('tavenem-theme')) {
-        const theme = parseInt(localStorage.getItem('tavenem-theme'));
+    const local = localStorage.getItem('tavenem-theme');
+    if (local) {
+        const theme = parseInt(local);
         if (theme === 1 || theme === 2) {
             return theme;
         }
@@ -25,7 +39,7 @@ export function getPreferredColorScheme() {
     return 1;
 }
 
-export function scrollToId(elementId) {
+export function scrollToId(elementId: string) {
     const element = document.getElementById(elementId);
     if (element instanceof HTMLElement) {
         element.scrollIntoView({
@@ -36,7 +50,7 @@ export function scrollToId(elementId) {
     }
 }
 
-export function setColorScheme(theme, manual) {
+export function setColorScheme(theme: number, manual?: boolean) {
     if (manual) {
         window.tavenem.framework._manualColorTheme = (theme !== 0);
     } else {
@@ -62,9 +76,13 @@ export function setColorScheme(theme, manual) {
     }
 }
 
+function setPreferredColorScheme() {
+    setColorScheme(getPreferredColorScheme());
+}
+
 if (window.matchMedia) {
     const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    colorSchemeQuery.addEventListener('change', setColorScheme(getPreferredColorScheme()));
+    colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
 }
 const currentScheme = getPreferredColorScheme();
 if (currentScheme === 2) {

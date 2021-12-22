@@ -32,7 +32,64 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
+	<PackageReference Include="Microsoft.AspNetCore.ClientAssets" Version="0.1.0-alpha.21528.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.1" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <Content Update="assets\**" Pack="false">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <None Include="tavenem_128.png" Pack="true" PackagePath="\" />
+    <ClientAssetsInputs Remove="assets\package.json" />
+    <ClientAssetsInputs Remove="assets\postcss.config.js" />
+    <ClientAssetsInputs Remove="assets\rollup.config.js" />
+    <ClientAssetsInputs Remove="assets\tavenem-framework.ts" />
+    <ClientAssetsInputs Remove="assets\tsconfig.json" />
+    <Content Include="assets\sass\framework.scss" />
+    <ScssFiles Include="assets\**\*.scss"></ScssFiles>
+  </ItemGroup>
+	
+  <PropertyGroup>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <ClientAssetsBuildOutputParameter>-d</ClientAssetsBuildOutputParameter>
+  </PropertyGroup>
+	
+  <Target Name="SassBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+    <PropertyGroup>
+      <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
+      <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))/</_SassOutputFullPath>
+      <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>
+    </PropertyGroup>
+    <MakeDir Directories="$(_SassOutputFolderPath)" />
+    <MakeDir Directories="$(_CssOutputFullPath)" />
+
+    <Message Importance="high" Text="Running npm run sass..." />
+    <Exec Command="npm run sass -- $(_SassOutputFullPath)" WorkingDirectory="assets\" />
+
+    <Message Importance="high" Text="Running npm run postcss..." />
+    <Exec Command="npm run postcss -- -d $(_CssOutputFullPath)" WorkingDirectory="$(_SassOutputFolderPath)" />
+
+    <ItemGroup>
+      <_CssBuildOutput Include="$(IntermediateOutputPath)css\**"></_CssBuildOutput>
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)stylebuild.complete.txt" Lines="@(_CssBuildOutput)" />
+  </Target>
+  
+  <Target Name="DefineCssAssets" AfterTargets="SassBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <FileWrites Include="@(_CssBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />
+      
+      <Content Condition="'$(TargetFramework)' != 'net6.0'" Include="@(_CssBuildOutput)" Link="wwwroot\%(_CssBuildOutput.RecursiveDir)\%(_CssBuildOutput.FileName)%(_CssBuildOutput.Extension)" />
+    </ItemGroup>
+    
+    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'" CandidateAssets="@(_CssBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_CssOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
+  </Target>
 
 </Project>
