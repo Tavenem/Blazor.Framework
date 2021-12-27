@@ -1,0 +1,297 @@
+﻿:root {
+    --tavenem-font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --tavenem-font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --tavenem-font-size-h1: 3rem;
+    --tavenem-font-size-h2: 2.5rem;
+    --tavenem-font-size-h3: 2rem;
+    --tavenem-font-size-h4: 1.75rem;
+    --tavenem-font-size-h5: 1.5rem;
+    --tavenem-font-size-h6: 1.25rem;
+    --tavenem-font-size-sm: .875rem;
+    --tavenem-font-size-subsup: .75rem;
+    --tavenem-font-weight: 400;
+    --tavenem-font-weight-bold: 700;
+    --tavenem-lineheight-body: 1.5;
+    --tavenem-lineheight-heading: 1.2;
+    --tavenem-dark-color-bg: #32333d;
+    --tavenem-dark-color-bg-alt: #22232a;
+    --tavenem-dark-color-bg-input: #121316;
+    --tavenem-dark-color-divider: #ffffff1e;
+    --tavenem-dark-color-overlay: rgba(255,255,255,0.5);
+    --tavenem-dark-color-text: #ffffffb2;
+    --tavenem-dark-color-text-secondary: #ffffff7f;
+    --tavenem-dark-color-text-disabled: #ffffff33;
+    --tavenem-dark-color-border: #ffffff1e;
+    --tavenem-dark-color-border-input: #ffffff4c;
+    --tavenem-dark-color-border-table: #ffffff1e;
+    --tavenem-dark-color-yellow-bg: #a82;
+    --tavenem-dark-color-secondary: #585f63;
+    --tavenem-dark-color-secondary-dim: #373c3e;
+    --tavenem-dark-color-secondary-darken: #484e51;
+    --tavenem-dark-color-secondary-lighten: #697277;
+    --tavenem-dark-color-dark: #27272f;
+    --tavenem-dark-color-dark-dim: #070708;
+    --tavenem-dark-color-dark-darken: #17171c;
+    --tavenem-dark-color-dark-lighten: #383843;
+    --tavenem-light-color-bg: white;
+    --tavenem-light-color-bg-alt: #ebebeb;
+    --tavenem-light-color-bg-input: white;
+    --tavenem-light-color-divider: #e0e0e0;
+    --tavenem-light-color-overlay: rgba(33,33,33,0.5);
+    --tavenem-light-color-text: #424242;
+    --tavenem-light-color-text-secondary: #00000089;
+    --tavenem-light-color-text-disabled: #00000060;
+    --tavenem-light-color-border: #0000001e;
+    --tavenem-light-color-border-input: #bdbdbd;
+    --tavenem-light-color-border-table: #e0e0e0;
+    --tavenem-light-color-table-hover: #0000000a;
+    --tavenem-light-color-table-stripe: #00000005;
+    --tavenem-light-color-yellow-bg: #fcf8e3;
+    --tavenem-light-color-secondary: #6c757d;
+    --tavenem-light-color-secondary-dim: #4c5257;
+    --tavenem-light-color-secondary-darken: #5c646a;
+    --tavenem-light-color-secondary-lighten: #7f8890;
+    --tavenem-light-color-secondary-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-dark: #424242;
+    --tavenem-light-color-dark-dim: #1f1f1f;
+    --tavenem-light-color-dark-darken: #303030;
+    --tavenem-light-color-dark-lighten: #545454;
+    --tavenem-light-color-dark-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-keyboard: var(--tavenem-light-color-text);
+    --tavenem-dark-color-keyboard-bg: rgba(255,255,255,.1);
+    --tavenem-light-color-keyboard: var(--tavenem-dark-color-text);
+    --tavenem-light-color-keyboard-bg: var(--tavenem-dark-color-bg);
+    --tavenem-color-bg: var(--tavenem-light-color-bg);
+    --tavenem-color-bg-alt: var(--tavenem-light-color-bg-alt);
+    --tavenem-color-bg-input: var(--tavenem-light-color-bg-input);
+    --tavenem-color-divider: var(--tavenem-light-color-divider);
+    --tavenem-color-overlay: var(--tavenem-light-color-overlay);
+    --tavenem-color-text: var(--tavenem-light-color-text);
+    --tavenem-color-text-secondary: var(--tavenem-light-color-text-secondary);
+    --tavenem-color-text-disabled: var(--tavenem-light-color-text-disabled);
+    --tavenem-color-border: var(--tavenem-light-color-border);
+    --tavenem-color-border-input: var(--tavenem-light-color-border-input);
+    --tavenem-color-border-table: var(--tavenem-light-color-border-table);
+    --tavenem-color-table-hover: var(--tavenem-light-color-table-hover);
+    --tavenem-color-table-stripe: var(--tavenem-light-color-table-stripe);
+    --tavenem-color-yellow-bg: var(--tavenem-light-color-yellow-bg);
+    --tavenem-color-keyboard: var(--tavenem-light-color-keyboard);
+    --tavenem-color-keyboard-bg: var(--tavenem-light-color-keyboard-bg);
+    --tavenem-color-primary: #964be2;
+    --tavenem-color-primary-dim: #7324c2;
+    --tavenem-color-primary-darken: #852cdd;
+    --tavenem-color-primary-lighten: #a86ae7;
+    --tavenem-color-primary-text: var(--tavenem-dark-color-text);
+    --tavenem-color-secondary: var(--tavenem-light-color-secondary);
+    --tavenem-color-secondary-dim: var(--tavenem-light-color-secondary-dim);
+    --tavenem-color-secondary-darken: var(--tavenem-light-color-secondary-darken);
+    --tavenem-color-secondary-lighten: var(--tavenem-light-color-secondary-lighten);
+    --tavenem-color-secondary-text: var(--tavenem-light-color-secondary-text);
+    --tavenem-color-tertiary: #1ec8a5;
+    --tavenem-color-tertiary-dim: #198670;
+    --tavenem-color-tertiary-darken: #19a98c;
+    --tavenem-color-tertiary-lighten: #2adfbb;
+    --tavenem-color-tertiary-text: var(--tavenem-dark-color-text);
+    --tavenem-color-danger: #f44336;
+    --tavenem-color-danger-dim: #be2d23;
+    --tavenem-color-danger-darken: #f32112;
+    --tavenem-color-danger-lighten: #f66055;
+    --tavenem-color-danger-text: var(--tavenem-dark-color-text);
+    --tavenem-color-dark: var(--tavenem-light-color-dark);
+    --tavenem-color-dark-dim: var(--tavenem-light-color-dark-dim);
+    --tavenem-color-dark-darken: var(--tavenem-light-color-dark-darken);
+    --tavenem-color-dark-lighten: var(--tavenem-light-color-dark-lighten);
+    --tavenem-color-dark-text: var(--tavenem-light-color-dark-text);
+    --tavenem-color-info: #2196f3;
+    --tavenem-color-info-dim: #206dac;
+    --tavenem-color-info-darken: #0c83e4;
+    --tavenem-color-info-lighten: #42a5f5;
+    --tavenem-color-info-text: var(--tavenem-dark-color-text);
+    --tavenem-color-success: #00c853;
+    --tavenem-color-success-dim: #146c38;
+    --tavenem-color-success-darken: #00a344;
+    --tavenem-color-success-lighten: #00eb62;
+    --tavenem-color-success-text: var(--tavenem-dark-color-text);
+    --tavenem-color-warning: #ff9800;
+    --tavenem-color-warning-dim: #9b681c;
+    --tavenem-color-warning-darken: #db8400;
+    --tavenem-color-warning-lighten: #ffa724;
+    --tavenem-color-warning-text: var(--tavenem-dark-color-text);
+    --tavenem-shadow-1: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
+    --tavenem-shadow-2: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
+    --tavenem-shadow-3: 0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12);
+    --tavenem-shadow-4: 0px 8px 10px -5px rgba(0,0,0,0.2),0px 16px 24px 2px rgba(0,0,0,0.14),0px 6px 30px 5px rgba(0,0,0,0.12);
+    --tavenem-shadow-5: 0px 10px 13px -6px rgba(0,0,0,0.2),0px 20px 31px 3px rgba(0,0,0,0.14),0px 8px 38px 7px rgba(0,0,0,0.12);
+    --tavenem-shadow-inset: inset 0 1px 2px rgba(0,0,0,0.075);
+    --tavenem-border-radius: 4px;
+    --tavenem-zindex-dialog: 1300;
+    --tavenem-zindex-snackbar: 1400;
+    --tavenem-zindex-tooltip: 1500;
+}
+
+[data-theme="dark"] {
+    --tavenem-color-bg: var(--tavenem-dark-color-bg);
+    --tavenem-color-bg-alt: var(--tavenem-dark-color-bg-alt);
+    --tavenem-color-bg-input: var(--tavenem-dark-color-bg-input);
+    --tavenem-color-divider: var(--tavenem-dark-color-divider);
+    --tavenem-color-overlay: var(--tavenem-dark-color-overlay);
+    --tavenem-color-text: var(--tavenem-dark-color-text);
+    --tavenem-color-text-secondary: var(--tavenem-dark-color-text-secondary);
+    --tavenem-color-text-disabled: var(--tavenem-dark-color-text-disabled);
+    --tavenem-color-border: var(--tavenem-dark-color-border);
+    --tavenem-color-border-input: var(--tavenem-dark-color-border-input);
+    --tavenem-color-border-table: var(--tavenem-dark-color-border-table);
+    --tavenem-color-yellow-bg: var(--tavenem-dark-color-yellow-bg);
+    --tavenem-color-keyboard: var(--tavenem-dark-color-keyboard);
+    --tavenem-color-keyboard-bg: var(--tavenem-dark-color-keyboard-bg);
+    --tavenem-color-secondary: var(--tavenem-dark-color-secondary);
+    --tavenem-color-secondary-dim: var(--tavenem-dark-color-secondary-dim);
+    --tavenem-color-secondary-darken: var(--tavenem-dark-color-secondary-darken);
+    --tavenem-color-secondary-lighten: var(--tavenem-dark-color-secondary-lighten);
+    --tavenem-color-dark: var(--tavenem-dark-color-dark);
+    --tavenem-color-dark-dim: var(--tavenem-dark-color-dark-dim);
+    --tavenem-color-dark-darken: var(--tavenem-dark-color-dark-darken);
+    --tavenem-color-dark-lighten: var(--tavenem-dark-color-dark-lighten);
+}
+
+$breakpoints: (
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1200px,
+	xxl: 1400px
+);
+
+$theme-colors: (
+    primary,
+    secondary,
+    tertiary,
+    danger,
+    dark,
+    info,
+    success,
+    warning
+);
+
+$ratios: (
+    1x1: 100%,
+    4x3: 75%,
+    16x9: 56.25%,
+    21x9: calc(9 / 21 * 100%)
+);
+
+$sides: (
+    bottom,
+    left,
+    right,
+    top
+);
+
+$display-values: (
+	block,
+	flex,
+	grid,
+	inline,
+	inline-block,
+	inline-flex,
+	none,
+	table,
+	table-cell,
+	table-row,
+);
+
+$dimension-values: (
+    25: 25%,
+    33: 33%,
+    50: 50%,
+    67: 67%,
+    75: 75%,
+    100: 100%,
+    auto: auto
+);
+
+$flex-directions: (
+    column,
+    column-reverse,
+    row,
+    row-reverse
+);
+
+$align-content-values: (
+    center,
+    end,
+    start,
+    space-around,
+    space-between,
+    stretch,
+);
+
+$align-items-values: (
+    baseline,
+    center,
+    end,
+    start,
+    stretch
+);
+
+$align-self-values: (
+    baseline,
+    center,
+    end,
+    start,
+    stretch
+);
+
+$flex-wrap-values: (
+    nowrap,
+    wrap,
+    wrap-reverse
+);
+
+$justify-content-values: (
+    center,
+    end,
+    space-around,
+    space-between,
+    space-evenly,
+    start
+);
+
+$order-values: (
+    first: -1,
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+    9: 9,
+    10: 10,
+    last: 999
+);
+
+$positive-spacers: (
+    0: 0,
+    1: .25rem,
+    2: .5rem,
+    3: 1rem,
+    4: 1.5rem,
+    5: 3rem
+);
+$spacers: map-merge($positive-spacers, (
+    n1: -.25rem,
+    n2: -0.5rem,
+    n3: -1rem,
+    n4: -1.5rem,
+    n5: -3rem
+));
+$spacers-and-auto: map-merge($spacers, (auto: auto));
+
+$text-alignments: (
+    center,
+    end,
+    start
+);

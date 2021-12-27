@@ -91,5 +91,38 @@
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_variables.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ScssFiles Remove="assets\sass\_blazor.scss" />
+    <ScssFiles Remove="assets\sass\_layout.scss" />
+    <ScssFiles Remove="assets\sass\_reset.scss" />
+    <ScssFiles Remove="assets\sass\_theme.scss" />
+    <ScssFiles Remove="assets\sass\_utilities.scss" />
+    <ScssFiles Remove="assets\sass\_variables.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_reset.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_layout.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_theme.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_utilities.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_blazor.scss" />
+  </ItemGroup>
 
 </Project>

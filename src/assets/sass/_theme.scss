@@ -1,0 +1,45 @@
+﻿html, body {
+    border-color: var(--tavenem-color-border);
+}
+
+@each $theme in $theme-colors {
+    .link-#{$theme} {
+        color: var(--tavenem-color-#{$theme});
+
+        &:hover,
+        &:focus {
+            color: var(--tavenem-color-#{$theme}-lighten);
+        }
+    }
+
+    .#{$theme} {
+        background-color: var(--tavenem-color-#{$theme});
+        color: var(--tavenem-color-primary-text);
+    }
+
+    .#{$theme}.darken {
+        background-color: var(--tavenem-color-#{$theme}-darken);
+        color: var(--tavenem-color-#{$theme}-text);
+    }
+
+    .#{$theme}.lighten {
+        background-color: var(--tavenem-color-#{$theme}-lighten);
+        color: var(--tavenem-color-#{$theme}-text);
+    }
+
+    .#{$theme}-text {
+        color: var(--tavenem-color-#{$theme});
+    }
+
+    .panel.#{$theme} {
+        background-color: var(--tavenem-color-#{$theme}-dim);
+    }
+
+    .border-#{$theme} {
+        border-color: var(--tavenem-color-#{$theme}) !important;
+    }
+}
+
+.bg-alt {
+    background-color: var(--tavenem-color-bg-alt);
+}

@@ -1,0 +1,576 @@
+﻿.codeblock {
+    background-color: var(--tavenem-color-dark-dim);
+    border-radius: var(--tavenem-border-radius);
+    color: var(--tavenem-color-dark-text);
+    height: 100%;
+    overflow: auto;
+    padding: 1rem;
+}
+
+.input-readonly-text {
+    background-color: transparent;
+    border: solid transparent;
+    border-width: 1px 0;
+    display: block;
+    margin-bottom: 0;
+    padding: .375rem 0;
+}
+
+.initialism {
+    font-size: .875rem;
+    text-transform: uppercase;
+}
+
+.blockquote {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+}
+
+.blockquote-footer {
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+    font-size: .875rem;
+    color: var(--tavenem-color-text-secondary);
+
+    &::before {
+        content: "\2014\00A0"; // em dash, nbsp
+    }
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+.clearfix::after {
+    display: block;
+    clear: both;
+    content: "";
+}
+
+@each $ratio, $padding in $ratios {
+    .ratio-#{$ratio} {
+        position: relative;
+        width: 100%;
+
+        &::before {
+            display: block;
+            padding-top: $padding;
+            content: "";
+        }
+
+        > * {
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
+    }
+}
+
+.fixed-bottom {
+    position: fixed;
+    bottom: 0;
+    z-index: 1204;
+}
+
+.fixed-top {
+    position: fixed;
+    top: 0;
+    z-index: 1205;
+}
+
+.sticky-bottom {
+    bottom: 0;
+    position: sticky;
+    z-index: 1202;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1203;
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .sticky-#{$breakpoint}-bottom {
+            bottom: 0;
+            position: sticky;
+            z-index: 1200;
+        }
+
+        .sticky-#{$breakpoint}-top {
+            position: sticky;
+            top: 0;
+            z-index: 1201;
+        }
+    }
+}
+
+.visually-hidden,
+.visually-hidden-focusable:not(:focus):not(:focus-within) {
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    white-space: nowrap !important;
+    width: 1px !important;
+}
+
+.stretched-link::after {
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vr {
+    align-self: stretch;
+    background-color: currentcolor;
+    display: inline-block;
+    min-height: 1rem;
+    opacity: .25;
+    width: 1px;
+}
+
+.float-end {
+    float: right;
+
+    *[dir="rtl"] & {
+        float: left;
+    }
+}
+
+.float-none {
+    float: none;
+}
+
+.float-start {
+    float: left;
+
+    *[dir="rtl"] & {
+        float: right;
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .float-#{$breakpoint}-end {
+            float: right;
+
+            *[dir="rtl"] & {
+                float: left;
+            }
+        }
+
+        .float-#{$breakpoint}-none {
+            float: none;
+        }
+
+        .float-#{$breakpoint}-start {
+            float: left;
+
+            *[dir="rtl"] & {
+                float: right;
+            }
+        }
+    }
+}
+
+@mixin generate-utility($prefix, $property, $map, $rtl: null) {
+    @if type-of(nth($map, 1)) != "list" {
+        $map: zip($map, $map);
+    }
+
+    @if $prefix != "" {
+        $prefix: $prefix + "-";
+    }
+
+    @each $key, $value in $map {
+        .#{$prefix}#{$key} {
+            #{$property}: $value !important;
+        }
+    }
+
+    @each $breakpoint, $min-width in $breakpoints {
+        @media (min-width: $min-width) {
+            @each $key, $value in $map {
+                $prop: $prefix + $breakpoint + "-" + $key;
+
+                @if $prefix == "" {
+                    $prop: $key + "-" + $breakpoint;
+                }
+
+                .#{$prop} {
+                    #{$property}: $value !important;
+                }
+            }
+        }
+    }
+
+    @if $rtl != null {
+        @each $key, $value in $map {
+            *[dir="rtl"] .#{$prefix}#{$key} {
+                #{$property}: unset !important;
+                #{$rtl}: $value !important;
+            }
+        }
+
+        @each $breakpoint, $min-width in $breakpoints {
+            @media (min-width: $min-width) {
+                @each $key, $value in $map {
+                    $prop: $prefix + $breakpoint + "-" + $key;
+
+                    @if $prefix == "" {
+                        $prop: $key + "-" + $breakpoint;
+                    }
+
+                    *[dir="rtl"] .#{$prop} {
+                        #{$property}: unset !important;
+                        #{$rtl}: $value !important;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@include generate-utility("d", display, $display-values);
+
+@media print {
+    .d-print-block {
+        display: block !important;
+    }
+
+    .d-print-flex {
+        display: flex !important;
+    }
+
+    .d-print-grid {
+        display: grid !important;
+    }
+
+    .d-print-inline {
+        display: inline !important;
+    }
+
+    .d-print-inline-block {
+        display: inline-block !important;
+    }
+
+    .d-print-inline-flex {
+        display: inline-flex !important;
+    }
+
+    .d-print-none {
+        display: none !important;
+    }
+
+    .d-print-table {
+        display: table !important;
+    }
+
+    .d-print-table-cell {
+        display: table-cell !important;
+    }
+
+    .d-print-table-row {
+        display: table-row !important;
+    }
+}
+
+.border {
+    border-color: var(--tavenem-color-border) !important;
+    border-style: solid !important;
+    border-width: 1px !important;
+}
+
+.border-0 {
+    border: 0 !important;
+}
+
+@each $side in $sides {
+    .border-#{$side} {
+        border-#{$side}-color: var(--tavenem-color-border) !important;
+        border-#{$side}-style: solid !important;
+        border-#{$side}-width: 1px !important;
+    }
+
+    .border-#{$side}-0 {
+        border-#{$side}: 0 !important;
+    }
+}
+
+@include generate-utility("w", width, $dimension-values);
+@include generate-utility("h", height, $dimension-values);
+
+.mw-100 {
+    max-width: 100% !important;
+}
+
+.mh-100 {
+    max-height: 100% !important;
+}
+
+.vw-100 {
+    width: 100vw !important;
+}
+
+.vh-100 {
+    height: 100vh !important;
+}
+
+.min-vw-100 {
+    min-width: 100vw !important;
+}
+
+.min-vh-100 {
+    min-height: 100vh !important;
+}
+
+.flex-fill {
+    flex: 1 1 auto !important;
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .flex-#{$breakpoint}-fill {
+            flex: 1 1 auto !important;
+        }
+    }
+}
+
+@include generate-utility("flex", flex-direction, $flex-directions);
+
+@for $i from 0 through 5 {
+    .flex-grow-#{$i} {
+        flex-grow: $i !important;
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        @for $i from 0 through 5 {
+            .flex-#{$breakpoint}-grow-#{$i} {
+                flex-grow: $i !important;
+            }
+        }
+    }
+}
+
+.flex-shrink-0 {
+    flex-shrink: 0 !important;
+}
+
+.flex-shrink-1 {
+    flex-shrink: 1 !important;
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .flex-#{$breakpoint}-shrink-0 {
+            flex-shrink: 0 !important;
+        }
+
+        .flex-#{$breakpoint}-shrink-1 {
+            flex-shrink: 1 !important;
+        }
+    }
+}
+
+@include generate-utility("", align-content, $align-content-values);
+@include generate-utility("", align-items, $align-items-values);
+@include generate-utility("", align-self, $align-self-values);
+@include generate-utility("flex", flex-wrap, $flex-wrap-values);
+@include generate-utility("", justify-content, $justify-content-values);
+@include generate-utility("order", order, $order-values);
+
+@include generate-utility("gap", gap, $positive-spacers);
+
+@include generate-utility("m", margin, $spacers-and-auto);
+@include generate-utility("mb", margin-bottom, $spacers-and-auto);
+@include generate-utility("mt", margin-top, $spacers-and-auto);
+
+@include generate-utility("me", margin-right, $spacers-and-auto, margin-left);
+@include generate-utility("ms", margin-left, $spacers-and-auto, margin-right);
+
+@each $key, $value in $spacers-and-auto {
+    .mx-#{$key} {
+        margin-left: $value !important;
+        margin-right: $value !important;
+    }
+
+    .my-#{$key} {
+        margin-bottom: $value !important;
+        margin-top: $value !important;
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        @each $key, $value in $map {
+            .mx-#{$breakpoint}-#{$key} {
+                margin-left: $value !important;
+                margin-right: $value !important;
+            }
+
+            .my-#{$breakpoint}-#{$key} {
+                margin-bottom: $value !important;
+                margin-top: $value !important;
+            }
+        }
+    }
+}
+
+@include generate-utility("p", padding, $spacers);
+@include generate-utility("pb", padding-bottom, $spacers);
+@include generate-utility("pt", padding-top, $spacers);
+
+@include generate-utility("pe", padding-right, $spacers, padding-left);
+@include generate-utility("ps", padding-left, $spacers, padding-right);
+
+@each $key, $value in $spacers {
+    .px-#{$key} {
+        padding-left: $value !important;
+        padding-right: $value !important;
+    }
+
+    .py-#{$key} {
+        padding-bottom: $value !important;
+        padding-top: $value !important;
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        @each $key, $value in $map {
+            .px-#{$breakpoint}-#{$key} {
+                padding-left: $value !important;
+                padding-right: $value !important;
+            }
+
+            .py-#{$breakpoint}-#{$key} {
+                padding-bottom: $value !important;
+                padding-top: $value !important;
+            }
+        }
+    }
+}
+
+.font-monospace {
+    font-family: var(--tavenem-font-family-monospace);
+}
+
+@include generate-utility("text", text-align, $text-alignments);
+
+.text-wrap {
+    white-space: normal !important;
+}
+
+.text-nowrap {
+    white-space: nowrap !important;
+}
+
+.text-break {
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+}
+
+*[dir="rtl"] .text-break {
+    word-wrap: unset !important;
+    word-break: unset !important;
+}
+
+.user-select-all {
+    -moz-user-select: all !important;
+    -webkit-user-select: all !important;
+    user-select: all !important;
+}
+
+.user-select-auto {
+    -moz-user-select: auto !important;
+    -webkit-user-select: auto !important;
+    user-select: auto !important;
+}
+
+.user-select-none {
+    -moz-user-select: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+}
+
+.rounded {
+    border-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-bottom {
+    border-bottom-left-radius: var(--tavenem-border-radius) !important;
+    border-bottom-right-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-left {
+    border-bottom-left-radius: var(--tavenem-border-radius) !important;
+    border-top-left-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-right {
+    border-bottom-right-radius: var(--tavenem-border-radius) !important;
+    border-top-right-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-top {
+    border-top-left-radius: var(--tavenem-border-radius) !important;
+    border-top-right-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-circle {
+    border-radius: 50% !important;
+}
+
+.rounded-pill {
+    border-radius: 9999px !important;
+}
+
+.transparent {
+    background-color: transparent !important;
+}
+
+.text-muted {
+    color: var(--tavenem-color-text-secondary);
+}
+
+.text-disabled {
+    color: var(--tavenem-color-text-disabled);
+}
+
+.text-reset {
+    color: inherit !important;
+}
+
+.elevation-0 {
+    box-shadow: none;
+}
+
+@for $i from 1 through 5 {
+    .elevation-#{$i} {
+        box-shadow: var(--tavenem-shadow-#{$i});
+    }
+}

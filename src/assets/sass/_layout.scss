@@ -1,0 +1,103 @@
+﻿.full-width {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+}
+
+.container,
+.container-fixed {
+    align-self: stretch;
+    column-gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 0%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    row-gap: 0;
+    width: 100%;
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .container-#{$breakpoint} {
+            @extend .container;
+            width: $min-width;
+        }
+
+        .container-fixed {
+            max-width: $min-width;
+        }
+    }
+}
+
+.row {
+    align-items: stretch;
+    align-self: stretch;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 0 1.5rem;
+
+    > * {
+        flex-shrink: 0;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    &.fill > * {
+        flex: 1 0 0%;
+    }
+}
+
+.col-auto {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .col-#{$breakpoint}-auto {
+            flex: 0 0 auto;
+            width: auto;
+        }
+    }
+}
+
+@for $i from 1 through 12 {
+    .row.cols-#{$i} {
+        > * {
+            flex: 0 0 auto;
+            width: calc(1 / $i * 100%);
+        }
+    }
+
+    .col-#{$i} {
+        flex: 0 0 auto;
+        width: calc(12 / $i * 100%);
+    }
+
+    .offset-#{$i} {
+        margin-left: calc($i / 12 * 100%);
+    }
+
+    @each $breakpoint, $min-width in $breakpoints {
+        @media (min-width: $min-width) {
+            .row.cols-#{$breakpoint}-#{$i} {
+                > * {
+                    flex: 0 0 auto;
+                    width: calc(1 / $i * 100%);
+                }
+            }
+
+            .col-#{$breakpoint}-#{$i} {
+                flex: 0 0 auto;
+                width: calc(12 / $i * 100%);
+            }
+
+            .offset-#{$breakpoint}-#{$i} {
+                margin-left: calc($i / 12 * 100%);
+            }
+        }
+    }
+}

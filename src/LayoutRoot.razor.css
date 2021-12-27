@@ -12,7 +12,7 @@
 	align-items: center;
 	justify-content: space-between;
 	min-height: 4em;
-	z-index: 1200;
+	z-index: 1206;
 }
 	.appbar.sticky {
 		position: sticky;
