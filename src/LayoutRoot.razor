@@ -19,6 +19,9 @@
             </div>
         }
     </div>
+    <div class="appbar @(AppBarBottomIsSticky ? "sticky" : null)">
+        @AppBarBottom
+    </div>
     @if (BottomDrawer is not null)
     {
         <div class="bottomdrawer @(BottomDrawerVisible ? "open" : "closed")">
@@ -29,6 +32,8 @@
 
 @code {
     [Parameter] public RenderFragment? AppBar { get; set; }
+    [Parameter] public RenderFragment? AppBarBottom { get; set; }
+    [Parameter] public bool AppBarBottomIsSticky { get; set; }
     [Parameter] public bool AppBarIsSticky { get; set; }
     [Parameter] public RenderFragment? BottomDrawer { get; set; }
     [Parameter] public bool BottomDrawerVisible { get; set; } = true;

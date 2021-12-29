@@ -1,0 +1,26 @@
+﻿.breadcrumbs {
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 1rem .75rem;
+    list-style: none;
+
+    li {
+        color: var(--tavenem-color-text);
+
+        + li {
+            padding-left: .75rem;
+
+            &::before {
+                float: left;
+                padding-right: .75rem;
+                content: var(--tavenem-breadcrumb-divider);
+            }
+        }
+
+        &.current {
+            color: var(--tavenem-color-text-secondary);
+        }
+    }
+}

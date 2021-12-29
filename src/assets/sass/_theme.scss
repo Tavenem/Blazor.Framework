@@ -14,7 +14,7 @@
 
     .#{$theme} {
         background-color: var(--tavenem-color-#{$theme});
-        color: var(--tavenem-color-primary-text);
+        color: var(--tavenem-color-#{$theme}-text);
     }
 
     .#{$theme}.darken {
@@ -25,6 +25,16 @@
     .#{$theme}.lighten {
         background-color: var(--tavenem-color-#{$theme}-lighten);
         color: var(--tavenem-color-#{$theme}-text);
+    }
+
+    .#{$theme}.filled {
+        background-color: var(--tavenem-color-#{$theme}) !important;
+        color: var(--tavenem-color-#{$theme}-text) !important;
+    }
+
+    .#{$theme}.outlined {
+        border-color: var(--tavenem-color-#{$theme}-darken);
+        color: unset;
     }
 
     .#{$theme}-text {
@@ -38,6 +48,17 @@
     .border-#{$theme} {
         border-color: var(--tavenem-color-#{$theme}) !important;
     }
+}
+
+.filled {
+    background-color: var(--tavenem-color-dark);
+    color: var(--tavenem-color-dark-text);
+    font-weight: var(--tavenem-font-weight-bold);
+}
+
+.outlined {
+    background-color: transparent !important;
+    border: 1px solid var(--tavenem-color-border);
 }
 
 .bg-alt {

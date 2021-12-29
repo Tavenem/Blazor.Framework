@@ -1,0 +1,78 @@
+﻿.avatar {
+    align-items: center;
+    background-color: var(--tavenem-color-dark-dim);
+    border-radius: 50%;
+    color: var(--tavenem-color-dark-text);
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    height: 2.5rem;
+    justify-content: center;
+    line-height: 1;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+    width: 2.5rem;
+
+    &.small {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: .875rem;
+    }
+
+    &.large {
+        width: 3.5rem;
+        height: 3.5rem;
+        font-size: 1.75rem;
+    }
+
+    img {
+        color: transparent;
+        height: 100%;
+        object-fit: cover;
+        text-align: center;
+        text-indent: 10000px;
+        width: 100%;
+    }
+}
+
+.avatar-group {
+    display: flex;
+
+    .avatar {
+        border: 2px solid transparent;
+        width: 2.75rem;
+        margin-inline-start: .75rem;
+        height: 2.75rem;
+
+        &:first-child {
+            margin-inline-start: 0px !important;
+        }
+
+        &.small {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+
+        &.large {
+            width: 3.75rem;
+            height: 3.75rem;
+        }
+    }
+
+    &.outlined {
+        border: 0;
+
+        .avatar {
+            background-color: transparent !important;
+            border: 2px solid var(--tavenem-color-border);
+        }
+
+        @each $theme in $theme-colors {
+            &.#{$theme} .avatar:not(.outlined) {
+                border-color: var(--tavenem-color-#{$theme}-darken);
+                color: unset;
+            }
+        }
+    }
+}

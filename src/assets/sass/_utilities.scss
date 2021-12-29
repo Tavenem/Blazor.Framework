@@ -152,50 +152,50 @@
 }
 
 .float-end {
-    float: right;
+    float: inline-end;
+}
 
-    *[dir="rtl"] & {
-        float: left;
-    }
+.float-left {
+    float: left;
 }
 
 .float-none {
     float: none;
 }
 
-.float-start {
-    float: left;
+.float-right {
+    float: right;
+}
 
-    *[dir="rtl"] & {
-        float: right;
-    }
+.float-start {
+    float: inline-start;
 }
 
 @each $breakpoint, $min-width in $breakpoints {
     @media (min-width: $min-width) {
         .float-#{$breakpoint}-end {
-            float: right;
+            float: inline-end;
+        }
 
-            *[dir="rtl"] & {
-                float: left;
-            }
+        .float-#{$breakpoint}-left {
+            float: left;
         }
 
         .float-#{$breakpoint}-none {
             float: none;
         }
 
-        .float-#{$breakpoint}-start {
-            float: left;
+        .float-#{$breakpoint}-right {
+            float: right;
+        }
 
-            *[dir="rtl"] & {
-                float: right;
-            }
+        .float-#{$breakpoint}-start {
+            float: inline-start;
         }
     }
 }
 
-@mixin generate-utility($prefix, $property, $map, $rtl: null) {
+@mixin generate-utility($prefix, $property, $map) {
     @if type-of(nth($map, 1)) != "list" {
         $map: zip($map, $map);
     }
@@ -221,32 +221,6 @@
 
                 .#{$prop} {
                     #{$property}: $value !important;
-                }
-            }
-        }
-    }
-
-    @if $rtl != null {
-        @each $key, $value in $map {
-            *[dir="rtl"] .#{$prefix}#{$key} {
-                #{$property}: unset !important;
-                #{$rtl}: $value !important;
-            }
-        }
-
-        @each $breakpoint, $min-width in $breakpoints {
-            @media (min-width: $min-width) {
-                @each $key, $value in $map {
-                    $prop: $prefix + $breakpoint + "-" + $key;
-
-                    @if $prefix == "" {
-                        $prop: $key + "-" + $breakpoint;
-                    }
-
-                    *[dir="rtl"] .#{$prop} {
-                        #{$property}: unset !important;
-                        #{$rtl}: $value !important;
-                    }
                 }
             }
         }
@@ -409,8 +383,10 @@
 @include generate-utility("mb", margin-bottom, $spacers-and-auto);
 @include generate-utility("mt", margin-top, $spacers-and-auto);
 
-@include generate-utility("me", margin-right, $spacers-and-auto, margin-left);
-@include generate-utility("ms", margin-left, $spacers-and-auto, margin-right);
+@include generate-utility("me", margin-inline-end, $spacers-and-auto);
+@include generate-utility("ml", margin-left, $spacers-and-auto);
+@include generate-utility("mr", margin-right, $spacers-and-auto);
+@include generate-utility("ms", margin-inline-start, $spacers-and-auto);
 
 @each $key, $value in $spacers-and-auto {
     .mx-#{$key} {
@@ -444,8 +420,10 @@
 @include generate-utility("pb", padding-bottom, $spacers);
 @include generate-utility("pt", padding-top, $spacers);
 
-@include generate-utility("pe", padding-right, $spacers, padding-left);
-@include generate-utility("ps", padding-left, $spacers, padding-right);
+@include generate-utility("pe", padding-inline-end, $spacers);
+@include generate-utility("pl", padding-left, $spacers);
+@include generate-utility("pr", padding-right, $spacers);
+@include generate-utility("ps", padding-inline-start, $spacers);
 
 @each $key, $value in $spacers {
     .px-#{$key} {
@@ -515,6 +493,10 @@
     -moz-user-select: none !important;
     -webkit-user-select: none !important;
     user-select: none !important;
+}
+
+.square {
+    border-radius: 0 !important;
 }
 
 .rounded {

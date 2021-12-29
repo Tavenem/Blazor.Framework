@@ -1,0 +1,44 @@
+﻿@mixin button {
+    align-items: center;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    margin: 0;
+    outline: 0;
+    padding: 0;
+    position: relative;
+    text-decoration: none;
+    user-select: none;
+    vertical-align: middle;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &::-moz-focus-inner {
+        border-style: none;
+    }
+
+    &:disabled {
+        color: var(--tavenem-color-text-disabled) !important;
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+.btn {
+    @include button();
+    border-radius: var(--tavenem-border-radius);
+    box-sizing: border-box;
+    color: var(--tavenem-color-text);
+    font-size: var(--tavenem-font-size-button);
+    font-weight: var(--tavenem-font-weight-button);
+    line-height: var(--tavenem-lineheight-button);
+    min-width: 4rem;
+    padding: .375rem 1rem;
+    text-transform: var(--tavenem-texttransform-button);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}

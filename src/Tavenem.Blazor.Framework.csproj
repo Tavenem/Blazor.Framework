@@ -97,6 +97,12 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ScssFiles Remove="assets\sass\components\_avatar.scss" />
+    <ScssFiles Remove="assets\sass\components\_badge.scss" />
+    <ScssFiles Remove="assets\sass\components\_breadcrumb.scss" />
+    <ScssFiles Remove="assets\sass\components\_button.scss" />
+    <ScssFiles Remove="assets\sass\components\_closebutton.scss" />
+    <ScssFiles Remove="assets\sass\_alert.scss" />
     <ScssFiles Remove="assets\sass\_blazor.scss" />
     <ScssFiles Remove="assets\sass\_layout.scss" />
     <ScssFiles Remove="assets\sass\_reset.scss" />
@@ -123,6 +129,30 @@
   
   <ItemGroup>
     <ClientAssetsInputs Remove="assets\sass\_blazor.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_alert.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_closebutton.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_avatar.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_badge.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_breadcrumb.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_button.scss" />
   </ItemGroup>
 
 </Project>

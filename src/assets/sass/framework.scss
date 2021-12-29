@@ -4,6 +4,12 @@
 @import "theme";
 @import "utilities";
 @import "blazor";
+@import "components/closebutton";
+@import "components/alert";
+@import "components/avatar";
+@import "components/badge";
+@import "components/breadcrumb";
+@import "components/button";
 
 *[id] {
   scroll-margin-top: var(--tavenem-toolbar-height);
@@ -50,11 +56,11 @@ button .icon-label {
 	padding: .75rem;
 	text-align: center;
 	transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
-}
 
-.icon-button:hover,
-.icon-button:focus-visible {
-	background-color: rgba(0,0,0,.06);
+	&:hover,
+	&:focus-visible {
+		background-color: rgba(0,0,0,.06);
+	}
 }
 
 .icon {
