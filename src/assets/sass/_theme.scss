@@ -3,46 +3,53 @@
 }
 
 @each $theme in $theme-colors {
-    .link-#{$theme} {
-        color: var(--tavenem-color-#{$theme});
-
-        &:hover,
-        &:focus {
-            color: var(--tavenem-color-#{$theme}-lighten);
-        }
+    :root {
+        --tavenem-color-#{$theme}: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness));
+        --tavenem-color-#{$theme}-darken: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) - 7);
+        --tavenem-color-#{$theme}-darken-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) - 14);
+        --tavenem-color-#{$theme}-lighten: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) + 7);
+        --tavenem-color-#{$theme}-lighten-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) + 14);
+        --tavenem-color-#{$theme}-hover: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .06);
+        --tavenem-color-#{$theme}-hover-bright: rgba(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .12);
+        --tavenem-color-#{$theme}-hover-dark: rgba(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) - 7, .06);
+        --tavenem-color-#{$theme}-hover-light: rgba(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) + 7, .06);
     }
 
     .#{$theme} {
         background-color: var(--tavenem-color-#{$theme});
         color: var(--tavenem-color-#{$theme}-text);
-    }
 
-    .#{$theme}.darken {
-        background-color: var(--tavenem-color-#{$theme}-darken);
-        color: var(--tavenem-color-#{$theme}-text);
-    }
+        &.darken {
+            background-color: var(--tavenem-color-#{$theme}-darken);
+            color: var(--tavenem-color-#{$theme}-text);
+        }
 
-    .#{$theme}.lighten {
-        background-color: var(--tavenem-color-#{$theme}-lighten);
-        color: var(--tavenem-color-#{$theme}-text);
-    }
+        &.lighten {
+            background-color: var(--tavenem-color-#{$theme}-lighten);
+            color: var(--tavenem-color-#{$theme}-text);
+        }
 
-    .#{$theme}.filled {
-        background-color: var(--tavenem-color-#{$theme}) !important;
-        color: var(--tavenem-color-#{$theme}-text) !important;
-    }
+        &.filled {
+            background-color: var(--tavenem-color-#{$theme});
+            color: var(--tavenem-color-#{$theme}-text);
+            font-weight: normal;
+        }
 
-    .#{$theme}.outlined {
-        border-color: var(--tavenem-color-#{$theme}-darken);
-        color: unset;
-    }
+        &.outlined {
+            border-color: var(--tavenem-color-#{$theme});
+            color: var(--tavenem-color-#{$theme});
+        }
 
-    .#{$theme}-text {
-        color: var(--tavenem-color-#{$theme});
-    }
+        &-text {
+            color: var(--tavenem-color-#{$theme});
 
-    .panel.#{$theme} {
-        background-color: var(--tavenem-color-#{$theme}-dim);
+            @include unify-parent("a") {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-lighten);
+                }
+            }
+        }
     }
 
     .border-#{$theme} {

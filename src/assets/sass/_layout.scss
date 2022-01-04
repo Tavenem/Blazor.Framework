@@ -1,7 +1,47 @@
-﻿.full-width {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    width: 100% !important;
+﻿.framework {
+    display: grid;
+    flex-direction: column;
+    flex: 1 0;
+    grid-template-areas:
+        "header header header"
+        "topdrawer topdrawer topdrawer"
+        "leftdrawer main rightdrawer"
+        "bottomdrawer bottomdrawer bottomdrawer"
+        "footer footer footer";
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto auto;
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+.appbar {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 4em;
+
+    &.dense, .dense & {
+        min-height: 3em;
+    }
+
+    &.top,
+    &.bottom {
+        z-index: var(--tavenem-zindex-appbar);
+
+        @media (min-width: 768px) and (orientation: landscape) {
+            min-height: 3em;
+        }
+    }
+
+    &.top {
+        grid-area: header;
+    }
+
+    &.bottom {
+        grid-area: footer;
+    }
 }
 
 .container,
@@ -20,9 +60,12 @@
 }
 
 @each $breakpoint, $min-width in $breakpoints {
+    .container-#{$breakpoint} {
+        @extend .container;
+    }
+
     @media (min-width: $min-width) {
         .container-#{$breakpoint} {
-            @extend .container;
             width: $min-width;
         }
 

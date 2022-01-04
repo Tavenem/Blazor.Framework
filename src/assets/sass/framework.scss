@@ -1,108 +1,62 @@
 ﻿@import "variables";
+@import "animations";
 @import "reset";
 @import "layout";
 @import "theme";
 @import "utilities";
-@import "blazor";
+@import "ripple";
+@import "components/overlay";
 @import "components/closebutton";
 @import "components/alert";
 @import "components/avatar";
 @import "components/badge";
 @import "components/breadcrumb";
 @import "components/button";
+@import "components/buttongroup";
+@import "components/card";
+@import "components/checkbox";
+@import "components/chip";
+@import "components/collapse";
+@import "components/drawer";
+@import "components/field";
+@import "components/modal";
+@import "components/select";
+@import "components/slider";
+@import "blazor";
 
 *[id] {
-  scroll-margin-top: var(--tavenem-toolbar-height);
-}
-
-.panel {
-	background-color: var(--tavenem-color-bg-alt);
-	padding: 1rem;
-	position: relative;
-
-	> .panel {
-		background-color: var(--tavenem-color-bg);
-
-		> .panel {
-			background-color: var(--tavenem-color-bg-alt);
-
-			> .panel {
-				background-color: var(--tavenem-color-bg);
-
-				> .panel {
-					background-color: var(--tavenem-color-bg-alt);
-
-					> .panel {
-						background-color: var(--tavenem-color-bg);
-					}
-				}
-			}
-		}
-	}
+    scroll-margin-top: var(--tavenem-toolbar-height);
 }
 
 button .icon-label {
-	align-items: inherit;
-	display: flex;
-	justify-content: inherit;
-	width: 100%;
+    align-items: inherit;
+    display: flex;
+    justify-content: inherit;
+    width: 100%;
 }
 
 .icon-button {
-	border-radius: 50%;
-	flex: 0 0 auto;
-	font-size: 1.5rem;
-	overflow: visible;
-	padding: .75rem;
-	text-align: center;
-	transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    overflow: visible;
+    padding: .75rem;
+    text-align: center;
+    transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
 
-	&:hover,
-	&:focus-visible {
-		background-color: rgba(0,0,0,.06);
-	}
+    &:hover,
+    &:focus-visible {
+        background-color: rgba(0,0,0,.06);
+    }
 }
 
 .icon {
-	display: inline-block;
-	fill: currentColor;
-	flex-shrink: 0;
-	font-size: 1.5rem;
-	height: 1em;
-	transition: fill 200ms cubic-bezier(.4,0,.2,1) 0ms;
-	user-select: none;
-	width: 1em;
-}
-
-.ripple {
-	overflow: hidden;
-	position: relative;
-
-	&:after {
-		background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
-		background-position: 50%;
-		background-repeat: no-repeat;
-		content: "";
-		display: block;
-		height: 100%;
-		left: 0;
-		opacity: 0;
-		pointer-events: none;
-		position: absolute;
-		top: 0;
-		transform: scale(10,10);
-		transition: transform .3s,opacity 1s;
-		width: 100%;
-	}
-
-	&:active:after {
-		transform: scale(0,0);
-		opacity: .1;
-		transition: 0s;
-	}
-}
-:is(.icon-button,
-input[type="checkbox"],
-input[type="radio"]).ripple:after {
-	transform: scale(7,7);
+    display: inline-block;
+    fill: currentColor;
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    height: 1rem;
+    transition: fill 200ms cubic-bezier(.4,0,.2,1) 0ms;
+    user-select: none;
+    width: 1rem;
 }

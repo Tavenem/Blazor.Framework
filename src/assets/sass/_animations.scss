@@ -1,0 +1,97 @@
+﻿@keyframes tf-fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-moz-keyframes tf-fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes tf-fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-o-keyframes tf-fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@-ms-keyframes tf-fadein {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes tf-slide-in-left {
+    from {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes tf-slide-out-left {
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes tf-slide-in-right {
+    from {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes tf-slide-out-right {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes tf-slide-in-bottom {
+    from {
+        transform: translateY(100%);
+    }
+}
+
+@keyframes tf-slide-out-bottom {
+    to {
+        transform: translateY(100%);
+    }
+}
+
+@keyframes tf-slide-in-top {
+    from {
+        transform: translateY(-100%);
+    }
+}
+
+@keyframes tf-slide-out-top {
+    to {
+        transform: translateY(-100%);
+    }
+}

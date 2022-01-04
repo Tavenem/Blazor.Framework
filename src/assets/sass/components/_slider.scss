@@ -1,0 +1,143 @@
+﻿@mixin slider-track {
+    &::-webkit-slider-runnable-track {
+        @content
+    }
+    &::-moz-range-track {
+        @content
+    }
+}
+
+@mixin slider-thumb {
+    &::-webkit-slider-thumb {
+        @content
+    }
+    &::-moz-range-thumb {
+        @content
+    }
+}
+
+.slider {
+    color: var(--tavenem-color-text);
+    display: inline-block;
+    user-select: none;
+    width: 100%;
+
+    > *:not(input) {
+        margin-top: .625rem;
+    }
+
+    > input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: transparent;
+        cursor: pointer;
+        display: block;
+        position: relative;
+        width: 100%;
+
+        &:focus {
+            outline: none;
+        }
+
+        @include slider-track {
+            border-radius: 1px;
+            height: 2px;
+            margin: 10px 0;
+            width: 100%;
+        }
+
+        @include slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            border: none;
+            border-radius: 50%;
+            height: 2px;
+            transform: scale(6, 6);
+            transition: box-shadow 0.2s;
+            width: 2px;
+        }
+
+        &:disabled, .disabled > & {
+            cursor: default;
+            opacity: 0.38;
+
+            @include slider-track {
+                background-color: var(--tavenem-color-text-disabled);
+            }
+
+            @include slider-thumb {
+                background-color: rgb(0, 0, 0);
+                color: rgb(255, 255, 255);
+                box-shadow: 0 0 0 1px rgb(255, 255, 255) !important;
+                transform: scale(4, 4);
+
+                &:hover {
+                    box-shadow: 0 0 0 1px rgb(255, 255, 255) !important;
+                }
+            }
+        }
+    }
+
+    .filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+        font-weight: unset;
+    }
+
+    .outlined {
+        background-color: transparent !important;
+        border: 0;
+    }
+
+    .bg-alt {
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            &, &.darken, &.lighten, &.filled, &.outlined {
+                background-color: transparent;
+                color: var(--tavenem-color-text);
+            }
+
+            --track-lightness: var(--tavenem-color-#{$theme}-lightness);
+            --thumb-color: var(--tavenem-color-#{$theme});
+
+            &.darken {
+                --track-lightness: var(--tavenem-color-#{$theme}-lightness) - 7;
+                --thumb-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                --track-lightness: var(--tavenem-color-#{$theme}-lightness) + 7;
+                --thumb-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+
+            &.outlined {
+                border-color: var(--tavenem-color-#{$theme});
+            }
+
+            > input {
+                @include slider-track {
+                    background-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.30);
+                }
+
+                @include slider-thumb {
+                    background-color: var(--thumb-color);
+                }
+
+                &:active, &:focus-visible {
+                    @include slider-thumb {
+                        box-shadow: 0 0 0 2px hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.24) !important;
+                    }
+                }
+
+                @include slider-thumb {
+                    &:hover {
+                        box-shadow: 0 0 0 2px hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.24) !important;
+                    }
+                }
+            }
+        }
+    }
+}

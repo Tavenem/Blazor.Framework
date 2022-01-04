@@ -29,12 +29,20 @@ body {
 hr {
     margin: 1rem 0;
     color: inherit;
-    background-color: currentColor;
+    background-color: var(--tavenem-color-divider);
     border: 0;
-    opacity: .25;
+    flex-shrink: 0;
 
     &:not([size]) {
         height: 1px;
+    }
+
+    .dark {
+        background-color: var(--tavenem-light-color-divider);
+    }
+
+    .light {
+        background-color: var(--tavenem-dark-color-divider);
     }
 }
 

@@ -1,17 +1,26 @@
-﻿@mixin button {
+﻿.btn {
+    @include ripple;
     align-items: center;
-    background-color: transparent;
+    background-color: var(--tavenem-color-secondary);
     border: 0;
-    border-radius: 0;
-    color: inherit;
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+    color: var(--tavenem-color-secondary-text);
     cursor: pointer;
     display: inline-flex;
+    font-size: var(--tavenem-font-size-button);
+    font-weight: var(--tavenem-font-weight-button);
     justify-content: center;
+    line-height: var(--tavenem-lineheight-button);
     margin: 0;
+    min-width: 4rem;
     outline: 0;
-    padding: 0;
+    padding: .375rem 1rem;
     position: relative;
     text-decoration: none;
+    text-transform: var(--tavenem-texttransform-button);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     user-select: none;
     vertical-align: middle;
     -moz-appearance: none;
@@ -22,23 +31,207 @@
         border-style: none;
     }
 
+    &:hover,
+    &:focus-visible {
+        background-color: var(--tavenem-color-secondary-darken);
+        box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+    }
+
+    &:active {
+        box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+    }
+
     &:disabled {
+        box-shadow: none;
+        background-color: var(--tavenem-color-action-disabled-bg) !important;
         color: var(--tavenem-color-text-disabled) !important;
         cursor: default;
         pointer-events: none;
     }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:hover,
+            &:focus-visible {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.darken {
+                &:hover,
+                &:focus-visible {
+                    background-color: var(--tavenem-color-#{$theme}-darken-2);
+                }
+            }
+
+            &.lighten {
+                &:hover,
+                &:focus-visible {
+                    background-color: var(--tavenem-color-#{$theme});
+                }
+            }
+        }
+    }
+
+    > .icon:first-child {
+        margin-inline-end: .5rem;
+        margin-inline-start: -.25rem;
+    }
+
+    > .icon:last-child {
+        margin-inline-end: -.25rem;
+        margin-inline-start: .5rem;
+    }
+
+    &.small {
+        font-size: 0.8125rem;
+        padding: .25rem .625rem;
+
+        > .icon:first-child {
+            margin-inline-start: -.125rem;
+        }
+
+        > .icon:last-child {
+            margin-inline-end: -.125rem;
+        }
+    }
+
+    &.large {
+        font-size: 0.9375rem;
+        padding: .5rem 1.375rem;
+    }
+
+    &.outlined {
+        color: var(--tavenem-color-text);
+        padding: calc(.375rem - 1px) calc(1rem - 1px);
+
+        &:hover,
+        &:focus-visible {
+            background-color: var(--tavenem-color-action-hover-bg);
+        }
+
+        @each $theme in $theme-colors {
+            &.#{$theme} {
+                &:hover,
+                &:focus-visible {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                }
+            }
+        }
+
+        &:disabled {
+            border-color: var(--tavenem-color-action-disabled-bg);
+        }
+
+        &.small {
+            font-size: 0.8125rem;
+            padding: calc(.25rem - 1px) calc(.625rem - 1px);
+        }
+
+        &.large {
+            font-size: 0.9375rem;
+            padding: calc(.5rem - 1px) calc(1.375rem - 1px);
+        }
+    }
 }
 
-.btn {
-    @include button();
-    border-radius: var(--tavenem-border-radius);
-    box-sizing: border-box;
-    color: var(--tavenem-color-text);
-    font-size: var(--tavenem-font-size-button);
-    font-weight: var(--tavenem-font-weight-button);
-    line-height: var(--tavenem-lineheight-button);
-    min-width: 4rem;
-    padding: .375rem 1rem;
-    text-transform: var(--tavenem-texttransform-button);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+.btn-text {
+    @extend .btn;
+    background-color: transparent !important;
+    box-shadow: none;
+    color: inherit;
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--tavenem-color-action-hover-bg);
+        box-shadow: none;
+    }
+
+    &:active {
+        box-shadow: none;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            color: var(--tavenem-color-#{$theme});
+
+            &:hover,
+            &:focus-visible {
+                color: var(--tavenem-color-#{$theme}-hover);
+            }
+
+            &.darken {
+                color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                color: var(--tavenem-color-#{$theme}-lighten);
+            }
+        }
+    }
+
+    &.small {
+        font-size: 0.8125rem;
+        padding: .25rem .3125rem;
+    }
+
+    &.large {
+        font-size: 0.9375rem;
+        padding: .5rem .6875rem;
+    }
+}
+
+.btn-icon {
+    @extend .btn-text;
+    border-radius: 9999px;
+    font-size: 1.25rem;
+    padding: .375rem;
+
+    &.small {
+        font-size: 1.125rem;
+        padding: .3125rem;
+    }
+
+    &.large {
+        font-size: 1.375rem;
+        padding: .3125rem;
+    }
+
+    &.filled {
+        background-color: var(--tavenem-light-color-secondary);
+        box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+        color: var(--tavenem-light-color-secondary-text);
+
+        &:hover,
+        &:focus-visible {
+            background-color: var(--tavenem-light-color-secondary-darken);
+            box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+        }
+
+        &:active {
+            box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+        }
+
+        @each $theme in $theme-colors {
+            &.#{$theme} {
+                &:hover,
+                &:focus-visible {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+            }
+        }
+    }
+
+    &.outlined {
+        padding: calc(.375rem - 1px);
+
+        &.small {
+            font-size: .914rem;
+            padding: calc(.3125rem - 1px);
+        }
+
+        &.large {
+            font-size: 1.289rem;
+            padding: calc(.3125rem - 1px);
+        }
+    }
 }

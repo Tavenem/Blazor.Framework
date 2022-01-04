@@ -1,5 +1,9 @@
-﻿.codeblock {
-    background-color: var(--tavenem-color-dark-dim);
+﻿.small {
+    font-size: .875rem;
+}
+
+.codeblock {
+    background-color: var(--tavenem-color-dark-hover);
     border-radius: var(--tavenem-border-radius);
     color: var(--tavenem-color-dark-text);
     height: 100%;
@@ -73,44 +77,43 @@
     }
 }
 
-.fixed-bottom {
-    position: fixed;
+.bottom {
     bottom: 0;
-    z-index: 1204;
 }
 
-.fixed-top {
+.top {
+    top: 0;
+}
+
+.fixed {
     position: fixed;
-    top: 0;
-    z-index: 1205;
+    z-index: 1013;
 }
 
-.sticky-bottom {
-    bottom: 0;
+.sticky {
     position: sticky;
-    z-index: 1202;
-}
-
-.sticky-top {
-    position: sticky;
-    top: 0;
-    z-index: 1203;
+    z-index: 1012;
 }
 
 @each $breakpoint, $min-width in $breakpoints {
     @media (min-width: $min-width) {
-        .sticky-#{$breakpoint}-bottom {
-            bottom: 0;
-            position: sticky;
-            z-index: 1200;
+        .fixed-#{$breakpoint} {
+            position: fixed;
+            z-index: 1011;
         }
 
-        .sticky-#{$breakpoint}-top {
+        .sticky-#{$breakpoint} {
             position: sticky;
             top: 0;
-            z-index: 1201;
+            z-index: 1010;
         }
     }
+}
+
+.full-width {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
 }
 
 .visually-hidden,
@@ -144,11 +147,18 @@
 
 .vr {
     align-self: stretch;
-    background-color: currentcolor;
+    background-color: var(--tavenem-color-divider);
     display: inline-block;
     min-height: 1rem;
-    opacity: .25;
     width: 1px;
+
+    .dark {
+        background-color: var(--tavenem-light-color-divider);
+    }
+
+    .light {
+        background-color: var(--tavenem-dark-color-divider);
+    }
 }
 
 .float-end {
@@ -548,11 +558,17 @@
 }
 
 .elevation-0 {
-    box-shadow: none;
+    box-shadow: none !important;
+
+    &:hover,
+    &:focus-visible,
+    &:active {
+        box-shadow: none !important;
+    }
 }
 
 @for $i from 1 through 5 {
     .elevation-#{$i} {
-        box-shadow: var(--tavenem-shadow-#{$i});
+        box-shadow: var(--tavenem-shadow-#{$i}) !important;
     }
 }

@@ -1,0 +1,38 @@
+﻿.overlay {
+    align-items: center;
+    animation: tf-fadein ease 0.15s;
+    -webkit-animation: tf-fadein ease 0.15s;
+    -moz-animation: tf-fadein ease 0.15s;
+    -o-animation: tf-fadein ease 0.15s;
+    background-color: rgba(33, 33, 33, 0.5);
+    border: none;
+    border-radius: inherit;
+    bottom: 0;
+    display: flex;
+    height: 100%;
+    left: 0;
+    margin: 0 !important;
+    justify-content: center;
+    overflow: hidden;
+    padding: 2rem;
+    position: fixed;
+    right: 0;
+    top: 0;
+    transition: .3s cubic-bezier(.25,.8,.5,1),z-index 1ms;
+    user-select: none;
+    width: 100%;
+    z-index: var(--tavenem-zindex-overlay);
+
+    &.local {
+        padding: 1rem;
+        position: absolute;
+    }
+
+    &:hover {
+        cursor: default;
+    }
+
+    &.light {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+}

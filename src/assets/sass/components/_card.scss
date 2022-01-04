@@ -1,0 +1,240 @@
+﻿.card {
+    align-self: stretch;
+    background-color: var(--tavenem-color-bg-alt);
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: var(--tavenem-shadow-1);
+    color: var(--tavenem-color-text);
+    column-gap: 1rem;
+    display: flex;
+    flex: 1 0 0%;
+    flex-direction: column;
+    margin: 1rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    position: relative;
+    row-gap: 0;
+
+    > {
+        * {
+            border-radius: 0;
+            flex: 1 1 auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        hr {
+            flex: 0 0 auto;
+        }
+
+        .header,
+        .footer {
+            align-items: center;
+            column-gap: 1rem;
+            display: flex;
+            flex: 0 0 auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+
+            > {
+                * {
+                    flex: 1 1 auto;
+                }
+
+                .avatar {
+                    flex: 0 0 auto;
+                }
+
+                .btn,
+                .btn-text,
+                .btn-icon,
+                .btn-close {
+                    flex: 0 0 auto;
+
+                    &:first-child {
+                        margin-inline-start: -.5rem;
+                    }
+
+                    &:last-child {
+                        margin-inline-end: -.5rem;
+                    }
+                }
+            }
+        }
+
+        .header {
+            margin-bottom: 1rem;
+
+            > {
+                * {
+                    margin-bottom: 0;
+                }
+
+                button, .btn {
+                    align-self: flex-start;
+                    margin-top: -.5rem;
+                }
+            }
+        }
+
+        .footer {
+            margin-top: 1rem;
+
+            > {
+                * {
+                    margin-top: 0;
+                }
+
+                button, .btn {
+                    align-self: flex-end;
+                    margin-bottom: -.5rem;
+                }
+            }
+        }
+
+        .media {
+            object-fit: contain;
+            width: 100%;
+
+            &.backdrop {
+                border-radius: inherit;
+                bottom: 0;
+                left: 0;
+                object-fit: cover;
+                position: absolute;
+                padding: 0;
+                right: 0;
+                top: 0;
+            }
+        }
+    }
+
+    > *:first-child {
+        border-top: none;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+
+    > *:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            background-color: var(--tavenem-color-#{$theme}-hover);
+
+            &.bg-alt {
+                background-color: var(--tavenem-color-#{$theme}-hover-dark);
+            }
+        }
+    }
+
+    .card {
+        background-color: var(--tavenem-color-bg);
+
+        @each $theme in $theme-colors {
+            &.#{$theme} {
+                background-color: var(--tavenem-color-#{$theme}-hover-dark);
+
+                &.bg-alt {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                }
+            }
+        }
+
+        .card {
+            background-color: var(--tavenem-color-bg-alt);
+
+            @each $theme in $theme-colors {
+                &.#{$theme} {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+
+                    &.bg-alt {
+                        background-color: var(--tavenem-color-#{$theme}-hover-dark);
+                    }
+                }
+            }
+
+            .card {
+                background-color: var(--tavenem-color-bg);
+
+                @each $theme in $theme-colors {
+                    &.#{$theme} {
+                        background-color: var(--tavenem-color-#{$theme}-hover-dark);
+
+                        &.bg-alt {
+                            background-color: var(--tavenem-color-#{$theme}-hover);
+                        }
+                    }
+                }
+
+                .card {
+                    background-color: var(--tavenem-color-bg-alt);
+
+                    @each $theme in $theme-colors {
+                        &.#{$theme} {
+                            background-color: var(--tavenem-color-#{$theme}-hover);
+
+                            &.bg-alt {
+                                background-color: var(--tavenem-color-#{$theme}-hover-dark);
+                            }
+                        }
+                    }
+
+                    .card {
+                        background-color: var(--tavenem-color-bg);
+
+                        @each $theme in $theme-colors {
+                            &.#{$theme} {
+                                background-color: var(--tavenem-color-#{$theme}-hover-dark);
+
+                                &.bg-alt {
+                                    background-color: var(--tavenem-color-#{$theme}-hover);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.card-group {
+    border-radius: var(--tavenem-border-radius);
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1px;
+    margin: 1rem;
+
+    > .card {
+        border-radius: 0;
+        flex: 1 0 0%;
+        margin: 0;
+    }
+
+    &.outlined {
+        background-color: var(--tavenem-color-border) !important;
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            background-color: transparent;
+
+            &.outlined {
+                background-color: var(--tavenem-color-#{$theme});
+            }
+        }
+
+        .border-#{$theme} {
+            background-color: var(--tavenem-color-#{$theme});
+        }
+    }
+}
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .card-group-#{$breakpoint} {
+            @extend .card-group;
+        }
+    }
+}

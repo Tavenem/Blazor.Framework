@@ -1,0 +1,12 @@
+﻿.select {
+    .selected-item {
+        background-color: var(--tavenem-color-primary-hover);
+        color: var(--tavenem-color-primary);
+    }
+
+    .select-all {
+        margin-top: .625rem;
+        border-bottom: 1px solid var(--tavenem-color-border);
+        padding-bottom: calc(1rem + 2px);
+    }
+}

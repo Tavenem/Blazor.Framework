@@ -1,0 +1,190 @@
+﻿.checkbox {
+    @include ripple;
+    align-items: center;
+    color: var(--tavenem-color-action);
+    cursor: pointer;
+    display: inline-flex;
+    vertical-align: middle;
+    -webkit-tap-highlight-color: transparent;
+
+    > .content {
+        color: var(--tavenem-color-text);
+    }
+
+    &:disabled, &.disabled {
+        &, &:hover, &:focus-visible {
+            color: var(--tavenem-color-action-disabled);
+
+            &, * {
+                background-color: transparent !important;
+                cursor: default;
+            }
+
+            * {
+                color: var(--tavenem-color-text-disabled);
+            }
+        }
+    }
+
+    &.readonly, &.readonly:hover {
+        &, * {
+            cursor: default;
+        }
+    }
+
+    > .checkbox-span {
+        cursor: pointer;
+        display: inline-block;
+        vertical-align: middle;
+        width: 100%;
+
+        > input[type="checkbox"] {
+            color: inherit;
+            cursor: inherit;
+            height: 100%;
+            left: 0;
+            margin: 0;
+            opacity: 0;
+            padding: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 1;
+        }
+
+        > .checkbox-icons {
+            display: flex;
+            position: relative;
+
+            &:hover {
+                background-color: var(--tavenem-color-action-hover-bg);
+            }
+
+            > .icon-checked {
+                left: 0;
+                position: absolute;
+                transform: scale(0);
+                transition: transform 150ms cubic-bezier(0.4, 0, 1, 1) 0ms;
+            }
+        }
+    }
+
+    .filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+        font-weight: unset;
+    }
+
+    .outlined {
+        background-color: transparent !important;
+        border: 0;
+    }
+
+    .bg-alt {
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            &, &.darken, &.lighten, &.filled, &.outlined {
+                background-color: transparent;
+                color: var(--tavenem-color-action);
+            }
+
+            > .checkbox-span > .checkbox-icons {
+                color: var(--tavenem-color-#{$theme});
+
+                &:hover {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                }
+            }
+
+            &.darken > .checkbox-span > .checkbox-icons {
+                color: var(--tavenem-color-#{$theme}-darken);
+
+                &:hover {
+                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
+                }
+            }
+
+            &.lighten > .checkbox-span > .checkbox-icons {
+                color: var(--tavenem-color-#{$theme}-lighten);
+
+                &:hover {
+                    background-color: var(--tavenem-color-#{$theme}-hover-light);
+                }
+            }
+
+            &.outlined {
+                border-color: var(--tavenem-color-#{$theme});
+            }
+        }
+    }
+
+    :checked + .checkbox-icons > .icon-checked {
+        transform: scale(1);
+        transition: transform 150ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    }
+
+    &.dense, .dense > & {
+        > .checkbox-span > .checkbox-icons {
+            padding: .25rem;
+        }
+    }
+}
+
+.radio {
+    @extend .checkbox;
+}
+
+.switch {
+    @extend .checkbox;
+
+    > .checkbox-span {
+        height: 2.375rem;
+        padding: .75rem;
+        width: 3.625rem;
+
+        > .track {
+            background-color: black;
+            border-radius: calc(.5rem - 1px);
+            height: 100%;
+            opacity: 0.48;
+            transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+            width: 100%;
+            z-index: -1;
+
+            :checked + & {
+                opacity: .5;
+            }
+
+            .disabled &, :disabled & {
+                opacity: .12;
+            }
+        }
+
+        > .checkbox-icons > .icon {
+            background-color: currentColor;
+            border-radius: 50%;
+            box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+            height: 1.25rem;
+            width: 1.25rem;
+        }
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            > .checkbox-span > .track {
+                background-color: var(--tavenem-color-#{$theme});
+            }
+
+            &.darken > .checkbox-span > .track {
+                color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten > .checkbox-span > .track {
+                color: var(--tavenem-color-#{$theme}-lighten);
+            }
+        }
+    }
+}

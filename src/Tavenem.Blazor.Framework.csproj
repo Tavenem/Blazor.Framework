@@ -101,8 +101,21 @@
     <ScssFiles Remove="assets\sass\components\_badge.scss" />
     <ScssFiles Remove="assets\sass\components\_breadcrumb.scss" />
     <ScssFiles Remove="assets\sass\components\_button.scss" />
+    <ScssFiles Remove="assets\sass\components\_buttongroup.scss" />
+    <ScssFiles Remove="assets\sass\components\_card.scss" />
+    <ScssFiles Remove="assets\sass\components\_checkbox.scss" />
+    <ScssFiles Remove="assets\sass\components\_chip.scss" />
     <ScssFiles Remove="assets\sass\components\_closebutton.scss" />
+    <ScssFiles Remove="assets\sass\components\_collapse.scss" />
+    <ScssFiles Remove="assets\sass\components\_drawer.scss" />
+    <ScssFiles Remove="assets\sass\components\_field.scss" />
+    <ScssFiles Remove="assets\sass\components\_modal.scss" />
+    <ScssFiles Remove="assets\sass\components\_overlay.scss" />
+    <ScssFiles Remove="assets\sass\components\_ripple.scss" />
+    <ScssFiles Remove="assets\sass\components\_select.scss" />
+    <ScssFiles Remove="assets\sass\components\_slider.scss" />
     <ScssFiles Remove="assets\sass\_alert.scss" />
+    <ScssFiles Remove="assets\sass\_animations.scss" />
     <ScssFiles Remove="assets\sass\_blazor.scss" />
     <ScssFiles Remove="assets\sass\_layout.scss" />
     <ScssFiles Remove="assets\sass\_reset.scss" />
@@ -153,6 +166,58 @@
   
   <ItemGroup>
     <ClientAssetsInputs Remove="assets\sass\components\_button.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_buttongroup.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_ripple.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_card.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_chip.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_modal.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_overlay.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\_animations.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_drawer.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_collapse.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_checkbox.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_field.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_select.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_slider.scss" />
   </ItemGroup>
 
 </Project>

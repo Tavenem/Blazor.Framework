@@ -1,4 +1,4 @@
-﻿<nav class="container">
+﻿<nav class="drawer left container @(Open ? null : "closed")">
     <div class="nav-item">
         <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
             Home
@@ -15,3 +15,7 @@
         </NavLink>
     </div>
 </nav>
+
+@code {
+    [Parameter] public bool Open { get; set; }
+}

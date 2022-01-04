@@ -1,0 +1,55 @@
+﻿@use "sass:selector";
+
+@mixin unify-parent($child) {
+    @at-root #{selector.unify(&, $child)} {
+        @content;
+    }
+}
+
+@mixin ripple {
+    overflow: hidden;
+    position: relative;
+
+    &:after {
+        background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
+        background-position: 50%;
+        background-repeat: no-repeat;
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        transform: scale(10,10);
+        transition: transform .3s,opacity 1s;
+        width: 100%;
+    }
+
+    &:active:after {
+        transform: scale(0,0);
+        opacity: .1;
+        transition: 0s;
+    }
+
+
+    &.btn-icon,
+    &.switch {
+        &:after {
+            transform: scale(7,7);
+        }
+    }
+
+    @include unify-parent("input[type="checkbox"]") {
+        &:after {
+            transform: scale(7,7);
+        }
+    }
+
+    @include unify-parent("input[type="radio"]") {
+        &:after {
+            transform: scale(7,7);
+        }
+    }
+}
