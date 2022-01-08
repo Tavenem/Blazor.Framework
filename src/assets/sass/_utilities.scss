@@ -201,6 +201,10 @@
         $map: zip($map, $map);
     }
 
+    @if $prefix == "" {
+        $prefix: $property;
+    }
+
     @if $prefix != "" {
         $prefix: $prefix + "-";
     }
@@ -373,9 +377,10 @@
 
 @include generate-utility("", align-content, $align-content-values);
 @include generate-utility("", align-items, $align-items-values);
-@include generate-utility("", align-self, $align-self-values);
+@include generate-utility("", align-self, $align-items-values);
 @include generate-utility("flex", flex-wrap, $flex-wrap-values);
 @include generate-utility("", justify-content, $justify-content-values);
+@include generate-utility("", justify-self, $justify-content-values);
 @include generate-utility("order", order, $order-values);
 
 @include generate-utility("gap", gap, $positive-spacers);

@@ -12,10 +12,10 @@
 
 .drawer {
     @extend .card;
-    background-color: var(--tavenem-color-bg-alt);
+    background-color: var(--tavenem-color-bg-surface);
     border-radius: 0;
     box-shadow: none;
-    color: var(--tavenem-color-text-secondary);
+    color: var(--tavenem-color-text);
     margin: 0 !important;
     outline: 0;
     overflow: hidden;

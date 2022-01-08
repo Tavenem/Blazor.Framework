@@ -13,7 +13,7 @@ public partial class AvatarGroup
     /// </summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    private int _max = 3;
+    private int? _max;
     /// <summary>
     /// <para>
     /// The maximum number avatars to display.
@@ -24,7 +24,7 @@ public partial class AvatarGroup
     /// </para>
     /// </summary>
     [Parameter]
-    public int Max
+    public int? Max
     {
         get => _max;
         set
@@ -86,5 +86,5 @@ public partial class AvatarGroup
 
     internal void Remove(Avatar avatar) => _avatars.Remove(avatar);
 
-    internal bool ShouldDisplay(Avatar avatar) => _avatars.IndexOf(avatar) < Max;
+    internal bool ShouldDisplay(Avatar avatar) => !_max.HasValue || _avatars.IndexOf(avatar) < _max;
 }

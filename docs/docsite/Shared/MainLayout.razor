@@ -2,18 +2,18 @@
 
 <div class="framework">
     <div class="appbar top">
-        <div class="row">
+        <div class="toolbar">
             <button title="Navigation menu" class="btn-icon" @onclick="ToggleNavMenu">
-                <svg class="icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"></path><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
+                <span class="icon menu" aria-hidden="true"></span>
             </button>
             <a href="https://tavenem.com/" title="Tavenem">
                 <img src="./images/tavenemlogo.svg" alt="" width="60" height="60" class="d-inline-block me-3" />
             </a>
             <h5><a href="" class="text-reset">Tavenem Blazor Framework Docs</a></h5>
+            <span class="justify-self-end">More soon...</span>
         </div>
-        <span>More soon...</span>
     </div>
-    <NavMenu Open="_drawerOpen" />
+    <LeftDrawer Open="_drawerOpen" />
     <main>
         @Body
     </main>

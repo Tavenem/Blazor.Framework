@@ -1,5 +1,6 @@
 ﻿.btn-close {
     @include ripple;
+    align-self: flex-start;
     background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3E%3C/svg%3E") center / 1em auto no-repeat;
     border: 0;
     border-radius: 50%;
@@ -7,7 +8,9 @@
     color: inherit;
     fill: currentColor;
     height: 1em;
+    justify-self: flex-end;
     opacity: .5;
+    order: 9999;
     padding: .25em;
     width: 1em;
 

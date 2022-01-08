@@ -1,7 +1,7 @@
 ﻿namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// One of the built-in color themes.
+/// One of the built-in color palettes.
 /// </summary>
 public enum ThemeColor
 {

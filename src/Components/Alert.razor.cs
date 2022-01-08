@@ -30,7 +30,7 @@ public partial class Alert
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
     /// <summary>
-    /// Invoked when the alert is closed.
+    /// Invoked when the component is closed.
     /// </summary>
     [Parameter] public EventCallback<Alert> OnClosed { get; set; }
 
@@ -47,6 +47,7 @@ public partial class Alert
     protected string ClassName => new CssBuilder("alert")
         .Add(ThemeColor.ToCSS())
         .Add("clickable", OnClick.HasDelegate)
+        .Add("d-none", IsClosed)
         .Add(Class)
         .AddClassFromDictionary(UserAttributes)
         .ToString();
@@ -59,7 +60,17 @@ public partial class Alert
         _ => "icon info outlined",
     };
 
-    private Task OnClosedAsync() => OnClosed.HasDelegate
-        ? OnClosed.InvokeAsync(this)
-        : Task.CompletedTask;
+    private bool IsClosed { get; set; }
+
+    private async Task OnClosedAsync()
+    {
+        if (OnClosed.HasDelegate)
+        {
+            await OnClosed.InvokeAsync(this);
+        }
+        else
+        {
+            IsClosed = true;
+        }
+    }
 }

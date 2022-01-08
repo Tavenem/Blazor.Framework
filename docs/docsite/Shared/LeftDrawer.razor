@@ -1,0 +1,20 @@
+﻿<Drawer Side="Side.Left" ThemeColor="ThemeColor.Primary" IsOpen="Open">
+    <ul class="list" role="navigation">
+        <li>
+            <NavLink href="" Match="NavLinkMatch.All">
+                <span class="icon home"></span>
+                Home
+            </NavLink>
+        </li>
+        <li>
+            <NavLink href="./fetchdata">
+                <span class="icon leaderboard"></span>
+                Fetch data
+            </NavLink>
+        </li>
+    </ul>
+</Drawer>
+
+@code {
+    [Parameter] public bool Open { get; set; }
+}
