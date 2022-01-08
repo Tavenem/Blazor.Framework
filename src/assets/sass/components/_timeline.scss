@@ -1,0 +1,414 @@
+﻿.timeline {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    &:before {
+        background: var(--tavenem-color-divider);
+        bottom: 0;
+        content: "";
+        position: absolute;
+        top: 0;
+    }
+
+    > .timeline-item {
+        --dot-color: var(--tavenem-color-secondary);
+        --dot-text: var(--tavenem-color-secondary-text);
+        display: flex;
+
+        > .content {
+            flex: 1 1 auto;
+            height: 100%;
+            position: relative;
+
+            > .card {
+                &:before, &:after {
+                    content: "";
+                    position: absolute;
+                }
+
+                &:before {
+                    border-bottom: 1em solid transparent;
+                    border-right: 1em solid rgba(0,0,0,.10);
+                    border-top: 1em solid transparent;
+                    top: calc(50% - .875em);
+                }
+
+                &:after {
+                    border-bottom: 1em solid transparent;
+                    border-right: 1em solid var(--tavenem-color-bg-surface);
+                    border-top: 1em solid transparent;
+                    top: calc(50% - 1em);
+                }
+
+                &.outlined:before {
+                    border-right-color: var(--tavenem-color-border);
+                    top: calc(50% - 1em);
+                }
+            }
+        }
+
+        > .divider {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            position: relative;
+
+            > .dot {
+                align-items: center;
+                background-color: transparent;
+                border-radius: 50%;
+                box-shadow: var(--tavenem-shadow-1);
+                display: flex;
+                height: 2.375em;
+                justify-content: center;
+                left: calc(50% - 19px);
+                width: 2.375em;
+
+                > .inner {
+                    align-items: center;
+                    background-color: var(--dot-color);
+                    border-radius: 50%;
+                    color: var(--dot-text);
+                    display: flex;
+                    height: 1.875em;
+                    justify-content: center;
+                    width: 1.875em;
+                }
+            }
+        }
+
+        > .opposite {
+            align-self: center;
+        }
+
+        &.small > .dot {
+            height: 1.5em;
+            width: 1.5em;
+
+            > .inner {
+                height: 1.125em;
+                width: 1.125em;
+            }
+        }
+
+        &.large > .dot {
+            height: 3.25em;
+            width: 3.25em;
+
+            > .inner {
+                height: 2.625em;
+                width: 2.625em;
+            }
+        }
+
+        &.filled {
+            background-color: transparent;
+            color: inherit;
+        }
+
+        &.outlined {
+            border: none;
+        }
+
+        &.bg-alt {
+            background-color: var(--tavenem-color-secondary);
+        }
+
+        @each $theme in $theme-colors {
+            &.#{$theme} {
+                --dot-color: var(--tavenem-color-#{$theme});
+                --dot-text: var(--tavenem-color-#{$theme}-text);
+                color: inherit;
+
+                &.bg-alt {
+                    background-color: transparent;
+                }
+
+                &.filled {
+                    background-color: transparent;
+                    color: inherit;
+
+                    &.bg-alt {
+                        background-color: transparent;
+                    }
+                }
+
+                &.darken {
+                    --dot-color: var(--tavenem-color-#{$theme}-darken);
+                    color: inherit;
+                }
+
+                &.lighten {
+                    --dot-color: var(--tavenem-color-#{$theme}-darken);
+                    color: inherit;
+                }
+            }
+        }
+    }
+
+    &.end, &.start {
+        > .timeline-item {
+            > .content {
+                max-width: calc(100% - 6em);
+            }
+
+            > .opposite {
+                display: none;
+            }
+        }
+    }
+
+    &:not(.horizontal) {
+        padding-top: 1.5em;
+
+        &:before {
+            height: 100%;
+            width: 2px;
+        }
+
+        > .timeline-item {
+            padding-bottom: 1.5em;
+
+            > .content {
+                max-width: calc(50% - 3em);
+            }
+
+            > .divider {
+                min-width: 6em;
+            }
+
+            > .opposite {
+                flex: 1 1 auto;
+                max-width: calc(50% - 3em);
+            }
+        }
+
+        &.end {
+            &:before {
+                left: auto;
+                right: calc(3em - 1px);
+            }
+
+            > .timeline-item {
+                flex-direction: row;
+
+                > .content > .card {
+                    &:before, &:after {
+                        left: auto;
+                        right: -1em;
+                        transform: rotate(180deg);
+                    }
+
+                    &.outlined:after {
+                        right: calc(-1em + 1px);
+                    }
+                }
+
+                > .divider {
+                    align-items: flex-end;
+                }
+            }
+        }
+
+        &.start {
+            &:before {
+                left: calc(3em - 1px);
+                right: auto;
+            }
+
+            > .timeline-item {
+                flex-direction: row-reverse;
+
+                > .content > .card {
+                    &:before, &:after {
+                        left: -1em;
+                        right: auto;
+                    }
+
+                    &.outlined:after {
+                        left: calc(-1em + 1px);
+                    }
+                }
+
+                > .divider {
+                    align-items: flex-start;
+                }
+            }
+        }
+    }
+
+    &:not(.horizontal, .end, .start) {
+        &:before {
+            left: auto;
+            right: calc(50% - 1px);
+        }
+
+        > .timeline-item {
+            &:nth-child(odd):not(.align-start), &.align-end {
+                flex-direction: row-reverse;
+
+                > .timeline-item > {
+                    .content > .card {
+                        &:before, &:after {
+                            left: -1em;
+                            right: auto;
+                        }
+
+                        &.outlined:after {
+                            left: calc(-1em + 1px);
+                        }
+                    }
+
+                    .opposite {
+                        text-align: end;
+                    }
+                }
+            }
+
+            &:nth-child(2n):not(.align-end) {
+                flex-direction: row;
+
+                > .timeline-item > {
+                    .content > .card {
+                        &:before, &:after {
+                            left: auto;
+                            right: -1em;
+                            transform: rotate(180deg);
+                        }
+
+                        &.outlined:after {
+                            right: calc(-1em + 1px);
+                        }
+                    }
+
+                    .opposite {
+                        text-align: start;
+                    }
+                }
+            }
+        }
+    }
+
+    &.horizontal {
+        flex-direction: row;
+
+        &:before {
+            height: 2px;
+            width: 100%;
+        }
+
+        > .timeline-item {
+            padding-left: 1.5em;
+            padding-right: 1.5em;
+            width: 100%;
+
+            > .content {
+                max-height: calc(50% - 3em);
+            }
+
+            > .divider {
+                min-height: 6em;
+            }
+        }
+
+        &:not(.end, .start) {
+            &:before {
+                bottom: calc(50% - 1px);
+                top: auto;
+            }
+
+            > .timeline-item {
+                &:nth-child(odd):not(.align-start), &.align-end {
+                    flex-direction: column-reverse;
+
+                    > .timeline-item > .content > .card {
+                        &:before, &:after {
+                            bottom: -1.5em;
+                            left: calc(50% - .5em);
+                            top: auto;
+                            transform: rotate(270deg);
+                        }
+
+                        &.outlined:after {
+                            bottom: calc(-1.5em + 1px);
+                        }
+                    }
+                }
+
+                &:nth-child(2n):not(.align-end) {
+                    flex-direction: column;
+
+                    > .timeline-item > .content > .card {
+                        &:before, &:after {
+                            bottom: auto;
+                            left: calc(50% - .5em);
+                            top: -1.5em;
+                            transform: rotate(270deg);
+                        }
+
+                        &.outlined:after {
+                            top: calc(-1.5em + 1px);
+                        }
+                    }
+                }
+            }
+        }
+
+        &.end {
+            &:before {
+                bottom: calc(3em - 1px);
+                top: auto;
+            }
+
+            > .timeline-item {
+                flex-direction: column;
+
+                > .content > .card {
+                    &:before, &:after {
+                        bottom: -1.5em;
+                        left: calc(50% - .5em);
+                        top: auto;
+                        transform: rotate(90deg);
+                    }
+
+                    &.outlined:after {
+                        bottom: calc(-1.5em + 1px);
+                    }
+                }
+
+                > .divider {
+                    justify-content: flex-end;
+                }
+            }
+        }
+
+        &.start {
+            &:before {
+                bottom: auto;
+                top: calc(3em - 1px);
+            }
+
+            > .timeline-item {
+                flex-direction: column-reverse;
+
+                > .content > .card {
+                    &:before, &:after {
+                        bottom: auto;
+                        left: calc(50% - .5em);
+                        top: -1.5em;
+                        transform: rotate(90deg);
+                    }
+
+                    &.outlined:after {
+                        top: calc(-1.5em + 1px);
+                    }
+                }
+
+                > .divider {
+                    justify-content: flex-start;
+                }
+            }
+        }
+    }
+}

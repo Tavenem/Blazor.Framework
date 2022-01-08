@@ -1,29 +1,29 @@
 ﻿.avatar {
     align-items: center;
-    background-color: var(--tavenem-color-dark-hover);
+    background-color: var(--tavenem-color-dark);
     border-radius: 50%;
     color: var(--tavenem-color-dark-text);
     display: inline-flex;
     flex-shrink: 0;
-    font-size: 1.25rem;
-    height: 2.5rem;
+    font-size: 1.25em;
+    height: 2.5em;
     justify-content: center;
     line-height: 1;
     overflow: hidden;
     position: relative;
     user-select: none;
-    width: 2.5rem;
+    width: 2.5em;
 
     &.small {
-        width: 1.5rem;
-        height: 1.5rem;
-        font-size: .875rem;
+        width: 1.5em;
+        height: 1.5em;
+        font-size: .875em;
     }
 
     &.large {
-        width: 3.5rem;
-        height: 3.5rem;
-        font-size: 1.75rem;
+        width: 3.5em;
+        height: 3.5em;
+        font-size: 1.75em;
     }
 
     img {
@@ -34,45 +34,133 @@
         text-indent: 10000px;
         width: 100%;
     }
+
+    &.outlined {
+        background-color: var(--tavenem-color-dark) !important;
+        border: 1px solid var(--tavenem-color-border);
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            background-color: var(--tavenem-color-#{$theme});
+            color: var(--tavenem-color-#{$theme}-text);
+
+            &.bg-alt {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.darken {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+                color: var(--tavenem-color-#{$theme}-text);
+            }
+
+            &.lighten {
+                background-color: var(--tavenem-color-#{$theme}-lighten);
+                color: var(--tavenem-color-#{$theme}-text);
+            }
+        }
+    }
 }
 
 .avatar-group {
     display: flex;
+    counter-reset: avatar-count;
 
     .avatar {
         border: 2px solid transparent;
-        width: 2.75rem;
-        margin-inline-start: .75rem;
-        height: 2.75rem;
+        width: 2.75em;
+        margin-inline-start: .75em;
+        height: 2.75em;
 
         &:first-child {
             margin-inline-start: 0px !important;
         }
 
         &.small {
-            width: 1.75rem;
-            height: 1.75rem;
+            width: 1.75em;
+            height: 1.75em;
         }
 
         &.large {
-            width: 3.75rem;
-            height: 3.75rem;
+            width: 3.75em;
+            height: 3.75em;
+        }
+
+        &:before {
+            counter-increment: avatar-count;
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+
+        .avatar {
+            background-color: var(--tavenem-color-dark);
+            color: var(--tavenem-color-dark-text);
         }
     }
 
     &.outlined {
-        border: 0;
+        border: none;
 
         .avatar {
-            background-color: transparent !important;
+            background-color: var(--tavenem-color-dark) !important;
             border: 2px solid var(--tavenem-color-border);
         }
+    }
 
-        @each $theme in $theme-colors {
-            &.#{$theme} .avatar:not(.outlined) {
-                border-color: var(--tavenem-color-#{$theme}-darken);
-                color: unset;
+    &.bg-alt {
+        background-color: transparent;
+
+        .avatar {
+            background-color: var(--tavenem-color-bg-alt);
+        }
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            color: var(--tavenem-color-#{$theme}-text);
+
+            .avatar {
+                background-color: var(--tavenem-color-#{$theme});
+                color: inherit;
             }
+
+            &.bg-alt {
+                background-color: transparent;
+
+                .avatar {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+            }
+
+            &.filled {
+                background-color: transparent;
+
+                .avatar {
+                    background-color: var(--tavenem-color-#{$theme});
+                }
+            }
+
+            &.outlined .avatar {
+                border-color: var(--tavenem-color-#{$theme});
+            }
+
+            &.darken {
+                .avatar {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+            }
+
+            &.lighten {
+                .avatar {
+                    background-color: var(--tavenem-color-#{$theme}-lighten);
+                }
+            }
+        }
+
+        .border-#{$theme} .avatar {
+            border-color: var(--tavenem-color-#{$theme}) !important;
         }
     }
 }

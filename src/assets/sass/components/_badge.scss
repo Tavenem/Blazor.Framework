@@ -1,5 +1,8 @@
 ﻿.badge {
     align-items: flex-start;
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--tavenem-color-secondary-text);
     display: flex;
     flex: 0 1;
     font-size: .75rem;
@@ -14,7 +17,10 @@
     width: 100%;
 
     .badge-content {
+        background-color: var(--tavenem-color-secondary);
+        border-color: inherit;
         border-radius: .625rem;
+        color: inherit;
         height: 1.25rem;
         inset: auto auto calc(100% - 4px) calc(100% - 4px);
         letter-spacing: 0;
@@ -162,5 +168,66 @@
         min-width: 0;
         padding: 0;
         width: .5625rem;
+    }
+
+    &.filled {
+        color: var(--tavenem-color-dark-text);
+
+        .badge-content {
+            background-color: var(--tavenem-color-dark);
+        }
+    }
+
+    &.outlined {
+        .badge-content {
+            background-color: transparent !important;
+            border: 1px solid var(--tavenem-color-border);
+        }
+    }
+
+    &.bg-alt {
+        .badge-content {
+            background-color: var(--tavenem-color-bg-alt);
+        }
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            .badge-content {
+                background-color: var(--tavenem-#{$theme});
+                color: var(--tavenem-color-#{$theme}-text);
+
+                @include unify-parent("a") {
+                    &:hover:not(.disabled, :disabled),
+                    &:focus:not(.disabled, :disabled) {
+                        color: var(--tavenem-color-#{$theme}-text);
+                    }
+                }
+            }
+
+            &.darken .badge-content {
+                background-color: var(--tavenem-#{$theme}-darken);
+                color: var(--tavenem-color-#{$theme}-text);
+
+                @include unify-parent("a") {
+                    &:hover:not(.disabled, :disabled),
+                    &:focus:not(.disabled, :disabled) {
+                        color: var(--tavenem-color-#{$theme}-text);
+                    }
+                }
+            }
+
+            &.lighten .badge-content {
+                background-color: var(--tavenem-#{$theme}-lighten);
+                color: var(--tavenem-color-#{$theme}-text);
+
+                @include unify-parent("a") {
+                    &:hover:not(.disabled, :disabled),
+                    &:focus:not(.disabled, :disabled) {
+                        color: var(--tavenem-color-#{$theme}-text);
+                    }
+                }
+            }
+        }
     }
 }

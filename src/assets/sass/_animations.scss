@@ -1,49 +1,19 @@
-﻿@keyframes tf-fadein {
-    0% {
-        opacity: 0;
+﻿@keyframes tf-rotation {
+    from {
+        transform: rotate(0deg);
     }
 
-    100% {
-        opacity: 1;
-    }
-}
-
-@-moz-keyframes tf-fadein {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
+    to {
+        transform: rotate(359deg);
     }
 }
 
-@-webkit-keyframes tf-fadein {
-    0% {
+@keyframes tf-fadein {
+    from {
         opacity: 0;
     }
 
-    100% {
-        opacity: 1;
-    }
-}
-
-@-o-keyframes tf-fadein {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-@-ms-keyframes tf-fadein {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
+    to {
         opacity: 1;
     }
 }

@@ -5,9 +5,11 @@
 @import "theme";
 @import "utilities";
 @import "ripple";
+@import "icon";
 @import "components/overlay";
 @import "components/closebutton";
 @import "components/alert";
+@import "components/appbar";
 @import "components/avatar";
 @import "components/badge";
 @import "components/breadcrumb";
@@ -19,44 +21,46 @@
 @import "components/collapse";
 @import "components/drawer";
 @import "components/field";
+@import "components/list";
 @import "components/modal";
+@import "components/pagination";
+@import "components/progress";
+@import "components/popover";
+@import "components/rating";
+@import "components/scrolltotop";
 @import "components/select";
+@import "components/skeleton";
 @import "components/slider";
+@import "components/snackbar";
+@import "components/table";
+@import "components/tabs";
+@import "components/toolbar";
+@import "components/tooltip";
 @import "blazor";
 
 *[id] {
-    scroll-margin-top: var(--tavenem-toolbar-height);
+    scroll-margin-top: 4em;
 }
 
-button .icon-label {
-    align-items: inherit;
-    display: flex;
-    justify-content: inherit;
-    width: 100%;
+html, body * {
+    scrollbar-color: var(--tavenem-color-scrollbar) transparent;
 }
 
-.icon-button {
-    border-radius: 50%;
-    flex: 0 0 auto;
-    font-size: 1.5rem;
-    overflow: visible;
-    padding: .75rem;
-    text-align: center;
-    transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
+::-webkit-scrollbar {
+    height: 1em;
+    width: 1em;
+    z-index: 1;
+}
 
-    &:hover,
-    &:focus-visible {
-        background-color: rgba(0,0,0,.06);
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--tavenem-color-scrollbar);
+    border-radius: 1px;
+
+    &:hover {
+        background: var(--tavenem-color-scrollbar-hover);
     }
-}
-
-.icon {
-    display: inline-block;
-    fill: currentColor;
-    flex-shrink: 0;
-    font-size: 1.5rem;
-    height: 1rem;
-    transition: fill 200ms cubic-bezier(.4,0,.2,1) 0ms;
-    user-select: none;
-    width: 1rem;
 }

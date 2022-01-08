@@ -43,6 +43,7 @@
     <Content Update="assets\**" Pack="false">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
+    <None Include="Components\Alert.razor.cs" />
     <None Include="tavenem_128.png" Pack="true" PackagePath="\" />
     <ClientAssetsInputs Remove="assets\package.json" />
     <ClientAssetsInputs Remove="assets\postcss.config.js" />
@@ -97,6 +98,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ScssFiles Remove="assets\sass\components\_appbar.scss" />
     <ScssFiles Remove="assets\sass\components\_avatar.scss" />
     <ScssFiles Remove="assets\sass\components\_badge.scss" />
     <ScssFiles Remove="assets\sass\components\_breadcrumb.scss" />
@@ -109,11 +111,25 @@
     <ScssFiles Remove="assets\sass\components\_collapse.scss" />
     <ScssFiles Remove="assets\sass\components\_drawer.scss" />
     <ScssFiles Remove="assets\sass\components\_field.scss" />
+    <ScssFiles Remove="assets\sass\components\_icon.scss" />
+    <ScssFiles Remove="assets\sass\components\_list.scss" />
     <ScssFiles Remove="assets\sass\components\_modal.scss" />
     <ScssFiles Remove="assets\sass\components\_overlay.scss" />
+    <ScssFiles Remove="assets\sass\components\_pagination.scss" />
+    <ScssFiles Remove="assets\sass\components\_popover.scss" />
+    <ScssFiles Remove="assets\sass\components\_progress.scss" />
+    <ScssFiles Remove="assets\sass\components\_rating.scss" />
     <ScssFiles Remove="assets\sass\components\_ripple.scss" />
+    <ScssFiles Remove="assets\sass\components\_scrolltotop.scss" />
     <ScssFiles Remove="assets\sass\components\_select.scss" />
+    <ScssFiles Remove="assets\sass\components\_skeleton.scss" />
     <ScssFiles Remove="assets\sass\components\_slider.scss" />
+    <ScssFiles Remove="assets\sass\components\_snackbar.scss" />
+    <ScssFiles Remove="assets\sass\components\_table.scss" />
+    <ScssFiles Remove="assets\sass\components\_tabs.scss" />
+    <ScssFiles Remove="assets\sass\components\_timeline.scss" />
+    <ScssFiles Remove="assets\sass\components\_toolbar.scss" />
+    <ScssFiles Remove="assets\sass\components\_tooltip.scss" />
     <ScssFiles Remove="assets\sass\_alert.scss" />
     <ScssFiles Remove="assets\sass\_animations.scss" />
     <ScssFiles Remove="assets\sass\_blazor.scss" />
@@ -218,6 +234,70 @@
   
   <ItemGroup>
     <ClientAssetsInputs Remove="assets\sass\components\_slider.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_icon.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_list.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_pagination.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_progress.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_rating.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_scrolltotop.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_table.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_skeleton.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_snackbar.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_tabs.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_timeline.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_toolbar.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_popover.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_tooltip.scss" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Alert.razor.cs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_appbar.scss" />
   </ItemGroup>
 
 </Project>

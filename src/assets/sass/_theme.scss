@@ -2,6 +2,20 @@
     border-color: var(--tavenem-color-border);
 }
 
+.filled {
+    background-color: var(--tavenem-color-secondary);
+    color: var(--tavenem-color-secondary-text);
+}
+
+.outlined {
+    background-color: transparent !important;
+    border: 1px solid var(--tavenem-color-border);
+}
+
+.bg-alt {
+    background-color: var(--tavenem-color-bg-alt);
+}
+
 @each $theme in $theme-colors {
     :root {
         --tavenem-color-#{$theme}: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness));
@@ -16,37 +30,57 @@
     }
 
     .#{$theme} {
-        background-color: var(--tavenem-color-#{$theme});
-        color: var(--tavenem-color-#{$theme}-text);
+        color: var(--tavenem-color-#{$theme});
 
-        &.darken {
-            background-color: var(--tavenem-color-#{$theme}-darken);
-            color: var(--tavenem-color-#{$theme}-text);
+        @include unify-parent("a") {
+            &:hover:not(.disabled, :disabled),
+            &:focus:not(.disabled, :disabled) {
+                color: var(--tavenem-color-#{$theme}-lighten);
+            }
         }
 
-        &.lighten {
-            background-color: var(--tavenem-color-#{$theme}-lighten);
-            color: var(--tavenem-color-#{$theme}-text);
+        &.bg-alt {
+            background-color: var(--tavenem-color-#{$theme}-hover);
         }
 
         &.filled {
             background-color: var(--tavenem-color-#{$theme});
             color: var(--tavenem-color-#{$theme}-text);
-            font-weight: normal;
-        }
-
-        &.outlined {
-            border-color: var(--tavenem-color-#{$theme});
-            color: var(--tavenem-color-#{$theme});
-        }
-
-        &-text {
-            color: var(--tavenem-color-#{$theme});
 
             @include unify-parent("a") {
                 &:hover:not(.disabled, :disabled),
                 &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-lighten);
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+
+            &.bg-alt {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+            }
+        }
+
+        &.outlined {
+            border-color: var(--tavenem-color-#{$theme});
+        }
+
+        &.darken {
+            color: var(--tavenem-color-#{$theme}-darken);
+
+            @include unify-parent("a") {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme});
+                }
+            }
+        }
+
+        &.lighten {
+            color: var(--tavenem-color-#{$theme}-lighten);
+
+            @include unify-parent("a") {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-lighten-2);
                 }
             }
         }
@@ -55,19 +89,4 @@
     .border-#{$theme} {
         border-color: var(--tavenem-color-#{$theme}) !important;
     }
-}
-
-.filled {
-    background-color: var(--tavenem-color-dark);
-    color: var(--tavenem-color-dark-text);
-    font-weight: var(--tavenem-font-weight-bold);
-}
-
-.outlined {
-    background-color: transparent !important;
-    border: 1px solid var(--tavenem-color-border);
-}
-
-.bg-alt {
-    background-color: var(--tavenem-color-bg-alt);
 }

@@ -1,0 +1,31 @@
+﻿.scroll-to-top {
+    bottom: 1em;
+    cursor: pointer;
+    flex: 1;
+    position: fixed;
+    right: 1em;
+    z-index: var(--tavenem-zindex-scroll-to-top);
+
+    &:not(.hidden) {
+        transition: transform 0.5s;
+    }
+
+    &.hidden {
+        flex: 0;
+        opacity: 0;
+        transform: scale(0) rotate(180deg);
+        transition: all 0.5s;
+        visibility: hidden;
+    }
+
+    &:after {
+        background: transparent;
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: var(--tavenem-zindex-tooltip);
+    }
+}

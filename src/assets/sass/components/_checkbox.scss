@@ -1,5 +1,8 @@
 ﻿.checkbox {
     @include ripple;
+    --checkbox-inherited-color: var(--tavenem-color-action);
+    --checkbox-inherited-content-color: var(--tavenem-color-text);
+    --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
     align-items: center;
     color: var(--tavenem-color-action);
     cursor: pointer;
@@ -8,7 +11,7 @@
     -webkit-tap-highlight-color: transparent;
 
     > .content {
-        color: var(--tavenem-color-text);
+        color: var(--checkbox-inherited-content-color);
     }
 
     &:disabled, &.disabled {
@@ -53,11 +56,12 @@
         }
 
         > .checkbox-icons {
+            color: var(--checkbox-inherited-color);
             display: flex;
             position: relative;
 
             &:hover {
-                background-color: var(--tavenem-color-action-hover-bg);
+                background-color: var(--checkbox-inherited-hover-bg);
             }
 
             > .icon-checked {
@@ -69,58 +73,6 @@
         }
     }
 
-    .filled {
-        background-color: transparent;
-        color: var(--tavenem-color-action);
-        font-weight: unset;
-    }
-
-    .outlined {
-        background-color: transparent !important;
-        border: 0;
-    }
-
-    .bg-alt {
-        background-color: transparent;
-    }
-
-    @each $theme in $theme-colors {
-        .#{$theme} {
-            &, &.darken, &.lighten, &.filled, &.outlined {
-                background-color: transparent;
-                color: var(--tavenem-color-action);
-            }
-
-            > .checkbox-span > .checkbox-icons {
-                color: var(--tavenem-color-#{$theme});
-
-                &:hover {
-                    background-color: var(--tavenem-color-#{$theme}-hover);
-                }
-            }
-
-            &.darken > .checkbox-span > .checkbox-icons {
-                color: var(--tavenem-color-#{$theme}-darken);
-
-                &:hover {
-                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                }
-            }
-
-            &.lighten > .checkbox-span > .checkbox-icons {
-                color: var(--tavenem-color-#{$theme}-lighten);
-
-                &:hover {
-                    background-color: var(--tavenem-color-#{$theme}-hover-light);
-                }
-            }
-
-            &.outlined {
-                border-color: var(--tavenem-color-#{$theme});
-            }
-        }
-    }
-
     :checked + .checkbox-icons > .icon-checked {
         transform: scale(1);
         transition: transform 150ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
@@ -128,7 +80,44 @@
 
     &.dense, .dense > & {
         > .checkbox-span > .checkbox-icons {
-            padding: .25rem;
+            padding: 4px;
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+    }
+
+    &.outlined {
+        border: none;
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            &, &.darken, &.lighten, &.filled {
+                color: var(--tavenem-color-action);
+            }
+
+            --checkbox-inherited-color: var(--tavenem-color-#{$theme});
+            --checkbox-inherited-content-color: var(--tavenem-color-#{$theme});
+            --checkbox-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
+
+            &.darken {
+                --checkbox-inherited-color: var(--tavenem-color-#{$theme}-darken);
+                --checkbox-inherited-content-color: var(--tavenem-color-#{$theme}-darken);
+                --checkbox-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
+            }
+
+            &.lighten {
+                --checkbox-inherited-color: var(--tavenem-color-#{$theme}-lighten);
+                --checkbox-inherited-content-color: var(--tavenem-color-#{$theme}-lighten);
+                --checkbox-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
+            }
         }
     }
 }
@@ -141,13 +130,13 @@
     @extend .checkbox;
 
     > .checkbox-span {
-        height: 2.375rem;
-        padding: .75rem;
-        width: 3.625rem;
+        height: calc(1.25em + 18px);
+        padding: 12px;
+        width: calc(1.25em + 38px);
 
         > .track {
             background-color: black;
-            border-radius: calc(.5rem - 1px);
+            border-radius: calc(.5em - 1px);
             height: 100%;
             opacity: 0.48;
             transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
@@ -167,8 +156,8 @@
             background-color: currentColor;
             border-radius: 50%;
             box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
-            height: 1.25rem;
-            width: 1.25rem;
+            height: 1.25em;
+            width: 1.25em;
         }
     }
 

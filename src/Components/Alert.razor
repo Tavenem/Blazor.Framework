@@ -1,0 +1,15 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @attributes="UserAttributes" role="alert" class="@ClassName" style="@Style" @onclick="OnClick">
+    @if (AutoIcon && !string.IsNullOrEmpty(IconClass))
+    {
+        <div class="@IconClass"></div>
+    }
+    @ChildContent
+    @if (CanClose)
+    {
+        <div class="btn-close" @onclick="OnClosedAsync"></div>
+    }
+</div>

@@ -1,0 +1,241 @@
+﻿.tabs {
+    --tab-active-bg: transparent;
+    --tab-active-color: var(--tavenem-color-primary);
+    --tab-active-hover: var(--tavenem-color-primary-hover);
+    color: var(--tavenem-color-text);
+    display: flex;
+    flex-direction: column;
+
+    > .tabs-toolbar {
+        background-color: var(--tavenem-color-bg-surface);
+        position: relative;
+
+        > .tabs-toolbar-inner {
+            display: flex;
+            min-height: 3em;
+
+            > .tabs-toolbar-content {
+                flex: 1 1 auto;
+                display: inline-block;
+                overflow: hidden;
+                position: relative;
+                transition: .3s cubic-bezier(.25,.8,.5,1);
+                width: 100%;
+                white-space: nowrap;
+
+                > .tabs-toolbar-wrapper {
+                    display: flex;
+                    position: inherit;
+                    transition: .3s cubic-bezier(.25,.8,.5,1);
+                    width: max-content;
+                }
+            }
+        }
+    }
+
+    .tab {
+        @include ripple;
+        align-items: center;
+        display: inline-flex;
+        flex-shrink: 0;
+        font-weight: var(--tavenem-font-weight-button);
+        justify-content: center;
+        line-height: 1.75;
+        min-height: 3em;
+        min-width: 10em;
+        padding: 6px .75em;
+        text-align: center;
+        text-transform: uppercase;
+        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        user-select: none;
+        white-space: normal;
+        width: 100%;
+
+        &:hover {
+            background-color: var(--tavenem-color-action-hover-bg);
+            cursor: pointer;
+        }
+
+        &.active {
+            background-color: var(--tab-active-bg);
+            border-color: var(--tab-active-color);
+            color: var(--tab-active-color);
+
+            &:hover {
+                background-color: var(--tab-active-hover);
+            }
+        }
+
+        &.disabled {
+            color: var(--tavenem-color-text-disabled);
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .icon {
+            margin-inline-end: .5rem;
+        }
+    }
+
+    > .panels {
+        position: relative;
+        transition: .3s cubic-bezier(.25,.8,.5,1);
+    }
+
+    &:not(.bottom, .left, .right) .tab {
+        border-left: 1px solid var(--tavenem-color-border);
+        border-right: 1px solid var(--tavenem-color-border);
+        border-top: 1px solid var(--tavenem-color-border);
+        border-top-left-radius: var(--tavenem-border-radius);
+        border-top-right-radius: var(--tavenem-border-radius);
+
+        &:not(.active) {
+            border-bottom: 1px solid var(--tavenem-color-border);
+        }
+
+        &.active {
+            border-top: 2px solid var(--tab-active-color);
+        }
+    }
+
+    &.bottom {
+        flex-direction: column-reverse;
+
+        .tab {
+            border-left: 1px solid var(--tavenem-color-border);
+            border-right: 1px solid var(--tavenem-color-border);
+            border-bottom: 1px solid var(--tavenem-color-border);
+            border-bottom-left-radius: var(--tavenem-border-radius);
+            border-bottom-right-radius: var(--tavenem-border-radius);
+
+            &:not(.active) {
+                border-top: 1px solid var(--tavenem-color-border);
+            }
+
+            &.active {
+                border-bottom: 2px solid var(--tab-active-color);
+            }
+        }
+    }
+
+    &.left, &.right {
+        .tab {
+            border-bottom: 1px solid var(--tavenem-color-border);
+            border-top: 1px solid var(--tavenem-color-border);
+        }
+
+        > .tabs-toolbar > .tabs-toolbar-inner {
+            flex-direction: column;
+
+            > .tabs-toolbar-content > .tabs-toolbar-wrapper {
+                flex-direction: column;
+            }
+
+            .tab-scroll-btn .icon {
+                transform: rotate(90deg);
+            }
+        }
+
+        > .panels {
+            display: flex;
+            flex-grow: 1;
+        }
+    }
+
+    &.left {
+        .tab {
+            border-bottom-left-radius: var(--tavenem-border-radius);
+            border-left: 1px solid var(--tavenem-color-border);
+            border-top-left-radius: var(--tavenem-border-radius);
+
+            &:not(.active) {
+                border-right: 1px solid var(--tavenem-color-border);
+            }
+
+            &.active {
+                border-left: 2px solid var(--tab-active-color);
+            }
+        }
+
+        flex-direction: row;
+    }
+
+    &.right {
+        .tab {
+            border-bottom-right-radius: var(--tavenem-border-radius);
+            border-right: 1px solid var(--tavenem-color-border);
+            border-top-right-radius: var(--tavenem-border-radius);
+
+            &:not(.active) {
+                border-left: 1px solid var(--tavenem-color-border);
+            }
+
+            &.active {
+                border-right: 2px solid var(--tab-active-color);
+            }
+        }
+
+        flex-direction: row-reverse;
+    }
+
+    &.filled {
+        --tab-active-bg: var(--tavenem-color-primary);
+        --tab-active-color: var(--tavenem-color-primary-text);
+        --tab-active-hover: var(--tavenem-color-primary-darken);
+        background-color: transparent;
+        color: var(--tavenem-color-text);
+    }
+
+    &.outlined {
+        background-color: transparent !important;
+        border: 1px solid var(--tavenem-color-border);
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+
+        .tab, > .panels {
+            background-color: var(--tavenem-color-bg-alt);
+        }
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --tab-active-color: var(--tavenem-color-#{$theme});
+            --tab-active-hover: var(--tavenem-color-#{$theme}-hover);
+            color: var(--tavenem-color-text);
+
+            &.bg-alt {
+                background-color: transparent;
+
+                .tab, > .panels {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                }
+            }
+
+            &.filled {
+                --tab-active-bg: var(--tavenem-color-#{$theme});
+                --tab-active-color: var(--tavenem-color-#{$theme}-text);
+                --tab-active-hover: var(--tavenem-color-#{$theme}-darken);
+                background-color: transparent;
+                color: var(--tavenem-color-text);
+
+                &.bg-alt {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+            }
+
+            &.darken {
+                --tab-active-color: var(--tavenem-color-#{$theme}-darken);
+                --tab-active-hover: var(--tavenem-color-#{$theme}-hover-dark);
+                color: var(--tavenem-color-text);
+            }
+
+            &.lighten {
+                --tab-active-color: var(--tavenem-color-#{$theme}-lighten);
+                --tab-active-hover: var(--tavenem-color-#{$theme}-hover-light);
+                color: var(--tavenem-color-text);
+            }
+        }
+    }
+}

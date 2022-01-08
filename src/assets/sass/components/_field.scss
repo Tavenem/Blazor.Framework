@@ -1,30 +1,195 @@
 ﻿.field {
+    --field-active-color: var(--tavenem-color-primary);
+    --field-bottom-border-hover-color: var(--tavenem-color-action);
+    --field-label-color: var(--tavenem-color-text-secondary);
+    --field-label-active-color: var(--tavenem-color-text);
     border: 0;
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
     margin: 0;
-    margin-bottom: .5rem;
-    margin-top: 1rem;
+    margin-bottom: .5em;
+    margin-top: 1em;
     max-width: 100%;
     padding: 0;
     position: relative;
     vertical-align: top;
 
     > .input {
-        &.text {
-            margin-top: 1rem;
+        align-items: center;
+        box-sizing: border-box;
+        color: var(--tavenem-color-text);
+        column-gap: 8px;
+        cursor: text;
+        display: inline-flex;
+        font-size: 1em;
+        font-weight: var(--tavenem-font-weight);
+        line-height: 1.1876em;
+        min-height: calc(1em + 3px);
+        position: relative;
+
+        &:not(.outlined) {
+            &:before {
+                border-bottom-color: var(--tavenem-color-border-input);
+                border-bottom-style: solid;
+                border-bottom-width: 1px;
+                bottom: 0;
+                content: "\00a0";
+                left: 0;
+                right: 0;
+                pointer-events: none;
+                position: absolute;
+                transition: border-bottom 0.2s, border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 0.2s;
+            }
+
+            &:hover:not(:disabled):before {
+                border-bottom-color: var(--field-bottom-border-hover-color);
+            }
+
+            &:disabled:before {
+                border-bottom-style: dotted;
+            }
+
+            &:after {
+                border-bottom-color: var(--field-active-color);
+                border-bottom-style: solid;
+                border-bottom-width: 2px;
+                bottom: 0;
+                content: "";
+                left: 0;
+                right: 0;
+                pointer-events: none;
+                position: absolute;
+                transform: scaleX(0);
+                transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+            }
+        }
+
+        &:disabled {
+            color: var(--tavenem-color-text-disabled) !important;
+            cursor: default;
+
+            .icon {
+                color: var(--tavenem-color-text-disabled) !important;
+                pointer-events: none;
+            }
+        }
+
+        > input, > .input {
+            background: none;
+            border: 0;
+            box-sizing: content-box;
+            color: currentColor;
+            display: block;
+            font: inherit;
+            height: 1.1876em;
+            min-width: 0;
+            margin: 0;
+            padding: 6px 0 7px;
+            position: relative;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
+
+            &::placeholder {
+                color: currentColor;
+                opacity: 0.42;
+                transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+            }
+
+            &::-ms-reveal, &::-ms-clear {
+                display: none !important;
+            }
+
+            &.multiline {
+                height: auto;
+                resize: none;
+                padding: 0;
+            }
+
+            &:focus {
+                outline: 0;
+            }
+
+            &:invalid {
+                box-shadow: none;
+            }
+
+            &:disabled {
+                opacity: 1;
+            }
+        }
+
+        > input[type=search] {
+            -moz-appearance: textfield;
+            -webkit-appearance: textfield;
+        }
+
+        > textarea {
+            cursor: auto;
+            height: auto;
+            margin: 6px 0 7px;
+            padding: 0;
+            resize: none;
+
+            &::-webkit-scrollbar {
+                cursor: crosshair;
+                height: 8px;
+                width: 8px;
+                z-index: 1;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: var(--tavenem-color-border-input);
+                border-radius: 1px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent;
+            }
+        }
+
+        > .range-separator {
+            visibility: hidden;
+            margin: 0 4px;
+        }
+
+        &:focus-within > .range-separator,
+        .shrink > & > .range-separator {
+            visibility: visible;
         }
     }
 
     > label {
-        color: var(--tavenem-color-text-secondary);
-        font-size: 1rem;
+        color: var(--field-label-color);
+        display: block;
+        font-size: 1em;
         font-weight: var(--tavenem-font-weight);
+        left: 0;
         line-height: 1;
         padding: 0;
         pointer-events: none;
+        position: absolute;
+        top: 0;
+        transform: translate(0, calc(1em + 8px) scale(1);
+        transform-origin: top left;
+        transition: color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
         z-index: 0;
+
+        *[dir="rtl"] & {
+            left: unset;
+            right: 0;
+            transform-origin: top right;
+        }
+
+        &:focus-within {
+            color: var(--field-label-focus-color);
+            transform: translate(0, 1.5px) scale(.75);
+        }
+    }
+
+    &.shrink > label {
+        color: var(--field-label-active-color);
+        transform: translate(0, 1.5px) scale(.75);
     }
 
     &.required > label::after {
@@ -32,8 +197,8 @@
     }
 
     > .helpers {
-        color: var(--tavenem-color-text-secondary);
-        font-size: 0.75rem;
+        color: var(--field-label-color);
+        font-size: 0.75em;
         font-weight: var(--tavenem-font-weight);
         line-height: 1.66;
         margin-top: 3px;
@@ -44,6 +209,10 @@
             transform: translateY(-100%);
             transition: color 200ms cubic-bezier(0,0,.2,1) 0ms,transform 200ms cubic-bezier(0,0,.2,1) 0ms;
         }
+
+        &:disabled {
+            color: var(--tavenem-color-text-disabled) !important;
+        }
     }
 
     &:focus-within, &.error {
@@ -52,77 +221,295 @@
         }
     }
 
-    &.disabled, &:disabled {
-        > input, > .helpers {
-            color: var(--tavenem-color-text-disabled);
+    &.filled {
+        > .input {
+            background-color: rgba(0, 0, 0, 0.09);
+            border-top-left-radius: var(--tavenem-border-radius);
+            border-top-right-radius: var(--tavenem-border-radius);
+            position: relative;
+            transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.13);
+            }
+
+            &:disabled {
+                background-color: rgba(0, 0, 0, 0.12);
+            }
+
+            > input, .input {
+                padding: calc(1em + 11px) 12px 10px;
+
+                &:-webkit-autofill {
+                    border-top-left-radius: inherit;
+                    border-top-right-radius: inherit;
+                }
+
+                &.multiline {
+                    padding: 0;
+                }
+            }
+
+            > textarea {
+                margin: calc(1em + 11px) 12px 10px;
+                padding: 0;
+            }
+        }
+
+        > label {
+            pointer-events: none;
+            transform: translate(12px, calc(1em + 4px)) scale(1);
+            z-index: 1;
+
+            *[dir="rtl"] & {
+                transform: translate(-12px, calc(1em + 4px)) scale(1);
+            }
+
+            &.shrink, &:focus-within {
+                transform: translate(12px, 10px) scale(.75);
+
+                *[dir="rtl"] & {
+                    transform: translate(-12px, 10px) scale(.75);
+                }
+            }
+        }
+
+        > .helpers {
+            padding-left: 12px;
+            padding-right: 12px;
         }
     }
 
-    &.error {
-        > .input, > .helpers {
-            color: var(--tavenem-color-error) !important;
-        }
-    }
+    &.outlined {
+        > .input {
+            border: 1px solid var(--tavenem-color-border-input);
+            border-radius: var(--tavenem-border-radius);
+            position: relative;
+            transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
-    .content {
-        height: auto;
-        min-height: calc(1rem + 3px);
+            &:not(:disabled, :focus-within):hover {
+                border-color: var(--tavenem-color-action);
+            }
+
+            &:focus-within {
+                border-color: var(--field-active-color);
+            }
+
+            &:disabled {
+                border-color: var(--tavenem-color-action-disabled) !important;
+            }
+
+            > input, .input {
+                padding: calc(1em + 2.5px) 14px;
+
+                &:-webkit-autofill {
+                    border-radius: inherit;
+                }
+            }
+
+            > textarea {
+                margin: calc(1em + 2.5px) 14px;
+                padding: 0;
+            }
+        }
+
+        > label {
+            background-color: var(--tavenem-color-bg-surface);
+            line-height: calc(1em + 2px);
+            padding: 0px 5px !important;
+            pointer-events: none;
+            transform: translate(14px, calc(1em + 4px)) scale(1);
+
+            *[dir="rtl"] & {
+                transform: translate(-14px, calc(1em + 4px)) scale(1);
+            }
+
+            &.shrink, &:focus-within {
+                transform: translate(14px, -6px) scale(.75);
+
+                *[dir="rtl"] & {
+                    transform: translate(-14px, -6px) scale(.75);
+                }
+            }
+        }
+
+        > .helpers {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
     }
 
     &.dense {
         margin-bottom: 2px;
         margin-top: 3px;
 
+        > .input > {
+            input, .input {
+                padding-top: 3px;
+            }
+
+            textarea {
+                margin-top: 3px;
+                padding-top: 0;
+            }
+        }
+
+        > label {
+            transform: translate(0, calc(1em + 3px)) scale(1);
+        }
+
         > .helpers {
             margin-top: 4px;
         }
 
-        .content {
-            padding-top: 0;
-            padding-bottom: 0;
+        &.filled {
+            > .input > {
+                input, .input {
+                    padding-bottom: 6px;
+                    padding-top: calc(1em + 7px);
+                }
+            }
+
+            > label {
+                transform: translate(12px, calc(1em + 1px)) scale(1);
+
+                *[dir="rtl"] & {
+                    transform: translate(-12px, calc(1em + 1px)) scale(1);
+                }
+
+                &.shrink, &:focus-within {
+                    transform: translate(12px, 7px) scale(.75);
+
+                    *[dir="rtl"] & {
+                        transform: translate(-12px, 7px) scale(.75);
+                    }
+                }
+            }
         }
 
-        &.filled .content {
-            padding-top: calc(1.25rem + 1px);
-            padding-bottom: 2px;
-        }
+        &.outlined {
+            > .input > {
+                input, .input {
+                    padding-bottom: calc(1em - 5.5px);
+                    padding-top: calc(1em - 5.5px);
+                }
 
-        &.outlined .content {
-            padding-top: calc(.5rem - 1px);
-            padding-bottom: 2px;
-        }
-    }
+                textarea {
+                    margin-bottom: calc(1em - 5.5px);
+                    margin-top: calc(1em - 5.5px);
+                    padding-bottom: 0;
+                    padding-top: 0;
+                }
+            }
 
-    &.filled {
-        > .helpers {
-            padding-left: .25rem;
-            padding-right: .25rem;
-        }
+            > label {
+                transform: translate(12px, calc(1em - 4px)) scale(1);
 
-        .icon,
-        .btn-icon {
-            + .content {
-                padding-inline-start: 0;
-                padding-inline-end: .75rem;
+                *[dir="rtl"] & {
+                    transform: translate(-12px, calc(1em - 4px)) scale(1);
+                }
             }
         }
     }
 
-    &.outlined {
-        > label {
-            line-height: calc(1rem + 2px);
+    &.error {
+        > .input {
+            color: var(--tavenem-color-error) !important;
+        }
+
+        &:not(.outlined) > .input:after {
+            border-bottom-color: var(--tavenem-color-error) !important;
+            transform: scaleX(1);
+        }
+
+        &.outlined > .input {
+            border-color: var(--tavenem-color-error) !important;
         }
 
         > .helpers {
-            padding-left: .5rem;
-            padding-right: .5rem;
+            color: var(--tavenem-color-error) !important;
         }
 
-        .icon,
-        .btn-icon {
-            + .content {
-                padding-inline-start: 0;
-                padding-inline-end: .875rem;
+        > label:focus-within {
+            color: var(--tavenem-color-error) !important;
+        }
+    }
+
+    &:disabled, &.disabled {
+        > .input {
+            color: var(--tavenem-color-text-disabled) !important;
+            cursor: default;
+
+            .icon {
+                color: var(--tavenem-color-text-disabled) !important;
+                pointer-events: none;
+            }
+
+            &:not(.outlined) {
+                &:before {
+                    border-bottom-style: dotted;
+                }
+            }
+
+            > input, > .input {
+                opacity: 1;
+            }
+        }
+
+        > .helpers {
+            color: var(--tavenem-color-text-disabled) !important;
+        }
+
+        &.filled {
+            > .input {
+                background-color: rgba(0, 0, 0, 0.12) !important;
+            }
+        }
+
+        &.outlined {
+            > .input {
+                border-color: var(--tavenem-color-action-disabled) !important;
+            }
+        }
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --field-active-color: var(--tavenem-color-#{$theme});
+            --field-bottom-border-hover-color: var(--tavenem-color-#{$theme}-hover-bright);
+            --field-label-color: var(--tavenem-color-#{$theme}-darken);
+            --field-label-active-color: var(--tavenem-color-#{$theme});
+
+            &.darken {
+                --field-active-color: var(--tavenem-color-#{$theme}-darken);
+                --field-label-color: var(--tavenem-color-#{$theme}-darken-2);
+                --field-label-active-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                --field-active-color: var(--tavenem-color-#{$theme}-lighten);
+                --field-label-color: var(--tavenem-color-#{$theme});
+                --field-label-active-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+
+            &.filled {
+                background-color: transparent;
+
+                > .input {
+                    background-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .09);
+
+                    &:hover {
+                        background-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), 0.13);
+                    }
+
+                    &:disabled {
+                        background-color: var(--tavenem-color-#{$theme}-hover-bright);
+                    }
+                }
             }
         }
     }
@@ -130,6 +517,7 @@
 
 .number-field {
     @extend .field;
+    --number-field-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
 
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
@@ -141,22 +529,12 @@
         -moz-appearance: textfield;
     }
 
-    > .input {
-        input {
-            padding-inline-end: 1.5rem;
-        }
-    }
-
-    &.filled > .input input {
-        padding-inline-start: .75rem;
-    }
-
-    &.outlined > .input input {
-        padding-inline-start: calc(.75rem + 2px);
+    > .input input {
+        padding-inline-end: 1.5em;
     }
 
     &.dense > .input input {
-        padding-inline-end: 1.25rem;
+        padding-inline-end: 1.25em;
     }
 
     .numeric-spin {
@@ -170,10 +548,31 @@
         top: 0;
 
         button {
+            background-color: transparent;
+            color: inherit;
             min-height: unset;
             min-width: unset;
             padding-bottom: 2px;
             padding-top: 2px;
+
+            &:hover,
+            &:focus-visible {
+                background-color: var(--number-field-inherited-hover-bg);
+            }
+        }
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --number-field-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
+
+            &.darken {
+                --number-field-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
+            }
+
+            &.lighten {
+                --number-field-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
+            }
         }
     }
 }

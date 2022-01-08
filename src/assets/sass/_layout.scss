@@ -12,36 +12,8 @@
     grid-template-rows: auto auto 1fr auto auto;
     height: 100%;
     overflow: hidden;
+    position: relative;
     width: 100%;
-}
-
-.appbar {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 4em;
-
-    &.dense, .dense & {
-        min-height: 3em;
-    }
-
-    &.top,
-    &.bottom {
-        z-index: var(--tavenem-zindex-appbar);
-
-        @media (min-width: 768px) and (orientation: landscape) {
-            min-height: 3em;
-        }
-    }
-
-    &.top {
-        grid-area: header;
-    }
-
-    &.bottom {
-        grid-area: footer;
-    }
 }
 
 .container,

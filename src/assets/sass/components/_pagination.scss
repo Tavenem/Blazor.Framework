@@ -1,0 +1,121 @@
+﻿.pagination {
+    --pagination-active-color: var(--tavenem-color-primary);
+    --pagination-active-text-color: var(--tavenem-color-primary-text);
+    align-items: center;
+    color: var(--tavenem-color-action);
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+
+    > li {
+        > * {
+            border-radius: 9999px;
+            height: 2em;
+            margin: 0 3px;
+            min-width: 2em;
+            padding: 0 6px;
+            text-align: center;
+        }
+
+        &:not(.selected) > * {
+            box-shadow: none;
+        }
+
+        &.selected {
+            background-color: var(--pagination-active-color);
+            color: var(--pagination-active-text-color);
+        }
+
+        .btn,
+        .btn-text,
+        .btn-icon {
+            background-color: inherit;
+            color: inherit;
+            line-height: normal;
+        }
+
+        .btn-icon {
+            padding: 0;
+        }
+
+        &:disabled, &.disabled {
+            color: var(--tavenem-color-action-disabled) !important;
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+    }
+
+    &.outlined {
+        border: none;
+
+        > li {
+            border: 1px solid var(--tavenem-color-border);
+
+            &.selected {
+                background-color: transparent;
+                border-color: (--pagination-active-color);
+            }
+        }
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &:disabled, &.disabled > li {
+        color: var(--tavenem-color-action-disabled) !important;
+
+        * {
+            box-shadow: none;
+            background-color: transparent !important;
+            color: var(--tavenem-color-action-disabled) !important;
+            cursor: default;
+            pointer-events: none;
+        }
+    }
+
+    &.small > li > * {
+        height: 1.625em;
+        margin: 0 1px;
+        min-width: 1.625em;
+        padding: 0 4px;
+    }
+
+    &.large > li > * {
+        height: 2.5em;
+        min-width: 2.5em;
+        padding: 0 10px;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            color: var(--tavenem-color-action);
+            --pagination-active-color: var(--tavenem-color-#{$theme});
+            --pagination-active-text-color: var(--tavenem-color-#{$theme}-text);
+
+            &.bg-alt {
+                background-color: transparent;
+            }
+
+            &.filled {
+                background-color: transparent;
+                color: var(--tavenem-color-action);
+
+                &.bg-alt {
+                    background-color: transparent;
+                }
+            }
+
+            &.darken {
+                --pagination-active-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                --pagination-active-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+        }
+    }
+}

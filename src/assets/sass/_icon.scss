@@ -1,0 +1,95 @@
+﻿.icon {
+    direction: ltr;
+    display: inline-block;
+    fill: currentColor;
+    flex-shrink: 0;
+    font-family: 'Material Icons';
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    height: 1rem;
+    letter-spacing: normal;
+    line-height: 1;
+    position: relative;
+    text-rendering: optimizeLegibility;
+    text-transform: none;
+    transition: fill 200ms cubic-bezier(.4,0,.2,1) 0ms;
+    user-select: none;
+    white-space: nowrap;
+    width: 1rem;
+    word-wrap: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.disabled, &:disabled,
+    .disabled &, *:disabled & {
+        color: var(--tavenem-color-text-disabled);
+    }
+
+    &.small, .small > & {
+        font-size: 1.25rem;
+    }
+
+    &.large, .large > & {
+        font-size: 2.25rem;
+    }
+
+    &.stacked {
+        color: var(--tavenem-color-bg);
+        font-size: .75rem;
+        left: 0;
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        z-index: 1;
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-text);
+    }
+
+    &.outlined {
+        border: none;
+        font-family: 'Material Icons Outlined';
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            color: var(--tavenem-color-#{$theme});
+
+            &, &.filled {
+                background-color: transparent;
+
+                &.bg-alt {
+                    background-color: transparent;
+                }
+            }
+
+            &.outlined {
+                font-family: 'Material Icons Outlined';
+            }
+
+            &.darken {
+                color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                color: var(--tavenem-color-#{$theme}-lighten);
+            }
+
+            &.stacked {
+                color: var(--tavenem-color-text);
+            }
+        }
+    }
+}

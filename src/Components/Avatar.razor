@@ -1,0 +1,24 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@if (AvatarGroup is null || AvatarGroup.ShouldDisplay(this))
+{
+    <div @attributes="UserAttributes" class="@ClassName" style="@Style">
+        @if (!string.IsNullOrEmpty(Image))
+        {
+            if (!string.IsNullOrEmpty(Alt))
+            {
+                <img src="@Image" alt="@Alt" />
+            }
+            else
+            {
+                <img src="@Image" />
+            }
+        }
+        else
+        {
+            @ChildContent
+        }
+    </div>
+}

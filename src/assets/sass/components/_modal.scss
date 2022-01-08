@@ -1,21 +1,4 @@
-﻿@-webkit-keyframes tf-open-dialog {
-    0% {
-        opacity: 0;
-    }
-
-    1% {
-        -webkit-transform: scale(0.5);
-        transform: scale(0.5);
-        opacity: 1;
-    }
-
-    100% {
-        -webkit-transform: scale(1);
-        transform: scale(1);
-    }
-}
-
-@keyframes tf-open-dialog {
+﻿@keyframes tf-open-dialog {
     0% {
         opacity: 0;
     }

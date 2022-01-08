@@ -1,0 +1,296 @@
+﻿.table {
+    --table-action-color: var(--tavenem-color-action);
+    --table-bg-color: transparent;
+    --table-border-color: var(--tavenem-color-border-table);
+    --table-hover-color: var(--tavenem-color-table-hover);
+    --table-stripe-color: var(--tavenem-light-color-table-stripe);
+    border-collapse: collapse;
+    border-spacing: 0;
+    display: table;
+    overflow: auto;
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    width: 100%;
+
+    thead {
+        display: table-header-group;
+    }
+
+    tbody {
+        display: table-row-group;
+    }
+
+    tr {
+        color: inherit;
+        display: table-row;
+        outline: 0;
+        vertical-align: middle;
+
+        > {
+            td, th {
+                border-bottom: 1px solid var(--table-border-color);
+                color: inherit;
+                display: table-cell;
+                font-size: 0.875rem;
+                font-weight: var(--tavenem-font-weight);
+                line-height: 1.43;
+                padding: 1rem;
+                text-align: start;
+                vertical-align: inherit;
+
+                .btn, .btn-text {
+                    margin: -1rem;
+                    padding: 0;
+                }
+
+                .btn-icon {
+                    margin: -.75rem;
+                    padding: 0;
+                }
+
+                .field {
+                    margin-bottom: 0;
+                    margin-top: 2px;
+
+                    > .input {
+                        font-size: .875rem;
+                    }
+                }
+            }
+
+            th {
+                font-weight: var(--tavenem-font-weight-bold);
+                line-height: 1.5rem;
+
+                &.column-header {
+                    align-items: center;
+                    display: flex;
+                    justify-content: space-between;
+
+                    &.clickable {
+                        cursor: pointer;
+                    }
+
+                    &:hover {
+                        color: var(--table-action-color);
+
+                        .icon:not(.active) {
+                            opacity: 0.8;
+                        }
+                    }
+
+                    .icon {
+                        font-size: 1.125rem;
+                        margin-left: 4px;
+                        margin-right: 4px;
+                        opacity: 0;
+                        transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+                        user-select: none;
+
+                        &.active {
+                            opacity: 1;
+                        }
+
+                        &.desc {
+                            transform: rotate(180deg);
+                        }
+                    }
+
+                    > .options {
+                        align-items: center;
+                        display: inline-flex;
+                    }
+                }
+            }
+        }
+
+        &:last-child > td {
+            border-bottom: none;
+        }
+
+        &:first-child {
+            border-top: none;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+
+            > td {
+                &:first-child {
+                    border-top-left-radius: inherit;
+                }
+
+                &:last-child {
+                    border-top-right-radius: inherit;
+                }
+            }
+        }
+
+        &:last-child {
+            border-bottom: none;
+            border-bottom-left-radius: inherit;
+            border-bottom-right-radius: inherit;
+
+            > td {
+                &:first-child {
+                    border-bottom-left-radius: inherit;
+                }
+
+                &:last-child {
+                    border-bottom-right-radius: inherit;
+                }
+            }
+        }
+    }
+
+    &.dense tr > {
+        td, th {
+            padding-bottom: 6px;
+            padding-top: 6px;
+
+            .btn-icon {
+                padding: 4px;
+            }
+        }
+    }
+
+    &.hover tr:hover {
+        background-color: var(--table-hover-color);
+    }
+
+    &.border {
+        border-color: var(--table-border-color) !important;
+
+        tr {
+            td {
+                border-right: 1px solid var(--table-border-color);
+
+                &:last-child {
+                    border-right: none;
+                }
+            }
+        }
+    }
+
+    &.striped tr:nth-of-type(odd) {
+        background-color: var(--table-stripe-color);
+
+        &:hover {
+            background-color: var(--table-hover-color);
+        }
+    }
+
+    &.sticky-header,
+    &.sticky-footer {
+        border-collapse: separate;
+        max-height: 100%;
+    }
+
+    &.sticky-header thead > th {
+        background-color: var(--table-bg-color);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    &.sticky-footer tfoot > td {
+        background-color: var(--table-bg-color);
+        bottom: 0;
+        position: sticky;
+        z-index: 2;
+    }
+
+    > *:first-child {
+        border-top: none;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+
+    > *:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    &.filled {
+        background-color: var(--table-bg-color);
+        color: var(--tavenem-color-text);
+    }
+
+    &.outlined {
+        border-color: var(--table-border-color);
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --table-action-color: var(--tavenem-color-#{$theme}-lighten);
+            --table-bg-color: var(--tavenem-color-#{$theme}-hover);
+            --table-border-color: var(--tavenem-color-#{$theme});
+            --table-hover-color: var(--tavenem-color-#{$theme}-hover);
+            --table-stripe-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .02);
+
+            &.filled {
+                background-color: var(--tavenem-color-#{$theme}-hover);
+                color: var(--tavenem-color-#{$theme});
+
+                @include unify-parent("a") {
+                    &:hover:not(.disabled, :disabled),
+                    &:focus:not(.disabled, :disabled) {
+                        color: var(--tavenem-color-#{$theme}-lighten);
+                    }
+                }
+
+                &.bg-alt {
+                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
+                }
+            }
+        }
+    }
+}
+
+@each $breakpoint, $max-width in $breakpoint-maxs {
+    .table-#{$breakpoint} {
+        @extend .table;
+
+        @media (max-width: $max-width) {
+            thead, tfoot {
+                display: none;
+            }
+
+            tbody {
+                border-top: 1px solid var(--table-border-color);
+            }
+
+            tr {
+                display: initial;
+
+                > td {
+                    align-items: center;
+                    border: none;
+                    display: flex;
+                    justify-content: space-between;
+                    padding: .875rem 1rem;
+                    text-align: start !important;
+
+                    &:last-child {
+                        border-bottom: 1px solid var(--table-border-color);
+                    }
+
+                    &:before {
+                        content: attr(data-label);
+                        font-weight: var(--tavenem-font-weight-bold);
+                        padding-inline-end: 1rem;
+                    }
+
+                    &.hide-xs {
+                        height: 0;
+                        margin: 0;
+                        padding: 0;
+                        visibility: collapse;
+                    }
+                }
+            }
+
+            &.dense tr > td {
+                padding: 6px 1rem;
+            }
+        }
+    }
+}

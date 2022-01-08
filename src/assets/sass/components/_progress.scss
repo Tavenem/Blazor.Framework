@@ -1,0 +1,280 @@
+﻿@keyframes tf-progress-rotate {
+    from {
+        transform-origin: 50% 50%;
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes tf-progress-dash {
+    0% {
+        stroke-dasharray: 1px, 200px;
+        stroke-dashoffset: 0px;
+    }
+
+    50% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -15px;
+    }
+
+    100% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -125px;
+    }
+}
+
+@keyframes tf-progress-indeterminate1 {
+    0% {
+        left: -35%;
+        right: 100%;
+    }
+
+    60% {
+        left: 100%;
+        right: -90%;
+    }
+
+    100% {
+        left: 100%;
+        right: -90%;
+    }
+}
+
+@keyframes tf-progress-indeterminate2 {
+    0% {
+        left: -200%;
+        right: 100%;
+    }
+
+    60% {
+        left: 107%;
+        right: -8%;
+    }
+
+    100% {
+        left: 107%;
+        right: -8%;
+    }
+}
+
+@keyframes tf-progress-vertical-indeterminate1 {
+    0% {
+        bottom: -35%;
+        top: 100%;
+    }
+
+    60% {
+        bottom: 100%;
+        top: -90%;
+    }
+
+    100% {
+        bottom: 100%;
+        top: -90%;
+    }
+}
+
+@keyframes tf-progress-vertical-indeterminate2 {
+    0% {
+        bottom: -200%;
+        top: 100%;
+    }
+
+    60% {
+        bottom: 107%;
+        top: -8%;
+    }
+
+    100% {
+        bottom: 107%;
+        top: -8%;
+    }
+}
+
+.progress {
+    --progress-color: inherit;
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    position: relative;
+
+    &:not(.linear) {
+        &:after {
+            color: var(--progress-color);
+            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='22 22 44 44'%3E%3Ccircle cx='44' cy='44' r='20' fill='none' stroke='currentColor' stroke-width='3'%3E%3C/circle%3E%3C/svg%3E");
+            display: inline-block;
+            height: 2.5rem;
+            width: 2.5rem;
+        }
+    }
+
+    &.small:not(.linear):after {
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+
+    &.large:not(.linear):after {
+        height: 3.5rem;
+        width: 3.5rem;
+    }
+
+    &.indeterminate {
+        &:not(.linear) {
+            &:after {
+                animation: tf-progress-rotate 1.4s linear infinite;
+
+                circle {
+                    animation: tf-progress-dash 1.4s ease-in-out infinite;
+                    stroke-dasharray: 80px, 200px;
+                    stroke-dashoffset: 0px;
+                }
+            }
+        }
+    }
+
+    &:not(.linear, .indeterminate) {
+        &:after {
+            transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+            circle {
+                transition: stroke-dashoffset 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+            }
+        }
+    }
+
+    &.linear {
+        background-color: var(--tavenem-color-action-hover-bg);
+        height: .5em;
+        width: 100%;
+
+        &:before {
+            animation: tf-progress-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+            background-color: var(--progress-color);
+            content: '';
+            display: block;
+            height: 100%;
+            left: 0;
+            opacity: 0.2;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s linear;
+            transform-origin: left;
+            width: auto;
+        }
+
+        &:after {
+            animation: tf-progress-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
+            background-color: var(--progress-color);
+            content: '';
+            display: block;
+            height: 100%;
+            left: 0;
+            opacity: 0.2;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s linear;
+            transform-origin: left;
+            width: auto;
+        }
+
+        &.vertical {
+            height: 100%;
+            width: .5rem;
+
+            &:before {
+                animation: tf-progress-vertical-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+                height: auto;
+                width: 100%;
+            }
+
+            &:after {
+                animation: tf-progress-vertical-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
+                height: auto;
+                width: 100%;
+            }
+        }
+
+        &.small {
+            height: .25rem;
+            width: 100%;
+
+            &.vertical {
+                height: 100%;
+                width: .25rem;
+            }
+        }
+
+        &.large {
+            height: .75rem;
+            width: 100%;
+
+            &.vertical {
+                height: 100%;
+                width: .75rem;
+            }
+        }
+    }
+
+    > * {
+        z-index: 1;
+    }
+
+    &.filled {
+        --progress-color: var(--tavenem-color-secondary);
+        background-color: transparent;
+        color: var(--tavenem-color-secondary-text);
+
+        &.linear {
+            background-color: var(--tavenem-color-action-hover-bg);
+        }
+    }
+
+    &.outlined.linear {
+        background-color: var(--tavenem-color-action-hover-bg) !important;
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+
+        &.linear {
+            background-color: var(--tavenem-color-action-hover-bg);
+        }
+    }
+
+    @each $theme in $theme-colors {
+        .#{$theme} {
+            --progress-color: var(--tavenem-color-#{$theme});
+
+            &.bg-alt {
+                background-color: transparent;
+
+                &.linear {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                }
+            }
+
+            &.filled {
+                background-color: transparent;
+                color: var(--tavenem-color-#{$theme});
+
+                &.linear {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                }
+
+                &.bg-alt {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+            }
+
+            &.darken {
+                --progress-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                --progress-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+        }
+    }
+}

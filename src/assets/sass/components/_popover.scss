@@ -1,0 +1,25 @@
+﻿.popover {
+    opacity: 0;
+    outline: 0;
+    position: absolute;
+    z-index: var(--tavenem-zindex-tooltip);
+
+    &.fixed {
+        z-index: var(--tavenem-zindex-tooltip);
+    }
+
+    &.open {
+        opacity: 1;
+        transition: opacity;
+    }
+
+    &:not(.open) {
+        transition-duration: 0ms !important;
+        transition-delay: 0ms !important;
+    }
+
+    .list {
+        max-height: inherit;
+        overflow-y: auto;
+    }
+}

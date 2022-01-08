@@ -1,0 +1,29 @@
+﻿.toolbar {
+    align-items: center;
+    display: flex;
+    height: 3.5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    position: relative;
+
+    @media (max-width: 575px) and (orientation: landscape) {
+        height: 3em;
+    }
+
+    @media (min-width: 576px) and (orientation: portrait) {
+        height: 4em;
+        padding-left: 1.5em;
+        padding-right: 1.5em;
+    }
+
+    &.dense {
+        height: 3em;
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+
+    &.filled {
+        background-color: var(--tavenem-color-bg-surface);
+        color: var(--tavenem-color-text);
+    }
+}

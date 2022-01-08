@@ -1,0 +1,62 @@
+﻿.tooltip-root {
+    display: inline-block;
+    width: fit-content;
+}
+
+.tooltip {
+    align-items: center;
+    background-color: var(--tavenem-color-dark);
+    border-radius: var(--tavenem-border-radius);
+    color: var(--tavenem-color-dark-text);
+    font-size: .75em;
+    font-weight: var(--tavenem-font-weight-button);
+    justify-content: center;
+    line-height: 1.4em;
+    padding: 4px 8px;
+    text-align: center;
+    z-index: var(--tavenem-zindex-tooltip);
+
+    &.arrow:after {
+        border-color: var(--tavenem-color-dark) transparent transparent transparent;
+        border-style: solid;
+        border-width: 6px;
+        content: "";
+        position: absolute;
+    }
+
+    &.top-center:not([data-popover-flip]), &.bottom-center[data-popover-flip] {
+        transform: translateY(-10px);
+
+        &.arrow:after {
+            top: 100%;
+            transform: rotate(0deg);
+        }
+    }
+
+    &.center-left:not([data-popover-flip]), &.center-right[data-popover-flip] {
+        transform: translateX(-10px);
+
+        &.arrow:after {
+            left: 100%;
+            transform: rotate(270deg);
+        }
+    }
+
+    &.center-right:not([data-popover-flip]), &.center-left[data-popover-flip] {
+        transform: translateX(10px);
+
+        &.arrow:after {
+            right: 100%;
+            transform: rotate(90deg);
+        }
+    }
+
+    &.bottom-center:not([data-popover-flip]), &.top-center[data-popover-flip] {
+        transform: translateY(10px);
+
+        &.arrow:after {
+            bottom: 100%;
+            transform: rotate(180deg);
+        }
+    }
+}
