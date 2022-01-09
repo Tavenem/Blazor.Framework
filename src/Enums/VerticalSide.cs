@@ -1,9 +1,9 @@
 ﻿namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// A side on which an element may be located.
+/// Indicates whether an element is located at the top or bottom.
 /// </summary>
-public enum Side
+public enum VerticalSide
 {
     /// <summary>
     /// No side specified.
@@ -19,14 +19,4 @@ public enum Side
     /// The bottom.
     /// </summary>
     Bottom = 2,
-
-    /// <summary>
-    /// The left side.
-    /// </summary>
-    Left = 3,
-
-    /// <summary>
-    /// The right side.
-    /// </summary>
-    Right = 4,
 }

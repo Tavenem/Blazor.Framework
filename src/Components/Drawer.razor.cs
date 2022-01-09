@@ -2,8 +2,18 @@
 
 namespace Tavenem.Blazor.Framework;
 
-public partial class Drawer
+/// <summary>
+/// Displays a drawer, with support for simple theming and closing.
+/// </summary>
+public partial class Drawer : IDisposable
 {
+    private bool _disposedValue;
+
+    /// <summary>
+    /// The breakpoint at which the drawer should be permanently visible.
+    /// </summary>
+    [Parameter] public Breakpoint Breakpoint { get; set; }
+
     /// <summary>
     /// The child content of this component.
     /// </summary>
@@ -61,17 +71,23 @@ public partial class Drawer
     /// </summary>
     [Parameter] public Side Side { get; set; }
 
+    private ThemeColor? _themeColor;
     /// <summary>
     /// One of the built-in color themes.
     /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
+    [Parameter]
+    public ThemeColor ThemeColor
+    {
+        get => _themeColor ?? FrameworkLayout?.ThemeColor ?? ThemeColor.Default;
+        set => _themeColor = value;
+    }
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.UserAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("drawer")
+    protected string ClassName => new CssBuilder(BreakpointClass)
         .Add(Side.ToCSS())
         .Add("closed", IsClosed)
         .Add("open", IsOpen)
@@ -80,9 +96,8 @@ public partial class Drawer
         .ToString();
 
     /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// The final value assigned to the footer's class attribute, including
+    /// component values.
     /// </summary>
     protected string FooterToolbarClassName => new CssBuilder("toolbar filled")
         .Add(ThemeColor.ToCSS())
@@ -90,14 +105,21 @@ public partial class Drawer
         .ToString();
 
     /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// The final value assigned to the header's class attribute, including
+    /// component values.
     /// </summary>
     protected string HeaderToolbarClassName => new CssBuilder("toolbar filled")
         .Add(ThemeColor.ToCSS())
         .Add(HeaderClass)
         .ToString();
+
+    private string BreakpointClass => Breakpoint switch
+    {
+        Breakpoint.None => "drawer",
+        _ => $"drawer-{Breakpoint.ToCSS}",
+    };
+
+    [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
 
     private bool _isClosed;
     /// <summary>
@@ -114,6 +136,59 @@ public partial class Drawer
             }
             _isClosed = value;
         }
+    }
+
+    /// <summary>
+    /// Toggle this drawer's open state.
+    /// </summary>
+    public async Task ToggleAsync()
+    {
+        if (IsOpen)
+        {
+            IsOpen = false;
+            IsClosed = true;
+            await OnClosed.InvokeAsync(this);
+            await IsOpenChanged.InvokeAsync(IsOpen);
+        }
+        else
+        {
+            IsOpen = true;
+            IsClosed = false;
+            await IsOpenChanged.InvokeAsync(IsOpen);
+        }
+    }
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// </summary>
+    protected override void OnInitialized() => FrameworkLayout?.Add(this);
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                FrameworkLayout?.Remove(this);
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     private async Task OnClosedAsync()

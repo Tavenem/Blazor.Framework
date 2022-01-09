@@ -1,0 +1,10 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits LayoutComponentBase
+
+<div class="framework">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+

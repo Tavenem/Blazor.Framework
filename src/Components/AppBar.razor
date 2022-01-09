@@ -1,0 +1,13 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @attributes="UserAttributes" class="@ClassName" style="@Style">
+    <div class="@ToolbarClassName">
+        @if (ControlsDrawerSide != Tavenem.Blazor.Framework.Side.None)
+        {
+            <div class="@DrawerToggleClassName" @onclick="OnDrawerToggleAsync"></div>
+        }
+        @ChildContent
+    </div>
+</div>

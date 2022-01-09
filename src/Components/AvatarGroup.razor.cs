@@ -2,6 +2,9 @@
 
 namespace Tavenem.Blazor.Framework;
 
+/// <summary>
+/// Displays an avatar group, with support for collapsing excess items.
+/// </summary>
 public partial class AvatarGroup
 {
     private readonly List<Avatar> _avatars = new();

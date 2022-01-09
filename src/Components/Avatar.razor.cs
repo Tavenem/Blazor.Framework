@@ -2,6 +2,9 @@
 
 namespace Tavenem.Blazor.Framework;
 
+/// <summary>
+/// Displays an avatar, with support for inclusion in a group.
+/// </summary>
 public partial class Avatar : IDisposable
 {
     private bool _disposedValue;
