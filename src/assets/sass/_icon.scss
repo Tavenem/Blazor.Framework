@@ -79,15 +79,15 @@
                 font-family: 'Material Icons Outlined';
             }
 
-            &.darken {
+            &.darken, .darken {
                 color: var(--tavenem-color-#{$theme}-darken);
             }
 
-            &.lighten {
+            &.lighten, .lighten {
                 color: var(--tavenem-color-#{$theme}-lighten);
             }
 
-            &.stacked {
+            &.stacked, .stacked {
                 color: var(--tavenem-color-text);
             }
         }

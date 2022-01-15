@@ -1,10 +1,10 @@
 ﻿.chip {
     align-items: center;
-    background-color: var(--tavenem-color-secondary);
+    background-color: var(--tavenem-color-default);
     border: none;
     border-radius: 9999px;
     box-sizing: border-box;
-    color: var(--tavenem-color-secondary-text);
+    color: var(--tavenem-color-default-text);
     column-gap: .25em;
     cursor: default;
     display: inline-flex;
@@ -32,7 +32,7 @@
     &:hover:not(.disabled, :disabled),
     &:focus-visible:not(.disabled, :disabled),
     &.selected {
-        background-color: var(--tavenem-color-secondary-darken);
+        background-color: var(--tavenem-color-default-darken);
     }
 
     &.small {
@@ -43,14 +43,6 @@
     &.large {
         font-size: 1em;
         height: 2.5em;
-    }
-
-    @include unify-parent("a") {
-        cursor: pointer;
-    }
-
-    @include unify-parent("button") {
-        cursor: pointer;
     }
 
     &.outlined {
@@ -67,13 +59,6 @@
         &.#{$theme} {
             background-color: var(--tavenem-color-#{$theme});
             color: var(--tavenem-color-#{$theme}-text);
-
-            @include unify-parent("a") {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-            }
 
             &:hover:not(.disabled, :disabled),
             &:focus-visible:not(.disabled, :disabled),
@@ -95,13 +80,6 @@
                 background-color: var(--tavenem-color-#{$theme}-darken);
                 color: var(--tavenem-color-#{$theme}-text);
 
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
-                }
-
                 &:hover:not(.disabled, :disabled),
                 &:focus-visible:not(.disabled, :disabled),
                 &.selected {
@@ -113,13 +91,6 @@
                 background-color: var(--tavenem-color-#{$theme}-lighten);
                 color: var(--tavenem-color-#{$theme}-text);
 
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
-                }
-
                 &:hover:not(.disabled, :disabled),
                 &:focus-visible:not(.disabled, :disabled),
                 &.selected {
@@ -130,31 +101,53 @@
     }
 }
 
+a.chip {
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:hover:not(.disabled, :disabled),
+            &:focus:not(.disabled, :disabled) {
+                color: var(--tavenem-color-#{$theme}-text);
+            }
+
+            &.darken {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+
+            &.lighten {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+        }
+    }
+}
+
+a.chip,
+button.chip {
+    cursor: pointer;
+}
+
 .chip-text {
-    @extend .chip;
-    color: var(--tavenem-color-secondary);
-    background-color: var(--tavenem-color-secondary-hover);
+    color: var(--tavenem-color-default);
+    background-color: var(--tavenem-color-default-hover);
 
     &:hover:not(.disabled, :disabled),
     &:focus-visible:not(.disabled, :disabled) {
-        background-color: var(--tavenem-color-secondary-hover-bright);
+        background-color: var(--tavenem-color-default-hover-bright);
     }
 
     &.selected {
-        background-color: var(--tavenem-color-secondary-hover-bright);
+        background-color: var(--tavenem-color-default-hover-bright);
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
             background-color: var(--tavenem-color-#{$theme}-hover);
             color: var(--tavenem-color-#{$theme});
-
-            @include unify-parent("a") {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-lighten);
-                }
-            }
 
             &:hover:not(.disabled, :disabled),
             &:focus-visible:not(.disabled, :disabled),
@@ -176,13 +169,6 @@
                 background-color: var(--tavenem-color-#{$theme}-hover-dark);
                 color: var(--tavenem-color-#{$theme}-darken);
 
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme});
-                    }
-                }
-
                 &:hover:not(.disabled, :disabled),
                 &:focus-visible:not(.disabled, :disabled),
                 &.selected {
@@ -194,17 +180,34 @@
                 background-color: var(--tavenem-color-#{$theme}-hover-light);
                 color: var(--tavenem-color-#{$theme}-lighten);
 
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-lighten-2);
-                    }
-                }
-
                 &:hover:not(.disabled, :disabled),
                 &:focus-visible:not(.disabled, :disabled),
                 &.selected {
                     background-color: var(--tavenem-color-#{$theme}-hover-bright);
+                }
+            }
+        }
+    }
+}
+a.chip-text {
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:hover:not(.disabled, :disabled),
+            &:focus:not(.disabled, :disabled) {
+                color: var(--tavenem-color-#{$theme}-lighten);
+            }
+
+            &.darken {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme});
+                }
+            }
+
+            &.lighten {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-lighten-2);
                 }
             }
         }

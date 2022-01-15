@@ -1,6 +1,5 @@
 ﻿.framework {
     display: grid;
-    flex-direction: column;
     flex: 1 0;
     grid-template-areas:
         "header header header"
@@ -32,10 +31,6 @@
 }
 
 @each $breakpoint, $min-width in $breakpoints {
-    .container-#{$breakpoint} {
-        @extend .container;
-    }
-
     @media (min-width: $min-width) {
         .container-#{$breakpoint} {
             width: $min-width;

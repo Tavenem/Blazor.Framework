@@ -139,13 +139,6 @@
             &.filled {
                 background-color: var(--tavenem-color-#{$theme}-hover);
                 color: var(--tavenem-color-#{$theme});
-
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-lighten);
-                    }
-                }
             }
         }
     }
@@ -185,6 +178,10 @@
                     &.bg-alt {
                         background-color: var(--tavenem-color-#{$theme}-hover-dark);
                     }
+
+                    &.filled {
+                        background-color: var(--tavenem-color-#{$theme}-hover);
+                    }
                 }
             }
 
@@ -222,6 +219,10 @@
 
                             &.bg-alt {
                                 background-color: var(--tavenem-color-#{$theme}-hover-dark);
+                            }
+
+                            &.filled {
+                                background-color: var(--tavenem-color-#{$theme}-hover);
                             }
                         }
                     }
@@ -274,7 +275,7 @@
         .#{$theme} {
             background-color: transparent;
 
-            &.outlined {
+            &.outlined, .outlined {
                 background-color: var(--tavenem-color-#{$theme});
             }
         }
@@ -285,9 +286,13 @@
     }
 }
 @each $breakpoint, $min-width in $breakpoints {
+    .card-group-#{$breakpoint} {
+        flex-direction: column;
+    }
+
     @media (min-width: $min-width) {
         .card-group-#{$breakpoint} {
-            @extend .card-group;
+            flex-direction: row;
         }
     }
 }

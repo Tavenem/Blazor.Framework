@@ -48,7 +48,8 @@ public partial class AppBar : IDisposable
     /// <summary>
     /// One of the built-in color themes.
     /// </summary>
-    [Parameter] public ThemeColor ThemeColor
+    [Parameter]
+    public ThemeColor ThemeColor
     {
         get => _themeColor ?? FrameworkLayout?.ThemeColor ?? ThemeColor.Default;
         set => _themeColor = value;
@@ -95,7 +96,15 @@ public partial class AppBar : IDisposable
     /// Method invoked when the component is ready to start, having received its
     /// initial parameters from its parent in the render tree.
     /// </summary>
-    protected override void OnInitialized() => FrameworkLayout?.Add(this);
+    protected override void OnInitialized()
+    {
+        FrameworkLayout?.Add(this);
+        if (Breakpoint == Breakpoint.None
+            && FrameworkLayout is not null)
+        {
+            Breakpoint = FrameworkLayout.SideDrawerBreakpoint;
+        }
+    }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,

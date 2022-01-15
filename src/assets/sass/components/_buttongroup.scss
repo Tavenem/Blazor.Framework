@@ -3,9 +3,9 @@
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-1);
     display: inline-flex;
-    --buttongroup-inherited-bg: var(--tavenem-color-secondary);
-    --buttongroup-inherited-hover-bg: var(--tavenem-color-secondary-darken);
-    --buttongroup-inherited-hover-color: var(--tavenem-color-secondary-text);
+    --buttongroup-inherited-bg: var(--tavenem-color-default);
+    --buttongroup-inherited-hover-bg: var(--tavenem-color-default-darken);
+    --buttongroup-inherited-hover-color: var(--tavenem-color-default-text);
     --buttongroup-inherited-hover-shadow: var(--tavenem-shadow-2);
     --buttongroup-inherited-border-color: var(--tavenem-color-border);
     --buttongroup-inherited-border-style: none;
@@ -103,7 +103,7 @@
         color: var(--tavenem-color-text);
         --buttongroup-inherited-bg: transparent;
         --buttongroup-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-        --buttongroup-inherited-hover-color: var(--tavenem-color-secondary-hover);
+        --buttongroup-inherited-hover-color: var(--tavenem-color-default-hover);
         --buttongroup-inherited-hover-shadow: none;
         --buttongroup-inherited-border-style: solid;
 
@@ -148,8 +148,7 @@
     }
 }
 
-.buttongroup-text {
-    @extend .buttongroup;
+.button-group-text {
     box-shadow: none;
     --buttongroup-inherited-bg: transparent;
     --buttongroup-inherited-hover-bg: var(--tavenem-color-action-hover-bg);

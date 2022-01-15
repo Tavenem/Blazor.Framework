@@ -1,8 +1,9 @@
 ﻿.badge {
+    --badge-content-inset: 4px;
     align-items: flex-start;
     background-color: transparent !important;
     border: none !important;
-    color: var(--tavenem-color-secondary-text);
+    color: var(--tavenem-color-default-text);
     display: flex;
     flex: 0 1;
     font-size: .75rem;
@@ -17,12 +18,12 @@
     width: 100%;
 
     .badge-content {
-        background-color: var(--tavenem-color-secondary);
+        background-color: var(--tavenem-color-default);
         border-color: inherit;
         border-radius: .625rem;
         color: inherit;
         height: 1.25rem;
-        inset: auto auto calc(100% - 4px) calc(100% - 4px);
+        inset: auto auto calc(100% - var(--badge-content-inset)) calc(100% - var(--badge-content-inset));
         letter-spacing: 0;
         line-height: 1;
         min-width: 1.25rem;
@@ -40,7 +41,7 @@
         justify-content: flex-start;
 
         .badge-content {
-            inset: auto calc(100% - 4px) calc(100% - 4px) auto;
+            inset: auto calc(100% - var(--badge-content-inset)) calc(100% - var(--badge-content-inset)) auto;
         }
     }
 
@@ -48,7 +49,7 @@
         justify-content: center;
 
         .badge-content {
-            bottom: calc(100% - 4px);
+            bottom: calc(100% - var(--badge-content-inset));
             inset: unset;
         }
     }
@@ -61,7 +62,7 @@
 
             .badge-content {
                 inset: unset;
-                right: calc(100% - 4px);
+                right: calc(100% - var(--badge-content-inset));
             }
         }
 
@@ -75,7 +76,7 @@
 
         &.right .badge-content {
             inset: unset;
-            left: calc(100% - 4px);
+            left: calc(100% - var(--badge-content-inset));
         }
     }
 
@@ -86,7 +87,7 @@
             justify-content: flex-start;
 
             .badge-content {
-                inset: calc(100% - 4px) calc(100% - 4px) auto auto;
+                inset: calc(100% - var(--badge-content-inset)) calc(100% - var(--badge-content-inset)) auto auto;
             }
         }
 
@@ -95,53 +96,17 @@
 
             .badge-content {
                 inset: unset;
-                top: calc(100% - 4px);
+                top: calc(100% - var(--badge-content-inset));
             }
         }
 
         &.right .badge-content {
-            inset: calc(100% - 4px) auto auto calc(100% - 4px);
+            inset: calc(100% - var(--badge-content-inset)) auto auto calc(100% - var(--badge-content-inset));
         }
     }
 
     &.overlap {
-        .badge-content {
-            inset: auto auto calc(100% - 12px) calc(100% - 12px);
-        }
-
-        &.left .badge-content {
-            inset: auto calc(100% - 12px) calc(100% - 12px) auto;
-        }
-
-        &.center .badge-content {
-            bottom: calc(100% - 12px);
-            inset: unset;
-        }
-
-        &-center {
-            &.left .badge-content {
-                right: calc(100% - 12px);
-            }
-
-            &.right .badge-content {
-                left: calc(100% - 12px);
-            }
-        }
-
-        &-bottom {
-            &.left .badge-content {
-                inset: calc(100% - 12px) calc(100% - 12px) auto auto;
-            }
-
-            &.center .badge-content {
-                inset: unset;
-                top: calc(100% - 12px);
-            }
-
-            &.right .badge-content {
-                inset: calc(100% - 12px) auto auto calc(100% - 12px);
-            }
-        }
+        --badge-content-inset: 12px;
     }
 
     &.border {
@@ -196,8 +161,22 @@
             .badge-content {
                 background-color: var(--tavenem-#{$theme});
                 color: var(--tavenem-color-#{$theme}-text);
+            }
 
-                @include unify-parent("a") {
+            a.badge-content {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+
+            &.darken {
+                .badge-content {
+                    background-color: var(--tavenem-#{$theme}-darken);
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+
+                a.badge-content {
                     &:hover:not(.disabled, :disabled),
                     &:focus:not(.disabled, :disabled) {
                         color: var(--tavenem-color-#{$theme}-text);
@@ -205,23 +184,13 @@
                 }
             }
 
-            &.darken .badge-content {
-                background-color: var(--tavenem-#{$theme}-darken);
-                color: var(--tavenem-color-#{$theme}-text);
-
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
+            &.lighten {
+                .badge-content {
+                    background-color: var(--tavenem-#{$theme}-lighten);
+                    color: var(--tavenem-color-#{$theme}-text);
                 }
-            }
 
-            &.lighten .badge-content {
-                background-color: var(--tavenem-#{$theme}-lighten);
-                color: var(--tavenem-color-#{$theme}-text);
-
-                @include unify-parent("a") {
+                a.badge-content {
                     &:hover:not(.disabled, :disabled),
                     &:focus:not(.disabled, :disabled) {
                         color: var(--tavenem-color-#{$theme}-text);

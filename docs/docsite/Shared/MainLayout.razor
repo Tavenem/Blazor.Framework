@@ -3,7 +3,10 @@
 <FrameworkLayout ThemeColor="ThemeColor.Primary">
     <TopAppbar />
     <LeftDrawer />
-    <main>
-        @Body
-    </main>
+    <div class="d-flex">
+        <main class="flex-grow-1">
+            @Body
+        </main>
+        <Contents Breakpoint="Breakpoint.Lg" />
+    </div>
 </FrameworkLayout>

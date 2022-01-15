@@ -10,6 +10,10 @@
     vertical-align: middle;
     -webkit-tap-highlight-color: transparent;
 
+    &:after {
+        transform: scale(7,7);
+    }
+
     > .content {
         color: var(--checkbox-inherited-content-color);
     }
@@ -35,53 +39,8 @@
         }
     }
 
-    > .checkbox-span {
-        cursor: pointer;
-        display: inline-block;
-        vertical-align: middle;
-        width: 100%;
-
-        > input[type="checkbox"] {
-            color: inherit;
-            cursor: inherit;
-            height: 100%;
-            left: 0;
-            margin: 0;
-            opacity: 0;
-            padding: 0;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            z-index: 1;
-        }
-
-        > .checkbox-icons {
-            color: var(--checkbox-inherited-color);
-            display: flex;
-            position: relative;
-
-            &:hover {
-                background-color: var(--checkbox-inherited-hover-bg);
-            }
-
-            > .icon-checked {
-                left: 0;
-                position: absolute;
-                transform: scale(0);
-                transition: transform 150ms cubic-bezier(0.4, 0, 1, 1) 0ms;
-            }
-        }
-    }
-
-    :checked + .checkbox-icons > .icon-checked {
-        transform: scale(1);
-        transition: transform 150ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
-    }
-
-    &.dense, .dense > & {
-        > .checkbox-span > .checkbox-icons {
-            padding: 4px;
-        }
+    &.dense, .dense > & .checkbox-icons {
+        padding: 4px;
     }
 
     &.filled {
@@ -122,58 +81,97 @@
     }
 }
 
-.radio {
-    @extend .checkbox;
+.checkbox-span {
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    width: 100%;
+
+    > input[type="checkbox"] {
+        color: inherit;
+        cursor: inherit;
+        height: 100%;
+        left: 0;
+        margin: 0;
+        opacity: 0;
+        padding: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1;
+    }
+}
+
+.checkbox-icons {
+    color: var(--checkbox-inherited-color);
+    display: flex;
+    position: relative;
+
+    &:hover {
+        background-color: var(--checkbox-inherited-hover-bg);
+    }
+
+    .icon-checked {
+        left: 0;
+        position: absolute;
+        transform: scale(0);
+        transition: transform 150ms cubic-bezier(0.4, 0, 1, 1) 0ms;
+    }
+
+    :checked + & .icon-checked {
+        transform: scale(1);
+        transition: transform 150ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    }
 }
 
 .switch {
-    @extend .checkbox;
-
-    > .checkbox-span {
+    .checkbox-span {
         height: calc(1.25em + 18px);
         padding: 12px;
         width: calc(1.25em + 38px);
+    }
 
-        > .track {
-            background-color: black;
-            border-radius: calc(.5em - 1px);
-            height: 100%;
-            opacity: 0.48;
-            transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-            width: 100%;
-            z-index: -1;
-
-            :checked + & {
-                opacity: .5;
-            }
-
-            .disabled &, :disabled & {
-                opacity: .12;
-            }
+    &.disabled, &:disabled {
+        .switch-track {
+            opacity: .12;
         }
+    }
 
-        > .checkbox-icons > .icon {
-            background-color: currentColor;
-            border-radius: 50%;
-            box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
-            height: 1.25em;
-            width: 1.25em;
-        }
+    .checkbox-icons .icon {
+        background-color: currentColor;
+        border-radius: 50%;
+        box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+        height: 1.25em;
+        width: 1.25em;
     }
 
     @each $theme in $theme-colors {
         .#{$theme} {
-            > .checkbox-span > .track {
+            .switch-track {
                 background-color: var(--tavenem-color-#{$theme});
             }
 
-            &.darken > .checkbox-span > .track {
+            &.darken .switch-track {
                 color: var(--tavenem-color-#{$theme}-darken);
             }
 
-            &.lighten > .checkbox-span > .track {
+            &.lighten .switch-track {
                 color: var(--tavenem-color-#{$theme}-lighten);
             }
         }
+    }
+}
+
+.switch-track {
+    background-color: black;
+    border-radius: calc(.5em - 1px);
+    height: 100%;
+    opacity: 0.48;
+    transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    width: 100%;
+    z-index: -1;
+
+    :checked + .checkbox-span & {
+        opacity: .5;
     }
 }

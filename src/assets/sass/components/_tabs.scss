@@ -6,82 +6,6 @@
     display: flex;
     flex-direction: column;
 
-    > .tabs-toolbar {
-        background-color: var(--tavenem-color-bg-surface);
-        position: relative;
-
-        > .tabs-toolbar-inner {
-            display: flex;
-            min-height: 3em;
-
-            > .tabs-toolbar-content {
-                flex: 1 1 auto;
-                display: inline-block;
-                overflow: hidden;
-                position: relative;
-                transition: .3s cubic-bezier(.25,.8,.5,1);
-                width: 100%;
-                white-space: nowrap;
-
-                > .tabs-toolbar-wrapper {
-                    display: flex;
-                    position: inherit;
-                    transition: .3s cubic-bezier(.25,.8,.5,1);
-                    width: max-content;
-                }
-            }
-        }
-    }
-
-    .tab {
-        @include ripple;
-        align-items: center;
-        display: inline-flex;
-        flex-shrink: 0;
-        font-weight: var(--tavenem-font-weight-button);
-        justify-content: center;
-        line-height: 1.75;
-        min-height: 3em;
-        min-width: 10em;
-        padding: 6px .75em;
-        text-align: center;
-        text-transform: uppercase;
-        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-        user-select: none;
-        white-space: normal;
-        width: 100%;
-
-        &:hover {
-            background-color: var(--tavenem-color-action-hover-bg);
-            cursor: pointer;
-        }
-
-        &.active {
-            background-color: var(--tab-active-bg);
-            border-color: var(--tab-active-color);
-            color: var(--tab-active-color);
-
-            &:hover {
-                background-color: var(--tab-active-hover);
-            }
-        }
-
-        &.disabled {
-            color: var(--tavenem-color-text-disabled);
-            cursor: default;
-            pointer-events: none;
-        }
-
-        .icon {
-            margin-inline-end: .5rem;
-        }
-    }
-
-    > .panels {
-        position: relative;
-        transition: .3s cubic-bezier(.25,.8,.5,1);
-    }
-
     &:not(.bottom, .left, .right) .tab {
         border-left: 1px solid var(--tavenem-color-border);
         border-right: 1px solid var(--tavenem-color-border);
@@ -124,19 +48,19 @@
             border-top: 1px solid var(--tavenem-color-border);
         }
 
-        > .tabs-toolbar > .tabs-toolbar-inner {
+        .tabs-toolbar-inner {
             flex-direction: column;
-
-            > .tabs-toolbar-content > .tabs-toolbar-wrapper {
-                flex-direction: column;
-            }
-
-            .tab-scroll-btn .icon {
-                transform: rotate(90deg);
-            }
         }
 
-        > .panels {
+        .tabs-toolbar-wrapper {
+            flex-direction: column;
+        }
+
+        .tab-scroll-btn .icon {
+            transform: rotate(90deg);
+        }
+
+        .tab-panels {
             display: flex;
             flex-grow: 1;
         }
@@ -194,7 +118,7 @@
     &.bg-alt {
         background-color: transparent;
 
-        .tab, > .panels {
+        .tab, .tab-panels {
             background-color: var(--tavenem-color-bg-alt);
         }
     }
@@ -208,7 +132,7 @@
             &.bg-alt {
                 background-color: transparent;
 
-                .tab, > .panels {
+                .tab, .tab-panels {
                     background-color: var(--tavenem-color-#{$theme}-hover);
                 }
             }
@@ -238,4 +162,90 @@
             }
         }
     }
+}
+
+.tabs-toolbar {
+    background-color: var(--tavenem-color-bg-surface);
+    position: relative;
+}
+
+.tabs-toolbar-inner {
+    display: flex;
+    min-height: 3em;
+}
+
+.tabs-toolbar-content {
+    flex: 1 1 auto;
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+    transition: .3s cubic-bezier(.25,.8,.5,1);
+    width: 100%;
+    white-space: nowrap;
+}
+
+.tabs-toolbar-wrapper {
+    display: flex;
+    position: inherit;
+    transition: .3s cubic-bezier(.25,.8,.5,1);
+    width: max-content;
+}
+
+.tab {
+    @include ripple;
+    align-items: center;
+    display: inline-flex;
+    flex-shrink: 0;
+    font-weight: var(--tavenem-font-weight-button);
+    justify-content: center;
+    line-height: 1.75;
+    min-height: 3em;
+    min-width: 10em;
+    padding: 6px .75em;
+    text-align: center;
+    text-transform: uppercase;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    user-select: none;
+    white-space: normal;
+    width: 100%;
+
+    > *:first-child {
+        border-bottom-left-radius: inherit;
+        border-top-left-radius: inherit;
+    }
+
+    > *:last-child {
+        border-bottom-right-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+
+    &:hover {
+        background-color: var(--tavenem-color-action-hover-bg);
+        cursor: pointer;
+    }
+
+    &.active {
+        background-color: var(--tab-active-bg);
+        border-color: var(--tab-active-color);
+        color: var(--tab-active-color);
+
+        &:hover {
+            background-color: var(--tab-active-hover);
+        }
+    }
+
+    &.disabled {
+        color: var(--tavenem-color-text-disabled);
+        cursor: default;
+        pointer-events: none;
+    }
+
+    .icon {
+        margin-inline-end: .5rem;
+    }
+}
+
+.tab-panels {
+    position: relative;
+    transition: .3s cubic-bezier(.25,.8,.5,1);
 }

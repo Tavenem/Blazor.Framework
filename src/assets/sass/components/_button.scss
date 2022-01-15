@@ -1,12 +1,12 @@
 ﻿.btn {
     @include ripple;
     align-items: center;
-    background-color: var(--tavenem-color-secondary);
+    background-color: var(--tavenem-color-default);
     border: 0;
     border-radius: var(--tavenem-border-radius);
     box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
     box-sizing: border-box;
-    color: var(--tavenem-color-secondary-text);
+    color: var(--tavenem-color-default-text);
     cursor: pointer;
     display: inline-flex;
     font-size: var(--tavenem-font-size-button);
@@ -33,7 +33,7 @@
 
     &:hover,
     &:focus-visible {
-        background-color: var(--tavenem-color-secondary-darken);
+        background-color: var(--tavenem-color-default-darken);
         box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
     }
 
@@ -106,13 +106,6 @@
             background-color: var(--tavenem-color-#{$theme});
             color: var(--tavenem-color-#{$theme}-text);
 
-            @include unify-parent("a") {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-            }
-
             &:hover,
             &:focus-visible {
                 background-color: var(--tavenem-color-#{$theme}-darken);
@@ -121,13 +114,6 @@
             &.darken {
                 background-color: var(--tavenem-color-#{$theme}-darken);
                 color: var(--tavenem-color-#{$theme}-text);
-
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
-                }
 
                 &:hover,
                 &:focus-visible {
@@ -138,13 +124,6 @@
             &.lighten {
                 background-color: var(--tavenem-color-#{$theme}-lighten);
                 color: var(--tavenem-color-#{$theme}-text);
-
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
-                }
 
                 &:hover,
                 &:focus-visible {
@@ -161,9 +140,32 @@
         }
     }
 }
+a.btn {
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:hover:not(.disabled, :disabled),
+            &:focus:not(.disabled, :disabled) {
+                color: var(--tavenem-color-#{$theme}-text);
+            }
+
+            &.darken {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+
+            &.lighten {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+        }
+    }
+}
 
 .btn-text {
-    @extend .btn;
     background-color: transparent !important;
     box-shadow: none;
     color: inherit;
@@ -192,13 +194,6 @@
         &.#{$theme} {
             color: var(--tavenem-color-#{$theme});
 
-            @include unify-parent("a") {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-lighten);
-                }
-            }
-
             &:hover,
             &:focus-visible {
                 color: var(--tavenem-color-#{$theme}-hover);
@@ -206,23 +201,33 @@
 
             &.darken {
                 color: var(--tavenem-color-#{$theme}-darken);
-
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme});
-                    }
-                }
             }
 
             &.lighten {
                 color: var(--tavenem-color-#{$theme}-lighten);
+            }
+        }
+    }
+}
+a.btn-text {
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:hover:not(.disabled, :disabled),
+            &:focus:not(.disabled, :disabled) {
+                color: var(--tavenem-color-#{$theme}-lighten);
+            }
 
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-lighten-2);
-                    }
+            &.darken {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme});
+                }
+            }
+
+            &.lighten {
+                &:hover:not(.disabled, :disabled),
+                &:focus:not(.disabled, :disabled) {
+                    color: var(--tavenem-color-#{$theme}-lighten-2);
                 }
             }
         }
@@ -230,12 +235,15 @@
 }
 
 .btn-icon {
-    @extend .btn-text;
     border-radius: 9999px;
     flex: 0 0 auto;
     font-size: 1.25em;
     padding: 6px;
     text-align: center;
+
+    &:after {
+        transform: scale(7,7);
+    }
 
     &.small {
         font-size: 1.125em;
@@ -252,7 +260,7 @@
 
         &:hover,
         &:focus-visible {
-            background-color: var(--tavenem-color-secondary-darken);
+            background-color: var(--tavenem-color-default-darken);
             box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
         }
 

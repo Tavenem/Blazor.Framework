@@ -1,12 +1,4 @@
-﻿@use "sass:selector";
-
-@mixin unify-parent($child) {
-    @at-root #{selector.unify(&, $child)} {
-        @content;
-    }
-}
-
-@mixin ripple {
+﻿@mixin ripple {
     overflow: hidden;
     position: relative;
 
@@ -31,25 +23,5 @@
         transform: scale(0,0);
         opacity: .1;
         transition: 0s;
-    }
-
-
-    &.btn-icon,
-    &.switch {
-        &:after {
-            transform: scale(7,7);
-        }
-    }
-
-    @include unify-parent("input[type="checkbox"]") {
-        &:after {
-            transform: scale(7,7);
-        }
-    }
-
-    @include unify-parent("input[type="radio"]") {
-        &:after {
-            transform: scale(7,7);
-        }
     }
 }

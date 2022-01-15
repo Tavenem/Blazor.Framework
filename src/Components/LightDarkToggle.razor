@@ -1,0 +1,8 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<button @attributes="UserAttributes" class="@ClassName" style="@Style" @onclick="OnClickAsync">
+    <span class="@IconClassName"></span>
+    @Text
+</button>

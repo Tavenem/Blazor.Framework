@@ -222,9 +222,9 @@
     }
 
     &.filled {
-        --progress-color: var(--tavenem-color-secondary);
+        --progress-color: var(--tavenem-color-default);
         background-color: transparent;
-        color: var(--tavenem-color-secondary-text);
+        color: var(--tavenem-color-default-text);
 
         &.linear {
             background-color: var(--tavenem-color-action-hover-bg);

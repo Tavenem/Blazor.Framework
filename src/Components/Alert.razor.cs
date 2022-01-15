@@ -21,8 +21,7 @@ public partial class Alert
     /// <summary>
     /// The child content of this component.
     /// </summary>
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
     /// Raised when the alert is clicked

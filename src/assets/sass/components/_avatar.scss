@@ -142,8 +142,10 @@
                 }
             }
 
-            &.outlined .avatar {
-                border-color: var(--tavenem-color-#{$theme});
+            &.outlined {
+                .avatar {
+                    border-color: var(--tavenem-color-#{$theme});
+                }
             }
 
             &.darken {

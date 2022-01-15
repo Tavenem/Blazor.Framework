@@ -1,0 +1,28 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@switch (Level)
+{
+    case HeadingLevel.H1:
+        <h1 @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></h1>
+        break;
+    case HeadingLevel.H2:
+        <h2 @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></h2>
+        break;
+    case HeadingLevel.H3:
+        <h3 @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></h3>
+        break;
+    case HeadingLevel.H4:
+        <h4 @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></h4>
+        break;
+    case HeadingLevel.H5:
+        <h5 @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></h5>
+        break;
+    case HeadingLevel.H6:
+        <h6 @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></h6>
+        break;
+    default:
+        <span @attributes="UserAttributes" id="@Id" class="@ClassName" style="@Style"></span>
+        break;
+}

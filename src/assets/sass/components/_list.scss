@@ -1,7 +1,7 @@
 ﻿.list {
     --list-hover-bg: var(--tavenem-color-action-hover-bg);
-    --list-selected-bg: var(--tavenem-color-primary-hover);
-    --list-selected-color: var(--tavenem-color-primary);
+    --list-active-bg: var(--tavenem-color-primary-hover);
+    --list-active-color: var(--tavenem-color-primary);
     color: var(--tavenem-color-action);
     list-style: none;
     margin: 0;
@@ -11,7 +11,7 @@
     padding-top: .5rem;
     position: relative;
 
-    > li {
+    > * {
         @include ripple;
         align-items: center;
         box-sizing: border-box;
@@ -27,49 +27,6 @@
         width: 100%;
         -webkit-tap-highlight-color: transparent;
 
-        &.subheader {
-            font-size: .875rem;
-            font-weight: var(--tavenem-font-weight-bold);
-            padding-bottom: 1.25rem;
-
-            &.inset {
-                padding-inline-start: 4.5rem;
-            }
-
-            &.sticky {
-                background-color: inherit;
-                position: sticky;
-                top: 0;
-                z-index: 1;
-            }
-        }
-
-        &.selected {
-            background-color: var(--list-selected-bg);
-            border-right: 1px solid var(--list-selected-color);
-            color: var(--list-selected-color);
-            padding-right: calc(1rem - 1px);
-        }
-
-        &.clickable {
-            background-color: transparent;
-            border: 0;
-            border-radius: 0;
-            cursor: pointer;
-            margin: 0;
-            outline: 0;
-            transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-            user-select: none;
-            vertical-align: middle;
-            -webkit-appearance: none;
-            -webkit-tap-highlight-color: transparent;
-
-            &:hover,
-            &:focus:not(.selected) {
-                background-color: var(--list-hover-bg);
-            }
-        }
-
         > .icon {
             flex-shrink: 0;
             margin: -.25rem;
@@ -80,7 +37,7 @@
             margin: -.25rem;
         }
 
-        > *:not(ul, .icon, .avatar) {
+        > *:not(ul, .list, .collapse, .icon, .avatar) {
             flex: 1 1 auto;
             min-width: 0;
         }
@@ -90,42 +47,87 @@
             cursor: default !important;
             pointer-events: none !important;
 
-            &.clickable {
-                &:hover,
-                &:focus:not(.selected) {
-                    background-color: transparent;
-                }
-            }
-
             .icon {
                 color: var(--tavenem-color-action-disabled) !important;
+            }
+        }
+    }
+
+    > .subheader {
+        font-size: .875rem;
+        font-weight: var(--tavenem-font-weight-bold);
+        padding-bottom: 1.25rem;
+
+        &.inset {
+            padding-inline-start: 4.5rem;
+        }
+
+        &.sticky {
+            background-color: inherit;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    }
+
+    > .active {
+        background-color: var(--list-active-bg);
+        border-right: 1px solid var(--list-active-color);
+        color: var(--list-active-color);
+        padding-right: calc(1rem - 1px);
+    }
+
+    > .clickable, a, button {
+        background-color: transparent;
+        border: 0;
+        border-radius: 0;
+        cursor: pointer;
+        margin: 0;
+        outline: 0;
+        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        user-select: none;
+        vertical-align: middle;
+        -webkit-appearance: none;
+        -webkit-tap-highlight-color: transparent;
+
+        &:hover,
+        &:focus:not(.active) {
+            background-color: var(--list-hover-bg);
+        }
+
+        &:disabled, &.disabled {
+            &:hover,
+            &:focus:not(.active) {
+                background-color: transparent;
             }
         }
     }
 
     &:disabled, &.disabled {
-        > li {
+        > * {
             color: var(--tavenem-color-action-disabled) !important;
             cursor: default !important;
             pointer-events: none !important;
-
-            &.clickable {
-                &:hover,
-                &:focus:not(.selected) {
-                    background-color: transparent;
-                }
-            }
 
             .icon {
                 color: var(--tavenem-color-action-disabled) !important;
             }
         }
+
+        > .clickable, a, button {
+            &:hover,
+            &:focus:not(.active) {
+                background-color: transparent;
+            }
+        }
     }
 
-    .list > li {
-        padding-inline-start: 2rem;
+    .list > {
+        * {
+            padding-inline-start: 2rem;
+        }
 
-        &.subheader.inset {
+        .subheader.inset {
             padding-inline-start: 6.5rem;
         }
     }
@@ -134,7 +136,7 @@
         padding-bottom: .25rem;
         padding-top: .25rem;
 
-        > li {
+        > * {
             padding-bottom: .25rem;
             padding-top: .25rem;
         }
@@ -148,8 +150,8 @@
     @each $theme in $theme-colors {
         &.#{$theme} {
             --list-hover-bg: var(--tavenem-color-#{$theme}-hover);
-            --list-selected-bg: var(--tavenem-color-#{$theme}-hover);
-            --list-selected-color: var(--tavenem-color-#{$theme});
+            --list-active-bg: var(--tavenem-color-#{$theme}-hover);
+            --list-active-color: var(--tavenem-color-#{$theme});
 
             &, &.darken, &.lighten, &.filled, &.outlined {
                 color: var(--tavenem-color-action);
@@ -157,8 +159,8 @@
 
             &.filled {
                 --list-hover-bg: var(--tavenem-color-#{$theme}-hover-bright);
-                --list-selected-bg: var(--tavenem-color-#{$theme});
-                --list-selected-color: var(--tavenem-color-#{$theme}-text);
+                --list-active-bg: var(--tavenem-color-#{$theme});
+                --list-active-color: var(--tavenem-color-#{$theme}-text);
                 background-color: var(--tavenem-color-#{$theme}-hover);
 
                 &.bg-alt {
@@ -168,19 +170,31 @@
 
             &.darken {
                 --list-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
-                --list-selected-bg: var(--tavenem-color-#{$theme}-hover-dark);
-                --list-selected-color: var(--tavenem-color-#{$theme}-darken);
+                --list-active-bg: var(--tavenem-color-#{$theme}-hover-dark);
+                --list-active-color: var(--tavenem-color-#{$theme}-darken);
             }
 
             &.lighten {
                 --list-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
-                --list-selected-bg: var(--tavenem-color-#{$theme}-hover-light);
-                --list-selected-color: var(--tavenem-color-#{$theme}-lighten);
+                --list-active-bg: var(--tavenem-color-#{$theme}-hover-light);
+                --list-active-color: var(--tavenem-color-#{$theme}-lighten);
             }
         }
     }
 }
 
-.tree {
-    @extend .list;
+.contents {
+    color: var(--tavenem-color-text-secondary);
+
+    > .active {
+        border-left: 1px solid var(--list-active-color);
+        border-right: none;
+    }
+
+    > .scroll-active {
+        background-color: var(--list-active-bg);
+        border-left: 1px solid var(--list-active-color);
+        color: var(--list-active-color);
+        padding-right: calc(1rem - 1px);
+    }
 }

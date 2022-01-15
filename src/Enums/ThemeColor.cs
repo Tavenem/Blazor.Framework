@@ -6,9 +6,9 @@
 public enum ThemeColor
 {
     /// <summary>
-    /// Default colors.
+    /// No specified color palette; the default color scheme for the component.
     /// </summary>
-    Default = 0,
+    None = 0,
 
     /// <summary>
     /// The primary color palette.
@@ -36,17 +36,28 @@ public enum ThemeColor
     Dark = 5,
 
     /// <summary>
+    /// <para>
+    /// The default color palette.
+    /// </para>
+    /// <para>
+    /// Note: this does not necessarily indicate the default for this component,
+    /// but the specific color theme called "default."
+    /// </para>
+    /// </summary>
+    Default = 6,
+
+    /// <summary>
     /// The info color palette.
     /// </summary>
-    Info = 6,
+    Info = 7,
 
     /// <summary>
     /// The success color palette.
     /// </summary>
-    Success = 7,
+    Success = 8,
 
     /// <summary>
     /// The warning color palette.
     /// </summary>
-    Warning = 8,
+    Warning = 9,
 }

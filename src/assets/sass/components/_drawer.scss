@@ -11,7 +11,6 @@
 }
 
 .drawer {
-    @extend .card;
     background-color: var(--tavenem-color-bg-surface);
     border-radius: 0;
     box-shadow: none;
@@ -89,14 +88,14 @@
                 overflow: hidden;
             }
 
-            &:not(.open) .list li {
+            &:not(.open) .list > * {
                 padding-left: 0;
                 padding-right: 0;
                 padding-inline-end: 0;
                 padding-inline-start: 0;
 
                 > {
-                    *:not(ul, .icon, .avatar) {
+                    *:not(ul, .list, .collapse, .icon, .avatar) {
                         display: none;
                     }
 
@@ -237,11 +236,19 @@
     }
 }
 
-@each $breakpoint, $min-width in $breakpoints {
-    .drawer-#{$breakpoint} {
-        @extend .drawer;
+.drawer-container {
+    > .overlay.drawer-overlay {
+        display: none;
     }
 
+    &.drawer-open {
+        .overlay {
+            display: flex;
+        }
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
     @media (min-width: $min-width) {
         .drawer-#{$breakpoint} {
             overflow-y: auto;
@@ -272,6 +279,10 @@
         }
 
         .drawer-toggle-#{$breakpoint} {
+            display: none;
+        }
+
+        .drawer-container-#{$breakpoint} > .overlay.drawer-overlay {
             display: none;
         }
     }

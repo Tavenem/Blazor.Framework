@@ -62,17 +62,17 @@
   <Target Name="SassBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
     <PropertyGroup>
       <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
-      <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))/</_SassOutputFullPath>
+      <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))</_SassOutputFullPath>
       <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>
     </PropertyGroup>
     <MakeDir Directories="$(_SassOutputFolderPath)" />
-    <MakeDir Directories="$(_CssOutputFullPath)" />
+    <MakeDir Directories="$(_CssOutputFolderPath)" />
 
     <Message Importance="high" Text="Running npm run sass..." />
     <Exec Command="npm run sass -- $(_SassOutputFullPath)" WorkingDirectory="assets\" />
 
     <Message Importance="high" Text="Running npm run postcss..." />
-    <Exec Command="npm run postcss -- -d $(_CssOutputFullPath)" WorkingDirectory="$(_SassOutputFolderPath)" />
+    <Exec Command="npm run postcss -- $(_SassOutputFullPath) -d $(_CssOutputFolderPath)" WorkingDirectory="assets\" />
 
     <ItemGroup>
       <_CssBuildOutput Include="$(IntermediateOutputPath)css\**"></_CssBuildOutput>

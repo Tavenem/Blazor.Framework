@@ -11,7 +11,7 @@
         }
     }
 
-    > .btn-icon {
+    .btn-icon {
         color: var(--rating-color) !important;
         transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
@@ -23,7 +23,7 @@
     &:disabled, &.disabled {
         --rating-color: var(--tavenem-color-text-disabled);
 
-        > .btn-icon {
+        .btn-icon {
             cursor: default;
             pointer-events: none;
 
@@ -34,7 +34,7 @@
     }
 
     &.readonly, &:read-only {
-        > .btn-icon {
+        .btn-icon {
             cursor: default;
             pointer-events: none;
 

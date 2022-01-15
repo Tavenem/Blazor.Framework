@@ -1,16 +1,12 @@
 ﻿<Drawer Side="Side.Left">
-    <ul class="list" role="navigation">
-        <li>
-            <NavLink href="" Match="NavLinkMatch.All">
-                <span class="icon home"></span>
-                Home
-            </NavLink>
-        </li>
-        <li>
-            <NavLink href="./fetchdata">
-                <span class="icon leaderboard"></span>
-                Fetch data
-            </NavLink>
-        </li>
-    </ul>
+    <div class="list" role="navigation">
+        <NavLink href="" Match="NavLinkMatch.All"><span class="icon home" /> Home</NavLink>
+        <Collapse Title="Getting Started">
+            <div class="list">
+                <NavLink href="./getting-started/installation">Installation</NavLink>
+                <NavLink href="./getting-started/layout">Layout</NavLink>
+                <NavLink href="./getting-started/themes">Themes</NavLink>
+            </div>
+        </Collapse>
+    </div>
 </Drawer>

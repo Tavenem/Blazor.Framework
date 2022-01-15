@@ -23,7 +23,7 @@ public class CssBuilder
     /// Initializes a new instance of <see cref="CssBuilder"/>.
     /// </summary>
     /// <param name="value">A starting value.</param>
-    public CssBuilder(string value)
+    public CssBuilder(string? value)
     {
         if (!string.IsNullOrWhiteSpace(value))
         {

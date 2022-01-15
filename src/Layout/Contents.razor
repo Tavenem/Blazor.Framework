@@ -1,0 +1,20 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<nav @attributes="UserAttributes" class="@ClassName" style="@Style">
+    @if (ChildContent is null)
+    {
+        <li class="subheader sticky">Contents</li>
+    }
+    else
+    {
+        @ChildContent
+    }
+    @foreach (var heading in _headings)
+    {
+        <li @key="heading.Id" class="clickable">
+            <AnchorLink href="@($"#{heading.Id}")">@heading.Title</AnchorLink>
+        </li>
+    }
+</nav>

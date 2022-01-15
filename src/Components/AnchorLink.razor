@@ -1,0 +1,16 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@if (string.IsNullOrEmpty(LocalLink))
+{
+    <NavLink @attributes="Attributes" class="@ClassName" style="@Style">
+        @ChildContent
+    </NavLink>
+}
+else
+{
+    <a @attributes="Attributes" class="@ClassName" style="@Style" @onclick="OnClickLocalLinkAsync">
+        @ChildContent
+    </a>
+}

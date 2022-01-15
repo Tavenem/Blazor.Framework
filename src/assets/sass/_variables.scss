@@ -17,6 +17,12 @@
     --tavenem-lineheight-heading: 1.2;
     --tavenem-lineheight-button: 1.75;
     --tavenem-texttransform-button: uppercase;
+    --tavenem-dark-color-text: #ffffffb2;
+    --tavenem-dark-color-text-secondary: #ffffff7f;
+    --tavenem-dark-color-text-disabled: #ffffff33;
+    --tavenem-light-color-text: #424242;
+    --tavenem-light-color-text-secondary: #00000089;
+    --tavenem-light-color-text-disabled: #00000060;
     --tavenem-dark-color-bg: #32333d;
     --tavenem-dark-color-bg-alt: #22232a;
     --tavenem-dark-color-bg-surface: #373740;
@@ -25,23 +31,48 @@
     --tavenem-dark-color-overlay: rgba(255,255,255,0.5);
     --tavenem-dark-color-action: #adadb1;
     --tavenem-dark-color-action-rgb: 173,173,177;
-    --tavenem-dark-color-text: #ffffffb2;
-    --tavenem-dark-color-text-secondary: #ffffff7f;
-    --tavenem-dark-color-text-disabled: #ffffff33;
     --tavenem-dark-color-border: #ffffff1e;
     --tavenem-dark-color-border-input: #ffffff4c;
     --tavenem-dark-color-border-table: #ffffff1e;
     --tavenem-dark-color-scrollbar: #67697e;
     --tavenem-dark-color-scrollbar-hover: #86889c;
     --tavenem-dark-color-yellow-bg: #a82;
-    --tavenem-dark-color-secondary-hue: 202;
-    --tavenem-dark-color-secondary-saturation: 6;
-    --tavenem-dark-color-secondary-lightness: 37;
-    --tavenem-dark-color-secondary-text: var(--tavenem-light-color-text);
+    --tavenem-dark-color-primary-hue: 270;
+    --tavenem-dark-color-primary-saturation: 72;
+    --tavenem-dark-color-primary-lightness: 59;
+    --tavenem-dark-color-primary-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-secondary-hue: 340;
+    --tavenem-dark-color-secondary-saturation: 100;
+    --tavenem-dark-color-secondary-lightness: 63;
+    --tavenem-dark-color-secondary-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-tertiary-hue: 168;
+    --tavenem-dark-color-tertiary-saturation: 74;
+    --tavenem-dark-color-tertiary-lightness: 45;
+    --tavenem-dark-color-tertiary-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-danger-hue: 4;
+    --tavenem-dark-color-danger-saturation: 90;
+    --tavenem-dark-color-danger-lightness: 58;
+    --tavenem-dark-color-danger-text: var(--tavenem-dark-color-text);
     --tavenem-dark-color-dark-hue: 240;
     --tavenem-dark-color-dark-saturation: 9;
     --tavenem-dark-color-dark-lightness: 17;
     --tavenem-dark-color-dark-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-default-hue: 202;
+    --tavenem-dark-color-default-saturation: 6;
+    --tavenem-dark-color-default-lightness: 37;
+    --tavenem-dark-color-default-text: var(--tavenem-light-color-text);
+    --tavenem-dark-color-info-hue: 207;
+    --tavenem-dark-color-info-saturation: 90;
+    --tavenem-dark-color-info-lightness: 54;
+    --tavenem-dark-color-info-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-success-hue: 145;
+    --tavenem-dark-color-success-saturation: 100;
+    --tavenem-dark-color-success-lightness: 39;
+    --tavenem-dark-color-success-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-warning-hue: 36;
+    --tavenem-dark-color-warning-saturation: 100;
+    --tavenem-dark-color-warning-lightness: 50;
+    --tavenem-dark-color-warning-text: var(--tavenem-dark-color-text);
     --tavenem-light-color-bg: white;
     --tavenem-light-color-bg-alt: #ebebeb;
     --tavenem-light-color-bg-surface: white;
@@ -50,25 +81,48 @@
     --tavenem-light-color-overlay: rgba(33,33,33,0.5);
     --tavenem-light-color-action: rgba(0,0,0,0.54);
     --tavenem-light-color-action-rgb: 0,0,0;
-    --tavenem-light-color-text: #424242;
-    --tavenem-light-color-text-secondary: #00000089;
-    --tavenem-light-color-text-disabled: #00000060;
     --tavenem-light-color-border: #0000001e;
     --tavenem-light-color-border-input: #bdbdbd;
     --tavenem-light-color-border-table: #e0e0e0;
-    --tavenem-light-color-table-hover: #0000000a;
-    --tavenem-light-color-table-stripe: #00000005;
     --tavenem-light-color-scrollbar: #c4c4c4;
     --tavenem-light-color-scrollbar-hover: #a6a6a6;
     --tavenem-light-color-yellow-bg: #fcf8e3;
-    --tavenem-light-color-secondary-hue: 208;
-    --tavenem-light-color-secondary-saturation: 7;
-    --tavenem-light-color-secondary-lightness: 46;
+    --tavenem-light-color-primary-hue: 270;
+    --tavenem-light-color-primary-saturation: 72;
+    --tavenem-light-color-primary-lightness: 59;
+    --tavenem-light-color-primary-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-secondary-hue: 340;
+    --tavenem-light-color-secondary-saturation: 100;
+    --tavenem-light-color-secondary-lightness: 63;
     --tavenem-light-color-secondary-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-tertiary-hue: 168;
+    --tavenem-light-color-tertiary-saturation: 74;
+    --tavenem-light-color-tertiary-lightness: 45;
+    --tavenem-light-color-tertiary-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-danger-hue: 4;
+    --tavenem-light-color-danger-saturation: 90;
+    --tavenem-light-color-danger-lightness: 58;
+    --tavenem-light-color-danger-text: var(--tavenem-dark-color-text);
     --tavenem-light-color-dark-hue: 0;
     --tavenem-light-color-dark-saturation: 0;
     --tavenem-light-color-dark-lightness: 26;
     --tavenem-light-color-dark-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-default-hue: 208;
+    --tavenem-light-color-default-saturation: 7;
+    --tavenem-light-color-default-lightness: 46;
+    --tavenem-light-color-default-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-info-hue: 207;
+    --tavenem-light-color-info-saturation: 90;
+    --tavenem-light-color-info-lightness: 54;
+    --tavenem-light-color-info-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-success-hue: 145;
+    --tavenem-light-color-success-saturation: 100;
+    --tavenem-light-color-success-lightness: 39;
+    --tavenem-light-color-success-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-warning-hue: 36;
+    --tavenem-light-color-warning-saturation: 100;
+    --tavenem-light-color-warning-lightness: 50;
+    --tavenem-light-color-warning-text: var(--tavenem-dark-color-text);
     --tavenem-dark-color-keyboard: var(--tavenem-light-color-text);
     --tavenem-dark-color-keyboard-bg: rgba(255,255,255,.1);
     --tavenem-light-color-keyboard: var(--tavenem-dark-color-text);
@@ -90,45 +144,49 @@
     --tavenem-color-border: var(--tavenem-light-color-border);
     --tavenem-color-border-input: var(--tavenem-light-color-border-input);
     --tavenem-color-border-table: var(--tavenem-light-color-border-table);
-    --tavenem-color-table-hover: var(--tavenem-light-color-table-hover);
-    --tavenem-color-table-stripe: var(--tavenem-light-color-table-stripe);
     --tavenem-color-scrollbar: var(--tavenem-light-color-scrollbar);
     --tavenem-color-scrollbar-hover: var(--tavenem-light-color-scrollbar-hover);
     --tavenem-color-yellow-bg: var(--tavenem-light-color-yellow-bg);
     --tavenem-color-keyboard: var(--tavenem-light-color-keyboard);
     --tavenem-color-keyboard-bg: var(--tavenem-light-color-keyboard-bg);
-    --tavenem-color-primary-hue: 270;
-    --tavenem-color-primary-saturation: 72;
-    --tavenem-color-primary-lightness: 59;
-    --tavenem-color-primary-text: var(--tavenem-dark-color-text);
+    --tavenem-color-table-hover: #0000000a;
+    --tavenem-color-table-stripe: #00000005;
+    --tavenem-color-primary-hue: var(--tavenem-light-color-primary-hue);
+    --tavenem-color-primary-saturation: var(--tavenem-light-color-primary-saturation);
+    --tavenem-color-primary-lightness: var(--tavenem-light-color-primary-lightness);
+    --tavenem-color-primary-text: var(--tavenem-light-color-primary-text);
     --tavenem-color-secondary-hue: var(--tavenem-light-color-secondary-hue);
     --tavenem-color-secondary-saturation: var(--tavenem-light-color-secondary-saturation);
     --tavenem-color-secondary-lightness: var(--tavenem-light-color-secondary-lightness);
     --tavenem-color-secondary-text: var(--tavenem-light-color-secondary-text);
-    --tavenem-color-tertiary-hue: 168;
-    --tavenem-color-tertiary-saturation: 74;
-    --tavenem-color-tertiary-lightness: 45;
-    --tavenem-color-tertiary-text: var(--tavenem-dark-color-text);
-    --tavenem-color-danger-hue: 4;
-    --tavenem-color-danger-saturation: 90;
-    --tavenem-color-danger-lightness: 58;
-    --tavenem-color-danger-text: var(--tavenem-dark-color-text);
+    --tavenem-color-tertiary-hue: var(--tavenem-light-color-tertiary-hue);
+    --tavenem-color-tertiary-saturation: var(--tavenem-light-color-tertiary-saturation);
+    --tavenem-color-tertiary-lightness: var(--tavenem-light-color-tertiary-lightness);
+    --tavenem-color-tertiary-text: var(--tavenem-light-color-tertiary-text);
+    --tavenem-color-danger-hue: var(--tavenem-light-color-danger-hue);
+    --tavenem-color-danger-saturation: var(--tavenem-light-color-danger-saturation);
+    --tavenem-color-danger-lightness: var(--tavenem-light-color-danger-lightness);
+    --tavenem-color-danger-text: var(--tavenem-light-color-danger-text);
     --tavenem-color-dark-hue: var(--tavenem-light-color-dark-hue);
     --tavenem-color-dark-saturation: var(--tavenem-light-color-dark-saturation);
     --tavenem-color-dark-lightness: var(--tavenem-light-color-dark-lightness);
-    --tavenem-color-dark-text: var(--tavenem-light-color-dark-text);
-    --tavenem-color-info-hue: 207;
-    --tavenem-color-info-saturation: 90;
-    --tavenem-color-info-lightness: 54;
-    --tavenem-color-info-text: var(--tavenem-dark-color-text);
-    --tavenem-color-success-hue: 145;
-    --tavenem-color-success-saturation: 100;
-    --tavenem-color-success-lightness: 39;
-    --tavenem-color-success-text: var(--tavenem-dark-color-text);
-    --tavenem-color-warning-hue: 36;
-    --tavenem-color-warning-saturation: 100;
-    --tavenem-color-warning-lightness: 50;
-    --tavenem-color-warning-text: var(--tavenem-dark-color-text);
+    --tavenem-color-dark-text: var(--tavenem-light-color-primary-text);
+    --tavenem-color-default-hue: var(--tavenem-light-color-default-hue);
+    --tavenem-color-default-saturation: var(--tavenem-light-color-default-saturation);
+    --tavenem-color-default-lightness: var(--tavenem-light-color-default-lightness);
+    --tavenem-color-default-text: var(--tavenem-light-color-default-text);
+    --tavenem-color-info-hue: var(--tavenem-light-color-info-hue);
+    --tavenem-color-info-saturation: var(--tavenem-light-color-info-saturation);
+    --tavenem-color-info-lightness: var(--tavenem-light-color-info-lightness);
+    --tavenem-color-info-text: var(--tavenem-light-color-info-text);
+    --tavenem-color-success-hue: var(--tavenem-light-color-success-hue);
+    --tavenem-color-success-saturation: var(--tavenem-light-color-success-saturation);
+    --tavenem-color-success-lightness: var(--tavenem-light-color-success-lightness);
+    --tavenem-color-success-text: var(--tavenem-light-color-success-text);
+    --tavenem-color-warning-hue: var(--tavenem-light-color-warning-hue);
+    --tavenem-color-warning-saturation: var(--tavenem-light-color-warning-saturation);
+    --tavenem-color-warning-lightness: var(--tavenem-light-color-warning-lightness);
+    --tavenem-color-warning-text: var(--tavenem-light-color-warning-text);
     --tavenem-color-error: var(--tavenem-color-danger);
     --tavenem-shadow-1: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12);
     --tavenem-shadow-2: 0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12);
@@ -139,10 +197,10 @@
     --tavenem-border-radius: 4px;
     --tavenem-breadcrumb-divider: "/";
     --tavenem-zindex-scroll-to-top: 100;
-    --tavenem-zindex-drawer: 1100;
-    --tavenem-zindex-appbar: 1200;
-    --tavenem-zindex-overlay: 1300;
-    --tavenem-zindex-dialog: 1400;
+    --tavenem-zindex-overlay: 1100;
+    --tavenem-zindex-drawer: 1200;
+    --tavenem-zindex-appbar: 1300;
+    --tavenem-zindex-modal: 1400;
     --tavenem-zindex-snackbar: 1500;
     --tavenem-zindex-tooltip: 1600;
 }
@@ -162,21 +220,47 @@
     --tavenem-color-border: var(--tavenem-dark-color-border);
     --tavenem-color-border-input: var(--tavenem-dark-color-border-input);
     --tavenem-color-border-table: var(--tavenem-dark-color-border-table);
-    --tavenem-color-table-hover: var(--tavenem-dark-color-table-hover);
-    --tavenem-color-table-stripe: var(--tavenem-dark-color-table-stripe);
     --tavenem-color-scrollbar: var(--tavenem-dark-color-scrollbar);
     --tavenem-color-scrollbar-hover: var(--tavenem-dark-color-scrollbar-hover);
     --tavenem-color-yellow-bg: var(--tavenem-dark-color-yellow-bg);
     --tavenem-color-keyboard: var(--tavenem-dark-color-keyboard);
     --tavenem-color-keyboard-bg: var(--tavenem-dark-color-keyboard-bg);
+    --tavenem-color-primary-hue: var(--tavenem-dark-color-primary-hue);
+    --tavenem-color-primary-saturation: var(--tavenem-dark-color-primary-saturation);
+    --tavenem-color-primary-lightness: var(--tavenem-dark-color-primary-lightness);
+    --tavenem-color-primary-text: var(--tavenem-dark-color-primary-text);
     --tavenem-color-secondary-hue: var(--tavenem-dark-color-secondary-hue);
     --tavenem-color-secondary-saturation: var(--tavenem-dark-color-secondary-saturation);
     --tavenem-color-secondary-lightness: var(--tavenem-dark-color-secondary-lightness);
     --tavenem-color-secondary-text: var(--tavenem-dark-color-secondary-text);
+    --tavenem-color-tertiary-hue: var(--tavenem-dark-color-tertiary-hue);
+    --tavenem-color-tertiary-saturation: var(--tavenem-dark-color-tertiary-saturation);
+    --tavenem-color-tertiary-lightness: var(--tavenem-dark-color-tertiary-lightness);
+    --tavenem-color-tertiary-text: var(--tavenem-dark-color-tertiary-text);
+    --tavenem-color-danger-hue: var(--tavenem-dark-color-danger-hue);
+    --tavenem-color-danger-saturation: var(--tavenem-dark-color-danger-saturation);
+    --tavenem-color-danger-lightness: var(--tavenem-dark-color-danger-lightness);
+    --tavenem-color-danger-text: var(--tavenem-dark-color-danger-text);
     --tavenem-color-dark-hue: var(--tavenem-dark-color-dark-hue);
     --tavenem-color-dark-saturation: var(--tavenem-dark-color-dark-saturation);
     --tavenem-color-dark-lightness: var(--tavenem-dark-color-dark-lightness);
     --tavenem-color-dark-text: var(--tavenem-dark-color-dark-text);
+    --tavenem-color-default-hue: var(--tavenem-dark-color-default-hue);
+    --tavenem-color-default-saturation: var(--tavenem-dark-color-default-saturation);
+    --tavenem-color-default-lightness: var(--tavenem-dark-color-default-lightness);
+    --tavenem-color-default-text: var(--tavenem-dark-color-default-text);
+    --tavenem-color-info-hue: var(--tavenem-dark-color-info-hue);
+    --tavenem-color-info-saturation: var(--tavenem-dark-color-info-saturation);
+    --tavenem-color-info-lightness: var(--tavenem-dark-color-info-lightness);
+    --tavenem-color-info-text: var(--tavenem-dark-color-info-text);
+    --tavenem-color-success-hue: var(--tavenem-dark-color-success-hue);
+    --tavenem-color-success-saturation: var(--tavenem-dark-color-success-saturation);
+    --tavenem-color-success-lightness: var(--tavenem-dark-color-success-lightness);
+    --tavenem-color-success-text: var(--tavenem-dark-color-success-text);
+    --tavenem-color-warning-hue: var(--tavenem-dark-color-warning-hue);
+    --tavenem-color-warning-saturation: var(--tavenem-dark-color-warning-saturation);
+    --tavenem-color-warning-lightness: var(--tavenem-dark-color-warning-lightness);
+    --tavenem-color-warning-text: var(--tavenem-dark-color-warning-text);
 }
 
 $breakpoints: (
@@ -200,6 +284,7 @@ $theme-colors: (
     tertiary,
     danger,
     dark,
+    default,
     info,
     success,
     warning
@@ -303,14 +388,16 @@ $positive-spacers: (
     2: .5rem,
     3: 1rem,
     4: 1.5rem,
-    5: 3rem
+    5: 3rem,
+    6: 4rem
 );
 $spacers: map-merge($positive-spacers, (
     n1: -.25rem,
     n2: -0.5rem,
     n3: -1rem,
     n4: -1.5rem,
-    n5: -3rem
+    n5: -3rem,
+    n6: -4rem
 ));
 $spacers-and-auto: map-merge($spacers, (auto: auto));
 

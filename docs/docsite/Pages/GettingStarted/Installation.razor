@@ -1,0 +1,63 @@
+﻿@page "/getting-started/installation"
+
+<PageTitle>Installation - Tavenem Blazor Framework</PageTitle>
+
+<h1>Installation</h1>
+
+<p>This page will show you how to install and get started using the Tavenem Blazor Framework.</p>
+
+<Heading Level="HeadingLevel.H2">1. Install</Heading>
+<p>The <code>Tavenem.Blazor.Framework</code> NuGet package is available through the package manager, or the CLI:</p>
+<div class="codeblock">
+    <pre class="user-select-all">dotnet add package Tavenem.Blazor.Framework</pre>
+</div>
+
+<Heading Level="HeadingLevel.H2">2. Import Namespace</Heading>
+<p>Add the package namespace to your <code>_Imports.razor</code> file.</p>
+<div class="codeblock">
+    <pre class="user-select-all pre-razor-code">
+        <span class="pre-directive">&#64;using</span> Tavenem.Blazor.Framework
+    </pre>
+</div>
+
+<Heading Level="HeadingLevel.H2">3. Add CSS Link</Heading>
+<p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
+<div class="codeblock">
+    @CodeFormatter.CodeToMarkup(_example1)
+</div>
+<p>
+    If you started your project with the default Blazor template, delete the
+    references to Bootstrap, and all the pregenerated content in the
+    <code>app.css</code> file (you can delete this file completely if you don't
+    plan to put your own content there).
+</p>
+<p class="text-muted">
+    Don't worry about the built-in Blazor styles in the template stylesheet. The
+    Tavenem Blazor Framework reproduces and modifies them.
+</p>
+
+<Heading Level="HeadingLevel.H2">4. Add Font link</Heading>
+<p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
+<div class="codeblock">
+    @CodeFormatter.CodeToMarkup(_example2)
+</div>
+<p>
+    If you prefer to use a different icon library, instead of
+    <a href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a>,
+    replace this step with the appropriate process.
+</p>
+<p>
+    See the <a href="/components/icon">Icon</a> component documentation for details.
+</p>
+
+<Heading Level="HeadingLevel.H2">5. Register Service with Dependency Injection</Heading>
+<p>Add the following to your <code>Program.cs</code>:</p>
+<div class="codeblock">
+    <pre class="user-select-all">builder.Services.AddTavenemFramework();</pre>
+</div>
+
+<Heading Level="HeadingLevel.H2">6. Set up the Framework</Heading>
+<p>Add a <code class="primary">FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>
+<p>See <a href="./gettingstarted/layout">Layout</a> for details.</p>
+
+

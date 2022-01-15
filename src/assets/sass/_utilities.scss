@@ -408,7 +408,7 @@
 
 @each $breakpoint, $min-width in $breakpoints {
     @media (min-width: $min-width) {
-        @each $key, $value in $map {
+        @each $key, $value in $spacers-and-auto {
             .mx-#{$breakpoint}-#{$key} {
                 margin-left: $value !important;
                 margin-right: $value !important;
@@ -445,7 +445,7 @@
 
 @each $breakpoint, $min-width in $breakpoints {
     @media (min-width: $min-width) {
-        @each $key, $value in $map {
+        @each $key, $value in $spacers {
             .px-#{$breakpoint}-#{$key} {
                 padding-left: $value !important;
                 padding-right: $value !important;
@@ -514,6 +514,14 @@
     border-bottom-right-radius: var(--tavenem-border-radius) !important;
 }
 
+.rounded-bottom-left {
+    border-bottom-left-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-bottom-right {
+    border-bottom-right-radius: var(--tavenem-border-radius) !important;
+}
+
 .rounded-left {
     border-bottom-left-radius: var(--tavenem-border-radius) !important;
     border-top-left-radius: var(--tavenem-border-radius) !important;
@@ -526,6 +534,14 @@
 
 .rounded-top {
     border-top-left-radius: var(--tavenem-border-radius) !important;
+    border-top-right-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-top-left {
+    border-top-left-radius: var(--tavenem-border-radius) !important;
+}
+
+.rounded-top-right {
     border-top-right-radius: var(--tavenem-border-radius) !important;
 }
 

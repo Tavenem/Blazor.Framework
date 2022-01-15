@@ -14,4 +14,19 @@ internal static class Extensions
             .ToLowerInvariant()
             .Replace('_', '-');
     }
+
+    public static Dictionary<TKey, TValue> Without<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, params TKey[] keys) where TKey : notnull
+    {
+        if (keys.Length == 0)
+        {
+            return dictionary;
+        }
+
+        var copy = new Dictionary<TKey, TValue>(dictionary);
+        foreach (var key in keys)
+        {
+            copy.Remove(key);
+        }
+        return copy;
+    }
 }

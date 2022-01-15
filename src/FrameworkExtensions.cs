@@ -16,6 +16,7 @@ public static class FrameworkExtensions
     public static IServiceCollection AddTavenemFramework(this IServiceCollection services)
     {
         services.AddScoped<FrameworkJsInterop>();
+        services.AddTransient<ScrollListener>();
         return services;
     }
 }

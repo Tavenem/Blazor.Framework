@@ -8,7 +8,7 @@
     gap: 6px;
     margin: 0;
 
-    > li {
+    li {
         > * {
             border-radius: 9999px;
             height: 2em;
@@ -18,11 +18,11 @@
             text-align: center;
         }
 
-        &:not(.selected) > * {
+        &:not(.active) > * {
             box-shadow: none;
         }
 
-        &.selected {
+        &.active {
             background-color: var(--pagination-active-color);
             color: var(--pagination-active-text-color);
         }
@@ -51,10 +51,10 @@
     &.outlined {
         border: none;
 
-        > li {
+        li {
             border: 1px solid var(--tavenem-color-border);
 
-            &.selected {
+            &.active {
                 background-color: transparent;
                 border-color: (--pagination-active-color);
             }
@@ -65,26 +65,28 @@
         background-color: transparent;
     }
 
-    &:disabled, &.disabled > li {
-        color: var(--tavenem-color-action-disabled) !important;
-
-        * {
-            box-shadow: none;
-            background-color: transparent !important;
+    &:disabled, &.disabled {
+        li {
             color: var(--tavenem-color-action-disabled) !important;
-            cursor: default;
-            pointer-events: none;
+
+            * {
+                box-shadow: none;
+                background-color: transparent !important;
+                color: var(--tavenem-color-action-disabled) !important;
+                cursor: default;
+                pointer-events: none;
+            }
         }
     }
 
-    &.small > li > * {
+    &.small li > * {
         height: 1.625em;
         margin: 0 1px;
         min-width: 1.625em;
         padding: 0 4px;
     }
 
-    &.large > li > * {
+    &.large li > * {
         height: 2.5em;
         min-width: 2.5em;
         padding: 0 10px;

@@ -1,10 +1,18 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
-@inherits LayoutComponentBase
+@inherits DrawerContainer
 
-<div class="framework">
+<div class="@ClassName" style="@Style">
     <CascadingValue Value="this" IsFixed="true">
         @ChildContent
     </CascadingValue>
+    @if (AutoScrollToTop)
+    {
+        <ScrollToTop>
+            <span class="btn btn-text btn-icon primary filled">
+                <span class="icon expand_less"></span>
+            </span>
+        </ScrollToTop>
+    }
+    <div class="overlay drawer-overlay" @onclick="OnCloseDrawersAsync" @onclick:stopPropagation="true"></div>
 </div>
-

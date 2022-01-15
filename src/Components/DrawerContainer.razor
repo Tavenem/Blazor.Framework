@@ -1,0 +1,10 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div class="@ClassName" style="@Style">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+    <div class="overlay drawer-overlay" @onclick="OnCloseDrawersAsync" @onclick:stopPropagation="true"></div>
+</div>

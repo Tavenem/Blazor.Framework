@@ -230,13 +230,6 @@
                 background-color: var(--tavenem-color-#{$theme}-hover);
                 color: var(--tavenem-color-#{$theme});
 
-                @include unify-parent("a") {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-lighten);
-                    }
-                }
-
                 &.bg-alt {
                     background-color: var(--tavenem-color-#{$theme}-hover-dark);
                 }
@@ -247,8 +240,6 @@
 
 @each $breakpoint, $max-width in $breakpoint-maxs {
     .table-#{$breakpoint} {
-        @extend .table;
-
         @media (max-width: $max-width) {
             thead, tfoot {
                 display: none;
