@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Components;
 
 namespace Tavenem.Blazor.Framework;
 
+/// <summary>
+/// Toggles between light and dark mode.
+/// </summary>
 public partial class LightDarkToggle
 {
     private const string DefaultDarkModeIconClass = "dark_mode";

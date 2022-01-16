@@ -1,0 +1,15 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @attributes="UserAttributes" role="alert" class="@ClassName" style="@Style" @onclick="OnClickAsync">
+    @if (!string.IsNullOrWhiteSpace(IconClass))
+    {
+        <span class="@IconClassName"></span>
+    }
+    @ChildContent
+    @if (CanClose)
+    {
+        <div class="btn-close" @onclick="OnClosedAsync"></div>
+    }
+</div>

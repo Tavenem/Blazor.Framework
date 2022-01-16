@@ -6,7 +6,7 @@
     <div class="header">
         @if (TitleContent is null)
         {
-            <div class="expand" @onclick="OnToggleAsync">
+            <div class="expand" @onclick="ToggleAsync">
                 @Title
                 <span class="icon expand_more"></span>
             </div>
@@ -14,7 +14,7 @@
         else
         {
             @TitleContent
-            <span class="icon expand expand_more" @onclick="OnToggleAsync"></span>
+            <span class="icon expand expand_more" @onclick="ToggleAsync"></span>
         }
     </div>
     @ChildContent

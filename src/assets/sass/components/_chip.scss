@@ -23,6 +23,10 @@
     vertical-align: middle;
     white-space: nowrap;
 
+    &.clickable {
+        cursor: pointer;
+    }
+
     &:disabled,
     &.disabled {
         opacity: 0.5;
