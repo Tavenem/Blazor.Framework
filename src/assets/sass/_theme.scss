@@ -19,14 +19,14 @@
 @each $theme in $theme-colors {
     :root {
         --tavenem-color-#{$theme}: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness));
-        --tavenem-color-#{$theme}-darken: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) - 7);
-        --tavenem-color-#{$theme}-darken-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) - 14);
-        --tavenem-color-#{$theme}-lighten: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) + 7);
-        --tavenem-color-#{$theme}-lighten-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) + 14);
+        --tavenem-color-#{$theme}-darken: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 7%));
+        --tavenem-color-#{$theme}-darken-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 14%));
+        --tavenem-color-#{$theme}-lighten: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 7%));
+        --tavenem-color-#{$theme}-lighten-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 14%));
         --tavenem-color-#{$theme}-hover: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .06);
-        --tavenem-color-#{$theme}-hover-bright: rgba(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .12);
-        --tavenem-color-#{$theme}-hover-dark: rgba(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) - 7, .06);
-        --tavenem-color-#{$theme}-hover-light: rgba(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness) + 7, .06);
+        --tavenem-color-#{$theme}-hover-bright: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .12);
+        --tavenem-color-#{$theme}-hover-dark: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 7%), .06);
+        --tavenem-color-#{$theme}-hover-light: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 7%), .06);
     }
 
     .#{$theme} {

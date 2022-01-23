@@ -1,4 +1,22 @@
-﻿.small {
+﻿.text-light {
+    font-weight: var(--tavenem-font-weight-light);
+}
+
+.text-casual {
+    --tavenem-casl: 1;
+}
+
+.text-close {
+    letter-spacing: -.12rem;
+}
+b.text-close,
+strong.text-close,
+dt.text-close,
+kbd kbd.text-close {
+    letter-spacing: -.07rem;
+}
+
+.small {
     font-size: .875rem;
 }
 
@@ -380,7 +398,6 @@
 @include generate-utility("", align-self, $align-items-values);
 @include generate-utility("flex", flex-wrap, $flex-wrap-values);
 @include generate-utility("", justify-content, $justify-content-values);
-@include generate-utility("", justify-self, $justify-content-values);
 @include generate-utility("order", order, $order-values);
 
 @include generate-utility("gap", gap, $positive-spacers);

@@ -13,7 +13,7 @@ public partial class DrawerContainer
     /// The breakpoint at which left and right drawers should be permanently
     /// visible.
     /// </summary>
-    [Parameter] public Breakpoint SideDrawerBreakpoint { get; set; } = Breakpoint.Md;
+    [Parameter] public Breakpoint SideDrawerBreakpoint { get; set; } = Breakpoint.Lg;
 
     /// <summary>
     /// The child content of this component.

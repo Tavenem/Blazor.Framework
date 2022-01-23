@@ -42,16 +42,17 @@
   <ItemGroup>
     <Content Update="assets\**" Pack="false">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-    <None Include="Components\Alert.razor.cs" />
     <None Include="tavenem_128.png" Pack="true" PackagePath="\" />
+    <ClientAssetsInputs Include="assets\sass\**\*.scss" Exclude="assets\sass\**\_*.scss" />
     <ClientAssetsInputs Remove="assets\package.json" />
     <ClientAssetsInputs Remove="assets\postcss.config.js" />
     <ClientAssetsInputs Remove="assets\rollup.config.js" />
     <ClientAssetsInputs Remove="assets\tavenem-framework.ts" />
     <ClientAssetsInputs Remove="assets\tsconfig.json" />
     <Content Include="assets\sass\framework.scss" />
-    <ScssFiles Include="assets\**\*.scss"></ScssFiles>
+    <ScssFiles Include="assets\**\*.scss" Exclude="assets\**\_*.scss" />
   </ItemGroup>
 	
   <PropertyGroup>
@@ -85,219 +86,19 @@
       <FileWrites Include="@(_CssBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />
       
-      <Content Condition="'$(TargetFramework)' != 'net6.0'" Include="@(_CssBuildOutput)" Link="wwwroot\%(_CssBuildOutput.RecursiveDir)\%(_CssBuildOutput.FileName)%(_CssBuildOutput.Extension)" />
+      <Content Condition="'$(TargetFramework)' != 'net6.0'"
+			   Include="@(_CssBuildOutput)"
+			   Link="wwwroot\%(_CssBuildOutput.RecursiveDir)\%(_CssBuildOutput.FileName)%(_CssBuildOutput.Extension)" />
     </ItemGroup>
     
-    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'" CandidateAssets="@(_CssBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_CssOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
+    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'"
+						   CandidateAssets="@(_CssBuildOutput)"
+						   SourceId="$(PackageId)"
+						   SourceType="Computed"
+						   ContentRoot="$(_CssOutputFolderPath)"
+						   BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_variables.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ScssFiles Remove="assets\sass\components\_appbar.scss" />
-    <ScssFiles Remove="assets\sass\components\_avatar.scss" />
-    <ScssFiles Remove="assets\sass\components\_badge.scss" />
-    <ScssFiles Remove="assets\sass\components\_breadcrumb.scss" />
-    <ScssFiles Remove="assets\sass\components\_button.scss" />
-    <ScssFiles Remove="assets\sass\components\_buttongroup.scss" />
-    <ScssFiles Remove="assets\sass\components\_card.scss" />
-    <ScssFiles Remove="assets\sass\components\_checkbox.scss" />
-    <ScssFiles Remove="assets\sass\components\_chip.scss" />
-    <ScssFiles Remove="assets\sass\components\_closebutton.scss" />
-    <ScssFiles Remove="assets\sass\components\_collapse.scss" />
-    <ScssFiles Remove="assets\sass\components\_drawer.scss" />
-    <ScssFiles Remove="assets\sass\components\_field.scss" />
-    <ScssFiles Remove="assets\sass\components\_icon.scss" />
-    <ScssFiles Remove="assets\sass\components\_list.scss" />
-    <ScssFiles Remove="assets\sass\components\_modal.scss" />
-    <ScssFiles Remove="assets\sass\components\_overlay.scss" />
-    <ScssFiles Remove="assets\sass\components\_pagination.scss" />
-    <ScssFiles Remove="assets\sass\components\_popover.scss" />
-    <ScssFiles Remove="assets\sass\components\_progress.scss" />
-    <ScssFiles Remove="assets\sass\components\_rating.scss" />
-    <ScssFiles Remove="assets\sass\components\_ripple.scss" />
-    <ScssFiles Remove="assets\sass\components\_scrolltotop.scss" />
-    <ScssFiles Remove="assets\sass\components\_select.scss" />
-    <ScssFiles Remove="assets\sass\components\_skeleton.scss" />
-    <ScssFiles Remove="assets\sass\components\_slider.scss" />
-    <ScssFiles Remove="assets\sass\components\_snackbar.scss" />
-    <ScssFiles Remove="assets\sass\components\_table.scss" />
-    <ScssFiles Remove="assets\sass\components\_tabs.scss" />
-    <ScssFiles Remove="assets\sass\components\_timeline.scss" />
-    <ScssFiles Remove="assets\sass\components\_toolbar.scss" />
-    <ScssFiles Remove="assets\sass\components\_tooltip.scss" />
-    <ScssFiles Remove="assets\sass\_alert.scss" />
-    <ScssFiles Remove="assets\sass\_animations.scss" />
-    <ScssFiles Remove="assets\sass\_blazor.scss" />
-    <ScssFiles Remove="assets\sass\_layout.scss" />
-    <ScssFiles Remove="assets\sass\_reset.scss" />
-    <ScssFiles Remove="assets\sass\_theme.scss" />
-    <ScssFiles Remove="assets\sass\_utilities.scss" />
-    <ScssFiles Remove="assets\sass\_variables.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_reset.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_layout.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_theme.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_utilities.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_blazor.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_alert.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_closebutton.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_avatar.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_badge.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_breadcrumb.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_button.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_buttongroup.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_ripple.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_card.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_chip.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_modal.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_overlay.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\_animations.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_drawer.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_collapse.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_checkbox.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_field.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_select.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_slider.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_icon.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_list.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_pagination.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_progress.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_rating.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_scrolltotop.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_table.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_skeleton.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_snackbar.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_tabs.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_timeline.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_toolbar.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_popover.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_tooltip.scss" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Remove="Alert.razor.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_appbar.scss" />
-  </ItemGroup>
 
 </Project>

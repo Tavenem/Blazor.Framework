@@ -8,13 +8,13 @@
         {
             <div class="expand" @onclick="ToggleAsync">
                 @Title
-                <span class="icon expand_more"></span>
+                <span class="icon">expand_more</span>
             </div>
         }
         else
         {
             @TitleContent
-            <span class="icon expand expand_more" @onclick="ToggleAsync"></span>
+            <span class="icon expand" @onclick="ToggleAsync">expand_more</span>
         }
     </div>
     @ChildContent

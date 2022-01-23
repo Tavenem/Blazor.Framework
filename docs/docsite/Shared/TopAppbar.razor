@@ -1,7 +1,13 @@
-﻿<AppBar Side="VerticalSide.Top" ControlsDrawerSide="Side.Left">
+﻿@inject NavigationManager NavigationManager
+
+<AppBar Side="VerticalSide.Top" ControlsDrawerSide="Side.Left">
     <a href="https://tavenem.com/" title="Tavenem">
-        <img src="./images/tavenemlogo.svg" alt="" width="60" height="60" class="d-inline-block me-3" />
+        <img src="./images/tavenemlogo.svg" alt="" width="60" height="60" class="d-inline-block me-1" />
     </a>
-    <h5><a href="" class="text-reset">Tavenem Blazor Framework Docs</a></h5>
-    <LightDarkToggle class="justify-self-end" />
+    <span class="primary text-close" style="font-size:2em;cursor:pointer" @onclick="Home">Tavenem Blazor Framework</span>
+    <LightDarkToggle class="ms-auto" />
 </AppBar>
+
+@code {
+    private void Home() => NavigationManager?.NavigateTo("./");
+}

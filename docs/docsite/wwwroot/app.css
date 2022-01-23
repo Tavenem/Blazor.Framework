@@ -1,4 +1,4 @@
-﻿html {
+html {
     height: 100%;
 }
 
@@ -30,7 +30,8 @@ body {
     margin: .1rem;
     text-align: center;
     vertical-align: middle;
-    width: 4rem;
+    width: 25vw;
+    max-height: 50vh;
 }
 @media (prefers-reduced-motion) {
     .loading-icon {

@@ -10,10 +10,9 @@
     "postcss": "8.4.5",
     "postcss-cli": "9.1.0",
     "postcss-import": "14.0.2",
-    "postcss-preset-env": "7.2.3",
     "rollup": "2.64.0",
     "rollup-plugin-terser": "7.0.2",
-    "sass": "1.48.0",
+    "sass": "1.49.0",
     "tslib": "2.3.1",
     "typescript": "4.5.4"
   },
@@ -22,6 +21,6 @@
     "build:Release": "rollup -c --environment build:Release",
     "build:Debug": "rollup -c --environment build:Debug",
     "sass": "sass ./sass/framework.scss",
-    "postcss": "postcss"
+    "postcss": "postcss --config postcss.config.js"
   }
 }

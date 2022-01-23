@@ -46,7 +46,7 @@ public partial class Contents
     private string BreakpointClass => Breakpoint switch
     {
         Breakpoint.None => "d-flex",
-        _ => $"d-none d-{Breakpoint.ToCSS}-flex",
+        _ => $"d-none d-{Breakpoint.ToCSS()}-flex",
     };
 
     [Inject] private FrameworkJsInterop? JsInterop { get; set; }

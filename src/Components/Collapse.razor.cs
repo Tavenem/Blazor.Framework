@@ -18,7 +18,8 @@ public partial class Collapse : IDisposable
     /// <summary>
     /// Whether the collapsed content is currently displayed.
     /// </summary>
-    [Parameter] public bool IsOpen
+    [Parameter]
+    public bool IsOpen
     {
         get => _isOpen;
         set => _ = SetOpenAsync(value);
@@ -64,7 +65,7 @@ public partial class Collapse : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.UserAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("alert")
+    protected string ClassName => new CssBuilder("collapse")
         .Add("open", _isOpen)
         .Add(Class)
         .AddClassFromDictionary(UserAttributes)

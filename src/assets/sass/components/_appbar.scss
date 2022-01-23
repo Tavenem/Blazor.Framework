@@ -1,7 +1,5 @@
 ﻿.appbar {
     align-content: center;
-    align-items: center;
-    background-color: var(--tavenem-color-bg-surface);
     box-sizing: border-box;
     color: var(--tavenem-color-text);
     display: flex;
@@ -11,6 +9,10 @@
     position: relative;
     width: 100%;
     z-index: var(--tavenem-zindex-appbar);
+
+    &.filled {
+        background-color: var(--tavenem-color-bg-surface);
+    }
 
     &.top {
         grid-area: header;
@@ -30,5 +32,12 @@
 
     &.dense, .dense & {
         min-height: 3em;
+    }
+
+    a {
+        &:hover,
+        &:focus-visible {
+            text-decoration: none;
+        }
     }
 }

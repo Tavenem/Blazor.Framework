@@ -20,10 +20,24 @@
     </pre>
 </div>
 
-<Heading Level="HeadingLevel.H2">3. Add CSS Link</Heading>
-<p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
+<Heading Level="HeadingLevel.H2">3. Add Font link</Heading>
+<p>Add the following links to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
 <div class="codeblock">
     @CodeFormatter.CodeToMarkup(_example1)
+</div>
+<p>
+    If you prefer to use a different icon library, instead of
+    <a href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a>,
+    replace this step with the appropriate process.
+</p>
+<p>
+    See the <a href="/components/icon">Icon</a> component documentation for details.
+</p>
+
+<Heading Level="HeadingLevel.H2">4. Add CSS Link</Heading>
+<p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
+<div class="codeblock">
+    @CodeFormatter.CodeToMarkup(_example2)
 </div>
 <p>
     If you started your project with the default Blazor template, delete the
@@ -34,20 +48,6 @@
 <p class="text-muted">
     Don't worry about the built-in Blazor styles in the template stylesheet. The
     Tavenem Blazor Framework reproduces and modifies them.
-</p>
-
-<Heading Level="HeadingLevel.H2">4. Add Font link</Heading>
-<p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
-<div class="codeblock">
-    @CodeFormatter.CodeToMarkup(_example2)
-</div>
-<p>
-    If you prefer to use a different icon library, instead of
-    <a href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a>,
-    replace this step with the appropriate process.
-</p>
-<p>
-    See the <a href="/components/icon">Icon</a> component documentation for details.
 </p>
 
 <Heading Level="HeadingLevel.H2">5. Register Service with Dependency Injection</Heading>

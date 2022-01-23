@@ -16,7 +16,7 @@ internal class FrameworkJsInterop : IAsyncDisposable
     public FrameworkJsInterop(IJSRuntime jsRuntime) => _moduleTask = new(
         () => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-framdework.js")
+            "./_content/Tavenem.Blazor.Framework/tavenem-framework.js")
         .AsTask());
 
     /// <summary>

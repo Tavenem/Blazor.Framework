@@ -3,25 +3,28 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:30389",
+      "applicationUrl": "http://localhost:30389/Blazor.Framework",
       "sslPort": 44345
     }
   },
   "profiles": {
     "Tavenem.Blazor.Framework.Docs": {
       "commandName": "Project",
+      "commandLineArgs": "--pathbase=/Blazor.Framework",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/Blazor.Framework/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "https://localhost:7136;http://localhost:5136",
+      "launchUrl": "https://localhost:7136/Blazor.Framework",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "IIS Express": {
       "commandName": "IISExpress",
+      "commandLineArgs": "--pathbase=/Blazor.Framework",
       "launchBrowser": true,
-      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/Blazor.Framework/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

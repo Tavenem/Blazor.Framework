@@ -14,7 +14,9 @@
     > * {
         @include ripple;
         align-items: center;
+        background-color: transparent;
         box-sizing: border-box;
+        color: inherit;
         column-gap: .5rem;
         display: flex;
         justify-content: flex-start;
@@ -26,6 +28,11 @@
         transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
         width: 100%;
         -webkit-tap-highlight-color: transparent;
+
+        &:focus-visible, &:hover {
+            background-color: transparent;
+            color: inherit;
+        }
 
         > .icon {
             flex-shrink: 0;

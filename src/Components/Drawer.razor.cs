@@ -125,6 +125,14 @@ public partial class Drawer : IDisposable
     /// The final value assigned to the header's class attribute, including
     /// component values.
     /// </summary>
+    protected string HeaderClassName => new CssBuilder("header appbar")
+        .Add("drawer-control", Header is null)
+        .ToString();
+
+    /// <summary>
+    /// The final value assigned to the header toolbar's class attribute, including
+    /// component values.
+    /// </summary>
     protected string HeaderToolbarClassName => new CssBuilder("toolbar filled")
         .Add(ThemeColor.ToCSS())
         .Add(HeaderClass)
@@ -141,7 +149,7 @@ public partial class Drawer : IDisposable
     private string? BreakpointClass => Breakpoint switch
     {
         Breakpoint.None => null,
-        _ => $"drawer-{Breakpoint.ToCSS}",
+        _ => $"drawer-{Breakpoint.ToCSS()}",
     };
 
     private bool DisplayOverlay { get; set; }

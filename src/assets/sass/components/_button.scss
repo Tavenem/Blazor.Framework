@@ -10,7 +10,7 @@
     cursor: pointer;
     display: inline-flex;
     font-size: var(--tavenem-font-size-button);
-    font-weight: var(--tavenem-font-weight-button);
+    font-weight: var(--tavenem-font-weight-semibold);
     justify-content: center;
     line-height: var(--tavenem-lineheight-button);
     margin: 0;
@@ -57,6 +57,11 @@
     > .icon:last-child {
         margin-inline-end: -4px;
         margin-inline-start: 8px;
+    }
+
+    > .icon:first-child:last-child {
+        margin-inline-end: -4px;
+        margin-inline-start: -4px;
     }
 
     &.small {
@@ -169,10 +174,11 @@ a.btn {
     background-color: transparent !important;
     box-shadow: none;
     color: inherit;
+    min-width: 0;
 
     &:hover,
     &:focus-visible {
-        background-color: var(--tavenem-color-action-hover-bg);
+        background-color: var(--tavenem-color-action-hover-bg) !important;
         box-shadow: none;
     }
 
@@ -196,7 +202,7 @@ a.btn {
 
             &:hover,
             &:focus-visible {
-                color: var(--tavenem-color-#{$theme}-hover);
+                background-color: var(--tavenem-color-#{$theme}-hover) !important;
             }
 
             &.darken {

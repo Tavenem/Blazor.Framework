@@ -9,6 +9,7 @@ public partial class AppBar : IDisposable
 {
     private bool _disposedValue;
 
+    private Breakpoint? _breakpoint;
     /// <summary>
     /// <para>
     /// The breakpoint at which the drawer should be permanently visible.
@@ -17,7 +18,12 @@ public partial class AppBar : IDisposable
     /// Ignored if <see cref="ControlsDrawerSide"/> is <see cref="Side.None"/>.
     /// </para>
     /// </summary>
-    [Parameter] public Breakpoint Breakpoint { get; set; }
+    [Parameter]
+    public Breakpoint Breakpoint
+    {
+        get => _breakpoint ?? FrameworkLayout?.SideDrawerBreakpoint ?? Breakpoint.None;
+        set => _breakpoint = value;
+    }
 
     /// <summary>
     /// The child content of this component.
@@ -78,15 +84,14 @@ public partial class AppBar : IDisposable
     protected string DrawerToggleClassName => Breakpoint switch
     {
         Breakpoint.None => "icon menu",
-        _ => $"icon menu drawer-toggle-{Breakpoint.ToCSS}",
+        _ => $"icon menu drawer-toggle-{Breakpoint.ToCSS()}",
     };
 
     /// <summary>
     /// The final value assigned to the toolbar's class attribute, including
     /// component values.
     /// </summary>
-    protected string ToolbarClassName => new CssBuilder("toolbar filled")
-        .Add(ThemeColor.ToCSS())
+    protected string ToolbarClassName => new CssBuilder("toolbar")
         .Add(ToolbarClass)
         .ToString();
 

@@ -9,8 +9,8 @@ public partial class Layout
     private const string _example2 =
 @"<FrameworkLayout ThemeColor=""ThemeColor.Primary"">
 	<AppBar Side=""VerticalSide.Top"" ControlsDrawerSide=""Side.Left"">
-		<h5><a href="""" class=""text-reset"">Main Title</a></h5>
-		<LightDarkToggle class=""justify-self-end"" />
+        <span class=""primary text-close"" style=""font-size:2em;cursor:pointer"" @onclick=""Home"">Main Title</span>
+		<LightDarkToggle class=""ms-auto"" />
 	</AppBar>
 	<Drawer Side=""Side.Left"">
 		<div class=""list"" role=""navigation"">
@@ -20,7 +20,7 @@ public partial class Layout
 		</div>
 	</Drawer>
     <div class=""d-flex"">
-        <main class=""flex-grow-1"">
+        <main class=""container mt-3"">
             @Body
         </main>
         <Contents Breakpoint=""Breakpoint.Lg"" />

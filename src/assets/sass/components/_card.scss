@@ -14,6 +14,10 @@
     position: relative;
     row-gap: 0;
 
+    &.drawer {
+        background-color: transparent;
+    }
+
     > {
         * {
             border-radius: 0;
@@ -27,7 +31,6 @@
 
         .header,
         .footer {
-            align-items: center;
             column-gap: 1em;
             display: flex;
             flex: 0 0 auto;

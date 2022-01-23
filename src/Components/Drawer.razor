@@ -3,16 +3,19 @@
 @inherits TavenemComponentBase
 
 <aside @attributes="UserAttributes" class="@ClassName" style="@Style">
-    <div class="header appbar">
+    <div class="@HeaderClassName">
         <div class="@HeaderToolbarClassName">
             @Header
             <div class="btn-close drawer-close-small" @onclick="OnClosedAsync"></div>
         </div>
     </div>
     @ChildContent
-    <div class="footer appbar">
-        <div class="@FooterToolbarClassName">
-            @Footer
+    @if (Footer is not null)
+    {
+        <div class="footer appbar">
+            <div class="@FooterToolbarClassName">
+                @Footer
+            </div>
         </div>
-    </div>
+    }
 </aside>

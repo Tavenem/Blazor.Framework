@@ -1,4 +1,5 @@
 ﻿.collapse {
+    align-items: stretch;
     background-color: var(--mud-palette-surface);
     border-radius: var(--tavenem-border-radius);
     color: var(--tavenem-color-bg-surface);
@@ -12,12 +13,6 @@
 
     @media (prefers-reduced-motion) {
         transition: none;
-    }
-
-    .list > & {
-        background-color: transparent;
-        border-radius: 0;
-        color: inherit;
     }
 
     > * {
@@ -71,9 +66,26 @@
             }
 
             &.icon, > .icon {
+                margin-inline-end: -.25rem;
                 order: 9999;
                 transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
             }
+
+            > .icon {
+                margin-inline-start: 1rem;
+            }
+        }
+    }
+
+    .list > & {
+        align-items: stretch;
+        background-color: transparent;
+        border-radius: 0;
+        color: inherit;
+        padding: 0;
+
+        > .header {
+            padding: .75rem 1rem;
         }
     }
 
@@ -88,6 +100,26 @@
         }
     }
 
+    > *:nth-child(2) {
+        flex: 1 1 auto;
+        margin-bottom: 0;
+        margin-top: 0;
+        max-height: 0;
+        max-width: 100%;
+        overflow: hidden;
+        padding-bottom: 0;
+        padding-top: 0;
+        transition: all .3s ease, max-height .3s cubic-bezier(.25,.8,.5,1);
+
+        &.dense {
+            padding-bottom: 0;
+        }
+    }
+
+    &.dense > *:nth-child(2) {
+        padding-bottom: 0;
+    }
+
     &.open {
         transition-delay: 0ms;
 
@@ -97,6 +129,15 @@
                     transform: rotate(-180deg);
                 }
             }
+        }
+
+        > *:nth-child(2) {
+            margin-bottom: unset;
+            margin-top: unset;
+            max-height: 9999px;
+            overflow: unset;
+            padding-bottom: 1rem;
+            padding-top: unset;
         }
     }
 
@@ -129,20 +170,6 @@
                 }
             }
         }
-    }
-
-    > *:nth-child(2) {
-        flex: 1 1 auto;
-        max-width: 100%;
-        padding-bottom: 1rem;
-
-        &.dense {
-            padding-bottom: 0;
-        }
-    }
-
-    &.dense > *:nth-child(2) {
-        padding-bottom: 0;
     }
 }
 

@@ -42,15 +42,6 @@ public partial class LightDarkToggle
         .AddClassFromDictionary(UserAttributes)
         .ToString();
 
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
-    /// </summary>
-    protected string IconClassName => new CssBuilder("icon")
-        .Add(IconClass)
-        .ToString();
-
     private string IconClass => IsDarkMode
         ? (DarkModeIconClass ?? LightModeIconClass ?? DefaultDarkModeIconClass)
         : (LightModeIconClass ?? DarkModeIconClass ?? DefaultLightModeIconClass);
