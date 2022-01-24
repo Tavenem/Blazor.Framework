@@ -48,7 +48,8 @@ public partial class ChipSet
     /// contain only one item.
     /// </para>
     /// </summary>
-    [Parameter] public Chip? SelectedItem
+    [Parameter]
+    public Chip? SelectedItem
     {
         get => SelectedItems.FirstOrDefault();
         set => _ = SetChipSelectionAsync(value);
@@ -90,11 +91,11 @@ public partial class ChipSet
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("d-flex my-2")
+    protected string CssClass => new CssBuilder("d-flex my-2")
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>

@@ -57,21 +57,37 @@ h1 {
     --tavenem-wght: var(--tavenem-font-weight-semibold);
     font-size: var(--tavenem-font-size-h1);
     font-weight: var(--tavenem-font-weight-semibold);
+
+    &:not(:first-child) {
+        margin-top: 1rem;
+    }
 }
 h2 {
     --tavenem-wght: var(--tavenem-font-weight-semibold);
     font-size: var(--tavenem-font-size-h2);
     font-weight: var(--tavenem-font-weight-semibold);
+
+    &:not(:first-child) {
+        margin-top: 1rem;
+    }
 }
 h3 {
     --tavenem-wght: var(--tavenem-font-weight-medium-bold);
     font-size: var(--tavenem-font-size-h3);
     font-weight: var(--tavenem-font-weight-medium-bold);
+
+    &:not(:first-child) {
+        margin-top: .5rem;
+    }
 }
 h4 {
     --tavenem-wght: var(--tavenem-font-weight-medium-bold);
     font-size: var(--tavenem-font-size-h4);
     font-weight: var(--tavenem-font-weight-medium-bold);
+
+    &:not(:first-child) {
+        margin-top: .5rem;
+    }
 }
 h5 {
     --tavenem-wght: var(--tavenem-font-weight-bold);
@@ -141,6 +157,7 @@ b, strong {
 
 small {
     font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
 }
 
 mark {
@@ -192,6 +209,7 @@ pre, code, kbd, samp {
     --tavenem-mono: 1;
     font-family: var(--tavenem-font-family-monospace);
     font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
 }
 
 pre {
@@ -203,6 +221,7 @@ pre {
     code {
         color: inherit;
         font-size: inherit;
+        line-height: inherit;
         word-break: normal;
     }
 }
@@ -224,10 +243,25 @@ kbd {
     font-weight: var(--tavenem-font-weight-light);
     padding: .2rem .4rem;
 
+    > *:first-child {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+
+    > *:last-child {
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
+    }
+
     kbd {
         --tavenem-wght: var(--tavenem-font-weight-medium-bold);
         font-size: 1rem;
         font-weight: var(--tavenem-font-weight-medium-bold);
+        line-height: var(--tavenem-lineheight-body);
         padding: 0;
     }
 }
@@ -255,8 +289,9 @@ table {
 caption {
     --tavenem-wght: var(--tavenem-font-weight-light);
     color: var(--tavenem-color-text-secondary);
-    font-size: .875rem;
+    font-size: var(--tavenem-font-size-sm);
     font-weight: var(--tavenem-font-weight-light);
+    line-height: var(--tavenem-lineheight-small);
     padding-bottom: .5rem;
     padding-top: .5rem;
     text-align: left;

@@ -122,6 +122,10 @@
         border-bottom-right-radius: inherit;
     }
 
+    > *:only-child {
+        border-radius: inherit;
+    }
+
     &.filled {
         background-color: var(--tavenem-color-bg-alt);
         color: var(--tavenem-color-text);

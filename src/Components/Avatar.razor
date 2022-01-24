@@ -4,7 +4,7 @@
 
 @if (AvatarGroup is null || AvatarGroup.ShouldDisplay(this))
 {
-    <div @attributes="UserAttributes" class="@ClassName" style="@Style">
+    <div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
         @if (!string.IsNullOrEmpty(Image))
         {
             if (!string.IsNullOrEmpty(Alt))

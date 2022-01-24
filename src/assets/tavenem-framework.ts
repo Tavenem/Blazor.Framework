@@ -14,6 +14,7 @@ interface ITavenem {
 
 interface HeadingData {
     id: string;
+    isActive: boolean;
     title: string;
 }
 
@@ -49,6 +50,7 @@ export function getHeadings(className: string): HeadingData[] {
             if (title) {
                 ids.push({
                     id: elements[i].id,
+                    isActive: elements[i].classList.contains("scroll-active"),
                     title,
                 });
             }
@@ -98,10 +100,11 @@ export function listenForScroll(this: any, dotnetReference: DotNet.DotNetObject,
     );
 }
 
-export function scrollSpy(this: any, className: string) {
-    window.tavenem.framework._spy = handleScrollSpy.bind(this, className);
+export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, className: string) {
+    window.tavenem.framework._spy = handleScrollSpy.bind(this, dotnetReference, className);
     document.addEventListener('scroll', window.tavenem.framework._spy, true);
     window.addEventListener('resize', window.tavenem.framework._spy, true);
+    window.tavenem.framework._spy(null as any);
 }
 
 export function scrollToId(elementId: string | null) {
@@ -122,6 +125,28 @@ export function scrollToId(elementId: string | null) {
         } else {
             history.replaceState(null, '', window.location.pathname);
         }
+    }
+}
+
+export function scrollToTop(selector: string | null) {
+    const element = selector
+        ? document.querySelector(selector)
+        : document;
+    if (!element) {
+        return;
+    }
+    if (element instanceof Document) {
+        window.scroll({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
+    } else if (element instanceof HTMLElement) {
+        element.scroll({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
     }
 }
 
@@ -189,31 +214,35 @@ function handleScroll(dotnetReference: DotNet.DotNetObject, event: Event) {
     }
 }
 
-function handleScrollSpy(className: string, event: Event) {
+function handleScrollSpy(dotnetReference: DotNet.DotNetObject, className: string, event: Event) {
     const elements = document.getElementsByClassName(className);
     if (elements.length === 0) {
         clearLastScrolled();
         return;
     }
 
-    const center = window.innerHeight / 2.0;
-
-    let minDifference = Number.MAX_SAFE_INTEGER;
-    let elementId = '';
+    let lowest = Number.MAX_SAFE_INTEGER;
+    let lowestAboveZero = Number.MAX_SAFE_INTEGER;
+    let lowestElementId = '';
+    let lowestElementIdAboveZero = '';
     for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
 
         const rect = element.getBoundingClientRect();
 
-        const diff = Math.abs(rect.top - center);
-
-        if (diff < minDifference) {
-            minDifference = diff;
-            elementId = element.id;
+        if (rect.top < lowest) {
+            lowest = rect.top;
+            lowestElementId = element.id;
+        }
+        if (rect.top > 0
+            && rect.top < lowestAboveZero) {
+            lowestAboveZero = rect.top;
+            lowestElementIdAboveZero = element.id;
         }
     }
 
-    const element = document.getElementById(elementId);
+    const element = document.getElementById(lowestElementIdAboveZero)
+        ?? document.getElementById(lowestElementId);
     if (!element) {
         clearLastScrolled();
         return;
@@ -223,10 +252,12 @@ function handleScrollSpy(className: string, event: Event) {
         return;
     }
 
+    const elementId = element.id;
     if (elementId != window.tavenem.framework._lastElement) {
         clearLastScrolled();
         window.tavenem.framework._lastElement = elementId;
         element.classList.add("scroll-active");
+        dotnetReference.invokeMethodAsync('RaiseOnScrollSpy', elementId);
     }
 }
 

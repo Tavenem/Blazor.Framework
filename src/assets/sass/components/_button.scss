@@ -27,6 +27,20 @@
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
 
+    > *:first-child {
+        border-top-left-radius: inherit;
+        border-bottom-left-radius: inherit;
+    }
+
+    > *:last-child {
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
+    }
+
     &::-moz-focus-inner {
         border-style: none;
     }
@@ -59,7 +73,7 @@
         margin-inline-start: 8px;
     }
 
-    > .icon:first-child:last-child {
+    > .icon:only-child {
         margin-inline-end: -4px;
         margin-inline-start: -4px;
     }
@@ -76,7 +90,7 @@
             margin-inline-end: -2px;
         }
 
-        > .icon:first-child:last-child {
+        > .icon:only-child {
             margin-inline-end: -2px;
             margin-inline-start: -2px;
         }
@@ -246,9 +260,13 @@ a.btn-text {
 }
 
 .btn-icon {
+    background-color: transparent;
     border-radius: 9999px;
+    box-shadow: none;
+    color: inherit;
     flex: 0 0 auto;
     font-size: 1.25em;
+    min-width: calc(1.25em + 12px);
     padding: 6px;
     text-align: center;
 
@@ -256,18 +274,32 @@ a.btn-text {
         transform: scale(7,7);
     }
 
+    &:hover,
+    &:focus-visible {
+        background-color: var(--tavenem-color-action-hover-bg);
+        box-shadow: none;
+    }
+
+    &:active {
+        box-shadow: none;
+    }
+
     &.small {
         font-size: 1.125em;
+        min-width: calc(1.125em + 12px);
         padding: 5px;
     }
 
     &.large {
         font-size: 1.375em;
+        min-width: calc(1.375em + 12px);
         padding: 5px;
     }
 
     &.filled {
+        background-color: var(--tavenem-color-default);
         box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+        color: var(--tavenem-color-default-text);
 
         &:hover,
         &:focus-visible {
@@ -282,21 +314,31 @@ a.btn-text {
 
     &.outlined {
         font-size: calc(1.25em - 2px);
+        min-width: calc(1.25em + 10px);
         padding: 5px;
 
         &.small {
             font-size: calc(1.125em - 2px);
+            min-width: calc(1.125em + 10px);
             padding: 4px;
         }
 
         &.large {
             font-size: calc(1.375em - 2px);
+            min-width: calc(1.375em + 10px);
             padding: 4px;
         }
     }
 
     @each $theme in $theme-colors {
         &.#{$theme}.filled {
+            background-color: var(--tavenem-color-#{$theme});
+            color: var(--tavenem-color-#{$theme}-text);
+
+            &.bg-alt {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
             &:hover,
             &:focus-visible {
                 background-color: var(--tavenem-color-#{$theme}-darken);

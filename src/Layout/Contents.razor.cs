@@ -5,9 +5,11 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// An auto-generated list of page contents.
 /// </summary>
-public partial class Contents
+public partial class Contents : IDisposable
 {
     private readonly List<HeadingData> _headings = new();
+
+    private bool _disposedValue;
 
     /// <summary>
     /// <para>
@@ -33,14 +35,24 @@ public partial class Contents
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("list contents left-select darken")
+    protected string CssClass => new CssBuilder("list contents highlight-start darken")
         .Add(ThemeColor.ToCSS())
         .Add("d-none", _headings.Count == 0)
         .Add(BreakpointClass, _headings.Count > 0)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .ToString();
+
+    /// <summary>
+    /// The final value assigned to the style attribute, including component
+    /// values and anything assigned by the user in <see
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
+    /// </summary>
+    protected string CssStyle => new CssBuilder("max-width:15em")
+        .AddStyle(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
     private string BreakpointClass => Breakpoint switch
@@ -49,37 +61,61 @@ public partial class Contents
         _ => $"d-none d-{Breakpoint.ToCSS()}-flex",
     };
 
-    [Inject] private FrameworkJsInterop? JsInterop { get; set; }
+    [CascadingParameter] private FrameworkLayout? Framework { get; set; }
+
+    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
 
     /// <summary>
-    /// Method invoked after each time the component has been rendered. Note
-    /// that the component does not automatically re-render after the completion
-    /// of any returned <see cref="Task" />, because that would cause an
-    /// infinite render loop.
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
     /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <returns>A <see cref="Task" /> representing any asynchronous
-    /// operation.</returns>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized() => Framework?.Add(this);
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                Framework?.Remove(this);
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Refresh the headings listed by the component.
+    /// </summary>
+    public async Task RefreshHeadingsAsync()
     {
         _headings.Clear();
-        if (JsInterop is null)
-        {
-            return;
-        }
-
         var headings = await JsInterop.GetHeadings();
         _headings.AddRange(headings);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    internal void SetActiveHeading(string? id)
+    {
+        foreach (var heading in _headings)
+        {
+            heading.IsActive = heading.Id == id;
+        }
+        StateHasChanged();
     }
 }

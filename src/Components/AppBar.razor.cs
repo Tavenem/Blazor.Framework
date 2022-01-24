@@ -69,12 +69,12 @@ public partial class AppBar : IDisposable
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("appbar")
+    protected string CssClass => new CssBuilder("appbar")
         .Add(Side.ToCSS())
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>

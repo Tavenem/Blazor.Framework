@@ -17,20 +17,43 @@ kbd kbd.text-close {
 }
 
 .small {
-    font-size: .875rem;
+    font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
 }
 
 .codeblock {
     background-color: var(--tavenem-color-dark-hover);
     border-radius: var(--tavenem-border-radius);
     color: var(--tavenem-color-dark-text);
-    height: 100%;
+    flex: 1 0 auto;
+    margin-bottom: 1rem;
     overflow: auto;
     padding: 1rem;
+
+    > *:first-child {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+
+    > *:last-child {
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
+    }
+
+    > * {
+        margin: 0;
+        overflow: unset;
+        padding: 0;
+    }
 }
 
 .initialism {
-    font-size: .875rem;
+    font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
     text-transform: uppercase;
 }
 
@@ -44,10 +67,11 @@ kbd kbd.text-close {
 }
 
 .blockquote-footer {
+    color: var(--tavenem-color-text-secondary);
     margin-top: -1rem;
     margin-bottom: 1rem;
-    font-size: .875rem;
-    color: var(--tavenem-color-text-secondary);
+    font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
 
     &::before {
         content: "\2014\00A0"; // em dash, nbsp

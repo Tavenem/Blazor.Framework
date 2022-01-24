@@ -1,12 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
 <FrameworkLayout ThemeColor="ThemeColor.Primary">
-    <TopAppbar />
-    <LeftDrawer />
-    <div class="d-flex">
-        <main class="container mt-3">
-            @Body
-        </main>
-        <Contents Breakpoint="Breakpoint.Lg" />
-    </div>
+    <FrameworkContent>
+        <TopAppbar />
+        <LeftDrawer />
+    </FrameworkContent>
+    <ChildContent>
+        @Body
+    </ChildContent>
 </FrameworkLayout>

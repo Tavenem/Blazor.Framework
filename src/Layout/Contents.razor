@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<nav @attributes="UserAttributes" class="@ClassName" style="@Style">
+<nav @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     @if (ChildContent is null)
     {
         <div class="subheader sticky">Contents</div>
@@ -13,8 +13,6 @@
     }
     @foreach (var heading in _headings)
     {
-        <div @key="heading.Id" class="clickable">
-            <AnchorLink href="@($"#{heading.Id}")">@heading.Title</AnchorLink>
-        </div>
+        <AnchorLink href="@($"#{heading.Id}")" Class="@(heading.IsActive ? "active" : null)">@heading.Title</AnchorLink>
     }
 </nav>

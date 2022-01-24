@@ -4,13 +4,13 @@
 
 @if (string.IsNullOrEmpty(LocalLink))
 {
-    <NavLink @attributes="Attributes" class="@ClassName" style="@Style">
+    <a @attributes="Attributes" class="@CssClass" style="@Style">
         @ChildContent
-    </NavLink>
+    </a>
 }
 else
 {
-    <a @attributes="Attributes" class="@ClassName" style="@Style" @onclick="OnClickLocalLinkAsync">
+    <a @attributes="Attributes" class="@CssClass" style="@Style" @onclick="OnClickLocalLinkAsync">
         @ChildContent
     </a>
 }

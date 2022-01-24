@@ -48,19 +48,19 @@ public partial class ScrollToTop : IDisposable
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("scroll-to-top")
+    protected string CssClass => new CssBuilder("scroll-to-top")
         .Add("hidden", !Visible)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
 
-    [Inject] private FrameworkJsInterop? JsInterop { get; set; }
+    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
 
-    [Inject] private ScrollListener? ScrollListener { get; set; }
+    [Inject] private ScrollListener ScrollListener { get; set; } = default!;
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -85,7 +85,7 @@ public partial class ScrollToTop : IDisposable
     /// </remarks>
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && ScrollListener is not null)
+        if (firstRender)
         {
             ScrollListener.Selector = Selector;
             ScrollListener.OnScroll += OnScroll;
@@ -103,10 +103,7 @@ public partial class ScrollToTop : IDisposable
             if (disposing)
             {
                 FrameworkLayout?.Remove(this);
-                if (ScrollListener is not null)
-                {
-                    ScrollListener.OnScroll -= OnScroll;
-                }
+                ScrollListener.OnScroll -= OnScroll;
             }
 
             _disposedValue = true;
@@ -124,13 +121,7 @@ public partial class ScrollToTop : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private async Task OnClickAsync()
-    {
-        if (JsInterop is not null)
-        {
-            await JsInterop.ScrollToId(ScrollListener?.Selector);
-        }
-    }
+    private async Task OnClickAsync() => await JsInterop.ScrollToTop(ScrollListener?.Selector);
 
     private async void OnScroll(object? sender, ScrollEventArgs e)
     {

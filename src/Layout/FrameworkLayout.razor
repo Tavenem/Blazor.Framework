@@ -2,14 +2,20 @@
 
 @inherits DrawerContainer
 
-<div class="@ClassName" style="@Style">
+<div class="@CssClass" style="@Style">
     <CascadingValue Value="this" IsFixed="true">
-        @ChildContent
+        @FrameworkContent
+        <div class="d-flex" style="overflow-y: auto">
+            <main id="main-container" class="container mt-3">
+                @ChildContent
+            </main>
+            <Contents Breakpoint="Breakpoint.Lg" />
+        </div>
     </CascadingValue>
     @if (AutoScrollToTop)
     {
-        <ScrollToTop>
-            <span class="btn btn-text btn-icon primary filled">
+        <ScrollToTop Selector="#main-container">
+            <span class="btn btn-icon primary filled">
                 <span class="icon">expand_less</span>
             </span>
         </ScrollToTop>

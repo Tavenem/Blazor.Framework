@@ -4,7 +4,6 @@
     border-radius: var(--tavenem-border-radius);
     color: var(--tavenem-color-bg-surface);
     display: flex;
-    flex: 1 0 100%;
     flex-direction: column;
     max-width: 100%;
     position: relative;
@@ -29,6 +28,10 @@
         border-bottom: none;
         border-bottom-left-radius: inherit;
         border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
     }
 
     > .header {

@@ -23,6 +23,7 @@ export function getHeadings(className) {
             if (title) {
                 ids.push({
                     id: elements[i].id,
+                    isActive: elements[i].classList.contains("scroll-active"),
                     title,
                 });
             }
@@ -61,10 +62,11 @@ export function listenForScroll(dotnetReference, selector) {
     }
     element.addEventListener('scroll', throttleScrollHandler.bind(this, dotnetReference), false);
 }
-export function scrollSpy(className) {
-    window.tavenem.framework._spy = handleScrollSpy.bind(this, className);
+export function scrollSpy(dotnetReference, className) {
+    window.tavenem.framework._spy = handleScrollSpy.bind(this, dotnetReference, className);
     document.addEventListener('scroll', window.tavenem.framework._spy, true);
     window.addEventListener('resize', window.tavenem.framework._spy, true);
+    window.tavenem.framework._spy(null);
 }
 export function scrollToId(elementId) {
     let element = elementId
@@ -85,6 +87,28 @@ export function scrollToId(elementId) {
         else {
             history.replaceState(null, '', window.location.pathname);
         }
+    }
+}
+export function scrollToTop(selector) {
+    const element = selector
+        ? document.querySelector(selector)
+        : document;
+    if (!element) {
+        return;
+    }
+    if (element instanceof Document) {
+        window.scroll({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
+    }
+    else if (element instanceof HTMLElement) {
+        element.scroll({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
     }
 }
 export function setColorScheme(theme, manual) {
@@ -146,25 +170,31 @@ function handleScroll(dotnetReference, event) {
         console.log('Error in handleScroll: ', { error });
     }
 }
-function handleScrollSpy(className, event) {
+function handleScrollSpy(dotnetReference, className, event) {
     const elements = document.getElementsByClassName(className);
     if (elements.length === 0) {
         clearLastScrolled();
         return;
     }
-    const center = window.innerHeight / 2.0;
-    let minDifference = Number.MAX_SAFE_INTEGER;
-    let elementId = '';
+    let lowest = Number.MAX_SAFE_INTEGER;
+    let lowestAboveZero = Number.MAX_SAFE_INTEGER;
+    let lowestElementId = '';
+    let lowestElementIdAboveZero = '';
     for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
         const rect = element.getBoundingClientRect();
-        const diff = Math.abs(rect.top - center);
-        if (diff < minDifference) {
-            minDifference = diff;
-            elementId = element.id;
+        if (rect.top < lowest) {
+            lowest = rect.top;
+            lowestElementId = element.id;
+        }
+        if (rect.top > 0
+            && rect.top < lowestAboveZero) {
+            lowestAboveZero = rect.top;
+            lowestElementIdAboveZero = element.id;
         }
     }
-    const element = document.getElementById(elementId);
+    const element = document.getElementById(lowestElementIdAboveZero)
+        ?? document.getElementById(lowestElementId);
     if (!element) {
         clearLastScrolled();
         return;
@@ -172,10 +202,12 @@ function handleScrollSpy(className, event) {
     if (element.getBoundingClientRect().top < window.innerHeight * 0.8 === false) {
         return;
     }
+    const elementId = element.id;
     if (elementId != window.tavenem.framework._lastElement) {
         clearLastScrolled();
         window.tavenem.framework._lastElement = elementId;
         element.classList.add("scroll-active");
+        dotnetReference.invokeMethodAsync('RaiseOnScrollSpy', elementId);
     }
 }
 function setPreferredColorScheme() {

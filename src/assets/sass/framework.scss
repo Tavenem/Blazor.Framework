@@ -58,7 +58,7 @@ html, body * {
 
 ::-webkit-scrollbar-thumb {
     background: var(--tavenem-color-scrollbar);
-    border-radius: 1px;
+    border-radius: var(--tavenem-border-radius);
 
     &:hover {
         background: var(--tavenem-color-scrollbar-hover);

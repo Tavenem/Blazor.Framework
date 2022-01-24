@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="UserAttributes" role="alert" class="@ClassName" style="@Style" @onclick="OnClickAsync">
+<div @attributes="AdditionalAttributes" role="alert" class="@CssClass" style="@Style" @onclick="OnClickAsync">
     @if (!string.IsNullOrWhiteSpace(IconClass))
     {
         <span class="@IconClassName"></span>

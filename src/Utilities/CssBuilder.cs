@@ -245,6 +245,33 @@ public class CssBuilder
     /// <summary>
     /// Adds a CSS style. A semicolor separator will be prepended automatically.
     /// </summary>
+    /// <param name="value">The style to add.</param>
+    /// <param name="when">
+    /// The value is only added if this value is <see langword="true"/>.
+    /// </param>
+    /// <returns>This instance</returns>
+    /// <remarks>
+    /// The style will not be added if <paramref name="value"/> is empty.
+    /// </remarks>
+    public CssBuilder AddStyle(string? value, bool when = true)
+    {
+        if (!when || string.IsNullOrWhiteSpace(value))
+        {
+            return this;
+        }
+
+        if (_builder.Length > 0)
+        {
+            _builder.Append(';');
+        }
+        _builder.Append(value);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a CSS style. A semicolor separator will be prepended automatically.
+    /// </summary>
     /// <param name="prop">The style property to add.</param>
     /// <param name="value">The style value to add.</param>
     /// <param name="when">

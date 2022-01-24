@@ -8,23 +8,36 @@
 
 <Heading Level="HeadingLevel.H2">1. Install</Heading>
 <p>The <code>Tavenem.Blazor.Framework</code> NuGet package is available through the package manager, or the CLI:</p>
-<div class="codeblock">
+<div class="codeblock pre-razor-code">
     <pre class="user-select-all">dotnet add package Tavenem.Blazor.Framework</pre>
 </div>
 
 <Heading Level="HeadingLevel.H2">2. Import Namespace</Heading>
 <p>Add the package namespace to your <code>_Imports.razor</code> file.</p>
-<div class="codeblock">
-    <pre class="user-select-all pre-razor-code">
-        <span class="pre-directive">&#64;using</span> Tavenem.Blazor.Framework
+<div class="codeblock pre-razor-code">
+    <pre class="user-select-all">
+        <span class="pre-directive">&#64;using</span><span> Tavenem</span><span class="pre-operator">.</span><span>Blazor</span><span class="pre-operator">.</span><span>Framework</span>
     </pre>
 </div>
 
 <Heading Level="HeadingLevel.H2">3. Add Font link</Heading>
 <p>Add the following links to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
-<div class="codeblock">
-    @CodeFormatter.CodeToMarkup(_example1)
+<div class="codeblock pre-razor-code">
+    @CodeFormatter.CodeToMarkup(_example1, true)
 </div>
+<p>
+    You may use a different font if you prefer, but a
+    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide">variable font</a>
+    is strongly recommended in order to work with the framework's styles most effectively.
+    The font you select should support weights from 300–900, and an italic style.
+</p>
+<p>
+    One of the strengths of the <a href="https://www.recursive.design/">Recursive</a> font
+    is that it supports both a variable-width and monospace variant in the same font,
+    using a variable axis. If you select a different font, you will also need to choose
+    a monospace font and override the <span class="pre-attribute">--tavenem-font-family-monospace</span>
+    property on <span class="pre-method">:root</span>.
+</p>
 <p>
     If you prefer to use a different icon library, instead of
     <a href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a>,
@@ -36,8 +49,8 @@
 
 <Heading Level="HeadingLevel.H2">4. Add CSS Link</Heading>
 <p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
-<div class="codeblock">
-    @CodeFormatter.CodeToMarkup(_example2)
+<div class="codeblock pre-razor-code">
+    @CodeFormatter.CodeToMarkup(_example2, true)
 </div>
 <p>
     If you started your project with the default Blazor template, delete the
@@ -52,8 +65,10 @@
 
 <Heading Level="HeadingLevel.H2">5. Register Service with Dependency Injection</Heading>
 <p>Add the following to your <code>Program.cs</code>:</p>
-<div class="codeblock">
-    <pre class="user-select-all">builder.Services.AddTavenemFramework();</pre>
+<div class="codeblock pre-razor-code">
+    <pre class="user-select-all">
+        <span class="pre-attribute">builder</span><span class="pre-operator">.</span><span>Services</span><span class="pre-operator">.</span><span class="pre-method">AddTavenemFramework</span><span>();</span>
+    </pre>
 </div>
 
 <Heading Level="HeadingLevel.H2">6. Set up the Framework</Heading>

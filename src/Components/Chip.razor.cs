@@ -63,15 +63,15 @@ public partial class Chip : IAsyncDisposable
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("chip")
+    protected string CssClass => new CssBuilder("chip")
         .Add(FinalThemeColor.ToCSS())
         .Add("clickable", OnClick.HasDelegate)
         .Add("selected", IsSelected)
         .Add("d-none", IsClosed)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>

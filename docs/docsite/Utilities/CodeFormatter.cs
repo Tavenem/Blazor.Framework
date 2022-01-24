@@ -20,6 +20,7 @@ public static class CodeFormatter
         var withinTag = false;
         var hasElement = false;
         var declaring = false;
+        var isHref = false;
         while (index < code.Length)
         {
             var (type, length) = ParseChunk(code[index..], escape, comment, withinTag);
@@ -39,68 +40,101 @@ public static class CodeFormatter
                     throw new InvalidOperationException("mismatched escape characters");
                 }
                 var value = code.Slice(index, length + 1);
-                var dotIndex = value.IndexOf('.');
-                if (dotIndex == -1)
+                if (isHref)
                 {
-                    sb.Append(Sanitized(code.Slice(index, length + 1)))
-                        .Append("</span>");
+                    if (value.StartsWith("http"))
+                    {
+                        sb.Append("</span><u class=\"pre-element\">")
+                            .Append(Sanitized(value[..^1]))
+                            .Append("</u>")
+                            .Append("<span>")
+                            .Append(escape.Value);
+                    }
+                    else
+                    {
+                        sb.Append(Sanitized(value))
+                            .Append("</span>");
+                    }
                 }
                 else
                 {
-                    var e = value[..dotIndex];
-                    var v = value[(dotIndex + 1)..^1];
-                    sb.Append("</span><span class=\"pre-enum\">")
-                        .Append(Sanitized(e))
-                        .Append("</span><span class=\"pre-operator\">")
-                        .Append('.')
-                        .Append("</span>")
-                        .Append(Sanitized(v))
-                        .Append("<span class=\"pre-value\">")
-                        .Append(escape)
-                        .Append("</span>");
-                }
-
-                escape = null;
-                index++;
-            }
-
-            switch (type)
-            {
-                case CodeType.Comment:
-                    if (comment)
+                    var dotIndex = value.IndexOf('.');
+                    if (dotIndex == -1)
                     {
-                        sb.Append(Sanitized(code.Slice(index, length)))
+                        sb.Append(Sanitized(value))
                             .Append("</span>");
                     }
                     else
                     {
-                        declaring = false;
-                        sb.Append("<span class=\"pre-comment\">")
-                            .Append(Sanitized(code.Slice(index, length)));
+                        sb.Append("</span><span class=\"pre-enum\">")
+                            .Append(Sanitized(value[..dotIndex]))
+                            .Append("</span><span class=\"pre-operator\">")
+                            .Append('.')
+                            .Append("</span>")
+                            .Append(Sanitized(value[(dotIndex + 1)..^1]))
+                            .Append("<span class=\"pre-value\">")
+                            .Append(escape)
+                            .Append("</span>");
                     }
-                    comment = !comment;
-                    break;
-                case CodeType.EscapeCharacter:
-                    escape = code[index];
-                    sb.Append("<span class=\"pre-value\">")
-                        .Append(code[index]);
-                    break;
-                case CodeType.Operator:
-                    sb.Append("<span class=\"pre-operator\">")
-                        .Append(code[index])
-                        .Append("</span>");
-                    break;
-                case CodeType.Tag:
-                    if (withinTag)
-                    {
-                        if (length == 1)
+                }
+
+                escape = null;
+                isHref = false;
+                index++;
+            }
+            else
+            {
+                switch (type)
+                {
+                    case CodeType.Comment:
+                        if (comment)
                         {
-                            if (code[index] == '>')
+                            sb.Append(Sanitized(code.Slice(index, length)))
+                                .Append("</span>");
+                        }
+                        else
+                        {
+                            declaring = false;
+                            sb.Append("<span class=\"pre-comment\">")
+                                .Append(Sanitized(code.Slice(index, length)));
+                        }
+                        comment = !comment;
+                        break;
+                    case CodeType.EscapeCharacter:
+                        escape = code[index];
+                        sb.Append("<span class=\"pre-value\">")
+                            .Append(code[index]);
+                        break;
+                    case CodeType.Operator:
+                        sb.Append("<span class=\"pre-operator\">")
+                            .Append(code[index])
+                            .Append("</span>");
+                        break;
+                    case CodeType.Tag:
+                        if (withinTag)
+                        {
+                            if (length == 1)
+                            {
+                                if (code[index] == '>')
+                                {
+                                    withinTag = false;
+                                    hasElement = false;
+                                    sb.Append("<span class=\"pre-tag\">")
+                                        .Append(code[index])
+                                        .Append("</span>");
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException("mismatched tag characters");
+                                }
+                            }
+                            else if (code[index] == '/'
+                                && code[index + 1] == '>')
                             {
                                 withinTag = false;
                                 hasElement = false;
                                 sb.Append("<span class=\"pre-tag\">")
-                                    .Append(code[index])
+                                    .Append(code.Slice(index, length))
                                     .Append("</span>");
                             }
                             else
@@ -108,102 +142,94 @@ public static class CodeFormatter
                                 throw new InvalidOperationException("mismatched tag characters");
                             }
                         }
-                        else if (code[index] == '/'
-                            && code[index + 1] == '>')
-                        {
-                            withinTag = false;
-                            hasElement = false;
-                            sb.Append("<span class=\"pre-tag\">")
-                                .Append(code.Slice(index, length))
-                                .Append("</span>");
-                        }
                         else
                         {
-                            throw new InvalidOperationException("mismatched tag characters");
+                            withinTag = true;
+                            sb.Append("<span class=\"pre-tag\">")
+                                .Append(Sanitized(code.Slice(index, length)))
+                                .Append("</span>");
                         }
-                    }
-                    else
-                    {
-                        withinTag = true;
-                        sb.Append("<span class=\"pre-tag\">")
-                            .Append(Sanitized(code.Slice(index, length)))
-                            .Append("</span>");
-                    }
-                    break;
-                default:
-                    if (char.IsWhiteSpace(code[index]))
-                    {
-                        sb.Append(code.Slice(index, length));
                         break;
-                    }
-                    if (withinTag)
-                    {
-                        if (hasElement)
+                    default:
+                        if (char.IsWhiteSpace(code[index]))
                         {
-                            if (code[index] == '@')
+                            isHref = false;
+                            sb.Append(code.Slice(index, length));
+                            break;
+                        }
+                        if (withinTag)
+                        {
+                            if (hasElement)
                             {
-                                declaring = true;
-                                sb.Append("<span class=\"pre-directive\">");
-                            }
-                            else if (char.IsUpper(code[index]))
-                            {
-                                if (declaring)
+                                if (code[index] == '@')
                                 {
-                                    sb.Append("<span class=\"pre-enum\">");
+                                    declaring = true;
+                                    sb.Append("<span class=\"pre-directive\">");
+                                }
+                                else if (char.IsUpper(code[index]))
+                                {
+                                    if (declaring)
+                                    {
+                                        sb.Append("<span class=\"pre-enum\">");
+                                    }
+                                    else
+                                    {
+                                        sb.Append("<span class=\"pre-component\">");
+                                    }
                                 }
                                 else
                                 {
-                                    sb.Append("<span class=\"pre-component\">");
+                                    if (code.Slice(index, length).Equals("href", StringComparison.Ordinal))
+                                    {
+                                        isHref = true;
+                                    }
+                                    sb.Append("<span class=\"pre-attribute\">");
                                 }
                             }
                             else
                             {
-                                sb.Append("<span class=\"pre-attribute\">");
+                                if (char.IsUpper(code[index]))
+                                {
+                                    sb.Append("<span class=\"pre-component\">");
+                                }
+                                else
+                                {
+                                    sb.Append("<span class=\"pre-element\">");
+                                }
+                                hasElement = true;
                             }
+                            sb.Append(code.Slice(index, length))
+                                .Append("</span>");
                         }
-                        else
+                        else if (code[index] == '@')
                         {
-                            if (char.IsUpper(code[index]))
+                            sb.Append("<span class=\"pre-directive\">");
+                            if (length > 1 && char.IsUpper(code[index]))
                             {
-                                sb.Append("<span class=\"pre-component\">");
+                                sb.Append(code[index])
+                                    .Append("</span><span class=\"pre-attribute\">")
+                                    .Append(code.Slice(index + 1, length - 1))
+                                    .Append("</span>");
                             }
                             else
                             {
-                                sb.Append("<span class=\"pre-element\">");
+                                sb.Append(code.Slice(index, length))
+                                    .Append("</span>");
+                                declaring = true;
                             }
-                            hasElement = true;
                         }
-                        sb.Append(code.Slice(index, length))
-                            .Append("</span>");
-                    }
-                    else if (code[index] == '@')
-                    {
-                        sb.Append("<span class=\"pre-directive\">");
-                        if (length > 1 && char.IsUpper(code[index]))
+                        else if (declaring)
                         {
-                            sb.Append(code[index])
-                                .Append("</span><span class=\"pre-attribute\">")
-                                .Append(code.Slice(index + 1, length - 1))
+                            sb.Append("<span class=\"pre-class\">")
+                                .Append(Sanitized(code.Slice(index, length)))
                                 .Append("</span>");
                         }
                         else
                         {
-                            sb.Append(code.Slice(index, length))
-                                .Append("</span>");
-                            declaring = true;
+                            sb.Append(Sanitized(code.Slice(index, length)));
                         }
-                    }
-                    else if (declaring)
-                    {
-                        sb.Append("<span class=\"pre-class\">")
-                            .Append(Sanitized(code.Slice(index, length)))
-                            .Append("</span>");
-                    }
-                    else
-                    {
-                        sb.Append(Sanitized(code.Slice(index, length)));
-                    }
-                    break;
+                        break;
+                }
             }
 
             index += length;
@@ -261,7 +287,7 @@ public static class CodeFormatter
                 {
                     i++;
                 }
-                if (i > 0)
+                if (i >= 0)
                 {
                     return (CodeType.None, i);
                 }

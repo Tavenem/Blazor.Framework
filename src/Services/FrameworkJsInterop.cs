@@ -71,14 +71,17 @@ internal class FrameworkJsInterop : IAsyncDisposable
     /// Observes scrolling and resizing events to detect which of the elements
     /// with the given class is currently in view.
     /// </summary>
+    /// <param name="dotNetRef">
+    /// A reference to the framework.
+    /// </param>
     /// <param name="className">
     /// The CSS class name of the elements to observe.
     /// </param>
-    public async ValueTask ScrollSpy(string className)
+    public async ValueTask ScrollSpy(DotNetObjectReference<FrameworkLayout> dotNetRef, string className)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module
-            .InvokeVoidAsync("scrollSpy", className)
+            .InvokeVoidAsync("scrollSpy", dotNetRef, className)
             .ConfigureAwait(false);
     }
 
@@ -91,6 +94,14 @@ internal class FrameworkJsInterop : IAsyncDisposable
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module
             .InvokeVoidAsync("scrollToId", elementId)
+            .ConfigureAwait(false);
+    }
+
+    public async ValueTask ScrollToTop(string? selector)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module
+            .InvokeVoidAsync("scrollToTop", selector)
             .ConfigureAwait(false);
     }
 

@@ -101,15 +101,15 @@ public partial class Drawer : IDisposable
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("card drawer")
+    protected string CssClass => new CssBuilder("card drawer")
         .Add(BreakpointClass)
         .Add(Side.ToCSS())
         .Add("closed", IsClosed)
         .Add("open", IsOpen)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>
@@ -173,7 +173,7 @@ public partial class Drawer : IDisposable
         }
     }
 
-    [Inject] private NavigationManager? NavigationManager { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     /// <summary>
     /// Close this drawer if it is open.
@@ -222,10 +222,7 @@ public partial class Drawer : IDisposable
             Breakpoint = FrameworkLayout.SideDrawerBreakpoint;
         }
 
-        if (NavigationManager is not null)
-        {
-            NavigationManager.LocationChanged += OnLocationChanged;
-        }
+        NavigationManager.LocationChanged += OnLocationChanged;
     }
 
     /// <summary>
@@ -239,10 +236,7 @@ public partial class Drawer : IDisposable
             if (disposing)
             {
                 FrameworkLayout?.Remove(this);
-                if (NavigationManager is not null)
-                {
-                    NavigationManager.LocationChanged -= OnLocationChanged;
-                }
+                NavigationManager.LocationChanged -= OnLocationChanged;
             }
 
             _disposedValue = true;

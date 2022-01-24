@@ -39,12 +39,12 @@ public partial class Heading
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder(HeadingClassName)
+    protected string CssClass => new CssBuilder(HeadingClassName)
         .Add(ThemeColor.ToCSS())
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>
@@ -53,7 +53,7 @@ public partial class Heading
     /// </summary>
     protected override void OnInitialized()
     {
-        if (UserAttributes.TryGetValue("id", out var value)
+        if (AdditionalAttributes.TryGetValue("id", out var value)
             && value is string id
             && !string.IsNullOrWhiteSpace(id))
         {

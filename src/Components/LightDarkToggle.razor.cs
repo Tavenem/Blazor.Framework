@@ -33,20 +33,20 @@ public partial class LightDarkToggle
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("btn")
-        .Add("btn-text btn-icon", string.IsNullOrWhiteSpace(Text))
+    protected string CssClass => new CssBuilder("btn")
+        .Add("btn-icon", string.IsNullOrWhiteSpace(Text))
         .Add(ThemeColor.ToCSS())
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     private string IconClass => IsDarkMode
         ? (DarkModeIconClass ?? LightModeIconClass ?? DefaultDarkModeIconClass)
         : (LightModeIconClass ?? DarkModeIconClass ?? DefaultLightModeIconClass);
 
-    [Inject] private FrameworkJsInterop? JsInterop { get; set; }
+    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note
@@ -70,7 +70,7 @@ public partial class LightDarkToggle
     /// </remarks>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && JsInterop is not null)
+        if (firstRender)
         {
             var mode = await JsInterop.GetPreferredColorScheme();
             IsDarkMode = mode == ThemePreference.Dark;
@@ -81,10 +81,7 @@ public partial class LightDarkToggle
 
     private async Task OnClickAsync()
     {
-        if (JsInterop is not null)
-        {
-            await JsInterop.SetColorScheme(IsDarkMode ? ThemePreference.Light : ThemePreference.Dark);
-            IsDarkMode = !IsDarkMode;
-        }
+        await JsInterop.SetColorScheme(IsDarkMode ? ThemePreference.Light : ThemePreference.Dark);
+        IsDarkMode = !IsDarkMode;
     }
 }

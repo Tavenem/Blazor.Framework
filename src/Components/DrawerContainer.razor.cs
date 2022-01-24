@@ -23,13 +23,13 @@ public partial class DrawerContainer
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected virtual string ClassName => new CssBuilder()
+    protected virtual string CssClass => new CssBuilder()
         .Add(DrawerContainerClass)
         .Add("drawer-open", HasOpenDrawer)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     private string DrawerContainerClass => SideDrawerBreakpoint switch

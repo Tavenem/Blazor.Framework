@@ -33,15 +33,20 @@
 
     &.small, .small > & {
         font-size: 1.25rem;
+        height: 1.25rem;
+        width: 1.25rem;
     }
 
     &.large, .large > & {
         font-size: 2.25rem;
+        height: 2.25rem;
+        width: 2.25rem;
     }
 
     &.stacked {
         color: var(--tavenem-color-bg);
         font-size: .75rem;
+        height: .75rem;
         left: 0;
         position: absolute;
         text-align: center;

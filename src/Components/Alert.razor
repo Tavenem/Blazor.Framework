@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="UserAttributes" role="alert" class="@ClassName" style="@Style" @onclick="OnClick">
+<div @attributes="AdditionalAttributes" role="alert" class="@CssClass" style="@Style" @onclick="OnClick">
     @if (AutoIcon && !string.IsNullOrEmpty(IconClass))
     {
         <div class="@IconClass"></div>

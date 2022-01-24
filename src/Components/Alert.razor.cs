@@ -41,14 +41,14 @@ public partial class Alert
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("alert")
+    protected string CssClass => new CssBuilder("alert")
         .Add(ThemeColor.ToCSS())
         .Add("clickable", OnClick.HasDelegate)
         .Add("d-none", IsClosed)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     private string? IconClass => ThemeColor switch

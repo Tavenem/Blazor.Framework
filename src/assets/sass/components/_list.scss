@@ -3,6 +3,8 @@
     --list-active-bg: var(--tavenem-color-primary-hover);
     --list-active-color: var(--tavenem-color-primary);
     color: var(--tavenem-color-action);
+    display: flex;
+    flex-direction: column;
     list-style: none;
     margin: 0;
     overflow: auto;
@@ -79,9 +81,9 @@
 
     > .active {
         background-color: var(--list-active-bg);
-        border-right: 1px solid var(--list-active-color);
+        border-inline-end: 1px solid var(--list-active-color);
         color: var(--list-active-color);
-        padding-right: calc(1rem - 1px);
+        padding-inline-end: calc(1rem - 1px);
     }
 
     > .clickable, a, button {
@@ -136,6 +138,19 @@
 
         .subheader.inset {
             padding-inline-start: 6.5rem;
+        }
+    }
+
+    &.highlight-start {
+        > .active {
+            border-inline-start: 1px solid var(--list-active-color);
+            border-inline-end: none;
+            padding-inline-start: calc(1rem - 1px);
+            padding-inline-end: 0;
+        }
+
+        .list > .active {
+            padding-inline-start: calc(2rem - 1px);
         }
     }
 

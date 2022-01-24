@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="UserAttributes" class="@ClassName" style="@Style">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
     <div class="header">
         @if (TitleContent is null)
         {
@@ -17,5 +17,7 @@
             <span class="icon expand" @onclick="ToggleAsync">expand_more</span>
         }
     </div>
-    @ChildContent
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
 </div>

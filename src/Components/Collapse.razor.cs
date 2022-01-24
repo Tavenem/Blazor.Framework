@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -7,6 +8,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Collapse : IDisposable
 {
+    private readonly List<AnchorLink> _links = new();
+
     private bool _disposedValue;
 
     /// <summary>
@@ -63,13 +66,15 @@ public partial class Collapse : IDisposable
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.UserAttributes"/>.
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string ClassName => new CssBuilder("collapse")
-        .Add("open", _isOpen)
+    protected string CssClass => new CssBuilder("collapse")
+        .Add("open", IsOpen)
         .Add(Class)
-        .AddClassFromDictionary(UserAttributes)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -82,9 +87,42 @@ public partial class Collapse : IDisposable
     /// </returns>
     protected override async Task OnInitializedAsync()
     {
+        NavigationManager.LocationChanged += OnLocationChanged;
         if (Accordion is not null)
         {
             await Accordion.AddAsync(this);
+        }
+    }
+
+    /// <summary>
+    /// Method invoked after each time the component has been rendered. Note
+    /// that the component does not automatically re-render after the completion
+    /// of any returned <see cref="Task" />, because that would cause an
+    /// infinite render loop.
+    /// </summary>
+    /// <param name="firstRender">
+    /// Set to <c>true</c> if this is the first time <see
+    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
+    /// component instance; otherwise <c>false</c>.
+    /// </param>
+    /// <returns>A <see cref="Task" /> representing any asynchronous
+    /// operation.</returns>
+    /// <remarks>
+    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
+    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
+    /// useful for performing interop, or interacting with values received from
+    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
+    /// that initialization work is only performed once.
+    /// </remarks>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_isOpen)
+        {
+            var open = _links.Any(x => x.IsActive);
+            if (open)
+            {
+                await SetOpenAsync(true);
+            }
         }
     }
 
@@ -98,6 +136,7 @@ public partial class Collapse : IDisposable
         {
             if (disposing)
             {
+                NavigationManager.LocationChanged -= OnLocationChanged;
                 Accordion?.Remove(this);
             }
 
@@ -130,6 +169,7 @@ public partial class Collapse : IDisposable
         _isOpen = value;
         OnIsOpenChanged?.Invoke(this, _isOpen);
         await IsOpenChanged.InvokeAsync(_isOpen);
+        StateHasChanged();
     }
 
     /// <summary>
@@ -137,5 +177,23 @@ public partial class Collapse : IDisposable
     /// </summary>
     public Task ToggleAsync() => SetOpenAsync(!_isOpen);
 
+    internal void Add(AnchorLink link) => _links.Add(link);
+
     internal void ForceRedraw() => StateHasChanged();
+
+    internal void Remove(AnchorLink link) => _links.Remove(link);
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (_isOpen)
+        {
+            return;
+        }
+        _links.ForEach(x => x.UpdateState(args));
+        var open = _links.Any(x => x.IsActive);
+        if (open)
+        {
+            await SetOpenAsync(true);
+        }
+    }
 }
