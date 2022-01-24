@@ -75,6 +75,11 @@
         > .icon:last-child {
             margin-inline-end: -2px;
         }
+
+        > .icon:first-child:last-child {
+            margin-inline-end: -2px;
+            margin-inline-start: -2px;
+        }
     }
 
     &.large {
