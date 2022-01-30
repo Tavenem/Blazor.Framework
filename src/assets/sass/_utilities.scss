@@ -1,4 +1,5 @@
 ﻿.text-light {
+    --tavenem-wght: 300;
     font-weight: var(--tavenem-font-weight-light);
 }
 
@@ -28,7 +29,7 @@ kbd kbd.text-close {
     flex: 1 0 auto;
     margin-bottom: 1rem;
     overflow: auto;
-    padding: 1rem;
+    padding: 1rem !important;
 
     > *:first-child {
         border-top-left-radius: inherit;
@@ -56,6 +57,11 @@ kbd kbd.text-close {
     line-height: var(--tavenem-lineheight-small);
     text-transform: uppercase;
 }
+.initialism[title] {
+    cursor: help;
+    text-decoration: underline dotted;
+    text-decoration-skip-ink: none;
+}
 
 .blockquote {
     margin-bottom: 1rem;
@@ -72,9 +78,10 @@ kbd kbd.text-close {
     margin-bottom: 1rem;
     font-size: var(--tavenem-font-size-sm);
     line-height: var(--tavenem-lineheight-small);
+    text-align: end;
 
     &::before {
-        content: "\2014\00A0"; // em dash, nbsp
+        content: "\00A0\2014\00A0"; // em dash, nbsp
     }
 }
 
@@ -501,10 +508,12 @@ kbd kbd.text-close {
 }
 
 .font-monospace {
+    --tavenem-mono: 1;
     font-family: var(--tavenem-font-family-monospace);
 }
 
 @include generate-utility("text", text-align, $text-alignments);
+@include generate-utility("text", text-transform, $text-transforms);
 
 .text-wrap {
     white-space: normal !important;
@@ -624,4 +633,10 @@ kbd kbd.text-close {
     .elevation-#{$i} {
         box-shadow: var(--tavenem-shadow-#{$i}) !important;
     }
+}
+
+.shake,
+.shake-hover:hover {
+    animation: tf-shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translateX(0);
 }

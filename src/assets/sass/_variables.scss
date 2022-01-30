@@ -23,9 +23,13 @@
     --tavenem-dark-color-text: #ffffffb2;
     --tavenem-dark-color-text-secondary: #ffffff7f;
     --tavenem-dark-color-text-disabled: #ffffff33;
+    --tavenem-dark-color-link: #6da7fd;
+    --tavenem-dark-color-link-hover: #3b88fc;
     --tavenem-light-color-text: #424242;
     --tavenem-light-color-text-secondary: #00000089;
     --tavenem-light-color-text-disabled: #00000060;
+    --tavenem-light-color-link: #0250c5;
+    --tavenem-light-color-link-hover: #013b92;
     --tavenem-dark-color-bg: #1a1a27;
     --tavenem-dark-color-bg-alt: #0c0c13;
     --tavenem-dark-color-bg-surface: #1e1d2a;
@@ -42,19 +46,19 @@
     --tavenem-dark-color-yellow-bg: #a82;
     --tavenem-dark-color-primary-hue: 246;
     --tavenem-dark-color-primary-saturation: 100%;
-    --tavenem-dark-color-primary-lightness: 72%;
+    --tavenem-dark-color-primary-lightness: 68%;
     --tavenem-dark-color-primary-text: var(--tavenem-dark-color-text);
-    --tavenem-dark-color-secondary-hue: 340;
-    --tavenem-dark-color-secondary-saturation: 100%;
-    --tavenem-dark-color-secondary-lightness: 63%;
-    --tavenem-dark-color-secondary-text: var(--tavenem-dark-color-text);
-    --tavenem-dark-color-tertiary-hue: 168;
-    --tavenem-dark-color-tertiary-saturation: 74%;
-    --tavenem-dark-color-tertiary-lightness: 45%;
-    --tavenem-dark-color-tertiary-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-secondary-hue: 168;
+    --tavenem-dark-color-secondary-saturation: 74%;
+    --tavenem-dark-color-secondary-lightness: 45%;
+    --tavenem-dark-color-secondary-text: var(--tavenem-light-color-text);
+    --tavenem-dark-color-tertiary-hue: 306;
+    --tavenem-dark-color-tertiary-saturation: 100%;
+    --tavenem-dark-color-tertiary-lightness: 77%;
+    --tavenem-dark-color-tertiary-text: var(--tavenem-light-color-text);
     --tavenem-dark-color-danger-hue: 350;
     --tavenem-dark-color-danger-saturation: 100%;
-    --tavenem-dark-color-danger-lightness: 62%;
+    --tavenem-dark-color-danger-lightness: 46%;
     --tavenem-dark-color-danger-text: var(--tavenem-dark-color-text);
     --tavenem-dark-color-dark-hue: 240;
     --tavenem-dark-color-dark-saturation: 9%;
@@ -63,19 +67,19 @@
     --tavenem-dark-color-default-hue: 202;
     --tavenem-dark-color-default-saturation: 6%;
     --tavenem-dark-color-default-lightness: 37%;
-    --tavenem-dark-color-default-text: var(--tavenem-light-color-text);
+    --tavenem-dark-color-default-text: var(--tavenem-dark-color-text);
     --tavenem-dark-color-info-hue: 220;
     --tavenem-dark-color-info-saturation: 100%;
-    --tavenem-dark-color-info-lightness: 65%;
+    --tavenem-dark-color-info-lightness: 56%;
     --tavenem-dark-color-info-text: var(--tavenem-dark-color-text);
     --tavenem-dark-color-success-hue: 140;
     --tavenem-dark-color-success-saturation: 58%;
     --tavenem-dark-color-success-lightness: 52%;
-    --tavenem-dark-color-success-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-success-text: var(--tavenem-light-color-text);
     --tavenem-dark-color-warning-hue: 36;
     --tavenem-dark-color-warning-saturation: 100%;
     --tavenem-dark-color-warning-lightness: 64%;
-    --tavenem-dark-color-warning-text: var(--tavenem-dark-color-text);
+    --tavenem-dark-color-warning-text: var(--tavenem-light-color-text);
     --tavenem-light-color-bg: white;
     --tavenem-light-color-bg-alt: #ebebeb;
     --tavenem-light-color-bg-surface: white;
@@ -94,17 +98,17 @@
     --tavenem-light-color-primary-saturation: 72%;
     --tavenem-light-color-primary-lightness: 59%;
     --tavenem-light-color-primary-text: var(--tavenem-dark-color-text);
-    --tavenem-light-color-secondary-hue: 340;
-    --tavenem-light-color-secondary-saturation: 100%;
-    --tavenem-light-color-secondary-lightness: 63%;
-    --tavenem-light-color-secondary-text: var(--tavenem-dark-color-text);
-    --tavenem-light-color-tertiary-hue: 168;
-    --tavenem-light-color-tertiary-saturation: 74%;
-    --tavenem-light-color-tertiary-lightness: 45%;
-    --tavenem-light-color-tertiary-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-secondary-hue: 168;
+    --tavenem-light-color-secondary-saturation: 74%;
+    --tavenem-light-color-secondary-lightness: 45%;
+    --tavenem-light-color-secondary-text: var(--tavenem-light-color-text);
+    --tavenem-light-color-tertiary-hue: 306;
+    --tavenem-light-color-tertiary-saturation: 72%;
+    --tavenem-light-color-tertiary-lightness: 76%;
+    --tavenem-light-color-tertiary-text: var(--tavenem-light-color-text);
     --tavenem-light-color-danger-hue: 4;
     --tavenem-light-color-danger-saturation: 90%;
-    --tavenem-light-color-danger-lightness: 58%;
+    --tavenem-light-color-danger-lightness: 48%;
     --tavenem-light-color-danger-text: var(--tavenem-dark-color-text);
     --tavenem-light-color-dark-hue: 0;
     --tavenem-light-color-dark-saturation: 0%;
@@ -116,16 +120,16 @@
     --tavenem-light-color-default-text: var(--tavenem-dark-color-text);
     --tavenem-light-color-info-hue: 207;
     --tavenem-light-color-info-saturation: 90%;
-    --tavenem-light-color-info-lightness: 54%;
+    --tavenem-light-color-info-lightness: 43%;
     --tavenem-light-color-info-text: var(--tavenem-dark-color-text);
     --tavenem-light-color-success-hue: 145;
     --tavenem-light-color-success-saturation: 100%;
-    --tavenem-light-color-success-lightness: 39%;
-    --tavenem-light-color-success-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-success-lightness: 40%;
+    --tavenem-light-color-success-text: var(--tavenem-light-color-text);
     --tavenem-light-color-warning-hue: 36;
     --tavenem-light-color-warning-saturation: 100%;
     --tavenem-light-color-warning-lightness: 50%;
-    --tavenem-light-color-warning-text: var(--tavenem-dark-color-text);
+    --tavenem-light-color-warning-text: var(--tavenem-light-color-text);
     --tavenem-dark-color-keyboard: var(--tavenem-light-color-text);
     --tavenem-dark-color-keyboard-bg: rgba(255,255,255,.1);
     --tavenem-light-color-keyboard: var(--tavenem-dark-color-text);
@@ -144,6 +148,8 @@
     --tavenem-color-text: var(--tavenem-light-color-text);
     --tavenem-color-text-secondary: var(--tavenem-light-color-text-secondary);
     --tavenem-color-text-disabled: var(--tavenem-light-color-text-disabled);
+    --tavenem-color-link: var(--tavenem-light-color-link);
+    --tavenem-color-link-hover: var(--tavenem-light-color-link-hover);
     --tavenem-color-border: var(--tavenem-light-color-border);
     --tavenem-color-border-input: var(--tavenem-light-color-border-input);
     --tavenem-color-border-table: var(--tavenem-light-color-border-table);
@@ -224,6 +230,8 @@
     --tavenem-color-text: var(--tavenem-dark-color-text);
     --tavenem-color-text-secondary: var(--tavenem-dark-color-text-secondary);
     --tavenem-color-text-disabled: var(--tavenem-dark-color-text-disabled);
+    --tavenem-color-link: var(--tavenem-dark-color-link);
+    --tavenem-color-link-hover: var(--tavenem-dark-color-link-hover);
     --tavenem-color-border: var(--tavenem-dark-color-border);
     --tavenem-color-border-input: var(--tavenem-dark-color-border-input);
     --tavenem-color-border-table: var(--tavenem-dark-color-border-table);
@@ -414,4 +422,10 @@ $text-alignments: (
     left,
     right,
     start
+);
+
+$text-transforms: (
+    capitalize,
+    lowercase,
+    uppercase
 );

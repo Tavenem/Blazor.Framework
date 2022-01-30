@@ -176,6 +176,19 @@ export function setColorScheme(theme: number, manual?: boolean) {
     }
 }
 
+export function shake(elementId: string | null) {
+    if (!elementId) {
+        return;
+    }
+    const element = document.getElementById(elementId);
+    if (!element || element.classList.contains('shake')) {
+        return;
+    }
+
+    element.classList.add('shake');
+    setTimeout(() => element.classList.remove('shake'), 1000);
+}
+
 function clearLastScrolled() {
     const lastElement = document.getElementById(window.tavenem.framework._lastElement);
     if (lastElement) {

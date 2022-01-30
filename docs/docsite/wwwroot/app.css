@@ -70,6 +70,9 @@ body {
 .pre-operator {
     color: #b4b4b4;
 }
+.pre-string {
+    color: #d69d85;
+}
 .pre-tag {
     color: #808080;
 }

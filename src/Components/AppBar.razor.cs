@@ -73,6 +73,7 @@ public partial class AppBar : IDisposable
     /// </summary>
     protected string CssClass => new CssBuilder("appbar")
         .Add(Side.ToCSS())
+        .Add($"controls-{ControlsDrawerSide.ToCSS()}", ControlsDrawerSide != Framework.Side.None)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
@@ -83,8 +84,8 @@ public partial class AppBar : IDisposable
     /// </summary>
     protected string DrawerToggleClassName => Breakpoint switch
     {
-        Breakpoint.None => "icon menu",
-        _ => $"icon menu drawer-toggle-{Breakpoint.ToCSS()}",
+        Breakpoint.None => "icon me-2",
+        _ => $"icon me-2 drawer-toggle-{Breakpoint.ToCSS()}",
     };
 
     /// <summary>

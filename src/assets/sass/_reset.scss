@@ -48,6 +48,7 @@ hr {
 }
 
 h1, h2, h3, h4, h5, h6 {
+    --tavenem-casl: .3;
     letter-spacing: -.07rem;
     line-height: var(--tavenem-lineheight-heading);
     margin-bottom: .5rem;
@@ -152,7 +153,12 @@ i, em {
 }
 
 b, strong {
+    --tavenem-wght: 700;
     font-weight: bolder;
+
+    b, strong {
+        --tavenem-wght: 900;
+    }
 }
 
 small {
@@ -181,12 +187,12 @@ sup {
 }
 
 a {
-    color: var(--tavenem-color-primary);
+    color: var(--tavenem-color-link);
     text-decoration: none;
 
     &:hover,
     &:focus-visible {
-        color: var(--tavenem-color-primary-darken);
+        color: var(--tavenem-color-link-hover);
     }
 
     &.underline {

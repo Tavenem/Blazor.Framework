@@ -146,7 +146,7 @@
             border-inline-start: 1px solid var(--list-active-color);
             border-inline-end: none;
             padding-inline-start: calc(1rem - 1px);
-            padding-inline-end: 0;
+            padding-inline-end: 1rem;
         }
 
         .list > .active {

@@ -133,7 +133,7 @@ public partial class Drawer : IDisposable
     /// The final value assigned to the header toolbar's class attribute, including
     /// component values.
     /// </summary>
-    protected string HeaderToolbarClassName => new CssBuilder("toolbar filled")
+    protected string HeaderToolbarClassName => new CssBuilder("toolbar")
         .Add(ThemeColor.ToCSS())
         .Add(HeaderClass)
         .ToString();
@@ -200,12 +200,14 @@ public partial class Drawer : IDisposable
             IsClosed = true;
             await OnClosed.InvokeAsync(this);
             await IsOpenChanged.InvokeAsync(IsOpen);
+            StateHasChanged();
         }
         else
         {
             IsOpen = true;
             IsClosed = false;
             await IsOpenChanged.InvokeAsync(IsOpen);
+            StateHasChanged();
         }
     }
 

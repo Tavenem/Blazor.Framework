@@ -6,7 +6,7 @@
     <div class="@ToolbarClassName">
         @if (ControlsDrawerSide != Tavenem.Blazor.Framework.Side.None)
         {
-            <div class="@DrawerToggleClassName" @onclick="OnDrawerToggleAsync"></div>
+            <div class="@DrawerToggleClassName" @onclick="OnDrawerToggleAsync">menu</div>
         }
         @ChildContent
     </div>

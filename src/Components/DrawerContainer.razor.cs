@@ -7,7 +7,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class DrawerContainer
 {
-    private readonly List<Drawer> _drawers = new();
+    private protected readonly List<Drawer> _drawers = new();
 
     /// <summary>
     /// The breakpoint at which left and right drawers should be permanently
@@ -35,7 +35,7 @@ public partial class DrawerContainer
     private string DrawerContainerClass => SideDrawerBreakpoint switch
     {
         Breakpoint.None => "drawer-container",
-        _ => $"drawer-container-{SideDrawerBreakpoint.ToCSS()}",
+        _ => $"drawer-container drawer-container-{SideDrawerBreakpoint.ToCSS()}",
     };
 
     private bool HasOpenDrawer { get; set; }

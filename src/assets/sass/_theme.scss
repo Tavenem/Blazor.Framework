@@ -36,19 +36,6 @@
             background-color: var(--tavenem-color-#{$theme}-hover);
         }
 
-        &.filled {
-            background-color: var(--tavenem-color-#{$theme});
-            color: var(--tavenem-color-#{$theme}-text);
-
-            &.bg-alt {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-        }
-
-        &.outlined {
-            border-color: var(--tavenem-color-#{$theme});
-        }
-
         &.darken {
             color: var(--tavenem-color-#{$theme}-darken);
         }
@@ -56,19 +43,33 @@
         &.lighten {
             color: var(--tavenem-color-#{$theme}-lighten);
         }
+
+        &.filled {
+            background-color: var(--tavenem-color-#{$theme});
+            color: var(--tavenem-color-#{$theme}-text);
+
+            &.bg-alt {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.darken {
+                background-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                background-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+        }
+
+        &.outlined {
+            border-color: var(--tavenem-color-#{$theme});
+        }
     }
 
     a.#{$theme} {
         &:hover:not(.disabled, :disabled),
         &:focus:not(.disabled, :disabled) {
             color: var(--tavenem-color-#{$theme}-lighten);
-        }
-
-        &.filled {
-            &:hover:not(.disabled, :disabled),
-            &:focus:not(.disabled, :disabled) {
-                color: var(--tavenem-color-#{$theme}-text);
-            }
         }
 
         &.darken {
@@ -82,6 +83,13 @@
             &:hover:not(.disabled, :disabled),
             &:focus:not(.disabled, :disabled) {
                 color: var(--tavenem-color-#{$theme}-lighten-2);
+            }
+        }
+
+        &.filled {
+            &:hover:not(.disabled, :disabled),
+            &:focus:not(.disabled, :disabled) {
+                color: var(--tavenem-color-#{$theme}-text);
             }
         }
     }

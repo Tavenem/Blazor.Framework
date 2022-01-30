@@ -1,4 +1,4 @@
-namespace Tavenem.Blazor.Framework.Docs.Pages.GettingStarted;
+namespace Tavenem.Blazor.Framework.Docs.Pages.Layout;
 
 public partial class Layout
 {
