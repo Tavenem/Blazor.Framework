@@ -69,7 +69,7 @@ public partial class Collapse : IDisposable
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected string CssClass => new CssBuilder("collapse")
-        .Add("open", IsOpen)
+        .Add("closed", !IsOpen)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();

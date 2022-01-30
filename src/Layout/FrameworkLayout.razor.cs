@@ -11,7 +11,6 @@ public partial class FrameworkLayout : IDisposable
 {
     private readonly List<AppBar> _appBars = new();
     private readonly List<Contents> _contents = new();
-    private readonly List<Drawer> _drawers = new();
     private readonly List<ScrollToTop> _scrollToTops = new();
 
     private bool _disposedValue;

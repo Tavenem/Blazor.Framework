@@ -64,13 +64,13 @@
 	@foreach (var color in Enum.GetValues<ThemeColor>().Where(x => x != ThemeColor.None))
 	{
 		<div class="@($"d-flex flex-column rounded filled {color.ToString().ToLowerInvariant()}")" style="min-width: 12em">
-			<p class="py-5">@color.ToString()</p>
+			<p class="py-5 mb-0 text-center">@color.ToString()</p>
 			<div class="d-flex rounded-bottom">
-				<div class="@($"lighten rounded-bottom-left {color.ToString().ToLowerInvariant()}")">
-					<p class="py-3">Lighten</p>
+				<div class="@($"flex-grow-1 filled lighten rounded-bottom-left {color.ToString().ToLowerInvariant()}")">
+					<p class="py-3 mb-0 text-center">Lighten</p>
 				</div>
-				<div class="@($"darken rounded-bottom-right {color.ToString().ToLowerInvariant()}")">
-					<p class="py-3">Darken</p>
+				<div class="@($"flex-grow-1 filled darken rounded-bottom-right {color.ToString().ToLowerInvariant()}")">
+					<p class="py-3 mb-0 text-center">Darken</p>
 				</div>
 			</div>
 		</div>
@@ -105,10 +105,10 @@
 </p>
 <dl>
 	<dt>--tavenem-font-family</dt>
-	<dd>system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"<span class="text-muted ms-2">The font family stack used for the <code class="pre-element">body</code> element</span></dd>
+	<dd>Recursive, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"<span class="text-muted ms-2">The font family stack used for the <code class="pre-element">body</code> element</span></dd>
 
 	<dt>--tavenem-font-family-monospace</dt>
-	<dd>SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace<span class="text-muted ms-2">The monospace font family stack used by the <code class="pre-class">font-monospace</code> utility class</span></dd>
+	<dd>Recursive, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace<span class="text-muted ms-2">The monospace font family stack used by the <code class="pre-class">font-monospace</code> utility class</span></dd>
 
 	<dt>--tavenem-font-size-h1</dt>
 	<dd>3rem<span class="text-muted ms-2">The font size used for <code class="pre-element">h1</code> elements</span></dd>
@@ -165,64 +165,76 @@
 	<dd>uppercase<span class="text-muted ms-2">The text transform applied to the <a href="/components/button">Button</a> component</span></dd>
 
 	<dt>--tavenem-dark-color-text</dt>
-	<dd>#ffffffb2<span class="text-muted ms-2">In dark mode, the color used for text and other foreground elements</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffffb2"></span>#ffffffb2<span class="text-muted ms-2">In dark mode, the color used for text and other foreground elements</span></dd>
 
 	<dt>--tavenem-dark-color-text-secondary</dt>
-	<dd>#ffffff7f<span class="text-muted ms-2">In dark mode, the color used for text and other foreground elements with the <code class="pre-class">text-muted</code> utility class applied</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffff7f"></span>#ffffff7f<span class="text-muted ms-2">In dark mode, the color used for text and other foreground elements with the <code class="pre-class">text-muted</code> utility class applied</span></dd>
 
 	<dt>--tavenem-dark-color-text-disabled</dt>
-	<dd>#ffffff33<span class="text-muted ms-2">In dark mode, the color used for disabled text and other disabled foreground elements</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffff33"></span>#ffffff33<span class="text-muted ms-2">In dark mode, the color used for disabled text and other disabled foreground elements</span></dd>
+
+	<dt>--tavenem-dark-color-link</dt>
+	<dd><span class="swatch" style="background-color:#6da7fd"></span>#6da7fd<span class="text-muted ms-2">In dark mode, the color used for hyperlinks</span></dd>
+
+	<dt>--tavenem-dark-color-link-hover</dt>
+	<dd><span class="swatch" style="background-color:#3b88fc"></span>#3b88fc<span class="text-muted ms-2">In dark mode, the color used for hyperlinks when hovered or focused</span></dd>
 
 	<dt>--tavenem-light-color-text</dt>
-	<dd>#424242<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements</span></dd>
+	<dd><span class="swatch" style="background-color:#424242"></span>#424242<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements</span></dd>
 
 	<dt>--tavenem-light-color-text-secondary</dt>
-	<dd>#00000089<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements with the <code class="pre-class">text-muted</code> utility class applied</span></dd>
+	<dd><span class="swatch" style="background-color:#00000089"></span>#00000089<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements with the <code class="pre-class">text-muted</code> utility class applied</span></dd>
 
 	<dt>--tavenem-light-color-text-disabled</dt>
-	<dd>#00000060<span class="text-muted ms-2">In light mode, the color used for disabled text and other disabled foreground elements</span></dd>
+	<dd><span class="swatch" style="background-color:#00000060"></span>#00000060<span class="text-muted ms-2">In light mode, the color used for disabled text and other disabled foreground elements</span></dd>
+
+	<dt>--tavenem-light-color-link</dt>
+	<dd><span class="swatch" style="background-color:#0250c5"></span>#0250c5<span class="text-muted ms-2">In light mode, the color used for hyperlinks</span></dd>
+
+	<dt>--tavenem-light-color-link-hover</dt>
+	<dd><span class="swatch" style="background-color:#013b92"></span>#013b92<span class="text-muted ms-2">In light mode, the color used for hyperlinks when hovered or focused</span></dd>
 
 	<dt>--tavenem-dark-color-bg</dt>
-	<dd>#32333d<span class="text-muted ms-2">In dark mode, the background color for the <code class="pre-element">body</code> element</span></dd>
+	<dd><span class="swatch" style="background-color:#1a1a27"></span>#1a1a27<span class="text-muted ms-2">In dark mode, the background color for the <code class="pre-element">body</code> element</span></dd>
 
 	<dt>--tavenem-dark-color-bg-alt</dt>
-	<dd>#22232a<span class="text-muted ms-2">In dark mode, the background color for elements with the <code class="pre-class">bg-alt</code> utility class applied</span></dd>
+	<dd><span class="swatch" style="background-color:#0c0c13"></span>#0c0c13<span class="text-muted ms-2">In dark mode, the background color for elements with the <code class="pre-class">bg-alt</code> utility class applied</span></dd>
 
 	<dt>--tavenem-dark-color-bg-surface</dt>
-	<dd>#373740<span class="text-muted ms-2">In dark mode, the background color for certain components with a non-transparent background</span></dd>
+	<dd><span class="swatch" style="background-color:#1e1d2a"></span>#1e1d2a<span class="text-muted ms-2">In dark mode, the background color for certain components with a non-transparent background</span></dd>
 
 	<dt>--tavenem-dark-color-bg-input</dt>
-	<dd>#121316<span class="text-muted ms-2">In dark mode, the background color for various <code class="pre-element">input</code> elements and components</span></dd>
+	<dd><span class="swatch" style="background-color:#121316"></span>#121316<span class="text-muted ms-2">In dark mode, the background color for various <code class="pre-element">input</code> elements and components</span></dd>
 
 	<dt>--tavenem-dark-color-divider</dt>
-	<dd>#ffffff1e<span class="text-muted ms-2">In dark mode, the color of <code class="pre-element">hr</code> elements and other dividers</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffff1e"></span>#ffffff1e<span class="text-muted ms-2">In dark mode, the color of <code class="pre-element">hr</code> elements and other dividers</span></dd>
 
 	<dt>--tavenem-dark-color-overlay</dt>
-	<dd>rgba(255,255,255,0.5)<span class="text-muted ms-2">In dark mode, the background color of the <a href="/components/overlay">Overlay</a> component</span></dd>
+	<dd><span class="swatch" style="background-color:rgba(255,255,255,0.5)"></span>rgba(255,255,255,0.5)<span class="text-muted ms-2">In dark mode, the background color of the <a href="/components/overlay">Overlay</a> component</span></dd>
 
 	<dt>--tavenem-dark-color-action</dt>
-	<dd>#adadb1<span class="text-muted ms-2">In dark mode, the color of various elements and components which indicate a user action (usually clickable elements)</span></dd>
+	<dd><span class="swatch" style="background-color:#adadb1"></span>#adadb1<span class="text-muted ms-2">In dark mode, the color of various elements and components which indicate a user action (usually clickable elements)</span></dd>
 
 	<dt>--tavenem-dark-color-action-rgb</dt>
 	<dd>173,173,177<span class="text-muted ms-2">The red, green, and blue values of <code class="pre-attribute">--tavenem-dark-color-action</code> (ignoring any alpha channel)</span></dd>
 
 	<dt>--tavenem-dark-color-border</dt>
-	<dd>#ffffff1e<span class="text-muted ms-2">In dark mode, the color used for most borders</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffff1e"></span>#ffffff1e<span class="text-muted ms-2">In dark mode, the color used for most borders</span></dd>
 
 	<dt>--tavenem-dark-color-border-input</dt>
-	<dd>#ffffff4c<span class="text-muted ms-2">In dark mode, the color used for borders of <code class="pre-element">input</code> elements and components</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffff4c"></span>#ffffff4c<span class="text-muted ms-2">In dark mode, the color used for borders of <code class="pre-element">input</code> elements and components</span></dd>
 
 	<dt>--tavenem-dark-color-border-table</dt>
-	<dd>#ffffff1e<span class="text-muted ms-2">In dark mode, the color used for borders of <code class="pre-element">table</code> elements</span></dd>
+	<dd><span class="swatch" style="background-color:#ffffff1e"></span>#ffffff1e<span class="text-muted ms-2">In dark mode, the color used for borders of <code class="pre-element">table</code> elements</span></dd>
 
 	<dt>--tavenem-dark-color-scrollbar</dt>
-	<dd>#67697e<span class="text-muted ms-2">In dark mode, the color used for the scrollbar</span></dd>
+	<dd><span class="swatch" style="background-color:#67697e"></span>#67697e<span class="text-muted ms-2">In dark mode, the color used for the scrollbar</span></dd>
 
 	<dt>--tavenem-dark-color-scrollbar-hover</dt>
-	<dd>#86889c<span class="text-muted ms-2">In dark mode, the color used for the scrollbar when hovered</span></dd>
+	<dd><span class="swatch" style="background-color:#86889c"></span>#86889c<span class="text-muted ms-2">In dark mode, the color used for the scrollbar when hovered</span></dd>
 
 	<dt>--tavenem-dark-color-yellow-bg</dt>
-	<dd>#a82<span class="text-muted ms-2">In dark mode, a yellow background color (used for the blazor error message)</span></dd>
+	<dd><span class="swatch" style="background-color:#a82"></span>#a82<span class="text-muted ms-2">In dark mode, a yellow background color (used for the blazor error message)</span></dd>
 
 	<dt>--tavenem-dark-color-primary-hue</dt>
 	<dd>246<span class="text-muted ms-2">In dark mode, the hue of the primary theme color</span></dd>
@@ -333,46 +345,46 @@
 	<dd>var(--tavenem-dark-color-text)<span class="text-muted ms-2">In dark mode, the color used for text set against a background with the warning theme color</span></dd>
 
 	<dt>--tavenem-light-color-bg</dt>
-	<dd>white<span class="text-muted ms-2">In light mode, the background color for the <code class="pre-element">body</code> element</span></dd>
+	<dd><span class="swatch" style="background-color:white"></span>white<span class="text-muted ms-2">In light mode, the background color for the <code class="pre-element">body</code> element</span></dd>
 
 	<dt>--tavenem-light-color-bg-alt</dt>
-	<dd>#ebebeb<span class="text-muted ms-2">In light mode, the background color for elements with the <code class="pre-class">bg-alt</code> utility class applied</span></dd>
+	<dd><span class="swatch" style="background-color:#ebebeb"></span>#ebebeb<span class="text-muted ms-2">In light mode, the background color for elements with the <code class="pre-class">bg-alt</code> utility class applied</span></dd>
 
 	<dt>--tavenem-light-color-bg-surface</dt>
-	<dd>white<span class="text-muted ms-2">In light mode, the background color for certain components with a non-transparent background</span></dd>
+	<dd><span class="swatch" style="background-color:white"></span>white<span class="text-muted ms-2">In light mode, the background color for certain components with a non-transparent background</span></dd>
 
 	<dt>--tavenem-light-color-bg-input</dt>
-	<dd>white<span class="text-muted ms-2">In light mode, the background color for various <code class="pre-element">input</code> elements and components</span></dd>
+	<dd><span class="swatch" style="background-color:white"></span>white<span class="text-muted ms-2">In light mode, the background color for various <code class="pre-element">input</code> elements and components</span></dd>
 
 	<dt>--tavenem-light-color-divider</dt>
-	<dd>#e0e0e0<span class="text-muted ms-2">In light mode, the color of <code class="pre-element">hr</code> elements and other dividers</span></dd>
+	<dd><span class="swatch" style="background-color:#e0e0e0"></span>#e0e0e0<span class="text-muted ms-2">In light mode, the color of <code class="pre-element">hr</code> elements and other dividers</span></dd>
 
 	<dt>--tavenem-light-color-overlay</dt>
-	<dd>rgba(33,33,33,0.5)<span class="text-muted ms-2">In light mode, the background color of the <a href="/components/overlay">Overlay</a> component</span></dd>
+	<dd><span class="swatch" style="background-color:rgba(33,33,33,0.5)"></span>rgba(33,33,33,0.5)<span class="text-muted ms-2">In light mode, the background color of the <a href="/components/overlay">Overlay</a> component</span></dd>
 
 	<dt>--tavenem-light-color-action</dt>
-	<dd>rgba(0,0,0,0.54)<span class="text-muted ms-2">In light mode, the color of various elements and components which indicate a user action (usually clickable elements)</span></dd>
+	<dd><span class="swatch" style="background-color:rgba(0,0,0,0.54)"></span>rgba(0,0,0,0.54)<span class="text-muted ms-2">In light mode, the color of various elements and components which indicate a user action (usually clickable elements)</span></dd>
 
 	<dt>--tavenem-light-color-action-rgb</dt>
 	<dd>0,0,0<span class="text-muted ms-2">The red, green, and blue values of <code class="pre-attribute">--tavenem-light-color-action</code> (ignoring any alpha channel)</span></dd>
 
 	<dt>--tavenem-light-color-border</dt>
-	<dd>#0000001e<span class="text-muted ms-2">In light mode, the color used for most borders</span></dd>
+	<dd><span class="swatch" style="background-color:#0000001e"></span>#0000001e<span class="text-muted ms-2">In light mode, the color used for most borders</span></dd>
 
 	<dt>--tavenem-light-color-border-input</dt>
-	<dd>#bdbdbd<span class="text-muted ms-2">In light mode, the color used for borders of <code class="pre-element">input</code> elements and components</span></dd>
+	<dd><span class="swatch" style="background-color:#bdbdbd"></span>#bdbdbd<span class="text-muted ms-2">In light mode, the color used for borders of <code class="pre-element">input</code> elements and components</span></dd>
 
 	<dt>--tavenem-light-color-border-table</dt>
-	<dd>#e0e0e0<span class="text-muted ms-2">In light mode, the color used for borders of <code class="pre-element">table</code> elements</span></dd>
+	<dd><span class="swatch" style="background-color:#e0e0e0"></span>#e0e0e0<span class="text-muted ms-2">In light mode, the color used for borders of <code class="pre-element">table</code> elements</span></dd>
 
 	<dt>--tavenem-light-color-scrollbar</dt>
-	<dd>#c4c4c4<span class="text-muted ms-2">In light mode, the color used for the scrollbar</span></dd>
+	<dd><span class="swatch" style="background-color:#c4c4c4"></span>#c4c4c4<span class="text-muted ms-2">In light mode, the color used for the scrollbar</span></dd>
 
 	<dt>--tavenem-light-color-scrollbar-hover</dt>
-	<dd>#a6a6a6<span class="text-muted ms-2">In light mode, the color used for the scrollbar when hovered</span></dd>
+	<dd><span class="swatch" style="background-color:#a6a6a6"></span>#a6a6a6<span class="text-muted ms-2">In light mode, the color used for the scrollbar when hovered</span></dd>
 
 	<dt>--tavenem-light-color-yellow-bg</dt>
-	<dd>#fcf8e3<span class="text-muted ms-2">In light mode, a yellow background color (used for the blazor error message)</span></dd>
+	<dd><span class="swatch" style="background-color:#fcf8e3"></span>#fcf8e3<span class="text-muted ms-2">In light mode, a yellow background color (used for the blazor error message)</span></dd>
 
 	<dt>--tavenem-light-color-primary-hue</dt>
 	<dd>246<span class="text-muted ms-2">In light mode, the hue of the primary theme color</span></dd>
@@ -486,7 +498,7 @@
 	<dd>var(--tavenem-light-color-text)<span class="text-muted ms-2">In dark mode, the color used for text within <code class="pre-element">kbd</code> elements</span></dd>
 
 	<dt>--tavenem-dark-color-keyboard-bg</dt>
-	<dd>rgba(255,255,255,.1)<span class="text-muted ms-2">In dark mode, the background color of <code class="pre-element">kbd</code> elements</span></dd>
+	<dd><span class="swatch" style="background-color:rgba(255,255,255,.1)"></span>rgba(255,255,255,.1)<span class="text-muted ms-2">In dark mode, the background color of <code class="pre-element">kbd</code> elements</span></dd>
 
 	<dt>--tavenem-light-color-keyboard</dt>
 	<dd>var(--tavenem-dark-color-text)<span class="text-muted ms-2">In light mode, the color used for text within <code class="pre-element">kbd</code> elements</span></dd>
@@ -495,10 +507,10 @@
 	<dd>var(--tavenem-dark-color-bg)<span class="text-muted ms-2">In light mode, the background color of <code class="pre-element">kbd</code> elements</span></dd>
 
 	<dt>--tavenem-color-table-hover</dt>
-	<dd>#0000000a<span class="text-muted ms-2">The background applied to hovered rows in a table with the <code class="pre-class">table</code> and <code class="pre-class">hover</code> classes</span></dd>
+	<dd><span class="swatch" style="background-color:#0000000a"></span>#0000000a<span class="text-muted ms-2">The background applied to hovered rows in a table with the <code class="pre-class">table</code> and <code class="pre-class">hover</code> classes</span></dd>
 
 	<dt>--tavenem-color-table-stripe</dt>
-	<dd>#00000005<span class="text-muted ms-2">The background applied to alternate rows in a table with the <code class="pre-class">table</code> and <code class="pre-class">striped</code> classes</span></dd>
+	<dd><span class="swatch" style="background-color:#00000005"></span>#00000005<span class="text-muted ms-2">The background applied to alternate rows in a table with the <code class="pre-class">table</code> and <code class="pre-class">striped</code> classes</span></dd>
 
 	<dt>--tavenem-color-error</dt>
 	<dd>var(--tavenem-color-danger)<span class="text-muted ms-2">The color used to indicate an error</span></dd>
@@ -552,33 +564,33 @@
 <p>
 	For each theme color there are also nine additional properties whose value
 	is based on their assigned hue, saturation, and lightness. In the following
-	list, replace every instance of "#{theme}" with the name of a theme color:
+	list, replace every instance of "{theme}" with the name of a theme color:
 </p>
 <dl>
-	<dt>--tavenem-color-#{$theme}</dt>
-	<dd>hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness))</dd>
+	<dt>--tavenem-color-{theme}</dt>
+	<dd>hsl(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), var(--tavenem-color-{theme}-lightness))</dd>
 
-	<dt>--tavenem-color-#{$theme}-darken</dt>
-	<dd>hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 7%))</dd>
+	<dt>--tavenem-color-{theme}-darken</dt>
+	<dd>hsl(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), calc(var(--tavenem-color-{theme}-lightness) - 7%))</dd>
 
-	<dt>--tavenem-color-#{$theme}-darken-2</dt>
-	<dd>hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 14%))</dd>
+	<dt>--tavenem-color-{theme}-darken-2</dt>
+	<dd>hsl(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), calc(var(--tavenem-color-{theme}-lightness) - 14%))</dd>
 
-	<dt>--tavenem-color-#{$theme}-lighten</dt>
-	<dd>hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 7%))</dd>
+	<dt>--tavenem-color-{theme}-lighten</dt>
+	<dd>hsl(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), calc(var(--tavenem-color-{theme}-lightness) + 7%))</dd>
 
-	<dt>--tavenem-color-#{$theme}-lighten-2</dt>
-	<dd>hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 14%))</dd>
+	<dt>--tavenem-color-{theme}-lighten-2</dt>
+	<dd>hsl(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), calc(var(--tavenem-color-{theme}-lightness) + 14%))</dd>
 
-	<dt>--tavenem-color-#{$theme}-hover</dt>
-	<dd>hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .06)</dd>
+	<dt>--tavenem-color-{theme}-hover</dt>
+	<dd>hsla(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), var(--tavenem-color-{theme}-lightness), .06)</dd>
 
-	<dt>--tavenem-color-#{$theme}-hover-bright</dt>
-	<dd>hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .12)</dd>
+	<dt>--tavenem-color-{theme}-hover-bright</dt>
+	<dd>hsla(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), var(--tavenem-color-{theme}-lightness), .12)</dd>
 
-	<dt>--tavenem-color-#{$theme}-hover-dark</dt>
-	<dd>hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 7%), .06)</dd>
+	<dt>--tavenem-color-{theme}-hover-dark</dt>
+	<dd>hsla(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), calc(var(--tavenem-color-{theme}-lightness) - 7%), .06)</dd>
 
-	<dt>--tavenem-color-#{$theme}-hover-light</dt>
-	<dd>hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 7%), .06)</dd>
+	<dt>--tavenem-color-{theme}-hover-light</dt>
+	<dd>hsla(var(--tavenem-color-{theme}-hue), var(--tavenem-color-{theme}-saturation), calc(var(--tavenem-color-{theme}-lightness) + 7%), .06)</dd>
 </dl>

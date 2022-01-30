@@ -135,6 +135,17 @@ export function setColorScheme(theme, manual) {
         localStorage.setItem('tavenem-theme', theme.toString());
     }
 }
+export function shake(elementId) {
+    if (!elementId) {
+        return;
+    }
+    const element = document.getElementById(elementId);
+    if (!element || element.classList.contains('shake')) {
+        return;
+    }
+    element.classList.add('shake');
+    setTimeout(() => element.classList.remove('shake'), 1000);
+}
 function clearLastScrolled() {
     const lastElement = document.getElementById(window.tavenem.framework._lastElement);
     if (lastElement) {

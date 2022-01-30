@@ -8,6 +8,24 @@
     }
 }
 
+@keyframes tf-shake {
+    10%, 90% {
+        transform: translateX(-1px);
+    }
+
+    20%, 80% {
+        transform: translateX(2px);
+    }
+
+    30%, 50%, 70% {
+        transform: translateX(-4px);
+    }
+
+    40%, 60% {
+        transform: translateX(4px);
+    }
+}
+
 @keyframes tf-fadein {
     from {
         opacity: 0;
@@ -20,48 +38,112 @@
 
 @keyframes tf-slide-in-left {
     from {
+        max-width: 0;
         transform: translateX(-100%);
+    }
+    1% {
+        max-width: 15em;
+        transform: translateX(-99%);
+    }
+    to {
+        max-width: 15em;
     }
 }
 
 @keyframes tf-slide-out-left {
+    from {
+        max-width: 15em;
+    }
+    99% {
+        max-width: 15em;
+        transform: translateX(-99%);
+    }
     to {
+        max-width: 0;
         transform: translateX(-100%);
     }
 }
 
 @keyframes tf-slide-in-right {
     from {
+        max-width: 0;
         transform: translateX(100%);
+    }
+    1% {
+        max-width: 15em;
+        transform: translateX(99%);
+    }
+    to {
+        max-width: 15em;
     }
 }
 
 @keyframes tf-slide-out-right {
+    from {
+        max-width: 15em;
+    }
+    99% {
+        max-width: 15em;
+        transform: translateX(99%);
+    }
     to {
+        max-width: 0;
         transform: translateX(100%);
     }
 }
 
 @keyframes tf-slide-in-bottom {
     from {
+        max-height: 0;
         transform: translateY(100%);
+    }
+    1% {
+        max-height: 20em;
+        transform: translateY(99%);
+    }
+    to {
+        max-height: 20em;
     }
 }
 
 @keyframes tf-slide-out-bottom {
+    from {
+        max-height: 20em;
+    }
+    99% {
+        max-height: 20em;
+        transform: translateY(99%);
+    }
     to {
+        max-height: 0;
         transform: translateY(100%);
     }
 }
 
 @keyframes tf-slide-in-top {
     from {
+        max-height: 0;
         transform: translateY(-100%);
+    }
+    1% {
+        max-height: 20em;
+        transform: translateY(-99%);
+    }
+    to {
+        max-height: 20em;
     }
 }
 
 @keyframes tf-slide-out-top {
+    from {
+        max-height: 20em;
+    }
+    99% {
+        max-height: 20em;
+        transform: translateY(-99%);
+    }
     to {
+        max-height: 0;
         transform: translateY(-100%);
     }
 }

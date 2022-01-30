@@ -13,7 +13,7 @@ public partial class AnchorLink : IDisposable
 {
     private const string DefaultActiveClass = "active";
 
-    private static readonly string[] _DisabledKeys = new[] { "href, target" };
+    private static readonly string[] _DisabledKeys = new[] { "href", "target" };
 
     private string? _currentLocation;
     private bool _disposedValue;

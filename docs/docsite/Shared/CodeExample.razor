@@ -1,0 +1,10 @@
+﻿<Collapse IsOpen="true" Class="outlined mb-3">
+    <TitleContent>
+        @CodeFragment
+    </TitleContent>
+    <ChildContent>
+        <div class="codeblock pre-razor-code" style="border-top: 1px solid var(--tavenem-color-border)">
+            @CodeFormatter.CodeToMarkup(Code, true)
+        </div>
+    </ChildContent>
+</Collapse>

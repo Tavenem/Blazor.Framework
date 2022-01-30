@@ -8,4 +8,5 @@ public enum CodeType
     Operator = 3,
     Tag = 4,
     NewLine = 5,
+    Whitespace = 6,
 }

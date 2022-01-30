@@ -28,6 +28,16 @@
         .header,
         .footer {
             min-height: 4em;
+
+            &.drawer-control {
+                height: auto;
+                margin-bottom: 0;
+                min-height: 0;
+
+                .toolbar {
+                    min-height: 0;
+                }
+            }
         }
     }
 
@@ -57,7 +67,7 @@
     &.right {
         flex-direction: column;
         height: 100%;
-        max-width: 15em;
+        max-width: 0;
         transition: width 0ms 400ms;
         width: 0;
 
@@ -77,7 +87,7 @@
         }
 
         &.icon {
-            animation: tf-full-to-icon 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-full-to-icon 225ms cubic-bezier(0, 0, 0.2, 1);
             padding-left: .5em;
             padding-right: .5em;
             transition: width 225ms cubic-bezier(0, 0, 0.2, 1);
@@ -123,7 +133,7 @@
         grid-area: leftdrawer;
 
         &.closed {
-            animation: tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -132,7 +142,7 @@
 
         &.open {
             &.icon {
-                animation: tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
 
                 @media (prefers-reduced-motion) {
                     animation: none;
@@ -140,11 +150,18 @@
             }
 
             &:not(.icon) {
-                animation: tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
+                animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
 
                 @media (prefers-reduced-motion) {
                     animation: none;
                 }
+            }
+        }
+
+        .controls-left + & {
+            .drawer-control,
+            .drawer-close-small {
+                display: none;
             }
         }
     }
@@ -153,7 +170,7 @@
         grid-area: rightdrawer;
 
         &.closed {
-            animation: tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -162,7 +179,7 @@
 
         &.open {
             &.icon {
-                animation: tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
 
                 @media (prefers-reduced-motion) {
                     animation: none;
@@ -170,11 +187,18 @@
             }
 
             &:not(.icon) {
-                animation: tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
+                animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
 
                 @media (prefers-reduced-motion) {
                     animation: none;
                 }
+            }
+        }
+
+        .controls-right + & {
+            .drawer-control,
+            .drawer-close-small {
+                display: none;
             }
         }
     }
@@ -184,7 +208,7 @@
         flex-direction: row;
         flex-wrap: wrap;
         height: 0;
-        max-height: 20em;
+        max-height: 0;
         padding-left: 1.5em;
         padding-right: 1.5em;
         transition: height 0ms 400ms;
@@ -203,7 +227,7 @@
         grid-area: bottomdrawer;
 
         &.closed {
-            animation: tf-slide-out-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-slide-out-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -211,10 +235,17 @@
         }
 
         &.open {
-            animation: tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
+            }
+        }
+
+        .controls-bottom + & {
+            .drawer-control,
+            .drawer-close-small {
+                display: none;
             }
         }
     }
@@ -223,7 +254,7 @@
         grid-area: topdrawer;
 
         &.closed {
-            animation: tf-slide-out-top 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-slide-out-top 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -231,13 +262,24 @@
         }
 
         &.open {
-            animation: tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
+            animation: forwards tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
             }
         }
+
+        .controls-top + & {
+            .drawer-control,
+            .drawer-close-small {
+                display: none;
+            }
+        }
     }
+}
+
+.drawer-close-small {
+    margin-inline-end: -1.5em;
 }
 
 .drawer-container {
@@ -264,7 +306,12 @@
 
             &.left,
             &.right {
+                max-width: 15em;
                 width: auto;
+
+                &.closed {
+                    animation: none;
+                }
 
                 &.icon {
                     padding-left: unset;
@@ -280,6 +327,11 @@
             &.bottom,
             &.top {
                 height: auto;
+                max-height: 20em;
+
+                &.closed {
+                    animation: none;
+                }
             }
         }
 
