@@ -81,7 +81,7 @@ kbd kbd.text-close {
     text-align: end;
 
     &::before {
-        content: "\00A0\2014\00A0"; // em dash, nbsp
+        content: "\00A0\2014\00A0"; // nbsp, em dash, nbsp
     }
 }
 

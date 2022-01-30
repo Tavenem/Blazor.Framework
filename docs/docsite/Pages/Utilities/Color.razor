@@ -1,0 +1,139 @@
+﻿@page "/utilities/color"
+
+<PageTitle>Color - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Color</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to control color.
+</p>
+
+<Heading Level="HeadingLevel.H2">Themes</Heading>
+
+<p>
+    Each theme class will assign associated theme color as the current foreground color.
+</p>
+
+<p>
+    Each theme class also has both a <code>lighten</code> and <code>darken</code> variant.
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""primary lighten"">Primary lighten text.</p>
+    <p class=""primary"">Primary text.</p>
+    <p class=""primary darken"">Primary darken text.</p>
+    <p class=""secondary lighten"">Secondary lighten text.</p>
+    <p class=""secondary"">Secondary text.</p>
+    <p class=""secondary darken"">Secondary darken text.</p>
+    <p class=""tertiary lighten"">Tertiary lighten text.</p>
+    <p class=""tertiary"">Tertiary text.</p>
+    <p class=""tertiary darken"">Tertiary darken text.</p>
+    <p class=""danger lighten"">Danger lighten text.</p>
+    <p class=""danger"">Danger text.</p>
+    <p class=""danger darken"">Danger darken text.</p>
+    <p class=""dark lighten"">Dark lighten text.</p>
+    <p class=""dark"">Dark text.</p>
+    <p class=""dark darken"">Dark darken text.</p>
+    <p class=""default lighten"">Default lighten text.</p>
+    <p class=""default"">Default text.</p>
+    <p class=""default darken"">Default darken text.</p>
+    <p class=""info lighten"">Info lighten text.</p>
+    <p class=""info"">Info text.</p>
+    <p class=""info darken"">Info darken text.</p>
+    <p class=""success lighten"">Success lighten text.</p>
+    <p class=""success"">Success text.</p>
+    <p class=""success darken"">Success darken text.</p>
+    <p class=""warning lighten"">Warning lighten text.</p>
+    <p class=""warning"">Warning text.</p>
+    <p class=""warning darken"">Warning darken text.</p>
+</div>")" />
+
+<p>
+    Adding the <code>filled</code> class assigns the theme color to the background color instead,
+    while the foreground becomes the color assigned as the complementary text color for the theme.
+</p>
+
+<p>
+    The <code>lighten</code> and <code>darken</code> variants can also be used in combination with <code>filled</code>.
+</p>
+
+<p>
+    If you use <code>filled</code> without assigning a theme class, the default theme is used.
+</p>
+
+<CodeExample Code="@(@"<div class=""row"">
+    <div class=""filled lighten""><p>Filled</p></div>
+    <div class=""filled""><p>Filled</p></div>
+    <div class=""filled darken""><p>Filled</p></div>
+    <div class=""primary filled lighten""><p>Primary filled</p></div>
+    <div class=""primary filled""><p>Primary filled</p></div>
+    <div class=""primary filled darken""><p>Primary filled</p></div>
+    <div class=""secondary filled lighten""><p>Secondary filled</p></div>
+    <div class=""secondary filled""><p>Secondary filled</p></div>
+    <div class=""secondary filled darken""><p>Secondary filled</p></div>
+    <div class=""tertiary filled lighten""><p>Tertiary filled</p></div>
+    <div class=""tertiary filled""><p>Tertiary filled</p></div>
+    <div class=""tertiary filled darken""><p>Tertiary filled</p></div>
+    <div class=""danger filled lighten""><p>Danger filled</p></div>
+    <div class=""danger filled""><p>Danger filled</p></div>
+    <div class=""danger filled darken""><p>Danger filled</p></div>
+    <div class=""dark filled lighten""><p>Dark filled</p></div>
+    <div class=""dark filled""><p>Dark filled</p></div>
+    <div class=""dark filled darken""><p>Dark filled</p></div>
+    <div class=""default filled lighten""><p>Default filled</p></div>
+    <div class=""default filled""><p>Default filled</p></div>
+    <div class=""default filled darken""><p>Default filled</p></div>
+    <div class=""info filled lighten""><p>Info filled</p></div>
+    <div class=""info filled""><p>Info filled</p></div>
+    <div class=""info filled darken""><p>Info filled</p></div>
+    <div class=""success filled lighten""><p>Success filled</p></div>
+    <div class=""success filled""><p>Success filled</p></div>
+    <div class=""success filled darken""><p>Success filled</p></div>
+    <div class=""warning filled lighten""><p>Warning filled</p></div>
+    <div class=""warning filled""><p>Warning filled</p></div>
+    <div class=""warning filled darken""><p>Warning filled</p></div>
+</div>")" />
+
+<Heading Level="HeadingLevel.H2">Background</Heading>
+
+<p>
+    The <code>bg-alt</code> class assigns an alternate background color to an element, and can be used when adjacent or nested elements need to be distinguished visually.
+</p>
+
+<p>
+    The <code>bg-alt</code> class can be used on its own, or combined with a theme class.
+</p>
+
+<CodeExample Code="@(@"<div class=""row"">
+    <div class=""bg-alt""><p>Alternate background</p></div>
+    <div class=""primary bg-alt""><p>Primary bg-alt</p></div>
+    <div class=""secondary bg-alt""><p>Secondary bg-alt</p></div>
+    <div class=""tertiary bg-alt""><p>Tertiary bg-alt</p></div>
+    <div class=""danger bg-alt""><p>Danger bg-alt</p></div>
+    <div class=""dark bg-alt""><p>Dark bg-alt</p></div>
+    <div class=""default bg-alt""><p>Default bg-alt</p></div>
+    <div class=""info bg-alt""><p>Info bg-alt</p></div>
+    <div class=""success bg-alt""><p>Success bg-alt</p></div>
+    <div class=""warning bg-alt""><p>Warning bg-alt</p></div>
+</div>")" />
+
+<p>
+    The <code>bg-alt</code> class can also be combined with <code>filled</code>, and has the same effect as using <code>darken</code>.
+</p>
+
+<CodeExample Code="@(@"<div class=""row"">
+    <div class=""filled bg-alt""><p>Filled bg-alt</p></div>
+    <div class=""primary filled bg-alt""><p>Primary filled bg-alt</p></div>
+    <div class=""secondary filled bg-alt""><p>Secondary filled bg-alt</p></div>
+    <div class=""tertiary filled bg-alt""><p>Tertiary filled bg-alt</p></div>
+    <div class=""danger filled bg-alt""><p>Danger filled bg-alt</p></div>
+    <div class=""dark filled bg-alt""><p>Dark filled bg-alt</p></div>
+    <div class=""default filled bg-alt""><p>Default filled bg-alt</p></div>
+    <div class=""info filled bg-alt""><p>Info filled bg-alt</p></div>
+    <div class=""success filled bg-alt""><p>Success filled bg-alt</p></div>
+    <div class=""warning filled bg-alt""><p>Warning filled bg-alt</p></div>
+</div>")" />
+
+<p>
+    The class <code>transparent</code> can also be used to remove the background color from an element which would normally have one.
+</p>

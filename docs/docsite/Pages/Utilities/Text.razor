@@ -8,11 +8,6 @@
     The Tavenem Blazor Framework provides a number of utility classes to help format text.
 </p>
 
-<p>
-    Most utilities can also be combined with <a href="/layout/breakpoints">breakpoint infixes</a> to
-    use them only above certain viewport sizes.
-</p>
-
 <Heading Level="HeadingLevel.H2">Alignment</Heading>
 
 <p>
@@ -25,7 +20,14 @@
     <p class=""text-center"">Center aligned text.</p>
     <p class=""text-right"">Right aligned text.</p>
     <p class=""text-end"">End aligned text.</p>
+</div>")" />
 
+<p>
+    The alignment utilities can also be combined with <a href="/layout/breakpoints">breakpoint infixes</a> to
+    use them only above certain viewport sizes.
+</p>
+
+<CodeExample Code="@(@"<div>
     <p class=""text-sm-center"">Center aligned text above the small breakpoint.</p>
     <p class=""text-md-center"">Center aligned text above the medium breakpoint.</p>
     <p class=""text-lg-center"">Center aligned text above the large breakpoint.</p>

@@ -5,6 +5,10 @@
 .filled {
     background-color: var(--tavenem-color-default);
     color: var(--tavenem-color-default-text);
+
+    &.bg-alt {
+        background-color: var(--tavenem-color-default-darken);
+    }
 }
 
 .outlined {
