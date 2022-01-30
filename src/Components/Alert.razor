@@ -3,9 +3,9 @@
 @inherits TavenemComponentBase
 
 <div @attributes="AdditionalAttributes" role="alert" class="@CssClass" style="@Style" @onclick="OnClick">
-    @if (AutoIcon && !string.IsNullOrEmpty(IconClass))
+    @if (AutoIcon)
     {
-        <div class="@IconClass"></div>
+        <div class="@IconClass">@Icon</div>
     }
     @ChildContent
     @if (CanClose)

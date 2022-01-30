@@ -51,12 +51,20 @@ public partial class Alert
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private string? IconClass => ThemeColor switch
+    private string Icon => ThemeColor switch
     {
-        ThemeColor.Danger => "icon error_outline",
-        ThemeColor.Success => "icon check_circle",
-        ThemeColor.Warning => "icon warning_amber",
-        _ => "icon info outlined",
+        ThemeColor.Danger => "error_outline",
+        ThemeColor.Success => "check_circle",
+        ThemeColor.Warning => "warning_amber",
+        _ => "info",
+    };
+
+    private string IconClass => ThemeColor switch
+    {
+        ThemeColor.Danger => "icon",
+        ThemeColor.Success => "icon",
+        ThemeColor.Warning => "icon",
+        _ => "icon outlined",
     };
 
     private bool IsClosed { get; set; }
