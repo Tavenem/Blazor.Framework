@@ -397,6 +397,13 @@ $order-values: (
     last: 999
 );
 
+$overflow-values: (
+    auto,
+    hidden,
+    scroll,
+    visible
+);
+
 $positive-spacers: (
     0: 0,
     1: .25rem,

@@ -512,6 +512,7 @@ kbd kbd.text-close {
     font-family: var(--tavenem-font-family-monospace);
 }
 
+@include generate-utility("overflow", overflow, $overflow-values);
 @include generate-utility("text", text-align, $text-alignments);
 @include generate-utility("text", text-transform, $text-transforms);
 
@@ -549,6 +550,14 @@ kbd kbd.text-close {
     -moz-user-select: none !important;
     -webkit-user-select: none !important;
     user-select: none !important;
+}
+
+.pe-auto {
+    pointer-events: auto !important;
+}
+
+.pe-none {
+    pointer-events: none !important;
 }
 
 .square {

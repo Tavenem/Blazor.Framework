@@ -1,0 +1,374 @@
+﻿@page "/utilities/flexbox"
+
+<PageTitle>Flexbox - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Flexbox</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to help format elements in a flexbox layout.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    The <code>d-flex</code> <a href="/utilities/display">display class</a> will make an element a flexbox container. The <code>d-inline-flex</code> class creates an inline flexbox. Responsive variants for each breakpoint also exist:
+</p>
+
+<ul>
+    <li><code>d-sm-flex</code></li>
+    <li><code>d-md-flex</code></li>
+    <li><code>d-lg-flex</code></li>
+    <li><code>d-xl-flex</code></li>
+    <li><code>d-xxl-flex</code></li>
+    <li><code>d-sm-inline-flex</code></li>
+    <li><code>d-md-inline-flex</code></li>
+    <li><code>d-lg-inline-flex</code></li>
+    <li><code>d-xl-inline-flex</code></li>
+    <li><code>d-xxl-inline-flex</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Direction</Heading>
+
+<p>
+    The direction of flow can be controlled with the <code>flex-direction</code> utility classes:
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex flex-column mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex flex-column-reverse mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex flex-row mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex flex-row-reverse"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>")" />
+
+<p>
+    The flex-direction classes also exist in breakpoint variants. For example:
+</p>
+
+<ul>
+    <li><code>flex-sm-column</code></li>
+    <li><code>flex-md-column</code></li>
+    <li><code>flex-lg-column</code></li>
+    <li><code>flex-xl-column</code></li>
+    <li><code>flex-xxl-column</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Justify</Heading>
+
+<p>
+    The <code>justify-content</code> property can be set with utility classes:
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex justify-content-center mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex justify-content-end mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex justify-content-space-around mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex justify-content-space-between mb-3"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex justify-content-space-evenly mb-3"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex justify-content-start mb-3"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>")" />
+
+<p>
+    These also have breakpoint variants. For example:
+</p>
+
+<ul>
+    <li><code>justify-content-sm-center</code></li>
+    <li><code>justify-content-md-center</code></li>
+    <li><code>justify-content-lg-center</code></li>
+    <li><code>justify-content-xl-center</code></li>
+    <li><code>justify-content-xxl-center</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Align</Heading>
+
+<p>
+    The <code>align-items</code> property can be set with utility classes:
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex align-items-baseline mb-2"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex align-items-center mb-2"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex align-items-end mb-2"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex align-items-start mb-3"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex align-items-stretch mb-3"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>")" />
+
+<p>
+    These also have breakpoint variants. For example:
+</p>
+
+<ul>
+    <li><code>align-items-sm-center</code></li>
+    <li><code>align-items-md-center</code></li>
+    <li><code>align-items-lg-center</code></li>
+    <li><code>align-items-xl-center</code></li>
+    <li><code>align-items-xxl-center</code></li>
+</ul>
+
+<p>
+    The <code>align-content</code> property can also be set with utility classes:
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex flex-wrap align-content-center mb-2"" style=""height:8em"">
+    <div class=""border p-2"" style=""width:33%"">Item 1</div>
+    <div class=""border p-2"" style=""width:33%"">Item 2</div>
+    <div class=""border p-2"" style=""width:33%"">Item 3</div>
+    <div class=""border p-2"" style=""width:33%"">Item 4</div>
+    <div class=""border p-2"" style=""width:33%"">Item 5</div>
+</div>
+<div class=""d-flex flex-wrap align-content-end mb-2"" style=""height:8em"">
+    <div class=""border p-2"" style=""width:33%"">Item 1</div>
+    <div class=""border p-2"" style=""width:33%"">Item 2</div>
+    <div class=""border p-2"" style=""width:33%"">Item 3</div>
+    <div class=""border p-2"" style=""width:33%"">Item 4</div>
+    <div class=""border p-2"" style=""width:33%"">Item 5</div>
+</div>
+<div class=""d-flex flex-wrap align-content-start mb-3"" style=""height:8em"">
+    <div class=""border p-2"" style=""width:33%"">Item 1</div>
+    <div class=""border p-2"" style=""width:33%"">Item 2</div>
+    <div class=""border p-2"" style=""width:33%"">Item 3</div>
+    <div class=""border p-2"" style=""width:33%"">Item 4</div>
+    <div class=""border p-2"" style=""width:33%"">Item 5</div>
+</div>
+<div class=""d-flex flex-wrap align-content-space-around mb-3"" style=""height:8em"">
+    <div class=""border p-2"" style=""width:33%"">Item 1</div>
+    <div class=""border p-2"" style=""width:33%"">Item 2</div>
+    <div class=""border p-2"" style=""width:33%"">Item 3</div>
+    <div class=""border p-2"" style=""width:33%"">Item 4</div>
+    <div class=""border p-2"" style=""width:33%"">Item 5</div>
+</div>
+<div class=""d-flex flex-wrap align-content-space-between mb-3"" style=""height:8em"">
+    <div class=""border p-2"" style=""width:33%"">Item 1</div>
+    <div class=""border p-2"" style=""width:33%"">Item 2</div>
+    <div class=""border p-2"" style=""width:33%"">Item 3</div>
+    <div class=""border p-2"" style=""width:33%"">Item 4</div>
+    <div class=""border p-2"" style=""width:33%"">Item 5</div>
+</div>
+<div class=""d-flex flex-wrap align-content-stretch mb-3"" style=""height:8em"">
+    <div class=""border p-2"" style=""width:33%"">Item 1</div>
+    <div class=""border p-2"" style=""width:33%"">Item 2</div>
+    <div class=""border p-2"" style=""width:33%"">Item 3</div>
+    <div class=""border p-2"" style=""width:33%"">Item 4</div>
+    <div class=""border p-2"" style=""width:33%"">Item 5</div>
+</div>")" />
+
+<p>
+    These also have breakpoint variants. For example:
+</p>
+
+<ul>
+    <li><code>align-content-sm-center</code></li>
+    <li><code>align-content-md-center</code></li>
+    <li><code>align-content-lg-center</code></li>
+    <li><code>align-content-xl-center</code></li>
+    <li><code>align-content-xxl-center</code></li>
+</ul>
+
+<p>
+    The <code>align-self</code> property can also be set on children with utility classes:
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex mb-2"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""align-self-baseline border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex mb-2"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""align-self-center border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex mb-2"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""align-self-end border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex mb-3"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""align-self-start border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>
+<div class=""d-flex align-items-start mb-3"" style=""height:8em"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""align-self-stretch border p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>")" />
+
+<p>
+    These also have breakpoint variants. For example:
+</p>
+
+<ul>
+    <li><code>align-self-sm-center</code></li>
+    <li><code>align-self-md-center</code></li>
+    <li><code>align-self-lg-center</code></li>
+    <li><code>align-self-xl-center</code></li>
+    <li><code>align-self-xxl-center</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Fill</Heading>
+
+<p>
+    The <code>flex-fill</code> class on a child item sets its <code>flex</code> property to <code>1
+    1 auto</code>. Set on multiple children, this allows them to distribute space based on the size
+    of their content, while also growing or shrinking as needed to fit the container.
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex mb-2"">
+    <div class=""border flex-fill p-2"">Item 1</div>
+    <div class=""border flex-fill p-2"">Item 2</div>
+    <div class=""border flex-fill p-2"">Item with a lot of content</div>
+</div>")" />
+
+<p>
+    This class also has breakpoint variants:
+</p>
+
+<ul>
+    <li><code>flex-sm-fill</code></li>
+    <li><code>flex-md-fill</code></li>
+    <li><code>flex-lg-fill</code></li>
+    <li><code>flex-xl-fill</code></li>
+    <li><code>flex-xxl-fill</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Grow and Shrink</Heading>
+
+<p>
+    The <code>flex-grow</code> property can be controlled with a set of utility classes.
+</p>
+
+<ul>
+    <li><code>flex-grow-0</code></li>
+    <li><code>flex-grow-1</code></li>
+    <li><code>flex-grow-2</code></li>
+    <li><code>flex-grow-3</code></li>
+    <li><code>flex-grow-4</code></li>
+    <li><code>flex-grow-5</code></li>
+</ul>
+
+<p>
+    Zero prevent the item from growing. THe values 1&ndash;5 indicate the proportion of the
+    container the item should take up, relative to other children that can grow. For exmaple:
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex mb-2"">
+    <div class=""border flex-grow-1 p-2"">Item 1</div>
+    <div class=""border flex-grow-2 p-2"">Item 2</div>
+    <div class=""border flex-grow-1 p-2"">Item 3</div>
+</div>")" />
+
+<p>
+    Each one also has breakpoint variants:
+</p>
+
+<ul>
+    <li><code>flex-sm-grow-1</code></li>
+    <li><code>flex-md-grow-1</code></li>
+    <li><code>flex-lg-grow-1</code></li>
+    <li><code>flex-xl-grow-1</code></li>
+    <li><code>flex-xxl-grow-1</code></li>
+</ul>
+
+<p>
+    The <code>flex-shrink</code> property can also be set with either <code>flex-shrink-0</code> or
+    <code>flex-shrink-1</code>, or breakpoint variants.
+</p>
+
+<Heading Level="HeadingLevel.H2">Wrap</Heading>
+
+<p>
+    Control whether children wrap with the <code>flex-wrap</code>, <code>flex-wrap-reverse</code>,
+    and <code>flex-nowrap</code> utility classes. These each have breakpoint variants.
+</p>
+
+<ul>
+    <li><code>flex-sm-wrap</code></li>
+    <li><code>flex-md-wrap</code></li>
+    <li><code>flex-lg-wrap</code></li>
+    <li><code>flex-xl-wrap</code></li>
+    <li><code>flex-xxl-wrap</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Order</Heading>
+
+<p>
+    The <code>order</code> property controls the layout order of a child, and can be set with utility classes in the format <code>order-{number}</code>, where {number} is either "<span class="font-monospace">first</span>," "<span class="font-monospace">last</span>," or a number from 0&ndash;10.
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex mb-2"">
+    <div class=""border p-2"">Item 1</div>
+    <div class=""border order-first p-2"">Item 2</div>
+    <div class=""border p-2"">Item 3</div>
+</div>")" />
+
+<p>
+    The <code>order-first</code> class sets an order of -1, while the <code>order-last</code> class
+    sets an order of 999.
+</p>
+
+<p>
+    Each one also has breakpoint variants:
+</p>
+
+<ul>
+    <li><code>order-sm-1</code></li>
+    <li><code>order-md-1</code></li>
+    <li><code>order-lg-1</code></li>
+    <li><code>order-xl-1</code></li>
+    <li><code>order-xxl-1</code></li>
+</ul>
