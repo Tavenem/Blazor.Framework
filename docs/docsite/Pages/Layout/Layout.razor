@@ -12,36 +12,55 @@
     like this:
 </p>
 <div class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(_example1)
+    @CodeFormatter.CodeToMarkup(@"<FrameworkLayout>
+    @Body
+</FrameworkLayout>")
 </div>
 
 <p>
     A more complete example, however, will look something like this:
 </p>
 <div class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(_example2)
+    @CodeFormatter.CodeToMarkup(@"<FrameworkLayout ThemeColor=""ThemeColor.Primary"">
+    <FrameworkContent>
+        <AppBar Side=""VerticalSide.Top"" ControlsDrawerSide=""Side.Left"">
+            <span class=""primary text-close"" style=""font-size:2em;cursor:pointer"" @onclick=""Home"">Main Title</span>
+            <LightDarkToggle class=""ms-auto"" />
+        </AppBar>
+        <Drawer Side=""Side.Left"">
+            <div class=""list"" role=""navigation"">
+                <NavLink href="""" Match=""NavLinkMatch.All""><span class=""icon"">home</span> Home</NavLink>
+                <NavLink href=""./counter""><span class=""icon"">pin</span> Counter</NavLink>
+                <NavLink href=""./fetchdata""><span class=""icon"">leaderboard</span> Fetch data</NavLink>
+            </div>
+        </Drawer>
+    </FrameworkContent>
+    <ChildContent>
+        @Body
+    </ChildContent>
+</FrameworkLayout>")
 </div>
 
 <p>
-    The example above includes an <a href="/components/appbar">AppBar</a> at the
+    The example above includes an <a href="./components/appbar">AppBar</a> at the
     top of the page, including a button which toggles between light and dark
-    modes, a <a href="/components/drawer">Drawer</a> on the left side which can
+    modes, a <a href="./components/drawer">Drawer</a> on the left side which can
     be opened and closed at small screen sizes, and becomes a permanent part of
     the left side of the page at larger sizes, and a dynamic
-    <a href="/components/contents">table of contents</a> which is displayed on the
+    <a href="./components/contents">table of contents</a> which is displayed on the
     right side at large view sizes.
 </p>
 <p>
     Apart from support for top and bottom <code class="primary">AppBars</code>,
     and <code class="primary">Drawers</code> on all four sides,
     the <code class="primary">FrameworkLayout</code> component includes a built-in
-    <a href="/components/scrolltotop">ScrollToTop</a> component for the main document.
+    <a href="./components/scrolltotop">ScrollToTop</a> component for the main document.
     You can override the built-in <code class="primary">ScrollToTop</code> by
     including your own.
 </p>
 <p>
     It also provides the overlays used for temporary <code class="primary">Drawers</code>
-    and <a href="/components/modal">Modals</a>.
+    and <a href="./components/modal">Modals</a>.
 </p>
 
 <Heading Level="HeadingLevel.H2">Theme</Heading>
@@ -56,4 +75,4 @@
     can still have its own <code class="primary">Theme</code> property set directly,
     however, which will override the inherited value.
 </p>
-<p>See <a href="/getting-started/themes">Themes</a> for more information about style and color.</p>
+<p>See <a href="./getting-started/themes">Themes</a> for more information about style and color.</p>

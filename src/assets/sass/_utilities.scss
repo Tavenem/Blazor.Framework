@@ -1,6 +1,9 @@
 ﻿.text-light {
-    --tavenem-wght: 300;
     font-weight: var(--tavenem-font-weight-light);
+}
+
+.text-lighter {
+    font-weight: lighter;
 }
 
 .text-casual {
@@ -17,6 +20,31 @@ kbd kbd.text-close {
     letter-spacing: -.07rem;
 }
 
+.lh-1 {
+    line-height: 1 !important;
+}
+
+.lh-sm {
+    line-height: var(--tavenem-lineheight-small) !important;
+}
+
+.lh-base {
+    line-height: var(--tavenem-lineheight-body) !important;
+
+    &.btn {
+        line-height: var(--tavenem-lineheight-button) !important;
+    }
+}
+h1, h2, h3, h4, h5, h6 {
+    &.lh-base {
+        line-height: var(--tavenem-lineheight-heading) !important;
+    }
+}
+
+.lh-lg {
+    line-height: var(--tavenem-lineheight-large) !important;
+}
+
 .small {
     font-size: var(--tavenem-font-size-sm);
     line-height: var(--tavenem-lineheight-small);
@@ -26,7 +54,7 @@ kbd kbd.text-close {
     background-color: var(--tavenem-color-dark-hover);
     border-radius: var(--tavenem-border-radius);
     color: var(--tavenem-color-dark-text);
-    flex: 1 0 auto;
+    flex: 0 0 auto;
     margin-bottom: 1rem;
     overflow: auto;
     padding: 1rem !important;
@@ -116,44 +144,24 @@ kbd kbd.text-close {
         }
     }
 }
+.ratio-custom {
+    --aspect-ratio: 100%;
+    position: relative;
+    width: 100%;
 
-.bottom {
-    bottom: 0;
-}
-
-.top {
-    top: 0;
-}
-
-.fixed {
-    position: fixed;
-    z-index: 1013;
-}
-
-.sticky {
-    position: sticky;
-    z-index: 1012;
-}
-
-@each $breakpoint, $min-width in $breakpoints {
-    @media (min-width: $min-width) {
-        .fixed-#{$breakpoint} {
-            position: fixed;
-            z-index: 1011;
-        }
-
-        .sticky-#{$breakpoint} {
-            position: sticky;
-            top: 0;
-            z-index: 1010;
-        }
+    &::before {
+        display: block;
+        padding-top: var(--aspect-ratio);
+        content: "";
     }
-}
 
-.full-width {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    width: 100% !important;
+    > * {
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
 }
 
 .visually-hidden,
@@ -190,6 +198,7 @@ kbd kbd.text-close {
     background-color: var(--tavenem-color-divider);
     display: inline-block;
     min-height: 1rem;
+    vertical-align: text-top;
     width: 1px;
 
     .dark {
@@ -325,8 +334,89 @@ kbd kbd.text-close {
     }
 }
 
+@include generate-utility("position", position, $position-values);
+
+.bottom {
+    bottom: 0;
+}
+
+.left {
+    left: 0;
+}
+
+.right {
+    right: 0;
+}
+
+.top {
+    top: 0;
+}
+
+@each $fraction in $position-fractions {
+    .bottom-#{$fraction} {
+        bottom: $fraction;
+    }
+
+    .left-#{$fraction} {
+        left: $fraction;
+    }
+
+    .right-#{$fraction} {
+        right: $fraction;
+    }
+
+    .top-#{$fraction} {
+        top: $fraction;
+    }
+}
+
+.translate-middle {
+    transform: translate(-50%, -50%);
+}
+
+.translate-middle-x {
+    transform: translateX(-50%);
+}
+
+.translate-middle-y {
+    transform: translateY(-50%);
+}
+
+.fixed {
+    position: fixed;
+    z-index: calc(var(--tavenem-zindex-fixed) + 13);
+}
+
+.sticky {
+    position: sticky;
+    z-index: calc(var(--tavenem-zindex-fixed) + 12);
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .fixed-#{$breakpoint} {
+            position: fixed;
+            z-index: calc(var(--tavenem-zindex-fixed) + 11);
+        }
+
+        .sticky-#{$breakpoint} {
+            position: sticky;
+            top: 0;
+            z-index: calc(var(--tavenem-zindex-fixed) + 10);
+        }
+    }
+}
+
+.full-width {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+}
+
 .border {
-    border-color: var(--tavenem-color-border) !important;
+    border-color: var(--tavenem-color-border);
     border-style: solid !important;
     border-width: 1px !important;
 }
@@ -337,7 +427,7 @@ kbd kbd.text-close {
 
 @each $side in $sides {
     .border-#{$side} {
-        border-#{$side}-color: var(--tavenem-color-border) !important;
+        border-#{$side}-color: var(--tavenem-color-border);
         border-#{$side}-style: solid !important;
         border-#{$side}-width: 1px !important;
     }
@@ -347,31 +437,31 @@ kbd kbd.text-close {
     }
 }
 
-@include generate-utility("w", width, $dimension-values);
 @include generate-utility("h", height, $dimension-values);
-
-.mw-100 {
-    max-width: 100% !important;
-}
+@include generate-utility("w", width, $dimension-values);
 
 .mh-100 {
     max-height: 100% !important;
 }
 
-.vw-100 {
-    width: 100vw !important;
+.mw-100 {
+    max-width: 100% !important;
 }
 
 .vh-100 {
     height: 100vh !important;
 }
 
-.min-vw-100 {
-    min-width: 100vw !important;
+.vw-100 {
+    width: 100vw !important;
 }
 
 .min-vh-100 {
     min-height: 100vh !important;
+}
+
+.min-vw-100 {
+    min-width: 100vw !important;
 }
 
 .flex-fill {
@@ -432,6 +522,17 @@ kbd kbd.text-close {
 @include generate-utility("order", order, $order-values);
 
 @include generate-utility("gap", gap, $positive-spacers);
+
+.center-items {
+    align-items: center !important;
+    justify-content: center !important;
+    justify-items: center !important;
+}
+
+.center-self {
+    align-self: center !important;
+    justify-self: center !important;
+}
 
 @include generate-utility("m", margin, $spacers-and-auto);
 @include generate-utility("mb", margin-bottom, $spacers-and-auto);
@@ -515,6 +616,7 @@ kbd kbd.text-close {
 @include generate-utility("overflow", overflow, $overflow-values);
 @include generate-utility("text", text-align, $text-alignments);
 @include generate-utility("text", text-transform, $text-transforms);
+@include generate-utility("align", vertical-align, $vertical-align-values);
 
 .text-wrap {
     white-space: normal !important;
@@ -641,6 +743,60 @@ kbd kbd.text-close {
 @for $i from 1 through 5 {
     .elevation-#{$i} {
         box-shadow: var(--tavenem-shadow-#{$i}) !important;
+    }
+}
+
+.visible {
+    visibility: visible !important;
+}
+
+.invisible {
+    visibility: hidden !important;
+}
+
+ul.bullets {
+    list-style: disc outside none;
+}
+
+ul.bullets ul {
+    list-style-type: circle;
+}
+
+ul, ol {
+    &.inline {
+        padding-left: 0;
+    }
+}
+
+ul, ol, dl {
+    &.inline {
+        display: inline-flex;
+        flex-wrap: wrap;
+        list-style: none;
+        gap: .5rem;
+        margin-bottom: 0;
+
+        ul, ol {
+            padding-left: 0;
+        }
+
+        ul, ol, dl {
+            display: inline-flex;
+            flex-wrap: wrap;
+            list-style: none;
+            gap: .5rem;
+            margin-bottom: 0;
+        }
+
+        dl > dd {
+            margin-bottom: 0;
+        }
+    }
+}
+
+dl.inline {
+    > dd {
+        margin-bottom: 0;
     }
 }
 

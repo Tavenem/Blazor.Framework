@@ -23,7 +23,7 @@
 </ul>
 
 <p>
-    There are also variations of each display class with <a href="/layout/breakpoints">breakpoint
+    There are also variations of each display class with <a href="./layout/breakpoints">breakpoint
     infixes</a> to use them only above certain viewport sizes. For example:
 </p>
 
@@ -53,7 +53,16 @@
     <li><code>d-print-table-row</code></li>
 </ul>
 
-<CodeExample Code="@(@"<div class=""row p-3"">
-    <div class=""d-block"" style=""height:5em;width:5em""></div>
-</div>")" />
+<Heading Level="HeadingLevel.H1">Visibility</Heading>
 
+<p>
+    To control the <code>visibility</code> property without affecting display or layout, use the
+    utility classes <code>visible</code> and <code>invisible</code> (which sets
+    <code>visibility</code> to <code>hidden</code>).
+</p>
+
+<p>
+    You can also control the visibility of elements, while keeping it readable to assistive
+    technology such as screenreaders with the <code>visually-hidden</code> and
+    <code>visually-hidden-focusable</code> classes.
+</p>

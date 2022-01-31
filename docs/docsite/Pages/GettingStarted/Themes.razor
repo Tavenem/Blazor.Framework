@@ -36,7 +36,7 @@
 
 <p>
 	The Tavenem Blazor Framework has built-in support for light and dark mode.
-	See <a href="/components/lightdarktoggle">LightDarkToggle</a> for
+	See <a href="./components/lightdarktoggle">LightDarkToggle</a> for
 	details.
 </p>
 <p>
@@ -46,10 +46,9 @@
 	whether your app is currently in light or dark mode.
 </p>
 <p>
-	For example: <code class="pre-attribute">--tavenem-color-text</code> will
-	evaluate to either <code class="pre-value">var(--tavenem-light-color-text)</code>
-	or <code class="pre-value">var(--tavenem-dark-color-text)</code>, depending
-	on the current mode.
+	For example: <code>--tavenem-color-text</code> will evaluate to either
+	<code>var(--tavenem-light-color-text)</code> or <code>var(--tavenem-dark-color-text)</code>,
+	depending on the current mode.
 </p>
 <p>
 	These properties allow you to customize the look of your app in light and
@@ -77,24 +76,20 @@
 	}
 </div>
 <p>
-	The theme colors are defined with hue, saturation, and lightness values so
-	that lighter, darker, and transparent versions can be generated
-	automatically via derived properties, without requiring separate properties
-	or recompilation of the source.
+	The theme colors are defined with hue, saturation, and lightness values so that lighter, darker,
+	and transparent versions can be generated automatically via derived properties, without
+	requiring separate properties or recompilation of the source.
 </p>
 <p>
-	There are light and dark mode variations of each theme color's hue,
-	saturation, and lightness, as well as the color of text which will show up
-	best against a background of that color.
+	There are light and dark mode variations of each theme color's hue, saturation, and lightness,
+	as well as the color of text which will show up best against a background of that color.
 </p>
 <p>
-	Note that each theme color has two lighter and darker varieties, which can
-	change the lightness value by up to 14%. As a result, you should ensure that
-	the lightness values you select for your theme colors are no less than 14
-	and no greater than 86. Ideally they should be well away from either
-	extreme, since a lightness value too close to 0 will be indistunguishable
-	from black, and a value too close to 100 will be indistinguishable from
-	white.
+	Note that each theme color has two lighter and darker varieties, which can change the lightness
+	value by up to 20%. As a result, you should ensure that the lightness values you select for your
+	theme colors are no less than 20 and no greater than 80. Ideally they should be well away from
+	either extreme, since a lightness value too close to 0 will be indistunguishable from black, and
+	a value too close to 100 will be indistinguishable from white.
 </p>
 
 <Heading Level="HeadingLevel.H2" Id="list">Property List</Heading>
@@ -135,7 +130,7 @@
 	<dd>.75rem<span class="text-muted ms-2">The font size used by <code class="pre-element">sub</code> and <code class="pre-element">sup</code> elements</span></dd>
 
 	<dt>--tavenem-font-size-button</dt>
-	<dd>.875em<span class="text-muted ms-2">The font size used by the <a href="/components/button">Button</a> component</span></dd>
+	<dd>.875em<span class="text-muted ms-2">The font size used by the <a href="./components/button">Button</a> component</span></dd>
 
 	<dt>--tavenem-font-weight-light</dt>
 	<dd>400<span class="text-muted ms-2">The font weight used for some elements, lighter than normal text</span></dd>
@@ -159,10 +154,10 @@
 	<dd>1.2<span class="text-muted ms-2">The line height used for all heading elements (<code class="pre-element">h1</code>, <code class="pre-element">h2</code>, etc.)</span></dd>
 
 	<dt>--tavenem-lineheight-button</dt>
-	<dd>1.75<span class="text-muted ms-2">The line height used by the <a href="/components/button">Button</a> component</span></dd>
+	<dd>1.75<span class="text-muted ms-2">The line height used by the <a href="./components/button">Button</a> component</span></dd>
 
 	<dt>--tavenem-texttransform-button</dt>
-	<dd>uppercase<span class="text-muted ms-2">The text transform applied to the <a href="/components/button">Button</a> component</span></dd>
+	<dd>uppercase<span class="text-muted ms-2">The text transform applied to the <a href="./components/button">Button</a> component</span></dd>
 
 	<dt>--tavenem-dark-color-text</dt>
 	<dd><span class="swatch" style="background-color:#ffffffb2"></span>#ffffffb2<span class="text-muted ms-2">In dark mode, the color used for text and other foreground elements</span></dd>
@@ -180,7 +175,7 @@
 	<dd><span class="swatch" style="background-color:#3b88fc"></span>#3b88fc<span class="text-muted ms-2">In dark mode, the color used for hyperlinks when hovered or focused</span></dd>
 
 	<dt>--tavenem-light-color-text</dt>
-	<dd><span class="swatch" style="background-color:#424242"></span>#424242<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements</span></dd>
+	<dd><span class="swatch" style="background-color:#000000bd"></span>#000000bd<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements</span></dd>
 
 	<dt>--tavenem-light-color-text-secondary</dt>
 	<dd><span class="swatch" style="background-color:#00000089"></span>#00000089<span class="text-muted ms-2">In light mode, the color used for text and other foreground elements with the <code class="pre-class">text-muted</code> utility class applied</span></dd>
@@ -210,7 +205,7 @@
 	<dd><span class="swatch" style="background-color:#ffffff1e"></span>#ffffff1e<span class="text-muted ms-2">In dark mode, the color of <code class="pre-element">hr</code> elements and other dividers</span></dd>
 
 	<dt>--tavenem-dark-color-overlay</dt>
-	<dd><span class="swatch" style="background-color:rgba(255,255,255,0.5)"></span>rgba(255,255,255,0.5)<span class="text-muted ms-2">In dark mode, the background color of the <a href="/components/overlay">Overlay</a> component</span></dd>
+	<dd><span class="swatch" style="background-color:rgba(255,255,255,0.5)"></span>rgba(255,255,255,0.5)<span class="text-muted ms-2">In dark mode, the background color of the <a href="./components/overlay">Overlay</a> component</span></dd>
 
 	<dt>--tavenem-dark-color-action</dt>
 	<dd><span class="swatch" style="background-color:#adadb1"></span>#adadb1<span class="text-muted ms-2">In dark mode, the color of various elements and components which indicate a user action (usually clickable elements)</span></dd>
@@ -360,7 +355,7 @@
 	<dd><span class="swatch" style="background-color:#e0e0e0"></span>#e0e0e0<span class="text-muted ms-2">In light mode, the color of <code class="pre-element">hr</code> elements and other dividers</span></dd>
 
 	<dt>--tavenem-light-color-overlay</dt>
-	<dd><span class="swatch" style="background-color:rgba(33,33,33,0.5)"></span>rgba(33,33,33,0.5)<span class="text-muted ms-2">In light mode, the background color of the <a href="/components/overlay">Overlay</a> component</span></dd>
+	<dd><span class="swatch" style="background-color:rgba(33,33,33,0.5)"></span>rgba(33,33,33,0.5)<span class="text-muted ms-2">In light mode, the background color of the <a href="./components/overlay">Overlay</a> component</span></dd>
 
 	<dt>--tavenem-light-color-action</dt>
 	<dd><span class="swatch" style="background-color:rgba(0,0,0,0.54)"></span>rgba(0,0,0,0.54)<span class="text-muted ms-2">In light mode, the color of various elements and components which indicate a user action (usually clickable elements)</span></dd>
@@ -540,25 +535,25 @@
 	<dd>"/"<span class="text-muted ms-2">The separator used between breadcrumb links</span></dd>
 
 	<dt>--tavenem-zindex-scroll-to-top</dt>
-	<dd>100<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="/components/scrolltotop">ScrollToTop</a> components</span></dd>
+	<dd>100<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="./components/scrolltotop">ScrollToTop</a> components</span></dd>
 
 	<dt>--tavenem-zindex-overlay</dt>
-	<dd>1100<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="/components/overlay">overlays</a></span></dd>
+	<dd>1100<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="./components/overlay">overlays</a></span></dd>
 
 	<dt>--tavenem-zindex-drawer</dt>
-	<dd>1200<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="/components/drawer">Drawer</a> components</span></dd>
+	<dd>1200<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="./components/drawer">Drawer</a> components</span></dd>
 
 	<dt>--tavenem-zindex-appbar</dt>
-	<dd>1300<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="/components/appbar">AppBar</a> components</span></dd>
+	<dd>1300<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="./components/appbar">AppBar</a> components</span></dd>
 
 	<dt>--tavenem-zindex-modal</dt>
-	<dd>1400<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="/components/modal">Modal</a> dialogs</span></dd>
+	<dd>1400<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="./components/modal">Modal</a> dialogs</span></dd>
 
 	<dt>--tavenem-zindex-snackbar</dt>
-	<dd>1500<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of the <a href="/components/snackbar">Snackbar</a> container</span></dd>
+	<dd>1500<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of the <a href="./components/snackbar">Snackbar</a> container</span></dd>
 
 	<dt>--tavenem-zindex-tooltip</dt>
-	<dd>1600<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="/components/tooltip">Tooltips</a></span></dd>
+	<dd>1600<span class="text-muted ms-2">The <code class="pre-attribute">z-index</code> of <a href="./components/tooltip">Tooltips</a></span></dd>
 </dl>
 
 <p>

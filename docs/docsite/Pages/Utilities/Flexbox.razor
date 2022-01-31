@@ -11,7 +11,7 @@
 <Heading Level="HeadingLevel.H2">Basics</Heading>
 
 <p>
-    The <code>d-flex</code> <a href="/utilities/display">display class</a> will make an element a flexbox container. The <code>d-inline-flex</code> class creates an inline flexbox. Responsive variants for each breakpoint also exist:
+    The <code>d-flex</code> <a href="./utilities/display">display class</a> will make an element a flexbox container. The <code>d-inline-flex</code> class creates an inline flexbox. Responsive variants for each breakpoint also exist:
 </p>
 
 <ul>
@@ -33,22 +33,22 @@
     The direction of flow can be controlled with the <code>flex-direction</code> utility classes:
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex flex-column mb-2"">
+<CodeExample Code="@(@"<div class=""d-flex flex-column bg-alt m-2"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex flex-column-reverse mb-2"">
+<div class=""d-flex flex-column-reverse bg-alt m-2"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex flex-row mb-2"">
+<div class=""d-flex flex-row bg-alt m-2"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex flex-row-reverse"">
+<div class=""d-flex flex-row-reverse bg-alt m-2"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
@@ -72,35 +72,37 @@
     The <code>justify-content</code> property can be set with utility classes:
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex justify-content-center mb-2"">
-    <div class=""border p-2"">Item 1</div>
-    <div class=""border p-2"">Item 2</div>
-    <div class=""border p-2"">Item 3</div>
-</div>
-<div class=""d-flex justify-content-end mb-2"">
-    <div class=""border p-2"">Item 1</div>
-    <div class=""border p-2"">Item 2</div>
-    <div class=""border p-2"">Item 3</div>
-</div>
-<div class=""d-flex justify-content-space-around mb-2"">
-    <div class=""border p-2"">Item 1</div>
-    <div class=""border p-2"">Item 2</div>
-    <div class=""border p-2"">Item 3</div>
-</div>
-<div class=""d-flex justify-content-space-between mb-3"">
-    <div class=""border p-2"">Item 1</div>
-    <div class=""border p-2"">Item 2</div>
-    <div class=""border p-2"">Item 3</div>
-</div>
-<div class=""d-flex justify-content-space-evenly mb-3"">
-    <div class=""border p-2"">Item 1</div>
-    <div class=""border p-2"">Item 2</div>
-    <div class=""border p-2"">Item 3</div>
-</div>
-<div class=""d-flex justify-content-start mb-3"">
-    <div class=""border p-2"">Item 1</div>
-    <div class=""border p-2"">Item 2</div>
-    <div class=""border p-2"">Item 3</div>
+<CodeExample Code="@(@"<div class=""w-100"">
+    <div class=""d-flex justify-content-center bg-alt mb-2"">
+        <div class=""border p-2"">Item 1</div>
+        <div class=""border p-2"">Item 2</div>
+        <div class=""border p-2"">Item 3</div>
+    </div>
+    <div class=""d-flex justify-content-end bg-alt mb-2"">
+        <div class=""border p-2"">Item 1</div>
+        <div class=""border p-2"">Item 2</div>
+        <div class=""border p-2"">Item 3</div>
+    </div>
+    <div class=""d-flex justify-content-space-around bg-alt mb-2"">
+        <div class=""border p-2"">Item 1</div>
+        <div class=""border p-2"">Item 2</div>
+        <div class=""border p-2"">Item 3</div>
+    </div>
+    <div class=""d-flex justify-content-space-between bg-alt mb-2"">
+        <div class=""border p-2"">Item 1</div>
+        <div class=""border p-2"">Item 2</div>
+        <div class=""border p-2"">Item 3</div>
+    </div>
+    <div class=""d-flex justify-content-space-evenly bg-alt mb-2"">
+        <div class=""border p-2"">Item 1</div>
+        <div class=""border p-2"">Item 2</div>
+        <div class=""border p-2"">Item 3</div>
+    </div>
+    <div class=""d-flex justify-content-start bg-alt"">
+        <div class=""border p-2"">Item 1</div>
+        <div class=""border p-2"">Item 2</div>
+        <div class=""border p-2"">Item 3</div>
+    </div>
 </div>")" />
 
 <p>
@@ -121,27 +123,27 @@
     The <code>align-items</code> property can be set with utility classes:
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex align-items-baseline mb-2"" style=""height:8em"">
+<CodeExample Code="@(@"<div class=""d-flex align-items-baseline bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex align-items-center mb-2"" style=""height:8em"">
+<div class=""d-flex align-items-center bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex align-items-end mb-2"" style=""height:8em"">
+<div class=""d-flex align-items-end bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex align-items-start mb-3"" style=""height:8em"">
+<div class=""d-flex align-items-start bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex align-items-stretch mb-3"" style=""height:8em"">
+<div class=""d-flex align-items-stretch bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
@@ -163,42 +165,42 @@
     The <code>align-content</code> property can also be set with utility classes:
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex flex-wrap align-content-center mb-2"" style=""height:8em"">
+<CodeExample Code="@(@"<div class=""d-flex flex-wrap align-content-center bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"" style=""width:33%"">Item 1</div>
     <div class=""border p-2"" style=""width:33%"">Item 2</div>
     <div class=""border p-2"" style=""width:33%"">Item 3</div>
     <div class=""border p-2"" style=""width:33%"">Item 4</div>
     <div class=""border p-2"" style=""width:33%"">Item 5</div>
 </div>
-<div class=""d-flex flex-wrap align-content-end mb-2"" style=""height:8em"">
+<div class=""d-flex flex-wrap align-content-end bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"" style=""width:33%"">Item 1</div>
     <div class=""border p-2"" style=""width:33%"">Item 2</div>
     <div class=""border p-2"" style=""width:33%"">Item 3</div>
     <div class=""border p-2"" style=""width:33%"">Item 4</div>
     <div class=""border p-2"" style=""width:33%"">Item 5</div>
 </div>
-<div class=""d-flex flex-wrap align-content-start mb-3"" style=""height:8em"">
+<div class=""d-flex flex-wrap align-content-start bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"" style=""width:33%"">Item 1</div>
     <div class=""border p-2"" style=""width:33%"">Item 2</div>
     <div class=""border p-2"" style=""width:33%"">Item 3</div>
     <div class=""border p-2"" style=""width:33%"">Item 4</div>
     <div class=""border p-2"" style=""width:33%"">Item 5</div>
 </div>
-<div class=""d-flex flex-wrap align-content-space-around mb-3"" style=""height:8em"">
+<div class=""d-flex flex-wrap align-content-space-around bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"" style=""width:33%"">Item 1</div>
     <div class=""border p-2"" style=""width:33%"">Item 2</div>
     <div class=""border p-2"" style=""width:33%"">Item 3</div>
     <div class=""border p-2"" style=""width:33%"">Item 4</div>
     <div class=""border p-2"" style=""width:33%"">Item 5</div>
 </div>
-<div class=""d-flex flex-wrap align-content-space-between mb-3"" style=""height:8em"">
+<div class=""d-flex flex-wrap align-content-space-between bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"" style=""width:33%"">Item 1</div>
     <div class=""border p-2"" style=""width:33%"">Item 2</div>
     <div class=""border p-2"" style=""width:33%"">Item 3</div>
     <div class=""border p-2"" style=""width:33%"">Item 4</div>
     <div class=""border p-2"" style=""width:33%"">Item 5</div>
 </div>
-<div class=""d-flex flex-wrap align-content-stretch mb-3"" style=""height:8em"">
+<div class=""d-flex flex-wrap align-content-stretch bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"" style=""width:33%"">Item 1</div>
     <div class=""border p-2"" style=""width:33%"">Item 2</div>
     <div class=""border p-2"" style=""width:33%"">Item 3</div>
@@ -222,27 +224,27 @@
     The <code>align-self</code> property can also be set on children with utility classes:
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex mb-2"" style=""height:8em"">
+<CodeExample Code="@(@"<div class=""d-flex bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""align-self-baseline border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex mb-2"" style=""height:8em"">
+<div class=""d-flex bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""align-self-center border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex mb-2"" style=""height:8em"">
+<div class=""d-flex bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""align-self-end border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex mb-3"" style=""height:8em"">
+<div class=""d-flex bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""align-self-start border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
 </div>
-<div class=""d-flex align-items-start mb-3"" style=""height:8em"">
+<div class=""d-flex align-items-start bg-alt m-2"" style=""height:8em"">
     <div class=""border p-2"">Item 1</div>
     <div class=""align-self-stretch border p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>
@@ -260,6 +262,19 @@
     <li><code>align-self-xxl-center</code></li>
 </ul>
 
+<Heading Level="HeadingLevel.H2">Centering</Heading>
+
+<p>
+    The <code>center-items</code> class will set both <code>justify-content</code> and
+    <code>align-items</code> to <code>center</code> (it also sets <code>justify-items</code>, for
+    grid layouts).
+</p>
+
+<p>
+    The <code>center-self</code> class will set <code>align-self</code> to <code>center</code> (it
+    also sets <code>justify-self</code>, for grid layouts).
+</p>
+
 <Heading Level="HeadingLevel.H2">Fill</Heading>
 
 <p>
@@ -268,7 +283,7 @@
     of their content, while also growing or shrinking as needed to fit the container.
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex mb-2"">
+<CodeExample Code="@(@"<div class=""d-flex w-100 bg-alt mb-2"">
     <div class=""border flex-fill p-2"">Item 1</div>
     <div class=""border flex-fill p-2"">Item 2</div>
     <div class=""border flex-fill p-2"">Item with a lot of content</div>
@@ -302,11 +317,11 @@
 </ul>
 
 <p>
-    Zero prevent the item from growing. THe values 1&ndash;5 indicate the proportion of the
+    Zero prevent the item from growing. The values 1&ndash;5 indicate the proportion of the
     container the item should take up, relative to other children that can grow. For exmaple:
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex mb-2"">
+<CodeExample Code="@(@"<div class=""d-flex w-100 bg-alt mb-2"">
     <div class=""border flex-grow-1 p-2"">Item 1</div>
     <div class=""border flex-grow-2 p-2"">Item 2</div>
     <div class=""border flex-grow-1 p-2"">Item 3</div>
@@ -350,7 +365,7 @@
     The <code>order</code> property controls the layout order of a child, and can be set with utility classes in the format <code>order-{number}</code>, where {number} is either "<span class="font-monospace">first</span>," "<span class="font-monospace">last</span>," or a number from 0&ndash;10.
 </p>
 
-<CodeExample Code="@(@"<div class=""d-flex mb-2"">
+<CodeExample Code="@(@"<div class=""d-flex bg-alt mb-2"">
     <div class=""border p-2"">Item 1</div>
     <div class=""border order-first p-2"">Item 2</div>
     <div class=""border p-2"">Item 3</div>

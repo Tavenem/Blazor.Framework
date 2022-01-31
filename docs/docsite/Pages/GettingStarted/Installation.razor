@@ -20,10 +20,11 @@
     </pre>
 </div>
 
-<Heading Level="HeadingLevel.H2">3. Add Font link</Heading>
+<Heading Level="HeadingLevel.H2">3. Add Font links</Heading>
 <p>Add the following links to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
 <div class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(_example1, true)
+    @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap"" rel=""stylesheet"">
+<link href=""https://fonts.googleapis.com/icon?family=Material+Icons"" rel=""stylesheet"">", true)
 </div>
 <p>
     You may use a different font if you prefer, but a
@@ -41,16 +42,16 @@
 <p>
     If you prefer to use a different icon library, instead of
     <a href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a>,
-    replace this step with the appropriate process.
+    replace the link above with the appropriate process.
 </p>
 <p>
-    See the <a href="/components/icon">Icon</a> component documentation for details.
+    See the <a href="./components/icon">Icon</a> component documentation for details.
 </p>
 
 <Heading Level="HeadingLevel.H2">4. Add CSS Link</Heading>
 <p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
 <div class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(_example2, true)
+    @CodeFormatter.CodeToMarkup(@"<link href=""_content/Tavenem.Blazor.Framework/framework.css"" rel=""stylesheet"">", true)
 </div>
 <p>
     If you started your project with the default Blazor template, delete the
@@ -58,9 +59,16 @@
     <code>app.css</code> file (you can delete this file completely if you don't
     plan to put your own content there).
 </p>
-<p class="text-muted">
+<p>
     Don't worry about the built-in Blazor styles in the template stylesheet. The
     Tavenem Blazor Framework reproduces and modifies them.
+</p>
+<p>
+    If you ordinarily use <a href="https://getbootstrap.com/">Bootstrap</a>, be aware that the
+    Tavenem Blazor Framework includes most of the same (or similar) utility classes, and most of the
+    same (or similar) components. Consider carefully before keeping references to Bootstrap's CSS in
+    your project, as there are likely to be conflicts leading to difficult-to-diagnose styling
+    issues.
 </p>
 
 <Heading Level="HeadingLevel.H2">5. Register Service with Dependency Injection</Heading>

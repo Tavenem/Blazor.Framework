@@ -15,6 +15,7 @@ interface ITavenem {
 interface HeadingData {
     id: string;
     isActive: boolean;
+    level: number;
     title: string;
 }
 
@@ -48,9 +49,15 @@ export function getHeadings(className: string): HeadingData[] {
                 title = elements[i].textContent;
             }
             if (title) {
+                let level = 0;
+                if (elements[i].tagName.startsWith('H')
+                    && elements[i].tagName.length === 2) {
+                    level = Number.parseInt(elements[i].tagName[1]);
+                }
                 ids.push({
                     id: elements[i].id,
                     isActive: elements[i].classList.contains("scroll-active"),
+                    level,
                     title,
                 });
             }

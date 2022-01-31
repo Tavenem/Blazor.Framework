@@ -1,0 +1,23 @@
+﻿@page "/utilities/shadows"
+
+<PageTitle>Shadows - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Shadows</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides utility classes to set five levels of box shadow (a.k.a
+    elevation):
+</p>
+
+<CodeExample Code="@(@"<div class=""row p-3 gap-6"">
+    <div class=""elevation-1"" style=""height:5em;width:5em""></div>
+    <div class=""elevation-2"" style=""height:5em;width:5em""></div>
+    <div class=""elevation-3"" style=""height:5em;width:5em""></div>
+    <div class=""elevation-4"" style=""height:5em;width:5em""></div>
+    <div class=""elevation-5"" style=""height:5em;width:5em""></div>
+</div>")" />
+
+<p>
+    You can also use <code>elevation-0</code> to remove the box shadow from an element which would
+    normally have one (including any shadow added on hover/focus/active).
+</p>

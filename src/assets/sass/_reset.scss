@@ -10,7 +10,7 @@
 
 * {
     border-color: inherit;
-    font-variation-settings: "MONO" var(--tavenem-mono), "CASL" var(--tavenem-casl), "wght" var(--tavenem-wght), "slnt" var(--tavenem-slnt);
+    font-variation-settings: "MONO" var(--tavenem-mono), "CASL" var(--tavenem-casl);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -55,7 +55,6 @@ h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
 }
 h1 {
-    --tavenem-wght: var(--tavenem-font-weight-semibold);
     font-size: var(--tavenem-font-size-h1);
     font-weight: var(--tavenem-font-weight-semibold);
 
@@ -64,7 +63,6 @@ h1 {
     }
 }
 h2 {
-    --tavenem-wght: var(--tavenem-font-weight-semibold);
     font-size: var(--tavenem-font-size-h2);
     font-weight: var(--tavenem-font-weight-semibold);
 
@@ -73,7 +71,6 @@ h2 {
     }
 }
 h3 {
-    --tavenem-wght: var(--tavenem-font-weight-medium-bold);
     font-size: var(--tavenem-font-size-h3);
     font-weight: var(--tavenem-font-weight-medium-bold);
 
@@ -82,7 +79,6 @@ h3 {
     }
 }
 h4 {
-    --tavenem-wght: var(--tavenem-font-weight-medium-bold);
     font-size: var(--tavenem-font-size-h4);
     font-weight: var(--tavenem-font-weight-medium-bold);
 
@@ -91,12 +87,10 @@ h4 {
     }
 }
 h5 {
-    --tavenem-wght: var(--tavenem-font-weight-bold);
     font-size: var(--tavenem-font-size-h5);
     font-weight: var(--tavenem-font-weight-bold);
 }
 h6 {
-    --tavenem-wght: var(--tavenem-font-weight-bold);
     font-size: var(--tavenem-font-size-h6);
     font-weight: var(--tavenem-font-weight-bold);
 }
@@ -148,17 +142,8 @@ blockquote {
     margin: 0 0 1rem;
 }
 
-i, em {
-    --tavenem-slnt: -15;
-}
-
 b, strong {
-    --tavenem-wght: 700;
     font-weight: bolder;
-
-    b, strong {
-        --tavenem-wght: 900;
-    }
 }
 
 small {
@@ -242,7 +227,6 @@ code {
 }
 
 kbd {
-    --tavenem-wght: var(--tavenem-font-weight-light);
     background-color: var(--tavenem-color-keyboard-bg);
     border-radius: var(--tavenem-border-radius);
     color: var(--tavenem-color-keyboard);
@@ -264,7 +248,6 @@ kbd {
     }
 
     kbd {
-        --tavenem-wght: var(--tavenem-font-weight-medium-bold);
         font-size: 1rem;
         font-weight: var(--tavenem-font-weight-medium-bold);
         line-height: var(--tavenem-lineheight-body);
@@ -293,7 +276,6 @@ table {
 }
 
 caption {
-    --tavenem-wght: var(--tavenem-font-weight-light);
     color: var(--tavenem-color-text-secondary);
     font-size: var(--tavenem-font-size-sm);
     font-weight: var(--tavenem-font-weight-light);
@@ -376,7 +358,6 @@ button, select {
 }
 
 input {
-    --tavenem-wght: var(--tavenem-font-weight);
     appearance: none;
     background-clip: padding-box;
     background-color: var(--tavenem-color-bg-input);

@@ -1,0 +1,135 @@
+﻿@page "/utilities/position"
+
+<PageTitle>Position - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Position</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to control the
+    position of elements.
+</p>
+
+<Heading Level="HeadingLevel.H2">Position</Heading>
+
+<p>
+    The <code>position</code> property itself can be set:
+</p>
+
+<ul>
+    <li><code>position-absolute</code></li>
+    <li><code>position-fixed</code></li>
+    <li><code>position-relative</code></li>
+    <li><code>position-static</code></li>
+    <li><code>position-sticky</code></li>
+</ul>
+
+<p>
+    There are also variations of each position class with <a href="./layout/breakpoints">breakpoint
+    infixes</a> to use them only above certain viewport sizes. For example:
+</p>
+
+<ul>
+    <li><code>position-sm-absolute</code></li>
+    <li><code>position-md-absolute</code></li>
+    <li><code>position-lg-absolute</code></li>
+    <li><code>position-xl-absolute</code></li>
+    <li><code>position-xxl-absolute</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Side</Heading>
+
+<p>
+    The placement of an element relative to a side can be controlled with a set of classes for each
+    side, in the format <code>{side}-{fraction}</code>, where {side} is one of:
+</p>
+
+<ul>
+    <li><code>bottom</code></li>
+    <li><code>left</code></li>
+    <li><code>right</code></li>
+    <li><code>top</code></li>
+</ul>
+
+<p>
+    And <code>fraction</code> is one of:
+</p>
+
+<ul>
+    <li><code>0</code></li>
+    <li><code>50</code> <small class="text-muted">(50%)</small></li>
+    <li><code>100</code> <small class="text-muted">(100%)</small></li>
+</ul>
+
+<p>
+    The sides can also be used as classes on their own (e.g. <code>top</code>), which is equivalent to using
+    <code>{side}-0</code>.
+</p>
+
+<Heading Level="HeadingLevel.H2">Translate</Heading>
+
+<p>
+    Elements are usually most easily centered using <code>grid</code> or <code>flex</code> layouts,
+    but when those are not possible, you can also use the translation utility classes
+    <code>translate-middle</code> (applies <code>translate(-50%, -50%)</code>),
+    <code>translate-middle-x</code> (applies <code>translateX(-50%)</code>), and
+    <code>translate-middle-y</code> (applies <code>translateY(-50%)</code>).
+</p>
+
+<Heading Level="HeadingLevel.H2">Fixed and Sticky</Heading>
+
+<p>
+    The <code>fixed</code> class both sets <code>position</code> to <code>fixed</code>, and also
+    sets <code>z-index</code> to a high value, which places it above most content.
+</p>
+
+<p>
+    The <code>sticky</code> class both sets <code>position</code> to <code>sticky</code>, and also
+    sets <code>z-index</code> to a high value, which places it above most content (but below fixed
+    elements).
+</p>
+
+<p>
+    Combine either with a placement class like <code>top</code> to also position the element in your
+    layout.
+</p>
+
+<p>
+    There are breakpoint variations of both these classes. For example:
+</p>
+
+<ul>
+    <li><code>fixed-sm</code></li>
+    <li><code>fixed-md</code></li>
+    <li><code>fixed-lg</code></li>
+    <li><code>fixed-xl</code></li>
+    <li><code>fixed-xxl</code></li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Vertical align</Heading>
+
+<p>
+    Set the vertical alignment of elements with a utility class:
+</p>
+
+<ul>
+    <li><code>align-baseline</code></li>
+    <li><code>align-bottom</code></li>
+    <li><code>align-middle</code></li>
+    <li><code>align-text-bottom</code></li>
+    <li><code>align-text-top</code></li>
+    <li><code>align-top</code></li>
+</ul>
+
+<p>
+    There are also variations of each vertical alignment class with <a
+    href="./layout/breakpoints">breakpoint infixes</a> to use them only above certain viewport sizes.
+    For example:
+</p>
+
+<ul>
+    <li><code>align-sm-baseline</code></li>
+    <li><code>align-md-baseline</code></li>
+    <li><code>align-lg-baseline</code></li>
+    <li><code>align-xl-baseline</code></li>
+    <li><code>align-xxl-baseline</code></li>
+</ul>

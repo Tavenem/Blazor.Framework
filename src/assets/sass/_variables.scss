@@ -19,13 +19,14 @@
     --tavenem-lineheight-heading: 1.2;
     --tavenem-lineheight-button: 1.75;
     --tavenem-lineheight-small: 1.2;
+    --tavenem-lineheight-large: 2;
     --tavenem-texttransform-button: uppercase;
     --tavenem-dark-color-text: #ffffffb2;
     --tavenem-dark-color-text-secondary: #ffffff7f;
     --tavenem-dark-color-text-disabled: #ffffff33;
     --tavenem-dark-color-link: #6da7fd;
     --tavenem-dark-color-link-hover: #3b88fc;
-    --tavenem-light-color-text: #424242;
+    --tavenem-light-color-text: #000000bd;
     --tavenem-light-color-text-secondary: #00000089;
     --tavenem-light-color-text-disabled: #00000060;
     --tavenem-light-color-link: #0250c5;
@@ -206,6 +207,7 @@
     --tavenem-border-radius: 4px;
     --tavenem-breadcrumb-divider: "/";
     --tavenem-zindex-scroll-to-top: 100;
+    --tavenem-zindex-fixed: 1000;
     --tavenem-zindex-overlay: 1100;
     --tavenem-zindex-drawer: 1200;
     --tavenem-zindex-appbar: 1300;
@@ -214,8 +216,6 @@
     --tavenem-zindex-tooltip: 1600;
     --tavenem-mono: 0;
     --tavenem-casl: 0;
-    --tavenem-slnt: 0;
-    --tavenem-wght: var(--tavenem-font-weight);
 }
 
 [data-theme="dark"] {
@@ -278,77 +278,6 @@
     --tavenem-color-warning-text: var(--tavenem-dark-color-warning-text);
 }
 
-$breakpoints: (
-    sm: 576px,
-    md: 768px,
-    lg: 992px,
-    xl: 1200px,
-    xxl: 1400px
-);
-$breakpoint-maxs: (
-    sm: 575px,
-    md: 767px,
-    lg: 991px,
-    xl: 1199px,
-    xxl: 1399px
-);
-
-$theme-colors: (
-    primary,
-    secondary,
-    tertiary,
-    danger,
-    dark,
-    default,
-    info,
-    success,
-    warning
-);
-
-$ratios: (
-    1x1: 100%,
-    4x3: 75%,
-    16x9: 56.25%,
-    21x9: calc(9 / 21 * 100%)
-);
-
-$sides: (
-    bottom,
-    left,
-    right,
-    top
-);
-
-$display-values: (
-    block,
-    flex,
-    grid,
-    inline,
-    inline-block,
-    inline-flex,
-    none,
-    table,
-    table-cell,
-    table-row,
-);
-
-$dimension-values: (
-    25: 25%,
-    33: 33%,
-    50: 50%,
-    67: 67%,
-    75: 75%,
-    100: 100%,
-    auto: auto
-);
-
-$flex-directions: (
-    column,
-    column-reverse,
-    row,
-    row-reverse
-);
-
 $align-content-values: (
     center,
     end,
@@ -364,6 +293,51 @@ $align-items-values: (
     end,
     start,
     stretch
+);
+
+$breakpoints: (
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px
+);
+$breakpoint-maxs: (
+    sm: 575px,
+    md: 767px,
+    lg: 991px,
+    xl: 1199px,
+    xxl: 1399px
+);
+
+$dimension-values: (
+    25: 25%,
+    33: 33%,
+    50: 50%,
+    67: 67%,
+    75: 75%,
+    100: 100%,
+    auto: auto
+);
+
+$display-values: (
+    block,
+    flex,
+    grid,
+    inline,
+    inline-block,
+    inline-flex,
+    none,
+    table,
+    table-cell,
+    table-row,
+);
+
+$flex-directions: (
+    column,
+    column-reverse,
+    row,
+    row-reverse
 );
 
 $flex-wrap-values: (
@@ -404,6 +378,20 @@ $overflow-values: (
     visible
 );
 
+$position-values: (
+    absolute,
+    fixed,
+    relative,
+    static,
+    sticky
+);
+
+$position-fractions: (
+    0,
+    50,
+    100
+);
+
 $positive-spacers: (
     0: 0,
     1: .25rem,
@@ -413,6 +401,33 @@ $positive-spacers: (
     5: 3rem,
     6: 4rem
 );
+
+$theme-colors: (
+    primary,
+    secondary,
+    tertiary,
+    danger,
+    dark,
+    default,
+    info,
+    success,
+    warning
+);
+
+$ratios: (
+    1x1: 100%,
+    4x3: 75%,
+    16x9: 56.25%,
+    21x9: calc(9 / 21 * 100%)
+);
+
+$sides: (
+    bottom,
+    left,
+    right,
+    top
+);
+
 $spacers: map-merge($positive-spacers, (
     n1: -.25rem,
     n2: -0.5rem,
@@ -435,4 +450,13 @@ $text-transforms: (
     capitalize,
     lowercase,
     uppercase
+);
+
+$vertical-align-values: (
+    baseline,
+    bottom,
+    middle,
+    text-bottom,
+    text-top,
+    top
 );

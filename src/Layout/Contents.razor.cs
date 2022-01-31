@@ -65,6 +65,13 @@ public partial class Contents : IDisposable
 
     [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
 
+    private int LowestLevel => (int)(_headings
+        .Where(x => x.Level != HeadingLevel.None)
+        .MinBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
+
+    private int HighestLevel => (int)(_headings
+        .MaxBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
+
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
     /// initial parameters from its parent in the render tree.
@@ -117,5 +124,23 @@ public partial class Contents : IDisposable
             heading.IsActive = heading.Id == id;
         }
         StateHasChanged();
+    }
+
+    private string? HeadingStyle(HeadingData heading)
+    {
+        if (LowestLevel == 0)
+        {
+            return null;
+        }
+
+        var offset = heading.Level == HeadingLevel.None
+            ? HighestLevel + 1
+            : (int)heading.Level - LowestLevel;
+        if (offset == 0)
+        {
+            return null;
+        }
+
+        return $"padding-inline-start:{offset * 0.5}rem";
     }
 }

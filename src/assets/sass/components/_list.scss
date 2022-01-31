@@ -21,6 +21,7 @@
         color: inherit;
         column-gap: .5rem;
         display: flex;
+        flex: 0 0 auto;
         justify-content: flex-start;
         list-style: none;
         padding: .75rem 1rem;
@@ -44,11 +45,6 @@
         > .avatar {
             flex-shrink: 0;
             margin: -.25rem;
-        }
-
-        > *:not(ul, .list, .collapse, .icon, .avatar) {
-            flex: 1 1 auto;
-            min-width: 0;
         }
 
         &:disabled, &.disabled {

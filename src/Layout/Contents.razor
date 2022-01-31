@@ -13,6 +13,6 @@
     }
     @foreach (var heading in _headings)
     {
-        <AnchorLink href="@($"#{heading.Id}")" Class="@(heading.IsActive ? "active" : null)">@heading.Title</AnchorLink>
+        <AnchorLink href="@($"#{heading.Id}")" Class="@(heading.IsActive ? "active" : null)"><span style="@HeadingStyle(heading)">@heading.Title</span></AnchorLink>
     }
 </nav>
