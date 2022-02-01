@@ -1,0 +1,72 @@
+﻿@page "/components/appbar"
+
+<PageTitle>AppBar - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">AppBar</Heading>
+
+<p>
+    The <code>AppBar</code> component is a toolbar docked to the top or bottom of a
+    container&mdash;usually the entire page.
+</p>
+
+<p>
+    The place you'll use an <code>AppBar</code> most often is in the <code>FrameworkLayout</code>
+    component's <code>FrameworkContent</code> area, to set the top or bottom (or both) content for
+    your app.
+</p>
+
+<p>
+    An <code>AppBar</code> can be placed inside any container, however, to add a docked toolbar to
+    sub-areas of your layout.
+</p>
+
+<Heading Level="HeadingLevel.H2">Placement</Heading>
+
+<p>
+    Set the <code>Side</code> property to either <code>Side.Bottom</code> or <code>Side.Top</code>
+    to dock an <code>AppBar</code>. This sets the <code>grid-area</code> property to either
+    <code>header</code> or <code>footer</code>, respectively. These area are already set up in the
+    <code>FrameworkLayout</code> component, but you will need to set them up yourself in other
+    containers.
+</p>
+
+<p>
+    If your container doesn't use grid layout, you may use one or more of the <a
+    href="./utilities/position">positioning utilities</a> to dock the <code>AppBar</code>, or use
+    your own CSS styles.
+</p>
+
+<Heading Level="HeadingLevel.H2">Content</Heading>
+
+<p>
+    An <code>AppBar</code> contains a single <a href="./components/toolbar">Toolbar</a> component,
+    whose class can be customized with the <code>ToolbarClass</code> property.
+</p>
+
+<Heading Level="HeadingLevel.H2">Drawer control</Heading>
+
+<p>
+    If an <code>AppBar</code> is container within a <a
+    href="./components/drawer">DrawerContainer</a> component (including a
+    <code>FrameworkLayout</code>, which inherits from <code>DrawerContainer</code>), you can set the
+    <code>ControlsDrawerSide</code> property to one of the following values to indicate which drawer
+    the appbar controls:
+</p>
+
+<ul>
+    <li><code>Side.Bottom</code></li>
+    <li><code>Side.Left</code></li>
+    <li><code>Side.Right</code></li>
+    <li><code>Side.Top</code></li>
+</ul>
+
+<p>
+    If you do so, the <code>AppBar</code> with automatically include a toggle button which controls
+    the visibility of the drawer.
+</p>
+
+<p>
+    You can also set the <code>Breakpoint</code> propety to any of the <code>Breakpoint</code>
+    values to indicate the breakpoint at which the drawer should be permanently visible (and the
+    toggle button will be hidden).
+</p>

@@ -61,6 +61,10 @@ public partial class DrawerContainer
         HasOpenDrawer = false;
     }
 
-    private void OnDrawerToggled(object? drawer, bool state) => HasOpenDrawer = state
-        || !_drawers.Any(x => x.IsOpen);
+    private void OnDrawerToggled(object? drawer, bool state)
+    {
+        HasOpenDrawer = state
+          || _drawers.Any(x => x.IsOpen);
+        StateHasChanged();
+    }
 }

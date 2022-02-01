@@ -17,6 +17,16 @@ public partial class Accordion
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Set to <see langword="true"/> to prevent opening or closing any child collapses by the user.
+    /// </para>
+    /// <para>
+    /// Note that open state can still be set programmatically.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.

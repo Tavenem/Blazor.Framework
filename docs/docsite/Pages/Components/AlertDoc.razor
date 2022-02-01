@@ -1,0 +1,223 @@
+﻿@page "/components/alert"
+
+<PageTitle>Alert - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Alert</Heading>
+
+<p>
+    An alert shows a message in a highly visible box.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    There is an alert for each of the <a href="./getting-started/themes">color themes</a>:
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert>Unthemed</Alert>
+        <Alert ThemeColor="ThemeColor.Primary">Primary</Alert>
+        <Alert ThemeColor="ThemeColor.Secondary">Secondary</Alert>
+        <Alert ThemeColor="ThemeColor.Tertiary">Tertiary</Alert>
+        <Alert ThemeColor="ThemeColor.Danger">Danger</Alert>
+        <Alert ThemeColor="ThemeColor.Dark">Dark</Alert>
+        <Alert ThemeColor="ThemeColor.Default">Default</Alert>
+        <Alert ThemeColor="ThemeColor.Info">Info</Alert>
+        <Alert ThemeColor="ThemeColor.Success">Success</Alert>
+        <Alert ThemeColor="ThemeColor.Warning">Warning</Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert>Unthemed</Alert>
+<Alert ThemeColor=""ThemeColor.Primary"">Primary</Alert>
+<Alert ThemeColor=""ThemeColor.Secondary"">Secondary</Alert>
+<Alert ThemeColor=""ThemeColor.Tertiary"">Tertiary</Alert>
+<Alert ThemeColor=""ThemeColor.Danger"">Danger</Alert>
+<Alert ThemeColor=""ThemeColor.Dark"">Dark</Alert>
+<Alert ThemeColor=""ThemeColor.Default"">Default</Alert>
+<Alert ThemeColor=""ThemeColor.Info"">Info</Alert>
+<Alert ThemeColor=""ThemeColor.Success"">Success</Alert>
+<Alert ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Variants</Heading>
+
+<p>
+    To minimize padding, use the <code>dense</code> class:
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert Class="dense">Unthemed</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Primary">Primary</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Secondary">Secondary</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Tertiary">Tertiary</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Danger">Danger</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Dark">Dark</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Default">Default</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Info">Info</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Success">Success</Alert>
+        <Alert Class="dense" ThemeColor="ThemeColor.Warning">Warning</Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert Class=""dense"">Unthemed</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Primary"">Primary</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Secondary"">Secondary</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Tertiary"">Tertiary</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Danger"">Danger</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Dark"">Dark</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Default"">Default</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Info"">Info</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Success"">Success</Alert>
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+    </ChildContent>
+</Collapse>
+
+<p>
+    There are <code>outlined</code> and <code>filled</code> variants for each theme. Be cautious
+    about their use, however, as they may easily be mistaken for buttons, depending on content and
+    placement.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert Class="outlined">Unthemed</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Primary">Primary</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Secondary">Secondary</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Tertiary">Tertiary</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Danger">Danger</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Dark">Dark</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Default">Default</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Info">Info</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Success">Success</Alert>
+        <Alert Class="outlined" ThemeColor="ThemeColor.Warning">Warning</Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert Class=""outlined"">Unthemed</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Primary"">Primary</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Secondary"">Secondary</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Tertiary"">Tertiary</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Danger"">Danger</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Dark"">Dark</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Default"">Default</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Info"">Info</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Success"">Success</Alert>
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+    </ChildContent>
+</Collapse>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert Class="filled">Unthemed</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Primary">Primary</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Secondary">Secondary</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Tertiary">Tertiary</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Danger">Danger</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Dark">Dark</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Default">Default</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Info">Info</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Success">Success</Alert>
+        <Alert Class="filled" ThemeColor="ThemeColor.Warning">Warning</Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert Class=""filled"">Unthemed</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Primary"">Primary</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Secondary"">Secondary</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Tertiary"">Tertiary</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Danger"">Danger</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Dark"">Dark</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Default"">Default</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Info"">Info</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Success"">Success</Alert>
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Icon</Heading>
+
+<p>
+    The icon of an alert is set automatically based on the theme, but you can override this by
+    setting the <code>AutoIcon</code> property to <code>false</code>.
+</p>
+
+<p>
+    You can also include your own custom icon, in any position you wish:
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert AutoIcon="false">Icon after the text <span class="icon">lightbulb</span></Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert AutoIcon=""false"">Icon after the text <span class=""icon"">lightbulb</span></Alert>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Closing</Heading>
+
+<p>
+    If you add an event callback to the <code>OnClosed</code> property, or an event handler to the
+    <code>Closed</code> event (or both), the alert will automatically get a close button which will
+    invoke both handlers.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        @if (_show)
+        {
+            <Alert OnClosed="@(_ => _show = false)">Dismissable</Alert>
+        }
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert OnClosed=""@(_ => _show = false)"">Dismissable</Alert>", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private bool</span> _show <span class="pre-operator">=</span> <span class="pre-element">true</span><span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also set the <code>AutoClose</code> property to <code>true</code> to show the close
+    button, which will simply set the <code>display</code> property to <code>none</code> when
+    pressed.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert AutoClose="true">Dismissable</Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert AutoClose=""true"">Dismissable</Alert>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Clicking</Heading>
+
+<p>
+    If you add an event callback to the <code>OnClick</code> property, the alert will show a pointer
+    cursor and respond to click events, which will invoke the <code>OnClick</code> callback.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <Alert ThemeColor="_theme" OnClick="@(_ => _theme = ThemeColor.Primary)">Click me</Alert>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Alert ThemeColor=""_theme"" OnClick=""@(_ => _theme = ThemeColor.Primary)"">Click me</Alert>", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-enum">ThemeColor</span> _theme <span class="pre-operator">=</span> <span class="pre-enum">ThemeColor</span><span class="pre-operator">.</span>None<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+@code {
+    private bool _show = true;
+    private ThemeColor _theme = ThemeColor.None;
+}

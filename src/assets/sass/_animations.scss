@@ -45,9 +45,6 @@
         max-width: 15em;
         transform: translateX(-99%);
     }
-    to {
-        max-width: 15em;
-    }
 }
 
 @keyframes tf-slide-out-left {
@@ -57,10 +54,6 @@
     99% {
         max-width: 15em;
         transform: translateX(-99%);
-    }
-    to {
-        max-width: 0;
-        transform: translateX(-100%);
     }
 }
 
@@ -73,9 +66,6 @@
         max-width: 15em;
         transform: translateX(99%);
     }
-    to {
-        max-width: 15em;
-    }
 }
 
 @keyframes tf-slide-out-right {
@@ -85,10 +75,6 @@
     99% {
         max-width: 15em;
         transform: translateX(99%);
-    }
-    to {
-        max-width: 0;
-        transform: translateX(100%);
     }
 }
 
@@ -101,9 +87,6 @@
         max-height: 20em;
         transform: translateY(99%);
     }
-    to {
-        max-height: 20em;
-    }
 }
 
 @keyframes tf-slide-out-bottom {
@@ -113,10 +96,6 @@
     99% {
         max-height: 20em;
         transform: translateY(99%);
-    }
-    to {
-        max-height: 0;
-        transform: translateY(100%);
     }
 }
 
@@ -129,9 +108,6 @@
         max-height: 20em;
         transform: translateY(-99%);
     }
-    to {
-        max-height: 20em;
-    }
 }
 
 @keyframes tf-slide-out-top {
@@ -141,9 +117,5 @@
     99% {
         max-height: 20em;
         transform: translateY(-99%);
-    }
-    to {
-        max-height: 0;
-        transform: translateY(-100%);
     }
 }

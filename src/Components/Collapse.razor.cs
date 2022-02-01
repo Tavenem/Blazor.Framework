@@ -13,9 +13,36 @@ public partial class Collapse : IDisposable
     private bool _disposedValue;
 
     /// <summary>
+    /// Any CSS class(es) to be applies to the collapse body (the part that is hidden when
+    /// collapsed).
+    /// </summary>
+    [Parameter] public string? BodyClass { get; set; }
+
+    /// <summary>
     /// The child content of this component.
     /// </summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Set to <see langword="true"/> to prevent opening or closing by the user.
+    /// </para>
+    /// <para>
+    /// Note that open state can still be set programmatically.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Any CSS class(es) to be applies to the collapse footer (the part that is not hidden when
+    /// collapsed).
+    /// </summary>
+    [Parameter] public string? FooterClass { get; set; }
+
+    /// <summary>
+    /// The footer content of this component.
+    /// </summary>
+    [Parameter] public RenderFragment? FooterContent { get; set; }
 
     private bool _isOpen;
     /// <summary>
@@ -64,14 +91,29 @@ public partial class Collapse : IDisposable
     [CascadingParameter] protected Accordion? Accordion { get; set; }
 
     /// <summary>
+    /// The final value assigned to the body's class attribute.
+    /// </summary>
+    protected string BodyCssClass => new CssBuilder("body")
+        .Add(BodyClass)
+        .ToString();
+
+    /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected string CssClass => new CssBuilder("collapse")
-        .Add("closed", !IsOpen)
+        .Add("closed", !_isOpen)
+        .Add("disabled", Disabled || Accordion?.Disabled == true)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
+        .ToString();
+
+    /// <summary>
+    /// The final value assigned to the footer's class attribute.
+    /// </summary>
+    protected string FooterCssClass => new CssBuilder("footer")
+        .Add(FooterClass)
         .ToString();
 
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
@@ -194,6 +236,14 @@ public partial class Collapse : IDisposable
         if (open)
         {
             await SetOpenAsync(true);
+        }
+    }
+
+    private async Task OnToggleAsync()
+    {
+        if (!Disabled && Accordion?.Disabled != true)
+        {
+            await SetOpenAsync(!_isOpen);
         }
     }
 }

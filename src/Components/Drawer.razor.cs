@@ -186,6 +186,8 @@ public partial class Drawer : IDisposable
             IsClosed = true;
             await OnClosed.InvokeAsync(this);
             await IsOpenChanged.InvokeAsync(IsOpen);
+            DrawerToggled?.Invoke(this, IsOpen);
+            StateHasChanged();
         }
     }
 
@@ -200,6 +202,7 @@ public partial class Drawer : IDisposable
             IsClosed = true;
             await OnClosed.InvokeAsync(this);
             await IsOpenChanged.InvokeAsync(IsOpen);
+            DrawerToggled?.Invoke(this, IsOpen);
             StateHasChanged();
         }
         else
@@ -207,6 +210,7 @@ public partial class Drawer : IDisposable
             IsOpen = true;
             IsClosed = false;
             await IsOpenChanged.InvokeAsync(IsOpen);
+            DrawerToggled?.Invoke(this, IsOpen);
             StateHasChanged();
         }
     }
@@ -255,17 +259,19 @@ public partial class Drawer : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private Task OnClosedAsync()
+    private async Task OnClosedAsync()
     {
         if (OnClosed.HasDelegate)
         {
-            return OnClosed.InvokeAsync(this);
+            await OnClosed.InvokeAsync(this);
+            DrawerToggled?.Invoke(this, IsOpen);
         }
         else
         {
             IsOpen = false;
             IsClosed = true;
-            return IsOpenChanged.InvokeAsync(IsOpen);
+            await IsOpenChanged.InvokeAsync(IsOpen);
+            DrawerToggled?.Invoke(this, IsOpen);
         }
     }
 

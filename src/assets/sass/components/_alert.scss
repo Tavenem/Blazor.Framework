@@ -1,12 +1,14 @@
 ﻿.alert {
     align-items: center;
-    background-color: transparent;
+    background-color: var(--tavenem-color-bg-surface);
     border-radius: var(--tavenem-border-radius);
     column-gap: .75rem;
-    display: flex;
+    display: inline-flex;
+    flex: 0 0 auto;
     font-size: 1em;
     font-weight: var(--tavenem-font-weight);
     line-height: var(--tavenem-lineheight-body);
+    margin: .5em;
     overflow: hidden;
     padding: 6px 1em;
     transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
@@ -36,26 +38,14 @@
     .icon {
         display: flex;
         font-size: 1.375rem;
+        height: 1.375rem;
+        margin: .25rem 0;
         opacity: 0.9;
-        padding: calc(.5rem - 1px) 0;
-
-        &:first-child {
-            margin-inline-start: -.5em;
-        }
-
-        &:last-child {
-            margin-inline-end: -.5em;
-        }
-
-        &:only-child {
-            margin-inline-start: -.5em;
-            margin-inline-end: -.5em;
-        }
+        width: 1.375rem;
     }
 
     > .btn-close {
-        margin-inline-start: auto;
-        margin-inline-end: -.5em;
+        margin: .25rem 0;
         order: 9999;
     }
 
@@ -72,6 +62,23 @@
             &.lighten {
                 background-color: var(--tavenem-color-#{$theme}-hover-light);
                 color: var(--tavenem-color-#{$theme});
+            }
+
+            &.filled {
+                background-color: var(--tavenem-color-#{$theme});
+                color: var(--tavenem-color-#{$theme}-text);
+
+                &.bg-alt {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+
+                &.darken {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                }
+
+                &.lighten {
+                    background-color: var(--tavenem-color-#{$theme}-lighten);
+                }
             }
         }
     }

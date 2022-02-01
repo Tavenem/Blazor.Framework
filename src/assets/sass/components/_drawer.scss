@@ -11,6 +11,7 @@
 }
 
 .drawer {
+    background-color: var(--tavenem-color-bg);
     border-radius: 0;
     box-shadow: none;
     color: var(--tavenem-color-text);
@@ -75,10 +76,6 @@
             transition: none;
         }
 
-        @media (max-width: 767px) {
-            width: 100%;
-        }
-
         .drawer-control,
         .drawer-close-small {
             @media (min-width: 768px) {
@@ -126,6 +123,20 @@
 
         &.open {
             width: auto;
+
+            &:not(.icon) {
+                max-width: 15em;
+            }
+        }
+
+        @media (max-width: 767px) {
+            &, &.open {
+                width: 100%;
+            }
+
+            &.open:not(.icon) {
+                max-width: unset;
+            }
         }
     }
 
@@ -134,6 +145,8 @@
 
         &.closed {
             animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-width: 0;
+            transform: translateX(-100%);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -164,6 +177,10 @@
                 display: none;
             }
         }
+
+        @media (max-width: 767px) {
+            grid-area: main;
+        }
     }
 
     &.right {
@@ -171,6 +188,8 @@
 
         &.closed {
             animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-width: 0;
+            transform: translateX(100%);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -201,6 +220,10 @@
                 display: none;
             }
         }
+
+        @media (max-width: 767px) {
+            grid-area: main;
+        }
     }
 
     &.bottom,
@@ -228,6 +251,8 @@
 
         &.closed {
             animation: forwards tf-slide-out-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 0;
+            transform: translateY(100%);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -236,6 +261,7 @@
 
         &.open {
             animation: forwards tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 20em;
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -255,6 +281,8 @@
 
         &.closed {
             animation: forwards tf-slide-out-top 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 0;
+            transform: translateY(-100%);
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -263,6 +291,7 @@
 
         &.open {
             animation: forwards tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 20em;
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -311,6 +340,12 @@
 
                 &.closed {
                     animation: none;
+                    transform: translateX(0);
+                    width: auto;
+
+                    &:not(.icon) {
+                        max-width: 15em;
+                    }
                 }
 
                 &.icon {
@@ -331,6 +366,8 @@
 
                 &.closed {
                     animation: none;
+                    max-height: 20em;
+                    transform: translateY(0);
                 }
             }
         }

@@ -14,10 +14,6 @@
     position: relative;
     row-gap: 0;
 
-    &.drawer {
-        background-color: transparent;
-    }
-
     > {
         * {
             border-radius: 0;

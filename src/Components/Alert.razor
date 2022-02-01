@@ -8,8 +8,8 @@
         <div class="@IconClass">@Icon</div>
     }
     @ChildContent
-    @if (CanClose)
+    @if (AutoClose || OnClosed.HasDelegate || Closed is not null)
     {
-        <div class="btn-close" @onclick="OnClosedAsync"></div>
+        <span class="btn-close" @onclick="OnClosedAsync">close</span>
     }
 </div>

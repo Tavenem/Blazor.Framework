@@ -6,7 +6,7 @@
     <div class="header">
         @if (TitleContent is null)
         {
-            <div class="expand" @onclick="ToggleAsync">
+            <div class="expand" @onclick="OnToggleAsync">
                 @Title
                 <span class="icon">expand_more</span>
             </div>
@@ -14,10 +14,18 @@
         else
         {
             @TitleContent
-            <span class="icon expand" @onclick="ToggleAsync">expand_more</span>
+            <span class="icon expand" @onclick="OnToggleAsync">expand_more</span>
         }
     </div>
-    <CascadingValue Value="this" IsFixed="true">
-        @ChildContent
-    </CascadingValue>
+    <div class="@BodyCssClass">
+        <CascadingValue Value="this" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    </div>
+    @if (FooterContent is not null)
+    {
+        <div class="@FooterCssClass">
+            @FooterContent
+        </div>
+    }
 </div>
