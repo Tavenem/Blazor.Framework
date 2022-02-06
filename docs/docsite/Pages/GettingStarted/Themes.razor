@@ -82,20 +82,25 @@
 </p>
 <p>
 	There are light and dark mode variations of each theme color's hue, saturation, and lightness,
-	as well as the color of text which will show up best against a background of that color.
+	as well as the color of text which will show up best against a background of that color. Each color has been selected to meet WCAG 2.0 level AA contrast guidelines when set against the default background color for its color scheme, or when used as a background color with text of the default color.
 </p>
 <p>
-	Note that each theme color has two lighter and darker varieties, which can change the lightness
-	value by up to 20%. As a result, you should ensure that the lightness values you select for your
-	theme colors are no less than 20 and no greater than 80. Ideally they should be well away from
-	either extreme, since a lightness value too close to 0 will be indistunguishable from black, and
-	a value too close to 100 will be indistinguishable from white.
+	Each theme color has two lighter and darker varieties, which can change the lightness value by
+	up to 20%. As a result, you should ensure that the lightness values you select for your theme
+	colors are no less than 20 and no greater than 80. Ideally they should be well away from either
+	extreme, since a lightness value too close to 0 will be indistunguishable from black, and a
+	value too close to 100 will be indistinguishable from white.
 </p>
 <p>
 	Each theme and its variations exist as utility classes which can be used to control the color of
 	most elements. The theme color by itself, used as a class, sets the foreground color to that
 	theme color (and the border color, although it does not actually add a border). You can add the
 	<code>lighten</code> or <code>darken</code> class to modify the lightness.
+</p>
+<p>
+	Please note that the lightened and darkened version of the theme colors may not meet WCAG 2.0
+	level AA contrast guidelines when used as text colors, or when used as background colors with
+	text of the default color. Use them with caution.
 </p>
 <p>
 	If you add the <code>filled</code> class, the background color is set to the theme color, and
