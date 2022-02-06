@@ -1,0 +1,42 @@
+﻿@page "/components/close-button"
+
+<PageTitle>Close Button - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Close Button</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides a generic close button component. By itself it simply
+    provides a set of styles, without any functionality. It is integrated into a number of other
+    framework components, but is also available for your own use.
+</p>
+
+<p>
+    To create an instance of the close button, simple add the <code>btn-close</code> class to a
+    <code>button</code> (or other semantic element), then add the text "close" inside the element
+    (and nothing else).
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <button class=""btn-close"">close</button>
+</div>
+<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <a class=""btn-close"">close</button>
+</div>")" />
+
+<p>
+    Close buttons contain styles to help them automatically position themselves at the top-end
+    corner of their container. These will usually work best when the container has either
+    <code>flex</code> or <code>grid</code> display.
+</p>
+
+<p>
+    A close button with the <code>disabled</code> attribute or the <code>disabled</code> class will
+    have a different visual appearance, and lose its hover and focus styles.
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <button class=""btn-close"" disabled>close</button>
+</div>
+<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <a class=""btn-close disabled"">close</button>
+</div>")" />

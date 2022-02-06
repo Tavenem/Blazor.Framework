@@ -44,6 +44,12 @@ public partial class Collapse : IDisposable
     /// </summary>
     [Parameter] public RenderFragment? FooterContent { get; set; }
 
+    /// <summary>
+    /// Will be <see langword="true"/> during openingm after <see cref="OnOpening"/> is invoked and
+    /// before it completes.
+    /// </summary>
+    public bool IsLoading { get; private set; }
+
     private bool _isOpen;
     /// <summary>
     /// Whether the collapsed content is currently displayed.
@@ -86,6 +92,16 @@ public partial class Collapse : IDisposable
     [Parameter] public RenderFragment? TitleContent { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Whether the entire title should toggle the collapse.
+    /// </para>
+    /// <para>
+    /// Always <see langword="true"/> when <see cref="TitleContent"/> is <see langword="null"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool TitleIsToggle { get; set; }
+
+    /// <summary>
     /// The group to which this component belongs, if any.
     /// </summary>
     [CascadingParameter] protected Accordion? Accordion { get; set; }
@@ -102,12 +118,18 @@ public partial class Collapse : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("collapse")
+    protected override string CssClass => new CssBuilder("collapse")
         .Add("closed", !_isOpen)
         .Add("disabled", Disabled || Accordion?.Disabled == true)
+        .Add("loading", IsLoading)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
+
+    /// <summary>
+    /// The expansion icon displayed in the header.
+    /// </summary>
+    protected string IconClass => IsLoading ? "sync" : "expand_more";
 
     /// <summary>
     /// The final value assigned to the footer's class attribute.
@@ -207,7 +229,14 @@ public partial class Collapse : IDisposable
             return;
         }
 
-        await OnOpening.InvokeAsync(this);
+        if (value && OnOpening.HasDelegate)
+        {
+            IsLoading = true;
+            StateHasChanged();
+            await OnOpening.InvokeAsync(this);
+            IsLoading = false;
+            StateHasChanged();
+        }
         _isOpen = value;
         OnIsOpenChanged?.Invoke(this, _isOpen);
         await IsOpenChanged.InvokeAsync(_isOpen);

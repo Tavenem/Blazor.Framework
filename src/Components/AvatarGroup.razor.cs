@@ -50,7 +50,7 @@ public partial class AvatarGroup
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("avatar-group")
+    protected override string CssClass => new CssBuilder("avatar-group")
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
@@ -85,6 +85,17 @@ public partial class AvatarGroup
     {
         _avatars.Add(avatar);
         StateHasChanged();
+    }
+
+    internal string? ZIndex(Avatar avatar)
+    {
+        var index = _avatars.IndexOf(avatar);
+        if (index == -1)
+        {
+            return null;
+        }
+
+        return (_avatars.Count - index).ToString();
     }
 
     internal void Remove(Avatar avatar) => _avatars.Remove(avatar);

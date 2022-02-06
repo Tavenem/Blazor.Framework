@@ -1,0 +1,276 @@
+﻿@page "/components/card"
+
+<PageTitle>Card - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Card</Heading>
+
+<p>
+    The card component is a general-purpose container which groups and organizes your content.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    To create a basic card, add the <code>card</code> class to an element (usually a
+    <code>div</code>). You can also assign it a theme class to color it.
+</p>
+
+<p>
+    Your content will normally be wrapped in a child element with the <code>body</code> class (such
+    as a <code>div</code>), which adds some padding and other basic styles. You can omit the
+    <code>body</code> class, however, when you need to utilize the full width of the card and apply
+    your own styles.
+</p>
+
+<CodeExample Code="@(@"<div class=""card"">
+    <div class=""body"">Content</div>
+</div>
+<div class=""card tertiary"">
+    <div class=""tertiary filled mb-2"">&nbsp;</div>
+    <div class=""body"">Tertiary</div>
+</div>")" />
+
+<p>
+    The <code>body</code> class also adds a vertical scrollbar when its content exceeds its height.
+    Normally a card (and any body elements) will grow to accommodate their content, but when the
+    height of the card (or any individual body element) is constrained, the scrollbar will appear.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""card"" style=""max-width:20rem;max-height:10rem"">
+    <div class=""body"">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu metus pulvinar, accumsan
+        odio ut, rutrum est. Aliquam dictum elit nec tristique tincidunt. Praesent ante tellus,
+        gravida vel elementum ac, posuere vitae lorem. In cursus magna sapien. Phasellus congue,
+        velit non bibendum ornare, nisl ligula gravida felis, a posuere justo ex vel erat. Phasellus
+        nec nunc vel nisl interdum bibendum et quis odio. Nulla pharetra magna id quam volutpat
+        sodales. Etiam consequat, elit quis sagittis posuere, ipsum orci dignissim nibh, in
+        ultricies ligula ex in libero. Praesent eget malesuada turpis, quis ultricies lectus.
+    </div>
+</div>")" />
+
+<Heading Level="HeadingLevel.H3">Header and footer</Heading>
+
+<p>
+    A card can have a header and footer, which are indicated with classes by those names.
+</p>
+
+<p>
+    Headers and footers have some special styling to accommodate avatars and buttons.
+</p>
+
+<CodeExample Code="@(@"<div class=""card primary"" style=""max-width:20rem"">
+    <div class=""header"">
+        <div class=""avatar""><img src=""./images/tavenemlogo_sq_inset.svg"" alt=""Tavenem logo"" /></div>
+        <div>
+            <h6>Title</h6>
+            <span>Subtitle</span>
+        </div>
+        <span class=""btn-close"">close</span>
+    </div>
+    <div class=""body"">Content</div>
+    <div class=""footer"">
+        <button class=""btn primary ms-auto"">Close</button>
+    </div>
+</div>")" />
+
+<Heading Level="HeadingLevel.H3">Media</Heading>
+
+<p>
+    To easily format media such as images, give them the <code>media</code> class.
+</p>
+
+<CodeExample Code="@(@"<div class=""card primary"" style=""max-width:20rem"">
+    <img class=""media"" src=""./images/stars.webp"" alt=""stars"" />
+    <div class=""body"">Content</div>
+</div>")" />
+
+<p>
+    To use an image as the background of an entire card, use both the <code>media</code> class, and
+    the <code>backdrop</code> class (which simply adds <code>object-fit: cover</code>). To add
+    content above the image, add a body with the <code>media-overlay</code> class, which absolutely
+    positions it and adds some padding.
+</p>
+
+<CodeExample Code="@(@"<div class=""card"" style=""max-width:20rem"">
+    <img class=""media backdrop"" src=""./images/stars.webp"" alt=""stars"" />
+    <div class=""body media-overlay"">Content</div>
+</div>")" />
+
+<Heading Level="HeadingLevel.H2">Nesting</Heading>
+
+<p>
+    Cards can be nested within one another. Although this isn't generally recommended, as it can
+    lead to a confusing or busy layout, the default behavior will alternate background colors to
+    distinguish the nested cards more readily.
+</p>
+
+<p>
+    Up to six levels of nesting are supported. After that the background colors will no longer
+    alternate automatically. If your layout involves such deeply nested cards, however, it is
+    recommended that you rethink your design.
+</p>
+
+<CodeExample Code="@(@"<div class=""card"" style=""max-width:20rem"">
+    <div class=""header""><h6>Outer</h6></div>
+    <div class=""row px-3 justify-content-space-between"">
+        <div>Outer content</div>
+        <div class=""card"" style=""max-width:20rem"">
+            <div class=""header""><h6>Inner</h6></div>
+            <div class=""body"">Inner content</div>
+        </div>
+    </div>
+</div>")" />
+
+<Heading Level="HeadingLevel.H2">Groups</Heading>
+
+<p>
+    Cards can be grouped together in a container with the <code>card-group</code> class (usually a
+    <code>div</code>).
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""card-group"">
+    <div class=""card primary"">
+        <div class=""header""><h6>Card 1</h6></div>
+        <div class=""body"">Primary</div>
+    </div>
+    <div class=""card secondary"">
+        <div class=""header""><h6>Card 2</h6></div>
+        <div class=""body"">Secondary</div>
+    </div>
+    <div class=""card tertiary"">
+        <div class=""header""><h6>Card 3</h6></div>
+        <div class=""body"">Tertiary</div>
+    </div>
+    <div class=""card danger"">
+        <div class=""header""><h6>Card 4</h6></div>
+        <div class=""body"">Danger</div>
+    </div>
+    <div class=""card dark"">
+        <div class=""header""><h6>Card 5</h6></div>
+        <div class=""body"">Dark</div>
+    </div>
+    <div class=""card default"">
+        <div class=""header""><h6>Card 6</h6></div>
+        <div class=""body"">Default</div>
+    </div>
+    <div class=""card info"">
+        <div class=""header""><h6>Card 7</h6></div>
+        <div class=""body"">Info</div>
+    </div>
+    <div class=""card success"">
+        <div class=""header""><h6>Card 8</h6></div>
+        <div class=""body"">Success</div>
+    </div>
+    <div class=""card warning"">
+        <div class=""header""><h6>Card 9</h6></div>
+        <div class=""body"">Warning</div>
+    </div>
+</div>")" />
+
+<p>
+    There are also variations of the <code>card-group</code> class with <a
+    href="./layout/breakpoints">breakpoint infixes</a>, which display the card in a vertical column
+    under the given breakpoint, and only begin to wrap them to the number of indicated columns at or above the breakpoint.
+</p>
+
+<ul>
+    <li><code>card-group-sm</code></li>
+    <li><code>card-group-md</code></li>
+    <li><code>card-group-lg</code></li>
+    <li><code>card-group-xl</code></li>
+    <li><code>card-group-xxl</code></li>
+</ul>
+
+<p>
+    Resize your browser to see this in action:
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""card-group-md"">
+    <div class=""card primary"">
+        <div class=""header""><h6>Card 1</h6></div>
+        <div class=""body"">Primary</div>
+    </div>
+    <div class=""card secondary"">
+        <div class=""header""><h6>Card 2</h6></div>
+        <div class=""body"">Secondary</div>
+    </div>
+    <div class=""card tertiary"">
+        <div class=""header""><h6>Card 3</h6></div>
+        <div class=""body"">Tertiary</div>
+    </div>
+    <div class=""card danger"">
+        <div class=""header""><h6>Card 4</h6></div>
+        <div class=""body"">Danger</div>
+    </div>
+    <div class=""card dark"">
+        <div class=""header""><h6>Card 5</h6></div>
+        <div class=""body"">Dark</div>
+    </div>
+    <div class=""card default"">
+        <div class=""header""><h6>Card 6</h6></div>
+        <div class=""body"">Default</div>
+    </div>
+    <div class=""card info"">
+        <div class=""header""><h6>Card 7</h6></div>
+        <div class=""body"">Info</div>
+    </div>
+    <div class=""card success"">
+        <div class=""header""><h6>Card 8</h6></div>
+        <div class=""body"">Success</div>
+    </div>
+    <div class=""card warning"">
+        <div class=""header""><h6>Card 9</h6></div>
+        <div class=""body"">Warning</div>
+    </div>
+</div>")" />
+
+<Heading Level="HeadingLevel.H3">Grid</Heading>
+
+<p>
+    Similar to a <a href="./layout/rows-columns">row</a>, you can add the <code>cols-{number}</code>
+    class on a card group to specify the number of equal-sized columns the group should contain.
+    Numbers 1 through 12 are supported.
+</p>
+
+<p>
+    You can also use the <a href="./layout/breakpoints">breakpoint infixes</a> to create different
+    numbers of columns for different viewport sizes.
+</p>
+
+<p>
+    Individual cards in a group can also apply the <code>col-{number}</code> classes to specify the
+    number of columns they span. Numbers 1 through 12 are supported, and you can also use breakpoint
+    infixes.
+</p>
+
+<p>
+    Cards can also apply a <code>start-{number}</code> class to specify the column where they are
+    placed. Numbers 1 through 12 are supported. This can be used to create gaps in the layout.
+</p>
+
+<CodeExample Code="@(@"<div class=""card-group cols-2 cols-md-3"">
+    <div class=""card primary"">
+        <div class=""header""><h6>Card 1</h6></div>
+        <div class=""body"">Primary</div>
+    </div>
+    <div class=""card secondary"">
+        <div class=""header""><h6>Card 2</h6></div>
+        <div class=""body"">Secondary</div>
+    </div>
+    <div class=""card tertiary"">
+        <div class=""header""><h6>Card 3</h6></div>
+        <div class=""body"">Tertiary</div>
+    </div>
+    <div class=""card danger col-2"">
+        <div class=""header""><h6>Card 4</h6></div>
+        <div class=""body"">Danger</div>
+    </div>
+    <div class=""card dark"">
+        <div class=""header""><h6>Card 5</h6></div>
+        <div class=""body"">Dark</div>
+    </div>
+    <div class=""card default start-2"">
+        <div class=""header""><h6>Card 6</h6></div>
+        <div class=""body"">Default</div>
+    </div>
+</div>")" />

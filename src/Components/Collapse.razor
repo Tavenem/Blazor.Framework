@@ -2,19 +2,28 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="header">
         @if (TitleContent is null)
         {
             <div class="expand" @onclick="OnToggleAsync">
                 @Title
-                <span class="icon">expand_more</span>
+                <span class="icon ms-2">@IconClass</span>
             </div>
+        }
+        else if (TitleIsToggle)
+        {
+            <div class="d-flex flex-column flex-grow-1 clickable" @onclick="OnToggleAsync">
+                @TitleContent
+            </div>
+            <span class="icon expand ms-2" @onclick="OnToggleAsync">@IconClass</span>
         }
         else
         {
-            @TitleContent
-            <span class="icon expand" @onclick="OnToggleAsync">expand_more</span>
+            <div class="d-flex flex-column flex-grow-1">
+                @TitleContent
+            </div>
+            <span class="icon expand ms-2" @onclick="OnToggleAsync">@IconClass</span>
         }
     </div>
     <div class="@BodyCssClass">

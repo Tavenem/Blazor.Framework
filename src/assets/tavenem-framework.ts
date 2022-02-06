@@ -1,11 +1,17 @@
 ﻿/// <reference types="./node_modules/@types/blazor__javascript-interop" />
 
+interface IPopoverHelper {
+    flipClassReplacements: object;
+    calculatePopoverPosition: (list: any[], boundingRect: DOMRect, selfRect: DOMRect) => void;
+}
+
 interface IFramework {
     _lastElement: string;
     _manualColorTheme: boolean;
     _spy: (event: Event) => void;
     _theme: number;
     _throttleScrollHandlerId: number;
+    popoverHelper: IPopoverHelper;
 }
 
 interface ITavenem {
@@ -25,6 +31,9 @@ declare global {
 
 window.tavenem = window.tavenem || {};
 window.tavenem.framework = window.tavenem.framework || {};
+window.tavenem.framework.popoverHelper = window.tavenem.framework.popoverHelper || {
+
+};
 
 export function cancelScrollListener(selector: string | null) {
     const element = selector

@@ -6,9 +6,13 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Displays a chip, with support for simple theming and closing.
 /// </summary>
-public partial class Chip : IAsyncDisposable
+public partial class Chip<TChip>
 {
-    private bool _disposedValue;
+    /// <summary>
+    /// Whether this chip should display a close button that sets its <c>display</c> property to
+    /// <c>none</c>.
+    /// </summary>
+    [Parameter] public bool AutoClose { get; set; }
 
     /// <summary>
     /// Whether this chip should have a close button.
@@ -19,6 +23,11 @@ public partial class Chip : IAsyncDisposable
     /// The child content of this component.
     /// </summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// The name of the icon to be displayed before the content.
+    /// </summary>
+    [Parameter] public string? Icon { get; set; }
 
     /// <summary>
     /// <para>
@@ -33,12 +42,12 @@ public partial class Chip : IAsyncDisposable
     /// <summary>
     /// Indicates whether this chip has been selected.
     /// </summary>
-    [Parameter] public bool IsSelected { get; set; }
+    public bool IsSelected => SelectedItems?.Contains(Item) == true;
 
     /// <summary>
-    /// Raised when the chip's selection state changes.
+    /// The item to which this chip is bound (if any).
     /// </summary>
-    [Parameter] public EventCallback<bool> IsSelectedChanged { get; set; }
+    [Parameter] public TChip? Item { get; set; }
 
     /// <summary>
     /// Raised when the chip is clicked.
@@ -53,7 +62,17 @@ public partial class Chip : IAsyncDisposable
     /// <summary>
     /// Invoked when the component is closed.
     /// </summary>
-    [Parameter] public EventCallback<Chip> OnClosed { get; set; }
+    [Parameter] public EventCallback<Chip<TChip>> OnClosed { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The text to be displayed.
+    /// </para>
+    /// <para>
+    /// Ignored if <see cref="ChildContent"/> is non-<see langword="null"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public string? Text { get; set; }
 
     /// <summary>
     /// One of the built-in color themes.
@@ -65,9 +84,9 @@ public partial class Chip : IAsyncDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("chip")
+    protected override string CssClass => new CssBuilder("chip")
         .Add(FinalThemeColor.ToCSS())
-        .Add("clickable", OnClick.HasDelegate)
+        .Add("clickable", OnClick.HasDelegate || ChipSet is not null)
         .Add("selected", IsSelected)
         .Add("d-none", IsClosed)
         .Add(Class)
@@ -77,20 +96,29 @@ public partial class Chip : IAsyncDisposable
     /// <summary>
     /// The set to which this chip belongs, if any.
     /// </summary>
-    [CascadingParameter] protected ChipSet? ChipSet { get; set; }
+    [CascadingParameter] protected ChipSet<TChip>? ChipSet { get; set; }
 
-    private string? IconClassName
+    /// <summary>
+    /// The selected items of the set to which this chip belongs, if any.
+    /// </summary>
+    [CascadingParameter] protected IEnumerable<TChip>? SelectedItems { get; set; }
+
+    private string? IconClassName => string.IsNullOrWhiteSpace(IconClass)
+        ? "icon"
+        : $"icon {IconClass}";
+
+    private string? IconName
     {
         get
         {
             if (ChipSet?.ShowSelectionIcon == true
                 && IsSelected)
             {
-                return "icon done";
+                return "done";
             }
-            return string.IsNullOrWhiteSpace(IconClass)
+            return string.IsNullOrWhiteSpace(Icon)
                 ? null
-                : $"icon {IconClass}";
+                : Icon;
         }
     }
 
@@ -102,66 +130,12 @@ public partial class Chip : IAsyncDisposable
         ? ChipSet.SelectedColor
         : ThemeColor;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized() => ChipSet?.Add(this);
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing && ChipSet is not null)
-            {
-                await ChipSet.RemoveAsync(this);
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous dispose operation.
-    /// </returns>
-    public async ValueTask DisposeAsync()
-    {
-        await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Changes this chip's selection state.
-    /// </summary>
-    /// <param name="value">Whether the chip is selected.</param>
-    /// <returns>
-    /// <see langword="true"/> if the selection state changes; otherwise <see
-    /// langword="false"/>.
-    /// </returns>
-    public async ValueTask<bool> SelectAsync(bool value)
-    {
-        if (IsSelected == value)
-        {
-            return false;
-        }
-
-        IsSelected = value;
-        await IsSelectedChanged.InvokeAsync(value);
-        return true;
-    }
-
-    internal void ForceRedraw() => StateHasChanged();
-
     private async Task OnClickAsync(MouseEventArgs e)
     {
+        if (ChipSet is not null)
+        {
+            await ChipSet.OnClickChipAsync(Item);
+        }
         await OnClick.InvokeAsync(e);
         OnClicked?.Invoke(this, EventArgs.Empty);
     }

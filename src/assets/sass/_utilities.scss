@@ -11,13 +11,7 @@
 }
 
 .text-close {
-    letter-spacing: -.12rem;
-}
-b.text-close,
-strong.text-close,
-dt.text-close,
-kbd kbd.text-close {
-    letter-spacing: -.07rem;
+    letter-spacing: -.07em;
 }
 
 .lh-1 {
@@ -35,7 +29,8 @@ kbd kbd.text-close {
         line-height: var(--tavenem-lineheight-button) !important;
     }
 }
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
     &.lh-base {
         line-height: var(--tavenem-lineheight-heading) !important;
     }

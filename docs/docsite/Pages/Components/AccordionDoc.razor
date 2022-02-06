@@ -21,10 +21,12 @@
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="accordion">
-            <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-            <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-            <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+        <div class="row justify-content-center">
+            <div class="accordion">
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </div>
         </div>
     </TitleContent>
     <ChildContent>
@@ -44,11 +46,13 @@
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <Accordion>
-            <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-            <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-            <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
-        </Accordion>
+        <div class="row justify-content-center">
+            <Accordion>
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </Accordion>
+        </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<Accordion>
@@ -68,10 +72,12 @@
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="accordion dense">
-            <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-            <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-            <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+        <div class="row justify-content-center">
+            <div class="accordion dense">
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </div>
         </div>
     </TitleContent>
     <ChildContent>
@@ -91,11 +97,13 @@
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="outlined">
-            <div class="accordion flush">
-                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+        <div class="row justify-content-center">
+            <div class="outlined">
+                <div class="accordion flush">
+                    <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                    <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                    <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                </div>
             </div>
         </div>
     </TitleContent>
@@ -120,11 +128,13 @@
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <Accordion Disabled="true">
-            <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-            <Collapse IsOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
-            <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
-        </Accordion>
+        <div class="row justify-content-center">
+            <Accordion Disabled="true">
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse IsOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </Accordion>
+        </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<Accordion Disabled=""true"">

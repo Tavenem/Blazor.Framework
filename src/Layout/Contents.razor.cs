@@ -37,7 +37,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("list contents highlight-start darken")
+    protected override string CssClass => new CssBuilder("list contents highlight-start darken")
         .Add(ThemeColor.ToCSS())
         .Add("d-none", _headings.Count == 0)
         .Add(BreakpointClass, _headings.Count > 0)
@@ -50,7 +50,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssStyle => new CssBuilder("max-width:15em")
+    protected override string CssStyle => new CssBuilder("max-width:15em")
         .AddStyle(Style)
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();

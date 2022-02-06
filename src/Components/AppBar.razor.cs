@@ -5,10 +5,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Displays an appbar, with support for simple theming and drawer control.
 /// </summary>
-public partial class AppBar : IDisposable
+public partial class AppBar
 {
-    private bool _disposedValue;
-
     private Breakpoint? _breakpoint;
     /// <summary>
     /// <para>
@@ -17,11 +15,27 @@ public partial class AppBar : IDisposable
     /// <para>
     /// Ignored if <see cref="ControlsDrawerSide"/> is <see cref="Side.None"/>.
     /// </para>
+    /// <para>
+    /// Defaults to the value of <see cref="FrameworkLayout.SideDrawerBreakpoint"/>, if <see
+    /// cref="ControlsDrawerSide"/> is set to left or right.
+    /// </para>
     /// </summary>
     [Parameter]
     public Breakpoint Breakpoint
     {
-        get => _breakpoint ?? FrameworkLayout?.SideDrawerBreakpoint ?? Breakpoint.None;
+        get
+        {
+            if (_breakpoint.HasValue)
+            {
+                return _breakpoint.Value;
+            }
+            if (ControlsDrawerSide is Framework.Side.Left
+                or Framework.Side.Right)
+            {
+                return FrameworkLayout?.SideDrawerBreakpoint ?? Breakpoint.None;
+            }
+            return Breakpoint.None;
+        }
         set => _breakpoint = value;
     }
 
@@ -34,11 +48,6 @@ public partial class AppBar : IDisposable
     /// The docking side of the drawer this appbar should toggle.
     /// </summary>
     [Parameter] public Side ControlsDrawerSide { get; set; }
-
-    /// <summary>
-    /// Invoked when the drawer toggle is clicked.
-    /// </summary>
-    [Parameter] public EventCallback<AppBar> OnDrawerToggle { get; set; }
 
     /// <summary>
     /// Custom CSS class(es) for the toolbar.
@@ -62,16 +71,11 @@ public partial class AppBar : IDisposable
     }
 
     /// <summary>
-    /// Invoked when the drawer toggle is clicked.
-    /// </summary>
-    public event EventHandler<EventArgs>? DrawerToggle;
-
-    /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("appbar")
+    protected override string CssClass => new CssBuilder("appbar")
         .Add(Side.ToCSS())
         .Add($"controls-{ControlsDrawerSide.ToCSS()}", ControlsDrawerSide != Framework.Side.None)
         .Add(Class)
@@ -98,50 +102,14 @@ public partial class AppBar : IDisposable
 
     [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
-    {
-        FrameworkLayout?.Add(this);
-        if (Breakpoint == Breakpoint.None
-            && FrameworkLayout is not null)
-        {
-            Breakpoint = FrameworkLayout.SideDrawerBreakpoint;
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                FrameworkLayout?.Remove(this);
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
+    private bool HasDrawer => ControlsDrawerSide != Framework.Side.None
+        && FrameworkLayout?.HasDrawer(ControlsDrawerSide) == true;
 
     private async Task OnDrawerToggleAsync()
     {
-        await OnDrawerToggle.InvokeAsync(this);
-        DrawerToggle?.Invoke(this, EventArgs.Empty);
+        if (FrameworkLayout is not null)
+        {
+            await FrameworkLayout.DrawerToggleAsync(ControlsDrawerSide);
+        }
     }
 }

@@ -1,0 +1,330 @@
+﻿@page "/components/chip"
+
+<PageTitle>Chip - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Chip</Heading>
+
+<p>
+    Chips are simple elements, usually displayed in groups.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    To create a chip, add the <code>chip</code> class to an element (usually a <code>span</code>,
+    but possibly a <code>button</code> if the chip is interactive). You can also assign it a theme
+    class to color it.
+</p>
+
+<CodeExample Code="@(@"<span class=""chip"">Example</span>
+<span class=""chip primary"">Primary</span>
+<span class=""chip secondary"">Secondary</span>
+<span class=""chip tertiary"">Tertiary</span>
+<span class=""chip danger""><span class=""icon"">error_outline</span>Danger</span>
+<span class=""chip dark"">Dark</span>
+<span class=""chip default"">Default</span>
+<span class=""chip info""><span class=""icon"">info</span>Info</span>
+<span class=""chip success"">Success<span class=""icon"">check_circle</span></span>
+<span class=""chip warning""><span class=""icon"">warning_amber</span>Warning</span>")" />
+
+<p>
+    To indicate that a non-button chip is interactive, add the <code>clickable</code> class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip clickable"">Example</span>
+<span class=""chip clickable primary"">Primary</span>
+<span class=""chip clickable secondary"">Secondary</span>
+<span class=""chip clickable tertiary"">Tertiary</span>
+<span class=""chip clickable danger""><span class=""icon"">error_outline</span>Danger</span>
+<span class=""chip clickable dark"">Dark</span>
+<span class=""chip clickable default"">Default</span>
+<span class=""chip clickable info""><span class=""icon"">info</span>Info</span>
+<span class=""chip clickable success"">Success<span class=""icon"">check_circle</span></span>
+<span class=""chip clickable warning""><span class=""icon"">warning_amber</span>Warning</span>")" />
+
+<Heading Level="HeadingLevel.H2">Disabled</Heading>
+
+<p>
+    A chip can be disabled by by using the <code>disabled</code> attribute for a button, or the
+    <code>disabled</code> class for other elements. When disabled, the opacity of a chip is lowered,
+    rather than using the usual disabled colors.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip disabled"">Example</span>
+<span class=""chip disabled primary"">Primary</span>
+<span class=""chip disabled secondary"">Secondary</span>
+<span class=""chip disabled tertiary"">Tertiary</span>
+<span class=""chip disabled danger""><span class=""icon"">error_outline</span>Danger</span>
+<span class=""chip disabled dark"">Dark</span>
+<span class=""chip disabled default"">Default</span>
+<span class=""chip disabled info""><span class=""icon"">info</span>Info</span>
+<span class=""chip disabled success"">Success<span class=""icon"">check_circle</span></span>
+<span class=""chip disabled warning""><span class=""icon"">warning_amber</span>Warning</span>")" />
+
+<Heading Level="HeadingLevel.H2">Variants</Heading>
+
+<p>
+    The size of a chip can be adjusted with the <code>small</code> and <code>large</code> classes.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<span class=""chip small primary"">Small</span>
+<span class=""chip primary"">Normal</span>
+<span class=""chip large primary"">Large</span>")" />
+
+<p>
+    The background can be reduced to a semitransparent tint by using the <code>chip-text</code>
+    class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip chip-text"">Example</span>
+<span class=""chip chip-text primary"">Primary</span>
+<span class=""chip chip-text secondary"">Secondary</span>
+<span class=""chip chip-text tertiary"">Tertiary</span>
+<span class=""chip chip-text danger""><span class=""icon"">error_outline</span>Danger</span>
+<span class=""chip chip-text dark"">Dark</span>
+<span class=""chip chip-text default"">Default</span>
+<span class=""chip chip-text info""><span class=""icon"">info</span>Info</span>
+<span class=""chip chip-text success"">Success<span class=""icon"">check_circle</span></span>
+<span class=""chip chip-text warning""><span class=""icon"">warning_amber</span>Warning</span>")" />
+
+<p>
+    Chips can also be <code>outlined</code>.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip outlined"">Example</span>
+<span class=""chip outlined primary"">Primary</span>
+<span class=""chip outlined secondary"">Secondary</span>
+<span class=""chip outlined tertiary"">Tertiary</span>
+<span class=""chip outlined danger""><span class=""icon"">error_outline</span>Danger</span>
+<span class=""chip outlined dark"">Dark</span>
+<span class=""chip outlined default"">Default</span>
+<span class=""chip outlined info""><span class=""icon"">info</span>Info</span>
+<span class=""chip outlined success"">Success<span class=""icon"">check_circle</span></span>
+<span class=""chip outlined warning""><span class=""icon"">warning_amber</span>Warning</span>")" />
+
+<p>
+    The <code>square</code> and <code>rounded</code> utility classes can be used to change the shape
+    of a chip.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip square primary"">Primary</span>
+<span class=""chip rounded secondary"">Secondary</span>")" />
+
+<Heading Level="HeadingLevel.H2">Component</Heading>
+
+<p>
+    A chip can also be displayed using the <code>Chip</code> component. This is usually when the
+    chip is generated based on bound data. Each <code>Chip</code> has a data type, indicated by the
+    <code>TChip</code> parameter when it can't be inferred. You can include the content as
+    <code>ChildContent</code>, or you can set the <code>Text</code> parameter to a string to display
+    that text.
+</p>
+
+<p>
+    An icon can be automatically displayed before the content of the chip by setting the
+    <code>Icon</code> property to the name of the icon. The <code>IconClass</code> property can be
+    used to customize the class of the icon span ("icon" is automatically included).
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Chip TChip="string">Unthemed</Chip>
+            <Chip TChip="string" ThemeColor="ThemeColor.Primary" Text="Primary" />
+            <Chip TChip="string" ThemeColor="ThemeColor.Info" Icon="info">Info</Chip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"">Unthemed</Chip>
+<Chip TChip=""string"" ThemeColor=""ThemeColor.Primary"" Text=""Primary"" />
+<Chip TChip=""string"" ThemeColor=""ThemeColor.Info"" Icon=""info"">Info</Chip>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Closing</Heading>
+
+<p>
+    If you add an event callback to the <code>OnClosed</code> property, the chip will automatically
+    get a close button which will invoke the handler.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            @if (_show)
+            {
+                <Chip TChip="string" OnClosed="@(_ => _show = false)">Dismissable</Chip>
+            }
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"" OnClosed=""@(_ => _show = false)"">Dismissable</Chip>", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private bool</span> _show <span class="pre-operator">=</span> <span class="pre-element">true</span><span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also set the <code>AutoClose</code> property to <code>true</code> to show the close
+    button, which will simply set the <code>display</code> property to <code>none</code> when
+    pressed.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Chip TChip="string" AutoClose="true">Dismissable</Chip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"" AutoClose=""true"">Dismissable</Chip>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Clicking</Heading>
+
+<p>
+    If you add an event callback to the <code>OnClick</code> property, the chip will automatically
+    receive the <code>clickable</code> class and respond to click events, which will invoke the
+    <code>OnClick</code> callback.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Chip TChip="string" ThemeColor="_theme" OnClick="@(_ => _theme = ThemeColor.Primary)">Click me</Chip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"" ThemeColor=""_theme"" OnClick=""@(_ => _theme = ThemeColor.Primary)"">Click me</Chip>", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-enum">ThemeColor</span> _theme <span class="pre-operator">=</span> <span class="pre-enum">ThemeColor</span><span class="pre-operator">.</span>None<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H1">ChipSet</Heading>
+
+<p>
+    Chips are most useful when displayed as part of a <code>ChipSet</code> component. This component
+    maintains a selection among child <code>Chip</code> components. By default, this is set to
+    single selection.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" @bind-SelectedItem="_selectedChip1" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItem=""_selectedChip"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedChip<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Multiselect</Heading>
+
+<p>
+    You can allow multiple selections by setting the <code>Multiselect</code> property to
+    <code>true</code>.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" @bind-SelectedItems="_selectedChips" Multiselect="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItems=""_selectedChips"" Multiselect=""true"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-enum">IEnumerable</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span><span class="pre-operator">?</span> _selectedChips<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Required</Heading>
+
+<p>
+    You can make the selection required by setting the <code>Required</code> property. Doing so
+    prevents de-selecting the last selected chip through user interaction. Programmatic changes
+    which result in the selection being cleared are still allowed, and no initial selection is
+    forced.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" @bind-SelectedItem="_selectedChip2" Required="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItem=""_selectedChip"" Required=""true"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedChip<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    The selection icon normally replaces any icon assigned to a chip via its <code>Icon</code>
+    property when the chip is selected. You can disable this behavior by setting the
+    <code>ShowSelectionIcon</code> property to <code>false</code>.
+</p>
+
+<p>
+    You can also choose to override the theme of selected chips by setting the
+    <code>SelectedColor</code> property of the <code>ChipSet</code>.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" @bind-SelectedItem="_selectedChip3" ShowSelectionIcon="false" SelectedColor="ThemeColor.Primary" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItem=""_selectedChip"" ShowSelectionIcon=""false"" SelectedColor=""ThemeColor.Primary"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedChip<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+@code {
+    private List<string> _chips = new() { "Chip 1", "Chip 2", "Chip 3" };
+    private string? _selectedChip1;
+    private string? _selectedChip2;
+    private string? _selectedChip3;
+    private IEnumerable<string>? _selectedChips;
+    private bool _show = true;
+    private ThemeColor _theme = ThemeColor.None;
+}

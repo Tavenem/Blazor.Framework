@@ -65,20 +65,22 @@
 
 .row {
     align-self: stretch;
+    column-gap: 1rem;
     display: flex;
-    flex: 1 0 auto;
+    flex-shrink: 0;
     flex-wrap: wrap;
-    gap: 1.5rem;
+    row-gap: .5rem;
+    width: 100%;
 
     &.fill > * {
         flex: 1 0 auto;
     }
-}
 
-.row.cols-1 {
-    display: grid;
-    grid-auto-columns: 1fr;
-    grid-template-columns: 1fr;
+    &.cols-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
 }
 
 @each $breakpoint, $min-width in $breakpoints {

@@ -55,8 +55,9 @@ public partial class AnchorLink : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder()
+    protected override string CssClass => new CssBuilder()
         .Add(ThemeColor.ToCSS())
+        .Add("disabled", Disabled)
         .Add(Class)
         .Add(ActiveClass ?? DefaultActiveClass, IsActive)
         .AddClassFromDictionary(AdditionalAttributes)

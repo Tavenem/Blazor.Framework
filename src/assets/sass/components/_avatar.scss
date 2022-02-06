@@ -15,15 +15,15 @@
     width: 2.5em;
 
     &.small {
-        width: 1.5em;
-        height: 1.5em;
         font-size: .875em;
+        height: 1.5em;
+        width: 1.5em;
     }
 
     &.large {
-        width: 3.5em;
-        height: 3.5em;
         font-size: 1.75em;
+        height: 3.5em;
+        width: 3.5em;
     }
 
     img {
@@ -33,11 +33,6 @@
         text-align: center;
         text-indent: 10000px;
         width: 100%;
-    }
-
-    &.outlined {
-        background-color: var(--tavenem-color-dark) !important;
-        border: 1px solid var(--tavenem-color-border);
     }
 
     @each $theme in $theme-colors {
@@ -58,6 +53,11 @@
                 background-color: var(--tavenem-color-#{$theme}-lighten);
                 color: var(--tavenem-color-#{$theme}-text);
             }
+
+            &.outlined {
+                background-color: transparent;
+                color: var(--tavenem-color-#{$theme});
+            }
         }
     }
 }
@@ -67,23 +67,23 @@
     counter-reset: avatar-count;
 
     .avatar {
-        border: 2px solid transparent;
-        width: 2.75em;
-        margin-inline-start: .75em;
-        height: 2.75em;
+        border: 2px solid var(--tavenem-color-bg);
+        height: calc(2.5em + 2px);
+        margin-inline-start: -.75em;
+        width: calc(2.5em + 2px);
 
         &:first-child {
             margin-inline-start: 0px !important;
         }
 
         &.small {
-            width: 1.75em;
-            height: 1.75em;
+            height: calc(1.5em + 2px);
+            width: calc(1.5em + 2px);
         }
 
         &.large {
-            width: 3.75em;
-            height: 3.75em;
+            height: calc(3.5em + 2px);
+            width: calc(3.5em + 2px);
         }
 
         &:before {

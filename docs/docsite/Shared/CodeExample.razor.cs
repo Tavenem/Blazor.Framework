@@ -8,7 +8,13 @@ public partial class CodeExample
 
     [Parameter] public bool IsOpen { get; set; } = true;
 
+    [Parameter] public string? RowClass { get; set; }
+
     private RenderFragment? CodeFragment { get; set; }
+
+    private string? RowCssClass => new CssBuilder("row justify-content-center")
+        .Add(RowClass)
+        .ToString();
 
     private RenderFragment AddContent()
         => builder => builder.AddMarkupContent(1, Code);

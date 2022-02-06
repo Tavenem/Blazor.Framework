@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    min-height: 3.5em;
+    min-height: 3.5rem;
     position: relative;
     width: 100%;
     z-index: var(--tavenem-zindex-appbar);
@@ -23,15 +23,15 @@
     }
 
     @media (max-width: 575px) and (orientation: landscape) {
-        height: 3em;
+        height: 3rem;
     }
 
     @media (min-width: 576px) and (orientation: portrait) {
-        height: 4em;
+        height: 4rem;
     }
 
     &.dense, .dense & {
-        min-height: 3em;
+        min-height: 3rem;
     }
 
     a {

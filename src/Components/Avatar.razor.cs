@@ -26,6 +26,11 @@ public partial class Avatar : IDisposable
     [Parameter] public string? Image { get; set; }
 
     /// <summary>
+    /// One of the built-in color themes.
+    /// </summary>
+    [Parameter] public ThemeColor ThemeColor { get; set; }
+
+    /// <summary>
     /// The group to which this avatar belongs, if any.
     /// </summary>
     [CascadingParameter] protected AvatarGroup? AvatarGroup { get; set; }
@@ -35,9 +40,20 @@ public partial class Avatar : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("alert")
+    protected override string CssClass => new CssBuilder("avatar")
+        .Add(ThemeColor.ToCSS())
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
+        .ToString();
+
+    /// <summary>
+    /// The final value assigned to the style attribute, including component
+    /// values and anything assigned by the user in <see
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
+    /// </summary>
+    protected override string CssStyle => new CssBuilder(Style)
+        .AddStyle("z-index", AvatarGroup?.ZIndex(this))
+        .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>

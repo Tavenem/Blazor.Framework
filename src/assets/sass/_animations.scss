@@ -42,17 +42,17 @@
         transform: translateX(-100%);
     }
     1% {
-        max-width: 15em;
+        max-width: 15rem;
         transform: translateX(-99%);
     }
 }
 
 @keyframes tf-slide-out-left {
     from {
-        max-width: 15em;
+        max-width: 15rem;
     }
     99% {
-        max-width: 15em;
+        max-width: 15rem;
         transform: translateX(-99%);
     }
 }
@@ -63,17 +63,17 @@
         transform: translateX(100%);
     }
     1% {
-        max-width: 15em;
+        max-width: 15rem;
         transform: translateX(99%);
     }
 }
 
 @keyframes tf-slide-out-right {
     from {
-        max-width: 15em;
+        max-width: 15rem;
     }
     99% {
-        max-width: 15em;
+        max-width: 15rem;
         transform: translateX(99%);
     }
 }
@@ -84,17 +84,17 @@
         transform: translateY(100%);
     }
     1% {
-        max-height: 20em;
+        max-height: 20rem;
         transform: translateY(99%);
     }
 }
 
 @keyframes tf-slide-out-bottom {
     from {
-        max-height: 20em;
+        max-height: 20rem;
     }
     99% {
-        max-height: 20em;
+        max-height: 20rem;
         transform: translateY(99%);
     }
 }
@@ -105,17 +105,17 @@
         transform: translateY(-100%);
     }
     1% {
-        max-height: 20em;
+        max-height: 20rem;
         transform: translateY(-99%);
     }
 }
 
 @keyframes tf-slide-out-top {
     from {
-        max-height: 20em;
+        max-height: 20rem;
     }
     99% {
-        max-height: 20em;
+        max-height: 20rem;
         transform: translateY(-99%);
     }
 }

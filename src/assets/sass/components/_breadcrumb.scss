@@ -6,10 +6,10 @@
     padding: 1rem .75rem;
     list-style: none;
 
-    li {
+    > * {
         color: var(--tavenem-color-text);
 
-        + li {
+        + * {
             padding-left: .75rem;
 
             &::before {
@@ -18,9 +18,18 @@
                 content: var(--tavenem-breadcrumb-divider);
             }
         }
+    }
 
-        &.current {
+    > *[aria-current="page"] {
+        &, * {
             color: var(--tavenem-color-text-secondary);
+        }
+
+        a {
+            color: var(--tavenem-color-action-disabled) !important;
+            cursor: default;
+            pointer-events: none;
+            text-decoration: none;
         }
     }
 }

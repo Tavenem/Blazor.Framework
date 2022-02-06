@@ -1,22 +1,43 @@
 ﻿.btn {
     @include ripple;
+    --button-default-active-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+    --button-default-bg: var(--tavenem-color-default);
+    --button-default-color: var(--tavenem-color-default-text);
+    --button-default-hover-bg: var(--tavenem-color-default-darken);
+    --button-default-hover-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+    --button-default-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+    --button-active-shadow: var(--button-inherited-active-shadow, var(--button-default-active-shadow));
+    --button-bg: var(--button-inherited-bg, var(--button-default-bg));
+    --button-border-color: var(--button-inherited-border-color, var(--tavenem-color-border));
+    --button-border-style: var(--button-inherited-border-style, none);
+    --button-color: var(--button-inherited-color, var(--button-default-color));
+    --button-font-size: var(--button-inherited-font-size, var(--tavenem-font-size-button));
+    --button-hover-bg: var(--button-inherited-hover-bg, var(--button-default-hover-bg));
+    --button-hover-color: var(--button-inherited-hover-color, var(--tavenem-color-default-text));
+    --button-hover-shadow: var(--button-inherited-hover-shadow, var(--button-default-hover-shadow));
+    --button-padding-x: var(--button-inherited-padding-x, 16px);
+    --button-padding-y: var(--button-inherited-padding-y, 6px);
+    --button-shadow: var(--button-inherited-shadow, var(--button-default-shadow));
     align-items: center;
-    background-color: var(--tavenem-color-default);
-    border: 0;
+    background-color: var(--button-bg);
+    border-color: var(--button-border-color);
     border-radius: var(--tavenem-border-radius);
-    box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+    border-style: var(--button-border-style);
+    border-width: 1px;
+    box-shadow: var(--button-shadow);
     box-sizing: border-box;
-    color: var(--tavenem-color-default-text);
+    color: var(--button-color);
     cursor: pointer;
     display: inline-flex;
-    font-size: var(--tavenem-font-size-button);
+    font-size: var(--button-font-size);
     font-weight: var(--tavenem-font-weight-semibold);
+    gap: .25rem;
     justify-content: center;
     line-height: var(--tavenem-lineheight-button);
     margin: 0;
-    min-width: 4em;
+    min-width: 4rem;
     outline: 0;
-    padding: 6px 16px;
+    padding: var(--button-padding-y) var(--button-padding-x);
     position: relative;
     text-decoration: none;
     text-transform: var(--tavenem-texttransform-button);
@@ -47,315 +68,306 @@
 
     &:hover,
     &:focus-visible {
-        background-color: var(--tavenem-color-default-darken);
-        box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+        background-color: var(--button-hover-bg);
+        box-shadow: var(--button-hover-shadow);
+        color: var(--button-hover-color);
     }
 
     &:active {
-        box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+        box-shadow: var(--button-active-shadow);
     }
 
-    &:disabled {
-        box-shadow: none;
+    &:disabled, &.disabled {
+        --button-active-shadow: none;
+        --button-bg: var(--tavenem-color-action-disabled-bg);
+        --button-color: var(--tavenem-color-text-disabled);
+        --button-hover-shadow: none;
+        --button-shadow: none;
         background-color: var(--tavenem-color-action-disabled-bg) !important;
         color: var(--tavenem-color-text-disabled) !important;
         cursor: default;
         pointer-events: none;
     }
 
-    > .icon:first-child {
-        margin-inline-end: 8px;
-        margin-inline-start: -4px;
-    }
-
-    > .icon:last-child {
-        margin-inline-end: -4px;
-        margin-inline-start: 8px;
-    }
-
-    > .icon:only-child {
-        margin-inline-end: -4px;
-        margin-inline-start: -4px;
-    }
-
     &.small {
-        font-size: calc(var(--tavenem-font-size-button) - 1px);
-        padding: 4px 10px;
-
-        > .icon:first-child {
-            margin-inline-start: -2px;
-        }
-
-        > .icon:last-child {
-            margin-inline-end: -2px;
-        }
-
-        > .icon:only-child {
-            margin-inline-end: -2px;
-            margin-inline-start: -2px;
-        }
+        --button-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-padding-x: 10px;
+        --button-padding-y: 4px;
     }
 
     &.large {
-        font-size: calc(var(--tavenem-font-size-button) + 1px);
-        padding: 8px 22px;
+        --button-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-padding-x: 22px;
+        --button-padding-y: 8px;
     }
 
     &.outlined {
-        color: var(--tavenem-color-action);
-        padding: 5px 15px;
+        --button-active-shadow: none;
+        --button-bg: transparent;
+        --button-border-style: solid;
+        --button-color: var(--tavenem-color-action);
+        --button-hover-bg: var(--tavenem-color-action-hover-bg);
+        --button-hover-color: var(--tavenem-color-action);
+        --button-hover-shadow: none;
+        --button-shadow: none;
+        padding: calc(var(--button-padding-y) - 1px) calc(var(--button-padding-x) - 1px);
 
-        &:hover,
-        &:focus-visible {
-            background-color: var(--tavenem-color-action-hover-bg);
+        &:disabled, &.disabled {
+            --button-border-color: var(--tavenem-color-action-disabled-bg);
         }
+    }
 
-        &:disabled {
-            border-color: var(--tavenem-color-action-disabled-bg);
-        }
-
-        &.small {
-            font-size: calc(var(--tavenem-font-size-button) - 1px);
-            padding: 3px 9px;
-        }
-
-        &.large {
-            font-size: calc(var(--tavenem-font-size-button) + 1px);
-            padding: 7px 21px;
-        }
+    &.border {
+        --button-border-style: solid;
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            background-color: var(--tavenem-color-#{$theme});
-            color: var(--tavenem-color-#{$theme}-text);
+            --button-bg: var(--tavenem-color-#{$theme});
+            --button-border-color: var(--tavenem-color-#{$theme}-text);
+            --button-color: var(--tavenem-color-#{$theme}-text);
+            --button-hover-bg: var(--tavenem-color-#{$theme}-darken);
+            --button-hover-color: var(--tavenem-color-#{$theme}-text);
+            color: var(--button-color);
 
-            &:hover,
-            &:focus-visible {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.darken {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-                color: var(--tavenem-color-#{$theme}-text);
-
-                &:hover,
-                &:focus-visible {
-                    background-color: var(--tavenem-color-#{$theme}-darken-2);
-                }
+            &.bg-alt, &.darken {
+                --button-bg: var(--tavenem-color-#{$theme}-darken);
+                --button-hover-bg: var(--tavenem-color-#{$theme}-darken-2);
             }
 
             &.lighten {
-                background-color: var(--tavenem-color-#{$theme}-lighten);
-                color: var(--tavenem-color-#{$theme}-text);
+                --button-bg: var(--tavenem-color-#{$theme}-lighten);
+                --button-hover-bg: var(--tavenem-color-#{$theme});
+            }
 
-                &:hover,
-                &:focus-visible {
-                    background-color: var(--tavenem-color-#{$theme});
+            &.outlined {
+                --button-bg: transparent;
+                --button-border-color: var(--tavenem-color-#{$theme});
+                --button-color: var(--tavenem-color-#{$theme});
+                --button-hover-bg: var(--tavenem-color-#{$theme}-hover);
+                --button-hover-color: var(--tavenem-color-#{$theme});
+            }
+
+            &.bg-alt, &.filled {
+                background-color: var(--button-bg);
+            }
+
+            &.darken, &.lighten, &.filled {
+                color: var(--button-color);
+            }
+
+            &.filled {
+                &.bg-alt, &.darken, &.lighten {
+                    background-color: var(--button-bg);
                 }
             }
 
             &.outlined {
-                &:hover,
-                &:focus-visible {
-                    background-color: var(--tavenem-color-#{$theme}-hover);
-                }
+                border-color: var(--button-border-color);
             }
         }
     }
 }
 a.btn {
+    &:hover:not(.disabled, :disabled),
+    &:focus:not(.disabled, :disabled) {
+        color: var(--button-hover-color);
+    }
+
     @each $theme in $theme-colors {
         &.#{$theme} {
-            &:hover:not(.disabled, :disabled),
-            &:focus:not(.disabled, :disabled) {
-                color: var(--tavenem-color-#{$theme}-text);
-            }
-
-            &.darken {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-            }
-
-            &.lighten {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-            }
+            --button-hover-color: var(--tavenem-color-#{$theme}-text);
         }
     }
 }
 
 .btn-text {
-    background-color: transparent !important;
-    box-shadow: none;
-    color: inherit;
+    --button-default-active-shadow: none;
+    --button-default-bg: transparent;
+    --button-default-color: inherit;
+    --button-default-hover-bg: var(--tavenem-color-action-hover-bg);
+    --button-default-hover-shadow: none;
+    --button-default-shadow: none;
     min-width: 0;
 
-    &:hover,
-    &:focus-visible {
-        background-color: var(--tavenem-color-action-hover-bg) !important;
-        box-shadow: none;
-    }
-
-    &:active {
-        box-shadow: none;
-    }
-
     &.small {
-        font-size: calc(var(--tavenem-font-size-button) - 1px);
-        padding: 4px 5px;
+        --button-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-padding-x: 5px;
     }
 
     &.large {
-        font-size: calc(var(--tavenem-font-size-button) + 1px);
-        padding: 8px 11px;
+        --button-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-padding-x: 11px;
+    }
+
+    &:disabled, &.disabled {
+        --button-bg: transparent;
+        background-color: transparent !important;
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            color: var(--tavenem-color-#{$theme});
+            --button-bg: transparent;
+            --button-border-color: var(--tavenem-color-#{$theme});
+            --button-color: var(--tavenem-color-#{$theme});
+            --button-hover-bg: var(--tavenem-color-#{$theme}-hover);
+            --button-hover-color: var(--tavenem-color-#{$theme});
+            color: var(--button-color);
 
-            &:hover,
-            &:focus-visible {
-                background-color: var(--tavenem-color-#{$theme}-hover) !important;
-            }
-
-            &.darken {
-                color: var(--tavenem-color-#{$theme}-darken);
+            &.bg-alt, &.darken {
+                --button-color: var(--tavenem-color-#{$theme}-darken);
+                --button-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
+                --button-hover-color: var(--tavenem-color-#{$theme}-darken);
             }
 
             &.lighten {
-                color: var(--tavenem-color-#{$theme}-lighten);
+                --button-color: var(--tavenem-color-#{$theme}-lighten);
+                --button-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
+                --button-hover-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+
+            &.bg-alt, &.filled {
+                background-color: var(--button-bg);
+            }
+
+            &.darken, &.lighten, &.filled {
+                color: var(--button-color);
+            }
+
+            &.filled {
+                &.bg-alt, &.darken, &.lighten {
+                    background-color: var(--button-bg);
+                }
+            }
+
+            &.outlined {
+                border-color: var(--button-border-color);
             }
         }
     }
 }
 a.btn-text {
+    &:hover:not(.disabled, :disabled),
+    &:focus:not(.disabled, :disabled) {
+        color: var(--button-hover-color);
+    }
+
     @each $theme in $theme-colors {
         &.#{$theme} {
-            &:hover:not(.disabled, :disabled),
-            &:focus:not(.disabled, :disabled) {
-                color: var(--tavenem-color-#{$theme}-lighten);
-            }
+            --button-hover-color: var(--tavenem-color-#{$theme}-lighten);
 
             &.darken {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme});
-                }
+                --button-hover-color: var(--tavenem-color-#{$theme});
             }
 
             &.lighten {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-lighten-2);
-                }
+                --button-hover-color: var(--tavenem-color-#{$theme}-lighten-2);
             }
         }
     }
 }
 
 .btn-icon {
-    background-color: transparent;
+    --button-default-active-shadow: none;
+    --button-default-bg: transparent;
+    --button-default-color: inherit;
+    --button-default-hover-bg: var(--tavenem-color-action-hover-bg);
+    --button-default-hover-shadow: none;
+    --button-default-shadow: none;
+    --button-font-size: var(--button-inherited-font-size-icon, 1.5rem);
+    --button-padding-y: var(--button-inherited-padding-y-icon, 6px);
     border-radius: 9999px;
-    box-shadow: none;
-    color: inherit;
     flex: 0 0 auto;
-    font-size: 1.25em;
-    min-width: calc(1.25em + 12px);
-    padding: 6px;
+    min-width: calc(var(--button-font-size) + (var(--button-padding-y) * 2));
+    padding: var(--button-padding-y) var(--button-padding-y);
     text-align: center;
 
     &:after {
         transform: scale(7,7);
     }
 
-    &:hover,
-    &:focus-visible {
-        background-color: var(--tavenem-color-action-hover-bg);
-        box-shadow: none;
-    }
-
-    &:active {
-        box-shadow: none;
+    .icon {
+        font-size: inherit;
     }
 
     &.small {
-        font-size: 1.125em;
-        min-width: calc(1.125em + 12px);
-        padding: 5px;
+        --button-font-size: 1.25rem;
+        --button-padding-y: 5px;
     }
 
     &.large {
-        font-size: 1.375em;
-        min-width: calc(1.375em + 12px);
-        padding: 5px;
+        --button-font-size: 2rem;
+        --button-padding-y: 5px;
     }
 
     &.filled {
-        background-color: var(--tavenem-color-default);
-        box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
-        color: var(--tavenem-color-default-text);
-
-        &:hover,
-        &:focus-visible {
-            background-color: var(--tavenem-color-default-darken);
-            box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
-        }
-
-        &:active {
-            box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
-        }
+        --button-active-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+        --button-bg: var(--tavenem-color-default);
+        --button-color: var(--tavenem-color-default-text);
+        --button-hover-bg: var(--tavenem-color-default-darken);
+        --button-hover-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+        --button-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
     }
 
     &.outlined {
-        font-size: calc(1.25em - 2px);
-        min-width: calc(1.25em + 10px);
-        padding: 5px;
-
-        &.small {
-            font-size: calc(1.125em - 2px);
-            min-width: calc(1.125em + 10px);
-            padding: 4px;
-        }
-
-        &.large {
-            font-size: calc(1.375em - 2px);
-            min-width: calc(1.375em + 10px);
-            padding: 4px;
-        }
+        padding: calc(var(--button-padding-y) - 1px) calc(var(--button-padding-y) - 1px);
     }
 
     @each $theme in $theme-colors {
-        &.#{$theme}.filled {
-            background-color: var(--tavenem-color-#{$theme});
-            color: var(--tavenem-color-#{$theme}-text);
+        &.#{$theme} {
+            --button-bg: transparent;
+            --button-color: var(--tavenem-color-#{$theme});
+            --button-hover-bg: var(--tavenem-color-#{$theme}-hover);
+            --button-hover-color: var(--tavenem-color-#{$theme});
+            color: var(--button-color);
 
-            &.bg-alt {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &:hover,
-            &:focus-visible {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.darken {
-                &:hover,
-                &:focus-visible {
-                    background-color: var(--tavenem-color-#{$theme}-darken-2);
-                }
+            &.bg-alt, &.darken {
+                --button-bg: var(--tavenem-color-#{$theme}-hover);
+                --button-color: var(--tavenem-color-#{$theme}-darken);
+                --button-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
+                --button-hover-color: var(--tavenem-color-#{$theme}-darken);
             }
 
             &.lighten {
-                &:hover,
-                &:focus-visible {
-                    background-color: var(--tavenem-color-#{$theme});
+                --button-bg: var(--tavenem-color-#{$theme}-hover);
+                --button-color: var(--tavenem-color-#{$theme}-lighten);
+                --button-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
+                --button-hover-color: var(--tavenem-color-#{$theme}-lighten);
+            }
+
+            &.filled {
+                --button-bg: var(--tavenem-color-#{$theme});
+                --button-color: var(--tavenem-color-#{$theme}-text);
+                --button-hover-bg: var(--tavenem-color-#{$theme}-darken);
+                --button-hover-color: var(--tavenem-color-#{$theme}-text);
+
+                &.bg-alt {
+                    --button-bg: var(--tavenem-color-#{$theme}-darken);
                 }
+
+                &.darken {
+                    --button-hover-bg: var(--tavenem-color-#{$theme}-darken-2);
+                }
+
+                &.lighten {
+                    --button-hover-bg: var(--tavenem-color-#{$theme});
+                }
+
+                &.bg-alt, &.darken, &.lighten {
+                    background-color: var(--button-bg);
+                }
+            }
+
+            &.bg-alt, &.filled {
+                background-color: var(--button-bg);
+            }
+
+            &.darken, &.lighten, &.filled {
+                color: var(--button-color);
+            }
+
+            &.outlined {
+                border-color: var(--button-border-color);
             }
         }
     }

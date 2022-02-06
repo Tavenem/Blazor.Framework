@@ -50,7 +50,7 @@ public partial class ScrollToTop : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("scroll-to-top")
+    protected override string CssClass => new CssBuilder("scroll-to-top")
         .Add("hidden", !Visible)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)

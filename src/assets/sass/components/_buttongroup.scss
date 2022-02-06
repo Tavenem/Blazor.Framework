@@ -3,42 +3,182 @@
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-1);
     display: inline-flex;
-    --buttongroup-inherited-bg: var(--tavenem-color-default);
-    --buttongroup-inherited-hover-bg: var(--tavenem-color-default-darken);
-    --buttongroup-inherited-hover-color: var(--tavenem-color-default-text);
-    --buttongroup-inherited-hover-shadow: var(--tavenem-shadow-2);
-    --buttongroup-inherited-border-color: var(--tavenem-color-border);
-    --buttongroup-inherited-border-style: none;
+    --button-inherited-active-shadow: var(--tavenem-shadow-2);
+    --button-inherited-bg: var(--tavenem-color-default);
+    --button-inherited-border-color: var(--tavenem-color-border);
+    --button-inherited-border-style: none;
+    --button-inherited-color: var(--tavenem-color-default-text);
+    --button-inherited-font-size: var(--tavenem-font-size-button);
+    --button-inherited-font-size-icon: 1.5rem;
+    --button-inherited-hover-bg: var(--tavenem-color-default-darken);
+    --button-inherited-hover-color: var(--tavenem-color-default-text);
+    --button-inherited-hover-shadow: var(--tavenem-shadow-2);
+    --button-inherited-padding-x: 16px;
+    --button-inherited-padding-y: 6px;
+    --button-inherited-padding-y-icon: 6px;
+    --button-inherited-shadow: none;
 
     &.elevation-0 {
-        --buttongroup-inherited-hover-shadow: none;
+        --button-inherited-active-shadow: none;
+        --button-inherited-hover-shadow: none;
     }
 
-    > {
+    &:not(.vertical) > {
         .btn,
         .btn-text,
         .btn-icon {
-            background-color: var(--buttongroup-inherited-bg);
-            box-shadow: none;
-            border-color: var(--buttongroup-inherited-border-color);
-            border-style: var(--buttongroup-inherited-border-style);
-            border-width: 1px;
-            color: inherit;
-            padding: 6px 16px;
+            &:not(:last-child) {
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
+            }
 
-            &:hover,
-            &:focus-visible {
-                background-color: var(--buttongroup-inherited-hover-bg);
-                box-shadow: var(--buttongroup-inherited-hover-shadow);
-                color: var(--buttongroup-inherited-hover-color);
+            &:not(:first-child) {
+                border-bottom-left-radius: 0;
+                border-left-style: solid;
+                border-top-left-radius: 0;
+                margin-left: -1px;
+            }
+
+            &:first-child {
+                border-bottom-left-radius: inherit;
+                border-top-left-radius: inherit;
+            }
+
+            &:last-child {
+                border-bottom-right-radius: inherit;
+                border-top-right-radius: inherit;
             }
         }
     }
 
-    > .btn-icon {
-        padding-left: 12px;
-        padding-right: 12px;
+    &.vertical {
+        flex-direction: column;
+
+        > {
+            .btn,
+            .btn-text,
+            .btn-icon {
+                width: 100%;
+
+                &:not(:last-child) {
+                    border-bottom-left-radius: 0;
+                    border-bottom-right-radius: 0;
+                    border-bottom-style: solid;
+                }
+
+                &:not(:first-child) {
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                    border-top-style: solid;
+                    margin-top: -1px;
+                }
+
+                &:first-child {
+                    border-top-left-radius: inherit;
+                    border-top-right-radius: inherit;
+                }
+
+                &:last-child {
+                    border-bottom-left-radius: inherit;
+                    border-bottom-right-radius: inherit;
+                }
+            }
+        }
     }
+
+    &.small {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-x: 10px;
+        --button-inherited-padding-y: 4px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-x: 22px;
+        --button-inherited-padding-y: 8px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.outlined {
+        box-shadow: none;
+        --button-inherited-active-shadow: none;
+        --button-inherited-bg: transparent;
+        --button-inherited-border-style: solid;
+        --button-inherited-color: var(--tavenem-color-text);
+        --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+        --button-inherited-hover-color: var(--tavenem-color-action);
+        --button-inherited-hover-shadow: none;
+        --button-inherited-padding-x: 15px;
+        --button-inherited-padding-y: 5px;
+        --button-inherited-padding-y-icon: 5px;
+
+        &.small {
+            --button-inherited-padding-x: 9px;
+            --button-inherited-padding-y: 3px;
+            --button-inherited-padding-y-icon: 4px;
+        }
+
+        &.large {
+            --button-inherited-padding-x: 21px;
+            --button-inherited-padding-y: 7px;
+            --button-inherited-padding-y-icon: 4px;
+        }
+    }
+
+    &.border {
+        --button-inherited-border-style: solid;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --button-inherited-bg: var(--tavenem-color-#{$theme});
+            --button-inherited-border-color: var(--tavenem-color-#{$theme}-text);
+            --button-inherited-color: var(--tavenem-color-#{$theme}-text);
+            --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-darken);
+            --button-inherited-hover-color: var(--tavenem-color-#{$theme}-text);
+
+            &.bg-alt, &.darken {
+                --button-inherited-bg: var(--tavenem-color-#{$theme}-darken);
+                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-darken-2);
+            }
+
+            &.lighten {
+                --button-inherited-bg: var(--tavenem-color-#{$theme}-lighten);
+                --button-inherited-hover-bg: var(--tavenem-color-#{$theme});
+            }
+
+            &.outlined {
+                --button-inherited-bg: transparent;
+                --button-inherited-border-color: var(--tavenem-color-#{$theme});
+                --button-inherited-color: var(--tavenem-color-#{$theme});
+                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
+                --button-inherited-hover-color: var(--tavenem-color-#{$theme});
+            }
+        }
+    }
+}
+
+.button-group-text {
+    background-color: transparent !important;
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: none;
+    display: inline-flex;
+    --button-inherited-active-shadow: none;
+    --button-inherited-bg: transparent;
+    --button-inherited-border-color: var(--tavenem-color-border);
+    --button-inherited-border-style: none;
+    --button-inherited-color: var(--tavenem-color-text);
+    --button-inherited-font-size: var(--tavenem-font-size-button);
+    --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+    --button-inherited-hover-color: var(--tavenem-color-action);
+    --button-inherited-hover-shadow: none;
+    --button-inherited-padding-x: 8px;
+    --button-inherited-padding-y: 6px;
+    --button-inherited-padding-y-icon: 7px;
+    --button-inherited-shadow: none;
 
     &:not(.vertical) > {
         .btn,
@@ -76,122 +216,70 @@
                 &:not(:first-child) {
                     border-top-left-radius: 0;
                     border-top-right-radius: 0;
+                    border-top-style: solid;
                     margin-top: -1px;
                 }
             }
         }
     }
 
-    &.small > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            padding: .25em .625em;
-        }
+    &.small {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-x: 5px;
+        --button-inherited-padding-y: 4px;
+        --button-inherited-padding-y-icon: 5px;
     }
 
-    &.large > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            padding: 4px 22px;
-        }
+    &.large {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-x: 11px;
+        --button-inherited-padding-y: 8px;
+        --button-inherited-padding-y-icon: 5px;
     }
 
     &.outlined {
-        box-shadow: none;
-        color: var(--tavenem-color-text);
-        --buttongroup-inherited-bg: transparent;
-        --buttongroup-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-        --buttongroup-inherited-hover-color: var(--tavenem-color-default-hover);
-        --buttongroup-inherited-hover-shadow: none;
-        --buttongroup-inherited-border-style: solid;
+        --button-inherited-border-style: solid;
+        --button-inherited-padding-x: 7px;
+        --button-inherited-padding-y: 5px;
+        --button-inherited-padding-y-icon: 5px;
 
-        &.small > {
-            .btn,
-            .btn-text,
-            .btn-icon {
-                padding: 3px 9px;
-            }
+        &.small {
+            --button-inherited-padding-x: 4px;
+            --button-inherited-padding-y: 3px;
+            --button-inherited-padding-y-icon: 4px;
         }
 
-        &.large > {
-            .btn,
-            .btn-text,
-            .btn-icon {
-                padding: 7px 21px;
-            }
+        &.large {
+            --button-inherited-padding-x: 10px;
+            --button-inherited-padding-y: 7px;
+            --button-inherited-padding-y-icon: 4px;
         }
+    }
+
+    &.border {
+        --button-inherited-border-style: solid;
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --buttongroup-inherited-bg: var(--tavenem-color-#{$theme});
-            --buttongroup-inherited-hover-bg: var(--tavenem-color-#{$theme}-darken);
-            --buttongroup-inherited-hover-color: var(--tavenem-color-#{$theme}-text);
-            --buttongroup-inherited-border-color: var(--tavenem-color-#{$theme});
+            --button-inherited-bg: transparent;
+            --button-inherited-border-color: var(--tavenem-color-#{$theme});
+            --button-inherited-color: var(--tavenem-color-#{$theme});
+            --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
+            --button-inherited-hover-color: var(--tavenem-color-#{$theme});
 
-            &.darken {
-                --buttongroup-inherited-bg: var(--tavenem-color-#{$theme}-darken);
-                --buttongroup-inherited-hover-bg: var(--tavenem-color-#{$theme}-darken-2);
+            &.bg-alt, &.darken {
+                --button-inherited-color: var(--tavenem-color-#{$theme}-darken);
+                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
+                --button-inherited-hover-color: var(--tavenem-color-#{$theme}-darken);
             }
 
             &.lighten {
-                --buttongroup-inherited-bg: var(--tavenem-color-#{$theme}-lighten);
-                --buttongroup-inherited-hover-bg: var(--tavenem-color-#{$theme});
-            }
-
-            &.outlined {
-                --buttongroup-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
-            }
-        }
-    }
-}
-
-.button-group-text {
-    box-shadow: none;
-    --buttongroup-inherited-bg: transparent;
-    --buttongroup-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-    --buttongroup-inherited-hover-color: var(--tavenem-color-text);
-    --buttongroup-inherited-hover-shadow: none;
-
-    > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            padding: 6px 8px;
-        }
-    }
-
-    &.small > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            padding: 4px 5px;
-        }
-    }
-
-    &.large > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            padding: 8px 11px;
-        }
-    }
-
-    @each $theme in $theme-colors {
-        &.#{$theme} {
-            color: var(--tavenem-color-#{$theme});
-            --buttongroup-inherited-bg: transparent;
-            --buttongroup-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-            --buttongroup-inherited-hover-color: var(--tavenem-color-#{$theme}-hover);
-
-            &.darken {
-                color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                color: var(--tavenem-color-#{$theme}-lighten);
+                --button-inherited-color: var(--tavenem-color-#{$theme}-lighten);
+                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
+                --button-inherited-hover-color: var(--tavenem-color-#{$theme}-lighten);
             }
         }
     }

@@ -31,7 +31,7 @@ public partial class Accordion
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("accordion")
+    protected override string CssClass => new CssBuilder("accordion")
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();

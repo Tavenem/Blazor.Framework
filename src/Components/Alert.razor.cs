@@ -49,7 +49,7 @@ public partial class Alert
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("alert")
+    protected override string CssClass => new CssBuilder("alert")
         .Add(ThemeColor.ToCSS())
         .Add("clickable", OnClick.HasDelegate)
         .Add("d-none", IsClosed)

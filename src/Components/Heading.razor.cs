@@ -41,7 +41,7 @@ public partial class Heading
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder(HeadingClassName)
+    protected override string CssClass => new CssBuilder(HeadingClassName)
         .Add(ThemeColor.ToCSS())
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)

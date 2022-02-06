@@ -5,29 +5,31 @@
     border-radius: 50%;
     box-sizing: content-box;
     color: inherit;
+    cursor: pointer;
     direction: ltr;
     display: inline-block;
     fill: currentColor;
     flex-shrink: 0;
     font-family: 'Material Icons';
-    font-size: 1em;
+    font-size: 1rem;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
-    height: 1em;
+    height: 1rem;
+    justify-self: end;
     letter-spacing: normal;
     line-height: 1;
     margin-inline-start: auto;
     opacity: .5;
     order: 9999;
-    padding: .25em;
+    padding: .25rem;
     position: relative;
     text-rendering: optimizeLegibility;
     text-transform: none;
     transition: fill 200ms cubic-bezier(.4,0,.2,1) 0ms;
     user-select: none;
     white-space: nowrap;
-    width: 1em;
+    width: 1rem;
     word-wrap: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -39,13 +41,16 @@
     }
 
     &:focus {
-        box-shadow: 0 0 0 .25em rgba(var(--tavenem-color-primary), .25);
+        box-shadow: 0 0 0 .25rem rgba(var(--tavenem-color-primary), .25);
         opacity: 1;
         outline: 0;
     }
 
     &:disabled,
     &.disabled {
+        box-shadow: none;
+        color: inherit !important;
+        cursor: default;
         opacity: .25;
         pointer-events: none;
     }

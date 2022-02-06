@@ -1,6 +1,6 @@
 ﻿@keyframes tf-icon-to-full {
     from {
-        width: 3.5em;
+        width: 3.5rem;
     }
 }
 
@@ -28,7 +28,7 @@
     > {
         .header,
         .footer {
-            min-height: 4em;
+            min-height: 4rem;
 
             &.drawer-control {
                 height: auto;
@@ -46,7 +46,7 @@
         > {
             .header,
             .footer {
-                min-height: 3em;
+                min-height: 3rem;
             }
         }
     }
@@ -55,7 +55,7 @@
         > {
             .header,
             .footer {
-                min-height: 3em;
+                min-height: 3rem;
             }
         }
     }
@@ -85,10 +85,10 @@
 
         &.icon {
             animation: forwards tf-full-to-icon 225ms cubic-bezier(0, 0, 0.2, 1);
-            padding-left: .5em;
-            padding-right: .5em;
+            padding-left: .5rem;
+            padding-right: .5rem;
             transition: width 225ms cubic-bezier(0, 0, 0.2, 1);
-            width: 3.5em;
+            width: 3.5rem;
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -125,7 +125,7 @@
             width: auto;
 
             &:not(.icon) {
-                max-width: 15em;
+                max-width: 15rem;
             }
         }
 
@@ -232,8 +232,8 @@
         flex-wrap: wrap;
         height: 0;
         max-height: 0;
-        padding-left: 1.5em;
-        padding-right: 1.5em;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
         transition: height 0ms 400ms;
         width: 100%;
 
@@ -261,7 +261,7 @@
 
         &.open {
             animation: forwards tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
-            max-height: 20em;
+            max-height: 20rem;
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -291,7 +291,7 @@
 
         &.open {
             animation: forwards tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
-            max-height: 20em;
+            max-height: 20rem;
 
             @media (prefers-reduced-motion) {
                 animation: none;
@@ -308,7 +308,7 @@
 }
 
 .drawer-close-small {
-    margin-inline-end: -1.5em;
+    margin-inline-end: -1.5rem;
 }
 
 .drawer-container {
@@ -335,7 +335,7 @@
 
             &.left,
             &.right {
-                max-width: 15em;
+                max-width: 15rem;
                 width: auto;
 
                 &.closed {
@@ -344,7 +344,7 @@
                     width: auto;
 
                     &:not(.icon) {
-                        max-width: 15em;
+                        max-width: 15rem;
                     }
                 }
 
@@ -362,11 +362,11 @@
             &.bottom,
             &.top {
                 height: auto;
-                max-height: 20em;
+                max-height: 20rem;
 
                 &.closed {
                     animation: none;
-                    max-height: 20em;
+                    max-height: 20rem;
                     transform: translateY(0);
                 }
             }

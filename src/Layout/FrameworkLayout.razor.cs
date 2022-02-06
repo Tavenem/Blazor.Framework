@@ -9,17 +9,27 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class FrameworkLayout : IDisposable
 {
-    private readonly List<AppBar> _appBars = new();
     private readonly List<Contents> _contents = new();
+    private readonly List<Drawer> _drawers = new();
     private readonly List<ScrollToTop> _scrollToTops = new();
 
     private bool _disposedValue;
     private DotNetObjectReference<FrameworkLayout>? _dotNetRef;
 
     /// <summary>
+    /// The child content of this component.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
     /// Any toolbars and drawers.
     /// </summary>
     [Parameter] public RenderFragment? FrameworkContent { get; set; }
+
+    /// <summary>
+    /// The breakpoint at which the left and right drawers should be permanently visible.
+    /// </summary>
+    [Parameter] public Breakpoint SideDrawerBreakpoint { get; set; } = Breakpoint.Lg;
 
     /// <summary>
     /// <para>
@@ -42,10 +52,21 @@ public partial class FrameworkLayout : IDisposable
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected override string CssClass => new CssBuilder("framework")
-        .Add(base.CssClass)
+        .Add(DrawerContainerClass)
+        .Add("drawer-open", HasOpenDrawer)
+        .Add(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     private bool AutoScrollToTop { get; set; } = true;
+
+    private string DrawerContainerClass => SideDrawerBreakpoint switch
+    {
+        Breakpoint.None => "drawer-container",
+        _ => $"drawer-container drawer-container-{SideDrawerBreakpoint.ToCSS()}",
+    };
+
+    private bool HasOpenDrawer { get; set; }
 
     [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
 
@@ -134,13 +155,13 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
-    internal void Add(AppBar appBar)
-    {
-        appBar.DrawerToggle += OnAppbarDrawerToggle;
-        _appBars.Add(appBar);
-    }
-
     internal void Add(Contents contents) => _contents.Add(contents);
+
+    internal void Add(Drawer drawer)
+    {
+        drawer.DrawerToggled += OnDrawerToggled;
+        _drawers.Add(drawer);
+    }
 
     internal void Add(ScrollToTop scrollToTop)
     {
@@ -151,13 +172,26 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
-    internal void Remove(AppBar appBar)
+    internal async Task DrawerToggleAsync(Side side)
     {
-        appBar.DrawerToggle -= OnAppbarDrawerToggle;
-        _appBars.Remove(appBar);
+        var drawer = _drawers.Find(x => x.Side == side);
+        if (drawer is null)
+        {
+            return;
+        }
+
+        await drawer.ToggleAsync();
     }
 
+    internal bool HasDrawer(Side side) => _drawers.Any(x => x.Side == side);
+
     internal void Remove(Contents contents) => _contents.Remove(contents);
+
+    internal void Remove(Drawer drawer)
+    {
+        drawer.DrawerToggled -= OnDrawerToggled;
+        _drawers.Remove(drawer);
+    }
 
     internal void Remove(ScrollToTop scrollToTop)
     {
@@ -168,21 +202,20 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
-    private async void OnAppbarDrawerToggle(object? sender, EventArgs _)
+    private protected async Task OnCloseDrawersAsync()
     {
-        if (sender is not AppBar appBar
-            || appBar.ControlsDrawerSide == Side.None)
+        foreach (var drawer in _drawers)
         {
-            return;
+            await drawer.CloseAsync();
         }
+        HasOpenDrawer = false;
+    }
 
-        var drawer = _drawers.Find(x => x.Side == appBar.ControlsDrawerSide);
-        if (drawer is null)
-        {
-            return;
-        }
-
-        await drawer.ToggleAsync();
+    private void OnDrawerToggled(object? drawer, bool state)
+    {
+        HasOpenDrawer = state
+          || _drawers.Any(x => x.IsOpen);
+        StateHasChanged();
     }
 
     private async void OnLocationChanged(object? _, LocationChangedEventArgs args)

@@ -1,14 +1,23 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
+@typeparam TChip
+
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" role="alert" class="@CssClass" style="@Style" @onclick="OnClickAsync">
-    @if (!string.IsNullOrWhiteSpace(IconClass))
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClickAsync">
+    @if (!string.IsNullOrWhiteSpace(IconName))
     {
-        <span class="@IconClassName"></span>
+        <span class="@IconClassName">@IconName</span>
     }
-    @ChildContent
-    @if (CanClose)
+    @if (ChildContent is null)
+    {
+        <span>@(Text ?? Item?.ToString())</span>
+    }
+    else
+    {
+        @ChildContent
+    }
+    @if (AutoClose || OnClosed.HasDelegate)
     {
         <div class="btn-close" @onclick="OnClosedAsync">close</div>
     }

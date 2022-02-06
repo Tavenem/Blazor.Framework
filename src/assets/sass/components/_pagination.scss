@@ -11,9 +11,9 @@
     li {
         > * {
             border-radius: 9999px;
-            height: 2em;
+            height: 2rem;
             margin: 0 3px;
-            min-width: 2em;
+            min-width: 2rem;
             padding: 0 6px;
             text-align: center;
         }
@@ -80,15 +80,15 @@
     }
 
     &.small li > * {
-        height: 1.625em;
+        height: 1.625rem;
         margin: 0 1px;
-        min-width: 1.625em;
+        min-width: 1.625rem;
         padding: 0 4px;
     }
 
     &.large li > * {
-        height: 2.5em;
-        min-width: 2.5em;
+        height: 2.5rem;
+        min-width: 2.5rem;
         padding: 0 10px;
     }
 

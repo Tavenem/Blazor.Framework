@@ -19,7 +19,7 @@ body {
     background-color: var(--tavenem-color-bg);
     color: var(--tavenem-color-text);
     font-family: var(--tavenem-font-family);
-    font-size: 1em;
+    font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
     line-height: var(--tavenem-lineheight-body);
     margin: 0;
@@ -47,14 +47,15 @@ hr {
     }
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
     --tavenem-casl: .3;
     letter-spacing: -.07rem;
     line-height: var(--tavenem-lineheight-heading);
     margin-bottom: .5rem;
     margin-top: 0;
 }
-h1 {
+h1, .h1 {
     font-size: var(--tavenem-font-size-h1);
     font-weight: var(--tavenem-font-weight-semibold);
 
@@ -62,7 +63,7 @@ h1 {
         margin-top: 1rem;
     }
 }
-h2 {
+h2, .h2 {
     font-size: var(--tavenem-font-size-h2);
     font-weight: var(--tavenem-font-weight-semibold);
 
@@ -70,7 +71,7 @@ h2 {
         margin-top: 1rem;
     }
 }
-h3 {
+h3, .h3 {
     font-size: var(--tavenem-font-size-h3);
     font-weight: var(--tavenem-font-weight-medium-bold);
 
@@ -78,7 +79,7 @@ h3 {
         margin-top: .5rem;
     }
 }
-h4 {
+h4, .h4 {
     font-size: var(--tavenem-font-size-h4);
     font-weight: var(--tavenem-font-weight-medium-bold);
 
@@ -86,11 +87,11 @@ h4 {
         margin-top: .5rem;
     }
 }
-h5 {
+h5, .h5 {
     font-size: var(--tavenem-font-size-h5);
     font-weight: var(--tavenem-font-weight-bold);
 }
-h6 {
+h6, .h6 {
     font-size: var(--tavenem-font-size-h6);
     font-weight: var(--tavenem-font-weight-bold);
 }
@@ -164,11 +165,11 @@ sub, sup {
 }
 
 sub {
-    bottom: -.25rem;
+    bottom: -.25em;
 }
 
 sup {
-    top: -.5rem;
+    top: -.5em;
 }
 
 a {
@@ -193,7 +194,15 @@ a {
     &:disabled, &.disabled {
         color: var(--tavenem-color-action-disabled) !important;
         cursor: default;
+        pointer-events: none;
+        text-decoration: none;
     }
+}
+a[aria-disabled="true"] {
+    color: var(--tavenem-color-action-disabled) !important;
+    cursor: default;
+    pointer-events: none;
+    text-decoration: none;
 }
 
 pre, code, kbd, samp {
@@ -248,7 +257,6 @@ kbd {
     }
 
     kbd {
-        font-size: 1rem;
         font-weight: var(--tavenem-font-weight-medium-bold);
         line-height: var(--tavenem-lineheight-body);
         padding: 0;
@@ -257,10 +265,10 @@ kbd {
 
 figure {
     display: inline-block;
-    margin: 0 0 1em;
+    margin: 0 0 1rem;
 
     img {
-        margin-bottom: .5em;
+        margin-bottom: .5rem;
         line-height: 1;
     }
 }
@@ -366,10 +374,10 @@ input {
     box-shadow: var(--tavenem-shadow-inset);
     color: var(--tavenem-color-text);
     display: block;
-    font-size: 1em;
+    font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
     line-height: var(--tavenem-lineheight-body);
-    padding: 6px .75em;
+    padding: 6px .75rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     width: 100%;
 
@@ -390,7 +398,7 @@ input {
     }
 
     &::-webkit-date-and-time-value {
-        height: calc(var(--tavenem-lineheight-body) * 1em);
+        height: calc(var(--tavenem-lineheight-body) * 1rem);
     }
 
     &::placeholder {
@@ -411,9 +419,9 @@ input {
         border-style: solid;
         border-width: 0;
         color: var(--tavenem-color-text);
-        margin: -6px -.75em;
-        margin-inline-end: .75em;
-        padding: 6px .75em;
+        margin: -6px -.75rem;
+        margin-inline-end: .75rem;
+        padding: 6px .75rem;
         pointer-events: none;
         transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
@@ -425,7 +433,7 @@ input {
     &[type="color"] {
         height: auto;
         padding: 6px;
-        width: 3em;
+        width: 3rem;
 
         &:not(:disabled):not([readonly]) {
             cursor: pointer;
@@ -433,12 +441,12 @@ input {
 
         &::-moz-color-swatch {
             border-radius: var(--tavenem-border-radius);
-            height: calc(var(--tavenem-lineheight-body) * 1em);
+            height: calc(var(--tavenem-lineheight-body) * 1rem);
         }
 
         &::-webkit-color-swatch {
             border-radius: var(--tavenem-border-radius);
-            height: calc(var(--tavenem-lineheight-body) * 1em);
+            height: calc(var(--tavenem-lineheight-body) * 1rem);
         }
     }
 }
@@ -452,7 +460,7 @@ select {
 }
 
 textarea {
-    min-height: calc(var(--tavenem-lineheight-body) * 1em + .75em + 2px);
+    min-height: calc(var(--tavenem-lineheight-body) * 1em + .75rem + 2px);
     resize: vertical;
 }
 

@@ -13,7 +13,7 @@
 
     &.end, &.start {
         .timeline-item-content {
-            max-width: calc(100% - 6em);
+            max-width: calc(100% - 6rem);
         }
 
         .timeline-item-opposite {
@@ -22,7 +22,7 @@
     }
 
     &:not(.horizontal) {
-        padding-top: 1.5em;
+        padding-top: 1.5rem;
 
         &:before {
             height: 100%;
@@ -30,26 +30,26 @@
         }
 
         .timeline-item {
-            padding-bottom: 1.5em;
+            padding-bottom: 1.5rem;
         }
 
         .timeline-item-content {
-            max-width: calc(50% - 3em);
+            max-width: calc(50% - 3rem);
         }
 
         .timeline-item-divider {
-            min-width: 6em;
+            min-width: 6rem;
         }
 
         .timeline-item-opposite {
             flex: 1 1 auto;
-            max-width: calc(50% - 3em);
+            max-width: calc(50% - 3rem);
         }
 
         &.end {
             &:before {
                 left: auto;
-                right: calc(3em - 1px);
+                right: calc(3rem - 1px);
             }
 
             .timeline-item {
@@ -59,12 +59,12 @@
             .timeline-item-content > .card {
                 &:before, &:after {
                     left: auto;
-                    right: -1em;
+                    right: -1rem;
                     transform: rotate(180deg);
                 }
 
                 &.outlined:after {
-                    right: calc(-1em + 1px);
+                    right: calc(-1rem + 1px);
                 }
             }
 
@@ -75,7 +75,7 @@
 
         &.start {
             &:before {
-                left: calc(3em - 1px);
+                left: calc(3rem - 1px);
                 right: auto;
             }
 
@@ -85,12 +85,12 @@
 
             .timeline-item-content > .card {
                 &:before, &:after {
-                    left: -1em;
+                    left: -1rem;
                     right: auto;
                 }
 
                 &.outlined:after {
-                    left: calc(-1em + 1px);
+                    left: calc(-1rem + 1px);
                 }
             }
 
@@ -112,12 +112,12 @@
 
                 .timeline-item-content > .card {
                     &:before, &:after {
-                        left: -1em;
+                        left: -1rem;
                         right: auto;
                     }
 
                     &.outlined:after {
-                        left: calc(-1em + 1px);
+                        left: calc(-1rem + 1px);
                     }
                 }
 
@@ -132,12 +132,12 @@
                 .timeline-item-content > .card {
                     &:before, &:after {
                         left: auto;
-                        right: -1em;
+                        right: -1rem;
                         transform: rotate(180deg);
                     }
 
                     &.outlined:after {
-                        right: calc(-1em + 1px);
+                        right: calc(-1rem + 1px);
                     }
                 }
 
@@ -157,17 +157,17 @@
         }
 
         .timeline-item {
-            padding-left: 1.5em;
-            padding-right: 1.5em;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
             width: 100%;
         }
 
         .timeline-item-content {
-            max-height: calc(50% - 3em);
+            max-height: calc(50% - 3rem);
         }
 
         .timeline-item-divider {
-            min-height: 6em;
+            min-height: 6rem;
         }
 
         &:not(.end, .start) {
@@ -182,14 +182,14 @@
 
                     .timeline-item-content > .card {
                         &:before, &:after {
-                            bottom: -1.5em;
-                            left: calc(50% - .5em);
+                            bottom: -1.5rem;
+                            left: calc(50% - .5rem);
                             top: auto;
                             transform: rotate(270deg);
                         }
 
                         &.outlined:after {
-                            bottom: calc(-1.5em + 1px);
+                            bottom: calc(-1.5rem + 1px);
                         }
                     }
                 }
@@ -200,13 +200,13 @@
                     .timeline-item-content > .card {
                         &:before, &:after {
                             bottom: auto;
-                            left: calc(50% - .5em);
-                            top: -1.5em;
+                            left: calc(50% - .5rem);
+                            top: -1.5rem;
                             transform: rotate(270deg);
                         }
 
                         &.outlined:after {
-                            top: calc(-1.5em + 1px);
+                            top: calc(-1.5rem + 1px);
                         }
                     }
                 }
@@ -215,7 +215,7 @@
 
         &.end {
             &:before {
-                bottom: calc(3em - 1px);
+                bottom: calc(3rem - 1px);
                 top: auto;
             }
 
@@ -225,14 +225,14 @@
 
             .timeline-item-content > .card {
                 &:before, &:after {
-                    bottom: -1.5em;
-                    left: calc(50% - .5em);
+                    bottom: -1.5rem;
+                    left: calc(50% - .5rem);
                     top: auto;
                     transform: rotate(90deg);
                 }
 
                 &.outlined:after {
-                    bottom: calc(-1.5em + 1px);
+                    bottom: calc(-1.5rem + 1px);
                 }
             }
 
@@ -244,7 +244,7 @@
         &.start {
             &:before {
                 bottom: auto;
-                top: calc(3em - 1px);
+                top: calc(3rem - 1px);
             }
 
             .timeline-item {
@@ -254,13 +254,13 @@
             .timeline-item-content > .card {
                 &:before, &:after {
                     bottom: auto;
-                    left: calc(50% - .5em);
+                    left: calc(50% - .5rem);
                     top: -1.5em;
                     transform: rotate(90deg);
                 }
 
                 &.outlined:after {
-                    top: calc(-1.5em + 1px);
+                    top: calc(-1.5rem + 1px);
                 }
             }
 
@@ -277,22 +277,22 @@
     display: flex;
 
     &.small .timeline-item-divider .dot {
-        height: 1.5em;
-        width: 1.5em;
+        height: 1.5rem;
+        width: 1.5rem;
 
         .inner {
-            height: 1.125em;
-            width: 1.125em;
+            height: 1.125rem;
+            width: 1.125rem;
         }
     }
 
     &.large .timeline-item-divider .dot {
-        height: 3.25em;
-        width: 3.25em;
+        height: 3.25rem;
+        width: 3.25rem;
 
         .inner {
-            height: 2.625em;
-            width: 2.625em;
+            height: 2.625rem;
+            width: 2.625rem;
         }
     }
 
@@ -353,22 +353,22 @@
         }
 
         &:before {
-            border-bottom: 1em solid transparent;
-            border-right: 1em solid rgba(0,0,0,.10);
-            border-top: 1em solid transparent;
-            top: calc(50% - .875em);
+            border-bottom: 1rem solid transparent;
+            border-right: 1rem solid rgba(0,0,0,.10);
+            border-top: 1rem solid transparent;
+            top: calc(50% - .875rem);
         }
 
         &:after {
-            border-bottom: 1em solid transparent;
-            border-right: 1em solid var(--tavenem-color-bg-surface);
-            border-top: 1em solid transparent;
-            top: calc(50% - 1em);
+            border-bottom: 1rem solid transparent;
+            border-right: 1rem solid var(--tavenem-color-bg-surface);
+            border-top: 1rem solid transparent;
+            top: calc(50% - 1rem);
         }
 
         &.outlined:before {
             border-right-color: var(--tavenem-color-border);
-            top: calc(50% - 1em);
+            top: calc(50% - 1rem);
         }
     }
 }
@@ -385,10 +385,10 @@
         border-radius: 50%;
         box-shadow: var(--tavenem-shadow-1);
         display: flex;
-        height: 2.375em;
+        height: 2.375rem;
         justify-content: center;
         left: calc(50% - 19px);
-        width: 2.375em;
+        width: 2.375rem;
 
         .inner {
             align-items: center;
@@ -396,9 +396,9 @@
             border-radius: 50%;
             color: var(--dot-text);
             display: flex;
-            height: 1.875em;
+            height: 1.875rem;
             justify-content: center;
-            width: 1.875em;
+            width: 1.875rem;
         }
     }
 }

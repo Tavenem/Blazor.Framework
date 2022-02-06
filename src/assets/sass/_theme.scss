@@ -20,7 +20,7 @@
 }
 
 .outlined {
-    background-color: transparent !important;
+    background-color: transparent;
     border: 1px solid var(--tavenem-color-border);
 }
 
@@ -75,6 +75,14 @@
 
         &.outlined {
             border-color: var(--tavenem-color-#{$theme});
+
+            &.darken {
+                border-color: var(--tavenem-color-#{$theme}-darken);
+            }
+
+            &.lighten {
+                border-color: var(--tavenem-color-#{$theme}-lighten);
+            }
         }
     }
 

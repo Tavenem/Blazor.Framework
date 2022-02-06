@@ -1,0 +1,49 @@
+﻿@page "/components/breadcrumbs"
+
+<PageTitle>Breadcrumbs - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Breadcrumbs</Heading>
+
+<p>
+    The breadcrumbs component displays a simple inline list with separators between each item. It is
+    intended for showing the navigational hierarchy of the current page. Usually the elements are
+    links to to the app areas which conceptually contain the current view.
+</p>
+
+<p>
+    To create a breadcrumb list, add the <code>breadcrumbs</code> class to an element (usually an
+    <code>ol</code> or other list).
+</p>
+
+<p>
+    If you set the <code>aria-current</code> attribute to <code>true</code> on any element in the
+    list, its appearance will change to visually indicate that there is no need to interact with it.
+    Links can be fully disabled, if necessary, by removing the <code>href</code> attribute, or using
+    an <a href="./components/anchor-link">AnchorLink</a> component with the <code>Disabled</code>
+    parameter set to <code>true</code>.
+</p>
+
+<CodeExample Code="@(@"<nav aria-label=""breadcrumb"">
+    <ol class=""breadcrumbs"">
+        <li><a href=""./"">Home</a></li>
+        <li>Components</li>
+        <li aria-current=""page""><a href=""./components/breadcrumbs"">Breadcrumbs</a></li>
+    </ol>
+</nav>")" />
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    The separator between items can be customized by setting the
+    <code>--tavenem-breadcrumb-divider</code> CSS property, either on the <code>breadcrumbs</code>
+    element to customize a single instance, or on <code>:root</code> to customize it for your entire
+    app.
+</p>
+
+<CodeExample Code="@(@"<nav aria-label=""breadcrumb"">
+    <ol class=""breadcrumbs"" style=""--tavenem-breadcrumb-divider:'>'"">
+        <li><a href=""./"">Home</a></li>
+        <li>Components</li>
+        <li aria-current=""page""><a href=""./components/breadcrumbs"">Breadcrumbs</a></li>
+    </ol>
+</nav>")" />

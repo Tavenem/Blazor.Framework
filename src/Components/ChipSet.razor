@@ -1,9 +1,30 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
+@attribute [CascadingTypeParameter(nameof(TChip))]
+@typeparam TChip
+
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
-    <CascadingValue Value="this" IsFixed="true">
-        @ChildContent
-    </CascadingValue>
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    @if (Items is not null)
+    {
+        <CascadingValue Value="this" IsFixed="true">
+        <CascadingValue Value="SelectedItems">
+            @if (Template is null)
+            {
+                foreach (var item in Items)
+                {
+                    <Chip Item="item" />
+                }
+            }
+            else
+            {
+                foreach (var item in Items)
+                {
+                    @Template(item);
+                }
+            }
+        </CascadingValue>
+        </CascadingValue>
+    }
 </div>

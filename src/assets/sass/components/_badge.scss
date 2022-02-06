@@ -1,32 +1,44 @@
 ﻿.badge {
-    --badge-content-inset: 4px;
-    align-items: flex-start;
+    --badge-content-inset-x: 4px;
+    --badge-content-inset-y: 4px;
     background-color: transparent !important;
     border: none !important;
     color: var(--tavenem-color-default-text);
     display: flex;
     flex: 0 1;
-    font-size: .75rem;
+    font-size: .75em;
     height: 100%;
-    justify-content: flex-end;
     left: 0;
-    margin-inline-end: unset;
-    margin-inline-start: -2px;
     pointer-events: none;
     position: absolute;
     top: 0;
     width: 100%;
+    z-index: 1;
 
-    .badge-content {
+    &:empty:after {
         background-color: var(--tavenem-color-default);
         border-color: inherit;
-        border-radius: .625rem;
+        border-radius: 50%;
+        content: '';
+        height: .75em;
+        inset: auto auto calc(100% - var(--badge-content-inset-y)) calc(100% - var(--badge-content-inset-x));
+        width: .75em;
+        pointer-events: auto;
+        position: absolute;
+        top: auto;
+        transition: .3s cubic-bezier(.25,.8,.5,1);
+        z-index: 1;
+    }
+
+    > * {
+        background-color: var(--tavenem-color-default);
+        border-color: inherit;
+        border-radius: 9999px;
         color: inherit;
-        height: 1.25rem;
-        inset: auto auto calc(100% - var(--badge-content-inset)) calc(100% - var(--badge-content-inset));
+        inset: auto auto calc(100% - var(--badge-content-inset-y)) calc(100% - var(--badge-content-inset-x));
         letter-spacing: 0;
         line-height: 1;
-        min-width: 1.25rem;
+        min-width: 1.25em;
         padding: 4px 6px;
         pointer-events: auto;
         position: absolute;
@@ -35,6 +47,7 @@
         top: auto;
         transition: .3s cubic-bezier(.25,.8,.5,1);
         white-space: nowrap;
+        z-index: 1;
 
         > *:first-child {
             border-top-left-radius: inherit;
@@ -51,82 +64,91 @@
         }
     }
 
-    &.left {
-        justify-content: flex-start;
-
-        .badge-content {
-            inset: auto calc(100% - var(--badge-content-inset)) calc(100% - var(--badge-content-inset)) auto;
-        }
+    > .icon {
+        font-size: 1.25em;
     }
 
-    &.center {
-        justify-content: center;
-
-        .badge-content {
-            bottom: calc(100% - var(--badge-content-inset));
-            inset: unset;
-        }
-    }
-
-    &-center {
-        align-items: center;
-
-        &.left {
-            justify-content: flex-start;
-
-            .badge-content {
-                inset: unset;
-                right: calc(100% - var(--badge-content-inset));
-            }
-        }
-
-        &.center {
-            justify-content: center;
-
-            .badge-content {
-                inset: unset;
-            }
-        }
-
-        &.right .badge-content {
-            inset: unset;
-            left: calc(100% - var(--badge-content-inset));
-        }
-    }
-
-    &-bottom {
+    &.bottom, &.bottom-right {
         align-items: flex-end;
 
-        &.left {
-            justify-content: flex-start;
-
-            .badge-content {
-                inset: calc(100% - var(--badge-content-inset)) calc(100% - var(--badge-content-inset)) auto auto;
-            }
+        > *, &:empty:after {
+            inset: calc(100% - var(--badge-content-inset-y)) auto auto calc(100% - var(--badge-content-inset-x));
         }
+    }
 
-        &.center {
-            justify-content: center;
+    &.bottom-center {
+        align-items: flex-end;
+        justify-content: center;
 
-            .badge-content {
-                inset: unset;
-                top: calc(100% - var(--badge-content-inset));
-            }
+        > *, &:empty:after {
+            inset: calc(100% - var(--badge-content-inset-y)) auto auto auto;
         }
+    }
 
-        &.right .badge-content {
-            inset: calc(100% - var(--badge-content-inset)) auto auto calc(100% - var(--badge-content-inset));
+    &.bottom-left {
+        align-items: flex-end;
+        justify-content: flex-start;
+
+        > *, &:empty:after {
+            inset: calc(100% - var(--badge-content-inset-y)) calc(100% - var(--badge-content-inset-x)) auto auto;
+        }
+    }
+
+    &.center, &.top-center {
+        justify-content: center;
+
+        > *, &:empty:after {
+            inset: auto auto calc(100% - var(--badge-content-inset-y)) auto;
+        }
+    }
+
+    &.center-center {
+        align-items: center;
+        justify-content: center;
+
+        > *, &:empty:after {
+            inset: unset;
+        }
+    }
+
+    &.center-left {
+        align-items: center;
+
+        > *, &:empty:after {
+            inset: auto calc(100% - (var(--badge-content-inset-x) - 4px)) auto auto;
+        }
+    }
+
+    &.center-right {
+        align-items: center;
+
+        > *, &:empty:after {
+            inset: auto auto auto calc(100% - (var(--badge-content-inset-x) - 4px));
+        }
+    }
+
+    &.left, &.top-left {
+        justify-content: flex-start;
+
+        > *, &:empty:after {
+            inset: auto calc(100% - var(--badge-content-inset-x)) calc(100% - var(--badge-content-inset-y)) auto;
         }
     }
 
     &.overlap {
-        --badge-content-inset: 12px;
+        --badge-content-inset-x: 8px;
+        --badge-content-inset-y: 12px;
+
+        &:empty:after {
+            --badge-content-inset-x: 4px;
+            --badge-content-inset-y: 8px;
+        }
     }
 
     &.border {
         border-style: none !important;
 
-        .badge-content {
+        > * {
             border-color: inherit;
             border-style: solid;
             border-width: 2px;
@@ -139,58 +161,76 @@
                 margin-top: -4px;
             }
         }
-    }
 
-    &.dot .badge-content {
-        border-radius: 50%;
-        height: .5625rem;
-        min-width: 0;
-        padding: 0;
-        width: .5625rem;
+        &:empty:after {
+            border-color: inherit;
+            border-style: solid;
+            border-width: 2px;
+        }
     }
 
     &.filled {
-        color: var(--tavenem-color-dark-text);
+        &.bg-alt {
+            > *, &:empty:after {
+                background-color: var(--tavenem-color-default-darken);
+            }
+        }
 
-        .badge-content {
-            background-color: var(--tavenem-color-dark);
+        &.darken {
+            > *, &:empty:after {
+                background-color: var(--tavenem-color-default-darken);
+            }
+        }
+
+        &.lighten {
+            > *, &:empty:after {
+                background-color: var(--tavenem-color-default-lighten);
+            }
         }
     }
 
     &.outlined {
-        .badge-content {
-            background-color: transparent !important;
-            border: 1px solid var(--tavenem-color-border);
+        > *, &:empty:after {
+            background-color: transparent;
+            border-style: solid;
+            border-width: 1px;
         }
     }
 
     &.bg-alt {
-        .badge-content {
+        > *, &:empty:after {
             background-color: var(--tavenem-color-bg-alt);
         }
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            .badge-content {
-                background-color: var(--tavenem-#{$theme});
+            > *, &:empty:after {
+                background-color: var(--tavenem-color-#{$theme});
                 color: var(--tavenem-color-#{$theme}-text);
             }
 
-            a.badge-content {
+            > a {
                 &:hover:not(.disabled, :disabled),
                 &:focus:not(.disabled, :disabled) {
                     color: var(--tavenem-color-#{$theme}-text);
                 }
             }
 
+            &.bg-alt {
+                > *, &:empty:after {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
+                    color: var(--tavenem-color-#{$theme}-text);
+                }
+            }
+
             &.darken {
-                .badge-content {
-                    background-color: var(--tavenem-#{$theme}-darken);
+                > *, &:empty:after {
+                    background-color: var(--tavenem-color-#{$theme}-darken);
                     color: var(--tavenem-color-#{$theme}-text);
                 }
 
-                a.badge-content {
+                > a {
                     &:hover:not(.disabled, :disabled),
                     &:focus:not(.disabled, :disabled) {
                         color: var(--tavenem-color-#{$theme}-text);
@@ -199,16 +239,25 @@
             }
 
             &.lighten {
-                .badge-content {
-                    background-color: var(--tavenem-#{$theme}-lighten);
+                > *, &:empty:after {
+                    background-color: var(--tavenem-color-#{$theme}-lighten);
                     color: var(--tavenem-color-#{$theme}-text);
                 }
 
-                a.badge-content {
+                > a {
                     &:hover:not(.disabled, :disabled),
                     &:focus:not(.disabled, :disabled) {
                         color: var(--tavenem-color-#{$theme}-text);
                     }
+                }
+            }
+
+            &.outlined {
+                border-color: var(--tavenem-color-#{$theme});
+
+                > *, &:empty:after {
+                    background-color: var(--tavenem-color-#{$theme}-hover);
+                    color: var(--tavenem-color-#{$theme});
                 }
             }
         }

@@ -91,6 +91,26 @@
 	either extreme, since a lightness value too close to 0 will be indistunguishable from black, and
 	a value too close to 100 will be indistinguishable from white.
 </p>
+<p>
+	Each theme and its variations exist as utility classes which can be used to control the color of
+	most elements. The theme color by itself, used as a class, sets the foreground color to that
+	theme color (and the border color, although it does not actually add a border). You can add the
+	<code>lighten</code> or <code>darken</code> class to modify the lightness.
+</p>
+<p>
+	If you add the <code>filled</code> class, the background color is set to the theme color, and
+	the foreground to an appropriate contrasting text color (as seen in the swatches above). You can
+	also use the <code>border-{theme}</code> classes to set the border color to a theme color.
+</p>
+<p>
+	The theme classes are:
+	<ul>
+		@foreach (var color in Enum.GetValues<ThemeColor>().Where(x => x != ThemeColor.None))
+		{
+			<li><code>@color.ToString().ToLowerInvariant()</code></li>
+		}
+	</ul>
+</p>
 
 <Heading Level="HeadingLevel.H2" Id="list">Property List</Heading>
 

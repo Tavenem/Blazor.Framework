@@ -5,68 +5,68 @@
 <Heading Level="HeadingLevel.H1">AppBar</Heading>
 
 <p>
-    The <code>AppBar</code> component is a toolbar docked to the top or bottom of a
-    container&mdash;usually the entire page.
-</p>
-
-<p>
-    The place you'll use an <code>AppBar</code> most often is in the <code>FrameworkLayout</code>
-    component's <code>FrameworkContent</code> area, to set the top or bottom (or both) content for
-    your app.
-</p>
-
-<p>
-    An <code>AppBar</code> can be placed inside any container, however, to add a docked toolbar to
-    sub-areas of your layout.
+    The <code>AppBar</code> component is a toolbar docked to the top or bottom of a Tavenem Blazor
+    Framework app. You can see one at the top of this site.
 </p>
 
 <Heading Level="HeadingLevel.H2">Placement</Heading>
 
 <p>
-    Set the <code>Side</code> property to either <code>Side.Bottom</code> or <code>Side.Top</code>
-    to dock an <code>AppBar</code>. This sets the <code>grid-area</code> property to either
-    <code>header</code> or <code>footer</code>, respectively. These area are already set up in the
-    <code>FrameworkLayout</code> component, but you will need to set them up yourself in other
-    containers.
+    Set the <code>Side</code> property of an <code>AppBar</code> to either <code>Side.Top</code> or
+    <code>Side.Bottom</code> to dock the <code>AppBar</code>. You can have one <code>AppBar</code>
+    docked to the top, and one docked to the bottom of your layout.
+</p>
+
+<Heading Level="HeadingLevel.H2">Theme</Heading>
+
+<p>
+    The <code>ThemeColor</code> property can be set to any of the theme colors to control the color
+    scheme of the <code>AppBar</code>. By default this is inherited from the
+    <code>FrameworkLayout</code> to help coordinate your design theme among all <code>AppBar</code>
+    and <code>Drawer</code> components, but you can override the value for individual bars, as
+    neeeded.
 </p>
 
 <p>
-    If your container doesn't use grid layout, you may use one or more of the <a
-    href="./utilities/position">positioning utilities</a> to dock the <code>AppBar</code>, or use
-    your own CSS styles.
+    You can also use the <code>bg-alt</code> class to set the bar apart with a darker background, or
+    use the <code>filled</code> class in combination with a theme to assign a solid background
+    color.
 </p>
 
 <Heading Level="HeadingLevel.H2">Content</Heading>
 
 <p>
     An <code>AppBar</code> contains a single <a href="./components/toolbar">Toolbar</a> component,
-    whose class can be customized with the <code>ToolbarClass</code> property.
+    whose class can be customized with the <code>ToolbarClass</code> property, and whose contents
+    are set via the <code>ChildContent</code> property of the <code>AppBar</code>.
 </p>
 
 <Heading Level="HeadingLevel.H2">Drawer control</Heading>
 
 <p>
-    If an <code>AppBar</code> is container within a <a
-    href="./components/drawer">DrawerContainer</a> component (including a
-    <code>FrameworkLayout</code>, which inherits from <code>DrawerContainer</code>), you can set the
-    <code>ControlsDrawerSide</code> property to one of the following values to indicate which drawer
-    the appbar controls:
+    You can set the <code>ControlsDrawerSide</code> property to one of the following values to
+    indicate which drawer the appbar controls:
 </p>
 
 <ul>
+    <li><code>Side.None</code></li>
+    <li><code>Side.Top</code></li>
     <li><code>Side.Bottom</code></li>
     <li><code>Side.Left</code></li>
     <li><code>Side.Right</code></li>
-    <li><code>Side.Top</code></li>
 </ul>
 
 <p>
     If you do so, the <code>AppBar</code> with automatically include a toggle button which controls
-    the visibility of the drawer.
+    the visibility of the indicated drawer. The toggle button will only appear if there actually
+    a drawer docked on that side.
 </p>
 
 <p>
     You can also set the <code>Breakpoint</code> propety to any of the <code>Breakpoint</code>
     values to indicate the breakpoint at which the drawer should be permanently visible (and the
-    toggle button will be hidden).
+    toggle button will be hidden). By default this is inherited from the
+    <code>FrameworkLayout</code> for left and right drawers, to more easily coordinate between the
+    <code>AppBar</code> and the associated <code>Drawer</code> (which has a <code>Breakpoint</code>
+    property of its own), but you may explicitly override the value if you wish.
 </p>

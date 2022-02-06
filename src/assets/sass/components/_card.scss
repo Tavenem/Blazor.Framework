@@ -6,11 +6,11 @@
     color: var(--tavenem-color-text);
     column-gap: 1rem;
     display: flex;
-    flex: 1 0 0%;
+    flex: 1 0 min-content;
     flex-direction: column;
-    margin: 1em;
-    padding-bottom: 1em;
-    padding-top: 1em;
+    margin: 1rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
     position: relative;
     row-gap: 0;
 
@@ -25,13 +25,22 @@
             flex: 0 0 auto;
         }
 
+        .body {
+            display: flex;
+            flex: 1 1 auto;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
         .header,
         .footer {
             column-gap: 1em;
             display: flex;
             flex: 0 0 auto;
-            padding-left: 1.5em;
-            padding-right: 1.5em;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
 
             > {
                 * {
@@ -49,18 +58,19 @@
                     flex: 0 0 auto;
 
                     &:first-child {
-                        margin-inline-start: -.5em;
+                        margin-inline-start: -.5rem;
                     }
 
                     &:last-child {
-                        margin-inline-end: -.5em;
+                        margin-inline-end: -.5rem;
                     }
                 }
             }
         }
 
         .header {
-            margin-bottom: 1em;
+            margin-bottom: 1rem;
+            order: -1;
 
             > {
                 * {
@@ -69,13 +79,13 @@
 
                 button, .btn {
                     align-self: flex-start;
-                    margin-top: -.5em;
                 }
             }
         }
 
         .footer {
-            margin-top: 1em;
+            margin-top: 1rem;
+            order: 9999;
 
             > {
                 * {
@@ -84,42 +94,71 @@
 
                 button, .btn {
                     align-self: flex-end;
-                    margin-bottom: -.5em;
                 }
             }
         }
 
         .media {
             object-fit: contain;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
             width: 100%;
+
+            .header + & {
+                margin-top: 0;
+            }
+
+            & + .footer {
+                margin-bottom: 0;
+            }
+
+            &:first-child {
+                border-top-left-radius: inherit;
+                border-top-right-radius: inherit;
+                margin-top: -1rem;
+            }
+
+            &:last-child {
+                border-bottom-left-radius: inherit;
+                border-bottom-right-radius: inherit;
+                margin-bottom: -1rem;
+            }
+
+            &:only-child {
+                border-radius: inherit;
+                margin-bottom: -1rem;
+                margin-top: -1rem;
+            }
 
             &.backdrop {
                 border-radius: inherit;
-                bottom: 0;
-                left: 0;
+                margin-bottom: -1rem;
+                margin-top: -1rem;
                 object-fit: cover;
-                position: absolute;
-                padding: 0;
-                right: 0;
-                top: 0;
             }
+        }
+
+        .media-overlay {
+            border-radius: inherit;
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            padding: 1rem;
+            right: 0;
+            top: 0;
         }
     }
 
     > *:first-child {
         border-top: none;
-        border-top-left-radius: inherit;
-        border-top-right-radius: inherit;
+        margin-top: 0;
+        padding-top: 0;
     }
 
     > *:last-child {
         border-bottom: none;
-        border-bottom-left-radius: inherit;
-        border-bottom-right-radius: inherit;
-    }
-
-    > *:only-child {
-        border-radius: inherit;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
 
     &.filled {
@@ -259,38 +298,78 @@
 
 .card-group {
     border-radius: var(--tavenem-border-radius);
+    box-shadow: var(--tavenem-shadow-1);
     display: flex;
-    flex-flow: row wrap;
+    flex: 1 1 min-content;
+    flex-wrap: wrap;
     gap: 1px;
-    margin: 1em;
+    margin: 1rem;
 
     > .card {
         border-radius: 0;
-        flex: 1 0 0%;
+        box-shadow: none;
         margin: 0;
     }
 
-    &.outlined {
-        background-color: var(--tavenem-color-border) !important;
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            background-color: transparent;
+        }
     }
 
-    @each $theme in $theme-colors {
-        .#{$theme} {
-            background-color: transparent;
+    &.cols-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+}
 
-            &.outlined, .outlined {
-                background-color: var(--tavenem-color-#{$theme});
+@for $i from 2 through 12 {
+    .card-group.cols-#{$i} {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat($i, 1fr);
+    }
+
+    @each $breakpoint, $min-width in $breakpoints {
+        @media (min-width: $min-width) {
+            .card-group.cols-#{$breakpoint}-#{$i} {
+                display: grid;
+                grid-auto-columns: 1fr;
+                grid-template-columns: repeat($i, 1fr);
             }
-        }
-
-        .border-#{$theme} {
-            background-color: var(--tavenem-color-#{$theme});
         }
     }
 }
+
 @each $breakpoint, $min-width in $breakpoints {
+    .card-group.cols-#{$breakpoint}-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+
     .card-group-#{$breakpoint} {
+        border-radius: var(--tavenem-border-radius);
+        box-shadow: var(--tavenem-shadow-1);
+        display: flex;
+        flex: 1 1 min-content;
         flex-direction: column;
+        flex-wrap: wrap;
+        gap: 1px;
+        margin: 1rem;
+
+        > .card {
+            border-radius: 0;
+            box-shadow: none;
+            margin: 0;
+        }
+
+        @each $theme in $theme-colors {
+            &.#{$theme} {
+                background-color: transparent;
+            }
+        }
     }
 
     @media (min-width: $min-width) {

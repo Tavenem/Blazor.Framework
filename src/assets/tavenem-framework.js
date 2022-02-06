@@ -1,5 +1,6 @@
 window.tavenem = window.tavenem || {};
 window.tavenem.framework = window.tavenem.framework || {};
+window.tavenem.framework.popoverHelper = window.tavenem.framework.popoverHelper || {};
 export function cancelScrollListener(selector) {
     const element = selector
         ? document.querySelector(selector)

@@ -1,0 +1,231 @@
+﻿@page "/components/button"
+
+<PageTitle>Button - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Button</Heading>
+
+<p>
+    The button component is highly flexible, and provides a variety of styling options for
+    interactive elements.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    To create a basic button, add the <code>btn</code> class to an element (usually a
+    <code>button</code>). You can also assign it a theme class to color it.
+</p>
+
+<CodeExample Code="@(@"<button class=""btn"">Example</button>
+<button class=""btn"" disabled>Disabled</button>
+<a class=""btn primary"">Primary</a>
+<span class=""btn secondary"">Secondary</span>
+<div class=""btn tertiary"">Tertiary</div>
+<button class=""btn danger""><span class=""icon"">error_outline</span>Danger</button>
+<button class=""btn dark"">Dark</button>
+<button class=""btn default"">Default</button>
+<button class=""btn info""><span class=""icon"">info</span>Info</button>
+<button class=""btn success"">Success<span class=""icon"">check_circle</span></button>
+<button class=""btn warning""><span class=""icon"">warning_amber</span>Warning</button>")" />
+
+<Heading Level="HeadingLevel.H2">Size</Heading>
+
+<p>
+    Add the <code>small</code> class to reduce the font size and padding, or the <code>large</code>
+    class to increase them.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<button class=""btn primary small"">Small</button>
+<button class=""btn secondary"">Normal</button>
+<button class=""btn tertiary large"">Large</button>")" />
+
+<Heading Level="HeadingLevel.H2">Variants</Heading>
+
+<p>
+    Use the <code>outlined</code> class to create outlined buttons, or add the <code>btn-text</code> class to
+    remove the background except on hover.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""row justify-content-center mb-3"">
+    <button class=""btn outlined"">Example</button>
+    <button class=""btn outlined"" disabled>Disabled</button>
+    <button class=""btn outlined primary"">Primary</button>
+    <button class=""btn outlined secondary"">Secondary</button>
+    <button class=""btn outlined tertiary"">Tertiary</button>
+    <button class=""btn outlined danger""><span class=""icon"">error_outline</span>Danger</button>
+    <button class=""btn outlined dark"">Dark</button>
+    <button class=""btn outlined default"">Default</button>
+    <button class=""btn outlined info""><span class=""icon"">info</span>Info</button>
+    <button class=""btn outlined success"">Success<span class=""icon"">check_circle</span></button>
+    <button class=""btn outlined warning""><span class=""icon"">warning_amber</span>Warning</button>
+</div>
+<div class=""row justify-content-center"">
+    <button class=""btn btn-text"">Example</button>
+    <button class=""btn btn-text"" disabled>Disabled</button>
+    <button class=""btn btn-text primary"">Primary</button>
+    <button class=""btn btn-text secondary"">Secondary</button>
+    <button class=""btn btn-text tertiary"">Tertiary</button>
+    <button class=""btn btn-text danger""><span class=""icon"">error_outline</span>Danger</button>
+    <button class=""btn btn-text dark"">Dark</button>
+    <button class=""btn btn-text default"">Default</button>
+    <button class=""btn btn-text info""><span class=""icon"">info</span>Info</button>
+    <button class=""btn btn-text success"">Success<span class=""icon"">check_circle</span></button>
+    <button class=""btn btn-text warning""><span class=""icon"">warning_amber</span>Warning</button>
+</div>")" />
+
+<Heading Level="HeadingLevel.H2">Icons</Heading>
+
+<p>
+    Add the <code>btn-icon</code> class to make a button specially tailored to contain a single <a
+    href="./components/icon">Icon</a>.
+</p>
+
+<p>
+    The <code>small</code>, <code>large</code>, <code>filled</code>, and <code>outlined</code>
+    variants all exist for icon buttons as well. You can also use the <code>square</code> or
+    <code>rounded</code> utility classes to change the default round shape. This will be most easily
+    noticed when using a <code>filled</code> or <code>outlined</code> variant.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<button class=""btn btn-icon danger""><span class=""icon"">delete</span></button>
+<button class=""btn btn-icon small primary""><span class=""icon"">verified</span></button>
+<button class=""btn btn-icon large secondary""><span class=""icon"">account_circle</span></button>
+<button class=""btn btn-icon filled tertiary""><span class=""icon"">favorite</span></button>
+<button class=""btn btn-icon outlined info""><span class=""icon"">visibility</span></button>
+<button class=""btn btn-icon"" disabled><span class=""icon"">thumb_up</span></button>
+<button class=""btn btn-icon square outlined primary""><span class=""icon"">dashboard</span></button>
+<button class=""btn btn-icon rounded filled primary""><span class=""icon"">settings</span></button>")" />
+
+<Heading Level="HeadingLevel.H2">Groups</Heading>
+
+<p>
+    Buttons can be combined into joined groups by wrapping them in a container with the
+    <code>button-group</code> class. You can also also create a vertical group by adding the
+    <code>vertical</code> class.
+</p>
+
+<p>
+    For better accessibility, this group should also have its <code>role</code> attribute set to
+    <code>group</code> (or in some cases, <code>toolbar</code>).
+</p>
+
+<p>
+    The button group as a whole can have a theme class applied, which causes all the buttons inside
+    to inherit that theme. Any individual button can still override that theme, however.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group primary"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn secondary"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>
+<div class=""button-group vertical primary"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn tertiary"">Button 3</button>
+</div>")" />
+
+<p>
+    Button groups can contain standard buttons or icon buttons, as well as a mix.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group primary"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn btn-icon""><span class=""icon"">description</span></button>
+</div>
+<div class=""button-group vertical primary"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn btn-icon""><span class=""icon"">description</span></button>
+    <button class=""btn"">Button 3</button>
+    <button class=""btn btn-icon""><span class=""icon"">fingerprint</span></button>
+</div>")" />
+
+<Heading Level="HeadingLevel.H3">Group customization</Heading>
+
+<p>
+    Button groups accept the <code>small</code> and <code>large</code> classes, and apply the
+    modifier to all the buttons in the group.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group small"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>
+<div class=""button-group large"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>")" />
+
+<p>
+    You can also create <code>outlined</code> button groups, or use <code>button-group-text</code>
+    to create a group of text buttons.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group outlined"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>
+<div class=""button-group-text"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>
+<div class=""button-group-text vertical"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>")" />
+
+<p>
+    You can use the <code>square</code> and <code>rounded-*</code> utility classes to control the
+    shape of the group.
+</p>
+
+<CodeExample Code="@(@"<div class=""button-group square"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>
+<div class=""button-group rounded-pill"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>")" />
+
+<p>
+    You can disable the group's shadow with the <code>elevation-0</code> utility class.
+</p>
+
+<CodeExample Code="@(@"<div class=""button-group elevation-0"">
+    <button class=""btn"">Button 1</button>
+    <button class=""btn"">Button 2</button>
+    <button class=""btn"">Button 3</button>
+</div>")" />
+
+<Heading Level="HeadingLevel.H3">Split button</Heading>
+
+<p>
+    Button groups can also contain <a href="./components/dropdown">Dropdown</a> components, which
+    has the effect of creating a split button:
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="button-group">
+                <button class="btn">Button</button>
+                <Dropdown><span class="icon">arrow_drop_down</span></Dropdown>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""button-group"">
+    <button class=""btn"">Button</button>
+    <Dropdown><span class=""icon"">arrow_drop_down</span></Dropdown>
+</div>", true)
+    </ChildContent>
+</Collapse>

@@ -1,25 +1,25 @@
 ﻿.toolbar {
     align-items: center;
     display: flex;
-    min-height: 3.5em;
-    padding-left: 1em;
-    padding-right: 1em;
+    min-height: 3.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     position: relative;
 
     @media (max-width: 575px) and (orientation: landscape) {
-        min-height: 3em;
+        min-height: 3rem;
     }
 
     @media (min-width: 576px) and (orientation: portrait) {
-        min-height: 4em;
-        padding-left: 1.5em;
-        padding-right: 1.5em;
+        min-height: 4rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
 
     &.dense {
-        min-height: 3em;
-        padding-left: 1em;
-        padding-right: 1em;
+        min-height: 3rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     &.filled {

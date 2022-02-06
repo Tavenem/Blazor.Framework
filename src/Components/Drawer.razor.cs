@@ -10,10 +10,33 @@ public partial class Drawer : IDisposable
 {
     private bool _disposedValue;
 
+    private Breakpoint? _breakpoint;
     /// <summary>
+    /// <para>
     /// The breakpoint at which the drawer should be permanently visible.
+    /// </para>
+    /// <para>
+    /// Defaults to the value of <see cref="FrameworkLayout.SideDrawerBreakpoint"/>, if <see
+    /// cref="Side"/> is set to left or right.
+    /// </para>
     /// </summary>
-    [Parameter] public Breakpoint Breakpoint { get; set; }
+    [Parameter]
+    public Breakpoint Breakpoint
+    {
+        get
+        {
+            if (_breakpoint.HasValue)
+            {
+                return _breakpoint.Value;
+            }
+            if (Side is Side.Left or Side.Right)
+            {
+                return FrameworkLayout?.SideDrawerBreakpoint ?? Breakpoint.None;
+            }
+            return Breakpoint.None;
+        }
+        set => _breakpoint = value;
+    }
 
     /// <summary>
     /// The child content of this component.
@@ -103,7 +126,7 @@ public partial class Drawer : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected string CssClass => new CssBuilder("card drawer")
+    protected override string CssClass => new CssBuilder("card drawer")
         .Add(BreakpointClass)
         .Add(Side.ToCSS())
         .Add("closed", IsClosed)
@@ -176,6 +199,44 @@ public partial class Drawer : IDisposable
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        FrameworkLayout?.Add(this);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                FrameworkLayout?.Remove(this);
+                NavigationManager.LocationChanged -= OnLocationChanged;
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     /// Close this drawer if it is open.
     /// </summary>
     public async Task CloseAsync()
@@ -213,50 +274,6 @@ public partial class Drawer : IDisposable
             DrawerToggled?.Invoke(this, IsOpen);
             StateHasChanged();
         }
-    }
-
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
-    {
-        FrameworkLayout?.Add(this);
-        if (Breakpoint == Breakpoint.None
-            && FrameworkLayout is not null)
-        {
-            Breakpoint = FrameworkLayout.SideDrawerBreakpoint;
-        }
-
-        NavigationManager.LocationChanged += OnLocationChanged;
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                FrameworkLayout?.Remove(this);
-                NavigationManager.LocationChanged -= OnLocationChanged;
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     private async Task OnClosedAsync()

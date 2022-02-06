@@ -171,7 +171,7 @@
 
 .tabs-toolbar-inner {
     display: flex;
-    min-height: 3em;
+    min-height: 3rem;
 }
 
 .tabs-toolbar-content {
@@ -196,12 +196,13 @@
     align-items: center;
     display: inline-flex;
     flex-shrink: 0;
+    font-size: 1rem;
     font-weight: var(--tavenem-font-weight-semibold);
     justify-content: center;
     line-height: 1.75;
-    min-height: 3em;
-    min-width: 10em;
-    padding: 6px .75em;
+    min-height: 3rem;
+    min-width: 10rem;
+    padding: 6px .75rem;
     text-align: center;
     text-transform: uppercase;
     transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;

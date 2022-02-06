@@ -2,9 +2,9 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="@ToolbarClassName">
-        @if (ControlsDrawerSide != Tavenem.Blazor.Framework.Side.None)
+        @if (HasDrawer)
         {
             <div class="@DrawerToggleClassName" @onclick="OnDrawerToggleAsync">menu</div>
         }

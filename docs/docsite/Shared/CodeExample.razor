@@ -1,6 +1,8 @@
 ﻿<Collapse IsOpen="IsOpen" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        @CodeFragment
+        <div class="@RowCssClass">
+            @CodeFragment
+        </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(Code, true)
