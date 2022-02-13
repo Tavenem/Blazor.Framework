@@ -1,5 +1,7 @@
 ﻿.alert {
     align-items: center;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     background-color: var(--tavenem-color-bg-surface);
     border-radius: var(--tavenem-border-radius);
     column-gap: .75rem;

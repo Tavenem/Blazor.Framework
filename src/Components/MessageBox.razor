@@ -1,0 +1,23 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<Dialog @attributes="AdditionalAttributes">
+    <TitleContent>
+        <h6>@Title</h6>
+    </TitleContent>
+    <ChildContent>
+        @Message
+    </ChildContent>
+    <FooterContent>
+        <button @onclick="OnOkClicked" class="btn btn-text primary">@OkText</button>
+        @if (!string.IsNullOrEmpty(AltText))
+        {
+            <button @onclick="OnAltClicked" class="btn btn-text danger">@AltText</button>
+        }
+        @if (!string.IsNullOrEmpty(CancelText))
+        {
+            <button @onclick="OnCancelClicked" class="btn btn-text default">@CancelText</button>
+        }
+    </FooterContent>
+</Dialog>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
+using System.Collections.ObjectModel;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -10,6 +11,7 @@ namespace Tavenem.Blazor.Framework;
 public partial class FrameworkLayout : IDisposable
 {
     private readonly List<Contents> _contents = new();
+    private readonly Collection<DialogReference> _dialogs = new();
     private readonly List<Drawer> _drawers = new();
     private readonly List<ScrollToTop> _scrollToTops = new();
 
@@ -60,6 +62,8 @@ public partial class FrameworkLayout : IDisposable
 
     private bool AutoScrollToTop { get; set; } = true;
 
+    [Inject] private DialogService DialogService { get; set; } = default!;
+
     private string DrawerContainerClass => SideDrawerBreakpoint switch
     {
         Breakpoint.None => "drawer-container",
@@ -77,7 +81,11 @@ public partial class FrameworkLayout : IDisposable
     /// initial parameters from its parent in the render tree.
     /// </summary>
     protected override void OnInitialized()
-        => NavigationManager.LocationChanged += OnLocationChanged;
+    {
+        DialogService.OnDialogAdded += OnDialogAdded;
+        DialogService.OnDialogClosed += DismissDialogInstance;
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note
@@ -144,6 +152,17 @@ public partial class FrameworkLayout : IDisposable
     }
 
     /// <summary>
+    /// Dismisses all open dialogs.
+    /// </summary>
+    public void DismissAllDialogs()
+    {
+        _dialogs
+            .ToList()
+            .ForEach(dialog => DismissDialogInstance(dialog, DialogResult.DefaultCancel));
+        StateHasChanged();
+    }
+
+    /// <summary>
     /// Invoked by javascript interop.
     /// </summary>
     [JSInvokable]
@@ -169,6 +188,15 @@ public partial class FrameworkLayout : IDisposable
         {
             _scrollToTops.Add(scrollToTop);
             AutoScrollToTop = false;
+        }
+    }
+
+    internal void DismissDialogInstance(Guid id, DialogResult? result = null)
+    {
+        var reference = GetDialogReference(id);
+        if (reference is not null)
+        {
+            DismissDialogInstance(reference, result);
         }
     }
 
@@ -202,6 +230,16 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
+    private void DismissDialogInstance(DialogReference dialog, DialogResult? result = null)
+    {
+        dialog.Dismiss(result);
+        _dialogs.Remove(dialog);
+        StateHasChanged();
+    }
+
+    private DialogReference? GetDialogReference(Guid id) => _dialogs
+        .SingleOrDefault(x => x.Id == id);
+
     private protected async Task OnCloseDrawersAsync()
     {
         foreach (var drawer in _drawers)
@@ -209,6 +247,12 @@ public partial class FrameworkLayout : IDisposable
             await drawer.CloseAsync();
         }
         HasOpenDrawer = false;
+    }
+
+    private void OnDialogAdded(DialogReference reference)
+    {
+        _dialogs.Add(reference);
+        StateHasChanged();
     }
 
     private void OnDrawerToggled(object? drawer, bool state)
@@ -220,6 +264,8 @@ public partial class FrameworkLayout : IDisposable
 
     private async void OnLocationChanged(object? _, LocationChangedEventArgs args)
     {
+        DismissAllDialogs();
+
         foreach (var contents in _contents)
         {
             await contents.RefreshHeadingsAsync();

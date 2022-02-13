@@ -31,6 +31,7 @@
     overflow-x: auto;
     padding-left: 1rem;
     padding-right: 1rem;
+    position: relative;
     row-gap: 0;
     width: 100%;
 }
@@ -47,6 +48,7 @@
         overflow-x: auto;
         padding-left: 1rem;
         padding-right: 1rem;
+        position: relative;
         row-gap: 0;
         width: 100%;
     }
@@ -69,6 +71,7 @@
     display: flex;
     flex-shrink: 0;
     flex-wrap: wrap;
+    position: relative;
     row-gap: .5rem;
     width: 100%;
 

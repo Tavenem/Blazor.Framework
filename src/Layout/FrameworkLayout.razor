@@ -11,6 +11,10 @@
             </main>
             <Contents Breakpoint="Breakpoint.Lg" />
         </div>
+        @foreach (var dialogReference in _dialogs)
+        {
+            @dialogReference.RenderFragment
+        }
     </CascadingValue>
     @if (AutoScrollToTop)
     {

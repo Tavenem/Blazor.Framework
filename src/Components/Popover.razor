@@ -1,0 +1,10 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div id="@($"popover-{_handler?.Id}")" @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    @if (IsOpen)
+    {
+        @ChildContent
+    }
+</div>

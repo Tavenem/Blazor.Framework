@@ -1,0 +1,262 @@
+﻿@page "/components/popover"
+
+<PageTitle>Popover - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Popover</Heading>
+
+<p>
+    The popover component is a floating element which overlays other elements.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    Use the <code>Popover</code> component to create a popover. It can contain
+    any content you wish. The <code>Open</code> property controls whether the
+    popover is visible, and can be controlled in any way you require.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center py-5">
+            <Popover IsOpen="_isOpen" AnchorOrigin="Origin.Top_Left" PopoverOrigin="Origin.Top_Left">
+                <div class="d-flex flex-column p-4">
+                    <p>Popovers can contain any content.</p>
+                    <button @onclick="Toggle" class="btn btn-text danger ms-auto mb-n3">Close</button>
+                </div>
+            </Popover>
+            <button @onclick="Toggle" class="btn primary">Toggle</button>
+            @*<Switch @bind-IsChecked="_isOpen" ThemeColor="ThemeColor.Primary" />*@
+            <button @onclick="Toggle" class="btn btn-icon primary">
+                <span class="icon">@ToggleIcon</span>
+            </button>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Popover IsOpen=""_isOpen"" AnchorOrigin=""Origin.Top_Left"" PopoverOrigin=""Origin.Top_Left"">
+    <div class=""d-flex flex-column p-4"">
+        <p>Popovers can contain any content.</p>
+        <button @onclick=""Toggle"" class=""btn btn-text danger ms-auto mb-n3"">Close</button>
+    </div>
+</Popover>
+<button @onclick=""Toggle"" class=""btn primary"">Toggle</button>
+<Switch @bind-IsChecked=""_isOpen"" ThemeColor=""ThemeColor.Primary"" />
+<button @onclick=""Toggle"" class=""btn btn-icon primary"">
+    <span class=""icon"">@ToggleIcon</span>
+</button>", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private bool</span> _isOpen<span class="pre-operator">;</span>
+    <span class="pre-element">private string</span> ToggleIcon <span class="pre-operator">=></span> _isOpen <span class="pre-operator">?</span> <span class="pre-string">"fullscreen_exit"</span> <span class="pre-operator">:</span> <span class="pre-string">"fullscreen"</span> <span class="pre-operator">;</span>
+    <span class="pre-element">private void</span> <span class="pre-method">Toggle</span><span class="pre-operator">() =></span> _isOpen <span class="pre-operator">= !</span>_isOpen<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Anchoring</Heading>
+
+<p>
+    The <code>AnchorOrigin</code> sets the anchor point of the element to which
+    the popover is attached (usually the nearest containing parent with
+    <code>relative position</code>). The <code>PopoverOrigin</code> property
+    sets the connection point of the popover itself to that anchor point.
+</p>
+
+<div class="row bg-alt rounded outlined p-4">
+    <div class="flex-grow-1 center-items">
+        <h6>Anchor Origin</h6>
+        @*<RadioGroup @bind-SelectedItem="_anchorOrigin" class="d-flex flex-column">
+            <Radio Value="Origin.Top_Left" ThemeColor="ThemeColor.Primary" class="dense">Top-Left</Radio>
+            <Radio Value="Origin.Top_Center" ThemeColor="ThemeColor.Primary" class="dense">Top-Center</Radio>
+            <Radio Value="Origin.Top_Right" ThemeColor="ThemeColor.Primary" class="dense">Top-Right</Radio>
+            <Radio Value="Origin.Center_Left" ThemeColor="ThemeColor.Primary" class="dense">Center-Left</Radio>
+            <Radio Value="Origin.Center_Center" ThemeColor="ThemeColor.Primary" class="dense">Center-Center</Radio>
+            <Radio Value="Origin.Center_Right" ThemeColor="ThemeColor.Primary" class="dense">Center-Right</Radio>
+            <Radio Value="Origin.Bottom_Left" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Left</Radio>
+            <Radio Value="Origin.Bottom_Center" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Center</Radio>
+            <Radio Value="Origin.Bottom_Right" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Right</Radio>
+        </RadioGroup>*@
+    </div>
+    <div class="d-flex flex-grow-1 center-items">
+        <div id="popover-origin-demo" class="rounded outlined position-relative" style="height:8rem;width:8rem">
+            <span class="badge primary @(_anchorOrigin.ToCSS())"></span>
+        </div>
+        <Popover AnchorId="popover-origin-demo" AnchorOrigin="_anchorOrigin" PopoverOrigin="_popoverOrigin" FlipBehavior="FlipBehavior.Flip_Never" IsOpen="true">
+            <div class="px-4 py-1">Popover content</div>
+            <div class="@GetLocation()" style="left:0;top:0">
+                <span class="icon">@GetIcon()</span>
+            </div>
+        </Popover>
+    </div>
+    <div class="flex-grow-1 center-items">
+        <h6>Popover Origin</h6>
+        @*<RadioGroup @bind-SelectedItem="_popoverOrigin" class="d-flex flex-column">
+            <Radio Value="Origin.Top_Left" ThemeColor="ThemeColor.Primary" class="dense">Top-Left</Radio>
+            <Radio Value="Origin.Top_Center" ThemeColor="ThemeColor.Primary" class="dense">Top-Center</Radio>
+            <Radio Value="Origin.Top_Right" ThemeColor="ThemeColor.Primary" class="dense">Top-Right</Radio>
+            <Radio Value="Origin.Center_Left" ThemeColor="ThemeColor.Primary" class="dense">Center-Left</Radio>
+            <Radio Value="Origin.Center_Center" ThemeColor="ThemeColor.Primary" class="dense">Center-Center</Radio>
+            <Radio Value="Origin.Center_Right" ThemeColor="ThemeColor.Primary" class="dense">Center-Right</Radio>
+            <Radio Value="Origin.Bottom_Left" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Left</Radio>
+            <Radio Value="Origin.Bottom_Center" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Center</Radio>
+            <Radio Value="Origin.Bottom_Right" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Right</Radio>
+        </RadioGroup>*@
+    </div>
+</div>
+
+<p>
+    You can specify a particular element to which the popover should be anchored
+    with the <code>AnchorId</code> property. The anchoring element must have the
+    same offset parent as the popover (nearest positioned ancestor element in
+    the containment hierarchy). When an anchor is specified, the
+    <code>AnchorOrigin</code> refers to the anchoring element. When it is
+    unspecified, <code>AnchorOrigin</code> refers to the containing positioned
+    parent.
+</p>
+
+<p>
+    You can set the <code>MatchWidth</code> property to <code>true</code> to
+    force the popover to have the same width as its anchoring element (whether a
+    named element, or its positioned parent).
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <div class="d-flex rounded outlined center-items p-4">
+                <div id="popover-anchor-demo" class="primary filled px-3 py-2">Anchored to this</div>
+                <Popover AnchorId="popover-anchor-demo" MatchWidth="true" AnchorOrigin="Origin.Bottom_Center" PopoverOrigin="Origin.Top_Center" IsOpen="true">
+                    <div class="p-2">I am anchored to an element.</div>
+                </Popover>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""d-flex rounded outlined center-items p-4"">
+    <div id=""popover-anchor-demo"" class=""primary filled px-3 py-2"">Anchored to this</div>
+    <Popover AnchorId=""popover-anchor-demo"" MatchWidth=""true"" AnchorOrigin=""Origin.Bottom_Center"" PopoverOrigin=""Origin.Top_Center"" IsOpen=""true"">
+        <div class=""p-2"">I am anchored to an element.</div>
+    </Popover>
+</div>", true)
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Flipping</Heading>
+
+<p>
+    Popovers can automatically flip to stay in view, when possible. Set the
+    <code>FlipBehavior</code> property to <code>Filp_OnOpen</code> to change the
+    direction the popover opens (the default), or to <code>Flip_Always</code> to
+    also flip anytime the window scrolls or resizes, if the popover would no
+    longer be fully in view. You can also set it to <code>Flip_Never</code> to
+    prevent the flipping behavior and always open in the direction specified by
+    <code>AnchorOrigin</code> and <code>PopoverOrigin</code>, regardless of
+    whether the popover would be visible in that position.
+</p>
+
+<div class="row bg-alt rounded outlined center-items p-6">
+    <div class="d-flex rounded outlined center-items p-4">
+        <div id="popover-flip-demo" class="primary filled px-3 py-2">Always flips</div>
+        <Popover AnchorId="popover-flip-demo" AnchorOrigin="Origin.Bottom_Center" PopoverOrigin="Origin.Top_Center" FlipBehavior="FlipBehavior.Flip_Always" IsOpen="true">
+            <div class="p-4">Scroll or resize your browser to see this popover flip</div>
+        </Popover>
+    </div>
+</div>
+
+<Heading Level="HeadingLevel.H2">Nesting</Heading>
+
+<p>
+    Popovers can have other popovers inside them.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center p-5">
+            <Popover IsOpen="true" AnchorOrigin="Origin.Center_Center" PopoverOrigin="Origin.Center_Center">
+                <div class="d-flex flex-column p-4">
+                    <button @onclick="ToggleNested" class="btn btn-text primary ms-auto">Toggle</button>
+                </div>
+                <Popover IsOpen="_isNestedOpen" AnchorOrigin="Origin.Center_Right" PopoverOrigin="Origin.Center_Left">
+                    <div class="p-4">Nested content</div>
+                </Popover>
+            </Popover>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Popover IsOpen=""true"" AnchorOrigin=""Origin.Center_Center"" PopoverOrigin=""Origin.Center_Center"">
+    <div class=""d-flex flex-column p-4"">
+        <button @onclick=""Toggle"" class=""btn btn-text primary ms-auto"">Toggle</button>
+    </div>
+    <Popover IsOpen=""_isOpen"" AnchorOrigin=""Origin.Center_Right"" PopoverOrigin=""Origin.Center_Left"">
+        <div class=""p-4"">
+            Nested content
+        </div>
+    </Popover>
+</Popover>", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private bool</span> _isOpen<span class="pre-operator">;</span>
+    <span class="pre-element">private void</span> <span class="pre-method">Toggle</span><span class="pre-operator">() =></span> _isOpen <span class="pre-operator">= !</span>_isOpen<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+@code {
+    private Origin _anchorOrigin = Origin.Top_Left, _popoverOrigin = Origin.Top_Left;
+    private bool _isOpen, _isNestedOpen;
+    private string ToggleIcon => _isOpen ? "fullscreen_exit" : "fullscreen";
+    private void Toggle() => _isOpen = !_isOpen;
+    private void ToggleNested() => _isNestedOpen = !_isNestedOpen;
+
+    private string GetIcon() => _popoverOrigin switch
+    {
+        Origin.Top_Center => "south",
+        Origin.Top_Right => "south_west",
+        Origin.Center_Left => "east",
+        Origin.Center_Center => "zoom_out_map",
+        Origin.Center_Right => "west",
+        Origin.Bottom_Left => "north_east",
+        Origin.Bottom_Center => "north",
+        Origin.Bottom_Right => "north_west",
+        _ => "south_east",
+    };
+
+    private string GetLocation()
+    {
+        string[] pos = _popoverOrigin.ToCSS()?.Split("-") ?? new string[] { string.Empty, string.Empty };
+
+        string align = string.Empty;
+        if(pos[0] == "center")
+        {
+            align = "align-items-center";
+        }
+        else if(pos[0] == "top")
+        {
+            align = "align-items-start";
+        }
+        else if (pos[0] == "bottom")
+        {
+            align = "align-items-end";
+        }
+
+        string justify = string.Empty;
+        if(pos[1] == "left")
+        {
+            justify = "justify-content-start";
+        }
+        else if (pos[1] == "right")
+        {
+            justify = "justify-content-end";
+        }
+        else if (pos[1] == "center")
+        {
+            justify = "justify-content-center";
+        }
+
+        return $"position-absolute h-100 w-100 d-flex {align} {justify}";
+    }
+}

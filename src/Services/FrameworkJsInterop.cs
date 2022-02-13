@@ -1,4 +1,5 @@
 using Microsoft.JSInterop;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -8,6 +9,10 @@ namespace Tavenem.Blazor.Framework;
 public class FrameworkJsInterop : IAsyncDisposable
 {
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
+    private readonly List<PopoverHandler> _popoverHandlers = new();
+    private readonly SemaphoreSlim _lock = new(1, 1);
+
+    private bool _popoversInitialized;
 
     /// <summary>
     /// Initializes a new instance of <see cref="FrameworkJsInterop"/>.
@@ -31,6 +36,10 @@ public class FrameworkJsInterop : IAsyncDisposable
         if (_moduleTask.IsValueCreated)
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
+            if (_popoversInitialized)
+            {
+                await module.InvokeVoidAsync("popoverDispose");
+            }
             await module.DisposeAsync().ConfigureAwait(false);
         }
 
@@ -115,6 +124,40 @@ public class FrameworkJsInterop : IAsyncDisposable
             .ConfigureAwait(false);
     }
 
+    internal async Task InitializePopoversAsync()
+    {
+        if (_popoversInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            await _lock.WaitAsync();
+            if (_popoversInitialized)
+            {
+                return;
+            }
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("popoverInitialize");
+            _popoversInitialized = true;
+        }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
+    internal async Task<PopoverHandler> RegisterPopoverAsync(string? anchorId = null)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        var handler = new PopoverHandler(module, anchorId);
+        _popoverHandlers.Add(handler);
+        return handler;
+    }
+
     /// <summary>
     /// Observes scrolling and resizing events to detect which of the elements
     /// with the given class is currently in view.
@@ -137,5 +180,18 @@ public class FrameworkJsInterop : IAsyncDisposable
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync("listenForScroll", dotNetRef, selector);
+    }
+
+    internal async Task<bool> UnregisterPopoverHandler(PopoverHandler handler)
+    {
+        if (!_popoverHandlers.Contains(handler)
+            || !handler.IsConnected)
+        {
+            return false;
+        }
+
+        await handler.DetachAsync();
+        _popoverHandlers.Remove(handler);
+        return true;
     }
 }

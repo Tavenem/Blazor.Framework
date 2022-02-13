@@ -86,19 +86,16 @@
       <FileWrites Include="@(_CssBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />
       
-      <Content Condition="'$(TargetFramework)' != 'net6.0'"
-			   Include="@(_CssBuildOutput)"
-			   Link="wwwroot\%(_CssBuildOutput.RecursiveDir)\%(_CssBuildOutput.FileName)%(_CssBuildOutput.Extension)" />
+      <Content Condition="'$(TargetFramework)' != 'net6.0'" Include="@(_CssBuildOutput)" Link="wwwroot\%(_CssBuildOutput.RecursiveDir)\%(_CssBuildOutput.FileName)%(_CssBuildOutput.Extension)" />
     </ItemGroup>
     
-    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'"
-						   CandidateAssets="@(_CssBuildOutput)"
-						   SourceId="$(PackageId)"
-						   SourceType="Computed"
-						   ContentRoot="$(_CssOutputFolderPath)"
-						   BasePath="$(StaticWebAssetBasePath)">
+    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'" CandidateAssets="@(_CssBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_CssOutputFolderPath)" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>
+  
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\sass\components\_dialog.scss" />
+  </ItemGroup>
 
 </Project>

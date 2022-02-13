@@ -317,7 +317,7 @@
     }
 
     &.drawer-open {
-        .overlay {
+        .overlay.drawer-overlay {
             display: flex;
         }
     }
