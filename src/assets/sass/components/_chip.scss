@@ -299,3 +299,49 @@ a.chip-text {
         }
     }
 }
+
+.chipset {
+    display: flex;
+    margin-bottom: .5rem;
+    margin-top: .5rem;
+    position: relative;
+
+    &.can-drag:not(:disabled, .disabled) > *:not(.no-drag) {
+        cursor: grab;
+        user-select: none;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    &.can-drop {
+        background-color: var(--tavenem-color-success-hover);
+        border-color: var(--tavenem-color-success);
+        border-style: solid;
+        border-width: 1px;
+
+        &:not(:empty) > *:last-child {
+            margin-inline-end: 2rem;
+        }
+
+        > .can-drop:hover {
+            margin-inline-start: 2rem;
+        }
+
+        > .no-drop:hover {
+            cursor: no-drop;
+        }
+    }
+
+    &.no-drop {
+        background-color: var(--tavenem-color-danger-hover);
+        border-color: var(--tavenem-color-danger);
+        border-style: solid;
+        border-width: 1px;
+
+        &:hover {
+            cursor: no-drop;
+        }
+    }
+}

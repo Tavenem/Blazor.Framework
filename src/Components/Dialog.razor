@@ -4,5 +4,15 @@
 
 @if (DialogInstance is not null)
 {
-
+    <FocusTrap>
+        <div @attributes="AdditionalAttributes" class="@BodyCssClass" style="@BodyStyle">
+            @ChildContent
+        </div>
+        @if (FooterContent is not null)
+        {
+            <div class="@FooterCssClass" style="@FooterStyle">
+                @FooterContent
+            </div>
+        }
+    </FocusTrap>
 }

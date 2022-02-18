@@ -113,60 +113,95 @@
 <Heading Level="HeadingLevel.H2">Component</Heading>
 
 <p>
-    A chip can also be displayed using the <code>Chip</code> component. This is usually when the
-    chip is generated based on bound data. Each <code>Chip</code> has a data type, indicated by the
-    <code>TChip</code> parameter when it can't be inferred. You can include the content as
-    <code>ChildContent</code>, or you can set the <code>Text</code> parameter to a string to display
-    that text.
+    You can also display data-bound sets of chips with the <code>ChipSet&lt;T></code> component.
+    This component allows you to display a set of chips based on any <code>List&lt;T></code> of
+    items, and bind one or more selected items from the list.
 </p>
 
 <p>
-    An icon can be automatically displayed before the content of the chip by setting the
-    <code>Icon</code> property to the name of the icon. The <code>IconClass</code> property can be
-    used to customize the class of the icon span ("icon" is automatically included).
+    Each <code>ChipSet</code> and its child <code>Chip</code>s have a data type, indicated by the
+    <code>TChip</code> parameter when it can't be inferred. The items in an <code>ChipSet</code>
+    are displayed using either the <code>Template RenderFragment</code> for each item, or if no
+    template is provided, with the <code>ToString</code> method of the items.
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Chip TChip="string">Unthemed</Chip>
-            <Chip TChip="string" ThemeColor="ThemeColor.Primary" Text="Primary" />
-            <Chip TChip="string" ThemeColor="ThemeColor.Info" Icon="info">Info</Chip>
+            <ChipSet TChip="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem1" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"">Unthemed</Chip>
-<Chip TChip=""string"" ThemeColor=""ThemeColor.Primary"" Text=""Primary"" />
-<Chip TChip=""string"" ThemeColor=""ThemeColor.Info"" Icon=""info"">Info</Chip>", true)
+        @CodeFormatter.CodeToMarkup(@"<ChipSet TChip=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span><span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedItem<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Multiselect</Heading>
+
+<p>
+    The <code>SelectionType</code> property determines how selection is handled. If it is set to
+    <code>None</code> then items are not selectable. If set to <code>Single</code> one item at a
+    time may be selected. If set to <code>Multiple</code> any number of items may be selected.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_items"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItems=""_selectedItems"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-enum">IEnumerable</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span><span class="pre-operator">?</span> _selectedItems<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Required</Heading>
+
+<p>
+    You can make the selection required by setting the <code>Required</code> property. Doing so
+    prevents de-selecting the last selected item through user interaction. Programmatic changes
+    which result in the selection being cleared are still allowed, and no initial selection is
+    forced.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet TChip="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem2" Required="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet TChip=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" Required=""true"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedItem<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
     </ChildContent>
 </Collapse>
 
 <Heading Level="HeadingLevel.H3">Closing</Heading>
 
 <p>
-    If you add an event callback to the <code>OnClosed</code> property, the chip will automatically
-    get a close button which will invoke the handler.
+    If you add an event callback to the <code>OnChipClosed</code> property, each chip will
+    automatically get a close button which will invoke the handler.
 </p>
-
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            @if (_show)
-            {
-                <Chip TChip="string" OnClosed="@(_ => _show = false)">Dismissable</Chip>
-            }
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"" OnClosed=""@(_ => _show = false)"">Dismissable</Chip>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private bool</span> _show <span class="pre-operator">=</span> <span class="pre-element">true</span><span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
-    </ChildContent>
-</Collapse>
 
 <p>
     You can also set the <code>AutoClose</code> property to <code>true</code> to show the close
@@ -177,143 +212,173 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Chip TChip="string" AutoClose="true">Dismissable</Chip>
+            <ChipSet Items="_chips2" AutoClose="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"" AutoClose=""true"">Dismissable</Chip>", true)
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_items"" AutoClose=""true"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Drag and Drop</Heading>
+
+<p>
+    Chips in an <code>ChipSet</code> can be draggable, both within the <code>ChipSet</code> (to
+    reorder items), and between <code>ChipSet</code>s with the same item type.
+</p>
+
+<p>
+    To make the items in a <code>ChipSet</code> draggable, set the <code>IsDragStart</code>
+    property of the <code>ChipSet</code> to <code>true</code>. To make a
+    <code>ChipSet</code> a valid drop destination (including for reordering items within itself)
+    set its <code>IsDropTarget</code> property to <code>true</code>.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_dragChips" IsDragStart="true" IsDropTarget="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_items"" IsDragStart=""true"" IsDropTarget=""true"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<p>
+    Individual items can disable dragging by returning <code>false</code> from a function assigned
+    to the <code>ItemIsDraggable</code> property.
+</p>
+
+<p>
+    The <code>OnDragStart</code> event handler is invoked when a drag operation starts, and the
+    <code>OnDragEnd</code> handler is invoked when it ends (including by cancellation).
+</p>
+
+<p>
+    A chip which is currently being dragged can have a custom class applied during the drag
+    operation, by setting the <code>ItemDraggingClass</code> property.
+</p>
+
+<p>
+    Likewise, a <code>ChipSet</code> which is the source of a drag operation can have a custom class
+    applied by setting the <code>DraggingClass</code> property.
+</p>
+
+<Heading Level="HeadingLevel.H3">Chips</Heading>
+
+<p>
+    An icon can be automatically displayed before the content of a chip by setting the
+    <code>Icon</code> property to a function which returns the name of the icon. The
+    <code>IconClass</code> property can be used to customize the class of the icon span ("icon" is
+    automatically included).
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips2" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_items"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() {</span> <span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can insert a separator before or after any chip by setting the <code>SeparatorBefore</code>
+    and <code>SeparatorAfter</code> properties to functions which return <code>true</code> for the
+    appropriate items.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips2" SeparatorBefore="@(i => i == "Item 2")" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_items"" SeparatorBefore=""@(i => i == ""Item 2"")"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+<span class="pre-directive">}</span>
+        </pre>
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Customization</Heading>
+
+<p>
+    A selection icon normally replaces any icon assigned to a chip via the <code>Icon</code>
+    property when the chip is selected. You can disable this behavior by setting the
+    <code>ShowSelectionIcon</code> property to <code>false</code>.
+</p>
+
+<p>
+    The theme color of any chip may be set by assigning a function to the
+    <code>ItemThemeColor</code> property. You can override the theme of selected chips by setting
+    the <code>SelectedColor</code> property.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet TChip="string" Items="_chips" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem3" ShowSelectionIcon="false" SelectedColor="ThemeColor.Primary" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet TChip=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" ShowSelectionIcon=""false"" SelectedColor=""ThemeColor.Primary"" />", true)
+        <br>
+        <pre>
+<span class="pre-directive">&#64;code {</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
+    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedItem<span class="pre-operator">;</span>
+<span class="pre-directive">}</span>
+        </pre>
     </ChildContent>
 </Collapse>
 
 <Heading Level="HeadingLevel.H3">Clicking</Heading>
 
 <p>
-    If you add an event callback to the <code>OnClick</code> property, the chip will automatically
+    If you add an event callback to the <code>OnItemClick</code> property, chips will automatically
     receive the <code>clickable</code> class and respond to click events, which will invoke the
-    <code>OnClick</code> callback.
+    <code>OnItemClick</code> callback.
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Chip TChip="string" ThemeColor="_theme" OnClick="@(_ => _theme = ThemeColor.Primary)">Click me</Chip>
+            <ChipSet Items="_chips2" ItemThemeColor="@(_ => _theme)" OnItemClick="@(_ => _theme = ThemeColor.Primary)" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Chip TChip=""string"" ThemeColor=""_theme"" OnClick=""@(_ => _theme = ThemeColor.Primary)"">Click me</Chip>", true)
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Primary)"" />", true)
         <br>
         <pre>
 <span class="pre-directive">&#64;code {</span>
     <span class="pre-element">private</span> <span class="pre-enum">ThemeColor</span> _theme <span class="pre-operator">=</span> <span class="pre-enum">ThemeColor</span><span class="pre-operator">.</span>None<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
-    </ChildContent>
-</Collapse>
-
-<Heading Level="HeadingLevel.H1">ChipSet</Heading>
-
-<p>
-    Chips are most useful when displayed as part of a <code>ChipSet</code> component. This component
-    maintains a selection among child <code>Chip</code> components. By default, this is set to
-    single selection.
-</p>
-
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" @bind-SelectedItem="_selectedChip1" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItem=""_selectedChip"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedChip<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
-    </ChildContent>
-</Collapse>
-
-<Heading Level="HeadingLevel.H2">Multiselect</Heading>
-
-<p>
-    You can allow multiple selections by setting the <code>Multiselect</code> property to
-    <code>true</code>.
-</p>
-
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" @bind-SelectedItems="_selectedChips" Multiselect="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItems=""_selectedChips"" Multiselect=""true"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-enum">IEnumerable</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span><span class="pre-operator">?</span> _selectedChips<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
-    </ChildContent>
-</Collapse>
-
-<Heading Level="HeadingLevel.H2">Required</Heading>
-
-<p>
-    You can make the selection required by setting the <code>Required</code> property. Doing so
-    prevents de-selecting the last selected chip through user interaction. Programmatic changes
-    which result in the selection being cleared are still allowed, and no initial selection is
-    forced.
-</p>
-
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" @bind-SelectedItem="_selectedChip2" Required="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItem=""_selectedChip"" Required=""true"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedChip<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
-    </ChildContent>
-</Collapse>
-
-<Heading Level="HeadingLevel.H2">Customization</Heading>
-
-<p>
-    The selection icon normally replaces any icon assigned to a chip via its <code>Icon</code>
-    property when the chip is selected. You can disable this behavior by setting the
-    <code>ShowSelectionIcon</code> property to <code>false</code>.
-</p>
-
-<p>
-    You can also choose to override the theme of selected chips by setting the
-    <code>SelectedColor</code> property of the <code>ChipSet</code>.
-</p>
-
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" @bind-SelectedItem="_selectedChip3" ShowSelectionIcon="false" SelectedColor="ThemeColor.Primary" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" @bind-SelectedItem=""_selectedChip"" ShowSelectionIcon=""false"" SelectedColor=""ThemeColor.Primary"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _chips <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Chip 1"</span>, <span class="pre-string">"Chip 2"</span>, <span class="pre-string">"Chip 3"</span><span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedChip<span class="pre-operator">;</span>
+    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
 <span class="pre-directive">}</span>
         </pre>
     </ChildContent>
@@ -321,6 +386,8 @@
 
 @code {
     private List<string> _chips = new() { "Chip 1", "Chip 2", "Chip 3" };
+    private List<string> _chips2 = new() { "Chip 1", "Chip 2", "Chip 3" };
+    private List<string> _dragChips = new() { "Chip 1", "Chip 2", "Chip 3" };
     private string? _selectedChip1;
     private string? _selectedChip2;
     private string? _selectedChip3;

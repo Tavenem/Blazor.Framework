@@ -128,7 +128,7 @@ public partial class DialogInstance
                             SubscribeDown = true,
                         }
                     },
-                    TargetClass = "modal",
+                    Class = "modal",
                 });
                 KeyListener.KeyDown += OnEscapeKeyDown;
             }

@@ -145,13 +145,7 @@ public partial class Dialog
         }
     }
 
-    /// <summary>
-    /// Close a currently open inlined dialog.
-    /// </summary>
-    /// <param name="dialogResult">
-    /// The result to set. If none is provided, a Cancel result will be used.
-    /// </param>
-    public void Close(DialogResult? dialogResult = null)
+    private void Close(DialogResult? dialogResult = null)
     {
         if (DialogInstance is not null
             || _reference is null)
@@ -162,36 +156,8 @@ public partial class Dialog
         _reference = null;
     }
 
-    /// <summary>
-    /// Show an inlined dialog.
-    /// </summary>
-    /// <param name="title">The title to display.</param>
-    /// <param name="options">
-    /// <para>
-    /// The options for displaying this dialog.
-    /// </para>
-    /// <para>
-    /// If omitted, and the <see cref="Options"/> parameter has been set, those
-    /// will be used.
-    /// </para>
-    /// </param>
-    /// <returns>
-    /// A <see cref="DialogReference"/> for the displayed dialog.
-    /// </returns>
-    /// <exception cref="InvalidOperationException">
-    /// <para>
-    /// Throws if called for a dialog displayed with the <see cref="Framework.DialogService"/>.
-    /// </para>
-    /// <para>
-    /// Only valid for inlined dialogs.
-    /// </para>
-    /// </exception>
-    public DialogReference Show(string? title = null, DialogOptions? options = null)
+    private DialogReference Show(string? title = null, DialogOptions? options = null)
     {
-        if (DialogInstance is not null)
-        {
-            throw new InvalidOperationException("You can only show an inlined dialog.");
-        }
         if (_reference is not null)
         {
             Close();

@@ -1,14 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
 internal static class Extensions
 {
-    private static readonly PropertyInfo? _jsRuntimeProperty =
-            typeof(WebElementReferenceContext).GetProperty("JSRuntime", BindingFlags.Instance | BindingFlags.NonPublic);
-
     public static string? ToCSS(this Enum value)
     {
         if (value is null || Convert.ToInt32(value) == 0)
@@ -20,6 +15,16 @@ internal static class Extensions
             .ToString()
             .ToLowerInvariant()
             .Replace('_', '-');
+    }
+
+    [return: NotNullIfNotNull("value")]
+    public static string? ToJsString(this string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+        return char.ToLowerInvariant(value[0]) + value[1..];
     }
 
     public static Dictionary<TKey, TValue> Without<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, params TKey[] keys) where TKey : notnull
@@ -35,15 +40,5 @@ internal static class Extensions
             copy.Remove(key);
         }
         return copy;
-    }
-
-    internal static IJSRuntime? GetJSRuntime(this ElementReference elementReference)
-    {
-        if (elementReference.Context is not WebElementReferenceContext context)
-        {
-            return null;
-        }
-
-        return _jsRuntimeProperty?.GetValue(context) as IJSRuntime;
     }
 }

@@ -1,0 +1,58 @@
+﻿@page "/components/contents"
+
+<PageTitle>Contents - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Contents</Heading>
+
+<p>
+    The contents component displays a list of headings on the current page, with
+    links to each of them.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    Use the <code>Contents</code> component to create a table of contents for
+    the current page. The list is built automatically by examining the current
+    page for <a href="./components/heading">Heading</a> components. It will be
+    re-built on any page navigation, but not if the page is changed dynamically.
+</p>
+
+<p>
+    The list of headings is refreshed on page navigation, but does not respond
+    to dynamic changes of the current page's contents. If one of your pages
+    might have headings which change dynamically, you can call the
+    <code>RefreshHeadingsAsync</code> method on a <code>Contents</code>
+    component to force it to refresh its list of headings.
+</p>
+
+<p>
+    You can make a <code>Contents</code> component responsive by setting the
+    <code>Breakpoint</code> parameter to the breakpoint at which the list should
+    be visible. When set to <code>None</code> (the default) the list is visible
+    at all breakpoints.
+</p>
+
+<p>
+    The <code>ThemeColor</code> parameter can be set to control the color theme
+    of the list.
+</p>
+
+<Heading Level="HeadingLevel.H2">Layout</Heading>
+
+<p>
+    The <code>FrameworkLayout</code> component has a built-in
+    <code>Contents</code> component. It is positioned after the main content
+    (typically on the right-hand side of a page), and will automatically share
+    the <code>ThemeColor</code> of the parent <code>FrameworkLayout</code>.
+</p>
+
+<p>
+    The <code>Breakpoint</code> parameter of the built-in <code>Contents</code>
+    component can be set with the <code>ContentsBreakpoint</code> parameter of
+    <code>FrameworkLayout</code> (it defaults to <code>Lg</code>). There is one
+    key difference, however: when set to <code>None</code> the table of contents
+    is hidden completely, rather than displayed at all breakpoints. This allows
+    you to suppress the built-in list (possibly in order to use it differently
+    in your own layout).
+</p>

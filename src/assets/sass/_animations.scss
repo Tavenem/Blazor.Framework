@@ -50,6 +50,7 @@
 @keyframes tf-slide-out-left {
     from {
         max-width: 15rem;
+        transform: translateX(0);
     }
     99% {
         max-width: 15rem;
@@ -71,6 +72,7 @@
 @keyframes tf-slide-out-right {
     from {
         max-width: 15rem;
+        transform: translateX(0);
     }
     99% {
         max-width: 15rem;
@@ -92,6 +94,7 @@
 @keyframes tf-slide-out-bottom {
     from {
         max-height: 20rem;
+        transform: translateY(0);
     }
     99% {
         max-height: 20rem;
@@ -113,6 +116,7 @@
 @keyframes tf-slide-out-top {
     from {
         max-height: 20rem;
+        transform: translateY(0);
     }
     99% {
         max-height: 20rem;

@@ -48,7 +48,13 @@ public class DialogOptions
     public bool HideHeader { get; set; }
 
     /// <summary>
+    /// <para>
     /// The location of the dialog.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="Origin.Center_Center"/> (the center of the
+    /// viewport).
+    /// </para>
     /// </summary>
     public Origin Origin { get; set; } = Origin.Center_Center;
 }

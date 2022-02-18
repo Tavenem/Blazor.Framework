@@ -23,11 +23,7 @@
     }
 
     @media (max-width: 575px) and (orientation: landscape) {
-        height: 3rem;
-    }
-
-    @media (min-width: 576px) and (orientation: portrait) {
-        height: 4rem;
+        min-height: 3rem;
     }
 
     &.dense, .dense & {

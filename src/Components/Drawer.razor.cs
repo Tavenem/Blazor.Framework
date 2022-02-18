@@ -10,6 +10,16 @@ public partial class Drawer : IDisposable
 {
     private bool _disposedValue;
 
+    /// <summary>
+    /// <para>
+    /// Invoked before the drawer is closed.
+    /// </para>
+    /// <para>
+    /// If it returns <see langword="false"/> the drawer will remain open.
+    /// </para>
+    /// </summary>
+    public event Func<Drawer, bool>? BeforeClosing;
+
     private Breakpoint? _breakpoint;
     /// <summary>
     /// <para>
@@ -51,7 +61,7 @@ public partial class Drawer : IDisposable
     /// <summary>
     /// The child content of the footer.
     /// </summary>
-    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
 
     /// <summary>
     /// Custom CSS class(es) for the footer.
@@ -61,7 +71,7 @@ public partial class Drawer : IDisposable
     /// <summary>
     /// The child content of the header.
     /// </summary>
-    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
 
     /// <summary>
     /// Custom CSS class(es) for the header.
@@ -85,6 +95,7 @@ public partial class Drawer : IDisposable
             if (_isOpen != value)
             {
                 _isOpen = value;
+                _isClosed = !value;
                 DrawerToggled?.Invoke(this, _isOpen);
             }
         }
@@ -94,11 +105,6 @@ public partial class Drawer : IDisposable
     /// Raised when the drawer's current open status changes.
     /// </summary>
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
-
-    /// <summary>
-    /// Invoked when the component is closed.
-    /// </summary>
-    [Parameter] public EventCallback<Drawer> OnClosed { get; set; }
 
     /// <summary>
     /// Custom CSS class(es) for the overlay (only displayed for temporary drawers).
@@ -149,7 +155,7 @@ public partial class Drawer : IDisposable
     /// component values.
     /// </summary>
     protected string HeaderClassName => new CssBuilder("header appbar")
-        .Add("drawer-control", Header is null)
+        .Add("drawer-control", HeaderContent is null)
         .ToString();
 
     /// <summary>
@@ -171,7 +177,7 @@ public partial class Drawer : IDisposable
 
     private string? BreakpointClass => Breakpoint switch
     {
-        Breakpoint.None => null,
+        Breakpoint.None => "drawer-breakpoint-none",
         _ => $"drawer-{Breakpoint.ToCSS()}",
     };
 
@@ -245,7 +251,6 @@ public partial class Drawer : IDisposable
         {
             IsOpen = false;
             IsClosed = true;
-            await OnClosed.InvokeAsync(this);
             await IsOpenChanged.InvokeAsync(IsOpen);
             DrawerToggled?.Invoke(this, IsOpen);
             StateHasChanged();
@@ -259,12 +264,15 @@ public partial class Drawer : IDisposable
     {
         if (IsOpen)
         {
-            IsOpen = false;
-            IsClosed = true;
-            await OnClosed.InvokeAsync(this);
-            await IsOpenChanged.InvokeAsync(IsOpen);
-            DrawerToggled?.Invoke(this, IsOpen);
-            StateHasChanged();
+            var canClose = BeforeClosing?.Invoke(this) ?? true;
+            if (canClose)
+            {
+                IsOpen = false;
+                IsClosed = true;
+                await IsOpenChanged.InvokeAsync(IsOpen);
+                DrawerToggled?.Invoke(this, IsOpen);
+                StateHasChanged();
+            }
         }
         else
         {
@@ -278,12 +286,8 @@ public partial class Drawer : IDisposable
 
     private async Task OnClosedAsync()
     {
-        if (OnClosed.HasDelegate)
-        {
-            await OnClosed.InvokeAsync(this);
-            DrawerToggled?.Invoke(this, IsOpen);
-        }
-        else
+        var canClose = BeforeClosing?.Invoke(this) ?? true;
+        if (canClose)
         {
             IsOpen = false;
             IsClosed = true;

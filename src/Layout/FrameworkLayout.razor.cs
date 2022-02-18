@@ -16,12 +16,26 @@ public partial class FrameworkLayout : IDisposable
     private readonly List<ScrollToTop> _scrollToTops = new();
 
     private bool _disposedValue;
+    private Func<Task>? _dropCallback;
     private DotNetObjectReference<FrameworkLayout>? _dotNetRef;
 
     /// <summary>
     /// The child content of this component.
     /// </summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The breakpoint at which the table of contents should be visible.
+    /// </para>
+    /// <para>
+    /// Set to <see cref="Breakpoint.None"/> to remove the list completely.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="Breakpoint.Lg"/>
+    /// </para>
+    /// </summary>
+    [Parameter] public Breakpoint ContentsBreakpoint { get; set; } = Breakpoint.Lg;
 
     /// <summary>
     /// Any toolbars and drawers.
@@ -47,6 +61,18 @@ public partial class FrameworkLayout : IDisposable
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
+
+    internal object? CurrentDragItem { get; set; }
+
+    internal Type? CurrentDragType { get; set; }
+
+    internal object? CurrentDropTarget { get; set; }
+
+    internal Type? CurrentDropTargetType { get; set; }
+
+    internal event EventHandler? DragEnded;
+
+    internal event EventHandler? DragStarted;
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
@@ -191,6 +217,34 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
+    internal async Task CancelDragAsync()
+    {
+        CurrentDragItem = null;
+        CurrentDragType = null;
+        CurrentDropTarget = null;
+        CurrentDropTargetType = null;
+        if (_dropCallback is not null)
+        {
+            await _dropCallback.Invoke();
+        }
+        DragEnded?.Invoke(this, EventArgs.Empty);
+    }
+
+    internal async Task CompleteDropAsync<TDropItem>(DropTarget<TDropItem>? target)
+    {
+        CurrentDropTarget = target;
+        CurrentDropTargetType = typeof(TDropItem);
+        if (_dropCallback is not null)
+        {
+            await _dropCallback.Invoke();
+        }
+        DragEnded?.Invoke(this, EventArgs.Empty);
+        CurrentDragItem = null;
+        CurrentDragType = null;
+        CurrentDropTarget = null;
+        CurrentDropTargetType = null;
+    }
+
     internal void DismissDialogInstance(Guid id, DialogResult? result = null)
     {
         var reference = GetDialogReference(id);
@@ -228,6 +282,14 @@ public partial class FrameworkLayout : IDisposable
             _scrollToTops.Remove(scrollToTop);
             AutoScrollToTop = _scrollToTops.Count == 0;
         }
+    }
+
+    internal void StartDrag<TItem>(TItem item, Func<Task> callback)
+    {
+        CurrentDragItem = item;
+        CurrentDragType = typeof(TItem);
+        DragStarted?.Invoke(this, EventArgs.Empty);
+        _dropCallback = callback;
     }
 
     private void DismissDialogInstance(DialogReference dialog, DialogResult? result = null)

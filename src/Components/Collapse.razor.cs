@@ -10,7 +10,7 @@ public partial class Collapse : IDisposable
 {
     private readonly List<AnchorLink> _links = new();
 
-    private bool _disposedValue;
+    private protected bool _disposedValue;
 
     /// <summary>
     /// Any CSS class(es) to be applies to the collapse body (the part that is hidden when
@@ -138,6 +138,8 @@ public partial class Collapse : IDisposable
         .Add(FooterClass)
         .ToString();
 
+    [CascadingParameter] private protected FrameworkLayout? FrameworkLayout { get; set; }
+
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     /// <summary>
@@ -254,6 +256,14 @@ public partial class Collapse : IDisposable
 
     internal void Remove(AnchorLink link) => _links.Remove(link);
 
+    private protected async Task OnToggleAsync()
+    {
+        if (!Disabled && Accordion?.Disabled != true)
+        {
+            await SetOpenAsync(!_isOpen);
+        }
+    }
+
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
         if (_isOpen)
@@ -265,14 +275,6 @@ public partial class Collapse : IDisposable
         if (open)
         {
             await SetOpenAsync(true);
-        }
-    }
-
-    private async Task OnToggleAsync()
-    {
-        if (!Disabled && Accordion?.Disabled != true)
-        {
-            await SetOpenAsync(!_isOpen);
         }
     }
 }

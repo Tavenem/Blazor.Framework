@@ -1,0 +1,13 @@
+﻿<Dialog>
+    <ChildContent>
+        Example dialog content.
+    </ChildContent>
+    <FooterContent>
+        <button class="btn btn-text primary" @onclick="@(_ => Dialog?.Close(DialogResult.DefaultOk))">OK</button>
+        <button class="btn btn-text" @onclick="@(_ => Dialog?.Cancel())">Cancel</button>
+    </FooterContent>
+</Dialog>
+
+@code {
+    [CascadingParameter] private DialogInstance? Dialog { get; set; }
+}

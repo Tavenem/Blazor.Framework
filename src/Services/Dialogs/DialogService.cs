@@ -71,7 +71,7 @@ public class DialogService
             builder.SetKey(reference.Id);
             builder.AddAttribute(1, nameof(DialogInstance.ChildContent), content);
             builder.AddAttribute(2, nameof(DialogInstance.Id), reference.Id);
-            builder.AddAttribute(3, nameof(DialogInstance.Options), options);
+            builder.AddAttribute(3, nameof(DialogInstance.Options), options ?? new());
             builder.AddAttribute(4, nameof(DialogInstance.Title), title);
             builder.CloseComponent();
         });

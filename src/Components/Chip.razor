@@ -2,23 +2,40 @@
 
 @typeparam TChip
 
-@inherits TavenemComponentBase
+@inherits ListItem<TChip>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClickAsync">
+@if (SeparatorBefore)
+{
+    <div class="vr"></div>
+}
+<div class="@CssClass"
+     style="@CssStyle"
+     draggable="@Draggable"
+     @onclick="OnClickAsync"
+     @ondragstart="OnDragStart"
+     @ondragend="OnDragEndAsync"
+     @ondragenter="OnDragEnter"
+     @ondragleave="OnDragLeave"
+     ondragover="event.preventDefault()"
+     @ondrop="OnDropAsync">
     @if (!string.IsNullOrWhiteSpace(IconName))
     {
         <span class="@IconClassName">@IconName</span>
     }
     @if (ChildContent is null)
     {
-        <span>@(Text ?? Item?.ToString())</span>
+        <span>@(Item?.ToString())</span>
     }
     else
     {
         @ChildContent
     }
-    @if (AutoClose || OnClosed.HasDelegate)
+    @if (ChipSet?.AutoClose == true || ChipSet?.OnChipClosed.HasDelegate == true)
     {
         <div class="btn-close" @onclick="OnClosedAsync">close</div>
     }
 </div>
+@if (SeparatorAfter)
+{
+    <div class="vr"></div>
+}

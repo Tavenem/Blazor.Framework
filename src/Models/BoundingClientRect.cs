@@ -68,4 +68,9 @@ internal record BoundingClientRect(
     public bool IsOutsideTop => Top < 0;
 
     public bool IsOutsideRight => Right > WindowWidth;
+
+    /// <summary>
+    /// An empty bounding rect.
+    /// </summary>
+    public static BoundingClientRect Empty { get; } = new(0, 0, 0, 0, 0, 0, 0, 0);
 }

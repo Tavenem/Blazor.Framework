@@ -50,7 +50,7 @@ public class KeyListener : IKeyListener, IAsyncDisposable
         if (_moduleTask.IsValueCreated)
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
-            await Disconnect();
+            await DisconnectAsync();
             await module.DisposeAsync().ConfigureAwait(false);
         }
 

@@ -387,9 +387,9 @@ class ElementReference {
         this.eventListeners[++this.listenerId] = listener;
         return this.listenerId;
     }
-    changeCss(element, css) {
+    changeCssClassName(element, className) {
         if (element) {
-            element.className = css;
+            element.className = className;
         }
     }
     changeCssVariable(element, name, newValue) {
@@ -507,6 +507,7 @@ class ElementReference {
 }
 window.tavenem = window.tavenem || {};
 window.tavenem.framework = window.tavenem.framework || {};
+window.tavenem.framework.elementReference = new ElementReference();
 window.tavenem.framework.popover = window.tavenem.framework.popover || new Popover();
 window.tavenem.framework.popoverHelper = window.tavenem.framework.popoverHelper || {
     flipClassReplacements: {
@@ -805,6 +806,9 @@ window.tavenem.framework.popoverHelper = window.tavenem.framework.popoverHelper 
     },
 };
 window.tavenem.framework.keyListener = new KeyListenerFactory();
+export function addEventListener(element, dotNetRef, event, callback, spec, stopPropagation) {
+    return window.tavenem.framework.elementReference.addEventListener(element, dotNetRef, event, callback, spec, stopPropagation);
+}
 export function cancelScrollListener(selector) {
     const element = selector
         ? document.querySelector(selector)
@@ -812,6 +816,27 @@ export function cancelScrollListener(selector) {
     if (element instanceof HTMLElement) {
         element.removeEventListener('scroll', throttleScrollHandler);
     }
+}
+export function changeCssClassName(element, className) {
+    window.tavenem.framework.elementReference.changeCssClassName(element, className);
+}
+export function changeCssVariable(element, name, newValue) {
+    window.tavenem.framework.elementReference.changeCssVariable(element, name, newValue);
+}
+export function focusFirstElement(element, skip = 0, min = 0) {
+    window.tavenem.framework.elementReference.focusFirst(element, skip, min);
+}
+export function focusLastElement(element, skip = 0, min = 0) {
+    window.tavenem.framework.elementReference.focusLast(element, skip, min);
+}
+export function getBoundingClientRect(element) {
+    return window.tavenem.framework.elementReference.getBoundingClientRect(element);
+}
+export function getClientRectFromFirstChild(element) {
+    return window.tavenem.framework.elementReference.getClientRectFromFirstChild(element);
+}
+export function getClientRectFromParent(element) {
+    return window.tavenem.framework.elementReference.getClientRectFromParent(element);
 }
 export function getHeadings(className) {
     const elements = document.getElementsByClassName(className);
@@ -864,6 +889,9 @@ export function getPreferredColorScheme() {
     }
     return 1;
 }
+export function elementHasFixedAncestors(element) {
+    return window.tavenem.framework.elementReference.hasFixedAncestors(element);
+}
 export function listenForKeyEvent(dotNetRef, elementId, options) {
     window.tavenem.framework.keyListener.connect(dotNetRef, elementId, options);
 }
@@ -890,6 +918,21 @@ export function popoverDispose() {
 }
 export function popoverInitialize() {
     window.tavenem.framework.popover.initialize();
+}
+export function removeEventListener(element, event, eventId) {
+    window.tavenem.framework.elementReference.removeEventListener(element, event, eventId);
+}
+export function restoreElementFocus(element) {
+    window.tavenem.framework.elementReference.restoreFocus(element);
+}
+export function saveElementFocus(element) {
+    window.tavenem.framework.elementReference.saveFocus(element);
+}
+export function select(element) {
+    window.tavenem.framework.elementReference.select(element);
+}
+export function selectRange(element, pos1, pos2) {
+    window.tavenem.framework.elementReference.selectRange(element, pos1, pos2);
 }
 export function scrollSpy(dotnetReference, className) {
     window.tavenem.framework._spy = handleScrollSpy.bind(this, dotnetReference, className);

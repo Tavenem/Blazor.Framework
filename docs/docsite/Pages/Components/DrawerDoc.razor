@@ -1,0 +1,141 @@
+﻿@page "/components/drawer"
+
+<PageTitle>Drawer - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Drawer</Heading>
+
+<p>
+    The <code>FrameworkLayout</code> component supports up to four drawers: one
+    on each side of the layout.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    Drawers are defined with a <code>Drawer</code> component, and should be
+    located in the <code>FrameworkContent LayoutFragment</code> of the
+    <code>FrameworkLayout</code> component that defines the main layout of your
+    app. You can have up to four drawers: a top, bottom, left, and right drawer.
+    The location is determined by the <code>Side</code> property of the drawer.
+</p>
+
+<p>
+    Up to two drawers can be controlled by a toggle button that is automatically
+    generated and linked on an <code>AppBar</code>: one on a top
+    <code>AppBar</code>, and one on a bottom <code>AppBar</code>. To create
+    these automatic toggles, set the <code>ControlsDrawerSide</code> property of
+    an <code>AppBar</code> to the same value as the <code>Side</code> property
+    of a drawer.
+</p>
+
+<Heading Level="HeadingLevel.H2">Size</Heading>
+
+<p>
+    The <code>Breakpoint</code> property controls the viewport size at which the
+    drawer will be permanently visible. Below that breakpoint the drawer will
+    only be displayed when toggled. Above that breakpoint, the drawer will
+    always be displayed, regardless of its open/closed state.
+</p>
+
+<p>
+    To automatically hide the <code>Appbar</code> toggles for drawers when above
+    the breakpoint, set the <code>Breakpoint</code> property on the
+    <code>Appbar</code> as well. To more easily coordinate these properties, the
+    <code>SideDrawerBreakpoint</code> property on <code>FrameworkContent</code>
+    itself may be set, which keeps both <code>Breakpoint</code> properties of a
+    linked <code>Drawer</code> and <code>AppBar</code> in sync.
+</p>
+
+<p>
+    Below the medium breakpoint, a left or right drawer will cover the entire
+    width of the screen. Above the medium breakpoint but below the configured
+    <code>Breakpoint</code> parameter, the drawer will partially cover the
+    viewport and an overlay will cover the remainder (excluing any
+    <code>AppBar</code>s). Interacting with the overlay will dismiss the drawer.
+</p>
+
+<p>
+    Top and bottom drawers always cover only part of the view. Below their
+    <code>Breakpoint</code> parameter, the rest of the view will be covered by
+    an overlay. Interacting with the overlay will dismiss the drawer.
+</p>
+
+<Heading Level="HeadingLevel.H3">Icon mode</Heading>
+
+<p>
+    A left or right drawer can also be given the <code>icon-drawer</code> class.
+    An icon drawer behaves differently than a normal drawer when closed: rather
+    than disappearing completely, it collapses to a narrow width, and hides
+    almost all elements other than icons and avatars. This style of drawer can
+    be used to display a set of icons when closed, and full menu items when
+    open.
+</p>
+
+<p>
+    An icon drawer automatically opens to its normal width when hovered, and
+    displays the normal content of each item. This does not actually toggle it
+    to the open state. Its <code>IsOpen</code> property does not change, none of
+    the usual events are triggered, and it will return to the collapsed state
+    when no longer hovered.
+</p>
+
+<p>
+    Like all other icons, the toggle icon of a Collapse component remains
+    visible in a collapsed icon drawer (although not any other part of their
+    header).
+</p>
+
+<p>
+    Be sure to assign an icon or avatar to each item in a drawer which is given
+    the <code>icon-drawer</code> class. In the collapsed state any items without
+    an icon or avatar will appear to be empty. If you prefer the icon to remain
+    hidden <em>except</em> when in the collapsed state, you can use one of the
+    display utility classes, such as <code>d-none</code>, to hide the icon or
+    avatar in the drawer's open state. When a drawer collapses, the
+    <code>display</code> property of icons and avatars is set to its normal
+    value with an <code>!important</code> flag to ensure that they become
+    visible.
+</p>
+
+<Heading Level="HeadingLevel.H2">Content</Heading>
+
+<p>
+    The main content of a drawer is set with its <code>ChildContent
+    RenderFragment</code>. You can also supply a <code>HeaderContent</code> and
+    <code>FooterContent RenderFragment</code> to add content to the top and
+    bottom of the drawer. A dismissable drawer will also have a <a
+    href="./components/close-button">Close Button</a> in its header, unless it's
+    toggled by an <code>AppBar</code>.
+</p>
+
+<p>
+    The theme of a drawer can be set with the <code>ThemeColor</code> property.
+</p>
+
+<p>
+    You can customize the CSS class of the header with the
+    <code>HeaderClass</code> property, or of the footer with the
+    <code>FooterClass</code> property. You can even customize the CSS class of
+    the overlay displayed behind a dismissable drawer with the
+    <code>OverlayClass</code> property.
+</p>
+
+<Heading Level="HeadingLevel.H2">Events</Heading>
+
+<p>
+    A drawer's <code>IsOpen</code> property indicates whether it is open or
+    closed, and can be bound. Remember, however, that above its configured
+    breakpoint, a drawer will remain visible even when "closed." In addition to
+    binding the property, drawers also provide a <code>DrawerToggled</code>
+    event handler, which provides a boolean parameter indicating the open state
+    of the drawer.
+</p>
+
+<p>
+    Drawers also provide a <code>BeforeClosing</code> event handler, which must
+    return a boolean. If it returns <code>false</code> the drawer will
+    <em>not</em> close. Not, however, that drawers will automatically close on
+    nagivation, or for some viewport resize events, without invoking this
+    handler. It should not be considered a substitute for a <a
+    href="./components/dialog">Dialog</a>.
+</p>

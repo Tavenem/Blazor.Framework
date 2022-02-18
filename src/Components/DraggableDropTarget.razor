@@ -1,0 +1,19 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TDragItem
+@typeparam TDropItem
+
+@inherits DropTarget<TDropItem>
+
+<div @attributes="AdditionalAttributes"
+     class="@CssClass"
+     style="@CssStyle"
+     draggable="true"
+     @ondragstart="OnDragStart"
+     @ondragend="OnDragEndAsync"
+     @ondragenter="OnDragEnter"
+     @ondragleave="OnDragLeave"
+     ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
+     @ondrop="OnDropAsync">
+    @ChildContent
+</div>

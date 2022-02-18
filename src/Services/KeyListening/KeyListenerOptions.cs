@@ -11,7 +11,7 @@ public class KeyListenerOptions
     /// <remarks>
     /// If this is not set explicitly, it will default to "framework"
     /// </remarks>
-    public string TargetClass { get; set; } = "framework";
+    public string Class { get; set; } = "framework";
 
     /// <summary>
     /// Keys to be listened to.

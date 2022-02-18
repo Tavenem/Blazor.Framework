@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -36,7 +37,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.1.22109.13" />
   </ItemGroup>
 	
   <ItemGroup>

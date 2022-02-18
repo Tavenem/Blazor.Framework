@@ -60,6 +60,13 @@ interface IFocusableElement extends HTMLElement {
     savedFocus?: IFocusableElement | undefined | null;
 }
 
+interface IBoundingClientRect extends DOMRect {
+    scrollY: number;
+    scrollX: number;
+    windowHeight: number;
+    windowWidth: number;
+}
+
 interface KeyboardEventArgs {
     AltKey: boolean;
     Code: string;
@@ -518,7 +525,7 @@ class ElementReference {
         dotNetRef: DotNet.DotNetObject,
         event: string,
         callback: string,
-        spec: any,
+        spec: Record<string, any>[],
         stopPropagation: boolean) {
         const listener = function (e: Event) {
             const args = Array.from(spec, x => serializeParameter(e, x));
@@ -532,9 +539,9 @@ class ElementReference {
         return this.listenerId;
     }
 
-    changeCss(element: Element, css: string) {
+    changeCssClassName(element: Element, className: string) {
         if (element) {
-            element.className = css;
+            element.className = className;
         }
     }
 
@@ -583,7 +590,7 @@ class ElementReference {
             return;
         }
 
-        const rect = JSON.parse(JSON.stringify(element.getBoundingClientRect()));
+        const rect: IBoundingClientRect = JSON.parse(JSON.stringify(element.getBoundingClientRect()));
 
         rect.scrollY = window.scrollY || document.documentElement.scrollTop;
         rect.scrollX = window.scrollX || document.documentElement.scrollLeft;
@@ -670,17 +677,19 @@ interface IFramework {
     _spy: (event: Event) => void;
     _theme: number;
     _throttleScrollHandlerId: number;
+    elementReference: ElementReference;
     keyListener: KeyListenerFactory;
     popover: Popover;
     popoverHelper: IPopoverHelper;
 }
 
 interface ITavenem {
-    framework: IFramework
+    framework: IFramework;
 }
 
 window.tavenem = window.tavenem || {};
 window.tavenem.framework = window.tavenem.framework || {};
+window.tavenem.framework.elementReference = new ElementReference();
 window.tavenem.framework.popover = window.tavenem.framework.popover || new Popover();
 window.tavenem.framework.popoverHelper = window.tavenem.framework.popoverHelper || {
     flipClassReplacements: {
@@ -1001,6 +1010,22 @@ window.tavenem.framework.popoverHelper = window.tavenem.framework.popoverHelper 
 };
 window.tavenem.framework.keyListener = new KeyListenerFactory();
 
+export function addEventListener(
+    element: Element,
+    dotNetRef: DotNet.DotNetObject,
+    event: string,
+    callback: string,
+    spec: Record<string, any>[],
+    stopPropagation: boolean) {
+    return window.tavenem.framework.elementReference.addEventListener(
+        element,
+        dotNetRef,
+        event,
+        callback,
+        spec,
+        stopPropagation);
+}
+
 export function cancelScrollListener(selector: string | null) {
     const element = selector
         ? document.querySelector(selector)
@@ -1008,6 +1033,34 @@ export function cancelScrollListener(selector: string | null) {
     if (element instanceof HTMLElement) {
         element.removeEventListener('scroll', throttleScrollHandler as any);
     }
+}
+
+export function changeCssClassName(element: Element, className: string) {
+    window.tavenem.framework.elementReference.changeCssClassName(element, className);
+}
+
+export function changeCssVariable(element: HTMLElement, name: string, newValue: string) {
+    window.tavenem.framework.elementReference.changeCssVariable(element, name, newValue);
+}
+
+export function focusFirstElement(element: HTMLElement, skip = 0, min = 0) {
+    window.tavenem.framework.elementReference.focusFirst(element, skip, min);
+}
+
+export function focusLastElement(element: HTMLElement, skip = 0, min = 0) {
+    window.tavenem.framework.elementReference.focusLast(element, skip, min);
+}
+
+export function getBoundingClientRect(element: HTMLElement) {
+    return window.tavenem.framework.elementReference.getBoundingClientRect(element);
+}
+
+export function getClientRectFromFirstChild(element: HTMLElement) {
+    return window.tavenem.framework.elementReference.getClientRectFromFirstChild(element);
+}
+
+export function getClientRectFromParent(element: HTMLElement) {
+    return window.tavenem.framework.elementReference.getClientRectFromParent(element);
 }
 
 export function getHeadings(className: string): HeadingData[] {
@@ -1067,6 +1120,10 @@ export function getPreferredColorScheme(): number {
     return 1;
 }
 
+export function elementHasFixedAncestors(element: Node | null) {
+    return window.tavenem.framework.elementReference.hasFixedAncestors(element);
+}
+
 export function listenForKeyEvent(dotNetRef: DotNet.DotNetObject, elementId: string, options: IKeyListenerOptions) {
     window.tavenem.framework.keyListener.connect(dotNetRef, elementId, options);
 }
@@ -1104,6 +1161,26 @@ export function popoverDispose() {
 
 export function popoverInitialize() {
     window.tavenem.framework.popover.initialize();
+}
+
+export function removeEventListener(element: Element, event: string, eventId: number) {
+    window.tavenem.framework.elementReference.removeEventListener(element, event, eventId);
+}
+
+export function restoreElementFocus(element: IFocusableElement) {
+    window.tavenem.framework.elementReference.restoreFocus(element);
+}
+
+export function saveElementFocus(element: IFocusableElement) {
+    window.tavenem.framework.elementReference.saveFocus(element);
+}
+
+export function select(element: HTMLInputElement) {
+    window.tavenem.framework.elementReference.select(element);
+}
+
+export function selectRange(element: HTMLInputElement, pos1: number, pos2: number) {
+    window.tavenem.framework.elementReference.selectRange(element, pos1, pos2);
 }
 
 export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, className: string) {

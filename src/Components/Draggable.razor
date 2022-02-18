@@ -1,0 +1,14 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TDragItem
+
+@inherits TavenemComponentBase
+
+<div @attributes="AdditionalAttributes"
+     class="@CssClass"
+     style="@CssStyle"
+     draggable="true"
+     @ondragstart="OnDragStart"
+     @ondragend="OnDragEndAsync">
+    @ChildContent
+</div>

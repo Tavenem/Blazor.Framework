@@ -82,22 +82,10 @@
     max-width: calc(100% - 4rem);
     z-index: calc(var(--tavenem-zindex-dialog) + 2);
 
-    > *:first-child {
-        border-top-left-radius: inherit;
-        border-top-right-radius: inherit;
-    }
-
-    > *:last-child {
-        border-bottom-left-radius: inherit;
-        border-bottom-right-radius: inherit;
-    }
-
-    > *:only-child {
-        border-radius: inherit;
-    }
-
     > .header {
         align-items: flex-end;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
         display: flex;
         flex: 0 0 auto;
         gap: .5rem;
@@ -105,17 +93,31 @@
         margin: 0;
         padding: 1rem 1.5rem;
         z-index: 1;
+
+        + * .body {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
     }
 
-    > .body {
+    > * > .body {
         -webkit-overflow-scrolling: touch;
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
         flex: 1 1 auto;
         padding: .5rem 1.5rem;
         position: relative;
+
+        *:last-child {
+            border-bottom-left-radius: inherit;
+            border-bottom-right-radius: inherit;
+        }
     }
 
-    > .footer {
+    > * > .footer {
         align-items: center;
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
         display: flex;
         flex: 0 0 auto;
         gap: .5rem;

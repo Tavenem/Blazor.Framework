@@ -1,0 +1,63 @@
+﻿@namespace Tavenem.Blazor.Framework.InternalComponents
+
+@typeparam TListItem
+
+@inherits Collapse
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <div class="@HeaderClass">
+        @if (TitleContent is null)
+        {
+            <div class="expand" @onclick="OnToggleAsync">
+                <span draggable="@Draggable"
+                      @ondragstart="OnDragStart"
+                      @ondragend="OnDragEndAsync"
+                      @ondragenter="OnDragEnter"
+                      @ondragleave="OnDragLeave"
+                      ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
+                      @ondrop="OnDropAsync">@Title</span>
+                <span class="icon ms-2">@IconClass</span>
+            </div>
+        }
+        else if (TitleIsToggle)
+        {
+            <div class="d-flex flex-column flex-grow-1 clickable"
+                 @onclick="OnToggleAsync"
+                 draggable="@Draggable"
+                 @ondragstart="OnDragStart"
+                 @ondragend="OnDragEndAsync"
+                 @ondragenter="OnDragEnter"
+                 @ondragleave="OnDragLeave"
+                 ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
+                 @ondrop="OnDropAsync">
+                 @TitleContent
+            </div>
+            <span class="icon expand ms-2" @onclick="OnToggleAsync">@IconClass</span>
+        }
+        else
+        {
+            <div class="d-flex flex-column flex-grow-1"
+                 draggable="@Draggable"
+                 @ondragstart="OnDragStart"
+                 @ondragend="OnDragEndAsync"
+                 @ondragenter="OnDragEnter"
+                 @ondragleave="OnDragLeave"
+                 ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
+                 @ondrop="OnDropAsync">
+                @TitleContent
+            </div>
+            <span class="icon expand ms-2" @onclick="OnToggleAsync">@IconClass</span>
+        }
+    </div>
+    <div class="@BodyCssClass">
+        <CascadingValue Value="this" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    </div>
+    @if (FooterContent is not null)
+    {
+        <div class="@FooterCssClass">
+            @FooterContent
+        </div>
+    }
+</div>

@@ -5,16 +5,16 @@
 <aside @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="@HeaderClassName">
         <div class="@HeaderToolbarClassName">
-            @Header
+            @HeaderContent
             <div class="btn-close drawer-close-small" @onclick="OnClosedAsync">close</div>
         </div>
     </div>
     @ChildContent
-    @if (Footer is not null)
+    @if (FooterContent is not null)
     {
         <div class="footer appbar">
             <div class="@FooterToolbarClassName">
-                @Footer
+                @FooterContent
             </div>
         </div>
     }

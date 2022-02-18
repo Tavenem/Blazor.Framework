@@ -1,37 +1,45 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
-@attribute [CascadingTypeParameter(nameof(TChip))]
-@typeparam TChip
+@attribute [CascadingTypeParameter(nameof(TListItem))]
+@typeparam TListItem
 
-@inherits ElementList<TChip>
+@inherits DropTarget<TListItem>
 
 <div @attributes="AdditionalAttributes"
      role="list"
      class="@CssClass"
      style="@CssStyle"
      @ondragenter="OnDragEnter"
-     ondragover="event.preventDefault()"
+     ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
      ondragstart="event.dataTransfer.setData('', event.target.id)"
      @ondrop="OnDropAsync">
+    @ChildContent
     @if (Items is not null)
     {
-        <CascadingValue Value="this as ElementList<TChip>" IsFixed="true">
+        <CascadingValue Value="this" IsFixed="true">
         <CascadingValue Value="SelectedItems">
             @if (Template is null)
             {
                 foreach (var item in Items)
                 {
-                    <Chip Item="item" />
+                    <ListItem @key="@(item?.GetHashCode() ?? 0)"
+                              TListItem="TListItem"
+                              Item="item" />
                 }
             }
             else
             {
                 foreach (var item in Items)
                 {
-                    @Template(item);
+                    <ListItem @key="@(item?.GetHashCode() ?? 0)"
+                              TListItem="TListItem"
+                              Item="item">
+                        @Template(item);
+                    </ListItem>
                 }
             }
         </CascadingValue>
         </CascadingValue>
     }
+    @FollowingContent
 </div>
