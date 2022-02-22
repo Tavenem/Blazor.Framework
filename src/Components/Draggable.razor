@@ -5,10 +5,9 @@
 @inherits TavenemComponentBase
 
 <div @attributes="AdditionalAttributes"
+     id="@Id"
      class="@CssClass"
      style="@CssStyle"
-     draggable="true"
-     @ondragstart="OnDragStart"
-     @ondragend="OnDragEndAsync">
+     draggable="@(IsDraggable ? "true" : "false")">
     @ChildContent
 </div>

@@ -44,11 +44,12 @@
 
 html, body * {
     scrollbar-color: var(--tavenem-color-scrollbar) transparent;
+    scrollbar-width: thin;
 }
 
 ::-webkit-scrollbar {
-    height: 1rem;
-    width: 1rem;
+    height: .5rem;
+    width: .5rem;
     z-index: 1;
 }
 
@@ -58,7 +59,7 @@ html, body * {
 
 ::-webkit-scrollbar-thumb {
     background: var(--tavenem-color-scrollbar);
-    border-radius: var(--tavenem-border-radius);
+    border-radius: 1px;
 
     &:hover {
         background: var(--tavenem-color-scrollbar-hover);

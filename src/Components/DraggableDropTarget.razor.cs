@@ -1,32 +1,133 @@
 using Microsoft.AspNetCore.Components;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
+/// <summary>
+/// A target for drag-drop operations, as well as an item which can be dragged.
+/// </summary>
+/// <typeparam name="TDragItem">The type of data dragged from this item.</typeparam>
+/// <typeparam name="TDropItem">The type of data dropped onto this target.</typeparam>
 public partial class DraggableDropTarget<TDragItem, TDropItem>
 {
-    private protected bool _dragOperationIsInProgress = false;
-
-    private bool _initialized;
+    /// <summary>
+    /// <para>
+    /// An optional CSS class to be added to this element when it is being dragged.
+    /// </para>
+    /// <para>
+    /// Defaults to <see langword="null"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public virtual string? DragClass { get; set; }
 
     /// <summary>
-    /// The data item bound to this component.
+    /// <para>
+    /// Sets the allowed drag effects for drag operations with this item.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="DragEffect.All"/>.
+    /// </para>
     /// </summary>
-    [Parameter] public TDragItem? Item { get; set; }
+    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.All;
 
     /// <summary>
-    /// Method invoked when the component has received parameters from its
-    /// parent in the render tree, and the incoming values have been assigned to
-    /// properties.
+    /// <para>
+    /// Invoked when a drag operation starts, to get the data to be dragged, and the allowed drop
+    /// type.
+    /// </para>
+    /// <para>
+    /// If not set, defaults to returning the object assigned to <see cref="Item"/>.
+    /// </para>
+    /// <para>
+    /// If <see cref="Item"/> is also unset, no drag event occurs.
+    /// </para>
     /// </summary>
-    protected override void OnParametersSet()
+    [Parameter] public virtual Func<DragStartData>? GetDragData { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether this item is currently draggable.
+    /// </para>
+    /// <para>
+    /// Defaults to <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public virtual bool IsDraggable { get; set; } = true;
+
+    /// <summary>
+    /// <para>
+    /// An optional data item bound to this component.
+    /// </para>
+    /// <para>
+    /// The <see cref="GetDragData"/> callback can be configured instead, for greater control over
+    /// the data provided to the drag operation.
+    /// </para>
+    /// <para>
+    /// If both this item and the <see cref="GetDragData"/> callback are unset, no drag operation
+    /// occurs.
+    /// </para>
+    /// <para>
+    /// If <typeparamref name="TDragItem"/> is <see cref="string"/> the drag data type will be
+    /// "text/plain", unless it is a valid <see cref="Uri"/>.
+    /// </para>
+    /// <para>
+    /// Valid <see cref="Uri"/> instances (including strings which can be parsed successfully as an
+    /// absolute <see cref="Uri"/>) will be given type "text/uri-list", and a fallback copy with
+    /// "text/plain" will also be added.
+    /// </para>
+    /// <para>
+    /// All other data will be set as the internal transfer item, and also serialized as JSON and
+    /// added with type "application/json". Serialization errors will be ignored. A fallback item of
+    /// type "text/plain" with the value of the object's <see cref="object.ToString"/> method will
+    /// also be set.
+    /// </para>
+    /// </summary>
+    [Parameter] public virtual TDragItem? Item { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Invoked when a drop operation completes with this element as the dropped item (including by
+    /// cancellation).
+    /// </para>
+    /// <para>
+    /// The argument parameter indicates which drag effect was ultimately selected for the drag-drop
+    /// operation.
+    /// </para>
+    /// </summary>
+    [Parameter] public virtual EventCallback<DragEffect> OnDropped { get; set; }
+
+    /// <summary>
+    /// The final value assigned to the class attribute, including component
+    /// values.
+    /// </summary>
+    protected override string CssClass => new CssBuilder("border-transparent")
+        .Add(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .ToString();
+
+    /// <summary>
+    /// Method invoked after each time the component has been rendered.
+    /// </summary>
+    /// <param name="firstRender">
+    /// Set to <c>true</c> if this is the first time <see
+    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
+    /// component instance; otherwise <c>false</c>.
+    /// </param>
+    /// <remarks>
+    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
+    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
+    /// useful for performing interop, or interacting with values received from
+    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
+    /// that initialization work is only performed once.
+    /// </remarks>
+    protected override void OnAfterRender(bool firstRender)
     {
-        base.OnParametersSet();
-
-        if (FrameworkLayout is not null
-            && !_initialized)
+        base.OnAfterRender(firstRender);
+        if (firstRender)
         {
-            _initialized = true;
-            FrameworkLayout.DragEnded += OnDragEndedInner;
+            DragDropListener.DragClass = DragClass;
+            DragDropListener.GetData = GetDragDataInner;
+            DragDropListener.OnDropped += OnDroppedAsync;
         }
     }
 
@@ -38,11 +139,9 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     {
         if (!_disposedValue)
         {
-            if (disposing
-                && _initialized
-                && FrameworkLayout is not null)
+            if (disposing)
             {
-                FrameworkLayout.DragEnded -= OnDragEndedInner;
+                DragDropListener.OnDropped -= OnDroppedAsync;
             }
             base.Dispose(disposing);
 
@@ -50,59 +149,31 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
         }
     }
 
-    /// <summary>
-    /// Event handler for <c>ondragend</c>
-    /// </summary>
-    protected async Task OnDragEndAsync()
+    private protected virtual DragStartData GetDragDataInner()
     {
-        if (_dragOperationIsInProgress)
+        if (!IsDraggable)
         {
-            _dragOperationIsInProgress = false;
-            if (FrameworkLayout is not null)
-            {
-                await FrameworkLayout.CancelDragAsync();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Event handler for <c>ondragstart</c>
-    /// </summary>
-    protected void OnDragStart()
-    {
-        if (FrameworkLayout is null)
-        {
-            return;
+            return DragStartData.None;
         }
 
-        _dragOperationIsInProgress = true;
-        FrameworkLayout.StartDrag(Item, OnDragCompleteInnerAsync);
-    }
-
-    /// <summary>
-    /// Called when a drag operation involving this item completes (including by cancellation).
-    /// </summary>
-    protected virtual Task OnDragCompleteAsync(DropTarget<TDragItem> target) => Task.CompletedTask;
-
-    /// <summary>
-    /// Called when any drag operation ends (including by cancellation).
-    /// </summary>
-    protected virtual void OnDragEnded() { }
-
-    private async Task OnDragCompleteInnerAsync()
-    {
-        _dragOperationIsInProgress = false;
-        if (FrameworkLayout?.CurrentDropTarget is DropTarget<TDragItem> target
-            && FrameworkLayout?.CurrentDragItem is TDragItem item)
+        if (GetDragData is not null)
         {
-            await OnDragCompleteAsync(target);
-            await target.OnDragToTargetCompleteAsync(item);
+            return GetDragData.Invoke();
         }
+
+        if (Item is null)
+        {
+            return DragStartData.None;
+        }
+
+        return DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed);
     }
 
-    private void OnDragEndedInner(object? sender, EventArgs e)
+    private protected virtual async void OnDroppedAsync(object? sender, DragEffect e)
     {
-        _dragOperationIsInProgress = false;
-        OnDragEnded();
+        if (IsDraggable)
+        {
+            await OnDropped.InvokeAsync(e);
+        }
     }
 }

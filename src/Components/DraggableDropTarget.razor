@@ -6,14 +6,9 @@
 @inherits DropTarget<TDropItem>
 
 <div @attributes="AdditionalAttributes"
+     id="@Id"
      class="@CssClass"
      style="@CssStyle"
-     draggable="true"
-     @ondragstart="OnDragStart"
-     @ondragend="OnDragEndAsync"
-     @ondragenter="OnDragEnter"
-     @ondragleave="OnDragLeave"
-     ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-     @ondrop="OnDropAsync">
+     draggable="@(IsDraggable ? "true" : "false")">
     @ChildContent
 </div>

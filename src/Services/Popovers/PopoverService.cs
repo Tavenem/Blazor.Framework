@@ -1,0 +1,91 @@
+﻿using Microsoft.JSInterop;
+
+namespace Tavenem.Blazor.Framework.Services;
+
+internal class PopoverService : IAsyncDisposable
+{
+    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
+    private readonly List<PopoverHandler> _popoverHandlers = new();
+    private readonly SemaphoreSlim _lock = new(1, 1);
+
+    private bool _popoversInitialized;
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="PopoverService"/>.
+    /// </summary>
+    /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+    public PopoverService(IJSRuntime jsRuntime) => _moduleTask = new(
+        () => jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/Tavenem.Blazor.Framework/tavenem-popover.js")
+        .AsTask());
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources asynchronously.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous dispose operation.
+    /// </returns>
+    public async ValueTask DisposeAsync()
+    {
+        if (_moduleTask.IsValueCreated)
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            if (_popoversInitialized)
+            {
+                await module.InvokeVoidAsync("popoverDispose");
+            }
+            await module.DisposeAsync().ConfigureAwait(false);
+        }
+
+        GC.SuppressFinalize(this);
+    }
+
+    internal async Task InitializePopoversAsync()
+    {
+        if (_popoversInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            await _lock.WaitAsync();
+            if (_popoversInitialized)
+            {
+                return;
+            }
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("popoverInitialize");
+            _popoversInitialized = true;
+        }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
+    internal async Task<PopoverHandler> RegisterPopoverAsync(string? anchorId = null)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        var handler = new PopoverHandler(module, anchorId);
+        _popoverHandlers.Add(handler);
+        return handler;
+    }
+
+    internal async Task<bool> UnregisterPopoverHandler(PopoverHandler handler)
+    {
+        if (!_popoverHandlers.Contains(handler)
+            || !handler.IsConnected)
+        {
+            return false;
+        }
+
+        await handler.DetachAsync();
+        _popoverHandlers.Remove(handler);
+        return true;
+    }
+}

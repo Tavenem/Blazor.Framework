@@ -10,14 +10,8 @@
 }
 <div class="@CssClass"
      style="@CssStyle"
-     draggable="@Draggable"
-     @onclick="OnClickAsync"
-     @ondragstart="OnDragStart"
-     @ondragend="OnDragEndAsync"
-     @ondragenter="OnDragEnter"
-     @ondragleave="OnDragLeave"
-     ondragover="event.preventDefault()"
-     @ondrop="OnDropAsync">
+     draggable="@IsDraggable"
+     @onclick="OnClickAsync">
     @if (!string.IsNullOrWhiteSpace(IconName))
     {
         <span class="@IconClassName">@IconName</span>

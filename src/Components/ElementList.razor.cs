@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -24,6 +25,22 @@ public partial class ElementList<TListItem>
     /// </para>
     /// </summary>
     [Parameter] public RenderFragment<TListItem>? CollapsibleTemplate { get; set; }
+
+    private DragEffect _dragEffectAllowed = DragEffect.CopyMove;
+    /// <summary>
+    /// <para>
+    /// Sets the allowed drag effects for drag operations with list items.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="DragEffect.CopyMove"/> for list items, but defers to parent lists.
+    /// </para>
+    /// </summary>
+    [Parameter]
+    public DragEffect DragEffectAllowed
+    {
+        get => ParentList?.DragEffectAllowed ?? _dragEffectAllowed;
+        set => _dragEffectAllowed = value;
+    }
 
     /// <summary>
     /// An additional class that is applied to this list when an item is
@@ -53,22 +70,33 @@ public partial class ElementList<TListItem>
     /// </summary>
     [Parameter] public Func<TListItem, string?>? IconClass { get; set; }
 
+    private bool _isDragStart;
     /// <summary>
     /// <para>
     /// Whether the items in this list can be dragged.
+    /// </para>
+    /// <para>
+    /// Defaults to <see langword="false"/>, but defers to a parent list.
     /// </para>
     /// <para>
     /// Both this and <see cref="IsDropTarget"/> must be <see langword="true"/>
     /// in order to enable re-ordering items within the same list.
     /// </para>
     /// </summary>
-    [Parameter] public bool IsDragStart { get; set; }
+    [Parameter]
+    public bool IsDragStart
+    {
+        get => _isDragStart || ParentList?.IsDragStart == true;
+        set => _isDragStart = value;
+    }
 
     private bool _isDropTarget;
     /// <summary>
     /// <para>
-    /// Whether items of type <typeparamref name="TListItem"/> can be dropped into
-    /// this list.
+    /// Whether this drop target is accepting drops.
+    /// </para>
+    /// <para>
+    /// Defaults to <see langword="false"/>, but defers to a parent list.
     /// </para>
     /// <para>
     /// Both this and <see cref="IsDragStart"/> must be <see langword="true"/>
@@ -87,11 +115,16 @@ public partial class ElementList<TListItem>
     /// </summary>
     [Parameter] public Func<TListItem, string?>? ItemClass { get; set; }
 
+    private string? _itemDraggingClass;
     /// <summary>
-    /// An additional class that is applied to list items when one is being
-    /// dragged from here.
+    /// An additional class that is applied to list items when one is being dragged.
     /// </summary>
-    [Parameter] public string? ItemDraggingClass { get; set; }
+    [Parameter]
+    public string? ItemDraggingClass
+    {
+        get => _itemDraggingClass ?? ParentList?.ItemDraggingClass;
+        set => _itemDraggingClass = value;
+    }
 
     /// <summary>
     /// <para>
@@ -154,6 +187,18 @@ public partial class ElementList<TListItem>
     [Parameter] public Func<TListItem, ThemeColor>? ItemThemeColor { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Invoked when a drop operation completes with a list item as the dropped item (including by
+    /// cancellation).
+    /// </para>
+    /// <para>
+    /// The argument parameter indicates which drag effect was ultimately selected for the drag-drop
+    /// operation.
+    /// </para>
+    /// </summary>
+    [Parameter] public EventCallback<DragEffect> OnDropped { get; set; }
+
+    /// <summary>
     /// Invoked when an item is clicked.
     /// </summary>
     [Parameter] public EventCallback<TListItem?> OnItemClick { get; set; }
@@ -169,11 +214,19 @@ public partial class ElementList<TListItem>
     /// </summary>
     [Parameter] public bool Required { get; set; }
 
+    private ThemeColor _selectedColor;
     /// <summary>
     /// If not <see cref="ThemeColor.None"/>, replaces the theme of selected
     /// items with this value.
     /// </summary>
-    [Parameter] public ThemeColor SelectedColor { get; set; }
+    [Parameter]
+    public ThemeColor SelectedColor
+    {
+        get => _selectedColor == ThemeColor.None
+            ? ParentList?.SelectedColor ?? ThemeColor.None
+            : _selectedColor;
+        set => _selectedColor = value;
+    }
 
     /// <summary>
     /// <para>
@@ -259,12 +312,24 @@ public partial class ElementList<TListItem>
     /// </summary>
     [Parameter] public Func<TListItem, bool>? SeparatorBefore { get; set; }
 
+    private bool _showSelectionIcon = true;
     /// <summary>
+    /// <para>
     /// If <see langword="true"/> the icon of selected items will display a
     /// checkmark (replacing any existing icon).
+    /// </para>
+    /// <para>
+    /// Defaults to <see langword="true"/>, but defers to the parent list.
+    /// </para>
     /// </summary>
-    [Parameter] public bool ShowSelectionIcon { get; set; } = true;
+    [Parameter]
+    public bool ShowSelectionIcon
+    {
+        get => _showSelectionIcon && ParentList?.ShowSelectionIcon != false;
+        set => _showSelectionIcon = value;
+    }
 
+    private RenderFragment<TListItem>? _template;
     /// <summary>
     /// <para>
     /// A template used to generate list items.
@@ -274,7 +339,12 @@ public partial class ElementList<TListItem>
     /// method will be used to generate its content.
     /// </para>
     /// </summary>
-    [Parameter] public virtual RenderFragment<TListItem>? Template { get; set; }
+    [Parameter]
+    public virtual RenderFragment<TListItem>? Template
+    {
+        get => _template ?? ParentList?.Template;
+        set => _template = value;
+    }
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
@@ -282,9 +352,7 @@ public partial class ElementList<TListItem>
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected override string CssClass => new CssBuilder("list")
-        .Add("can-drag", IsDragStartValue)
-        .Add("can-drop", _canDrop)
-        .Add("no-drop", _dragOver && !_canDrop)
+        .Add("can-drag", IsDragStart)
         .Add(DraggingClass ?? ParentList?.DraggingClass, _dragInProgress)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
@@ -294,18 +362,6 @@ public partial class ElementList<TListItem>
     /// The list to which this one belongs, if any.
     /// </summary>
     [CascadingParameter] protected ElementList<TListItem>? ParentList { get; set; }
-
-    internal bool IsDragStartValue => IsDragStart || ParentList?.IsDragStartValue == true;
-
-    internal string? ItemDraggingClassValue => ItemDraggingClass ?? ParentList?.ItemDraggingClassValue;
-
-    internal ThemeColor SelectedColorValue => SelectedColor == ThemeColor.None
-        ? ParentList?.SelectedColorValue ?? ThemeColor.None
-        : SelectedColor;
-
-    internal bool ShowSelectionIconValue => ShowSelectionIcon || ParentList?.ShowSelectionIconValue == true;
-
-    internal RenderFragment<TListItem>? TemplateValue => Template ?? ParentList?.TemplateValue;
 
     /// <summary>
     /// Method invoked when the component has received parameters from its parent in the render
@@ -336,6 +392,24 @@ public partial class ElementList<TListItem>
         _selectedItems.AddRange(remaining);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+
+    internal void DragEnded()
+    {
+        _dragInProgress = false;
+        ParentList?.DragEnded();
+    }
+
+    internal void DragStarted()
+    {
+        if (ParentList is not null)
+        {
+            ParentList.DragStarted();
+        }
+        else
+        {
+            _dragInProgress = true;
+        }
     }
 
     internal int? IndexOfItem(TListItem? item) => item is null ? null : Items?.IndexOf(item);
@@ -403,23 +477,46 @@ public partial class ElementList<TListItem>
         StateHasChanged();
     }
 
-    /// <summary>
-    /// Invoked when a drag operation completes.
-    /// </summary>
-    /// <param name="item">The droped item.</param>
-    protected override async Task OnDropCompleteAsync(TListItem item)
+    private protected override async void OnDropAsync(object? sender, DropEventArgs e)
     {
-        (Items ??= new()).Add(item);
-        await ItemsChanged.InvokeAsync(Items);
-        await OnDrop.InvokeAsync(item);
-        StateHasChanged();
-    }
+        if (!IsDropTarget)
+        {
+            return;
+        }
 
-    private void OnDragStarted(object? sender, EventArgs e)
-    {
-        (var item, _canDrop) = ItemCanBeDropped();
-        _dragInProgress = item is not null && Items?.Contains(item) == true;
-        StateHasChanged();
+        var item = DragDropService.TryGetData<TListItem>(e);
+
+        if (OnDrop.HasDelegate)
+        {
+            await OnDrop.InvokeAsync(new()
+            {
+                Data = e.Data,
+                Effect = e.Effect,
+                Item = item,
+            });
+        }
+        else if (item is not null)
+        {
+            if (e.Effect != DragEffect.Move)
+            {
+                try
+                {
+                    item = JsonSerializer.Deserialize<TListItem>(JsonSerializer.Serialize(item));
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException("Copying this type of list item is not supported.", ex);
+                }
+                if (item is null)
+                {
+                    throw new InvalidOperationException("Copying this type of list item is not supported: round-trip deserialization returned null");
+                }
+            }
+
+            (Items ??= new()).Add(item);
+            await ItemsChanged.InvokeAsync(Items);
+            StateHasChanged();
+        }
     }
 
     private async Task SetSelectionAsync(TListItem? selectedItem)

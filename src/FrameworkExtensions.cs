@@ -1,4 +1,5 @@
 ﻿using Tavenem.Blazor.Framework;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -15,8 +16,13 @@ public static class FrameworkExtensions
     /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
     public static IServiceCollection AddTavenemFramework(this IServiceCollection services)
     {
-        services.AddScoped<FrameworkJsInterop>();
+        services.AddScoped<UtilityService>();
+        services.AddScoped<DragDropService>();
+        services.AddScoped<PopoverService>();
+        services.AddScoped<ScrollService>();
+        services.AddScoped<ThemeService>();
         services.AddScoped<DialogService>();
+        services.AddTransient<DragDropListener>();
         services.AddTransient<IKeyListener, KeyListener>();
         services.AddTransient<ScrollListener>();
         return services;

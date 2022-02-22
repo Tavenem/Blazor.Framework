@@ -92,7 +92,7 @@ internal static class ElementReferenceExtensions
         ? null
         : await jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-framework.js");
+            "./_content/Tavenem.Blazor.Framework/tavenem-utility.js");
 
     private static Dictionary<string, object> GetSerializationSpec(Type type)
     {

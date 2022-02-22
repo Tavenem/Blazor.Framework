@@ -27,6 +27,18 @@ internal static class Extensions
         return char.ToLowerInvariant(value[0]) + value[1..];
     }
 
+    public static string ToJsString(this DragEffect value) => value switch
+    {
+        DragEffect.None => "none",
+        DragEffect.Copy => "copy",
+        DragEffect.Link => "link",
+        DragEffect.CopyLink => "copyLink",
+        DragEffect.Move => "move",
+        DragEffect.CopyMove => "copyMove",
+        DragEffect.LinkMove => "linkMove",
+        _ => "all",
+    };
+
     public static Dictionary<TKey, TValue> Without<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, params TKey[] keys) where TKey : notnull
     {
         if (keys.Length == 0)

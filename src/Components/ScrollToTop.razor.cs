@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -58,7 +59,7 @@ public partial class ScrollToTop : IDisposable
 
     [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
 
-    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
+    [Inject] private ScrollService ScrollService { get; set; } = default!;
 
     [Inject] private ScrollListener ScrollListener { get; set; } = default!;
 
@@ -121,7 +122,7 @@ public partial class ScrollToTop : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private async Task OnClickAsync() => await JsInterop.ScrollToTop(ScrollListener?.Selector);
+    private async Task OnClickAsync() => await ScrollService.ScrollToTop(ScrollListener?.Selector);
 
     private async void OnScroll(object? sender, ScrollEventArgs e)
     {
@@ -132,12 +133,12 @@ public partial class ScrollToTop : IDisposable
         if (topOffset >= TopOffset && !Visible)
         {
             Visible = true;
-            await InvokeAsync(() => StateHasChanged());
+            await InvokeAsync(StateHasChanged);
         }
         else if (topOffset < TopOffset && Visible)
         {
             Visible = false;
-            await InvokeAsync(() => StateHasChanged());
+            await InvokeAsync(StateHasChanged);
         }
     }
 }

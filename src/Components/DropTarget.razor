@@ -5,12 +5,8 @@
 @inherits TavenemComponentBase
 
 <div @attributes="AdditionalAttributes"
+     id="@Id"
      class="@CssClass"
-     style="@CssStyle"
-     @ondragenter="OnDragEnter"
-     @ondragleave="OnDragLeave"
-     ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-     ondragstart="event.dataTransfer.setData('', event.target.id)"
-     @ondrop="OnDropAsync">
+     style="@CssStyle">
     @ChildContent
 </div>

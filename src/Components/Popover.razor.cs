@@ -126,7 +126,7 @@ public partial class Popover : IAsyncDisposable
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
-    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
+    [Inject] private PopoverService PopoverService { get; set; } = default!;
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note
@@ -153,8 +153,8 @@ public partial class Popover : IAsyncDisposable
     {
         if (firstRender)
         {
-            await JsInterop.InitializePopoversAsync();
-            _handler = await JsInterop.RegisterPopoverAsync(AnchorId);
+            await PopoverService.InitializePopoversAsync();
+            _handler = await PopoverService.RegisterPopoverAsync(AnchorId);
             StateHasChanged();
         }
         else if (!_initialized && _handler is not null)
@@ -179,7 +179,7 @@ public partial class Popover : IAsyncDisposable
             {
                 try
                 {
-                    await JsInterop.UnregisterPopoverHandler(_handler);
+                    await PopoverService.UnregisterPopoverHandler(_handler);
                 }
                 catch (JSDisconnectedException) { }
                 catch (TaskCanceledException) { }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -37,7 +37,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.1.22109.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.2" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -50,7 +50,12 @@
     <ClientAssetsInputs Remove="assets\package.json" />
     <ClientAssetsInputs Remove="assets\postcss.config.js" />
     <ClientAssetsInputs Remove="assets\rollup.config.js" />
-    <ClientAssetsInputs Remove="assets\tavenem-framework.ts" />
+    <ClientAssetsInputs Remove="assets\tavenem-dragdrop.ts" />
+    <ClientAssetsInputs Remove="assets\tavenem-keylistener.ts" />
+    <ClientAssetsInputs Remove="assets\tavenem-popover.ts" />
+    <ClientAssetsInputs Remove="assets\tavenem-scroll.ts" />
+    <ClientAssetsInputs Remove="assets\tavenem-theme.ts" />
+    <ClientAssetsInputs Remove="assets\tavenem-utility.ts" />
     <ClientAssetsInputs Remove="assets\tsconfig.json" />
     <Content Include="assets\sass\framework.scss" />
     <ScssFiles Include="assets\**\*.scss" Exclude="assets\**\_*.scss" />
@@ -94,9 +99,5 @@
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>
-  
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\sass\components\_dialog.scss" />
-  </ItemGroup>
 
 </Project>

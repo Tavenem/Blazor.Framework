@@ -63,7 +63,7 @@ public partial class Contents : IDisposable
 
     [CascadingParameter] private FrameworkLayout? Framework { get; set; }
 
-    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
+    [Inject] private UtilityService JsInterop { get; set; } = default!;
 
     private int LowestLevel => (int)(_headings
         .Where(x => x.Level != HeadingLevel.None)

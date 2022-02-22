@@ -29,10 +29,7 @@ public partial class Chip<TChip>
             ElementList?.OnItemClick.HasDelegate == true
                 || ElementList?.SelectionType != SelectionType.None)
         .Add("selected", IsSelected)
-        .Add("no-drag", !Draggable)
-        .Add("can-drop", _dragOver && _canDrop)
-        .Add("no-drop", _dragOver && !_canDrop)
-        .Add(ElementList?.ItemDraggingClassValue, _dragOperationIsInProgress)
+        .Add("no-drag", !IsDraggable)
         .Add("d-none", IsClosed)
         .Add(ClassName)
         .ToString();

@@ -1,10 +1,10 @@
 ﻿using Microsoft.JSInterop;
 
-namespace Tavenem.Blazor.Framework;
+namespace Tavenem.Blazor.Framework.Services;
 
 internal class ScrollListener : IDisposable
 {
-    private readonly FrameworkJsInterop _jsInterop;
+    private readonly ScrollService _scrollService;
 
     private bool _disposedValue;
     private DotNetObjectReference<ScrollListener>? _dotNetRef;
@@ -16,7 +16,7 @@ internal class ScrollListener : IDisposable
     public string? Selector { get; set; }
 
     /// <summary>
-    /// OnScroll event. Fired when a element is scrolled
+    /// Raised when the element is scrolled.
     /// </summary>
     public event EventHandler<ScrollEventArgs> OnScroll
     {
@@ -24,8 +24,26 @@ internal class ScrollListener : IDisposable
         remove => Unsubscribe(value);
     }
 
-    public ScrollListener(FrameworkJsInterop jsInterop)
-        => _jsInterop = jsInterop;
+    public ScrollListener(ScrollService scrollService)
+        => _scrollService = scrollService;
+
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Unsubscribe to scroll events.
+    /// </summary>
+    private ValueTask Cancel()
+        => _scrollService.CancelScrollListener(Selector);
+
+    /// <summary>
+    /// Invoked by javascript interop.
+    /// </summary>
+    [JSInvokable] public void RaiseOnScroll(ScrollEventArgs e) => _onScroll?.Invoke(this, e);
 
     protected virtual void Dispose(bool disposing)
     {
@@ -40,31 +58,13 @@ internal class ScrollListener : IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Unsubscribe to scroll events.
-    /// </summary>
-    private ValueTask Cancel()
-        => _jsInterop.CancelScrollListener(Selector);
-
-    /// <summary>
-    /// Invoked by javascript interop.
-    /// </summary>
-    [JSInvokable] public void RaiseOnScroll(ScrollEventArgs e) => _onScroll?.Invoke(this, e);
-
     /// <summary>
     /// Subscribe to scroll events.
     /// </summary>
     private ValueTask Start()
     {
         _dotNetRef = DotNetObjectReference.Create(this);
-        return _jsInterop.StartScrollListener(_dotNetRef, Selector);
+        return _scrollService.StartScrollListener(_dotNetRef, Selector);
     }
 
     private async void Subscribe(EventHandler<ScrollEventArgs> value)

@@ -32,16 +32,11 @@
 }
 else
 {
-    <div class="@CssClass"
+    <div id="@Id"
+         class="@CssClass"
          style="@CssStyle"
-         draggable="@Draggable"
-         @onclick="OnClickAsync"
-         @ondragstart="OnDragStart"
-         @ondragend="OnDragEndAsync"
-         @ondragenter="OnDragEnter"
-         @ondragleave="OnDragLeave"
-         ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-         @ondrop="OnDropAsync">
+         draggable="@IsDraggable"
+         @onclick="OnClickAsync">
         @if (!string.IsNullOrWhiteSpace(IconName))
         {
             <span class="@IconClassName">@IconName</span>

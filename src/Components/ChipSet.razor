@@ -6,13 +6,10 @@
 @inherits ElementList<TChip>
 
 <div @attributes="AdditionalAttributes"
+     id="@Id"
      role="list"
      class="@CssClass"
-     style="@CssStyle"
-     @ondragenter="OnDragEnter"
-     ondragover="event.preventDefault()"
-     ondragstart="event.dataTransfer.setData('', event.target.id)"
-     @ondrop="OnDropAsync">
+     style="@CssStyle">
     @if (Items is not null)
     {
         <CascadingValue Value="this as ElementList<TChip>" IsFixed="true">

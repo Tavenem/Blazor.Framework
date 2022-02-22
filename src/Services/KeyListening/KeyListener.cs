@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using Tavenem.Blazor.Framework.KeyListening;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -34,7 +33,7 @@ public class KeyListener : IKeyListener, IAsyncDisposable
         _dotNetRef = DotNetObjectReference.Create(this);
         _moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-framework.js")
+            "./_content/Tavenem.Blazor.Framework/tavenem-keylistener.js")
             .AsTask());
     }
 

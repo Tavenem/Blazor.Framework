@@ -70,7 +70,7 @@ public partial class AnchorLink : IDisposable
 
     [CascadingParameter] private Collapse? Collapse { get; set; }
 
-    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
+    [Inject] private ScrollService ScrollService { get; set; } = default!;
 
     private protected string? LocalLink { get; set; }
 
@@ -174,7 +174,7 @@ public partial class AnchorLink : IDisposable
     {
         if (!string.IsNullOrEmpty(LocalLink))
         {
-            await JsInterop.ScrollToId(LocalLink);
+            await ScrollService.ScrollToId(LocalLink);
         }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace Tavenem.Blazor.Framework.KeyListening;
+﻿namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// Options for listening to keyboard events.

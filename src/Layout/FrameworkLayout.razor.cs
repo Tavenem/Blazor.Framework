@@ -16,7 +16,6 @@ public partial class FrameworkLayout : IDisposable
     private readonly List<ScrollToTop> _scrollToTops = new();
 
     private bool _disposedValue;
-    private Func<Task>? _dropCallback;
     private DotNetObjectReference<FrameworkLayout>? _dotNetRef;
 
     /// <summary>
@@ -62,18 +61,6 @@ public partial class FrameworkLayout : IDisposable
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    internal object? CurrentDragItem { get; set; }
-
-    internal Type? CurrentDragType { get; set; }
-
-    internal object? CurrentDropTarget { get; set; }
-
-    internal Type? CurrentDropTargetType { get; set; }
-
-    internal event EventHandler? DragEnded;
-
-    internal event EventHandler? DragStarted;
-
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
@@ -98,7 +85,7 @@ public partial class FrameworkLayout : IDisposable
 
     private bool HasOpenDrawer { get; set; }
 
-    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
+    [Inject] private ScrollService ScrollService { get; set; } = default!;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
@@ -144,7 +131,7 @@ public partial class FrameworkLayout : IDisposable
             if (!string.IsNullOrEmpty(ScrollSpyClass))
             {
                 _dotNetRef = DotNetObjectReference.Create(this);
-                await JsInterop.ScrollSpy(_dotNetRef, ScrollSpyClass);
+                await ScrollService.ScrollSpy(_dotNetRef, ScrollSpyClass);
             }
         }
     }
@@ -217,34 +204,6 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
-    internal async Task CancelDragAsync()
-    {
-        CurrentDragItem = null;
-        CurrentDragType = null;
-        CurrentDropTarget = null;
-        CurrentDropTargetType = null;
-        if (_dropCallback is not null)
-        {
-            await _dropCallback.Invoke();
-        }
-        DragEnded?.Invoke(this, EventArgs.Empty);
-    }
-
-    internal async Task CompleteDropAsync<TDropItem>(DropTarget<TDropItem>? target)
-    {
-        CurrentDropTarget = target;
-        CurrentDropTargetType = typeof(TDropItem);
-        if (_dropCallback is not null)
-        {
-            await _dropCallback.Invoke();
-        }
-        DragEnded?.Invoke(this, EventArgs.Empty);
-        CurrentDragItem = null;
-        CurrentDragType = null;
-        CurrentDropTarget = null;
-        CurrentDropTargetType = null;
-    }
-
     internal void DismissDialogInstance(Guid id, DialogResult? result = null)
     {
         var reference = GetDialogReference(id);
@@ -282,14 +241,6 @@ public partial class FrameworkLayout : IDisposable
             _scrollToTops.Remove(scrollToTop);
             AutoScrollToTop = _scrollToTops.Count == 0;
         }
-    }
-
-    internal void StartDrag<TItem>(TItem item, Func<Task> callback)
-    {
-        CurrentDragItem = item;
-        CurrentDragType = typeof(TItem);
-        DragStarted?.Invoke(this, EventArgs.Empty);
-        _dropCallback = callback;
     }
 
     private void DismissDialogInstance(DialogReference dialog, DialogResult? result = null)
@@ -339,6 +290,6 @@ public partial class FrameworkLayout : IDisposable
             return;
         }
 
-        await JsInterop.ScrollToId(uri.Fragment[1..]);
+        await ScrollService.ScrollToId(uri.Fragment[1..]);
     }
 }

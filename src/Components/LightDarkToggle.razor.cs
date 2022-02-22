@@ -46,7 +46,7 @@ public partial class LightDarkToggle
         ? (DarkModeIconClass ?? LightModeIconClass ?? DefaultDarkModeIconClass)
         : (LightModeIconClass ?? DarkModeIconClass ?? DefaultLightModeIconClass);
 
-    [Inject] private FrameworkJsInterop JsInterop { get; set; } = default!;
+    [Inject] private ThemeService ThemeService { get; set; } = default!;
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note
@@ -72,7 +72,7 @@ public partial class LightDarkToggle
     {
         if (firstRender)
         {
-            var mode = await JsInterop.GetPreferredColorScheme();
+            var mode = await ThemeService.GetPreferredColorScheme();
             IsDarkMode = mode == ThemePreference.Dark;
         }
     }
@@ -81,7 +81,7 @@ public partial class LightDarkToggle
 
     private async Task OnClickAsync()
     {
-        await JsInterop.SetColorScheme(IsDarkMode ? ThemePreference.Light : ThemePreference.Dark);
+        await ThemeService.SetColorScheme(IsDarkMode ? ThemePreference.Light : ThemePreference.Dark);
         IsDarkMode = !IsDarkMode;
     }
 }

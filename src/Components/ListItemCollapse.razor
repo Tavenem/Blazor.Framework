@@ -9,41 +9,26 @@
         @if (TitleContent is null)
         {
             <div class="expand" @onclick="OnToggleAsync">
-                <span draggable="@Draggable"
-                      @ondragstart="OnDragStart"
-                      @ondragend="OnDragEndAsync"
-                      @ondragenter="OnDragEnter"
-                      @ondragleave="OnDragLeave"
-                      ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-                      @ondrop="OnDropAsync">@Title</span>
+                <span id="@Id"
+                      draggable="@(IsDraggable ? "true" : "false")">@Title</span>
                 <span class="icon ms-2">@IconClass</span>
             </div>
         }
         else if (TitleIsToggle)
         {
-            <div class="d-flex flex-column flex-grow-1 clickable"
+            <div id="@Id"
+                 class="d-flex flex-column flex-grow-1 clickable"
                  @onclick="OnToggleAsync"
-                 draggable="@Draggable"
-                 @ondragstart="OnDragStart"
-                 @ondragend="OnDragEndAsync"
-                 @ondragenter="OnDragEnter"
-                 @ondragleave="OnDragLeave"
-                 ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-                 @ondrop="OnDropAsync">
+                 draggable="@(IsDraggable ? "true" : "false")">
                  @TitleContent
             </div>
             <span class="icon expand ms-2" @onclick="OnToggleAsync">@IconClass</span>
         }
         else
         {
-            <div class="d-flex flex-column flex-grow-1"
-                 draggable="@Draggable"
-                 @ondragstart="OnDragStart"
-                 @ondragend="OnDragEndAsync"
-                 @ondragenter="OnDragEnter"
-                 @ondragleave="OnDragLeave"
-                 ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-                 @ondrop="OnDropAsync">
+            <div id="@Id"
+                 class="d-flex flex-column flex-grow-1"
+                 draggable="@(IsDraggable ? "true" : "false")">
                 @TitleContent
             </div>
             <span class="icon expand ms-2" @onclick="OnToggleAsync">@IconClass</span>

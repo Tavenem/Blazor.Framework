@@ -6,13 +6,10 @@
 @inherits DropTarget<TListItem>
 
 <div @attributes="AdditionalAttributes"
+     id="@Id"
      role="list"
      class="@CssClass"
-     style="@CssStyle"
-     @ondragenter="OnDragEnter"
-     ondragover="event.preventDefault();event.dataTransfer.dropEffect='move'"
-     ondragstart="event.dataTransfer.setData('', event.target.id)"
-     @ondrop="OnDropAsync">
+     style="@CssStyle">
     @ChildContent
     @if (Items is not null)
     {
