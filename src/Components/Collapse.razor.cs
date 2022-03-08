@@ -19,11 +19,6 @@ public partial class Collapse : IDisposable
     [Parameter] public string? BodyClass { get; set; }
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// Set to <see langword="true"/> to prevent opening or closing by the user.
     /// </para>

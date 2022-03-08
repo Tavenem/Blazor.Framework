@@ -1,0 +1,38 @@
+﻿@page "/components/scroll-to-top"
+
+<PageTitle>Scroll to Top - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Scroll to Top</Heading>
+
+<p>
+    The scroll to top component does just what the name implies: clicking on it smoothly scrolls the
+    document to the top of the page (or another element). It is hidden by default until the user
+    scrolls past a certain point, and the <code>FrameworkLayout</code> element includes a built-in
+    version, so you don't need to do anything at all to include one in your Tavenem Blazor Framework
+    app, unless you'd like to customize its behavior or appearance.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    The <code>ScrollToTop</code> component included in the layout by default uses an icon button
+    filled with the primary theme color, and has a simple upward caret as its content. If you define
+    your own componment, you can include any <code>ChildContent</code> within it that you like. The
+    component itself has no specific appearance, allowing complete customization.
+</p>
+
+<p>
+    The <code>Selector</code> property can be set to a CSS selector, which will be used to find the
+    element to which the scroll event will be attached. If left <code>null</code> the main document
+    will be the target. To add a <code>ScrollToTop</code> to a subsection of a document, simply give
+    that section an id and use that id (preceded by a '#' character) as the <code>Selector</code>. A
+    <code>ScrollToTop</code> with a non-<code>null Selector</code> does not replace the default
+    <code>ScrollToTop</code> that targets the full page.
+</p>
+
+<p>
+    The <code>TopOffset</code> property indicates the distance in pixels from the top of the
+    selected element at which the component becomes visible. The default is 300. To make the
+    component visible at all times, you should set this to zero and also set the
+    <code>Visible</code> property to <code>true</code>.
+</p>

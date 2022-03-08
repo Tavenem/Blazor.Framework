@@ -5,11 +5,11 @@
 <div @attributes="AdditionalAttributes" role="alert" class="@CssClass" style="@CssStyle" @onclick="OnClick">
     @if (AutoIcon)
     {
-        <div class="@IconClass">@Icon</div>
+        <tf-icon class="@IconClass">@Icon</tf-icon>
     }
     @ChildContent
     @if (AutoClose || OnClosed.HasDelegate || Closed is not null)
     {
-        <span class="btn-close" @onclick="OnClosedAsync">close</span>
+        <tf-close @onclick="OnClosedAsync" />
     }
 </div>

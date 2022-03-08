@@ -6,13 +6,13 @@
 
 <p>This page will show you how to install and get started using the Tavenem Blazor Framework.</p>
 
-<Heading Level="HeadingLevel.H2">1. Install</Heading>
+<Heading Level="HeadingLevel.H2" Title="Install">1. Install</Heading>
 <p>The <code>Tavenem.Blazor.Framework</code> NuGet package is available through the package manager, or the CLI:</p>
 <div class="codeblock pre-razor-code">
     <pre class="user-select-all">dotnet add package Tavenem.Blazor.Framework</pre>
 </div>
 
-<Heading Level="HeadingLevel.H2">2. Import Namespace</Heading>
+<Heading Level="HeadingLevel.H2" Title="Import Namespace">2. Import Namespace</Heading>
 <p>Add the package namespace to your <code>_Imports.razor</code> file.</p>
 <div class="codeblock pre-razor-code">
     <pre class="user-select-all">
@@ -20,22 +20,23 @@
     </pre>
 </div>
 
-<Heading Level="HeadingLevel.H2">3. Add Font links</Heading>
+<Heading Level="HeadingLevel.H2" Title="Add Font links">3. Add Font links</Heading>
 <p>Add the following links to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
 <div class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap"" rel=""stylesheet"">
+    @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap"" rel=""stylesheet"">
 <link href=""https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"" rel=""stylesheet"">", true)
 </div>
 <p>
-    You may use a different font if you prefer, but a
-    <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide">variable font</a>
-    is strongly recommended in order to work with the framework's styles most effectively.
-    The font you select should support weights from 300–900, and an italic style.
+    You may use different fonts if you prefer, but a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide">variable
+    font</a> is strongly recommended in order to work with the framework's styles most effectively.
+    The body font you select should support weights from 300–900, and an italic style. The title
+    font you select should support weights from 500–700.
 </p>
 <p>
     One of the strengths of the <a href="https://www.recursive.design/">Recursive</a> font
     is that it supports both a variable-width and monospace variant in the same font,
-    using a variable axis. If you select a different font, you will also need to choose
+    using a variable axis. If you select a different body font, you will also need to choose
     a monospace font and override the <span class="pre-attribute">--tavenem-font-family-monospace</span>
     property on <span class="pre-method">:root</span>.
 </p>
@@ -48,7 +49,7 @@
     See the <a href="./components/icon">Icon</a> component documentation for details.
 </p>
 
-<Heading Level="HeadingLevel.H2">4. Add CSS Link</Heading>
+<Heading Level="HeadingLevel.H2" Title="Add CSS Link">4. Add CSS Link</Heading>
 <p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
 <div class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<link href=""_content/Tavenem.Blazor.Framework/framework.css"" rel=""stylesheet"">", true)
@@ -71,7 +72,7 @@
     issues.
 </p>
 
-<Heading Level="HeadingLevel.H2">5. Register Service with Dependency Injection</Heading>
+<Heading Level="HeadingLevel.H2" Title="Register Service with Dependency Injection">5. Register Service with Dependency Injection</Heading>
 <p>Add the following to your <code>Program.cs</code>:</p>
 <div class="codeblock pre-razor-code">
     <pre class="user-select-all">
@@ -79,7 +80,7 @@
     </pre>
 </div>
 
-<Heading Level="HeadingLevel.H2">6. Set up the Framework</Heading>
+<Heading Level="HeadingLevel.H2" Title="Set up the Framework">6. Set up the Framework</Heading>
 <p>Add a <code class="primary">FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>
 <p>See <a href="./layout/layout">Layout</a> for details.</p>
 

@@ -45,7 +45,7 @@
             flex-grow: 1;
         }
 
-        &.expand, > .expand {
+        > .expand {
             align-items: center;
             align-self: stretch;
             display: flex;
@@ -59,17 +59,25 @@
                 cursor: pointer;
             }
 
-            > *:not(.icon) {
+            > *:not(tf-icon) {
                 flex: 1 1 auto;
             }
 
-            &.icon, > .icon {
+            > tf-icon {
                 margin-inline-end: -.25rem;
                 margin-inline-start: auto;
                 order: 9999;
                 transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
                 transform: rotate(-180deg);
             }
+        }
+
+        > tf-icon.expand {
+            margin-inline-end: -.25rem;
+            margin-inline-start: auto;
+            order: 9999;
+            transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+            transform: rotate(-180deg);
         }
 
         > .clickable {
@@ -158,10 +166,12 @@
         transition-delay: 100ms;
 
         > .header {
-            &.expand, > .expand {
-                &.icon, > .icon {
-                    transform: rotate(0deg);
-                }
+            > .expand > tf-icon {
+                transform: rotate(0deg);
+            }
+
+            > tf-icon.expand {
+                transform: rotate(0deg);
             }
         }
 
@@ -177,31 +187,39 @@
 
     &.loading {
         > .header {
-            &.expand, > .expand {
-                &.icon, > .icon {
-                    animation: tf-rotation 1s infinite linear;
-                }
+            > .expand > tf-icon {
+                animation: tf-rotation 1s infinite linear;
+            }
+
+            > tf-icon.expand {
+                animation: tf-rotation 1s infinite linear;
             }
         }
     }
 
     .tree > & {
         > .header {
-            &.expand, > .expand {
+            > .expand {
                 order: -1;
 
-                &.icon, > .icon {
+                > tf-icon {
                     order: -1;
                     transform: rotate(0deg);
                 }
             }
+
+            > tf-icon.expand {
+                transform: rotate(0deg);
+            }
         }
 
         &.closed > .header {
-            &.expand, > .expand {
-                &.icon, > .icon {
-                    transform: rotate(-90deg);
-                }
+            > .expand > tf-icon {
+                transform: rotate(-90deg);
+            }
+
+            > tf-icon.expand {
+                transform: rotate(0deg);
             }
         }
     }
@@ -228,35 +246,7 @@
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            color: var(--tavenem-color-#{$theme});
-            background-color: var(--tavenem-color-#{$theme}-hover);
-
-            &.darken {
-                color: var(--tavenem-color-#{$theme}-darken);
-                background-color: var(--tavenem-color-#{$theme}-hover-dark);
-            }
-
-            &.lighten {
-                color: var(--tavenem-color-#{$theme}-lighten);
-                background-color: var(--tavenem-color-#{$theme}-hover-light);
-            }
-
-            &.filled {
-                background-color: var(--tavenem-color-#{$theme});
-                color: var(--tavenem-color-#{$theme}-text);
-
-                &.bg-alt {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                }
-
-                &.darken {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                }
-
-                &.lighten {
-                    background-color: var(--tavenem-color-#{$theme}-lighten);
-                }
-            }
+            background-color: var(--tavenem-theme-color-hover);
         }
     }
 }

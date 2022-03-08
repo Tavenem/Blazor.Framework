@@ -1,0 +1,36 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TChip
+
+@inherits ListItem<TChip>
+
+@if (SeparatorBefore)
+{
+    <div class="vr"></div>
+}
+<div id="@Id"
+     class="@CssClass"
+     style="@CssStyle"
+     draggable="@(IsDraggable ? "true" : "false")"
+     @onclick="OnClickAsync">
+    @if (!string.IsNullOrWhiteSpace(IconName))
+    {
+        <tf-icon class="@IconClassName">@IconName</tf-icon>
+    }
+    @if (ChildContent is null)
+    {
+        <span>@(Item?.ToString())</span>
+    }
+    else
+    {
+        @ChildContent
+    }
+    @if (ChipSet?.AutoClose == true || ChipSet?.OnChipClosed.HasDelegate == true)
+    {
+        <tf-close @onclick="OnClosedAsync" />
+    }
+</div>
+@if (SeparatorAfter)
+{
+    <div class="vr"></div>
+}

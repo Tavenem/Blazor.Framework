@@ -41,11 +41,6 @@ public partial class Popover : IAsyncDisposable
     [Parameter] public Origin AnchorOrigin { get; set; } = Origin.Bottom_Center;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// The delay between opening the popover and performing the visibility
     /// transition, in milliseconds.
     /// </summary>
@@ -61,6 +56,11 @@ public partial class Popover : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public FlipBehavior FlipBehavior { get; set; } = FlipBehavior.Filp_OnOpen;
+
+    /// <summary>
+    /// The id of the element.
+    /// </summary>
+    public string Id => $"popover-{_handler?.Id}";
 
     /// <summary>
     /// Whether the popover is currently visible.
@@ -81,6 +81,16 @@ public partial class Popover : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public string? MaxHeight { get; set; }
+
+    /// <summary>
+    /// A number of pixels this popover is offset from the left edge of its anchor.
+    /// </summary>
+    [Parameter] public double? OffsetX { get; set; }
+
+    /// <summary>
+    /// A number of pixels this popover is offset from the top edge of its anchor.
+    /// </summary>
+    [Parameter] public double? OffsetY { get; set; }
 
     /// <summary>
     /// <para>
@@ -127,6 +137,43 @@ public partial class Popover : IAsyncDisposable
         .ToString();
 
     [Inject] private PopoverService PopoverService { get; set; } = default!;
+
+    /// <summary>
+    /// Sets parameters supplied by the component's parent in the render tree.
+    /// </summary>
+    /// <param name="parameters">The parameters.</param>
+    /// <returns>
+    /// A <see cref="Task" /> that completes when the component has finished updating and rendering
+    /// itself.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// Parameters are passed when <see cref="ComponentBase.SetParametersAsync(ParameterView)" /> is
+    /// called. It is not required that the caller supply a parameter value for all of the
+    /// parameters that are logically understood by the component.
+    /// </para>
+    /// <para>
+    /// The default implementation of <see cref="ComponentBase.SetParametersAsync(ParameterView)" />
+    /// will set the value of each property decorated with <c>Parameter</c> or
+    /// <c>CascadingParameter</c> that has a corresponding value in the <see cref="ParameterView"
+    /// />. Parameters that do not have a corresponding value will be unchanged.
+    /// </para>
+    /// </remarks>
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var initialOffsetX = OffsetX;
+        var initialOffsetY = OffsetY;
+
+        await base.SetParametersAsync(parameters);
+
+        if (_handler is not null
+            && _initialized
+            && (OffsetX != initialOffsetX
+            || OffsetY != initialOffsetY))
+        {
+            await _handler.SetOffsetAsync(OffsetX, OffsetY);
+        }
+    }
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note

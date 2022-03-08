@@ -1,4 +1,6 @@
 ﻿.badge {
+    --tavenem-badge-color: inherit;
+    --tavenem-badge-color-bg: var(--tavenem-color-default);
     --badge-content-inset-x: 4px;
     --badge-content-inset-y: 4px;
     background-color: transparent !important;
@@ -16,9 +18,10 @@
     z-index: 1;
 
     &:empty:after {
-        background-color: var(--tavenem-color-default);
+        background-color: var(--tavenem-badge-color-bg);
         border-color: inherit;
         border-radius: 50%;
+        color: var(--tavenem-badge-color);
         content: '';
         height: .75em;
         inset: auto auto calc(100% - var(--badge-content-inset-y)) calc(100% - var(--badge-content-inset-x));
@@ -31,10 +34,10 @@
     }
 
     > * {
-        background-color: var(--tavenem-color-default);
+        background-color: var(--tavenem-badge-color-bg);
         border-color: inherit;
         border-radius: 9999px;
-        color: inherit;
+        color: var(--tavenem-badge-color);
         inset: auto auto calc(100% - var(--badge-content-inset-y)) calc(100% - var(--badge-content-inset-x));
         letter-spacing: 0;
         line-height: 1;
@@ -64,7 +67,14 @@
         }
     }
 
-    > .icon {
+    > a:not(.disabled, :disabled) {
+        &:hover,
+        &:focus-visible {
+            color: var(--tavenem-badge-color);
+        }
+    }
+
+    > tf-icon {
         font-size: 1.25em;
     }
 
@@ -153,13 +163,13 @@
             border-style: solid;
             border-width: 2px;
             padding: 3px 4px;
+        }
 
-            &.icon {
-                margin-left: -4px;
-                margin-inline-start: -4px;
-                margin-inline-end: unset;
-                margin-top: -4px;
-            }
+        > tf-icon {
+            margin-left: -4px;
+            margin-inline-start: -4px;
+            margin-inline-end: unset;
+            margin-top: -4px;
         }
 
         &:empty:after {
@@ -169,97 +179,27 @@
         }
     }
 
+    &.bg-alt {
+        --tavenem-badge-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+    }
+
     &.filled {
-        &.bg-alt {
-            > *, &:empty:after {
-                background-color: var(--tavenem-color-default-darken);
-            }
-        }
-
-        &.darken {
-            > *, &:empty:after {
-                background-color: var(--tavenem-color-default-darken);
-            }
-        }
-
-        &.lighten {
-            > *, &:empty:after {
-                background-color: var(--tavenem-color-default-lighten);
-            }
-        }
+        --tavenem-badge-color-bg: var(--tavenem-theme-color, var(--tavenem-color-default));
     }
 
     &.outlined {
+        --tavenem-badge-color-bg: transparent;
+
         > *, &:empty:after {
-            background-color: transparent;
             border-style: solid;
             border-width: 1px;
         }
     }
 
-    &.bg-alt {
-        > *, &:empty:after {
-            background-color: var(--tavenem-color-bg-alt);
-        }
-    }
-
     @each $theme in $theme-colors {
         &.#{$theme} {
-            > *, &:empty:after {
-                background-color: var(--tavenem-color-#{$theme});
-                color: var(--tavenem-color-#{$theme}-text);
-            }
-
-            > a {
-                &:hover:not(.disabled, :disabled),
-                &:focus:not(.disabled, :disabled) {
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-            }
-
-            &.bg-alt {
-                > *, &:empty:after {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-            }
-
-            &.darken {
-                > *, &:empty:after {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-
-                > a {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
-                }
-            }
-
-            &.lighten {
-                > *, &:empty:after {
-                    background-color: var(--tavenem-color-#{$theme}-lighten);
-                    color: var(--tavenem-color-#{$theme}-text);
-                }
-
-                > a {
-                    &:hover:not(.disabled, :disabled),
-                    &:focus:not(.disabled, :disabled) {
-                        color: var(--tavenem-color-#{$theme}-text);
-                    }
-                }
-            }
-
-            &.outlined {
-                border-color: var(--tavenem-color-#{$theme});
-
-                > *, &:empty:after {
-                    background-color: var(--tavenem-color-#{$theme}-hover);
-                    color: var(--tavenem-color-#{$theme});
-                }
-            }
+            --tavenem-badge-color: var(--tavenem-theme-color-text);
+            --tavenem-badge-color-bg: var(--tavenem-theme-color);
         }
     }
 }

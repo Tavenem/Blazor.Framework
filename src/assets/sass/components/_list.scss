@@ -1,7 +1,18 @@
-﻿.list {
+﻿.drop-placeholder {
+    background-color: var(--tavenem-color-info-hover);
+    border: 1px solid var(--tavenem-color-info);
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: inset 0 0 10px 5px var(--tavenem-color-info-hover-bright);
+    height: calc(var(--tavenem-lineheight-body) * 1em);
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+.list {
     --list-hover-bg: var(--tavenem-color-action-hover-bg);
     --list-active-bg: var(--tavenem-color-primary-hover);
     --list-active-color: var(--tavenem-color-primary);
+    --list-active-hover-bg: var(--tavenem-color-primary-hover-bright);
     color: var(--tavenem-color-action);
     display: flex;
     flex-direction: column;
@@ -12,78 +23,117 @@
     padding-bottom: .5em;
     padding-top: .5em;
     position: relative;
+    scrollbar-gutter: stable;
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
-    > * {
-        @include ripple;
-        align-items: center;
-        background-color: transparent;
-        box-sizing: border-box;
-        color: inherit;
-        column-gap: .5em;
-        display: flex;
-        flex: 0 0 auto;
-        justify-content: flex-start;
-        list-style: none;
-        padding: .75em 1em;
-        position: relative;
-        text-align: start;
-        text-decoration: none;
-        transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
-        width: 100%;
-        -webkit-tap-highlight-color: transparent;
-
-        &:focus-visible, &:hover {
+    > {
+        * {
+            @include ripple;
+            align-items: center;
             background-color: transparent;
+            box-sizing: border-box;
             color: inherit;
-        }
+            column-gap: .5em;
+            display: flex;
+            flex: 0 0 auto;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            list-style: none;
+            padding: .5em 1em;
+            position: relative;
+            text-align: start;
+            text-decoration: none;
+            transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
 
-        > .icon {
-            flex-shrink: 0;
-            margin: -.25em;
-        }
+            &:focus-visible, &:hover {
+                background-color: transparent;
+                color: inherit;
+            }
 
-        > .avatar {
-            flex-shrink: 0;
-            margin: -.25em;
-        }
+            > tf-icon, > .avatar, .list-icon-spacer {
+                flex-shrink: 0;
+                margin-bottom: -.25em;
+                margin-top: -.25em;
+            }
 
-        &:disabled, &.disabled {
-            color: var(--tavenem-color-action-disabled) !important;
-            cursor: default !important;
-            pointer-events: none !important;
-
-            .icon {
+            &:disabled, &.disabled {
                 color: var(--tavenem-color-action-disabled) !important;
+                cursor: default !important;
+                pointer-events: none !important;
+
+                tf-icon {
+                    color: var(--tavenem-color-action-disabled) !important;
+                }
             }
         }
-    }
 
-    > .subheader {
-        font-size: .875em;
-        font-weight: var(--tavenem-font-weight-bold);
-        padding-bottom: 1.25em;
+        .subheader {
+            font-size: .875em;
+            font-weight: var(--tavenem-font-weight-bold);
+            padding-bottom: 1.25em;
 
-        &.inset {
-            padding-inline-start: 4.5em;
+            &.inset {
+                padding-inline-start: 4.5em;
+            }
+
+            &.sticky {
+                background-color: inherit;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
         }
 
-        &.sticky {
-            background-color: inherit;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+        hr {
+            background-color: var(--tavenem-color-divider);
+            margin: 0;
+            padding: 0;
+        }
+
+        .active {
+            background-color: var(--list-active-bg);
+            border-inline-end: 1px solid var(--list-active-color);
+            color: var(--list-active-color);
+            padding-inline-end: calc(1em - 1px);
+        }
+
+        .clickable, a, button {
+            background-color: transparent;
+            border: 0;
+            border-radius: 0;
+            cursor: pointer;
+            margin: 0;
+            outline: 0;
+            transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+            user-select: none;
+            vertical-align: middle;
+            -webkit-appearance: none;
+            -webkit-tap-highlight-color: transparent;
+
+            &:hover,
+            &:focus:not(.active) {
+                &:not(:disabled, .disabled) {
+                    background-color: var(--list-hover-bg);
+
+                    &.active {
+                        background-color: var(--list-active-hover-bg);
+                    }
+                }
+            }
+        }
+
+        .drop-placeholder {
+            align-self: stretch;
+            background-color: var(--tavenem-color-info-hover);
+            margin-inline-end: 1em;
+            margin-inline-start: 1em;
+            width: auto;
         }
     }
 
-    > .active {
-        background-color: var(--list-active-bg);
-        border-inline-end: 1px solid var(--list-active-color);
-        color: var(--list-active-color);
-        padding-inline-end: calc(1em - 1px);
-    }
-
-    .clickable > *, > .clickable, a, button {
+    &.clickable > * {
         background-color: transparent;
         border: 0;
         border-radius: 0;
@@ -98,29 +148,28 @@
 
         &:hover,
         &:focus:not(.active) {
-            background-color: var(--list-hover-bg);
-        }
+            &:not(:disabled, .disabled) {
+                background-color: var(--list-hover-bg);
 
-        &:disabled, &.disabled {
-            &:hover,
-            &:focus:not(.active) {
-                background-color: transparent;
+                &.active {
+                    background-color: var(--list-active-hover-bg);
+                }
             }
         }
     }
 
-    &:disabled, &.disabled {
-        > * {
+    &.disabled > {
+        * {
             color: var(--tavenem-color-action-disabled) !important;
             cursor: default !important;
             pointer-events: none !important;
 
-            .icon {
+            tf-icon {
                 color: var(--tavenem-color-action-disabled) !important;
             }
         }
 
-        > .clickable, a, button {
+        .clickable, a, button {
             &:hover,
             &:focus:not(.active) {
                 background-color: transparent;
@@ -156,54 +205,44 @@
     }
 
     &.filled {
-        background-color: var(--tavenem-color-bg-surface);
+        --list-hover-bg: var(--tavenem-theme-color-hover-bright, var(--tavenem-color-action-hover-bg));
+        --list-active-bg: var(--tavenem-theme-color, var(--tavenem-color-primary-hover));
+        --list-active-color: var(--tavenem-theme-color-text, var(--tavenem-color-primary));
+        --list-active-hover-bg: var(--tavenem-theme-color-hover-bright, var(--tavenem-color-primary-hover-bright));
+        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+        background-color: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-surface));
         color: var(--tavenem-color-action);
     }
 
-    &.can-drop {
-        &:not(:empty) > *:last-child {
-            margin-bottom: 2rem;
-        }
+    &.can-drop:not(.self-drop) {
+        padding-bottom: 2.5em;
 
-        > .can-drop:hover {
-            margin-top: 2rem;
+        &.dense {
+            padding-bottom: 2em;
         }
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --list-hover-bg: var(--tavenem-color-#{$theme}-hover);
-            --list-active-bg: var(--tavenem-color-#{$theme}-hover);
-            --list-active-color: var(--tavenem-color-#{$theme});
+            --list-hover-bg: var(--tavenem-theme-color-hover);
+            --list-active-bg: var(--tavenem-theme-color-hover);
+            --list-active-color: var(--tavenem-theme-color);
+            --list-active-hover-bg: var(--tavenem-theme-color-hover-bright);
+            color: var(--tavenem-color-action);
+        }
 
-            &, &.darken, &.lighten, &.filled, &.outlined {
-                color: var(--tavenem-color-action);
-            }
-
-            &.filled {
-                --list-hover-bg: var(--tavenem-color-#{$theme}-hover-bright);
-                --list-active-bg: var(--tavenem-color-#{$theme});
-                --list-active-color: var(--tavenem-color-#{$theme}-text);
-                background-color: var(--tavenem-color-#{$theme}-hover);
-
-                &.bg-alt {
-                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                }
-            }
-
-            &.darken {
-                --list-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
-                --list-active-bg: var(--tavenem-color-#{$theme}-hover-dark);
-                --list-active-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                --list-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
-                --list-active-bg: var(--tavenem-color-#{$theme}-hover-light);
-                --list-active-color: var(--tavenem-color-#{$theme}-lighten);
-            }
+        > .#{$theme} {
+            --list-hover-bg: var(--tavenem-theme-color-hover-bright);
+            background-color: var(--tavenem-theme-color-hover);
+            color: var(--tavenem-theme-color);
         }
     }
+}
+
+.list-icon-spacer {
+    display: inline-block;
+    font-size: 1.5em;
+    width: 1em;
 }
 
 .contents {

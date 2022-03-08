@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<div id="@($"popover-{_handler?.Id}")" @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+<div id="@Id" @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     @if (IsOpen)
     {
         @ChildContent

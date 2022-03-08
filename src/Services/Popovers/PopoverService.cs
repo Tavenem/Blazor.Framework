@@ -8,6 +8,7 @@ internal class PopoverService : IAsyncDisposable
     private readonly List<PopoverHandler> _popoverHandlers = new();
     private readonly SemaphoreSlim _lock = new(1, 1);
 
+    private bool _disposedValue;
     private bool _popoversInitialized;
 
     /// <summary>
@@ -29,17 +30,37 @@ internal class PopoverService : IAsyncDisposable
     /// </returns>
     public async ValueTask DisposeAsync()
     {
-        if (_moduleTask.IsValueCreated)
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            if (_popoversInitialized)
-            {
-                await module.InvokeVoidAsync("popoverDispose");
-            }
-            await module.DisposeAsync().ConfigureAwait(false);
-        }
-
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        await DisposeAsync(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources asynchronously.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous dispose operation.
+    /// </returns>
+    protected virtual async ValueTask DisposeAsync(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                if (_moduleTask.IsValueCreated)
+                {
+                    var module = await _moduleTask.Value.ConfigureAwait(false);
+                    if (_popoversInitialized)
+                    {
+                        await module.InvokeVoidAsync("popoverDispose");
+                    }
+                    await module.DisposeAsync().ConfigureAwait(false);
+                }
+            }
+
+            _disposedValue = true;
+        }
     }
 
     internal async Task InitializePopoversAsync()

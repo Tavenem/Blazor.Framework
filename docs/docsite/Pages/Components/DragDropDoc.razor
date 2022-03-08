@@ -43,32 +43,30 @@
     {
         <Draggable Item=""item"" OnDropped=""@(e => Drag(_items2, item, e))"" DragEffectAllowed=""DragEffect.CopyMove"">@item</Draggable>
     }
-</DropTarget>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">></span> _items1 <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">()</span>
-    <span class="pre-operator">{</span>
-        <span class="pre-string">"Drag this item"</span><span class="pre-operator">,</span>
-        <span class="pre-string">"Or this one"</span><span class="pre-operator">,</span>
-        <span class="pre-string">"Try dragging text into this box"</span><span class="pre-operator">,</span>
-    <span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">></span> _items2 <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">()</span>
-    <span class="pre-operator">{</span>
-        <span class="pre-string">"Drag this item, too"</span><span class="pre-operator">,</span>
-        <span class="pre-string">"Try dragging these items into a text editor"</span><span class="pre-operator">,</span>
-    <span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">void</span> <span class="pre-method">Drag</span><span class="pre-operator">(</span><span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">></span> items<span class="pre-operator">,</span> <span class="pre-element">string</span> value<span class="pre-operator">,</span> <span class="pre-enum">DragEffect</span> e<span class="pre-operator">)</span>
-    <span class="pre-operator">{</span>
-        <span class="pre-element">if</span> <span class="pre-operator">(</span>e <span class="pre-operator">==</span> <span class="pre-enum">DragEffect</span><span class="pre-operator">.</span>Move<span class="pre-operator">)</span>
-        <span class="pre-operator">{</span>
-            items<span class="pre-operator">.</span><span class="pre-method">Remove</span><span class="pre-operator">(</span>value<span class="pre-operator">)</span><span class="pre-operator">;</span>
-        <span class="pre-operator">}</span>
-    <span class="pre-operator">}</span>
-    <span class="pre-element">private</span> <span class="pre-element">void</span> <span class="pre-method">Drop</span><span class="pre-operator">(</span><span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">></span> items<span class="pre-operator">,</span> <span class="pre-class">DropEventArgs</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">></span> e<span class="pre-operator">)</span>
-        <span class="pre-operator">=></span> items<span class="pre-operator">.</span><span class="pre-method">Add</span><span class="pre-operator">(</span>e<span class="pre-operator">.</span>Data<span class="pre-operator">?.</span><span class="pre-method">FirstOrDefault</span><span class="pre-operator">().</span>Value <span class="pre-operator">??</span> <span class="pre-string">"Error"</span><span class="pre-operator">);</span>
-<span class="pre-directive">}</span>
-        </pre>
+</DropTarget>
+
+@code {
+    private List<string> _items1 = new()
+    {
+        ""Drag this item"",
+        ""Or this one"",
+        ""Try dragging text into this box"",
+    };
+    private List<string> _items2 = new()
+    {
+        ""Drag this item, too"",
+        ""Try dragging these items into a text editor"",
+    };
+    private void Drag(List<string> items, string value, DragEffect e)
+    {
+        if (e == DragEffect.Move)
+        {
+            items.Remove(value);
+        }
+    }
+    private void Drop(List<string> items, DropEventArgs<string> e)
+        => items.Add(e.Data?.FirstOrDefault().Value ?? ""Error"");
+}")
     </ChildContent>
 </Collapse>
 
@@ -119,6 +117,24 @@
     drag operation, and cleared when the drag ends.
 </p>
 
+<p>
+    Dragged string data will set the "text/plain" data type on the dragged data, and will be
+    droppable into most drop targets. Dragged <code>Uri</code> objects, and strings which parse as
+    valid, absolute URIs will set "text/uri-list" data, as well as a "text/plain" fallback. Other
+    data types are serializaed as JSON and set as "application/json" data. A string representation
+    (obtained with the <code>object.ToString</code> method) will also be set as a "text/plain"
+    fallback.
+</p>
+
+<p>
+    Your dragged <code>Item</code> may implement the <code>IDraggable</code> interface to provide
+    more control over its dragged representation. <code>IDraggable</code> provides three methods:
+    <code>ToDraggedJson</code> and <code>ToDraggedString</code>. Both of these methods have default
+    implementaions, however these replicate the default behavior for items which don't implement the
+    interface at all, so it is only worthwhile to implement the interface if at least one of the
+    methods is overridden.
+</p>
+
 <Heading Level="HeadingLevel.H2">Drop Target</Heading>
 
 <p>
@@ -157,20 +173,8 @@
     data types, and should return a <code>DragEffect</code> which indicates the type of drop
     allowed. Valid return types are <code>None</code>, <code>All</code>, <code>Copy</code>,
     <code>Link</code>, or <code>Move</code> (i.e. none of the combined flags used to indicate
-    allowed drag operations). If the item being dragged over the target was dragged from within the
-    same Tavenem Blazor Framework app instance (typically the same browser tab), a second parameter
-    will contain the actual item being dragged. This won't be the case for string data, including
-    string data from within the Tavenem Blazor Framework, or any data from outside the app. For such
-    data only the data types present can be used to determine the allowed drop effect.
-</p>
-
-<p>
-    The <code>CanDrop</code> property can be set to a function which returns a boolean value to
-    indicate whether data transferred within the same Tavenem Blazor Framework app instance
-    (typically the same browser tab) can be dropped. This can be a useful shortcut for drop targets
-    which <em>only</em> accept internally-transferred data, to avoid the complexity of the
-    <code>GetDropEffect</code> delegate. Note that <code>CanDrop</code> is ignored if
-    <code>GetDropEffect</code> has been set.
+    allowed drag operations). <code>GetDropEffect</code> will not be invoked if the dragged item is
+    not of the correct type. Instead, <code>None</code> will be returned.
 </p>
 
 <p>

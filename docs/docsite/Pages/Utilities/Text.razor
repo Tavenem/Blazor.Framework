@@ -146,6 +146,17 @@
     <p style=""--tavenem-casl:.5"">""Half-casual"" text.</p>
 </div>")" />
 
+<p>
+    You can change the font family of a heading to the font family normally used for body text with
+    the utility class <code>body-font</code>, or give ordinary text the same font family as headings
+    with the <code>title-font</code> class.
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p>Normal text.</p>
+    <p class=""title-font"">Title-font text.</p>
+</div>")" />
+
 <Heading Level="HeadingLevel.H2">Color</Heading>
 
 <p>
@@ -158,7 +169,7 @@
 </div>")" />
 
 <p>
-    You can also reset the color of text to the default, when it would normally be given a different
+    You can reset the color of text to the current color, when it would normally be given a different
     color:
 </p>
 
@@ -167,6 +178,17 @@
     <p>This one hasn't: <a href="""">link</a>.</p>
     <p class=""primary text-reset"">This text is reset.</p>
     <p class=""primary"">This text isn't.</p>
+</div>")" />
+
+<p>
+    You can also reset the color of text to the default color, when the current color has been changed:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""primary"">
+        This paragraph has a color class applied.
+        <span class=""text-color-reset"">This span has been reset.</p>
+    </p>
 </div>")" />
 
 <Heading Level="HeadingLevel.H2">Letter Spacing</Heading>

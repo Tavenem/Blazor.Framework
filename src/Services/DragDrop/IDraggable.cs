@@ -1,4 +1,6 @@
-﻿namespace Tavenem.Blazor.Framework;
+﻿using System.Text.Json;
+
+namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// Implement this interface to provide guidance for the JSON and/or plaintext representations of a
@@ -7,20 +9,46 @@
 public interface IDraggable
 {
     /// <summary>
+    /// <para>
     /// Gets a string representation of this item in JSON format, for dragging operations.
+    /// </para>
+    /// <para>
+    /// This method has a default interface implementation which uses standard JSON serialization.
+    /// </para>
     /// </summary>
     /// <returns>
-    /// A string in JSON format; or <see langword="null"/> if the default JSON serializer should be
-    /// used to serialize this item.
+    /// A string in JSON format; or <see langword="null"/> if this item should not set any
+    /// 'application/json' data.
     /// </returns>
-    string? ToDraggedJson();
+    /// <remarks>
+    /// <para>
+    /// An item of this type should be deserializable from the returned JSON, or it will not be
+    /// possible to successfully drop the item on a target which will automatically attempt to
+    /// reconstitute an instance of the item, such as a <see cref="DropTarget{TDropItem}"/> or an
+    /// <see cref="ElementList{TListItem}"/>.
+    /// </para>
+    /// <para>
+    /// For example, if you have a complex business object which can be uniquely identified by a
+    /// single Id parameter, you could override this method to return just that Id (in JSON format)
+    /// and none of the other properties of the object. You would, however, need to ensure that a
+    /// deserialized instance with only the Id parameter set could successfully reproduce the
+    /// complete object.
+    /// </para>
+    /// </remarks>
+    public string? ToDraggedJson() => JsonSerializer.Serialize(this, GetType());
 
     /// <summary>
+    /// <para>
     /// Gets a string representation of this item in plain text format, for dragging operations.
+    /// </para>
+    /// <para>
+    /// This method has a default interface implementation which returns <see
+    /// cref="object.ToString"/>, or the string "null" if that method returns null, since it is
+    /// generally good practice for all drag operations to specify a 'text/plain' fallback.
+    /// </para>
     /// </summary>
     /// <returns>
-    /// A string; or <see langword="null"/> if the default <see cref="object.ToString"/> method
-    /// should be used to get a string representation of this item.
+    /// A string; or <see langword="null"/> if this item should not set any 'text/plain' data.
     /// </returns>
-    string? ToDraggedString();
+    public string? ToDraggedString() => ToString();
 }

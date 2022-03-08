@@ -2,30 +2,33 @@
     border-color: var(--tavenem-color-border);
 }
 
+.darken {
+    --tavenem-theme-color: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-2);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-dark);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-base);
+}
+
+.lighten {
+    --tavenem-theme-color: var(--tavenem-theme-color-lighten-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-base);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-light);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-2);
+}
+
+.bg-alt {
+    background-color: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+}
+
 .filled {
-    background-color: var(--tavenem-color-default);
-    color: var(--tavenem-color-default-text);
-
-    &.bg-alt {
-        background-color: var(--tavenem-color-default-darken);
-    }
-
-    &.darken {
-        background-color: var(--tavenem-color-default-darken);
-    }
-
-    &.lighten {
-        background-color: var(--tavenem-color-default-lighten);
-    }
+    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
+    background-color: var(--tavenem-theme-color, var(--tavenem-color-default));
+    color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
 }
 
 .outlined {
     background-color: transparent;
     border: 1px solid var(--tavenem-color-border);
-}
-
-.bg-alt {
-    background-color: var(--tavenem-color-bg-alt);
 }
 
 @each $theme in $theme-colors {
@@ -41,82 +44,35 @@
         --tavenem-color-#{$theme}-hover-light: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 12%), .06);
     }
 
-    .#{$theme} {
-        color: var(--tavenem-color-#{$theme});
-
-        &.bg-alt {
-            background-color: var(--tavenem-color-#{$theme}-hover);
-        }
-
-        &.darken {
-            color: var(--tavenem-color-#{$theme}-darken);
-        }
-
-        &.lighten {
-            color: var(--tavenem-color-#{$theme}-lighten);
-        }
-
-        &.filled {
-            background-color: var(--tavenem-color-#{$theme});
-            color: var(--tavenem-color-#{$theme}-text);
-
-            &.bg-alt {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.darken {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                background-color: var(--tavenem-color-#{$theme}-lighten);
-            }
-        }
-
-        &.outlined {
-            border-color: var(--tavenem-color-#{$theme});
-
-            &.darken {
-                border-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                border-color: var(--tavenem-color-#{$theme}-lighten);
-            }
-        }
+    :where(.#{$theme}) {
+        --tavenem-theme-color-base: var(--tavenem-color-#{$theme});
+        --tavenem-theme-color-darken-base: var(--tavenem-color-#{$theme}-darken);
+        --tavenem-theme-color-darken-2: var(--tavenem-color-#{$theme}-darken-2);
+        --tavenem-theme-color-hover-base: var(--tavenem-color-#{$theme}-hover);
+        --tavenem-theme-color-hover-bright: var(--tavenem-color-#{$theme}-hover-bright);
+        --tavenem-theme-color-hover-dark: var(--tavenem-color-#{$theme}-hover-dark);
+        --tavenem-theme-color-hover-light: var(--tavenem-color-#{$theme}-hover-light);
+        --tavenem-theme-color-lighten-base: var(--tavenem-color-#{$theme}-lighten);
+        --tavenem-theme-color-lighten-2: var(--tavenem-color-#{$theme}-lighten-2);
+        --tavenem-theme-color-text: var(--tavenem-color-#{$theme}-text);
+        --tavenem-theme-color: var(--tavenem-theme-color-base);
+        --tavenem-color-border: var(--tavenem-theme-color);
+        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+        --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-base);
+        --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-base);
+        --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-base);
+        color: var(--tavenem-theme-color);
     }
 
-    a.#{$theme} {
-        color: var(--tavenem-color-#{$theme});
-
-        &:hover:not(.disabled, :disabled),
-        &:focus:not(.disabled, :disabled) {
-            color: var(--tavenem-color-#{$theme}-lighten);
-        }
-
-        &.darken {
-            &:hover:not(.disabled, :disabled),
-            &:focus:not(.disabled, :disabled) {
-                color: var(--tavenem-color-#{$theme});
-            }
-        }
-
-        &.lighten {
-            &:hover:not(.disabled, :disabled),
-            &:focus:not(.disabled, :disabled) {
-                color: var(--tavenem-color-#{$theme}-lighten-2);
-            }
-        }
-
-        &.filled {
-            &:hover:not(.disabled, :disabled),
-            &:focus:not(.disabled, :disabled) {
-                color: var(--tavenem-color-#{$theme}-text);
-            }
+    a.#{$theme}:not(.filled, .disabled, :disabled) {
+        &:hover,
+        &:focus {
+            color: var(--tavenem-theme-color-lighten);
         }
     }
 
     .border-#{$theme} {
-        border-color: var(--tavenem-color-#{$theme}) !important;
+        --tavenem-color-border: var(--tavenem-theme-color);
+        border-color: var(--tavenem-color-border) !important;
     }
 }

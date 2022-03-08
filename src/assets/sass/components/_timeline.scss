@@ -296,6 +296,10 @@
         }
     }
 
+    &.bg-alt {
+        background-color: transparent;
+    }
+
     &.filled {
         background-color: transparent;
         color: inherit;
@@ -305,38 +309,11 @@
         border: none;
     }
 
-    &.bg-alt {
-        background-color: var(--tavenem-color-default);
-    }
-
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --dot-color: var(--tavenem-color-#{$theme});
-            --dot-text: var(--tavenem-color-#{$theme}-text);
+            --dot-color: var(--tavenem-theme-color);
+            --dot-text: var(--tavenem-theme-color-text);
             color: inherit;
-
-            &.bg-alt {
-                background-color: transparent;
-            }
-
-            &.filled {
-                background-color: transparent;
-                color: inherit;
-
-                &.bg-alt {
-                    background-color: transparent;
-                }
-            }
-
-            &.darken {
-                --dot-color: var(--tavenem-color-#{$theme}-darken);
-                color: inherit;
-            }
-
-            &.lighten {
-                --dot-color: var(--tavenem-color-#{$theme}-darken);
-                color: inherit;
-            }
         }
     }
 }

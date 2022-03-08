@@ -1,0 +1,239 @@
+﻿@page "/components/dropdown"
+
+<PageTitle>Dropdown - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Dropdown</Heading>
+
+<p>
+    The dropdown component combines a button with a popover menu of items. The items can be anything
+    you choose. Clicking on any item, or outside the menu, automatically closes the popover.
+</p>
+
+<p>
+    Dropdowns are useful for menu buttons and custom context menus.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    The basic <code>Dropdown</code> component provides a toggle button. The <code>Text</code>
+    propoerty controls the text on the button. When activated, a menu will appear with the
+    <code>ChildContent</code> of the menu inside a <a href="./components/list">List</a>.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Dropdown Text="Click me">
+                <span>First choice</span>
+                <span>Second choice</span>
+                <span>Third choice</span>
+            </Dropdown>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Click me"">
+    <span>First choice</span>
+    <span>Second choice</span>
+    <span>Third choice</span>
+</Dropdown>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Activation</Heading>
+
+<p>
+    The <code>ActivationType</code> property controls which events trigger the popover menu's
+    appearance. By default this is set to a left click (usually equated with a tap on mobile
+    devices). You can select right click, both left and right clicks, or
+    <code>MouseEvent.MouseOver</code> to create a menu that opens on hover. Using
+    <code>MouseEvent.Any</code> produces some tricky interaction behavior, and should be avoided in
+    most situations to avoid user confusion. Experiment with the last example below to see how
+    mouseover and click events interact.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Dropdown Text="Right-click me" ActivationType="MouseEvent.RightClick">
+                <span>First choice</span>
+                <span>Second choice</span>
+                <span>Third choice</span>
+            </Dropdown>
+            <Dropdown Text="Hover over me" ActivationType="MouseEvent.MouseOver">
+                <span>First choice</span>
+                <span>Second choice</span>
+                <span>Third choice</span>
+            </Dropdown>
+            <Dropdown Text="Click or hover over me" ActivationType="MouseEvent.Any">
+                <span>First choice</span>
+                <span>Second choice</span>
+                <span>Third choice</span>
+            </Dropdown>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Click me"" ActivationType=""MouseEvent.RightClick"">
+    <span>First choice</span>
+    <span>Second choice</span>
+    <span>Third choice</span>
+</Dropdown>
+<Dropdown Text=""Hover over me"" ActivationType=""MouseEvent.MouseOver"">
+    <span>First choice</span>
+    <span>Second choice</span>
+    <span>Third choice</span>
+</Dropdown>
+<Dropdown Text=""Click or hover over me"" ActivationType=""MouseEvent.Any"">
+    <span>First choice</span>
+    <span>Second choice</span>
+    <span>Third choice</span>
+</Dropdown>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can set the <code>IsDisabled</code> property to <code>true</code> to disable the menu, which
+    closes the popover if it was already open, disables the trigger button, and prevents the menu
+    from opening.
+</p>
+
+<Heading Level="HeadingLevel.H3">Custom activation</Heading>
+
+<p>
+    You can set the <code>HideButton</code> property to <code>true</code> to remove the built-in
+    trigger button. You can use the <code>IsOpen</code> property to control the dropdown's open
+    state. Note that the <code>ActivationType</code> property will no longer control the way the
+    dropdown opens. It can still be useful when set to <code>MouseEvent.MouseOver</code>, as it will
+    still cause the dropdown to close when the mouse leaves it.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <div @onclick="Toggle" class="dark filled p-3 position-relative d-flex center-items" style="height:10rem;width:10rem">
+                <div>Click anywhere in this box</div>
+                <Dropdown @ref="_dropdown" HideButton="true">
+                    <span>First choice</span>
+                    <span>Second choice</span>
+                    <span>Third choice</span>
+                </Dropdown>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div @onclick=""Toggle"" class=""dark filled p-3 position-relative d-flex center-items"" style=""height:10rem;width:10rem"">
+    <div>Click anywhere in this box</div>
+    <Dropdown @ref=""_dropdown"" HideButton=""true"">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+</div>
+
+@code {
+    private Dropdown? _dropdown;
+
+    private void Toggle(MouseEventArgs e)
+    {
+        if (_dropdown is not null)
+        {
+            _dropdown.Toggle(e);
+        }
+    }
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>OpenAtPointer</code> property, if set to <code>true</code>, will cause the popover to
+    open at the position of the activation event, rather than in the position normally defined by
+    its anchor properties. This can be used to create a typical context menu. In combination with
+    <code>HideButton</code> it can provide a context menu for an area.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <div @oncontextmenu="Open"
+                 @oncontextmenu:preventDefault="true"
+                 class="dark filled p-3 position-relative d-flex center-items"
+                 style="height:10rem;width:10rem">
+                <div>Right-click anywhere in this box</div>
+                <Dropdown @ref="_dropdown2" HideButton="true" OpenAtPointer="true">
+                    <span>First choice</span>
+                    <span>Second choice</span>
+                    <span>Third choice</span>
+                </Dropdown>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div @oncontextmenu=""Open""
+     @oncontextmenu:preventDefault=""true""
+     class=""dark filled p-3 position-relative d-flex center-items""
+     style=""height:10rem;width:10rem"">
+    <div>Right-click anywhere in this box</div>
+    <Dropdown @ref=""_dropdown"" HideButton=""true"" OpenAtPointer=""true"">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+</div>
+
+@code {
+    private Dropdown? _dropdown;
+
+    private void Open(MouseEventArgs e)
+    {
+        if (_dropdown is not null)
+        {
+            _dropdown.Open(e);
+        }
+    }
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    The <code>ThemeColor</code> property can be used to provide a color theme for the trigger
+    button.
+</p>
+
+<p>
+    The <code>Icon</code> property can be used to provide an icon for the trigger button. If an
+    <code>Icon</code> is provided, but no <code>Text</code>, the button will automatically become an
+    icon button.
+</p>
+
+<p>
+    The <code>Dense</code> property can be used to reduce the padding between items in the menu.
+</p>
+
+<p>
+    You can control the popover used to present the menu using the <code>AnchorId</code>,
+    <code>AnchorOrigin</code>, <code>MaxHeight</code>, and <code>PopoverOrigin</code> properties,
+    which are all passed down to the popover. In addition, the <code>PopoverClass</code> and
+    <code>PopoverStyle</code> properties allow you to control the CSS properties of the popover. 
+</p>
+
+@code {
+    private Dropdown? _dropdown, _dropdown2;
+
+    private void Open(MouseEventArgs e)
+    {
+        if (_dropdown2 is not null)
+        {
+            _dropdown2.Open(e);
+        }
+    }
+
+    private void Toggle(MouseEventArgs e)
+    {
+        if (_dropdown is not null)
+        {
+            _dropdown.Toggle(e);
+        }
+    }
+}

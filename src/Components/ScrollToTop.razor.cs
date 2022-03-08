@@ -11,13 +11,8 @@ public partial class ScrollToTop : IDisposable
     private bool _disposedValue;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
-    /// The CSS class name to which the scroll event will be attached.
+    /// The CSS selector to which the scroll event will be attached.
     /// </para>
     /// <para>
     /// If left <see langword="null"/> the entire document will be the target.

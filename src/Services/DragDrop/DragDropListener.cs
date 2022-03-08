@@ -29,7 +29,7 @@ namespace Tavenem.Blazor.Framework.Services;
 /// the allowed effects, the agent will automatically choose a fallback effect.
 /// </para>
 /// </returns>
-internal delegate Task<DragEffect> GetDropEffectDelegateInternal(string[] types);
+internal delegate DragEffect GetDropEffectDelegateInternal(string[] types);
 
 internal class DragDropListener : IDisposable
 {
@@ -37,23 +37,8 @@ internal class DragDropListener : IDisposable
 
     private bool _disposedValue;
     private DotNetObjectReference<DragDropListener>? _dotNetRef;
-    private EventHandler<DropEventArgs>? _onDrop;
+    private EventHandler<IEnumerable<KeyValuePair<string, string>>>? _onDrop;
     private EventHandler<DragEffect>? _onDropped;
-
-    /// <summary>
-    /// <para>
-    /// An optional CSS class to be added to this element when it is being dragged.
-    /// </para>
-    /// <para>
-    /// Defaults to <see langword="null"/>.
-    /// </para>
-    /// </summary>
-    public string? DragClass { get; set; }
-
-    /// <summary>
-    /// An optional CSS class to be added to this drop target when a valid item is dragged over it.
-    /// </summary>
-    public string? DropClass { get; set; }
 
     private DragEffect _dropEffect = DragEffect.All;
     /// <summary>
@@ -88,6 +73,22 @@ internal class DragDropListener : IDisposable
     /// The id of the element to which the event will be attached.
     /// </summary>
     public string? ElementId { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Indicates whether a current drag operation is valid for this drop target.
+    /// </para>
+    /// <para>
+    /// Will be <see langword="null"/> if no drag operation is currently taking place over this
+    /// target.
+    /// </para>
+    /// </summary>
+    public bool? DropValid { get; set; }
+
+    /// <summary>
+    /// Raised when <see cref="DropValid"/> changes.
+    /// </summary>
+    public event EventHandler? DropValidChanged;
 
     /// <summary>
     /// <para>
@@ -132,15 +133,9 @@ internal class DragDropListener : IDisposable
     public GetDropEffectDelegateInternal? GetEffect { get; set; }
 
     /// <summary>
-    /// An optional CSS class to be added to this drop target when an invalid item is dragged over
-    /// it.
-    /// </summary>
-    public string? NoDropClass { get; set; }
-
-    /// <summary>
     /// Raised when a drop operation completes with this element as the target drop zone.
     /// </summary>
-    public event EventHandler<DropEventArgs> OnDrop
+    public event EventHandler<IEnumerable<KeyValuePair<string, string>>> OnDrop
     {
         add => SubscribeDrop(value);
         remove => UnsubscribeDrop(value);
@@ -191,27 +186,47 @@ internal class DragDropListener : IDisposable
         var newData = new List<KeyValuePair<string, object>>();
         foreach (var (type, item) in data.Data)
         {
-            if (type == "tavenem/drop-data")
-            {
-                var id = _dragDropService.SetInternalTransferData(item);
-                newData.Add(new($"tavenem/drop-data-{id}", id));
-            }
-            else if (type.StartsWith("tavenem/drop-data", StringComparison.Ordinal))
-            {
-                newData.Add(new(type, item));
-            }
-            else if (item is string str)
+            if (item is string str)
             {
                 newData.Add(new(type, str));
             }
-            else
+            else if (item is IDraggable draggable)
             {
-                var json = JsonSerializer.Serialize(item);
+                var json = draggable.ToDraggedJson();
                 if (string.IsNullOrEmpty(json))
                 {
-                    throw new InvalidOperationException("drag data item serialized as null");
+                    var draggedStr = draggable.ToDraggedString()
+                        ?? item.ToString();
+                    if (!string.IsNullOrEmpty(draggedStr))
+                    {
+                        newData.Add(new(type, draggedStr));
+                    }
                 }
-                newData.Add(new(type, json));
+                else
+                {
+                    newData.Add(new(type, json));
+                }
+            }
+            else
+            {
+                string? json = null;
+                try
+                {
+                    json = JsonSerializer.Serialize(item);
+                }
+                catch { }
+                if (string.IsNullOrEmpty(json))
+                {
+                    var draggedStr = item.ToString();
+                    if (!string.IsNullOrEmpty(draggedStr))
+                    {
+                        newData.Add(new(type, draggedStr));
+                    }
+                }
+                else
+                {
+                    newData.Add(new(type, json));
+                }
             }
         }
 
@@ -226,14 +241,14 @@ internal class DragDropListener : IDisposable
     /// Invoked by javascript interop.
     /// </summary>
     [JSInvokable]
-    public async Task<string?> GetDropEffect(string[] types)
+    public string? GetDropEffect(string[] types)
     {
         if (GetEffect is null)
         {
             return null;
         }
 
-        var effect = await GetEffect.Invoke(types);
+        var effect = GetEffect.Invoke(types);
         return effect switch
         {
             DragEffect.None
@@ -248,13 +263,28 @@ internal class DragDropListener : IDisposable
     /// Invoked by javascript interop.
     /// </summary>
     [JSInvokable]
-    public void DropHandled(DropEventArgs e) => _onDrop?.Invoke(this, e);
+    public void DropHandled(IEnumerable<KeyValuePair<string, string>> e)
+    {
+        DropValid = null;
+        DropValidChanged?.Invoke(this, EventArgs.Empty);
+        _onDrop?.Invoke(this, e);
+    }
 
     /// <summary>
     /// Invoked by javascript interop.
     /// </summary>
     [JSInvokable]
     public void DroppedHandled(DragEffect e) => _onDropped?.Invoke(this, e);
+
+    /// <summary>
+    /// Invoked by javascript interop.
+    /// </summary>
+    [JSInvokable]
+    public void SetDropValid(bool? value)
+    {
+        DropValid = value;
+        DropValidChanged?.Invoke(this, EventArgs.Empty);
+    }
 
     protected virtual void Dispose(bool disposing)
     {
@@ -278,7 +308,7 @@ internal class DragDropListener : IDisposable
     private ValueTask StartDragListener()
     {
         _dotNetRef ??= DotNetObjectReference.Create(this);
-        return _dragDropService.StartDragListener(_dotNetRef, ElementId, DragClass);
+        return _dragDropService.StartDragListener(_dotNetRef, ElementId);
     }
 
     private ValueTask StartDropListener()
@@ -289,12 +319,10 @@ internal class DragDropListener : IDisposable
             ElementId,
             DropEffect == DragEffect.All
                 ? null
-                : DropEffect,
-            DropClass,
-            NoDropClass);
+                : DropEffect);
     }
 
-    private async void SubscribeDrop(EventHandler<DropEventArgs> value)
+    private async void SubscribeDrop(EventHandler<IEnumerable<KeyValuePair<string, string>>> value)
     {
         if (_onDrop is null)
         {
@@ -312,7 +340,7 @@ internal class DragDropListener : IDisposable
         _onDropped += value;
     }
 
-    private async void UnsubscribeDrop(EventHandler<DropEventArgs> value)
+    private async void UnsubscribeDrop(EventHandler<IEnumerable<KeyValuePair<string, string>>> value)
     {
         _onDrop -= value;
         if (_onDrop is null)

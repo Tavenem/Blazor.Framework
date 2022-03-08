@@ -1,0 +1,196 @@
+﻿@page "/components/pagination"
+
+<PageTitle>Pagination - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Pagination</Heading>
+
+<p>
+    The pagination component provides links to pages from a range.
+</p>
+
+<p>
+    Pagination can be presented in one of two ways: using a CSS class, or with a component.
+</p>
+
+<Heading Level="HeadingLevel.H2">CSS</Heading>
+
+<p>
+    To create pagination using only css, add the <code>pagination</code> class to an element
+    (usually a <code>nav</code>). Within that element, create a list (usually an <code>ol</code>),
+    and add <code>li</code> items for each page. Typically these items will contain buttons or links
+    which perform navigation to the indicated page. Add the <code>active</code> class to the current
+    page to show that that item is not selectable.
+</p>
+
+<CodeExample Code="@(@"<nav class=""pagination"" role=""navigation"">
+    <ol>
+        <li><button class=""btn btn-text"">1</button></li>
+        <li><button class=""btn btn-text"">2</button></li>
+        <li class=""active"" aria-current=""true""><button class=""btn btn-text"" disabled>3</button></li>
+        <li><button class=""btn btn-text"">4</button></li>
+        <li><button class=""btn btn-text"">5</button></li>
+    </ol>
+</nav>")" />
+
+<p>
+    You can add the <code>disabled</code> class to the element with the <code>pagination</code>
+    class to give all the elements a disabled appearance. Note that this doesn't actually disable
+    any elements. You'll need to do that normally, with disabled attributes on buttons, or by
+    removing the <code>href</code> attribute of links.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<nav class=""pagination disabled"" role=""navigation"">
+    <ol>
+        <li><button class=""btn btn-text"">1</button></li>
+        <li><button class=""btn btn-text"">2</button></li>
+        <li class=""active"" aria-current=""true""><button class=""btn btn-text"" disabled>3</button></li>
+        <li><button class=""btn btn-text"">4</button></li>
+        <li><button class=""btn btn-text"">5</button></li>
+    </ol>
+</nav>")" />
+
+<Heading Level="HeadingLevel.H2">Component</Heading>
+
+<p>
+    You can also use the <code>Pagination</code> component. Use the <code>CurrentPage</code>
+    property to indicate the current page by its zero-based index, and the <code>PageCount</code>
+    property to indicate the total number of pages. <code>CurrentPage</code> is a bindable property,
+    and will update when the user changes pages by activating any of the page controls.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Pagination CurrentPage="3" PageCount="5" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Pagination CurrentPage=""3"" PageCount=""5"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can set the <code>Disabled</code> property to <code>true</code> to indicate that the
+    pagination is inactive, and doing so will automatically disable the page controls.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Pagination CurrentPage="3" PageCount="5" Disabled="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Pagination CurrentPage=""3"" PageCount=""5"" Disabled=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Collapsing excess pages</Heading>
+
+<p>
+    You can set the <code>MaxPagesDisplayed</code> property to the maximum number of pages you want
+    shown. It is set to 5 by default. The component will automatically balance the number of pages
+    before and after the current page, so that the total number does not exceed the maximum. Any
+    hidden pages will be replaced by an ellipsis.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column align-items-center">
+            <div class="justify-content-center">
+                <Pagination CurrentPage="2" PageCount="13" />
+            </div>
+            <div class="justify-content-center">
+                <Pagination CurrentPage="7" PageCount="13" />
+            </div>
+            <div class="justify-content-center">
+                <Pagination CurrentPage="11" PageCount="13" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""justify-content-center"">
+    <Pagination CurrentPage=""2"" PageCount=""13"" />
+</div>
+<div class=""justify-content-center"">
+    <Pagination CurrentPage=""7"" PageCount=""13"" />
+</div>
+<div class=""justify-content-center"">
+    <Pagination CurrentPage=""11"" PageCount=""13"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Indeterminate page count</Heading>
+
+<p>
+    The <code>PageCount</code> property can be set to <code>null</code> (this is the default). When
+    it is <code>null</code>, the pagination component will show all pages before the curernt page
+    normally (since it can assume that those all exist). It will not show any pages <em>after</em>
+    the current page, however, since it can't know for certain whether there are any. However, the
+    next page and last page buttons will always remain active.
+</p>
+
+<p>
+    You must assign a callback to the <code>NextRequested</code> and <code>LastRequested</code>
+    parameters, which are invoked when those controls are activated for a pagination component with
+    a <code>null PageCount</code>. Your paging logic should determine whether there are additional
+    pages to load, and if so, update <code>CurrentPage</code> accordingly.
+</p>
+
+<p>
+    If no additional pages are available, it is recommended that you also set <code>PageCount</code>
+    to the value of <code>CurrentPage</code>, so that the "next page" and "last page" control will
+    be disabled, indicating to the user that they are already on the last page, and so that further
+    navigation will reflect the now-known number of total pages.
+</p>
+
+<Heading Level="HeadingLevel.H3">Customization</Heading>
+
+<p>
+    You can set the <code>ThemeColor</code> property to specify a color theme for the component.
+</p>
+
+<p>
+    You can use the <code>small</code> or <code>large</code> classes to change the size of the
+    controls:
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column align-items-center">
+            <div class="justify-content-center">
+                <Pagination Class="small" CurrentPage="3" PageCount="5" />
+            </div>
+            <div class="justify-content-center">
+                <Pagination CurrentPage="3" PageCount="5" />
+            </div>
+            <div class="justify-content-center">
+                <Pagination Class="large" CurrentPage="3" PageCount="5" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""justify-content-center"">
+    <Pagination Class=""small"" CurrentPage=""3"" PageCount=""5"" />
+</div>
+<div class=""justify-content-center"">
+    <Pagination CurrentPage=""3"" PageCount=""5"" />
+</div>
+<div class=""justify-content-center"">
+    <Pagination Class=""large"" CurrentPage=""3"" PageCount=""5"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Use the <code>FirstPageIcon</code>, <code>LastPageIcon</code>, <code>NextPageIcon</code>, and
+    <code>PreviousPageIcon</code> properties to customize the controls on either side of the
+    pagination component. This is necessary if you replace the default font icon (see <a
+    href="./getting-started/installation">Installation</a> for details).
+</p>
+
+<p>
+    You can use the <code>PageClass</code> and <code>PageStyle</code> properties to customize the
+    CSS style of the page controls, including the first, previous, next, and last controls.
+</p>

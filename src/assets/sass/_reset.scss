@@ -49,8 +49,7 @@ hr {
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
-    --tavenem-casl: .3;
-    letter-spacing: -.07rem;
+    font-family: var(--tavenem-font-family-title);
     line-height: var(--tavenem-lineheight-heading);
     margin-bottom: .5rem;
     margin-top: 0;
@@ -237,10 +236,12 @@ code {
 
 kbd {
     background-color: var(--tavenem-color-keyboard-bg);
+    border: 1px solid var(--tavenem-color-border);
     border-radius: var(--tavenem-border-radius);
+    box-shadow: 0 1px 1px rgb(0 0 0 / 20%), 0 2px 0 0 rgba(var(--tavenem-color-base-rgb), 70%) inset;
     color: var(--tavenem-color-keyboard);
-    font-weight: var(--tavenem-font-weight-light);
-    padding: .2rem .4rem;
+    font-weight: var(--tavenem-font-weight-semibold);
+    padding: 2px 4px;
 
     > *:first-child {
         border-top-left-radius: inherit;
@@ -257,6 +258,8 @@ kbd {
     }
 
     kbd {
+        border: 0;
+        box-shadow: none;
         font-weight: var(--tavenem-font-weight-medium-bold);
         line-height: var(--tavenem-lineheight-body);
         padding: 0;

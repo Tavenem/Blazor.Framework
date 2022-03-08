@@ -1,0 +1,33 @@
+﻿@page "/components/skeleton"
+
+<PageTitle>Skeleton - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Skeleton</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides a utility component to help style loading placeholder
+    elements, sometimes referred to as skeleton elements.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    To add a skeleton element, just add the <code>skeleton</code> class to any element (usually a
+    <code>div</code> or <code>span</code>). Add the <code>text</code> class for an element meant to
+    represent text. You can add the <code>rounded-circle</code> or <code>rounded-pill</code>
+    classes to control the shape. You can also assign a theme class to affect the color.
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex flex-column"" style=""height:18rem;width:12rem"">
+    <span class=""skeleton text primary""></span>
+    <span class=""skeleton text""></span>
+    <div class=""flex-grow-1 d-flex my-2 gap-2"">
+        <div class=""skeleton rounded-circle flex-grow-2 info""></div>
+        <div class=""flex-grow-1"">
+            <span class=""skeleton text secondary""></span>
+            <span class=""skeleton text""></span>
+            <span class=""skeleton text"" style=""width:50%""></span>
+        </div>
+    </div>
+    <div class=""skeleton""></div>
+</div>")" />

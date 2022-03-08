@@ -1,0 +1,55 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@ChildContent
+<nav @attributes="AdditionalAttributes" role="navigation" class="@CssClass" style="@CssStyle">
+    <ol>
+        <li>
+            <button @onclick="OnFirst" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == 0)">
+                <tf-icon>@FirstPageIcon</tf-icon>
+            </button>
+        </li>
+        <li>
+            <button @onclick="OnPrevious" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == 0)">
+                <tf-icon>@PreviousPageIcon</tf-icon>
+            </button>
+        </li>
+        @if (FirstPage > 0)
+        {
+            <li>&hellip;</li>
+        }
+        @for (ulong i = FirstPage; i <= LastPage; i++)
+        {
+            var index = i;
+            @if (index == CurrentPage)
+            {
+                <li @key="index" class="active">
+                    <div class="@PageCssClass">@((index + 1).ToString("N0"))</div>
+                </li>
+            }
+            else
+            {
+                <li @key="index">
+                    <button @onclick="@(_ => CurrentPage = index)" class="@PageCssClass" disabled="@Disabled">
+                        @((index + 1).ToString("N0"))
+                    </button>
+                </li>
+            }
+        }
+        @if (PageCount.HasValue && LastPage < PageCount.Value - 1)
+        {
+            <li>&hellip;</li>
+        }
+        <li>
+            <button @onclick="OnNextAsync" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == PageCount)">
+                <tf-icon>@NextPageIcon</tf-icon>
+            </button>
+        </li>
+        <li>
+            <button @onclick="OnLastAsync" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == PageCount)">
+                <tf-icon>@LastPageIcon</tf-icon>
+            </button>
+        </li>
+    </ol>
+</nav>

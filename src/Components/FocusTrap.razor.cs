@@ -26,11 +26,6 @@ public partial class FocusTrap : IAsyncDisposable
     private bool _shouldRender = true;
 
     /// <summary>
-    /// Child content of the component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// The element on which to set focus when the component is created or
     /// enabled.

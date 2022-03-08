@@ -1,10 +1,10 @@
-﻿.btn-close {
+﻿tf-close {
     @include ripple;
     align-self: flex-start;
     border: 0;
     border-radius: 50%;
     box-sizing: content-box;
-    color: inherit;
+    color: var(--tavenem-color-text);
     cursor: pointer;
     direction: ltr;
     display: inline-block;
@@ -36,7 +36,6 @@
     -moz-osx-font-smoothing: grayscale;
 
     &:hover {
-        color: inherit;
         opacity: .75;
         text-decoration: none;
     }
@@ -47,10 +46,10 @@
         outline: 0;
     }
 
-    &:disabled,
+    &[disabled],
     &.disabled {
         box-shadow: none;
-        color: inherit !important;
+        color: var(--tavenem-color-text-disabled) !important;
         cursor: default;
         opacity: .25;
         pointer-events: none;

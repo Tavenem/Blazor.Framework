@@ -1,6 +1,6 @@
-﻿.icon {
+﻿tf-icon {
     direction: ltr;
-    display: inline-block;
+    display: none;
     fill: currentColor;
     flex-shrink: 0;
     font-family: 'Material Icons';
@@ -20,36 +20,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    &:focus {
-        outline: none;
-    }
-
-    &.disabled, &:disabled,
-    .disabled &, *:disabled & {
-        color: var(--tavenem-color-text-disabled);
-    }
-
-    &.small, .small > & {
-        font-size: 1.25em;
-    }
-
-    &.large, .large > & {
-        font-size: 2.25em;
-    }
-
-    &.stacked {
-        color: var(--tavenem-color-bg);
-        font-size: .75em;
-        left: 0;
-        position: absolute;
-        text-align: center;
-        width: 100%;
-        z-index: 1;
-    }
-
-    &.filled {
-        background-color: transparent;
-        color: var(--tavenem-color-text);
+    &:defined {
+        display: inline-block;
     }
 
     &.outlined {
@@ -57,37 +29,59 @@
         font-family: 'Material Icons Outlined';
     }
 
-    &.bg-alt {
-        background-color: transparent;
+    &:focus {
+        outline: none;
+    }
+
+    &.disabled, &[disabled],
+    .disabled &, *:disabled & {
+        color: var(--tavenem-color-text-disabled);
+    }
+
+    &.small {
+        font-size: 1.25em;
+    }
+
+    &.large {
+        font-size: 2.25em;
+    }
+}
+
+.icon-stack {
+    display: inline-grid;
+    place-items: center;
+
+    * {
+        grid-area: 1 / 1;
+    }
+
+    &.small {
+        font-size: calc(5em / 6);
+    }
+
+    &.large {
+        font-size: 1.5em;
+    }
+
+    :nth-child(n+2) {
+        font-size: 1em;
+    }
+
+    :nth-child(n+3) {
+        font-size: .75em;
+    }
+
+    :nth-child(even) {
+        color: var(--tavenem-color-bg);
     }
 
     @each $theme in $theme-colors {
+        &.#{$theme} :nth-child(even) {
+            color: var(--tavenem-theme-color-text);
+        }
+
         .#{$theme} {
-            color: var(--tavenem-color-#{$theme});
-
-            &, &.filled {
-                background-color: transparent;
-
-                &.bg-alt {
-                    background-color: transparent;
-                }
-            }
-
-            &.outlined {
-                font-family: 'Material Icons Outlined';
-            }
-
-            &.darken, .darken {
-                color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten, .lighten {
-                color: var(--tavenem-color-#{$theme}-lighten);
-            }
-
-            &.stacked, .stacked {
-                color: var(--tavenem-color-text);
-            }
+            color: var(--tavenem-theme-color);
         }
     }
 }

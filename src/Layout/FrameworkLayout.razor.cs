@@ -19,11 +19,6 @@ public partial class FrameworkLayout : IDisposable
     private DotNetObjectReference<FrameworkLayout>? _dotNetRef;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// The breakpoint at which the table of contents should be visible.
     /// </para>
@@ -61,6 +56,10 @@ public partial class FrameworkLayout : IDisposable
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
+    internal Heading? ActiveHeading { get; private set; }
+
+    internal List<Heading> Headings { get; } = new();
+
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
@@ -77,6 +76,14 @@ public partial class FrameworkLayout : IDisposable
 
     [Inject] private DialogService DialogService { get; set; } = default!;
 
+    private Snackbar? ExtraSnackbarBottomLeft => SnackbarService.GetExtraSnackbar(Corner.Bottom_Left);
+
+    private Snackbar? ExtraSnackbarBottomRight => SnackbarService.GetExtraSnackbar(Corner.Bottom_Right);
+
+    private Snackbar? ExtraSnackbarTopLeft => SnackbarService.GetExtraSnackbar(Corner.Top_Left);
+
+    private Snackbar? ExtraSnackbarTopRight => SnackbarService.GetExtraSnackbar(Corner.Top_Right);
+
     private string DrawerContainerClass => SideDrawerBreakpoint switch
     {
         Breakpoint.None => "drawer-container",
@@ -87,7 +94,19 @@ public partial class FrameworkLayout : IDisposable
 
     [Inject] private ScrollService ScrollService { get; set; } = default!;
 
+    private IEnumerable<Snackbar> SnackbarsBottomLeft => SnackbarService.GetDisplayedSnackbars(Corner.Bottom_Left).Reverse();
+
+    private IEnumerable<Snackbar> SnackbarsBottomRight => SnackbarService.GetDisplayedSnackbars(Corner.Bottom_Right).Reverse();
+
+    private IEnumerable<Snackbar> SnackbarsTopLeft => SnackbarService.GetDisplayedSnackbars(Corner.Top_Left);
+
+    private IEnumerable<Snackbar> SnackbarsTopRight => SnackbarService.GetDisplayedSnackbars(Corner.Top_Right);
+
+    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
+
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Inject] private UtilityService UtilityService { get; set; } = default!;
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -97,8 +116,17 @@ public partial class FrameworkLayout : IDisposable
     {
         DialogService.OnDialogAdded += OnDialogAdded;
         DialogService.OnDialogClosed += DismissDialogInstance;
+        SnackbarService.OnSnackbarsUpdated += OnSnackbarsUpdated;
         NavigationManager.LocationChanged += OnLocationChanged;
     }
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its initial parameters
+    /// from its parent in the render tree. Override this method if you will perform an asynchronous
+    /// operation and want the component to refresh when that operation is completed.
+    /// </summary>
+    /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
+    protected override Task OnInitializedAsync() => UtilityService.RegisterComponents().AsTask();
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note
@@ -124,33 +152,19 @@ public partial class FrameworkLayout : IDisposable
     {
         if (firstRender)
         {
-            foreach (var contents in _contents)
-            {
-                await contents.RefreshHeadingsAsync();
-            }
             if (!string.IsNullOrEmpty(ScrollSpyClass))
             {
                 _dotNetRef = DotNetObjectReference.Create(this);
                 await ScrollService.ScrollSpy(_dotNetRef, ScrollSpyClass);
             }
-        }
-    }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
+            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+            if (uri.Fragment.Length == 0)
             {
-                NavigationManager.LocationChanged -= OnLocationChanged;
-                _dotNetRef?.Dispose();
+                return;
             }
 
-            _disposedValue = true;
+            await ScrollService.ScrollToId(uri.Fragment[1..]);
         }
     }
 
@@ -181,10 +195,10 @@ public partial class FrameworkLayout : IDisposable
     [JSInvokable]
     public void RaiseOnScrollSpy(string? id)
     {
-        foreach (var contents in _contents)
-        {
-            contents.SetActiveHeading(id);
-        }
+        ActiveHeading = string.IsNullOrEmpty(id)
+            ? null
+            : Headings.Find(x => x.Id == id);
+        RefreshContents();
     }
 
     internal void Add(Contents contents) => _contents.Add(contents);
@@ -193,6 +207,12 @@ public partial class FrameworkLayout : IDisposable
     {
         drawer.DrawerToggled += OnDrawerToggled;
         _drawers.Add(drawer);
+    }
+
+    internal string Add(Heading heading)
+    {
+        Headings.Add(heading);
+        return $"heading-{Headings.Count}";
     }
 
     internal void Add(ScrollToTop scrollToTop)
@@ -226,6 +246,14 @@ public partial class FrameworkLayout : IDisposable
 
     internal bool HasDrawer(Side side) => _drawers.Any(x => x.Side == side);
 
+    internal void RefreshContents()
+    {
+        foreach (var contents in _contents)
+        {
+            contents.Refresh();
+        }
+    }
+
     internal void Remove(Contents contents) => _contents.Remove(contents);
 
     internal void Remove(Drawer drawer)
@@ -240,6 +268,27 @@ public partial class FrameworkLayout : IDisposable
         {
             _scrollToTops.Remove(scrollToTop);
             AutoScrollToTop = _scrollToTops.Count == 0;
+        }
+    }
+
+    internal void Remove(Heading heading) => Headings.Remove(heading);
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                SnackbarService.OnSnackbarsUpdated -= OnSnackbarsUpdated;
+                NavigationManager.LocationChanged -= OnLocationChanged;
+                _dotNetRef?.Dispose();
+            }
+
+            _disposedValue = true;
         }
     }
 
@@ -279,11 +328,6 @@ public partial class FrameworkLayout : IDisposable
     {
         DismissAllDialogs();
 
-        foreach (var contents in _contents)
-        {
-            await contents.RefreshHeadingsAsync();
-        }
-
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (uri.Fragment.Length == 0)
         {
@@ -292,4 +336,6 @@ public partial class FrameworkLayout : IDisposable
 
         await ScrollService.ScrollToId(uri.Fragment[1..]);
     }
+
+    private void OnSnackbarsUpdated() => InvokeAsync(StateHasChanged);
 }

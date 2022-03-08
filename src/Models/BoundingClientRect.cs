@@ -11,7 +11,7 @@
 /// <param name="ScrollY">the vertical offset since the top of the page</param>
 /// <param name="WindowHeight">height of the viewport</param>
 /// <param name="WindowWidth">width of the viewport</param>
-internal record BoundingClientRect(
+public record BoundingClientRect(
     double Top,
     double Left,
     double Width,
@@ -21,6 +21,11 @@ internal record BoundingClientRect(
     double WindowHeight,
     double WindowWidth)
 {
+    /// <summary>
+    /// An empty bounding rect.
+    /// </summary>
+    public static BoundingClientRect Empty { get; } = new(0, 0, 0, 0, 0, 0, 0, 0);
+
     /// <summary>
     /// the left X coordinate
     /// </summary>
@@ -61,16 +66,23 @@ internal record BoundingClientRect(
     /// </summary>
     public double AbsoluteBottom => Bottom + ScrollY;
 
+    /// <summary>
+    /// Whether <see cref="Bottom"/> is greater than <see cref="WindowHeight"/>.
+    /// </summary>
     public bool IsOutsideBottom => Bottom > WindowHeight;
 
+    /// <summary>
+    /// Whether <see cref="Left"/> is less than zero.
+    /// </summary>
     public bool IsOutsideLeft => Left < 0;
 
+    /// <summary>
+    /// Whether <see cref="Top"/> is less than zero.
+    /// </summary>
     public bool IsOutsideTop => Top < 0;
 
-    public bool IsOutsideRight => Right > WindowWidth;
-
     /// <summary>
-    /// An empty bounding rect.
+    /// Whether <see cref="Right"/> is greater than <see cref="WindowWidth"/>.
     /// </summary>
-    public static BoundingClientRect Empty { get; } = new(0, 0, 0, 0, 0, 0, 0, 0);
+    public bool IsOutsideRight => Right > WindowWidth;
 }

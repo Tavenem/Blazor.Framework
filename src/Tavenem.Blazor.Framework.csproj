@@ -50,13 +50,8 @@
     <ClientAssetsInputs Remove="assets\package.json" />
     <ClientAssetsInputs Remove="assets\postcss.config.js" />
     <ClientAssetsInputs Remove="assets\rollup.config.js" />
-    <ClientAssetsInputs Remove="assets\tavenem-dragdrop.ts" />
-    <ClientAssetsInputs Remove="assets\tavenem-keylistener.ts" />
-    <ClientAssetsInputs Remove="assets\tavenem-popover.ts" />
-    <ClientAssetsInputs Remove="assets\tavenem-scroll.ts" />
-    <ClientAssetsInputs Remove="assets\tavenem-theme.ts" />
-    <ClientAssetsInputs Remove="assets\tavenem-utility.ts" />
     <ClientAssetsInputs Remove="assets\tsconfig.json" />
+    <ClientAssetsInputs Remove="assets\scripts\*.ts" />
     <Content Include="assets\sass\framework.scss" />
     <ScssFiles Include="assets\**\*.scss" Exclude="assets\**\_*.scss" />
   </ItemGroup>

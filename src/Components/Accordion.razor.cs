@@ -12,11 +12,6 @@ public partial class Accordion
     private bool _childrenNeedUpdates = false;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// Set to <see langword="true"/> to prevent opening or closing any child collapses by the user.
     /// </para>

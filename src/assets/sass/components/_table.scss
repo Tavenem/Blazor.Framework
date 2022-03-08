@@ -73,12 +73,12 @@
                     &:hover {
                         color: var(--table-action-color);
 
-                        .icon:not(.active) {
+                        tf-icon:not(.active) {
                             opacity: 0.8;
                         }
                     }
 
-                    .icon {
+                    tf-icon {
                         font-size: 1.125em;
                         margin-left: 4px;
                         margin-right: 4px;
@@ -210,8 +210,9 @@
     }
 
     &.filled {
-        background-color: var(--table-bg-color);
-        color: var(--tavenem-color-text);
+        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+        background-color: var(--tavenem-theme-color-hover, var(--table-bg-color));
+        color: var(--tavenem-theme-color, var(--tavenem-color-text));
     }
 
     &.outlined {
@@ -220,19 +221,19 @@
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --table-action-color: var(--tavenem-color-#{$theme}-lighten);
-            --table-bg-color: var(--tavenem-color-#{$theme}-hover);
-            --table-border-color: var(--tavenem-color-#{$theme});
-            --table-hover-color: var(--tavenem-color-#{$theme}-hover);
-            --table-stripe-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .02);
+            --table-stripe-lightness: var(--tavenem-color-#{$theme}-lightness);
+            --table-action-color: var(--tavenem-theme-color-lighten);
+            --table-bg-color: var(--tavenem-theme-color-hover);
+            --table-border-color: var(--tavenem-theme-color);
+            --table-hover-color: var(--tavenem-theme-color-hover);
+            --table-stripe-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--table-stripe-lightness), .02);
 
-            &.filled {
-                background-color: var(--tavenem-color-#{$theme}-hover);
-                color: var(--tavenem-color-#{$theme});
+            &.darken {
+                --table-stripe-lightness: calc(var(--tavenem-color-#{$theme}-lightness) - 10%);
+            }
 
-                &.bg-alt {
-                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                }
+            &.lighten {
+                --table-stripe-lightness: calc(var(--tavenem-color-#{$theme}-lightness) + 10%);
             }
         }
     }

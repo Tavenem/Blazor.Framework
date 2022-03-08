@@ -1,0 +1,101 @@
+﻿@page "/components/icon"
+
+<PageTitle>Icon - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Icon</Heading>
+
+<p>
+    The Tavenem Blazor Framework includes a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a> to easily
+    display an icon with an icon font. It is optimized for use with <a
+    href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a>, but
+    any icon library can be selected if you provide CSS overrides for the default styles.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    To insert an icon, simply use the <code>tf-icon</code> custom element, with the name of the
+    glyph as the content. You can use any of the theme classes to color the icon, and you can use
+    the <code>disabled</code> class to give an icon a dimmed appearance.
+</p>
+
+<CodeExample Code="@(@"<tf-icon>thumb_up</tf-icon>
+<tf-icon class=""disabled"">hide_source</tf-icon>
+<tf-icon class=""primary"">view_quilt</tf-icon>
+<tf-icon class=""secondary"">next_plan</tf-icon>
+<tf-icon class=""tertiary"">accessible_forward</tf-icon>
+<tf-icon class=""danger"">error_outline</tf-icon>
+<tf-icon class=""dark"">all_inbox</tf-icon>
+<tf-icon class=""default"">hourglass_full</tf-icon>
+<tf-icon class=""info"">info</tf-icon>
+<tf-icon class=""success"">check_circle</tf-icon>
+<tf-icon class=""warning"">warning_amber</tf-icon>")" />
+
+<p>
+    You can use the <code>outlined</code> class to switch to the 'Material Icons Outlined' font
+    family (if you are using the suggested font imports). Note that not all icons have a distinct
+    appearance in the outlined variant.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<tf-icon class=""outlined"">thumb_up</tf-icon>
+<tf-icon class=""outlined disabled"">hide_source</tf-icon>
+<tf-icon class=""outlined primary"">view_quilt</tf-icon>
+<tf-icon class=""outlined secondary"">next_plan</tf-icon>
+<tf-icon class=""outlined tertiary"">accessible_forward</tf-icon>
+<tf-icon class=""outlined danger"">error_outline</tf-icon>
+<tf-icon class=""outlined dark"">all_inbox</tf-icon>
+<tf-icon class=""outlined default"">hourglass_full</tf-icon>
+<tf-icon class=""outlined info"">info</tf-icon>
+<tf-icon class=""outlined success"">check_circle</tf-icon>
+<tf-icon class=""outlined warning"">warning_amber</tf-icon>")" />
+
+<p>
+    The <code>small</code> and <code>large</code> classes can be used to adjust the size of the
+    icon. Note, however, that icons are sized using relative font sizing, so the current font size
+    will influence their final size.
+</p>
+
+<CodeExample Code="@(@"<div class=""d-flex align-items-center justify-content-center gap-2 w-100"">
+    <tf-icon class=""small"">thumb_up</tf-icon>
+    <tf-icon>thumb_up</tf-icon>
+    <tf-icon class=""large"">thumb_up</tf-icon>
+</div>
+<div style=""font-size:2em"" class=""d-flex align-items-center justify-content-center gap-2 w-100"">
+    <tf-icon class=""small"">thumb_up</tf-icon>
+    <tf-icon>thumb_up</tf-icon>
+    <tf-icon class=""large"">thumb_up</tf-icon>
+</div>")" />
+
+<Heading Level="HeadingLevel.H2">Stacking</Heading>
+
+<p>
+    Icons can be stacked on top of one another to create composed icons. To do this, enclose the
+    stack in a container (such as a <code>div</code> or <code>span</code>) with the class
+    <code>icon-stack</code>. Any number of icons can be stacked, but after a point their decreasing
+    size will make them difficult to distinguish.
+</p>
+
+<p>
+    An icon stack can be given the <code>small</code> or <code>large</code> classes, or a theme
+    class. The size will apply to the stack as a whole, and the theme will apply to alternate icons,
+    with the even icons taking the contrast color for that theme.
+</p>
+
+<CodeExample Code="@(@"<div class=""icon-stack large"">
+    <tf-icon>hexagon</tf-icon>
+    <tf-icon class=""danger"">interests</tf-icon>
+</div>
+<div class=""icon-stack large success"">
+    <tf-icon>shopping_bag</tf-icon>
+    <tf-icon>paid</tf-icon>
+</div>
+<div class=""icon-stack large"">
+    <tf-icon class=""warning"">work</tf-icon>
+    <tf-icon class=""danger"">build</tf-icon>
+</div>
+<span class=""icon-stack large"">
+    <tf-icon>bookmark</tf-icon>
+    <tf-icon>star_rate</tf-icon>
+    <tf-icon class=""success"">done</tf-icon>
+</span>")" />

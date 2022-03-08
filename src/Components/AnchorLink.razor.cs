@@ -26,11 +26,6 @@ public partial class AnchorLink : IDisposable
     [Parameter] public string? ActiveClass { get; set; }
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// If <see langword="true"/>, the link will be disabled.
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
@@ -63,10 +58,30 @@ public partial class AnchorLink : IDisposable
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private protected Dictionary<string, object> Attributes => Disabled
-        || !string.IsNullOrEmpty(LocalLink)
-        ? AdditionalAttributes.Without(_DisabledKeys)
-        : AdditionalAttributes;
+    private protected Dictionary<string, object> Attributes
+    {
+        get
+        {
+            var attributes = AdditionalAttributes;
+            if (!string.IsNullOrEmpty(LocalLink))
+            {
+                var fragmentIndex = NavigationManager.Uri.IndexOf('#');
+                var url = fragmentIndex == -1
+                    ? NavigationManager.Uri
+                    : NavigationManager.Uri[..fragmentIndex];
+                attributes["href"] = $"{url}#{LocalLink}";
+            }
+            if (Disabled)
+            {
+                attributes = attributes.Without(_DisabledKeys);
+            }
+            if (IsActive)
+            {
+                attributes = attributes.With(new KeyValuePair<string, object>("aria-current", "true"));
+            }
+            return attributes;
+        }
+    }
 
     [CascadingParameter] private Collapse? Collapse { get; set; }
 

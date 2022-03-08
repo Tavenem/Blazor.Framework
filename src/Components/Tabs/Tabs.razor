@@ -1,0 +1,93 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@attribute [CascadingTypeParameter(nameof(TTabItem))]
+@typeparam TTabItem
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <CascadingValue Value="this" IsFixed="true">
+        <div class="tabs-toolbar">
+            <div class="tabs-toolbar-inner">
+                @PreTabContent
+                @if (ShowScrollButtons)
+                {
+                    <button @onclick="ScrollBack" class="tab-scroll-btn btn btn-icon" disabled="@_backButtonDisabled">
+                        <tf-icon>@BackIcon</tf-icon>
+                    </button>
+                }
+                <div @ref="_tabsContent" class="tabs-toolbar-content">
+                    <div class="tabs-toolbar-wrapper">
+                        @for (var i = 0; i < _panels.Count; i++)
+                        {
+                            <div @ref="_panels[i].PanelReference"
+                                 @onclick="@(_ => ActivatePanelAsync(i))"
+                                 class="@GetTabClass(i)">
+                                @if (_panels[i].TabContent is not null)
+                                {
+                                    @_panels[i].TabContent
+                                }
+                                else if (_panels[i].Title.HasValue
+                                    && !string.IsNullOrWhiteSpace(_panels[i].Title!.Value.Value))
+                                {
+                                    @_panels[i].Title!.Value
+                                }
+                                @if (_panels[i].OnClose.HasDelegate
+                                    || OnClose.HasDelegate)
+                                {
+                                    <tf-close @onclick="@(_ => OnCloseTabAsync(i))" />
+                                }
+                            </div>
+                        }
+                        @if (Items is not null
+                            && PanelTemplate is not null)
+                        {
+                            for (var i = 0; i < Items.Count; i++)
+                            {
+                                <div @ref="_references[i]"
+                                     @onclick="@(_ => ActivatePanelAsync(i + _panels.Count))"
+                                     class="@GetTabClass(i + _panels.Count)">
+                                    @if (TabTemplate is not null)
+                                    {
+                                        @TabTemplate(Items[i + _panels.Count])
+                                    }
+                                    else if (TabTitle is not null)
+                                    {
+                                        @TabTitle(Items[i + _panels.Count])
+                                    }
+                                    @if (OnClose.HasDelegate)
+                                    {
+                                        <tf-close @onclick="@(_ => OnCloseTabAsync(i))" />
+                                    }
+                                </div>
+                            }
+                        }
+                        <div class="tab-slider" style="@SliderStyle"></div>
+                    </div>
+                </div>
+                @if (ShowScrollButtons)
+                {
+                    <button @onclick="ScrollForward" class="tab-scroll-btn btn btn-icon" disabled="@_forwardButtonDisabled">
+                        <tf-icon>@ForwardIcon</tf-icon>
+                    </button>
+                }
+                @PostTabContent
+            </div>
+        </div>
+        @if (HeaderContent is not null)
+        {
+            @HeaderContent(ActiveItem)
+        }
+        <div class="tab-panels">
+            @if (ActivePanelIndex < _panels.Count)
+            {
+                @ChildContent
+            }
+            else if (Items is not null
+                && PanelTemplate is not null)
+            {
+                @PanelTemplate(Items[ActivePanelIndex - _panels.Count])
+            }
+        </div>
+    </CascadingValue>
+</div>

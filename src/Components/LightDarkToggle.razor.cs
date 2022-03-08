@@ -7,18 +7,23 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class LightDarkToggle
 {
-    private const string DefaultDarkModeIconClass = "dark_mode";
-    private const string DefaultLightModeIconClass = "light_mode";
+    private const string DefaultDarkModeIcon = "dark_mode";
+    private const string DefaultLightModeIcon = "light_mode";
 
     /// <summary>
-    /// Custom CSS class(es) for the icon when set to dark mode.
+    /// Custom icon when set to dark mode.
     /// </summary>
-    [Parameter] public string? DarkModeIconClass { get; set; } = DefaultDarkModeIconClass;
+    [Parameter] public string? DarkModeIcon { get; set; } = DefaultDarkModeIcon;
 
     /// <summary>
-    /// Custom CSS class(es) for the icon when set to light mode.
+    /// Custom icon when set to light mode.
     /// </summary>
-    [Parameter] public string? LightModeIconClass { get; set; } = DefaultLightModeIconClass;
+    [Parameter] public string? LightModeIcon { get; set; } = DefaultLightModeIcon;
+
+    /// <summary>
+    /// Whether the app is current set to a dark color scheme.
+    /// </summary>
+    public bool IsDarkMode { get; private set; }
 
     /// <summary>
     /// Text to display on the button.
@@ -42,9 +47,9 @@ public partial class LightDarkToggle
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private string IconClass => IsDarkMode
-        ? (DarkModeIconClass ?? LightModeIconClass ?? DefaultDarkModeIconClass)
-        : (LightModeIconClass ?? DarkModeIconClass ?? DefaultLightModeIconClass);
+    private string Icon => IsDarkMode
+        ? (DarkModeIcon ?? LightModeIcon ?? DefaultDarkModeIcon)
+        : (LightModeIcon ?? DarkModeIcon ?? DefaultLightModeIcon);
 
     [Inject] private ThemeService ThemeService { get; set; } = default!;
 
@@ -76,8 +81,6 @@ public partial class LightDarkToggle
             IsDarkMode = mode == ThemePreference.Dark;
         }
     }
-
-    private bool IsDarkMode { get; set; }
 
     private async Task OnClickAsync()
     {

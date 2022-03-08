@@ -57,26 +57,11 @@
     }
 
     @each $theme in $theme-colors {
-        .#{$theme} {
-            &, &.darken, &.lighten, &.filled {
-                color: var(--tavenem-color-action);
-            }
-
-            --checkbox-inherited-color: var(--tavenem-color-#{$theme});
-            --checkbox-inherited-content-color: var(--tavenem-color-#{$theme});
-            --checkbox-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
-
-            &.darken {
-                --checkbox-inherited-color: var(--tavenem-color-#{$theme}-darken);
-                --checkbox-inherited-content-color: var(--tavenem-color-#{$theme}-darken);
-                --checkbox-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
-            }
-
-            &.lighten {
-                --checkbox-inherited-color: var(--tavenem-color-#{$theme}-lighten);
-                --checkbox-inherited-content-color: var(--tavenem-color-#{$theme}-lighten);
-                --checkbox-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
-            }
+        &.#{$theme} {
+            --checkbox-inherited-color: var(--tavenem-theme-color);
+            --checkbox-inherited-content-color: var(--tavenem-theme-color);
+            --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
+            color: var(--tavenem-color-action);
         }
     }
 }
@@ -137,7 +122,7 @@
         }
     }
 
-    .checkbox-icons .icon {
+    .checkbox-icons tf-icon {
         background-color: currentColor;
         border-radius: 50%;
         box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
@@ -146,18 +131,8 @@
     }
 
     @each $theme in $theme-colors {
-        .#{$theme} {
-            .switch-track {
-                background-color: var(--tavenem-color-#{$theme});
-            }
-
-            &.darken .switch-track {
-                color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten .switch-track {
-                color: var(--tavenem-color-#{$theme}-lighten);
-            }
+        &.#{$theme} .switch-track {
+            background-color: var(--tavenem-theme-color);
         }
     }
 }

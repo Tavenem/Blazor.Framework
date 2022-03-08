@@ -24,24 +24,20 @@
     }
 
     &:not(.vertical) > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            &:not(:last-child) {
-                border-bottom-right-radius: 0;
-                border-top-right-radius: 0;
-            }
+        .btn {
+            border-bottom-left-radius: inherit;
+            border-top-left-radius: inherit;
 
-            &:not(:first-child) {
+            + .btn {
                 border-bottom-left-radius: 0;
                 border-left-style: solid;
                 border-top-left-radius: 0;
                 margin-left: -1px;
             }
 
-            &:first-child {
-                border-bottom-left-radius: inherit;
-                border-top-left-radius: inherit;
+            &:not(:last-child) {
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
             }
 
             &:last-child {
@@ -54,34 +50,27 @@
     &.vertical {
         flex-direction: column;
 
-        > {
-            .btn,
-            .btn-text,
-            .btn-icon {
-                width: 100%;
+        > .btn {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            width: 100%;
 
-                &:not(:last-child) {
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
-                    border-bottom-style: solid;
-                }
+            + .btn {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                border-top-style: solid;
+                margin-top: -1px;
+            }
 
-                &:not(:first-child) {
-                    border-top-left-radius: 0;
-                    border-top-right-radius: 0;
-                    border-top-style: solid;
-                    margin-top: -1px;
-                }
+            &:not(:last-child) {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom-style: solid;
+            }
 
-                &:first-child {
-                    border-top-left-radius: inherit;
-                    border-top-right-radius: inherit;
-                }
-
-                &:last-child {
-                    border-bottom-left-radius: inherit;
-                    border-bottom-right-radius: inherit;
-                }
+            &:last-child {
+                border-bottom-left-radius: inherit;
+                border-bottom-right-radius: inherit;
             }
         }
     }
@@ -132,30 +121,30 @@
         --button-inherited-border-style: solid;
     }
 
+    &.bg-alt {
+        --button-inherited-bg: var(--tavenem-theme-color-darken);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-darken-2);
+    }
+
+    &.darken, &.lighten {
+        --button-inherited-bg: var(--tavenem-theme-color);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-darken);
+    }
+
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --button-inherited-bg: var(--tavenem-color-#{$theme});
-            --button-inherited-border-color: var(--tavenem-color-#{$theme}-text);
-            --button-inherited-color: var(--tavenem-color-#{$theme}-text);
-            --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-darken);
-            --button-inherited-hover-color: var(--tavenem-color-#{$theme}-text);
-
-            &.bg-alt, &.darken {
-                --button-inherited-bg: var(--tavenem-color-#{$theme}-darken);
-                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-darken-2);
-            }
-
-            &.lighten {
-                --button-inherited-bg: var(--tavenem-color-#{$theme}-lighten);
-                --button-inherited-hover-bg: var(--tavenem-color-#{$theme});
-            }
+            --button-inherited-bg: var(--tavenem-theme-color);
+            --button-inherited-border-color: var(--tavenem-theme-color-text);
+            --button-inherited-color: var(--tavenem-theme-color-text);
+            --button-inherited-hover-bg: var(--tavenem-theme-color-darken);
+            --button-inherited-hover-color: var(--tavenem-theme-color-text);
 
             &.outlined {
                 --button-inherited-bg: transparent;
-                --button-inherited-border-color: var(--tavenem-color-#{$theme});
-                --button-inherited-color: var(--tavenem-color-#{$theme});
-                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
-                --button-inherited-hover-color: var(--tavenem-color-#{$theme});
+                --button-inherited-border-color: var(--tavenem-theme-color);
+                --button-inherited-color: var(--tavenem-theme-color);
+                --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
+                --button-inherited-hover-color: var(--tavenem-theme-color);
             }
         }
     }
@@ -180,45 +169,37 @@
     --button-inherited-padding-y-icon: 7px;
     --button-inherited-shadow: none;
 
-    &:not(.vertical) > {
-        .btn,
-        .btn-text,
-        .btn-icon {
-            &:not(:last-child) {
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
+    &:not(.vertical) > .btn {
+        + .btn {
+            border-bottom-left-radius: 0;
+            border-left-style: solid;
+            border-top-left-radius: 0;
+            margin-left: -1px;
+        }
 
-            &:not(:first-child) {
-                border-bottom-left-radius: 0;
-                border-left-style: solid;
-                border-top-left-radius: 0;
-                margin-left: -1px;
-            }
+        &:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
         }
     }
 
     &.vertical {
         flex-direction: column;
 
-        > {
-            .btn,
-            .btn-text,
-            .btn-icon {
-                width: 100%;
+        > .btn {
+            width: 100%;
 
-                &:not(:last-child) {
-                    border-bottom-left-radius: 0;
-                    border-bottom-right-radius: 0;
-                    border-bottom-style: solid;
-                }
+            + .btn {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                border-top-style: solid;
+                margin-top: -1px;
+            }
 
-                &:not(:first-child) {
-                    border-top-left-radius: 0;
-                    border-top-right-radius: 0;
-                    border-top-style: solid;
-                    margin-top: -1px;
-                }
+            &:not(:last-child) {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom-style: solid;
             }
         }
     }
@@ -262,25 +243,25 @@
         --button-inherited-border-style: solid;
     }
 
+    &.bg-alt {
+        --button-inherited-color: var(--tavenem-theme-color-darken);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-hover-dark);
+        --button-inherited-hover-color: var(--tavenem-theme-color-darken);
+    }
+
+    &.darken, &.lighten {
+        --button-inherited-color: var(--tavenem-theme-color);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        --button-inherited-hover-color: var(--tavenem-theme-color);
+    }
+
     @each $theme in $theme-colors {
         &.#{$theme} {
             --button-inherited-bg: transparent;
-            --button-inherited-border-color: var(--tavenem-color-#{$theme});
-            --button-inherited-color: var(--tavenem-color-#{$theme});
-            --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
-            --button-inherited-hover-color: var(--tavenem-color-#{$theme});
-
-            &.bg-alt, &.darken {
-                --button-inherited-color: var(--tavenem-color-#{$theme}-darken);
-                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
-                --button-inherited-hover-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                --button-inherited-color: var(--tavenem-color-#{$theme}-lighten);
-                --button-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
-                --button-inherited-hover-color: var(--tavenem-color-#{$theme}-lighten);
-            }
+            --button-inherited-border-color: var(--tavenem-theme-color);
+            --button-inherited-color: var(--tavenem-theme-color);
+            --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
+            --button-inherited-hover-color: var(--tavenem-theme-color);
         }
     }
 }

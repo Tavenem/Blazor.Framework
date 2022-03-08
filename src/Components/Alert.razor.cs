@@ -15,14 +15,14 @@ public partial class Alert
     [Parameter] public bool AutoClose { get; set; }
 
     /// <summary>
+    /// <para>
     /// Whether this alert should display an icon appropriate to its theme.
+    /// </para>
+    /// <para>
+    /// The default is <see langword="true"/>.
+    /// </para>
     /// </summary>
     [Parameter] public bool AutoIcon { get; set; } = true;
-
-    /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
     /// Raised when the component is closed.
@@ -65,12 +65,10 @@ public partial class Alert
         _ => "info",
     };
 
-    private string IconClass => ThemeColor switch
+    private string? IconClass => ThemeColor switch
     {
-        ThemeColor.Danger => "icon",
-        ThemeColor.Success => "icon",
-        ThemeColor.Warning => "icon",
-        _ => "icon outlined",
+        ThemeColor.Danger or ThemeColor.Success or ThemeColor.Warning => null,
+        _ => "outlined",
     };
 
     private bool IsClosed { get; set; }

@@ -17,6 +17,10 @@
 }
 
 .slider {
+    --thumb-color: unset;
+    --thumb-shadow-color: rgba(0,0,0,.24);
+    --thumb-shadow: 0 0 0 2px var(--thumb-shadow-color);
+    --track-color: unset;
     color: var(--tavenem-color-text);
     display: inline-block;
     user-select: none;
@@ -40,6 +44,7 @@
         }
 
         @include slider-track {
+            background-color: var(--track-color);
             border-radius: 1px;
             height: 2px;
             margin: 10px 0;
@@ -49,96 +54,71 @@
         @include slider-thumb {
             appearance: none;
             -webkit-appearance: none;
+            background-color: var(--thumb-color);
             border: none;
             border-radius: 50%;
             height: 2px;
             transform: scale(6, 6);
             transition: box-shadow 0.2s;
             width: 2px;
+
+            &:hover {
+                box-shadow: var(--thumb-shadow);
+            }
+        }
+
+        &:active, &:focus-visible {
+            @include slider-thumb {
+                box-shadow: var(--thumb-shadow);
+            }
         }
     }
 
     &:disabled, &.disabled {
+        --thumb-shadow-color: rgba(255, 255, 255);
+        --thumb-shadow: 0 0 0 1px var(--thumb-shadow-color);
+
         input {
+            --thumb-color: rgb(0, 0, 0);
+            --track-color: var(--tavenem-color-text-disabled);
             cursor: default;
             opacity: 0.38;
 
-            @include slider-track {
-                background-color: var(--tavenem-color-text-disabled);
-            }
-
             @include slider-thumb {
-                background-color: rgb(0, 0, 0);
                 color: rgb(255, 255, 255);
-                box-shadow: 0 0 0 1px rgb(255, 255, 255) !important;
+                box-shadow: var(--thumb-shadow);
                 transform: scale(4, 4);
-
-                &:hover {
-                    box-shadow: 0 0 0 1px rgb(255, 255, 255) !important;
-                }
             }
         }
     }
 
-    .filled {
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.filled {
         background-color: transparent;
         color: var(--tavenem-color-action);
-        font-weight: unset;
     }
 
-    .outlined {
-        background-color: transparent !important;
+    &.outlined {
         border: 0;
-    }
-
-    .bg-alt {
-        background-color: transparent;
     }
 
     @each $theme in $theme-colors {
         .#{$theme} {
-            &, &.darken, &.lighten, &.filled, &.outlined {
-                background-color: transparent;
-                color: var(--tavenem-color-text);
-            }
-
             --track-lightness: var(--tavenem-color-#{$theme}-lightness);
-            --thumb-color: var(--tavenem-color-#{$theme});
+            --track-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.30);
+            --thumb-color: var(--tavenem-theme-color);
+            --thumb-shadow-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.24);
+            color: var(--tavenem-color-text);
 
             &.darken {
-                --track-lightness: var(--tavenem-color-#{$theme}-lightness) - 7;
-                --thumb-color: var(--tavenem-color-#{$theme}-darken);
+                --track-lightness: calc(var(--tavenem-color-#{$theme}-lightness) - 10%);
             }
 
             &.lighten {
-                --track-lightness: var(--tavenem-color-#{$theme}-lightness) + 7;
-                --thumb-color: var(--tavenem-color-#{$theme}-lighten);
-            }
-
-            &.outlined {
-                border-color: var(--tavenem-color-#{$theme});
-            }
-
-            input {
-                @include slider-track {
-                    background-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.30);
-                }
-
-                @include slider-thumb {
-                    background-color: var(--thumb-color);
-                }
-
-                &:active, &:focus-visible {
-                    @include slider-thumb {
-                        box-shadow: 0 0 0 2px hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.24) !important;
-                    }
-                }
-
-                @include slider-thumb {
-                    &:hover {
-                        box-shadow: 0 0 0 2px hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.24) !important;
-                    }
-                }
+                --track-lightness: calc(var(--tavenem-color-#{$theme}-lightness) + 10%);
             }
         }
     }

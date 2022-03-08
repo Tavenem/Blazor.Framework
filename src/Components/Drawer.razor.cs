@@ -49,11 +49,6 @@ public partial class Drawer : IDisposable
     }
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// Invoked when the drawer open state changes.
     /// </summary>
     public event EventHandler<bool>? DrawerToggled;

@@ -14,6 +14,14 @@
     letter-spacing: -.07em;
 }
 
+.title-font {
+    font-family: var(--tavenem-font-family-title);
+}
+
+.body-font {
+    font-family: var(--tavenem-font-family);
+}
+
 .lh-1 {
     line-height: 1 !important;
 }
@@ -731,6 +739,10 @@ h1, h2, h3, h4, h5, h6,
     color: inherit !important;
 }
 
+.text-color-reset {
+    color: var(--tavenem-color-text) !important;
+}
+
 .elevation-0 {
     box-shadow: none !important;
 
@@ -807,7 +819,7 @@ dl.inline {
     transform: translateX(0);
 }
 
-.can-drag:not(:disabled, .disabled) > *:not(.no-drag) {
+.can-drag:not(:disabled, [disabled], .disabled) > *:not(.no-drag) {
     cursor: grab;
     user-select: none;
 

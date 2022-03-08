@@ -1,0 +1,68 @@
+﻿@namespace Tavenem.Blazor.Framework.InternalComponents
+
+@typeparam TListItem
+
+@inherits DraggableDropTarget<TListItem, TListItem>
+
+@if (SeparatorBefore)
+{
+    <hr />
+}
+@if (Item is not null && ElementList?.ItemIsCollapsible?.Invoke(Item) == true)
+{
+    <ListItemCollapse TListItem="TListItem"
+                      Class="@CollapseClass"
+                      Style="@Style"
+                      Title="@(ChildContent is null ? Item?.ToString() : null)"
+                      TitleIsToggle="true">
+        <TitleContent>@ChildContent</TitleContent>
+        <ChildContent>
+            @if (Item is not null)
+            {
+                if (ElementList?.CollapsibleTemplate is null)
+                {
+                    <span>@(Item?.ToString())</span>
+                }
+                else
+                {
+                    @ElementList.CollapsibleTemplate(Item)
+                }
+            }
+        </ChildContent>
+    </ListItemCollapse>
+}
+else
+{
+    <div id="@Id"
+         class="@CssClass"
+         style="@CssStyle"
+         draggable="@(IsDraggable ? "true" : "false")"
+         @onclick="OnClickAsync">
+        @if (HasValidDrop)
+        {
+            <div class="@ElementList?.DropPlaceholderClass"></div>
+        }
+        @if (!string.IsNullOrWhiteSpace(IconName))
+        {
+            <tf-icon class="@IconClassName">@IconName</tf-icon>
+        }
+        else if (ElementList is not null
+            && ElementList.SelectionType != SelectionType.None
+            && ElementList.ShowSelectionIcon)
+        {
+            <div class="list-icon-spacer"></div>
+        }
+        @if (ChildContent is null)
+        {
+            <span>@(Item?.ToString())</span>
+        }
+        else
+        {
+            @ChildContent
+        }
+    </div>
+}
+@if (SeparatorAfter)
+{
+    <hr />
+}

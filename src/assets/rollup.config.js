@@ -14,42 +14,49 @@ if (process.env.build === 'Release') {
 }
 
 export default [{
-    input: "./tavenem-utility.ts",
+    input: "./scripts/tavenem-utility.ts",
     output: {
         format: 'es',
         sourcemap: true,
     },
     plugins: plugins,
 }, {
-    input: "./tavenem-dragdrop.ts",
+    input: "./scripts/tavenem-dragdrop.ts",
     output: {
         format: 'es',
         sourcemap: true,
     },
     plugins: plugins,
 }, {
-    input: "./tavenem-keylistener.ts",
+    input: "./scripts/tavenem-keylistener.ts",
     output: {
         format: 'es',
         sourcemap: true,
     },
     plugins: plugins,
 }, {
-    input: "./tavenem-popover.ts",
+    input: "./scripts/tavenem-popover.ts",
     output: {
         format: 'es',
         sourcemap: true,
     },
     plugins: plugins,
 }, {
-    input: "./tavenem-scroll.ts",
+    input: "./scripts/tavenem-resize.ts",
     output: {
         format: 'es',
         sourcemap: true,
     },
     plugins: plugins,
 }, {
-    input: "./tavenem-theme.ts",
+    input: "./scripts/tavenem-scroll.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
+    input: "./scripts/tavenem-theme.ts",
     output: {
         format: 'es',
         sourcemap: true,

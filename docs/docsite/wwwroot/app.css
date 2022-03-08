@@ -55,6 +55,9 @@ body {
 .pre-component {
     color: #009696;
 }
+.pre-control {
+    color: #d8a0df;
+}
 .pre-directive {
     color: #a699e6;
 }

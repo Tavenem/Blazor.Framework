@@ -24,7 +24,7 @@
             <Collapse>
                 <TitleContent>
                     <div class="d-flex align-items-center">
-                        <span class="icon">info</span><span>&nbsp;Click the arrow to the right</span>
+                        <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
                     </div>
                 </TitleContent>
                 <ChildContent>
@@ -38,13 +38,13 @@
 <Collapse>
     <TitleContent>
         <div class=""d-flex align-items-center"">
-            <span class=""icon"">info</span><span>&nbsp;Click the arrow to the right</span>
+            <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
         </div>
     </TitleContent>
     <ChildContent>
         This is the body
     </ChildContent>
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -63,7 +63,7 @@
             <Collapse TitleIsToggle="true">
                 <TitleContent>
                     <div class="d-flex align-items-center">
-                        <span class="icon">info</span><span>&nbsp;Click this title</span>
+                        <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
                     </div>
                 </TitleContent>
                 <ChildContent>
@@ -76,13 +76,13 @@
         @CodeFormatter.CodeToMarkup(@"<Collapse TitleIsToggle=""true"">
     <TitleContent>
         <div class=""d-flex align-items-center"">
-            <span class=""icon"">info</span><span>&nbsp;Click this title</span>
+            <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
         </div>
     </TitleContent>
     <ChildContent>
         This is the body
     </ChildContent>
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -114,7 +114,7 @@
     <FooterContent>
         This is a footer
     </FooterContent>
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -138,7 +138,7 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Disabled=""true"">
     This is the body
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -164,7 +164,7 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""dense"">
     This is the body
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -194,7 +194,7 @@
     <FooterContent>
         This is a footer
     </FooterContent>
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -240,7 +240,7 @@
     <FooterContent>
         This is a footer
     </FooterContent>
-</Collapse>", true)
+</Collapse>")
     </ChildContent>
 </Collapse>
 
@@ -269,18 +269,16 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" OnOpening=""LoadAsync"">
     @_asyncBody
-</Collapse>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span> _asyncBody <span class="pre-operator">=</span> <span class="pre-element">string</span><span class="pre-operator">.</span>Empty<span class="pre-operator">;</span>
-    <span class="pre-element">private</span> <span class="pre-element">async</span> <span class="pre-class">Task</span> <span class="pre-method">LoadAsync</span><span class="pre-operator">()</span>
-    <span class="pre-directive">{</span>
-        <span class="pre-element">await</span> <span class="pre-class">Task</span><span class="pre-operator">.</span><span class="pre-method">Delay</span><span class="pre-operator">(</span>3000<span class="pre-operator">);</span>
-        _asyncBody <span class="pre-operator">=</span> <span class="pre-string">"Loaded"</span><span class="pre-operator">;</span>
-    <span class="pre-directive">}</span>
-<span class="pre-directive">}</span>
-        </pre>
+</Collapse>
+
+@code {
+    private string _asyncBody = string.Empty;
+    private async Task LoadAsync()
+    {
+        await Task.Delay(3000);
+        _asyncBody = ""Loaded"";
+    }
+}")
     </ChildContent>
 </Collapse>
 

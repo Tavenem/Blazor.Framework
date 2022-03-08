@@ -2,18 +2,23 @@
 
 @inherits TavenemComponentBase
 
-<nav @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
-    @if (ChildContent is null)
-    {
-        <div class="subheader sticky">Contents</div>
-    }
-    else
-
-    {
-        @ChildContent
-    }
-    @foreach (var heading in _headings)
-    {
-        <AnchorLink href="@($"#{heading.Id}")" Class="@(heading.IsActive ? "active" : null)"><span style="@HeadingStyle(heading)">@heading.Title</span></AnchorLink>
-    }
-</nav>
+@if (HeadingCount > 0)
+{
+    <nav @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+        @if (ChildContent is null)
+        {
+            <div class="subheader sticky">Contents</div>
+        }
+        else
+        {
+            @ChildContent
+        }
+        @if (Framework is not null)
+        {
+            foreach (var heading in Framework.Headings)
+            {
+                <AnchorLink href="@($"#{heading.Id}")" Class="@(heading == ActiveHeading ? "active" : null)"><span style="@HeadingStyle(heading)">@heading.Title</span></AnchorLink>
+            }
+        }
+    </nav>
+}

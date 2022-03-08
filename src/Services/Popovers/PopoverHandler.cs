@@ -36,4 +36,7 @@ internal class PopoverHandler
         await _jsInterop.InvokeVoidAsync("popoverConnect", Id, AnchorId);
         IsConnected = true;
     }
+
+    public ValueTask SetOffsetAsync(double? x, double? y)
+        => _jsInterop.InvokeVoidAsync("setPopoverOffset", Id, x, y);
 }

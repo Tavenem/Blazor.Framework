@@ -1,0 +1,10 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@typeparam TTabItem
+
+@if (!Disabled && Index == (Parent?.ActivePanelIndex ?? -1))
+{
+    @ChildContent
+}

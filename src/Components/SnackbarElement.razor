@@ -1,0 +1,29 @@
+﻿@namespace Tavenem.Blazor.Framework.InternalComponents
+
+@inherits TavenemComponentBase
+
+@StyleFragment
+<div role="alert" class="@CssClass" style="@CssStyle" @onclick="OnClick">
+    @if (Snackbar?.Properties.Options.AutoIcon == true)
+    {
+        <tf-icon>@Icon</tf-icon>
+    }
+    @Message
+    @if (SnackbarService.ShowDuplicateCounter
+        && Snackbar is not null
+        && Snackbar.DuplicateCounter > 1)
+    {
+        if (Snackbar.DuplicateCounter > 999)
+        {
+            <span class="ml-1">(999+)</span>
+        }
+        else
+        {
+            <span class="ml-1">(@(Snackbar.DuplicateCounter))</span>
+        }
+    }
+    @if (ShowClose)
+    {
+        <tf-close @onclick="OnClosed" />
+    }
+</div>

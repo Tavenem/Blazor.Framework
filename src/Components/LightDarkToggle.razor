@@ -3,6 +3,9 @@
 @inherits TavenemComponentBase
 
 <button @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClickAsync">
-    <span class="icon">@IconClass</span>
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <tf-icon>@Icon</tf-icon>
+    }
     @Text
 </button>

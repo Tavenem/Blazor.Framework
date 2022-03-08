@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Provides listening for keyboard events.
 /// </summary>
-public class KeyListener : IKeyListener, IAsyncDisposable
+internal class KeyListener : IKeyListener, IAsyncDisposable
 {
     private readonly DotNetObjectReference<KeyListener> _dotNetRef;
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;

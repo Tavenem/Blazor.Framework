@@ -4,15 +4,29 @@
     align-items: center;
     color: var(--tavenem-color-action);
     display: inline-flex;
+    flex-direction: column;
     flex-wrap: wrap;
-    gap: 6px;
-    margin: 0;
+    font-size: 1rem;
+    gap: .5rem;
+
+    > * {
+        align-items: center;
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        [dir="rtl"] & {
+            flex-direction: row-reverse;
+        }
+    }
 
     li {
         > * {
             border-radius: 9999px;
             height: 2rem;
-            margin: 0 3px;
             min-width: 2rem;
             padding: 0 6px;
             text-align: center;
@@ -22,30 +36,25 @@
             box-shadow: none;
         }
 
-        &.active {
+        &.active > * {
             background-color: var(--pagination-active-color);
             color: var(--pagination-active-text-color);
-        }
-
-        .btn,
-        .btn-text,
-        .btn-icon {
-            background-color: inherit;
-            color: inherit;
-            line-height: normal;
         }
 
         .btn-icon {
             padding: 0;
         }
 
-        &:disabled, &.disabled {
+        &.disabled {
+            --pagination-active-color: var(--tavenem-color-action-disabled-bg);
+            --pagination-active-text-color: var(--tavenem-color-action-disabled);
             color: var(--tavenem-color-action-disabled) !important;
         }
     }
 
     &.filled {
         background-color: transparent;
+        color: var(--tavenem-color-action);
     }
 
     &.outlined {
@@ -54,7 +63,7 @@
         li {
             border: 1px solid var(--tavenem-color-border);
 
-            &.active {
+            &.active > * {
                 background-color: transparent;
                 border-color: (--pagination-active-color);
             }
@@ -65,13 +74,15 @@
         background-color: transparent;
     }
 
-    &:disabled, &.disabled {
+    &.disabled {
+        --pagination-active-color: var(--tavenem-color-action-disabled-bg);
+        --pagination-active-text-color: var(--tavenem-color-action-disabled);
+
         li {
             color: var(--tavenem-color-action-disabled) !important;
 
-            * {
+            > * {
                 box-shadow: none;
-                background-color: transparent !important;
                 color: var(--tavenem-color-action-disabled) !important;
                 cursor: default;
                 pointer-events: none;
@@ -79,45 +90,31 @@
         }
     }
 
-    &.small li > * {
-        height: 1.625rem;
-        margin: 0 1px;
-        min-width: 1.625rem;
-        padding: 0 4px;
+    &.small {
+        --button-inherited-font-size: 0.7109375rem;
+        font-size: .8125rem;
+
+        li > * {
+            height: 1.625rem;
+            min-width: 1.625rem;
+        }
     }
 
-    &.large li > * {
-        height: 2.5rem;
-        min-width: 2.5rem;
-        padding: 0 10px;
+    &.large {
+        --button-inherited-font-size: 1.3125rem;
+        font-size: 1.5rem;
+
+        li > * {
+            height: 2.5rem;
+            min-width: 2.5rem;
+        }
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
+            --pagination-active-color: var(--tavenem-theme-color);
+            --pagination-active-text-color: var(--tavenem-theme-color-text);
             color: var(--tavenem-color-action);
-            --pagination-active-color: var(--tavenem-color-#{$theme});
-            --pagination-active-text-color: var(--tavenem-color-#{$theme}-text);
-
-            &.bg-alt {
-                background-color: transparent;
-            }
-
-            &.filled {
-                background-color: transparent;
-                color: var(--tavenem-color-action);
-
-                &.bg-alt {
-                    background-color: transparent;
-                }
-            }
-
-            &.darken {
-                --pagination-active-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                --pagination-active-color: var(--tavenem-color-#{$theme}-lighten);
-            }
         }
     }
 }

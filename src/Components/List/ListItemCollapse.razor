@@ -1,0 +1,47 @@
+﻿@namespace Tavenem.Blazor.Framework.InternalComponents
+
+@typeparam TListItem
+
+@inherits Collapse
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <div id="@Id"
+         class="@HeaderClass"
+         draggable="@(IsDraggable ? "true" : "false")">
+        @if (ListItem?.HasValidDrop == true)
+        {
+            <div class="@ListItem?.DropPlaceholderClass"></div>
+        }
+        @if (TitleContent is null)
+        {
+            <div class="expand" @onclick="OnToggleAsync">
+                <span>@Title</span>
+                <tf-icon class="ms-2">@IconClass</tf-icon>
+            </div>
+        }
+        else if (TitleIsToggle)
+        {
+            <div class="d-flex flex-column flex-grow-1 clickable"
+                 @onclick="OnToggleAsync">
+                 @TitleContent
+            </div>
+            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconClass</tf-icon>
+        }
+        else
+        {
+            <div class="d-flex flex-column flex-grow-1">@TitleContent</div>
+            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconClass</tf-icon>
+        }
+    </div>
+    <div class="@BodyCssClass">
+        <CascadingValue Value="this" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
+    </div>
+    @if (FooterContent is not null)
+    {
+        <div class="@FooterCssClass">
+            @FooterContent
+        </div>
+    }
+</div>

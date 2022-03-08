@@ -1,0 +1,50 @@
+﻿@page "/components/light-dark-toggle"
+
+<PageTitle>Light-Dark Toggle - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Light-Dark Toggle</Heading>
+
+<p>
+    The Tavenem Blazor Framework provides built-in support for both light and dark themes. The
+    light-dark toggle component is a simple toggle button which switches between the color schemes.
+    It is expected that most layouts will include one in an <a
+    href="./components/appbar">AppBar</a>, to allow the user to switch modes.
+</p>
+
+<p>
+    When a Tavenem Blazor Framework app starts, the user agent's preferred color scheme is detected,
+    if possible. This might be a device setting or a browser setting. The app will respond to
+    changes to this preference while running, allowing live switching. If a light-dark toggle button
+    is used to switch to a different mode, a value is saved in <code>localStorage</code> which
+    indicates that the user has explicitly selected a color scheme for the app. The user agent
+    preference will then be ignored in favor of this override. If the toggle is used to switch back
+    to the user's agent-configured preference, the manual override is cleared. The override will
+    <em>not</em> be cleared if the <em>agent</em> setting is changed to match a manual override,
+    however. This combination of behaviors should usually reflect a uesr's intentions when setting
+    modes.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    The <code>IsDarkMode</code> read-only property indicates whether the app is currently set to a
+    dark color scheme.
+</p>
+
+<p>
+    The toggle component has default icons for both light and dark modes. You can override these
+    with your own, however, using the <code>LightModeIcon</code> and <code>DarkModeIcon</code>
+    properties. You will always need to do this if you choose to use an icon library other than <a
+    href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a> (see
+    <a href="./getting-started/installation">Installation</a> for more information). You can also
+    set either or both properties to <code>null</code> if you prefer not to use icons.
+</p>
+
+<p>
+    The <code>Text</code> property can be used to add text to the toggle button. There is no text by
+    default.
+</p>
+
+<p>
+    The <code>ThemeColor</code> property can be used to color the icons and/or text.
+</p>

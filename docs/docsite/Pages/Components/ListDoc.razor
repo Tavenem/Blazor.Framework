@@ -24,16 +24,6 @@
 </div>")" />
 
 <p>
-    You can assign a theme class to a list to color it.
-</p>
-
-<CodeExample Code="@(@"<ul class=""list primary"">
-    <li>Item 1</li>
-    <li>Item 2</li>
-    <li>Item 3</li>
-</ul>")" />
-
-<p>
     To indicate that a non-button, non-link list item is interactive, add the <code>clickable</code>
     class to the item. You can also add it to the list itself to apply to every item.
 </p>
@@ -47,6 +37,16 @@
     <span class=""active"">Item 2</span>
     <span>Item 3</span>
 </div>")" />
+
+<p>
+    You can assign a theme class to a list to choose the color used to indicate active items.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list secondary"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <p>
     Use the <code>highlight-start</code> class to modify the active indicator's position.
@@ -115,14 +115,12 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span><span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedItem<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+    private string? _selectedItem;
+}")
     </ChildContent>
 </Collapse>
 
@@ -141,14 +139,12 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItems=""_selectedItems"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-enum">IEnumerable</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span><span class="pre-operator">?</span> _selectedItems<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItems=""_selectedItems"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+    private IEnumerable<string>? _selectedItems;
+}")
     </ChildContent>
 </Collapse>
 
@@ -168,14 +164,12 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" Required=""true"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedItem<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" Required=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+    private string? _selectedItem;
+}")
     </ChildContent>
 </Collapse>
 
@@ -192,12 +186,12 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList Items="_items2" ItemIsCollapsible="@(i => i == "Item 2")">
+            <ElementList Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
                 <Template>
                     <span>@context</span>
                 </Template>
                 <CollapsibleTemplate>
-                    <ElementList Items="_items2" />
+                    <ElementList Items="_items" />
                 </CollapsibleTemplate>
             </ElementList>
         </div>
@@ -210,13 +204,11 @@
     <CollapsibleTemplate>
         <ElementList Items=""_items"" />
     </CollapsibleTemplate>
-</ElementList>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() {</span> <span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-<span class="pre-directive">}</span>
-        </pre>
+</ElementList>
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
     </ChildContent>
 </Collapse>
 
@@ -246,13 +238,11 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" IsDragStart=""true"" IsDropTarget=""true"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" IsDragStart=""true"" IsDropTarget=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
     </ChildContent>
 </Collapse>
 
@@ -298,24 +288,21 @@
 <p>
     An icon can be automatically displayed before the content of a list item by setting the
     <code>Icon</code> property to a function which returns the name of the icon. The
-    <code>IconClass</code> property can be used to customize the class of the icon span ("icon" is
-    automatically included).
+    <code>IconClass</code> property can be used to customize the class of the icon.
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList Items="_items2" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
+            <ElementList Items="_items" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() {</span> <span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
     </ChildContent>
 </Collapse>
 
@@ -328,49 +315,45 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList Items="_items2" SeparatorBefore="@(i => i == "Item 2")" />
+            <ElementList Items="_items" SeparatorBefore="@(i => i == "Item 2")" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SeparatorBefore=""@(i => i == ""Item 2"")"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SeparatorBefore=""@(i => i == ""Item 2"")"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
     </ChildContent>
 </Collapse>
 
 <Heading Level="HeadingLevel.H3">Customization</Heading>
 
 <p>
-    A selection icon normally replaces any icon assigned to a item via the <code>Icon</code>
-    property when the item is selected. You can disable this behavior by setting the
-    <code>ShowSelectionIcon</code> property to <code>false</code>.
+    You can choose to display a special selection icon for selected items by setting
+    <code>ShowSelectionIcon</code> to <code>true</code>. The selection icon takes the place of any
+    icon assigned via the <code>Icon</code> property.
 </p>
 
 <p>
     The theme color of any item may be set by assigning a function to the
-    <code>ItemThemeColor</code> property. You can override the theme of selected items by setting
-    the <code>SelectedColor</code> property.
+    <code>ItemThemeColor</code> property. Selected items will always use the theme for the list
+    itself, rather than their own theme, to make it clear that they are currently selected.
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem3" ShowSelectionIcon="false" SelectedColor="ThemeColor.Primary" />
+            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem3" ShowSelectionIcon="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" ShowSelectionIcon=""false"" SelectedColor=""ThemeColor.Primary"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-    <span class="pre-element">private</span> <span class="pre-element">string</span><span class="pre-operator">?</span> _selectedItem<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" ShowSelectionIcon=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+    private string? _selectedItem;
+}")
     </ChildContent>
 </Collapse>
 
@@ -385,24 +368,21 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items2" ItemThemeColor="@(_ => _theme)" OnItemClick="@(_ => _theme = ThemeColor.Primary)" />
+            <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="@(_ => _theme = ThemeColor.Secondary)" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Primary)"" />", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-enum">ThemeColor</span> _theme <span class="pre-operator">=</span> <span class="pre-enum">ThemeColor</span><span class="pre-operator">.</span>None<span class="pre-operator">;</span>
-    <span class="pre-element">private</span> <span class="pre-class">List</span><span class="pre-operator">&lt;</span><span class="pre-element">string</span><span class="pre-operator">&gt;</span> _items <span class="pre-operator">=</span> <span class="pre-element">new</span><span class="pre-operator">() { </span><span class="pre-string">"Item 1"</span>, <span class="pre-string">"Item 2"</span>, <span class="pre-string">"Item 3"</span> <span class="pre-operator">};</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Secondary)"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+    private ThemeColor _theme = ThemeColor.None;
+}")
     </ChildContent>
 </Collapse>
 
 @code {
     private List<string> _items = new() { "Item 1", "Item 2", "Item 3" };
-    private List<string> _items2 = new() { "Item 1", "Item 2", "Item 3" };
     private List<int> _items3 = new() { 1, 2, 3 };
     private List<string> _dragItems = new() { "Item 1", "Item 2", "Item 3" };
     private string? _selectedItem1;

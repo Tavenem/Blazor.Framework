@@ -28,7 +28,7 @@
             <button @onclick="Toggle" class="btn primary">Toggle</button>
             @*<Switch @bind-IsChecked="_isOpen" ThemeColor="ThemeColor.Primary" />*@
             <button @onclick="Toggle" class="btn btn-icon primary">
-                <span class="icon">@ToggleIcon</span>
+                <tf-icon>@ToggleIcon</tf-icon>
             </button>
         </div>
     </TitleContent>
@@ -42,16 +42,14 @@
 <button @onclick=""Toggle"" class=""btn primary"">Toggle</button>
 <Switch @bind-IsChecked=""_isOpen"" ThemeColor=""ThemeColor.Primary"" />
 <button @onclick=""Toggle"" class=""btn btn-icon primary"">
-    <span class=""icon"">@ToggleIcon</span>
-</button>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private bool</span> _isOpen<span class="pre-operator">;</span>
-    <span class="pre-element">private string</span> ToggleIcon <span class="pre-operator">=></span> _isOpen <span class="pre-operator">?</span> <span class="pre-string">"fullscreen_exit"</span> <span class="pre-operator">:</span> <span class="pre-string">"fullscreen"</span> <span class="pre-operator">;</span>
-    <span class="pre-element">private void</span> <span class="pre-method">Toggle</span><span class="pre-operator">() =></span> _isOpen <span class="pre-operator">= !</span>_isOpen<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+    <tf-icon>@ToggleIcon</tf-icon>
+</button>
+
+@code {
+    private bool _isOpen;
+    private string ToggleIcon => _isOpen ? ""fullscreen_exit"" : ""fullscreen"";
+    private void Toggle() => _isOpen = !_isOpen;
+}")
     </ChildContent>
 </Collapse>
 
@@ -86,7 +84,7 @@
         <Popover AnchorId="popover-origin-demo" AnchorOrigin="_anchorOrigin" PopoverOrigin="_popoverOrigin" FlipBehavior="FlipBehavior.Flip_Never" IsOpen="true">
             <div class="px-4 py-1">Popover content</div>
             <div class="@GetLocation()" style="left:0;top:0">
-                <span class="icon">@GetIcon()</span>
+                <tf-icon>@GetIcon()</tf-icon>
             </div>
         </Popover>
     </div>
@@ -107,19 +105,17 @@
 </div>
 
 <p>
-    You can specify a particular element to which the popover should be anchored
-    with the <code>AnchorId</code> property. The anchoring element must have the
-    same offset parent as the popover (nearest positioned ancestor element in
-    the containment hierarchy). When an anchor is specified, the
-    <code>AnchorOrigin</code> refers to the anchoring element. When it is
-    unspecified, <code>AnchorOrigin</code> refers to the containing positioned
-    parent.
+    You can specify a particular element to which the popover should be anchored with the
+    <code>AnchorId</code> property. The anchoring element must have the same offset parent as the
+    popover (nearest positioned ancestor element in the containment hierarchy). When an anchor is
+    specified, the <code>AnchorOrigin</code> refers to the anchoring element. When it is
+    unspecified, <code>AnchorOrigin</code> refers to the containing positioned parent.
 </p>
 
 <p>
-    You can set the <code>MatchWidth</code> property to <code>true</code> to
-    force the popover to have the same width as its anchoring element (whether a
-    named element, or its positioned parent).
+    You can set the <code>MatchWidth</code> property to <code>true</code> to force the popover to
+    have the same width as its anchoring element (whether a named element, or its positioned
+    parent).
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -139,7 +135,7 @@
     <Popover AnchorId=""popover-anchor-demo"" MatchWidth=""true"" AnchorOrigin=""Origin.Bottom_Center"" PopoverOrigin=""Origin.Top_Center"" IsOpen=""true"">
         <div class=""p-2"">I am anchored to an element.</div>
     </Popover>
-</div>", true)
+</div>")
     </ChildContent>
 </Collapse>
 
@@ -194,14 +190,12 @@
             Nested content
         </div>
     </Popover>
-</Popover>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private bool</span> _isOpen<span class="pre-operator">;</span>
-    <span class="pre-element">private void</span> <span class="pre-method">Toggle</span><span class="pre-operator">() =></span> _isOpen <span class="pre-operator">= !</span>_isOpen<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+</Popover>
+
+@code {
+    private bool _isOpen;
+    private void Toggle() => _isOpen = !_isOpen;
+}")
     </ChildContent>
 </Collapse>
 

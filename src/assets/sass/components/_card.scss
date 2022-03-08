@@ -1,6 +1,7 @@
 ﻿.card {
+    --card-color-bg: var(--tavenem-color-bg-alt);
     align-self: stretch;
-    background-color: var(--tavenem-color-bg-alt);
+    background-color: var(--card-color-bg);
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-1);
     color: var(--tavenem-color-text);
@@ -54,7 +55,7 @@
                 .btn,
                 .btn-text,
                 .btn-icon,
-                .btn-close {
+                tf-close {
                     flex: 0 0 auto;
 
                     &:first-child {
@@ -161,132 +162,111 @@
         padding-bottom: 0;
     }
 
-    &.filled {
-        background-color: var(--tavenem-color-bg-alt);
-        color: var(--tavenem-color-text);
+    &.bg-alt {
+        --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg));
+        background-color: var(--card-color-bg);
     }
 
-    &.bg-alt {
-        background-color: var(--tavenem-color-bg);
+    &.filled {
+        --card-color-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-alt));
+        background-color: var(--card-color-bg);
+        color: var(--tavenem-theme-color, var(--tavenem-color-text));
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            background-color: var(--tavenem-color-#{$theme}-hover);
-
-            &.bg-alt {
-                background-color: var(--tavenem-color-#{$theme}-hover-dark);
-            }
-
-            &.filled {
-                background-color: var(--tavenem-color-#{$theme}-hover);
-                color: var(--tavenem-color-#{$theme});
-            }
+            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+            --card-color-bg: var(--tavenem-theme-color-hover);
         }
     }
 
     .card {
-        background-color: var(--tavenem-color-bg);
+        --card-color-bg: var(--tavenem-color-bg);
 
         &.bg-alt {
-            background-color: var(--tavenem-color-bg-alt);
+            --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+        }
+
+        &.filled {
+            --card-color-bg: var(--tavenem-theme-color-hover-dark, var(--tavenem-color-bg));
         }
 
         @each $theme in $theme-colors {
             &.#{$theme} {
-                background-color: var(--tavenem-color-#{$theme}-hover-dark);
-
-                &.bg-alt {
-                    background-color: var(--tavenem-color-#{$theme}-hover);
-                }
-
-                &.filled {
-                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                }
+                --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+                --card-color-bg: var(--tavenem-theme-color-hover-dark);
             }
         }
 
         .card {
-            background-color: var(--tavenem-color-bg-alt);
+            --card-color-bg: var(--tavenem-color-bg-alt);
 
             &.bg-alt {
-                background-color: var(--tavenem-color-bg);
+                --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg));
+            }
+
+            &.filled {
+                --card-color-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-alt));
             }
 
             @each $theme in $theme-colors {
                 &.#{$theme} {
-                    background-color: var(--tavenem-color-#{$theme}-hover);
-
-                    &.bg-alt {
-                        background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                    }
-
-                    &.filled {
-                        background-color: var(--tavenem-color-#{$theme}-hover);
-                    }
+                    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+                    --card-color-bg: var(--tavenem-theme-color-hover);
                 }
             }
 
             .card {
-                background-color: var(--tavenem-color-bg);
+                --card-color-bg: var(--tavenem-color-bg);
 
                 &.bg-alt {
-                    background-color: var(--tavenem-color-bg-alt);
+                    --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+                }
+
+                &.filled {
+                    --card-color-bg: var(--tavenem-theme-color-hover-dark, var(--tavenem-color-bg));
                 }
 
                 @each $theme in $theme-colors {
                     &.#{$theme} {
-                        background-color: var(--tavenem-color-#{$theme}-hover-dark);
-
-                        &.bg-alt {
-                            background-color: var(--tavenem-color-#{$theme}-hover);
-                        }
-
-                        &.filled {
-                            background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                        }
+                        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+                        --card-color-bg: var(--tavenem-theme-color-hover-dark);
                     }
                 }
 
                 .card {
-                    background-color: var(--tavenem-color-bg-alt);
+                    --card-color-bg: var(--tavenem-color-bg-alt);
 
                     &.bg-alt {
-                        background-color: var(--tavenem-color-bg);
+                        --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg));
+                    }
+
+                    &.filled {
+                        --card-color-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-alt));
                     }
 
                     @each $theme in $theme-colors {
                         &.#{$theme} {
-                            background-color: var(--tavenem-color-#{$theme}-hover);
-
-                            &.bg-alt {
-                                background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                            }
-
-                            &.filled {
-                                background-color: var(--tavenem-color-#{$theme}-hover);
-                            }
+                            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+                            --card-color-bg: var(--tavenem-theme-color-hover);
                         }
                     }
 
                     .card {
-                        background-color: var(--tavenem-color-bg);
+                        --card-color-bg: var(--tavenem-color-bg);
 
                         &.bg-alt {
-                            background-color: var(--tavenem-color-bg-alt);
+                            --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+                        }
+
+                        &.filled {
+                            --card-color-bg: var(--tavenem-theme-color-hover-dark, var(--tavenem-color-bg));
                         }
 
                         @each $theme in $theme-colors {
                             &.#{$theme} {
-                                background-color: var(--tavenem-color-#{$theme}-hover-dark);
-
-                                &.bg-alt {
-                                    background-color: var(--tavenem-color-#{$theme}-hover);
-                                }
-
-                                &.filled {
-                                    background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                                }
+                                --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+                                --card-color-bg: var(--tavenem-theme-color-hover-dark);
                             }
                         }
                     }
@@ -309,12 +289,6 @@
         border-radius: 0;
         box-shadow: none;
         margin: 0;
-    }
-
-    @each $theme in $theme-colors {
-        &.#{$theme} {
-            background-color: transparent;
-        }
     }
 
     &.cols-1 {
@@ -363,12 +337,6 @@
             border-radius: 0;
             box-shadow: none;
             margin: 0;
-        }
-
-        @each $theme in $theme-colors {
-            &.#{$theme} {
-                background-color: transparent;
-            }
         }
     }
 

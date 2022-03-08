@@ -1,0 +1,26 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@if (_chunks is null
+    || string.IsNullOrWhiteSpace(Text)
+    || string.IsNullOrWhiteSpace(HighlightedText))
+{
+    @Text
+}
+else
+{
+    <span style="display:inline-flex;align-items:baseline;white-space:pre-wrap">
+        @foreach (var chunk in _chunks)
+        {
+            if (chunk.IsMatch)
+            {
+                <mark @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">@chunk.Text</mark>
+            }
+            else
+            {
+                <span>@chunk.Text</span>
+            }
+        }
+    </span>
+}

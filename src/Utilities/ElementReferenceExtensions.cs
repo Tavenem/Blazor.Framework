@@ -68,6 +68,9 @@ internal static class ElementReferenceExtensions
         => await elementReference.InvokeAsync<BoundingClientRect>("getClientRectFromParent")
         ?? BoundingClientRect.Empty;
 
+    public static async ValueTask<string?> GetTextContentAsync(this ElementReference elementReference)
+        => await elementReference.InvokeAsync<string?>("getTextContent");
+
     public static ValueTask<bool> HasFixedAncestorsAsync(this ElementReference elementReference)
         => elementReference.InvokeAsync<bool>("elementHasFixedAncestors");
 

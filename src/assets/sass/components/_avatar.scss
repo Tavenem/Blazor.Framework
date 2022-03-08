@@ -1,8 +1,8 @@
 ﻿.avatar {
     align-items: center;
-    background-color: var(--tavenem-color-dark);
+    background-color: var(--tavenem-avatar-color-bg, var(--tavenem-color-dark));
     border-radius: 50%;
-    color: var(--tavenem-color-dark-text);
+    color: var(--tavenem-avatar-color, var(--tavenem-color-dark-text));
     display: inline-flex;
     flex-shrink: 0;
     font-size: 1.25em;
@@ -37,37 +37,22 @@
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            background-color: var(--tavenem-color-#{$theme});
-            color: var(--tavenem-color-#{$theme}-text);
-
-            &.bg-alt {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.darken {
-                background-color: var(--tavenem-color-#{$theme}-darken);
-                color: var(--tavenem-color-#{$theme}-text);
-            }
-
-            &.lighten {
-                background-color: var(--tavenem-color-#{$theme}-lighten);
-                color: var(--tavenem-color-#{$theme}-text);
-            }
-
-            &.outlined {
-                background-color: transparent;
-                color: var(--tavenem-color-#{$theme});
-            }
+            --tavenem-avatar-color: var(--tavenem-theme-color-text);
+            --tavenem-avatar-color-bg: var(--tavenem-theme-color);
+            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
         }
     }
 }
 
 .avatar-group {
+    --tavenem-avatar-color: var(--tavenem-color-dark-text);
+    --tavenem-avatar-color-bg: var(--tavenem-color-dark);
+    --tavenem-avatar-color-border: var(--tavenem-color-bg);
     display: flex;
     counter-reset: avatar-count;
 
     .avatar {
-        border: 2px solid var(--tavenem-color-bg);
+        border: 2px solid var(--tavenem-avatar-color-border);
         height: calc(2.5em + 2px);
         margin-inline-start: -.75em;
         width: calc(2.5em + 2px);
@@ -93,76 +78,26 @@
 
     &.filled {
         background-color: transparent;
-
-        .avatar {
-            background-color: var(--tavenem-color-dark);
-            color: var(--tavenem-color-dark-text);
-        }
     }
 
     &.outlined {
+        --tavenem-avatar-color-border: var(--tavenem-color-border);
         border: none;
-
-        .avatar {
-            background-color: var(--tavenem-color-dark) !important;
-            border: 2px solid var(--tavenem-color-border);
-        }
     }
 
     &.bg-alt {
+        --tavenem-avatar-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
         background-color: transparent;
-
-        .avatar {
-            background-color: var(--tavenem-color-bg-alt);
-        }
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            color: var(--tavenem-color-#{$theme}-text);
-
-            .avatar {
-                background-color: var(--tavenem-color-#{$theme});
-                color: inherit;
-            }
-
-            &.bg-alt {
-                background-color: transparent;
-
-                .avatar {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                }
-            }
-
-            &.filled {
-                background-color: transparent;
-
-                .avatar {
-                    background-color: var(--tavenem-color-#{$theme});
-                }
-            }
-
-            &.outlined {
-                .avatar {
-                    border-color: var(--tavenem-color-#{$theme});
-                }
-            }
-
-            &.darken {
-                .avatar {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                }
-            }
-
-            &.lighten {
-                .avatar {
-                    background-color: var(--tavenem-color-#{$theme}-lighten);
-                }
-            }
+            --tavenem-avatar-color: var(--tavenem-theme-color-text);
+            --tavenem-avatar-color-bg: var(--tavenem-theme-color);
         }
 
-        .border-#{$theme} .avatar {
-            border-color: var(--tavenem-color-#{$theme}) !important;
+        &.border-#{$theme} .avatar {
+            --tavenem-avatar-color-border: var(--tavenem-color-border);
         }
     }
 }

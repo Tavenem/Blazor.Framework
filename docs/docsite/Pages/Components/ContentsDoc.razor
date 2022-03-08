@@ -12,18 +12,10 @@
 <Heading Level="HeadingLevel.H2">Basics</Heading>
 
 <p>
-    Use the <code>Contents</code> component to create a table of contents for
-    the current page. The list is built automatically by examining the current
-    page for <a href="./components/heading">Heading</a> components. It will be
-    re-built on any page navigation, but not if the page is changed dynamically.
-</p>
-
-<p>
-    The list of headings is refreshed on page navigation, but does not respond
-    to dynamic changes of the current page's contents. If one of your pages
-    might have headings which change dynamically, you can call the
-    <code>RefreshHeadingsAsync</code> method on a <code>Contents</code>
-    component to force it to refresh its list of headings.
+    Use the <code>Contents</code> component to create a table of contents for the current page. The
+    list is built automatically by examining the current page for <a
+    href="./components/heading">Heading</a> components. The list is rebuilt on page navigation, and
+    responds to dynamic adding and removing of <code>Heading</code> components.
 </p>
 
 <p>

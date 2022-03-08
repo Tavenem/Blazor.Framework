@@ -7,9 +7,12 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Contents : IDisposable
 {
-    private readonly List<HeadingData> _headings = new();
-
     private bool _disposedValue;
+
+    /// <summary>
+    /// The currenly active heading.
+    /// </summary>
+    public Heading? ActiveHeading { get; private set; }
 
     /// <summary>
     /// <para>
@@ -23,11 +26,6 @@ public partial class Contents : IDisposable
     [Parameter] public Breakpoint Breakpoint { get; set; }
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; } = ThemeColor.Primary;
@@ -39,8 +37,7 @@ public partial class Contents : IDisposable
     /// </summary>
     protected override string CssClass => new CssBuilder("list contents highlight-start darken")
         .Add(ThemeColor.ToCSS())
-        .Add("d-none", _headings.Count == 0)
-        .Add(BreakpointClass, _headings.Count > 0)
+        .Add(BreakpointClass)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
@@ -65,12 +62,17 @@ public partial class Contents : IDisposable
 
     [Inject] private UtilityService JsInterop { get; set; } = default!;
 
-    private int LowestLevel => (int)(_headings
-        .Where(x => x.Level != HeadingLevel.None)
-        .MinBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
+    private int LowestLevel => Framework is null
+        ? 0
+        : (int)(Framework.Headings
+            .Where(x => x.Level != HeadingLevel.None)
+            .MinBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
 
-    private int HighestLevel => (int)(_headings
-        .MaxBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
+    private int HeadingCount => (Framework?.Headings.Count) ?? 0;
+
+    private int HighestLevel => Framework is null
+        ? 0
+        : (int)(Framework.Headings.MaxBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -106,27 +108,9 @@ public partial class Contents : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>
-    /// Refresh the headings listed by the component.
-    /// </summary>
-    public async Task RefreshHeadingsAsync()
-    {
-        _headings.Clear();
-        var headings = await JsInterop.GetHeadings();
-        _headings.AddRange(headings);
-        await InvokeAsync(StateHasChanged);
-    }
+    internal void Refresh() => StateHasChanged();
 
-    internal void SetActiveHeading(string? id)
-    {
-        foreach (var heading in _headings)
-        {
-            heading.IsActive = heading.Id == id;
-        }
-        StateHasChanged();
-    }
-
-    private string? HeadingStyle(HeadingData heading)
+    private string? HeadingStyle(Heading heading)
     {
         if (LowestLevel == 0)
         {

@@ -39,7 +39,7 @@
 <Alert ThemeColor=""ThemeColor.Default"">Default</Alert>
 <Alert ThemeColor=""ThemeColor.Info"">Info</Alert>
 <Alert ThemeColor=""ThemeColor.Success"">Success</Alert>
-<Alert ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+<Alert ThemeColor=""ThemeColor.Warning"">Warning</Alert>")
     </ChildContent>
 </Collapse>
 
@@ -74,7 +74,7 @@
 <Alert Class=""dense"" ThemeColor=""ThemeColor.Default"">Default</Alert>
 <Alert Class=""dense"" ThemeColor=""ThemeColor.Info"">Info</Alert>
 <Alert Class=""dense"" ThemeColor=""ThemeColor.Success"">Success</Alert>
-<Alert Class=""dense"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+<Alert Class=""dense"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>")
     </ChildContent>
 </Collapse>
 
@@ -109,7 +109,7 @@
 <Alert Class=""outlined"" ThemeColor=""ThemeColor.Default"">Default</Alert>
 <Alert Class=""outlined"" ThemeColor=""ThemeColor.Info"">Info</Alert>
 <Alert Class=""outlined"" ThemeColor=""ThemeColor.Success"">Success</Alert>
-<Alert Class=""outlined"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+<Alert Class=""outlined"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>")
     </ChildContent>
 </Collapse>
 
@@ -138,7 +138,7 @@
 <Alert Class=""filled"" ThemeColor=""ThemeColor.Default"">Default</Alert>
 <Alert Class=""filled"" ThemeColor=""ThemeColor.Info"">Info</Alert>
 <Alert Class=""filled"" ThemeColor=""ThemeColor.Success"">Success</Alert>
-<Alert Class=""filled"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>", true)
+<Alert Class=""filled"" ThemeColor=""ThemeColor.Warning"">Warning</Alert>")
     </ChildContent>
 </Collapse>
 
@@ -156,11 +156,11 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Alert AutoIcon="false">Icon after the text <span class="icon">lightbulb</span></Alert>
+            <Alert AutoIcon="false">Icon after the text <tf-icon>lightbulb</tf-icon></Alert>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Alert AutoIcon=""false"">Icon after the text <span class=""icon"">lightbulb</span></Alert>", true)
+        @CodeFormatter.CodeToMarkup(@"<Alert AutoIcon=""false"">Icon after the text <tf-icon>lightbulb</tf-icon></Alert>")
     </ChildContent>
 </Collapse>
 
@@ -182,13 +182,11 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Alert OnClosed=""@(_ => _show = false)"">Dismissable</Alert>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private bool</span> _show <span class="pre-operator">=</span> <span class="pre-element">true</span><span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<Alert OnClosed=""@(_ => _show = false)"">Dismissable</Alert>
+
+@code {
+    private bool _show = true;
+}")
     </ChildContent>
 </Collapse>
 
@@ -205,7 +203,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Alert AutoClose=""true"">Dismissable</Alert>", true)
+        @CodeFormatter.CodeToMarkup(@"<Alert AutoClose=""true"">Dismissable</Alert>")
     </ChildContent>
 </Collapse>
 
@@ -223,13 +221,11 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Alert ThemeColor=""_theme"" OnClick=""@(_ => _theme = ThemeColor.Primary)"">Click me</Alert>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private</span> <span class="pre-enum">ThemeColor</span> _theme <span class="pre-operator">=</span> <span class="pre-enum">ThemeColor</span><span class="pre-operator">.</span>None<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<Alert ThemeColor=""_theme"" OnClick=""@(_ => _theme = ThemeColor.Primary)"">Click me</Alert>
+
+@code {
+    private ThemeColor _theme = ThemeColor.None;
+}")
     </ChildContent>
 </Collapse>
 

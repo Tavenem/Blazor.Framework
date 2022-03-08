@@ -40,11 +40,6 @@ public partial class AppBar
     }
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// The docking side of the drawer this appbar should toggle.
     /// </summary>
     [Parameter] public Side ControlsDrawerSide { get; set; }
@@ -88,8 +83,8 @@ public partial class AppBar
     /// </summary>
     protected string DrawerToggleClassName => Breakpoint switch
     {
-        Breakpoint.None => "icon me-2",
-        _ => $"icon me-2 drawer-toggle-{Breakpoint.ToCSS()}",
+        Breakpoint.None => "me-2",
+        _ => $"me-2 drawer-toggle-{Breakpoint.ToCSS()}",
     };
 
     /// <summary>

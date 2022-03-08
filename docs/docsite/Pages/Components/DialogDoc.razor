@@ -32,14 +32,12 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowMessageBox"">Open</button>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-operator">[</span><span class="pre-class">Inject</span><span class="pre-operator">]</span> <span class="pre-element">private</span> <span class="pre-class">DialogService</span> DialogService <span class="pre-operator">{</span> <span class="pre-element">get</span><span class="pre-operator">;</span> <span class="pre-element">set</span><span class="pre-operator">;</span> <span class="pre-operator">}</span> <span class="pre-operator">=</span> <span class="pre-element">default</span><span class="pre-operator">!;</span>
-    <span class="pre-element">private void</span> <span class="pre-method>ShowMessageBox</span><span class="pre-operator">() =></span> DialogService<span class="pre-operator">.</span><span class="pre-method">ShowMessageBox</span><span class="pre-operator">(</span><span class="pre-class">MessageBoxOptions</span><span class="pre-operator">.</span><span class="pre-method">Ok</span><span class="pre-operator">(</span><span class="pre-string">"Example dialog"</span><span class="pre-operator">))</span><span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowMessageBox"">Open</button>
+
+@code {
+    [Inject] private DialogService DialogService { get; set; } = default!;
+    private void ShowMessageBox() => DialogService.ShowMessageBox(MessageBoxOptions.Ok(""Example dialog""));
+}")
     </ChildContent>
 </Collapse>
 
@@ -107,17 +105,14 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-operator">[</span><span class="pre-class">Inject</span><span class="pre-operator">]</span> <span class="pre-element">private</span> <span class="pre-class">DialogService</span> DialogService <span class="pre-operator">{</span> <span class="pre-element">get</span><span class="pre-operator">;</span> <span class="pre-element">set</span><span class="pre-operator">;</span> <span class="pre-operator">}</span> <span class="pre-operator">=</span> <span class="pre-element">default</span><span class="pre-operator">!;</span>
-    <span class="pre-element">private void</span> <span class="pre-method>ShowDialog</span><span class="pre-operator">() =></span> DialogService<span class="pre-operator">.</span><span class="pre-method">Show</span><span class="pre-operator">&lt;</span><span class="pre-class">ExampleDialog</span><span class="pre-operator">></span><span class="pre-operator">(</span><span class="pre-string">"Example"</span><span class="pre-operator">)</span><span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>
 
+@code {
+    [Inject] private DialogService DialogService { get; set; } = default!;
+    private void ShowDialog() => DialogService.Show<ExampleDialog>(""Example"");
+}")
         <p class="mt-3 mb-1">
-            And in ExampleDialog.razor:
+            And in <code>ExampleDialog.razor</code>:
         </p>
         @CodeFormatter.CodeToMarkup(@"<Dialog>
     <ChildContent>
@@ -127,13 +122,11 @@
         <button class=""btn btn-text primary"" @onclick=""@(_ => Dialog?.Close(DialogResult.DefaultOk))"">OK</button>
         <button class=""btn btn-text"" @onclick=""@(_ => Dialog?.Cancel())"">Cancel</button>
     </Footer>
-</Dialog>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-operator">[</span><span class="pre-class">CascadingParameter</span><span class="pre-operator">]</span> <span class="pre-element">private</span> <span class="pre-class">DialogInstance</span><span class="pre-operator">?</span> Dialog <span class="pre-operator">{</span> <span class="pre-element">get</span><span class="pre-operator">;</span> <span class="pre-element">set</span><span class="pre-operator">;</span> <span class="pre-operator">}</span>
-<span class="pre-directive">}</span>
-        </pre>
+</Dialog>
+
+@code {
+    [CascadingParameter] private DialogInstance? Dialog { get; set; }
+}")
     </ChildContent>
 </Collapse>
 
@@ -233,13 +226,11 @@
 	<FooterContent>
 		<button class=""btn btn-text"" @onclick=""@(_ => _isVisible = false)"">Close</button>
 	</FooterContent>
-</Dialog>", true)
-        <br>
-        <pre>
-<span class="pre-directive">&#64;code {</span>
-    <span class="pre-element">private bool</span> _isVisible<span class="pre-operator">;</span>
-<span class="pre-directive">}</span>
-        </pre>
+</Dialog>
+
+@code {
+    private bool _isVisible;
+}")
     </ChildContent>
 </Collapse>
 

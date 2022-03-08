@@ -1,0 +1,42 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@attribute [CascadingTypeParameter(nameof(TListItem))]
+@typeparam TListItem
+
+@inherits DropTarget<TListItem>
+
+<div @attributes="AdditionalAttributes"
+     id="@Id"
+     role="list"
+     class="@CssClass"
+     style="@CssStyle">
+    @ChildContent
+    @if (Items is not null)
+    {
+        <CascadingValue Value="this" IsFixed="true">
+        <CascadingValue Value="SelectedItems">
+            @if (Template is null)
+            {
+                foreach (var item in Items)
+                {
+                    <ListItem TListItem="TListItem" Item="item" />
+                }
+            }
+            else
+            {
+                foreach (var item in Items)
+                {
+                    <ListItem TListItem="TListItem" Item="item">
+                        @Template(item)
+                    </ListItem>
+                }
+            }
+            @if (HasValidDrop && NoDropTargetChildren)
+            {
+                <div class="@DropPlaceholderClass"></div>
+            }
+        </CascadingValue>
+        </CascadingValue>
+    }
+    @FollowingContent
+</div>

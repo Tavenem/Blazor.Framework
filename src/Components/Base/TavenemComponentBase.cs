@@ -14,6 +14,11 @@ public abstract class TavenemComponentBase : ComponentBase
     public Dictionary<string, object> AdditionalAttributes { get; set; } = new Dictionary<string, object>();
 
     /// <summary>
+    /// The child content of this component.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
     /// Custom CSS class(es) for the component.
     /// </summary>
     [Parameter] public string? Class { get; set; }

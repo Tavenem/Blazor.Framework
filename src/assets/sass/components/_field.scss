@@ -59,6 +59,8 @@
     }
 
     &.filled {
+        background-color: transparent;
+
         .input {
             background-color: rgba(0, 0, 0, 0.09);
             border-top-left-radius: var(--tavenem-border-radius);
@@ -277,7 +279,7 @@
             color: var(--tavenem-color-text-disabled) !important;
             cursor: default;
 
-            .icon {
+            tf-icon {
                 color: var(--tavenem-color-text-disabled) !important;
                 pointer-events: none;
             }
@@ -316,22 +318,10 @@
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --field-active-color: var(--tavenem-color-#{$theme});
-            --field-bottom-border-hover-color: var(--tavenem-color-#{$theme}-hover-bright);
-            --field-label-color: var(--tavenem-color-#{$theme}-darken);
-            --field-label-active-color: var(--tavenem-color-#{$theme});
-
-            &.darken {
-                --field-active-color: var(--tavenem-color-#{$theme}-darken);
-                --field-label-color: var(--tavenem-color-#{$theme}-darken-2);
-                --field-label-active-color: var(--tavenem-color-#{$theme}-darken);
-            }
-
-            &.lighten {
-                --field-active-color: var(--tavenem-color-#{$theme}-lighten);
-                --field-label-color: var(--tavenem-color-#{$theme});
-                --field-label-active-color: var(--tavenem-color-#{$theme}-lighten);
-            }
+            --field-active-color: var(--tavenem-theme-color);
+            --field-bottom-border-hover-color: var(--tavenem-theme-color-hover-bright);
+            --field-label-color: var(--tavenem-theme-color-darken);
+            --field-label-active-color: var(--tavenem-theme-color);
 
             &.filled {
                 background-color: transparent;
@@ -344,7 +334,7 @@
                     }
 
                     &:disabled {
-                        background-color: var(--tavenem-color-#{$theme}-hover-bright);
+                        background-color: var(--tavenem-theme-color-hover-bright);
                     }
                 }
             }
@@ -406,7 +396,7 @@
         color: var(--tavenem-color-text-disabled) !important;
         cursor: default;
 
-        .icon {
+        tf-icon {
             color: var(--tavenem-color-text-disabled) !important;
             pointer-events: none;
         }
@@ -538,15 +528,7 @@
 
     @each $theme in $theme-colors {
         &.#{$theme} {
-            --number-field-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover);
-
-            &.darken {
-                --number-field-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-dark);
-            }
-
-            &.lighten {
-                --number-field-inherited-hover-bg: var(--tavenem-color-#{$theme}-hover-light);
-            }
+            --number-field-inherited-hover-bg: var(--tavenem-theme-color-hover);
         }
     }
 }

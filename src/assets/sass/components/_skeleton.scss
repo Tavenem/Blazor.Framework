@@ -12,60 +12,29 @@
     }
 }
 
-@keyframes tf-skeleton-wave {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    60% {
-        transform: translateX(100%);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
-}
-
-.mud-skeleton {
+.skeleton {
+    animation: tf-skeleton-pulse 1.5s ease-in-out 0.5s infinite;
     background-color: rgba(0, 0, 0, 0.11);
-    display: block;
-    height: 1.2rem;
+    flex-grow: 1;
 
     &.text {
         border-radius: var(--tavenem-border-radius);
-        height: auto;
+        display: inline-block;
+        flex-grow: 0;
         margin-bottom: 0;
         margin-top: 0;
         transform: scale(1, 0.60);
         transform-origin: 0 60%;
+        width: 100%;
 
         &:empty:before {
             content: "\00a0";
         }
     }
 
-    &.circle {
-        border-radius: 50%;
-    }
-
-    &.pulse {
-        animation: tf-skeleton-pulse 1.5s ease-in-out 0.5s infinite;
-    }
-
-    &.wave {
-        overflow: hidden;
-        position: relative;
-
-        &:after {
-            animation: tf-skeleton-wave 1.6s linear 0.5s infinite;
-            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
-            bottom: 0;
-            content: "";
-            left: 0;
-            right: 0;
-            position: absolute;
-            top: 0;
-            transform: translateX(-100%);
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            background-color: var(--tavenem-theme-color-hover);
         }
     }
 }

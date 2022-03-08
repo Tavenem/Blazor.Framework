@@ -1,4 +1,6 @@
 ﻿.alert {
+    --tavenem-theme-color: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-2);
     align-items: center;
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
@@ -37,49 +39,48 @@
         cursor: pointer;
     }
 
-    .icon {
+    tf-icon {
         display: flex;
         font-size: 1.375em;
         margin: .25em 0;
         opacity: 0.9;
     }
 
-    > .btn-close {
+    > tf-close {
         margin: .25rem 0;
         order: 9999;
     }
 
+    &.darken {
+        --tavenem-theme-color: var(--tavenem-theme-color-darken-2);
+        --tavenem-theme-color-lighten: var(--tavenem-theme-color-darken);
+    }
+
+    &.lighten {
+        --tavenem-theme-color: var(--tavenem-theme-color-base);
+        --tavenem-theme-color-darken: var(--tavenem-theme-color-darken);
+        --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-base);
+    }
+
+    &.filled {
+        --tavenem-theme-color: var(--tavenem-theme-color-base);
+        --tavenem-theme-color-darken: var(--tavenem-theme-color-darken);
+
+        &.darken {
+            --tavenem-theme-color: var(--tavenem-theme-color-darken);
+            --tavenem-theme-color-lighten: var(--tavenem-theme-color-base);
+        }
+
+        &.lighten {
+            --tavenem-theme-color: var(--tavenem-theme-color-lighten-base);
+            --tavenem-theme-color-darken: var(--tavenem-theme-color-base);
+            --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-2);
+        }
+    }
+
     @each $theme in $theme-colors {
         &.#{$theme} {
-            background-color: var(--tavenem-color-#{$theme}-hover);
-            color: var(--tavenem-color-#{$theme}-darken);
-
-            &.darken {
-                background-color: var(--tavenem-color-#{$theme}-hover-dark);
-                color: var(--tavenem-color-#{$theme}-darken-2);
-            }
-
-            &.lighten {
-                background-color: var(--tavenem-color-#{$theme}-hover-light);
-                color: var(--tavenem-color-#{$theme});
-            }
-
-            &.filled {
-                background-color: var(--tavenem-color-#{$theme});
-                color: var(--tavenem-color-#{$theme}-text);
-
-                &.bg-alt {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                }
-
-                &.darken {
-                    background-color: var(--tavenem-color-#{$theme}-darken);
-                }
-
-                &.lighten {
-                    background-color: var(--tavenem-color-#{$theme}-lighten);
-                }
-            }
+            background-color: var(--tavenem-theme-color-hover);
         }
     }
 }

@@ -357,7 +357,7 @@
             overflow-x: hidden;
         }
 
-        .icon {
+        tf-icon {
             display: inline-block !important;
             font-size: 1.5rem;
             margin: auto !important;
@@ -386,7 +386,7 @@
             overflow-y: auto;
 
             .drawer-control,
-            .btn-close {
+            tf-close {
                 display: none;
             }
 
@@ -447,7 +447,7 @@
                     overflow-x: hidden;
                 }
 
-                .icon {
+                tf-icon {
                     font-size: 1.5rem;
                     margin: auto !important;
                 }

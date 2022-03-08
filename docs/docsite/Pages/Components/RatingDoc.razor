@@ -1,0 +1,181 @@
+﻿@page "/components/rating"
+
+<PageTitle>Rating - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Rating</Heading>
+
+<p>
+    The rating component is a custom variation of a radio input which uses icons to indicate a
+    value scale.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    Use the <code>Rating</code> component to create a rating input. The <code>Value</code> property
+    indicates the current rating, and can be bound. The <code>MaxValue</code> sets the number of
+    input icons, and defaults to 5.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column center-items">
+            <Rating Value="3" />
+            <Rating Value="6" MaxValue="10" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" />
+<Rating Value=""6"" MaxValue=""10"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can set the <code>Disabled</code> property to <code>true</code> to disable the component, or
+    the <code>ReadOnly</code> property to <code>true</code> to prevent setting the value, but
+    without the dimmed color of a disabled control.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column center-items">
+            <Rating Value="4" Disabled="true" />
+            <Rating Value="2" ReadOnly="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Rating Value=""4"" Disabled=""true"" />
+<Rating Value=""2"" ReadOnly=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Hover binding</Heading>
+
+<p>
+    The <code>HoveredValue</code> property indicates the rating control the user is currently
+    hovering over, and can be bound.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column center-items">
+            <Rating @bind-HoveredValue="_hoverRating" />
+            <span>@GetRating(_hoverRating)</span>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Rating @bind-HoveredValue=""_hoverRating"" />
+<span>@GetRating(_hoverRating)</span>
+
+@code {
+    private byte? _hoverRating;
+    private string GetRating(byte? value) => value switch
+    {
+        1 => ""Terrible"",
+        2 => ""Bad"",
+        3 => ""Ok"",
+        4 => ""Good"",
+        5 => ""Terrific!"",
+        _ => ""Please select a rating"",
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    You can set a color with the <code>ThemeColor</code> property.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column center-items">
+            <Rating Value="3" ThemeColor="ThemeColor.Primary" />
+            <Rating Value="3" ThemeColor="ThemeColor.Secondary" />
+            <Rating Value="3" ThemeColor="ThemeColor.Tertiary" />
+            <Rating Value="3" ThemeColor="ThemeColor.Dark" />
+            <Rating Value="3" ThemeColor="ThemeColor.Default" />
+            <Rating Value="3" ThemeColor="ThemeColor.Info" />
+            <Rating Value="3" ThemeColor="ThemeColor.Success" />
+            <Rating Value="3" ThemeColor="ThemeColor.Warning" />
+            <Rating Value="3" ThemeColor="ThemeColor.Danger" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Primary"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Secondary"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Tertiary"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Dark"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Default"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Info"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Success"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Warning"" />
+<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can use the <code>small</code> or <code>large</code> classes to adjust the size of the controls.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column center-items">
+            <Rating Value="3" Class="small" />
+            <Rating Value="3" />
+            <Rating Value="3" Class="large" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" Class=""small"" />
+<Rating Value=""3"" />
+<Rating Value=""3"" Class=""large"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>ActiveIcon</code> and <code>InactiveIcon</code> properties can be used to control the
+    icons used for full and empty rating controls, respectively.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row flex-column center-items">
+            <Rating Value="3" ThemeColor="ThemeColor.Danger" ActiveIcon="favorite" InactiveIcon="favorite_border" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" ActiveIcon=""favorite"" InactiveIcon=""favorite_border"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can use the <code>RatingItemClass</code> and <code>RatingItemStyle</code> properties to
+    customize the CSS style of the rating controls.
+</p>
+
+<Heading Level="HeadingLevel.H2">Keyboard navigation</Heading>
+
+<p>
+    When focused, and not disabled or readonly:
+    <ul>
+        <li><kbd>&larr;</kbd> decreases the value by 1</li>
+        <li><kbd>Shift</kbd> + <kbd>&larr;</kbd> sets the value to zero</li>
+        <li><kbd>&rarr;</kbd> increases the value by 1</li>
+        <li><kbd>Shift</kbd> + <kbd>&rarr;</kbd> sets the value to the maximum</li>
+    </ul>
+</p>
+
+@code {
+    private byte? _hoverRating;
+    private string GetRating(byte? value) => value switch
+    {
+        1 => "Terrible",
+        2 => "Bad",
+        3 => "Ok",
+        4 => "Good",
+        5 => "Terrific!",
+        _ => "Please select a rating",
+    };
+}

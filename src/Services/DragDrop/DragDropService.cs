@@ -10,7 +10,6 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public class DragDropService : IAsyncDisposable
 {
-    private readonly Dictionary<Guid, object?> _internalTransfers = new();
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
 
     /// <summary>
@@ -22,24 +21,6 @@ public class DragDropService : IAsyncDisposable
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-dragdrop.js")
         .AsTask());
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous dispose operation.
-    /// </returns>
-    public async ValueTask DisposeAsync()
-    {
-        if (_moduleTask.IsValueCreated)
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.DisposeAsync().ConfigureAwait(false);
-        }
-
-        GC.SuppressFinalize(this);
-    }
 
     /// <summary>
     /// Gets a <see cref="DragStartData"/> object for the given item.
@@ -69,6 +50,12 @@ public class DragDropService : IAsyncDisposable
     /// type "text/plain" with the value of the object's <see cref="object.ToString"/> method will
     /// also be set.
     /// </para>
+    /// <para>
+    /// If the item implements <see cref="IDraggable"/>, its <see cref="IDraggable.ToDraggedJson"/>
+    /// and <see cref="IDraggable.ToDraggedString"/> methods will be used to get the JSON and string
+    /// representations, rather than the default JSON serialization and <see
+    /// cref="object.ToString"/> methods.
+    /// </para>
     /// </param>
     /// <param name="effectAllowed">
     /// The drag effects allowed for the drag-drop operation.
@@ -76,7 +63,7 @@ public class DragDropService : IAsyncDisposable
     /// <returns>
     /// A configured <see cref="DragStartData"/> instance.
     /// </returns>
-    public DragStartData GetDragStartData<TData>(TData item, string? type = null, DragEffect effectAllowed = DragEffect.All)
+    public static DragStartData GetDragStartData<TData>(TData item, string? type = null, DragEffect effectAllowed = DragEffect.All)
     {
         var data = new List<KeyValuePair<string, object>>();
         if (item is null)
@@ -88,64 +75,16 @@ public class DragDropService : IAsyncDisposable
             };
         }
 
-        if (string.IsNullOrEmpty(type))
-        {
-            if (typeof(TData) == typeof(string))
-            {
-                var str = item as string;
-                if (Uri.IsWellFormedUriString(str, UriKind.Absolute))
-                {
-                    data.Add(new("text/uri-list", str));
-                }
-                if (!string.IsNullOrEmpty(str))
-                {
-                    data.Add(new("text/plain", str));
-                }
-            }
-            else
-            {
-                var id = SetInternalTransferData(item);
-                data.Add(new($"tavenem/drop-data-{id}", id));
-
-                string? json = null;
-                if (item is IDraggable draggable)
-                {
-                    json = draggable.ToDraggedJson();
-                }
-                if (string.IsNullOrEmpty(json))
-                {
-                    try
-                    {
-                        json = JsonSerializer.Serialize(item);
-                    }
-                    catch { }
-                }
-                if (!string.IsNullOrEmpty(json))
-                {
-                    data.Add(new("application/json", json));
-                }
-
-                string? str = null;
-                if (item is IDraggable draggable1)
-                {
-                    str = draggable1.ToDraggedString();
-                }
-                if (string.IsNullOrEmpty(str))
-                {
-                    str = item.ToString();
-                }
-                if (!string.IsNullOrEmpty(str))
-                {
-                    data.Add(new("text/plain", str));
-                }
-            }
-        }
-        else if (typeof(TData) == typeof(string))
+        if (typeof(TData) == typeof(string)
+            || typeof(TData) == typeof(Uri))
         {
             var str = item.ToString();
             if (!string.IsNullOrEmpty(str))
             {
-                data.Add(new(type, str));
+                if (!string.IsNullOrEmpty(type))
+                {
+                    data.Add(new(type, str));
+                }
                 if (type != "text/uri-list"
                     && Uri.IsWellFormedUriString(str, UriKind.Absolute))
                 {
@@ -157,33 +96,24 @@ public class DragDropService : IAsyncDisposable
                 }
             }
         }
-        else if (typeof(TData) == typeof(Uri))
-        {
-            var uri = item.ToString();
-            if (!string.IsNullOrEmpty(uri))
-            {
-                data.Add(new(type, uri));
-                if (type != "text/uri-list")
-                {
-                    data.Add(new("text/uri-list", uri));
-                }
-                if (type != "text/plain")
-                {
-                    data.Add(new("text/plain", uri));
-                }
-            }
-        }
         else
         {
-            var id = SetInternalTransferData(item);
-            data.Add(new($"tavenem/drop-data-{id}", id));
+            var draggable = item as IDraggable;
+            var str = draggable?.ToDraggedString()
+                ?? item.ToString();
+
+            if (!string.IsNullOrEmpty(type)
+                && !string.IsNullOrEmpty(str))
+            {
+                data.Add(new(type, str));
+            }
 
             string? json = null;
-            if (item is IDraggable draggable)
+            if (draggable is not null)
             {
                 json = draggable.ToDraggedJson();
             }
-            if (string.IsNullOrEmpty(json))
+            else
             {
                 try
                 {
@@ -191,25 +121,25 @@ public class DragDropService : IAsyncDisposable
                 }
                 catch { }
             }
+
             if (!string.IsNullOrEmpty(json))
             {
-                data.Add(new(type, json));
-                if (type != "application/json")
+                if (string.IsNullOrEmpty(type))
                 {
-                    data.Add(new("application/json", json));
+                    data.Add(new($"application/json-{typeof(TData).Name}", json));
                 }
+
+                data.Add(new("application/json", json));
             }
 
-            string? str = null;
-            if (item is IDraggable draggable1)
+            if (draggable is not null)
             {
-                str = draggable1.ToDraggedString();
+                if (!string.IsNullOrEmpty(str))
+                {
+                    data.Add(new("text/plain", str));
+                }
             }
-            if (string.IsNullOrEmpty(str))
-            {
-                str = item.ToString();
-            }
-            if (!string.IsNullOrEmpty(str))
+            else if (!string.IsNullOrEmpty(str))
             {
                 data.Add(new("text/plain", str));
             }
@@ -223,7 +153,7 @@ public class DragDropService : IAsyncDisposable
     }
 
     /// <summary>
-    /// Tries to get data of the given type from a <see cref="DropEventArgs"/> instance.
+    /// Tries to get data of the given type.
     /// </summary>
     /// <typeparam name="TData">The type of data to retrieve.</typeparam>
     /// <param name="e">A <see cref="DropEventArgs"/> instance.</param>
@@ -260,30 +190,19 @@ public class DragDropService : IAsyncDisposable
     /// The requested data, if found; otherwise, the default value for the <typeparamref
     /// name="TData"/> type.
     /// </returns>
-    public TData? TryGetData<TData>(DropEventArgs e, string? type = null)
+    public static TData? TryGetData<TData>(IEnumerable<KeyValuePair<string, string>> e, string? type = null)
     {
-        if (e.Data is null)
+        if (string.IsNullOrEmpty(type)
+            && TryGetDataOfType<TData>(e, out var jsonData))
         {
-            return default;
-        }
-
-        if ((string.IsNullOrEmpty(type)
-            || type == "tavenem/drop-data")
-            && TryGetInternalDataOfType<TData>(e, out var internalData))
-        {
-            return internalData;
-        }
-
-        if (type == "tavenem/drop-data")
-        {
-            return default;
+            return jsonData;
         }
 
         if (typeof(TData) == typeof(string))
         {
             if (!string.IsNullOrEmpty(type))
             {
-                foreach (var (dataType, item) in e.Data)
+                foreach (var (dataType, item) in e)
                 {
                     if (dataType == type
                         && item is TData strItem)
@@ -294,7 +213,7 @@ public class DragDropService : IAsyncDisposable
                 return default;
             }
 
-            foreach (var (dataType, item) in e.Data)
+            foreach (var (dataType, item) in e)
             {
                 if (dataType != "tavenem/drop-data"
                     && item is TData strItem)
@@ -304,12 +223,31 @@ public class DragDropService : IAsyncDisposable
             }
         }
 
-        if (TryGetDataOfType<TData>(e, out var data, type))
+        if (!string.IsNullOrEmpty(type)
+            && TryGetDataOfType<TData>(e, out var data, type))
         {
             return data;
         }
 
         return default;
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources asynchronously.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous dispose operation.
+    /// </returns>
+    public async ValueTask DisposeAsync()
+    {
+        if (_moduleTask.IsValueCreated)
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.DisposeAsync().ConfigureAwait(false);
+        }
+
+        GC.SuppressFinalize(this);
     }
 
     internal async ValueTask CancelDragListener(string? elementId)
@@ -324,60 +262,35 @@ public class DragDropService : IAsyncDisposable
         await module.InvokeVoidAsync("cancelDropListener", elementId);
     }
 
-    internal object? GetInternalTransferData(string? id)
-    {
-        if (Guid.TryParse(id, out var guid)
-            && _internalTransfers.TryGetValue(guid, out var data))
-        {
-            return data;
-        }
-        return null;
-    }
-
-    internal string SetInternalTransferData<T>(T data)
-    {
-        var guid = Guid.NewGuid();
-        _internalTransfers[guid] = data;
-        return guid.ToString();
-    }
-
-    internal async ValueTask StartDragListener(DotNetObjectReference<DragDropListener> dotNetRef, string? elementId, string? dragClass)
+    internal async ValueTask StartDragListener(DotNetObjectReference<DragDropListener> dotNetRef, string? elementId)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("listenForDrag", dotNetRef, elementId, dragClass);
+        await module.InvokeVoidAsync("listenForDrag", dotNetRef, elementId);
     }
 
     internal async ValueTask StartDropListener(
         DotNetObjectReference<DragDropListener> dotNetRef,
         string? elementId,
-        DragEffect? effect,
-        string? dropClass,
-        string? noDropClass)
+        DragEffect? effect)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
             "listenForDrop",
             dotNetRef,
             elementId,
-            effect?.ToJsString(),
-            dropClass,
-            noDropClass);
+            effect?.ToJsString());
     }
 
     private static bool TryGetDataOfType<TData>(
-        DropEventArgs e,
+        IEnumerable<KeyValuePair<string, string>> e,
         [NotNullWhen(true)] out TData? data,
-        string? type)
+        string? type = null)
     {
         type ??= "application/json";
 
         data = default;
-        if (e.Data is null)
-        {
-            return false;
-        }
 
-        foreach (var (dataType, item) in e.Data)
+        foreach (var (dataType, item) in e)
         {
             if (dataType == type)
             {
@@ -391,31 +304,6 @@ public class DragDropService : IAsyncDisposable
                 }
                 if (data is not null)
                 {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private bool TryGetInternalDataOfType<TData>(DropEventArgs e, [NotNullWhen(true)] out TData? data)
-    {
-        data = default;
-        if (e.Data is null)
-        {
-            return false;
-        }
-
-        foreach (var (dataType, item) in e.Data)
-        {
-            if (dataType == "tavenem/drop-data")
-            {
-                var internalItem = GetInternalTransferData(item);
-                if (internalItem is TData dataItem)
-                {
-                    data = dataItem;
-                    _internalTransfers.Remove(Guid.Parse(item));
                     return true;
                 }
             }

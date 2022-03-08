@@ -1,18 +1,35 @@
 ﻿.rating {
-    --rating-color: #ffb400;
+    --button-inherited-color: #ffb400;
+    --button-inherited-hover-bg: transparent;
+    --button-inherited-hover-color: var(--button-inherited-color);
+    --button-inherited-hover-shadow: none;
     color: var(--rating-color);
     display: inline-flex;
 
     &:focus-visible {
         outline: none;
 
-        &:not(:disabled, .disabled) {
+        &:not(.disabled) {
             background-color: var(--tavenem-color-action-hover-bg);
         }
     }
 
+    input {
+        border: 0;
+        clip: rect(0,0,0,0);
+        cursor: inherit;
+        margin: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 0;
+    }
+
     .btn-icon {
-        color: var(--rating-color) !important;
+        min-width: calc(var(--button-font-size));
+        padding-left: 0;
+        padding-right: 0;
         transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
         &:hover, :focus-within {
@@ -20,9 +37,21 @@
         }
     }
 
-    &:disabled, &.disabled {
-        --rating-color: var(--tavenem-color-text-disabled);
+    &.disabled {
+        --button-inherited-color: var(--tavenem-color-text-disabled);
 
+        .btn-icon {
+            color: var(--tavenem-color-text-disabled) !important;
+            cursor: default;
+            pointer-events: none;
+
+            &:hover, :focus-within {
+                transform: none;
+            }
+        }
+    }
+
+    &.readonly {
         .btn-icon {
             cursor: default;
             pointer-events: none;
@@ -33,14 +62,19 @@
         }
     }
 
-    &.readonly, &:read-only {
-        .btn-icon {
-            cursor: default;
-            pointer-events: none;
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
 
-            &:hover, :focus-within {
-                transform: none;
-            }
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --button-inherited-color: var(--tavenem-theme-color);
         }
     }
 }
