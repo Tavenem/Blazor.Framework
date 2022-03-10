@@ -16,15 +16,10 @@ public partial class Draggable<TDragItem> : IDisposable
     /// Sets the allowed drag effects for drag operations with this item.
     /// </para>
     /// <para>
-    /// Defaults to <see cref="DragEffect.All"/>.
+    /// Defaults to <see cref="DragEffect.CopyMove"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.All;
-
-    /// <summary>
-    /// A CSS class added to this item when it is being dragged.
-    /// </summary>
-    [Parameter] public virtual string? DraggingClass { get; set; }
+    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.CopyMove;
 
     /// <summary>
     /// <para>
@@ -60,11 +55,6 @@ public partial class Draggable<TDragItem> : IDisposable
     /// </para>
     /// </summary>
     [Parameter] public virtual bool IsDraggable { get; set; } = true;
-
-    /// <summary>
-    /// Indicates whether a drag operation is currently taking place with this draggable item.
-    /// </summary>
-    public bool IsDragging { get; private set; }
 
     /// <summary>
     /// <para>
@@ -107,16 +97,6 @@ public partial class Draggable<TDragItem> : IDisposable
     /// </para>
     /// </summary>
     [Parameter] public EventCallback<DragEffect> OnDropped { get; set; }
-
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values.
-    /// </summary>
-    protected override string CssClass => new CssBuilder()
-        .Add(DraggingClass, IsDragging)
-        .Add(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
-        .ToString();
 
     [Inject] private DragDropListener DragDropListener { get; set; } = default!;
 
@@ -210,12 +190,6 @@ public partial class Draggable<TDragItem> : IDisposable
         else
         {
             data = DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed);
-        }
-
-        if (data.Data?.Any() == true
-            && data.EffectAllowed != DragEffect.None)
-        {
-            IsDragging = true;
         }
 
         return data;

@@ -97,12 +97,6 @@ public partial class ListItemCollapse<TListItem>
             data = DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed);
         }
 
-        if (data.Data?.Any() == true
-            && data.EffectAllowed != DragEffect.None)
-        {
-            ListItem?.DragStarted();
-        }
-
         return data;
     }
 
@@ -157,15 +151,6 @@ public partial class ListItemCollapse<TListItem>
             return;
         }
 
-        ListItem.DragEnded();
-
-        if (ListItem.OnDropped.HasDelegate)
-        {
-            await ListItem.OnDropped.InvokeAsync(e);
-        }
-        else if (e == DragEffect.Move)
-        {
-            await ListItem.RemoveFromListAsync();
-        }
+        await ListItem.ItemDroppedAsync(e);
     }
 }

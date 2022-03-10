@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Globalization;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -8,6 +10,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Tabs<TTabItem> : IAsyncDisposable
 {
+    private readonly HashSet<string> _dropTargetElements = new();
+    private readonly List<DynamicTabInfo<TTabItem>> _dynamicItems = new();
     private readonly List<TabPanel<TTabItem>> _panels = new();
 
     private double _allTabsSize;
@@ -16,7 +20,6 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     private bool _forwardButtonDisabled;
     private bool _isRendered;
     private double _position;
-    private ElementReference[] _references = Array.Empty<ElementReference>();
     private double _scrollPosition;
     private double _size;
     private ElementReference _tabsContent;
@@ -55,14 +58,134 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     [Parameter] public EventCallback<int?> ActivePanelIndexChanged { get; set; }
 
     /// <summary>
+    /// The icon to use for the "new tab" button.
+    /// </summary>
+    [Parameter] public string AddIcon { get; set; } = "add";
+
+    /// <summary>
     /// The icon to use for scrolling back through the tabs.
     /// </summary>
     [Parameter] public string BackIcon { get; set; } = "chevron_left";
 
     /// <summary>
+    /// Can be set to <see langword="true"/> to indicate that non-staic tabs (i.e. those generated
+    /// from <see cref="Items"/>) should have close buttons, even if <see cref="OnClose"/> has not
+    /// been configured.
+    /// </summary>
+    [Parameter] public bool CanCloseTabs { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// A CSS class added to the tab list when a valid item is dragged over it.
+    /// </para>
+    /// <para>
+    /// Defaults to "can-drop" but can be overridden with <see langword="null"/> to disable.
+    /// </para>
+    /// </summary>
+    [Parameter] public virtual string? CanDropClass { get; set; } = "can-drop";
+
+    /// <summary>
+    /// <para>
+    /// Sets the allowed drag effects for drag operations with tabs.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="DragEffect.CopyMove"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public DragEffect DragEffectAllowed { get; set; }
+
+    private DragEffect _dropEffect = DragEffect.All;
+    /// <summary>
+    /// <para>
+    /// The drop effect allowed on this drop target.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="DragEffect.All"/>.
+    /// </para>
+    /// <para>
+    /// Only <see cref="DragEffect.Copy"/>, <see cref="DragEffect.Link"/>, <see
+    /// cref="DragEffect.Move"/>, and <see cref="DragEffect.All"/> are allowed. Setting any other
+    /// value has no effect.
+    /// </para>
+    /// </summary>
+    [Parameter]
+    public virtual DragEffect DropEffect
+    {
+        get => _dropEffect;
+        set
+        {
+            if (value is DragEffect.Copy
+                or DragEffect.Link
+                or DragEffect.Move
+                or DragEffect.All)
+            {
+                _dropEffect = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// <para>
+    /// A CSS class applied to the placeholder tab displayed at the position in the list where a
+    /// drop will occur.
+    /// </para>
+    /// <para>
+    /// Defaults to "drop-placeholder".
+    /// </para>
+    /// </summary>
+    [Parameter] public string? DropPlaceholderClass { get; set; } = "drop-placeholder";
+
+    /// <summary>
+    /// <para>
+    /// Whether the tabs are draggable, and items of type <typeparamref name="TTabItem"/> can be
+    /// dropped onto the tab control to generate a new tab.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool EnableDragDrop { get; set; }
+
+    /// <summary>
     /// The icon to use for scrolling forward through the tabs.
     /// </summary>
     [Parameter] public string ForwardIcon { get; set; } = "chevron_right";
+
+    /// <summary>
+    /// <para>
+    /// Invoked when a drag operation enters the tab list, to get the effect which will be
+    /// performed.
+    /// </para>
+    /// <para>
+    /// The parameter is a list of the data types present in the drop.
+    /// </para>
+    /// <para>
+    /// Return <see cref="DragEffect.None"/> to prevent dropping the item.
+    /// </para>
+    /// <para>
+    /// Return <see cref="DragEffect.All"/> to allow any action selected by the user.
+    /// </para>
+    /// <para>
+    /// Return <see cref="DragEffect.Copy"/>, <see cref="DragEffect.Link"/>, or <see
+    /// cref="DragEffect.Move"/> to specify the type of action which will be performed.
+    /// </para>
+    /// <para>
+    /// Other values of <see cref="DragEffect"/> are treated as <see cref="DragEffect.All"/>.
+    /// </para>
+    /// <para>
+    /// If not set, no effect restriction occurs.
+    /// </para>
+    /// <para>
+    /// Note that not all drag operations permit all effects. If the effect returned is not among
+    /// the allowed effects, the agent will automatically choose a fallback effect.
+    /// </para>
+    /// </summary>
+    public GetDropEffectDelegate<TTabItem>? GetDropEffect { get; set; }
+
+    /// <summary>
+    /// Indicates whether this item currently has a valid dragged item over it.
+    /// </summary>
+    public bool HasValidDrop => DragDropListener.DropValid == true;
 
     /// <summary>
     /// <para>
@@ -83,7 +206,22 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// cref="TabTitle"/> properties should be provided.
     /// </para>
     /// </summary>
-    [Parameter] public List<TTabItem>? Items { get; set; }
+    [Parameter] public List<TTabItem?>? Items { get; set; }
+
+    /// <summary>
+    /// Raised when the items list changes.
+    /// </summary>
+    [Parameter] public EventCallback<List<TTabItem?>?> ItemsChanged { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// A CSS class added to the tab list when an invalid item is dragged over it.
+    /// </para>
+    /// <para>
+    /// Defaults to "no-drop" but can be overridden with <see langword="null"/> to disable.
+    /// </para>
+    /// </summary>
+    [Parameter] public virtual string? NoDropClass { get; set; } = "no-drop";
 
     /// <summary>
     /// <para>
@@ -124,6 +262,23 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     [Parameter] public EventCallback<TTabItem?> OnClose { get; set; }
 
     /// <summary>
+    /// Invoked when an item is dropped on the tab list.
+    /// </summary>
+    [Parameter] public EventCallback<DropEventArgs<TTabItem>> OnDrop { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Invoked when a drop operation completes with a tab as the dropped item (including by
+    /// cancellation).
+    /// </para>
+    /// <para>
+    /// The argument parameter indicates which drag effect was ultimately selected for the drag-drop
+    /// operation.
+    /// </para>
+    /// </summary>
+    [Parameter] public EventCallback<DragEffect> OnDropped { get; set; }
+
+    /// <summary>
     /// The total number of panels, including static panels and templated panels included via <see
     /// cref="Items"/>.
     /// </summary>
@@ -132,7 +287,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// <summary>
     /// A template used to generate panels for <see cref="Items"/>.
     /// </summary>
-    [Parameter] public RenderFragment<TTabItem>? PanelTemplate { get; set; }
+    [Parameter] public RenderFragment<TTabItem?>? PanelTemplate { get; set; }
 
     /// <summary>
     /// Displayed after the last tab (and after the "add tab" button, if adding is supported).
@@ -147,7 +302,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// <summary>
     /// A template used to generate tabs for <see cref="Items"/>.
     /// </summary>
-    [Parameter] public RenderFragment<TTabItem>? TabTemplate { get; set; }
+    [Parameter] public RenderFragment<TTabItem?>? TabTemplate { get; set; }
 
     /// <summary>
     /// <para>
@@ -157,7 +312,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// Ignored if <see cref="TabTemplate"/> is on-<see langword="null"/>.
     /// </para>
     /// </summary>
-    [Parameter] public Func<TTabItem, MarkupString>? TabTitle { get; set; }
+    [Parameter] public Func<TTabItem?, MarkupString>? TabTitle { get; set; }
 
     private Side _tabSide = Side.Top;
     /// <summary>
@@ -197,6 +352,10 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
+    [Inject] private protected DragDropListener DragDropListener { get; set; } = default!;
+
+    private protected bool NoDropTargetChildren => _dropTargetElements.Count == 0;
+
     [Inject] private IResizeObserver ResizeObserver { get; set; } = default!;
 
     private string ScrollStyle => new CssBuilder()
@@ -215,21 +374,53 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     private string SliderStyle => new CssBuilder()
         .AddStyle(
             TabSide is Side.Top or Side.Bottom ? "width" : "height",
-            $"{_size.ToString("F2").Trim('0')}px")
+            $"{_size.ToString("F2").Trim('0').TrimEnd('.')}px")
         .AddStyle(
             TabSide is Side.Top or Side.Bottom ? "left" : "top",
-            $"{_position.ToString("F2").Trim('0')}px",
+            $"{_position.ToString("F2").Trim('0').TrimEnd('.')}px",
             TabSide is Side.Top or Side.Bottom)
         .AddStyle(
             "transition",
             $"{(TabSide is Side.Top or Side.Bottom ? "left" : "top")} .3s cubic-bezier(.64,.09,.08,1)")
         .ToString();
 
+    private string ToolbarCssClass => new CssBuilder("tabs-toolbar")
+        .Add(CanDropClass, DragDropListener.DropValid)
+        .Add(NoDropClass, DragDropListener.DropValid == false)
+        .ToString();
+
+    private string ToolbarId { get; } = Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// </summary>
+    protected override void OnInitialized()
+        => DragDropListener.DropValidChanged += OnDropValidChanged;
+
     /// <summary>
     /// Method invoked when the component has received parameters from its parent in
     /// the render tree, and the incoming values have been assigned to properties.
     /// </summary>
     protected override void OnParametersSet() => Rerender();
+
+    /// <summary>
+    /// Method invoked when the component has received parameters from its parent in the render
+    /// tree, and the incoming values have been assigned to properties.
+    /// </summary>
+    /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ActiveItem is not null
+            && Items?.Contains(ActiveItem) != true)
+        {
+            ActiveItem = default;
+            if (_activePanelIndex > 0)
+            {
+                await ActivatePanelAsync(_activePanelIndex - 1, true);
+            }
+        }
+    }
 
     /// <summary>
     /// Sets parameters supplied by the component's parent in the render tree.
@@ -255,27 +446,76 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </remarks>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var oldItems = Items?.ToList();
+        if (Items is not null
+            && parameters.TryGetValue(nameof(Items), out List<TTabItem>? items))
+        {
+            if (items is null)
+            {
+                for (var i = 0; i < _dynamicItems.Count; i++)
+                {
+                    await ResizeObserver.Unobserve(_dynamicItems[i].ElementReference);
+                }
+                _dynamicItems.Clear();
+            }
+            else
+            {
+                for (var i = 0; i < items.Count && i < _dynamicItems.Count; i++)
+                {
+                    if (_dynamicItems[i].Item is null
+                        && items[i] is null)
+                    {
+                        continue;
+                    }
+                    if (items[i] is not null
+                        && _dynamicItems[i].Item?
+                        .Equals(items[i]) == true)
+                    {
+                        continue;
+                    }
+
+                    await ResizeObserver.Unobserve(_dynamicItems[i].ElementReference);
+                    _dynamicItems[i] = new() { Item = items[i] };
+                }
+
+                for (var i = _dynamicItems.Count; i < items.Count; i++)
+                {
+                    _dynamicItems.Add(new() { Item = items[i] });
+                }
+
+                while (_dynamicItems.Count > items.Count)
+                {
+                    await ResizeObserver.Unobserve(_dynamicItems[items.Count].ElementReference);
+                    _dynamicItems.RemoveAt(items.Count);
+                }
+            }
+        }
 
         await base.SetParametersAsync(parameters);
+    }
 
-        if ((oldItems is null
-            && Items is null)
-            || (oldItems is not null
-            && Items is not null
-            && oldItems.SequenceEqual(Items)))
+    /// <summary>
+    /// Method invoked after each time the component has been rendered.
+    /// </summary>
+    /// <param name="firstRender">
+    /// Set to <c>true</c> if this is the first time <see
+    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
+    /// component instance; otherwise <c>false</c>.
+    /// </param>
+    /// <remarks>
+    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
+    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
+    /// useful for performing interop, or interacting with values received from
+    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
+    /// that initialization work is only performed once.
+    /// </remarks>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
         {
-            return;
+            DragDropListener.ElementId = ToolbarId;
+            DragDropListener.GetEffect = GetDropEffectInternal;
+            DragDropListener.OnDrop += OnDropAsync;
         }
-
-        foreach (var reference in _references)
-        {
-            await ResizeObserver.Unobserve(reference);
-        }
-
-        _references = Items is null || Items.Count == 0
-            ? Array.Empty<ElementReference>()
-            : new ElementReference[Items.Count];
     }
 
     /// <summary>
@@ -296,11 +536,13 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </remarks>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        foreach (var reference in _references)
+        for (var i = 0; i < _dynamicItems.Count; i++)
         {
-            if (!string.IsNullOrEmpty(reference.Id))
+            if (!_dynamicItems[i].Observed
+                && _dynamicItems[i].DragDropComponent is not null)
             {
-                await ResizeObserver.Observe(reference);
+                await ResizeObserver.Observe(_dynamicItems[i].ElementReference);
+                _dynamicItems[i].Observed = true;
             }
         }
 
@@ -382,7 +624,13 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </summary>
     /// <param name="index">The index of the panel to activate.</param>
     public Task ActivatePanelAsync(int index)
-        => ActivatePanelAsync(index, true);
+        => ActivatePanelAsync(index, false);
+
+    internal void AddDropTarget(string id)
+    {
+        _dropTargetElements.Add(id);
+        StateHasChanged();
+    }
 
     internal async Task<int> AddPanelAsync(TabPanel<TTabItem> panel)
     {
@@ -403,6 +651,61 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         return _panels.Count - 1;
     }
 
+    internal void ClearDropTarget(string id)
+    {
+        _dropTargetElements.Remove(id);
+        StateHasChanged();
+    }
+
+    internal void DragEnded(string? id)
+    {
+        if (!string.IsNullOrEmpty(id))
+        {
+            _dropTargetElements.Remove(id);
+        }
+        StateHasChanged();
+    }
+
+    internal DragEffect GetDropEffectShared(string[] types)
+    {
+        if (!EnableDragDrop)
+        {
+            return DragEffect.None;
+        }
+
+        var hasTabItem = types.Contains($"application/json-{typeof(TTabItem).Name}");
+        if (!hasTabItem
+            && types.Any(x => x.StartsWith("application/json-")))
+        {
+            return DragEffect.None;
+        }
+
+        return GetDropEffect?.Invoke(types)
+            ?? (OnDrop.HasDelegate
+            || hasTabItem
+            || typeof(TTabItem) == typeof(string)
+            ? DragEffect.All
+            : DragEffect.None);
+    }
+
+    internal int? IndexOfItem(TTabItem? item) => item is null ? null : Items?.IndexOf(item);
+
+    internal async Task InsertItemAsync(TTabItem item, int? index)
+    {
+        if (index.HasValue)
+        {
+            (Items ??= new()).Insert(index.Value, item);
+            _dynamicItems.Insert(index.Value, new() { Item = item });
+        }
+        else
+        {
+            (Items ??= new()).Add(item);
+            _dynamicItems.Add(new() { Item = item });
+        }
+        await ItemsChanged.InvokeAsync(Items);
+        StateHasChanged();
+    }
+
     internal async Task RemovePanelAsync(TabPanel<TTabItem> panel)
     {
         if (_disposedValue)
@@ -420,12 +723,12 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             if (index == _panels.Count - 1
                 && index > 0)
             {
-                await ActivatePanelAsync(index - 1);
+                await ActivatePanelAsync(index - 1, true);
             }
         }
         else if (_activePanelIndex > index)
         {
-            await ActivatePanelAsync(_activePanelIndex - 1);
+            await ActivatePanelAsync(_activePanelIndex - 1, true);
         }
         _panels.RemoveAt(index);
         await ResizeObserver.Unobserve(panel.PanelReference);
@@ -459,6 +762,8 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             if (disposing)
             {
                 ResizeObserver.OnResized -= OnResized;
+                DragDropListener.DropValidChanged -= OnDropValidChanged;
+                DragDropListener.OnDrop -= OnDropAsync;
                 await ResizeObserver.DisposeAsync();
             }
 
@@ -574,6 +879,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         SetScrollabilityStates();
     }
 
+    private DragEffect GetDropEffectInternal(string[] types)
+        => GetDropEffectShared(types);
+
     private double GetLengthOfPanelItems(int index)
     {
         var total = 0.0;
@@ -582,9 +890,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         {
             total += GetReferenceSize(_panels[i].PanelReference);
         }
-        for (; i < index && i - _panels.Count < _references.Length; i++)
+        for (; i < index && i - _panels.Count < _dynamicItems.Count; i++)
         {
-            total += GetReferenceSize(_references[i - _panels.Count]);
+            total += GetReferenceSize(_dynamicItems[i - _panels.Count].ElementReference);
         }
         return total;
     }
@@ -599,9 +907,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         {
             return GetReferenceSize(_panels[index].PanelReference);
         }
-        else if (index - _panels.Count < _references.Length)
+        else if (index - _panels.Count < _dynamicItems.Count)
         {
-            return GetReferenceSize(_references[index - _panels.Count]);
+            return GetReferenceSize(_dynamicItems[index - _panels.Count].ElementReference);
         }
         else
         {
@@ -618,19 +926,36 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     private string GetTabClass(int index) => new CssBuilder("tab")
         .Add("active", index == ActivePanelIndex)
         .Add("disabled", index < _panels.Count && _panels[index].Disabled)
+        .Add("no-drag", EnableDragDrop && !_panels[index].IsDraggable)
         .ToString();
 
-    private async void OnCloseTabAsync(int index)
+    private async Task OnAddTabAsync()
     {
-        if (index < _panels.Count)
+        if (OnAdd is null)
         {
-            await _panels[index].OnClose.InvokeAsync(_panels[index].Item);
-            await OnClose.InvokeAsync(_panels[index].Item);
+            return;
         }
-        else if (Items is not null
-            && index - _panels.Count < Items.Count)
+
+        var item = OnAdd.Invoke();
+        (Items ??= new()).Add(item);
+        _dynamicItems.Add(new() { Item = item });
+        await ItemsChanged.InvokeAsync(Items);
+    }
+
+    private async Task OnCloseTabAsync(int index, bool suppressClose = false)
+    {
+        if (!suppressClose)
         {
-            await OnClose.InvokeAsync(Items[index - _panels.Count]);
+            if (index < _panels.Count)
+            {
+                await _panels[index].OnClose.InvokeAsync(_panels[index].Item);
+                await OnClose.InvokeAsync(_panels[index].Item);
+            }
+            else if (Items is not null
+                && index - _panels.Count < Items.Count)
+            {
+                await OnClose.InvokeAsync(Items[index - _panels.Count]);
+            }
         }
 
         if (index == _activePanelIndex)
@@ -638,31 +963,171 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             if (index == _panels.Count - 1
                 && index > 0)
             {
-                await ActivatePanelAsync(index - 1);
+                await ActivatePanelAsync(index - 1, true);
             }
         }
         else if (_activePanelIndex > index)
         {
-            await ActivatePanelAsync(_activePanelIndex - 1);
+            await ActivatePanelAsync(_activePanelIndex - 1, true);
         }
 
-        if (index < _panels.Count)
+        if (index >= _panels.Count)
         {
-            await ResizeObserver.Unobserve(_panels[index].PanelReference);
-            _panels.RemoveAt(index);
-        }
-        else
-        {
-            await ResizeObserver.Unobserve(_references[index - _panels.Count]);
+            await ResizeObserver.Unobserve(_dynamicItems[index - _panels.Count].ElementReference);
+            _dynamicItems.RemoveAt(index - _panels.Count);
             Items?.RemoveAt(index - _panels.Count);
-            _references = _references
-                .Take(index - _panels.Count)
-                .Skip(1)
-                .ToArray();
+            await ItemsChanged.InvokeAsync(Items);
+            Rerender();
+            StateHasChanged();
+        }
+    }
+
+    private async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
+    {
+        if (!EnableDragDrop)
+        {
+            return;
         }
 
-        Rerender();
-        StateHasChanged();
+        var item = DragDropService.TryGetData<TTabItem>(e);
+        if (OnDrop.HasDelegate)
+        {
+            await OnDrop.InvokeAsync(new()
+            {
+                Data = e,
+                Item = item,
+            });
+        }
+        else if (item is not null)
+        {
+            (Items ??= new()).Add(item);
+            await ItemsChanged.InvokeAsync(Items);
+            await ActivatePanelAsync(Items.Count - 1 + _panels.Count, true);
+        }
+    }
+
+    private async Task OnDropOnItemAsync(int index, DropEventArgs<TTabItem> e)
+    {
+        if (!EnableDragDrop
+            || index < 0
+            || Items is null
+            || index >= Items.Count
+            || e.Data is null)
+        {
+            return;
+        }
+
+        if (e.Item?.Equals(Items[index]) == true)
+        {
+            return;
+        }
+
+        if (OnDrop.HasDelegate)
+        {
+            await OnDrop.InvokeAsync(e);
+        }
+        else if (e.Item is not null)
+        {
+            await InsertItemAsync(
+                e.Item,
+                index);
+        }
+    }
+
+    private async Task OnDroppedItemAsync(int index, DragEffect e)
+    {
+        if (!EnableDragDrop)
+        {
+            return;
+        }
+
+        DragEnded(_dynamicItems[index].Id);
+
+        if (OnDropped.HasDelegate)
+        {
+            await OnDropped.InvokeAsync(e);
+        }
+        else if (e == DragEffect.Move)
+        {
+            await OnCloseTabAsync(index);
+        }
+    }
+
+    private void OnDropValidChanged(object? sender, EventArgs e) => StateHasChanged();
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+                if (_activePanelIndex == 0)
+                {
+                    if (PanelCount > 0)
+                    {
+                        var index = PanelCount - 1;
+                        while (index > _activePanelIndex
+                            && index < _panels.Count
+                            && _panels[index].Disabled)
+                        {
+                            index--;
+                        }
+                        if (index != _activePanelIndex)
+                        {
+                            await ActivatePanelAsync(index, true);
+                        }
+                    }
+                }
+                else
+                {
+                    var index = _activePanelIndex - 1;
+                    while (index >= 0
+                        && index < _panels.Count
+                        && _panels[index].Disabled)
+                    {
+                        index--;
+                    }
+                    if (index >= 0)
+                    {
+                        await ActivatePanelAsync(index, true);
+                    }
+                }
+                break;
+            case "ArrowRight":
+                if (_activePanelIndex == PanelCount - 1)
+                {
+                    var index = 0;
+                    while (index < _activePanelIndex
+                        && index < _panels.Count
+                        && _panels[index].Disabled)
+                    {
+                        index++;
+                    }
+                    if (index < _activePanelIndex)
+                    {
+                        await ActivatePanelAsync(index, true);
+                    }
+                }
+                else if (PanelCount > 0)
+                {
+                    var index = _activePanelIndex + 1;
+                    while (index < _panels.Count
+                        && _panels[index].Disabled)
+                    {
+                        index++;
+                    }
+                    if (index < PanelCount)
+                    {
+                        await ActivatePanelAsync(index, true);
+                    }
+                }
+                break;
+            case "Delete":
+                if (PanelCount > 0)
+                {
+                    await OnCloseTabAsync(_activePanelIndex);
+                }
+                break;
+        }
     }
 
     private async void OnResized(IDictionary<ElementReference, BoundingClientRect> changes)

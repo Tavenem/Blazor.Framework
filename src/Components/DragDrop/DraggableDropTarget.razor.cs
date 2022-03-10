@@ -15,15 +15,10 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// Sets the allowed drag effects for drag operations with this item.
     /// </para>
     /// <para>
-    /// Defaults to <see cref="DragEffect.All"/>.
+    /// Defaults to <see cref="DragEffect.CopyMove"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.All;
-
-    /// <summary>
-    /// A CSS class added to this item when it is being dragged.
-    /// </summary>
-    [Parameter] public virtual string? DraggingClass { get; set; }
+    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.CopyMove;
 
     /// <summary>
     /// <para>
@@ -48,11 +43,6 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// </para>
     /// </summary>
     [Parameter] public virtual bool IsDraggable { get; set; } = true;
-
-    /// <summary>
-    /// Indicates whether a drag operation is currently taking place with this draggable item.
-    /// </summary>
-    public bool IsDragging { get; private protected set; }
 
     /// <summary>
     /// <para>
@@ -101,7 +91,6 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// values.
     /// </summary>
     protected override string CssClass => new CssBuilder("border-transparent")
-        .Add(DraggingClass, IsDragging)
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, !DragDropListener.DropValid)
         .Add(Class)
@@ -170,12 +159,6 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
         else
         {
             data = DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed);
-        }
-
-        if (data.Data?.Any() == true
-            && data.EffectAllowed != DragEffect.None)
-        {
-            IsDragging = true;
         }
 
         return data;

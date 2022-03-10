@@ -57,6 +57,12 @@ public partial class SnackbarElement : IDisposable
         _ => "info",
     };
 
+    private string Role => (Snackbar?.Properties.Options.ThemeColor ?? ThemeColor.None) switch
+    {
+        ThemeColor.Danger or ThemeColor.Warning => "alert",
+        _ => "status",
+    };
+
     private bool ShowClose => Snackbar?.Properties.Options.ShowCloseButton != false;
 
     [Inject] SnackbarService SnackbarService { get; set; } = default!;

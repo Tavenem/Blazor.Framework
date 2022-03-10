@@ -81,26 +81,6 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     /// </summary>
     public bool IsSelected => ParentSelectedItems?.Contains(Item) == true;
 
-    private EventCallback<DragEffect> _onDropped;
-    /// <summary>
-    /// <para>
-    /// Invoked when a drop operation completes with this element as the dropped item (including by
-    /// cancellation).
-    /// </para>
-    /// <para>
-    /// The argument parameter indicates which drag effect was ultimately selected for the drag-drop
-    /// operation.
-    /// </para>
-    /// </summary>
-    [Parameter]
-    public override EventCallback<DragEffect> OnDropped
-    {
-        get => _onDropped.HasDelegate
-            ? _onDropped
-            : ElementList?.OnDropped ?? _onDropped;
-        set => _onDropped = value;
-    }
-
     /// <summary>
     /// Whether to show a separator after this item.
     /// </summary>
@@ -218,14 +198,6 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         }
     }
 
-    internal void DragEnded() => ElementList?.DragEnded(Id);
-
-    internal void DragStarted()
-    {
-        IsDragging = true;
-        ElementList?.DragStarted();
-    }
-
     internal async Task DropItemAsync(TListItem item)
     {
         if (ElementList is not null)
@@ -236,44 +208,24 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         }
     }
 
-    internal async Task RemoveFromListAsync()
+    internal async Task ItemDroppedAsync(DragEffect e)
     {
-        if (Item is not null
+        ElementList?.DragEnded(Id);
+
+        if (OnDropped.HasDelegate)
+        {
+            await OnDropped.InvokeAsync(e);
+        }
+        else if (ElementList?.OnDropped.HasDelegate == true)
+        {
+            await ElementList.OnDropped.InvokeAsync(e);
+        }
+        else if (e == DragEffect.Move
+            && Item is not null
             && ElementList is not null)
         {
             await ElementList.RemoveItemAsync(Item);
         }
-    }
-
-    private protected override DragStartData GetDragDataInner()
-    {
-        if (!IsDraggable || DragEffectAllowed == DragEffect.None)
-        {
-            return DragStartData.None;
-        }
-
-        DragStartData data;
-        if (GetDragData is not null)
-        {
-            data = GetDragData.Invoke();
-        }
-        else if (Item is null)
-        {
-            return DragStartData.None;
-        }
-        else
-        {
-            data = DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed);
-        }
-
-        if (data.Data?.Any() == true
-            && data.EffectAllowed != DragEffect.None)
-        {
-            IsDragging = true;
-            ElementList?.DragStarted();
-        }
-
-        return data;
     }
 
     private protected override DragEffect GetDropEffectInternal(string[] types)
@@ -323,16 +275,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
             return;
         }
 
-        ElementList?.DragEnded(Id);
-
-        if (OnDropped.HasDelegate)
-        {
-            await OnDropped.InvokeAsync(e);
-        }
-        else if (e == DragEffect.Move)
-        {
-            await RemoveFromListAsync();
-        }
+        await ItemDroppedAsync(e);
     }
 
     private protected override void OnDropValidChanged(object? sender, EventArgs e)

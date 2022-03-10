@@ -9,8 +9,6 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class ElementList<TListItem>
 {
-    private protected bool _dragInProgress;
-
     private readonly HashSet<string> _dropTargetElements = new();
 
     /// <summary>
@@ -43,12 +41,6 @@ public partial class ElementList<TListItem>
         get => ParentList?.DragEffectAllowed ?? _dragEffectAllowed;
         set => _dragEffectAllowed = value;
     }
-
-    /// <summary>
-    /// An additional class that is applied to this list when an item is
-    /// being dragged from here.
-    /// </summary>
-    [Parameter] public string? DraggingClass { get; set; }
 
     /// <summary>
     /// <para>
@@ -374,7 +366,6 @@ public partial class ElementList<TListItem>
     /// </summary>
     protected override string CssClass => new CssBuilder("list")
         .Add("can-drag", IsDragStart)
-        .Add(DraggingClass ?? ParentList?.DraggingClass, _dragInProgress)
         .Add(CanDropClass, HasValidDrop)
         .Add("self-drop", HasValidDrop && NoDropTargetChildren)
         .Add(NoDropClass, DragDropListener.DropValid == false)
@@ -396,8 +387,6 @@ public partial class ElementList<TListItem>
     /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
     protected override async Task OnParametersSetAsync()
     {
-        base.OnParametersSet();
-
         if (Items is null)
         {
             if (_selectedItems.Count > 0)
@@ -434,25 +423,12 @@ public partial class ElementList<TListItem>
 
     internal void DragEnded(string? id)
     {
-        _dragInProgress = false;
         if (!string.IsNullOrEmpty(id))
         {
             _dropTargetElements.Remove(id);
         }
         ParentList?.DragEnded(id);
         StateHasChanged();
-    }
-
-    internal void DragStarted()
-    {
-        if (ParentList is not null)
-        {
-            ParentList.DragStarted();
-        }
-        else
-        {
-            _dragInProgress = true;
-        }
     }
 
     internal DragEffect GetDropEffectShared(string[] types)

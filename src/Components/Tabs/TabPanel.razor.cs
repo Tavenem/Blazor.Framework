@@ -12,7 +12,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class TabPanel<TTabItem> : IAsyncDisposable
 {
-    private bool _disposedValue;
+    private bool _asyncDisposedValue;
 
     /// <summary>
     /// <para>
@@ -25,10 +25,59 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
 
+    private DragEffect _dragEffectAllowed = DragEffect.CopyMove;
     /// <summary>
-    /// The item to which this tab is bound.
+    /// <para>
+    /// Sets the allowed drag effects for drag operations with this item.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="DragEffect.CopyMove"/>, but defers to the parent.
+    /// </para>
     /// </summary>
-    [Parameter] public TTabItem? Item { get; set; }
+    [Parameter]
+    public override DragEffect DragEffectAllowed
+    {
+        get => Parent?.DragEffectAllowed ?? _dragEffectAllowed;
+        set => _dragEffectAllowed = value;
+    }
+
+    private bool? _isDraggable;
+    /// <summary>
+    /// <para>
+    /// Whether this tab is currently draggable.
+    /// </para>
+    /// <para>
+    /// Default is to defer to the parent's <see cref="Tabs{TTabItem}.EnableDragDrop"/> property.
+    /// </para>
+    /// <para>
+    /// Ignored if the parent's <see cref="Tabs{TTabItem}.EnableDragDrop"/> property is <see
+    /// langword="false"/>.
+    /// </para>
+    /// </summary>
+    [Parameter]
+    public override bool IsDraggable
+    {
+        get => _isDraggable != false
+            && Item is not null
+            && Parent?.EnableDragDrop == true;
+        set => _isDraggable = value;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Whether this tab is accepting drops.
+    /// </para>
+    /// <para>
+    /// Always has the same value as the parent's <see cref="Tabs{TTabItem}.EnableDragDrop"/>
+    /// property. Setting it has no effect.
+    /// </para>
+    /// </summary>
+    [Parameter]
+    public override bool IsDropTarget
+    {
+        get => Parent?.EnableDragDrop == true;
+        set { }
+    }
 
     /// <summary>
     /// <para>
@@ -56,15 +105,30 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// The HTML to display in the tab.
     /// </para>
     /// <para>
+    /// Ignored if <see cref="TabContent"/> or <see cref="TitleMarkup"/> is non-<see langword="null"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public string? Title { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// HTML to display in the tab.
+    /// </para>
+    /// <para>
     /// Ignored if <see cref="TabContent"/> is non-<see langword="null"/>.
     /// </para>
     /// </summary>
-    [Parameter] public MarkupString? Title { get; set; }
+    [Parameter] public MarkupString? TitleMarkup { get; set; }
 
     /// <summary>
     /// Content to display inside the tab.
     /// </summary>
     [Parameter] public RenderFragment? TabContent { get; set; }
+
+    /// <summary>
+    /// The id of the panel element.
+    /// </summary>
+    public string PanelId => $"panel-{Id}";
 
     /// <summary>
     /// The parent <see cref="Tabs{TTabItem}"/> component.
@@ -137,7 +201,7 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// </returns>
     protected virtual async ValueTask DisposeAsync(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_asyncDisposedValue)
         {
             if (disposing && Parent is not null)
             {
@@ -145,7 +209,84 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
                 Index = -1;
             }
 
-            _disposedValue = true;
+            _asyncDisposedValue = true;
         }
+    }
+
+    private protected override DragEffect GetDropEffectInternal(string[] types)
+        => Parent?.GetDropEffectShared(types)
+        ?? DragEffect.None;
+
+    private protected override async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
+    {
+        if (!IsDropTarget
+            || Parent is null)
+        {
+            return;
+        }
+
+        var item = DragDropService.TryGetData<TTabItem>(e);
+        if (item?.Equals(Item) == true)
+        {
+            return;
+        }
+
+        if (OnDrop.HasDelegate)
+        {
+            await OnDrop.InvokeAsync(new()
+            {
+                Data = e,
+                Item = item,
+            });
+        }
+        else if (item is not null
+            && Parent is not null)
+        {
+            await Parent.InsertItemAsync(
+                item,
+                0);
+        }
+    }
+
+    private protected override async void OnDroppedAsync(object? sender, DragEffect e)
+    {
+        if (!IsDraggable)
+        {
+            return;
+        }
+
+        Parent?.DragEnded(Id);
+
+        if (OnDropped.HasDelegate)
+        {
+            await OnDropped.InvokeAsync(e);
+        }
+        else if (Parent?.OnDropped.HasDelegate == true)
+        {
+            await Parent.OnDropped.InvokeAsync(e);
+        }
+        else if (e == DragEffect.Move
+            && Item is not null
+            && Parent is not null)
+        {
+            await Parent.RemovePanelAsync(this);
+        }
+    }
+
+    private protected override void OnDropValidChanged(object? sender, EventArgs e)
+    {
+        if (Parent is not null
+            && !string.IsNullOrEmpty(Id))
+        {
+            if (DragDropListener.DropValid == true)
+            {
+                Parent.AddDropTarget(Id);
+            }
+            else
+            {
+                Parent.ClearDropTarget(Id);
+            }
+        }
+        StateHasChanged();
     }
 }

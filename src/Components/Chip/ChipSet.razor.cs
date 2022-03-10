@@ -31,7 +31,6 @@ public partial class ChipSet<TChip>
     /// </summary>
     protected override string CssClass => new CssBuilder("chipset")
         .Add("can-drag", IsDragStart)
-        .Add(DraggingClass, _dragInProgress)
         .Add(CanDropClass, HasValidDrop)
         .Add(NoDropClass, DragDropListener.DropValid == false)
         .Add(Class)

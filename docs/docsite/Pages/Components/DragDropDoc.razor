@@ -82,7 +82,7 @@
     The <code>Draggable</code> component has an <code>IsDraggable</code> property which determines
     whether it can currently be dragged. It is <code>true</code> by default. The
     <code>DragEffectAllowed</code> property controls what drag effects (copy, link and/or move) are
-    permitted when dragging the item. All drag operations are allowed by default.
+    permitted when dragging the item. Copy and move operations are allowed by default.
 </p>
 
 <p>
@@ -110,11 +110,6 @@
     attribute of the main, draggable element in your HTML markup to the <code>Id</code> property,
     and set the <code>draggable</code> attribute to the <code>IsDraggable</code> property (or simply
     to <code>true</code> if your subclass will always be draggable).
-</p>
-
-<p>
-    You can set the <code>DragClass</code> to a CSS class which will be set on the element during a
-    drag operation, and cleared when the drag ends.
 </p>
 
 <p>

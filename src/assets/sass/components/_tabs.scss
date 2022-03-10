@@ -6,26 +6,8 @@
     display: flex;
     flex-direction: column;
 
-    &:not(.bottom, .left, .right) {
-        .tab {
-            border-left: 1px solid var(--tavenem-color-border);
-            border-right: 1px solid var(--tavenem-color-border);
-            border-top: 1px solid var(--tavenem-color-border);
-            border-top-left-radius: inherit;
-            border-top-right-radius: inherit;
-
-            &:not(.active) {
-                border-bottom: 1px solid var(--tavenem-color-border);
-            }
-
-            &.active {
-                border-top: 2px solid var(--tab-active-color);
-            }
-        }
-
-        .tab-slider {
-            bottom: 0;
-        }
+    &:not(.bottom, .left, .right) .tab-slider {
+        bottom: 0;
     }
 
     &:not(.left, .right) .tab-slider {
@@ -38,33 +20,12 @@
     &.bottom {
         flex-direction: column-reverse;
 
-        .tab {
-            border-left: 1px solid var(--tavenem-color-border);
-            border-right: 1px solid var(--tavenem-color-border);
-            border-bottom: 1px solid var(--tavenem-color-border);
-            border-bottom-left-radius: inherit;
-            border-bottom-right-radius: inherit;
-
-            &:not(.active) {
-                border-top: 1px solid var(--tavenem-color-border);
-            }
-
-            &.active {
-                border-bottom: 2px solid var(--tab-active-color);
-            }
-        }
-
         .tab-slider {
             top: 0;
         }
     }
 
     &.left, &.right {
-        .tab {
-            border-bottom: 1px solid var(--tavenem-color-border);
-            border-top: 1px solid var(--tavenem-color-border);
-        }
-
         .tabs-toolbar-inner {
             flex-direction: column;
         }
@@ -97,20 +58,6 @@
     &.left {
         flex-direction: row;
 
-        .tab {
-            border-bottom-left-radius: inherit;
-            border-left: 1px solid var(--tavenem-color-border);
-            border-top-left-radius: inherit;
-
-            &:not(.active) {
-                border-right: 1px solid var(--tavenem-color-border);
-            }
-
-            &.active {
-                border-left: 2px solid var(--tab-active-color);
-            }
-        }
-
         .tab-slider {
             right: 0;
         }
@@ -118,20 +65,6 @@
 
     &.right {
         flex-direction: row-reverse;
-
-        .tab {
-            border-bottom-right-radius: inherit;
-            border-right: 1px solid var(--tavenem-color-border);
-            border-top-right-radius: inherit;
-
-            &:not(.active) {
-                border-left: 1px solid var(--tavenem-color-border);
-            }
-
-            &.active {
-                border-right: 2px solid var(--tab-active-color);
-            }
-        }
 
         .tab-slider {
             left: 0;
@@ -171,7 +104,6 @@
 }
 
 .tabs-toolbar {
-    background-color: var(--tavenem-color-bg-surface);
     border-radius: inherit;
     position: relative;
 }
@@ -196,6 +128,11 @@
     position: inherit;
     transition: .3s cubic-bezier(.25,.8,.5,1);
     width: max-content;
+
+    .drop-placeholder {
+        margin-bottom: 0;
+        width: 10rem;
+    }
 }
 
 .tab {
@@ -203,6 +140,7 @@
     align-items: center;
     display: inline-flex;
     flex-shrink: 0;
+    font-family: var(--tavenem-font-family-title);
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight-semibold);
     justify-content: center;
@@ -215,7 +153,6 @@
     transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     user-select: none;
     white-space: normal;
-    width: 100%;
 
     > *:first-child {
         border-bottom-left-radius: inherit;

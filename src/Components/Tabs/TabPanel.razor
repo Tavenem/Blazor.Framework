@@ -1,10 +1,15 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
-@inherits TavenemComponentBase
+@inherits DraggableDropTarget<TTabItem, TTabItem>
 
 @typeparam TTabItem
 
-@if (!Disabled && Index == (Parent?.ActivePanelIndex ?? -1))
-{
-    @ChildContent
-}
+<div id="@PanelId"
+     role="tabpanel"
+     hidden="@(Disabled || Index != (Parent?.ActivePanelIndex ?? -1))"
+     aria-expanded="@(Disabled || Index != (Parent?.ActivePanelIndex ?? -1) ? "false" : "true")">
+    @if (!Disabled && Index == (Parent?.ActivePanelIndex ?? -1))
+    {
+        @ChildContent
+    }
+</div>

@@ -3,7 +3,7 @@
 @inherits TavenemComponentBase
 
 @StyleFragment
-<div role="alert" class="@CssClass" style="@CssStyle" @onclick="OnClick">
+<div role="@Role" class="@CssClass" style="@CssStyle" @onclick="OnClick">
     @if (Snackbar?.Properties.Options.AutoIcon == true)
     {
         <tf-icon>@Icon</tf-icon>

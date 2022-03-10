@@ -7,7 +7,8 @@
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <CascadingValue Value="this" IsFixed="true">
-        <div class="tabs-toolbar">
+        <div id="@ToolbarId"
+             class="@ToolbarCssClass">
             <div class="tabs-toolbar-inner">
                 @PreTabContent
                 @if (ShowScrollButtons)
@@ -17,50 +18,87 @@
                     </button>
                 }
                 <div @ref="_tabsContent" class="tabs-toolbar-content">
-                    <div class="tabs-toolbar-wrapper">
+                    <div class="tabs-toolbar-wrapper"
+                         role="tablist"
+                         tabindex="0"
+                         @onkeydown="OnKeyDownAsync">
                         @for (var i = 0; i < _panels.Count; i++)
                         {
-                            <div @ref="_panels[i].PanelReference"
-                                 @onclick="@(_ => ActivatePanelAsync(i))"
-                                 class="@GetTabClass(i)">
-                                @if (_panels[i].TabContent is not null)
+                            var index = i;
+                            <div @ref="_panels[index].PanelReference"
+                                 id="@_panels[index].Id"
+                                 @onclick="@(_ => ActivatePanelAsync(index))"
+                                 draggable="@(_panels[index].IsDraggable ? "true" : "false")"
+                                 class="@GetTabClass(index)"
+                                 role="tab"
+                                 aria-controls="@_panels[index].PanelId"
+                                 aria-selected="@(index == _activePanelIndex ? "true" : "false")">
+                                @if (_panels[index].TabContent is not null)
                                 {
-                                    @_panels[i].TabContent
+                                    @_panels[index].TabContent
                                 }
-                                else if (_panels[i].Title.HasValue
-                                    && !string.IsNullOrWhiteSpace(_panels[i].Title!.Value.Value))
+                                else if (_panels[index].TitleMarkup.HasValue
+                                    && !string.IsNullOrWhiteSpace(_panels[index].TitleMarkup!.Value.Value))
                                 {
-                                    @_panels[i].Title!.Value
+                                    @_panels[index].TitleMarkup!.Value
                                 }
-                                @if (_panels[i].OnClose.HasDelegate
+                                else
+                                {
+                                    @_panels[index].Title
+                                }
+                                @if (_panels[index].OnClose.HasDelegate
                                     || OnClose.HasDelegate)
                                 {
-                                    <tf-close @onclick="@(_ => OnCloseTabAsync(i))" />
+                                    <tf-close @onclick="@(_ => OnCloseTabAsync(index))" />
                                 }
                             </div>
                         }
                         @if (Items is not null
                             && PanelTemplate is not null)
                         {
-                            for (var i = 0; i < Items.Count; i++)
+                            for (var i = 0; i < _dynamicItems.Count && i < Items.Count; i++)
                             {
-                                <div @ref="_references[i]"
-                                     @onclick="@(_ => ActivatePanelAsync(i + _panels.Count))"
-                                     class="@GetTabClass(i + _panels.Count)">
-                                    @if (TabTemplate is not null)
-                                    {
-                                        @TabTemplate(Items[i + _panels.Count])
-                                    }
-                                    else if (TabTitle is not null)
-                                    {
-                                        @TabTitle(Items[i + _panels.Count])
-                                    }
-                                    @if (OnClose.HasDelegate)
-                                    {
-                                        <tf-close @onclick="@(_ => OnCloseTabAsync(i))" />
-                                    }
-                                </div>
+                                var index = i;
+                                <DraggableDropTarget @ref="_dynamicItems[index].DragDropComponent"
+                                                     Id="@_dynamicItems[index].Id"
+                                                     TDragItem="TTabItem"
+                                                     TDropItem="TTabItem"
+                                                     Class="@GetTabClass(index + _panels.Count)"
+                                                     DragEffectAllowed="DragEffectAllowed"
+                                                     IsDraggable="EnableDragDrop"
+                                                     IsDropTarget="EnableDragDrop"
+                                                     Item="Items[index]"
+                                                     OnDrop="@(e => OnDropOnItemAsync(index, e))"
+                                                     OnDropped="@(e => OnDroppedItemAsync(index, e))">
+                                    <div @ref="_dynamicItems[index].ElementReference"
+                                         @onclick="@(_ => ActivatePanelAsync(index + _panels.Count))"
+                                         role="tab"
+                                         aria-selected="@(index - _panels.Count == _activePanelIndex ? "true" : "false")"
+                                         aria-controls="@_dynamicItems[index].PanelId">
+                                        @if (_dynamicItems[index].DragDropComponent?.HasValidDrop == true
+                                            || (index == 0 && _panels.Any(x => x.HasValidDrop)))
+                                        {
+                                            <div class="@DropPlaceholderClass"></div>
+                                        }
+                                        @if (TabTemplate is not null)
+                                        {
+                                            @TabTemplate(Items[index + _panels.Count])
+                                        }
+                                        else if (TabTitle is not null)
+                                        {
+                                            @TabTitle(Items[index + _panels.Count])
+                                        }
+                                        @if (OnClose.HasDelegate)
+                                        {
+                                            <tf-close @onclick="@(_ => OnCloseTabAsync(index))" />
+                                        }
+                                    </div>
+                                </DraggableDropTarget>
                             }
+                        }
+                        @if (HasValidDrop && NoDropTargetChildren)
+                        {
+                            <div class="@DropPlaceholderClass"></div>
                         }
                         <div class="tab-slider" style="@SliderStyle"></div>
                     </div>
@@ -71,6 +109,12 @@
                         <tf-icon>@ForwardIcon</tf-icon>
                     </button>
                 }
+                @if (OnAdd is not null)
+                {
+                    <button @onclick="OnAddTabAsync" class="btn btn-icon">
+                        <tf-icon>@AddIcon</tf-icon>
+                    </button>
+                }
                 @PostTabContent
             </div>
         </div>
@@ -79,14 +123,23 @@
             @HeaderContent(ActiveItem)
         }
         <div class="tab-panels">
-            @if (ActivePanelIndex < _panels.Count)
-            {
-                @ChildContent
-            }
-            else if (Items is not null
+            @ChildContent
+            @if (Items is not null
                 && PanelTemplate is not null)
             {
-                @PanelTemplate(Items[ActivePanelIndex - _panels.Count])
+                for (var i = 0; i < _dynamicItems.Count && i < Items.Count; i++)
+                {
+                    var index = i;
+                    <div id="@_dynamicItems[index].PanelId"
+                         role="tabpanel"
+                         hidden="@(index + _panels.Count != ActivePanelIndex))"
+                         aria-expanded="@(index + _panels.Count == ActivePanelIndex ? "true" : "false")">
+                        @if (index + _panels.Count == ActivePanelIndex)
+                        {
+                            @PanelTemplate(Items[index])
+                        }
+                    </div>
+                }
             }
         </div>
     </CascadingValue>
