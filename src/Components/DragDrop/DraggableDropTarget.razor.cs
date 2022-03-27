@@ -18,7 +18,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// Defaults to <see cref="DragEffect.CopyMove"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.CopyMove;
+    [Parameter] public DragEffect DragEffectAllowed { get; set; } = DragEffect.CopyMove;
 
     /// <summary>
     /// <para>
@@ -32,7 +32,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// If <see cref="Item"/> is also unset, no drag event occurs.
     /// </para>
     /// </summary>
-    [Parameter] public virtual Func<DragStartData>? GetDragData { get; set; }
+    [Parameter] public Func<DragStartData>? GetDragData { get; set; }
 
     /// <summary>
     /// <para>
@@ -42,7 +42,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// Defaults to <see langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual bool IsDraggable { get; set; } = true;
+    [Parameter] public bool IsDraggable { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -72,7 +72,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// also be set.
     /// </para>
     /// </summary>
-    [Parameter] public virtual TDragItem? Item { get; set; }
+    [Parameter] public TDragItem? Item { get; set; }
 
     /// <summary>
     /// <para>
@@ -84,18 +84,22 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// operation.
     /// </para>
     /// </summary>
-    [Parameter] public virtual EventCallback<DragEffect> OnDropped { get; set; }
+    [Parameter] public EventCallback<DragEffect> OnDropped { get; set; }
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values.
     /// </summary>
-    protected override string CssClass => new CssBuilder("border-transparent")
+    protected override string? CssClass => new CssBuilder("border-transparent")
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, !DragDropListener.DropValid)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
+
+    internal virtual DragEffect GetDragEffectAllowed() => DragEffectAllowed;
+
+    internal virtual bool GetIsDraggable() => IsDraggable;
 
     /// <summary>
     /// Method invoked after each time the component has been rendered.
@@ -142,7 +146,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
 
     private protected virtual DragStartData GetDragDataInner()
     {
-        if (!IsDraggable || DragEffectAllowed == DragEffect.None)
+        if (!GetIsDraggable() || GetDragEffectAllowed() == DragEffect.None)
         {
             return DragStartData.None;
         }
@@ -158,7 +162,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
         }
         else
         {
-            data = DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed);
+            data = DragDropService.GetDragStartData(Item, effectAllowed: GetDragEffectAllowed());
         }
 
         return data;
@@ -166,7 +170,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
 
     private protected virtual async void OnDroppedAsync(object? sender, DragEffect e)
     {
-        if (IsDraggable)
+        if (GetIsDraggable())
         {
             await OnDropped.InvokeAsync(e);
         }

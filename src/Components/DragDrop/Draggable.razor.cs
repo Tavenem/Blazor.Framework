@@ -19,7 +19,7 @@ public partial class Draggable<TDragItem> : IDisposable
     /// Defaults to <see cref="DragEffect.CopyMove"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual DragEffect DragEffectAllowed { get; set; } = DragEffect.CopyMove;
+    [Parameter] public DragEffect DragEffectAllowed { get; set; } = DragEffect.CopyMove;
 
     /// <summary>
     /// <para>
@@ -33,7 +33,7 @@ public partial class Draggable<TDragItem> : IDisposable
     /// If <see cref="Item"/> is also unset, no drag event occurs.
     /// </para>
     /// </summary>
-    [Parameter] public virtual Func<DragStartData>? GetDragData { get; set; }
+    [Parameter] public Func<DragStartData>? GetDragData { get; set; }
 
     /// <summary>
     /// <para>
@@ -54,7 +54,7 @@ public partial class Draggable<TDragItem> : IDisposable
     /// Defaults to <see langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual bool IsDraggable { get; set; } = true;
+    [Parameter] public bool IsDraggable { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -84,7 +84,7 @@ public partial class Draggable<TDragItem> : IDisposable
     /// also be set.
     /// </para>
     /// </summary>
-    [Parameter] public virtual TDragItem? Item { get; set; }
+    [Parameter] public TDragItem? Item { get; set; }
 
     /// <summary>
     /// <para>

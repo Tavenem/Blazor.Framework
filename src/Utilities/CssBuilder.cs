@@ -553,7 +553,9 @@ public class CssBuilder
     /// It is possible to continue using this <see cref="CssBuilder"/> instance after calling
     /// this method, and to call it again to obtain the new value.
     /// </remarks>
-    public override string ToString() => _builder.ToString();
+    public override string? ToString() => _builder.Length == 0
+        ? null
+        : _builder.ToString();
 
     private CssBuilder Add(CssBuilder value, char separator, bool when = true)
     {

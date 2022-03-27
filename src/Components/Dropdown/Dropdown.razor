@@ -1,0 +1,43 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@if (!HideButton)
+{
+    <button @ref="Button"
+            @attributes="AdditionalAttributes"
+            id="@Id"
+            class="@CssClass"
+            style="@CssStyle"
+            disabled="@Disabled"
+            @onmousedown="OnMouseDown"
+            @onmouseup="ToggleAsync"
+            @oncontextmenu:preventDefault="@(ActivationType.HasFlag(MouseEvent.RightClick))">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <tf-icon>@Icon</tf-icon>
+        }
+        @Text
+    </button>
+}
+<Popover @ref="Popover"
+         AnchorOrigin="AnchorOriginValue"
+         Class="@PopoverCssClass"
+         AnchorId="@(string.IsNullOrEmpty(AnchorId) ? (HideButton ? null : Id) : AnchorId)"
+         FocusOut="StartClosing"
+         IsOpen="_isOpen"
+         MatchWidth="@(!OpenAtPointer && !HideButton)"
+         MaxHeight="@MaxHeight"
+         OffsetX="PopoverOffsetX"
+         OffsetY="PopoverOffsetY"
+         PopoverOrigin="PopoverOriginValue"
+         Style="@PopoverStyle"
+         ThemeColor="ThemeColor"
+         oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)"
+         tabindex="-1">
+    <div class="@ListCssClass"
+         @onclick="Close"
+         @onclick:stopPropagation="true">
+        @ChildContent
+    </div>
+</Popover>

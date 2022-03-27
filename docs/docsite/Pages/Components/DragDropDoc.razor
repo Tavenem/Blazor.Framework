@@ -175,9 +175,8 @@
 <p>
     The <code>OnDrop</code> property should be set to a callback which handles a drop event for the
     target. If this property is not set, the drop target will not accept any dragged data. This
-    callback receives a <code>DropEventArgs</code> parameter with the dropped data and the final
-    drag effect, and should perform whatever operation is appropriate for the data being dropped. Be
-    sure to take the <code>DragEffect</code> into account, unless your target accepts only one kind.
+    callback receives a <code>DropEventArgs</code> parameter with the dropped data, and should
+    perform whatever operation is appropriate for the data being dropped.
 </p>
 
 <p>
@@ -222,6 +221,6 @@
             items.Remove(value);
         }
     }
-    private void Drop(List<string> items, DropEventArgs<string> e)
+    private void Drop(List<string> items, DropEventArgs e)
         => items.Add(e.Data?.FirstOrDefault().Value ?? "Error");
 }

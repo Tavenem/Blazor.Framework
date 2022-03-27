@@ -86,8 +86,8 @@ internal static class ElementReferenceExtensions
     public static ValueTask SelectAsync(this ElementReference elementReference)
         => elementReference.InvokeVoidAsync("select");
 
-    public static ValueTask SelectRangeAsync(this ElementReference elementReference, int pos1, int pos2)
-        => elementReference.InvokeVoidAsync("selectRange", pos1, pos2);
+    public static ValueTask SelectRangeAsync(this ElementReference elementReference, int start, int? end = null)
+        => elementReference.InvokeVoidAsync("selectRange", start, end);
 
     private static async ValueTask<IJSObjectReference?> GetJSModule(this ElementReference elementReference)
         => elementReference.Context is not WebElementReferenceContext context

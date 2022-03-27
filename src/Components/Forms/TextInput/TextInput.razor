@@ -1,0 +1,133 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits InputComponentBase<string>
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+    <div class="input">
+        @if (PrefixContent is not null)
+        {
+            @PrefixContent(Value)
+        }
+        else if (!string.IsNullOrEmpty(PrefixIcon) || !string.IsNullOrEmpty(PrefixText))
+        {
+            @if (!string.IsNullOrEmpty(PrefixIcon))
+            {
+                <tf-icon>@PrefixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PrefixText))
+            {
+                <span>@PrefixText</span>
+            }
+        }
+        <input @ref="ElementReference"
+               @attributes="InputAttributes"
+               id="@Id"
+               type="@InputType.ToCSS()"
+               class="@InputCssClass"
+               style="@InputCssStyle"
+               autocomplete="@AutocompleteValue"
+               autocorrect="@AutocorrectValue"
+               autofocus="@AutoFocus"
+               disabled="@Disabled"
+               list="@DataListId"
+               maxlength="@MaxLength"
+               pattern="@Pattern"
+               placeholder="@Placeholder"
+               readonly="@ReadOnly"
+               required="@Required"
+               spellcheck="@SpellcheckValue"
+               tabindex="@TabIndex"
+               value="@CurrentValue"
+               @onclick="OnClick"
+               @onclick:stopPropagation="true"
+               @oninput="OnInput"
+               @onchange="OnChangeAsync"
+               @onfocusin="OnFocusIn"
+               @onfocusout="OnFocusOut" />
+        @if (CanClear)
+        {
+            <button class="btn btn-icon small" @onclick="Clear">
+                <tf-icon>@ClearIcon</tf-icon>
+            </button>
+        }
+        @if (PostfixContent is not null)
+        {
+            @PostfixContent(Value)
+        }
+        else if (!string.IsNullOrEmpty(PostfixIcon) || !string.IsNullOrEmpty(PostfixText))
+        {
+            @if (!string.IsNullOrEmpty(PostfixIcon))
+            {
+                <tf-icon>@PostfixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PostfixText))
+            {
+                <span>@PostfixText</span>
+            }
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if ((ShowLength && MaxLength.HasValue)
+        || !string.IsNullOrEmpty(HelpText)
+        || !IsValid)
+    {
+        <div class="@HelpersClass">
+            @if (!IsValid)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+            @if (ShowLength && MaxLength.HasValue)
+            {
+                <div class="ml-auto">
+                    <span>@CurrentLength</span>
+                    <span>/</span>
+                    <span>@MaxLength</span>
+                </div>
+            }
+        </div>
+    }
+    <Popover Class="filled"
+             AnchorId="@Id"
+             IsOpen="ShowSuggestions"
+             MatchWidth="true">
+        <ul class="@SuggestionListCssClass"
+            @onclick:stopPropagation="true">
+            @foreach (var suggestion in FilteredSuggestions)
+            {
+                <li @key="suggestion" @onclick="@(_ => SuggestionSelectedAsync(suggestion))">@suggestion</li>
+            }
+            @if (SuggestionTemplate is null)
+            {
+                @foreach (var suggestion in FilteredSuggestionValues)
+                {
+                    <li @key="suggestion.Key" @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))">@suggestion.Value.ToString()</li>
+                }
+            }
+            else
+            {
+                @foreach (var suggestion in FilteredSuggestionValues)
+                {
+                    <li @key="suggestion.Key" @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))">
+                        @SuggestionTemplate(suggestion.Value)
+                    </li>
+                }
+            }
+            @if (LoadingSuggestions)
+            {
+                <tf-progress-circle></tf-progress-circle>
+            }
+        </ul>
+    </Popover>
+</div>

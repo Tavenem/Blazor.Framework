@@ -51,12 +51,6 @@ class ElementReference {
         }
     }
 
-    focus(element: HTMLElement) {
-        if (element) {
-            element.focus();
-        }
-    }
-
     focusFirst(element: HTMLElement, skip = 0, min = 0) {
         if (element) {
             const tabbables = getTabbableElements(element);
@@ -175,21 +169,19 @@ class ElementReference {
         }
     }
 
-    selectRange(element: HTMLInputElement, pos1: number, pos2: number) {
+    selectRange(element: HTMLInputElement, start: number, end: number | null) {
         if (element) {
             if (element.setSelectionRange) {
-                element.setSelectionRange(pos1, pos2);
+                element.setSelectionRange(start, end);
             } else if (element.selectionStart) {
-                element.selectionStart = pos1;
-                element.selectionEnd = pos2;
+                element.selectionStart = start;
+                element.selectionEnd = end;
             }
             element.focus();
         }
     }
 }
 const elementReference = new ElementReference();
-
-let notifyOutsideEventRef: ((event: MouseEvent) => void) | null | undefined;
 
 export function addEventListener(
     element: Element,
@@ -205,14 +197,6 @@ export function addEventListener(
         callback,
         spec,
         stopPropagation);
-}
-
-export function cancelOutsideEvent() {
-    if (notifyOutsideEventRef) {
-        window.removeEventListener('click', notifyOutsideEventRef);
-        window.removeEventListener('contextmenu', notifyOutsideEventRef);
-        notifyOutsideEventRef = null;
-    }
 }
 
 export function changeCssClassName(element: Element, className: string) {
@@ -251,23 +235,16 @@ export function elementHasFixedAncestors(element: Node | null) {
     return elementReference.hasFixedAncestors(element);
 }
 
-export function notifyOutsideEvent(this: any, dotNetRef: DotNet.DotNetObject, elementId: string) {
-    // On a short timeout to avoid notifying on an initiating event.
-    setTimeout(() => {
-        if (notifyOutsideEventRef) {
-            cancelOutsideEvent();
-        }
-        notifyOutsideEventRef = onNotifyOutsideEvent.bind(this, dotNetRef, elementId);
-        window.addEventListener('click', notifyOutsideEventRef);
-        window.addEventListener('contextmenu', notifyOutsideEventRef);
-    }, 250);
-}
-
 export function open(url?: string, target?: string, features?: string) {
     window.open(url, target, features);
 }
 
 export function registerComponents() {
+    const icon = customElements.get('tf-icon');
+    if (icon) {
+        return;
+    }
+
     customElements.define('tf-icon', class extends HTMLElement { });
 
     customElements.define('tf-close', class extends HTMLElement {
@@ -712,8 +689,8 @@ export function select(element: HTMLInputElement) {
     elementReference.select(element);
 }
 
-export function selectRange(element: HTMLInputElement, pos1: number, pos2: number) {
-    elementReference.selectRange(element, pos1, pos2);
+export function selectRange(element: HTMLInputElement, start: number, end: number | null) {
+    elementReference.selectRange(element, start, end);
 }
 
 export function shake(elementId: string | null) {
@@ -742,19 +719,6 @@ function getTabbableElements(element: HTMLElement) {
         "[tabindex]:not([tabindex='-1'])," +
         "[contentEditable=true]:not([tabindex='-1']"
     );
-}
-
-function onNotifyOutsideEvent(dotNetRef: DotNet.DotNetObject, elementId: string, event: MouseEvent) {
-    const element = document.getElementById(elementId);
-    if (element instanceof HTMLElement
-        && event.target instanceof HTMLElement
-        && !element.contains(event.target)) {
-        dotNetRef.invokeMethodAsync("OutsideEventNotice");
-        if (notifyOutsideEventRef) {
-            window.removeEventListener('click', notifyOutsideEventRef);
-            window.removeEventListener('contextmenu', notifyOutsideEventRef);
-        }
-    }
 }
 
 function serializeParameter(data: any, spec: any) {

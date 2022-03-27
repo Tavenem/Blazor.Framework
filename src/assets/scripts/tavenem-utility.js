@@ -25,11 +25,6 @@ class ElementReference {
             element.style.setProperty(name, newValue);
         }
     }
-    focus(element) {
-        if (element) {
-            element.focus();
-        }
-    }
     focusFirst(element, skip = 0, min = 0) {
         if (element) {
             const tabbables = getTabbableElements(element);
@@ -135,30 +130,22 @@ class ElementReference {
             element.select();
         }
     }
-    selectRange(element, pos1, pos2) {
+    selectRange(element, start, end) {
         if (element) {
             if (element.setSelectionRange) {
-                element.setSelectionRange(pos1, pos2);
+                element.setSelectionRange(start, end);
             }
             else if (element.selectionStart) {
-                element.selectionStart = pos1;
-                element.selectionEnd = pos2;
+                element.selectionStart = start;
+                element.selectionEnd = end;
             }
             element.focus();
         }
     }
 }
 const elementReference = new ElementReference();
-let notifyOutsideEventRef;
 export function addEventListener(element, dotNetRef, event, callback, spec, stopPropagation) {
     return elementReference.addEventListener(element, dotNetRef, event, callback, spec, stopPropagation);
-}
-export function cancelOutsideEvent() {
-    if (notifyOutsideEventRef) {
-        window.removeEventListener('click', notifyOutsideEventRef);
-        window.removeEventListener('contextmenu', notifyOutsideEventRef);
-        notifyOutsideEventRef = null;
-    }
 }
 export function changeCssClassName(element, className) {
     elementReference.changeCssClassName(element, className);
@@ -187,20 +174,14 @@ export function getTextContent(element) {
 export function elementHasFixedAncestors(element) {
     return elementReference.hasFixedAncestors(element);
 }
-export function notifyOutsideEvent(dotNetRef, elementId) {
-    setTimeout(() => {
-        if (notifyOutsideEventRef) {
-            cancelOutsideEvent();
-        }
-        notifyOutsideEventRef = onNotifyOutsideEvent.bind(this, dotNetRef, elementId);
-        window.addEventListener('click', notifyOutsideEventRef);
-        window.addEventListener('contextmenu', notifyOutsideEventRef);
-    }, 250);
-}
 export function open(url, target, features) {
     window.open(url, target, features);
 }
 export function registerComponents() {
+    const icon = customElements.get('tf-icon');
+    if (icon) {
+        return;
+    }
     customElements.define('tf-icon', class extends HTMLElement {
     });
     customElements.define('tf-close', class extends HTMLElement {
@@ -609,8 +590,8 @@ export function saveElementFocus(element) {
 export function select(element) {
     elementReference.select(element);
 }
-export function selectRange(element, pos1, pos2) {
-    elementReference.selectRange(element, pos1, pos2);
+export function selectRange(element, start, end) {
+    elementReference.selectRange(element, start, end);
 }
 export function shake(elementId) {
     if (!elementId) {
@@ -634,18 +615,6 @@ function getTabbableElements(element) {
         "details:not([tabindex='-1'])," +
         "[tabindex]:not([tabindex='-1'])," +
         "[contentEditable=true]:not([tabindex='-1']");
-}
-function onNotifyOutsideEvent(dotNetRef, elementId, event) {
-    const element = document.getElementById(elementId);
-    if (element instanceof HTMLElement
-        && event.target instanceof HTMLElement
-        && !element.contains(event.target)) {
-        dotNetRef.invokeMethodAsync("OutsideEventNotice");
-        if (notifyOutsideEventRef) {
-            window.removeEventListener('click', notifyOutsideEventRef);
-            window.removeEventListener('contextmenu', notifyOutsideEventRef);
-        }
-    }
 }
 function serializeParameter(data, spec) {
     if (typeof data == "undefined" ||

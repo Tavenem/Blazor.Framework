@@ -25,60 +25,6 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
 
-    private DragEffect _dragEffectAllowed = DragEffect.CopyMove;
-    /// <summary>
-    /// <para>
-    /// Sets the allowed drag effects for drag operations with this item.
-    /// </para>
-    /// <para>
-    /// Defaults to <see cref="DragEffect.CopyMove"/>, but defers to the parent.
-    /// </para>
-    /// </summary>
-    [Parameter]
-    public override DragEffect DragEffectAllowed
-    {
-        get => Parent?.DragEffectAllowed ?? _dragEffectAllowed;
-        set => _dragEffectAllowed = value;
-    }
-
-    private bool? _isDraggable;
-    /// <summary>
-    /// <para>
-    /// Whether this tab is currently draggable.
-    /// </para>
-    /// <para>
-    /// Default is to defer to the parent's <see cref="Tabs{TTabItem}.EnableDragDrop"/> property.
-    /// </para>
-    /// <para>
-    /// Ignored if the parent's <see cref="Tabs{TTabItem}.EnableDragDrop"/> property is <see
-    /// langword="false"/>.
-    /// </para>
-    /// </summary>
-    [Parameter]
-    public override bool IsDraggable
-    {
-        get => _isDraggable != false
-            && Item is not null
-            && Parent?.EnableDragDrop == true;
-        set => _isDraggable = value;
-    }
-
-    /// <summary>
-    /// <para>
-    /// Whether this tab is accepting drops.
-    /// </para>
-    /// <para>
-    /// Always has the same value as the parent's <see cref="Tabs{TTabItem}.EnableDragDrop"/>
-    /// property. Setting it has no effect.
-    /// </para>
-    /// </summary>
-    [Parameter]
-    public override bool IsDropTarget
-    {
-        get => Parent?.EnableDragDrop == true;
-        set { }
-    }
-
     /// <summary>
     /// <para>
     /// Invoked before the tab is activated.
@@ -138,6 +84,14 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     internal int Index { get; set; } = -1;
 
     internal ElementReference PanelReference { get; set; }
+
+    internal override DragEffect GetDragEffectAllowed() => Parent?.DragEffectAllowed ?? DragEffectAllowed;
+
+    internal override bool GetIsDraggable() => IsDraggable
+        && Item is not null
+        && Parent?.EnableDragDrop == true;
+
+    internal override bool GetIsDropTarget() => Parent?.EnableDragDrop == true;
 
     /// <summary>
     /// Method invoked when the component is ready to start, having received its
@@ -219,7 +173,7 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
 
     private protected override async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
-        if (!IsDropTarget
+        if (!GetIsDropTarget()
             || Parent is null)
         {
             return;
@@ -233,11 +187,7 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
 
         if (OnDrop.HasDelegate)
         {
-            await OnDrop.InvokeAsync(new()
-            {
-                Data = e,
-                Item = item,
-            });
+            await OnDrop.InvokeAsync(new(e));
         }
         else if (item is not null
             && Parent is not null)
@@ -250,7 +200,7 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
 
     private protected override async void OnDroppedAsync(object? sender, DragEffect e)
     {
-        if (!IsDraggable)
+        if (!GetIsDraggable())
         {
             return;
         }

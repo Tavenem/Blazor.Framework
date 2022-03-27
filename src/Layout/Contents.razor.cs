@@ -35,7 +35,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("list contents highlight-start darken")
+    protected override string? CssClass => new CssBuilder("list contents highlight-start darken")
         .Add(ThemeColor.ToCSS())
         .Add(BreakpointClass)
         .Add(Class)
@@ -47,7 +47,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssStyle => new CssBuilder("max-width:15em")
+    protected override string? CssStyle => new CssBuilder("max-width:15em")
         .AddStyle(Style)
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();

@@ -1,0 +1,41 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@inherits BoolInputComponentBase<TValue>
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <label>
+        <span class="@IconClass" tabindex="@TabIndex">
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   type="checkbox"
+                   tabindex="-1"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autofocus="@AutoFocus"
+                   checked="@IsChecked"
+                   disabled="@Disabled"
+                   readonly="@ReadOnly"
+                   @onchange="@OnChange"
+                   @onclick:preventDefault="@ReadOnly" />
+            <tf-icon>@Icon</tf-icon>
+        </span>
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <span class="label">@Label</span>
+        }
+    </label>
+    @if (IsValid == false)
+    {
+        <div class="field-helpers">
+            <ul class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </div>
+    }
+</div>

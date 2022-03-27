@@ -95,10 +95,14 @@
         background-color: transparent;
         border-radius: 0;
         color: inherit;
-        padding: 0;
 
         > .header {
-            padding: .75rem 1rem;
+            min-height: 0;
+            padding: 0;
+        }
+
+        > .body {
+            padding: 0;
         }
     }
 
@@ -118,7 +122,6 @@
         flex: 1 0 auto;
         flex-direction: column;
         max-height: 9999px;
-        max-width: 100%;
         padding: 1rem 1.5rem;
         transition: all .3s ease, max-height .3s cubic-bezier(.25,.8,.5,1);
 
@@ -151,7 +154,7 @@
         }
 
         > .list {
-            margin: -1rem -1.5rem;
+            padding-inline-start: 0;
         }
     }
 
@@ -197,33 +200,6 @@
         }
     }
 
-    .tree > & {
-        > .header {
-            > .expand {
-                order: -1;
-
-                > tf-icon {
-                    order: -1;
-                    transform: rotate(0deg);
-                }
-            }
-
-            > tf-icon.expand {
-                transform: rotate(0deg);
-            }
-        }
-
-        &.closed > .header {
-            > .expand > tf-icon {
-                transform: rotate(-90deg);
-            }
-
-            > tf-icon.expand {
-                transform: rotate(0deg);
-            }
-        }
-    }
-
     &.dense {
         .header, .body, .footer {
             padding: .25rem .75rem;
@@ -247,6 +223,43 @@
     @each $theme in $theme-colors {
         &.#{$theme} {
             background-color: var(--tavenem-theme-color-hover);
+        }
+    }
+}
+
+.tree .list,
+.tree.list {
+    > .collapse {
+        margin-inline-start: 0;
+        padding-inline-start: 0;
+
+        > .header {
+            padding-inline-start: 0;
+
+            > .expand {
+                margin-inline-end: 1rem;
+                margin-inline-start: 0 !important;
+                order: -1;
+
+                > tf-icon {
+                    order: -1;
+                    transform: rotate(0deg);
+                }
+            }
+
+            > tf-icon.expand {
+                transform: rotate(0deg);
+            }
+        }
+
+        &.closed > .header {
+            > .expand > tf-icon {
+                transform: rotate(-90deg);
+            }
+
+            > tf-icon.expand {
+                transform: rotate(-90deg);
+            }
         }
     }
 }

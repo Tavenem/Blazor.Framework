@@ -30,7 +30,6 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </summary>
     public TTabItem? ActiveItem { get; private set; }
 
-    private int _activePanelIndex = 0;
     /// <summary>
     /// <para>
     /// The index of the currently active panel.
@@ -45,12 +44,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// Always zero when there are no panels at all.
     /// </para>
     /// </summary>
-    [Parameter]
-    public int ActivePanelIndex
-    {
-        get => _activePanelIndex;
-        set => _ = ActivatePanelAsync(value, true);
-    }
+    [Parameter] public int ActivePanelIndex { get; set; }
 
     /// <summary>
     /// Raised when <see cref="ActivePanelIndex"/> changes.
@@ -94,7 +88,6 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </summary>
     [Parameter] public DragEffect DragEffectAllowed { get; set; }
 
-    private DragEffect _dropEffect = DragEffect.All;
     /// <summary>
     /// <para>
     /// The drop effect allowed on this drop target.
@@ -108,21 +101,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// value has no effect.
     /// </para>
     /// </summary>
-    [Parameter]
-    public virtual DragEffect DropEffect
-    {
-        get => _dropEffect;
-        set
-        {
-            if (value is DragEffect.Copy
-                or DragEffect.Link
-                or DragEffect.Move
-                or DragEffect.All)
-            {
-                _dropEffect = value;
-            }
-        }
-    }
+    [Parameter] public virtual DragEffect DropEffect { get; set; } = DragEffect.All;
 
     /// <summary>
     /// <para>
@@ -264,7 +243,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// <summary>
     /// Invoked when an item is dropped on the tab list.
     /// </summary>
-    [Parameter] public EventCallback<DropEventArgs<TTabItem>> OnDrop { get; set; }
+    [Parameter] public EventCallback<DropEventArgs> OnDrop { get; set; }
 
     /// <summary>
     /// <para>
@@ -314,7 +293,6 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </summary>
     [Parameter] public Func<TTabItem?, MarkupString>? TabTitle { get; set; }
 
-    private Side _tabSide = Side.Top;
     /// <summary>
     /// <para>
     /// The side of the component on which the tabs appear.
@@ -326,14 +304,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// Setting to <see cref="Side.None"/> results in the default value.
     /// </para>
     /// </summary>
-    [Parameter]
-    public Side TabSide
-    {
-        get => _tabSide;
-        set => _tabSide = value == Side.None
-            ? Side.Top
-            : value;
-    }
+    [Parameter] public Side TabSide { get; set; } = Side.Top;
 
     /// <summary>
     /// One of the built-in color themes.
@@ -345,7 +316,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("tabs")
+    protected override string? CssClass => new CssBuilder("tabs")
         .Add(Class)
         .Add(ThemeColor.ToCSS())
         .Add(TabSide.ToCSS())
@@ -358,7 +329,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
     [Inject] private IResizeObserver ResizeObserver { get; set; } = default!;
 
-    private string ScrollStyle => new CssBuilder()
+    private string? ScrollStyle => new CssBuilder()
         .AddStyle(
             "transform",
             $"translateX({(-1 * _scrollPosition).ToString(CultureInfo.InvariantCulture)}px)",
@@ -371,83 +342,31 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
     private bool ShowScrollButtons => _allTabsSize > _toolbarContentSize;
 
-    private string SliderStyle => new CssBuilder()
+    private string? SliderStyle => new CssBuilder()
         .AddStyle(
             TabSide is Side.Top or Side.Bottom ? "width" : "height",
-            $"{_size.ToString("F2").Trim('0').TrimEnd('.')}px")
+            _size.ToPixels())
         .AddStyle(
             TabSide is Side.Top or Side.Bottom ? "left" : "top",
-            $"{_position.ToString("F2").Trim('0').TrimEnd('.')}px",
-            TabSide is Side.Top or Side.Bottom)
+            _position.ToPixels())
         .AddStyle(
             "transition",
             $"{(TabSide is Side.Top or Side.Bottom ? "left" : "top")} .3s cubic-bezier(.64,.09,.08,1)")
         .ToString();
 
-    private string ToolbarCssClass => new CssBuilder("tabs-toolbar")
+    private string? ToolbarCssClass => new CssBuilder("tabs-toolbar")
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, DragDropListener.DropValid == false)
         .ToString();
 
     private string ToolbarId { get; } = Guid.NewGuid().ToString();
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
-        => DragDropListener.DropValidChanged += OnDropValidChanged;
-
-    /// <summary>
-    /// Method invoked when the component has received parameters from its parent in
-    /// the render tree, and the incoming values have been assigned to properties.
-    /// </summary>
-    protected override void OnParametersSet() => Rerender();
-
-    /// <summary>
-    /// Method invoked when the component has received parameters from its parent in the render
-    /// tree, and the incoming values have been assigned to properties.
-    /// </summary>
-    /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
-    protected override async Task OnParametersSetAsync()
-    {
-        if (ActiveItem is not null
-            && Items?.Contains(ActiveItem) != true)
-        {
-            ActiveItem = default;
-            if (_activePanelIndex > 0)
-            {
-                await ActivatePanelAsync(_activePanelIndex - 1, true);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Sets parameters supplied by the component's parent in the render tree.
-    /// </summary>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns>
-    /// A <see cref="Task" /> that completes when the component has finished updating and rendering
-    /// itself.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    /// Parameters are passed when <see cref="ComponentBase.SetParametersAsync(ParameterView)" /> is
-    /// called. It is not required that the caller supply a parameter value for all of the
-    /// parameters that are logically understood by the component.
-    /// </para>
-    /// <para>
-    /// The default implementation of <see cref="ComponentBase.SetParametersAsync(ParameterView)" />
-    /// will set the value of each property decorated with <see cref="ParameterAttribute" /> or <see
-    /// cref="CascadingParameterAttribute" /> that has a corresponding value in the <see
-    /// cref="ParameterView" />. Parameters that do not have a corresponding value will be
-    /// unchanged.
-    /// </para>
-    /// </remarks>
+    /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (Items is not null
-            && parameters.TryGetValue(nameof(Items), out List<TTabItem>? items))
+        var oldActivePanelIndex = ActivePanelIndex;
+
+        if (parameters.TryGetValue(nameof(Items), out List<TTabItem>? items))
         {
             if (items is null)
             {
@@ -459,27 +378,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             }
             else
             {
-                for (var i = 0; i < items.Count && i < _dynamicItems.Count; i++)
-                {
-                    if (_dynamicItems[i].Item is null
-                        && items[i] is null)
-                    {
-                        continue;
-                    }
-                    if (items[i] is not null
-                        && _dynamicItems[i].Item?
-                        .Equals(items[i]) == true)
-                    {
-                        continue;
-                    }
-
-                    await ResizeObserver.Unobserve(_dynamicItems[i].ElementReference);
-                    _dynamicItems[i] = new() { Item = items[i] };
-                }
-
                 for (var i = _dynamicItems.Count; i < items.Count; i++)
                 {
-                    _dynamicItems.Add(new() { Item = items[i] });
+                    _dynamicItems.Add(new());
                 }
 
                 while (_dynamicItems.Count > items.Count)
@@ -491,7 +392,46 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
 
         await base.SetParametersAsync(parameters);
+
+        if (DropEffect is not DragEffect.Copy
+            and not DragEffect.Link
+            and not DragEffect.Move
+            and not DragEffect.All)
+        {
+            DropEffect = DragEffect.All;
+        }
+
+        if (TabSide == Side.None)
+        {
+            TabSide = Side.Top;
+        }
+
+        if (ActivePanelIndex != oldActivePanelIndex)
+        {
+            await ActivatePanelAsync(ActivePanelIndex);
+        }
     }
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet() => Rerender();
+
+    /// <inheritdoc/>
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ActiveItem is not null
+            && Items?.Contains(ActiveItem) != true)
+        {
+            ActiveItem = default;
+            if (ActivePanelIndex > 0)
+            {
+                await ActivatePanelAsync(ActivePanelIndex - 1, true);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnInitialized()
+        => DragDropListener.DropValidChanged += OnDropValidChanged;
 
     /// <summary>
     /// Method invoked after each time the component has been rendered.
@@ -556,7 +496,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
         if (_panels.Count > 0)
         {
-            ActiveItem = _panels[_activePanelIndex].Item;
+            ActiveItem = _panels[ActivePanelIndex].Item;
         }
 
         await ResizeObserver.Observe(references);
@@ -695,12 +635,12 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         if (index.HasValue)
         {
             (Items ??= new()).Insert(index.Value, item);
-            _dynamicItems.Insert(index.Value, new() { Item = item });
+            _dynamicItems.Insert(index.Value, new());
         }
         else
         {
             (Items ??= new()).Add(item);
-            _dynamicItems.Add(new() { Item = item });
+            _dynamicItems.Add(new());
         }
         await ItemsChanged.InvokeAsync(Items);
         StateHasChanged();
@@ -718,7 +658,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         {
             return;
         }
-        else if (index == _activePanelIndex)
+        else if (index == ActivePanelIndex)
         {
             if (index == _panels.Count - 1
                 && index > 0)
@@ -726,9 +666,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
                 await ActivatePanelAsync(index - 1, true);
             }
         }
-        else if (_activePanelIndex > index)
+        else if (ActivePanelIndex > index)
         {
-            await ActivatePanelAsync(_activePanelIndex - 1, true);
+            await ActivatePanelAsync(ActivePanelIndex - 1, true);
         }
         _panels.RemoveAt(index);
         await ResizeObserver.Unobserve(panel.PanelReference);
@@ -800,16 +740,16 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             await OnActivate.InvokeAsync(Items[index - _panels.Count]);
         }
 
-        _activePanelIndex = index;
+        ActivePanelIndex = index;
         if (_isRendered)
         {
             if (PanelCount == 0)
             {
                 ActiveItem = default;
             }
-            else if (_panels.Count > _activePanelIndex)
+            else if (_panels.Count > ActivePanelIndex)
             {
-                ActiveItem = _panels[_activePanelIndex].Item;
+                ActiveItem = _panels[ActivePanelIndex].Item;
             }
             else if (Items is null)
             {
@@ -817,7 +757,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             }
             else
             {
-                ActiveItem = Items[_activePanelIndex - _panels.Count];
+                ActiveItem = Items[ActivePanelIndex - _panels.Count];
             }
         }
 
@@ -840,8 +780,8 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         var indexCorrection = 1;
         while (true)
         {
-            var panelAfterIndex = _activePanelIndex + indexCorrection;
-            if (panelAfterIndex < _panels.Count)
+            var panelAfterIndex = ActivePanelIndex + indexCorrection;
+            if (panelAfterIndex < _panels.Count + _dynamicItems.Count)
             {
                 length += GetPanelLength(panelAfterIndex);
             }
@@ -854,7 +794,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
             length = _toolbarContentSize - length;
 
-            var panelBeforeIndex = _activePanelIndex - indexCorrection;
+            var panelBeforeIndex = ActivePanelIndex - indexCorrection;
             if (panelBeforeIndex >= 0)
             {
                 length -= GetPanelLength(panelBeforeIndex);
@@ -871,7 +811,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             }
 
             length = _toolbarContentSize - length;
-            panelToStart = _activePanelIndex + indexCorrection;
+            panelToStart = ActivePanelIndex - indexCorrection;
             indexCorrection++;
         }
 
@@ -892,7 +832,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
         for (; i < index && i - _panels.Count < _dynamicItems.Count; i++)
         {
-            total += GetReferenceSize(_dynamicItems[i - _panels.Count].ElementReference);
+            total += GetReferenceSize(_dynamicItems[i - _panels.Count].ElementReference) + 2;
         }
         return total;
     }
@@ -909,7 +849,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
         else if (index - _panels.Count < _dynamicItems.Count)
         {
-            return GetReferenceSize(_dynamicItems[index - _panels.Count].ElementReference);
+            return GetReferenceSize(_dynamicItems[index - _panels.Count].ElementReference) + 2;
         }
         else
         {
@@ -923,10 +863,10 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         _ => ResizeObserver.GetSizeInfo(reference)?.Height ?? 0,
     };
 
-    private string GetTabClass(int index) => new CssBuilder("tab")
+    private string? GetTabClass(int index) => new CssBuilder("tab")
         .Add("active", index == ActivePanelIndex)
         .Add("disabled", index < _panels.Count && _panels[index].Disabled)
-        .Add("no-drag", EnableDragDrop && !_panels[index].IsDraggable)
+        .Add("no-drag", EnableDragDrop && !_panels[index].GetIsDraggable())
         .ToString();
 
     private async Task OnAddTabAsync()
@@ -938,8 +878,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
         var item = OnAdd.Invoke();
         (Items ??= new()).Add(item);
-        _dynamicItems.Add(new() { Item = item });
+        _dynamicItems.Add(new());
         await ItemsChanged.InvokeAsync(Items);
+        Rerender();
     }
 
     private async Task OnCloseTabAsync(int index, bool suppressClose = false)
@@ -958,27 +899,25 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             }
         }
 
-        if (index == _activePanelIndex)
-        {
-            if (index == _panels.Count - 1
-                && index > 0)
-            {
-                await ActivatePanelAsync(index - 1, true);
-            }
-        }
-        else if (_activePanelIndex > index)
-        {
-            await ActivatePanelAsync(_activePanelIndex - 1, true);
-        }
-
         if (index >= _panels.Count)
         {
             await ResizeObserver.Unobserve(_dynamicItems[index - _panels.Count].ElementReference);
             _dynamicItems.RemoveAt(index - _panels.Count);
             Items?.RemoveAt(index - _panels.Count);
             await ItemsChanged.InvokeAsync(Items);
+        }
+
+        if (index == ActivePanelIndex)
+        {
+            await ActivatePanelAsync(index, true);
+        }
+        else if (ActivePanelIndex > index)
+        {
+            await ActivatePanelAsync(ActivePanelIndex - 1, true);
+        }
+        else
+        {
             Rerender();
-            StateHasChanged();
         }
     }
 
@@ -989,16 +928,14 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             return;
         }
 
-        var item = DragDropService.TryGetData<TTabItem>(e);
         if (OnDrop.HasDelegate)
         {
-            await OnDrop.InvokeAsync(new()
-            {
-                Data = e,
-                Item = item,
-            });
+            await OnDrop.InvokeAsync(new(e));
+            return;
         }
-        else if (item is not null)
+
+        var item = DragDropService.TryGetData<TTabItem>(e);
+        if (item is not null)
         {
             (Items ??= new()).Add(item);
             await ItemsChanged.InvokeAsync(Items);
@@ -1006,7 +943,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
     }
 
-    private async Task OnDropOnItemAsync(int index, DropEventArgs<TTabItem> e)
+    private async Task OnDropOnItemAsync(int index, DropEventArgs e)
     {
         if (!EnableDragDrop
             || index < 0
@@ -1017,7 +954,8 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             return;
         }
 
-        if (e.Item?.Equals(Items[index]) == true)
+        var item = DragDropService.TryGetData<TTabItem>(e.Data);
+        if (item?.Equals(Items[index]) == true)
         {
             return;
         }
@@ -1026,10 +964,10 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         {
             await OnDrop.InvokeAsync(e);
         }
-        else if (e.Item is not null)
+        else if (item is not null)
         {
             await InsertItemAsync(
-                e.Item,
+                item,
                 index);
         }
     }
@@ -1060,18 +998,18 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         switch (e.Key)
         {
             case "ArrowLeft":
-                if (_activePanelIndex == 0)
+                if (ActivePanelIndex == 0)
                 {
                     if (PanelCount > 0)
                     {
                         var index = PanelCount - 1;
-                        while (index > _activePanelIndex
+                        while (index > ActivePanelIndex
                             && index < _panels.Count
                             && _panels[index].Disabled)
                         {
                             index--;
                         }
-                        if (index != _activePanelIndex)
+                        if (index != ActivePanelIndex)
                         {
                             await ActivatePanelAsync(index, true);
                         }
@@ -1079,7 +1017,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
                 }
                 else
                 {
-                    var index = _activePanelIndex - 1;
+                    var index = ActivePanelIndex - 1;
                     while (index >= 0
                         && index < _panels.Count
                         && _panels[index].Disabled)
@@ -1093,23 +1031,23 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
                 }
                 break;
             case "ArrowRight":
-                if (_activePanelIndex == PanelCount - 1)
+                if (ActivePanelIndex == PanelCount - 1)
                 {
                     var index = 0;
-                    while (index < _activePanelIndex
+                    while (index < ActivePanelIndex
                         && index < _panels.Count
                         && _panels[index].Disabled)
                     {
                         index++;
                     }
-                    if (index < _activePanelIndex)
+                    if (index < ActivePanelIndex)
                     {
                         await ActivatePanelAsync(index, true);
                     }
                 }
                 else if (PanelCount > 0)
                 {
-                    var index = _activePanelIndex + 1;
+                    var index = ActivePanelIndex + 1;
                     while (index < _panels.Count
                         && _panels[index].Disabled)
                     {
@@ -1124,7 +1062,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
             case "Delete":
                 if (PanelCount > 0)
                 {
-                    await OnCloseTabAsync(_activePanelIndex);
+                    await OnCloseTabAsync(ActivePanelIndex);
                 }
                 break;
         }
@@ -1144,6 +1082,10 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         foreach (var panel in _panels)
         {
             total += GetReferenceSize(panel.PanelReference);
+        }
+        for (var i = 0; i < _dynamicItems.Count; i++)
+        {
+            total += GetReferenceSize(_dynamicItems[i].ElementReference) + 2;
         }
         _allTabsSize = total;
 

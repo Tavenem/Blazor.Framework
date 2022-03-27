@@ -12,7 +12,7 @@
      role="listitem"
      class="@CssClass"
      style="@CssStyle"
-     draggable="@(IsDraggable ? "true" : "false")"
+     draggable="@(GetIsDraggable() ? "true" : "false")"
      @onclick="OnClickAsync">
     @if (!string.IsNullOrWhiteSpace(IconName))
     {

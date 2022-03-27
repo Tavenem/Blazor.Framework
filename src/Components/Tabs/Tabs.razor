@@ -19,6 +19,7 @@
                 }
                 <div @ref="_tabsContent" class="tabs-toolbar-content">
                     <div class="tabs-toolbar-wrapper"
+                         style="@ScrollStyle"
                          role="tablist"
                          tabindex="0"
                          @onkeydown="OnKeyDownAsync">
@@ -26,13 +27,14 @@
                         {
                             var index = i;
                             <div @ref="_panels[index].PanelReference"
+                                 @key="@_panels[index].Id"
                                  id="@_panels[index].Id"
                                  @onclick="@(_ => ActivatePanelAsync(index))"
-                                 draggable="@(_panels[index].IsDraggable ? "true" : "false")"
+                                 draggable="@(_panels[index].GetIsDraggable() ? "true" : "false")"
                                  class="@GetTabClass(index)"
                                  role="tab"
                                  aria-controls="@_panels[index].PanelId"
-                                 aria-selected="@(index == _activePanelIndex ? "true" : "false")">
+                                 aria-selected="@(index == ActivePanelIndex ? "true" : "false")">
                                 @if (_panels[index].TabContent is not null)
                                 {
                                     @_panels[index].TabContent
@@ -60,10 +62,10 @@
                             {
                                 var index = i;
                                 <DraggableDropTarget @ref="_dynamicItems[index].DragDropComponent"
+                                                     @key="@_dynamicItems[index].Id"
                                                      Id="@_dynamicItems[index].Id"
                                                      TDragItem="TTabItem"
                                                      TDropItem="TTabItem"
-                                                     Class="@GetTabClass(index + _panels.Count)"
                                                      DragEffectAllowed="DragEffectAllowed"
                                                      IsDraggable="EnableDragDrop"
                                                      IsDropTarget="EnableDragDrop"
@@ -72,8 +74,9 @@
                                                      OnDropped="@(e => OnDroppedItemAsync(index, e))">
                                     <div @ref="_dynamicItems[index].ElementReference"
                                          @onclick="@(_ => ActivatePanelAsync(index + _panels.Count))"
+                                         class="@GetTabClass(index + _panels.Count)"
                                          role="tab"
-                                         aria-selected="@(index - _panels.Count == _activePanelIndex ? "true" : "false")"
+                                         aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")"
                                          aria-controls="@_dynamicItems[index].PanelId">
                                         @if (_dynamicItems[index].DragDropComponent?.HasValidDrop == true
                                             || (index == 0 && _panels.Any(x => x.HasValidDrop)))
@@ -88,9 +91,9 @@
                                         {
                                             @TabTitle(Items[index + _panels.Count])
                                         }
-                                        @if (OnClose.HasDelegate)
+                                        @if (CanCloseTabs || OnClose.HasDelegate)
                                         {
-                                            <tf-close @onclick="@(_ => OnCloseTabAsync(index))" />
+                                            <tf-close @onclick="@(_ => OnCloseTabAsync(index))" @onclick:stopPropagation="true" />
                                         }
                                     </div>
                                 </DraggableDropTarget>
@@ -100,6 +103,12 @@
                         {
                             <div class="@DropPlaceholderClass"></div>
                         }
+                        @if (OnAdd is not null)
+                        {
+                            <button @onclick="OnAddTabAsync" class="btn btn-icon add-btn">
+                                <tf-icon>@AddIcon</tf-icon>
+                            </button>
+                        }
                         <div class="tab-slider" style="@SliderStyle"></div>
                     </div>
                 </div>
@@ -107,12 +116,6 @@
                 {
                     <button @onclick="ScrollForward" class="tab-scroll-btn btn btn-icon" disabled="@_forwardButtonDisabled">
                         <tf-icon>@ForwardIcon</tf-icon>
-                    </button>
-                }
-                @if (OnAdd is not null)
-                {
-                    <button @onclick="OnAddTabAsync" class="btn btn-icon">
-                        <tf-icon>@AddIcon</tf-icon>
                     </button>
                 }
                 @PostTabContent
@@ -130,9 +133,10 @@
                 for (var i = 0; i < _dynamicItems.Count && i < Items.Count; i++)
                 {
                     var index = i;
-                    <div id="@_dynamicItems[index].PanelId"
+                    <div @key="@_dynamicItems[index].PanelId"
+                         id="@_dynamicItems[index].PanelId"
                          role="tabpanel"
-                         hidden="@(index + _panels.Count != ActivePanelIndex))"
+                         hidden="@(index + _panels.Count != ActivePanelIndex)"
                          aria-expanded="@(index + _panels.Count == ActivePanelIndex ? "true" : "false")">
                         @if (index + _panels.Count == ActivePanelIndex)
                         {

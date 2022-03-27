@@ -37,7 +37,7 @@ else
          role="listitem"
          class="@CssClass"
          style="@CssStyle"
-         draggable="@(IsDraggable ? "true" : "false")"
+         draggable="@(GetIsDraggable() ? "true" : "false")"
          @onclick="OnClickAsync">
         @if (HasValidDrop)
         {
@@ -45,11 +45,11 @@ else
         }
         @if (!string.IsNullOrWhiteSpace(IconName))
         {
-            <tf-icon class="@IconClassName">@IconName</tf-icon>
+            <tf-icon @onclick="OnClickIconAsync" class="@IconClassName">@IconName</tf-icon>
         }
         else if (ElementList is not null
             && ElementList.SelectionType != SelectionType.None
-            && ElementList.ShowSelectionIcon)
+            && ElementList.ShowSelectionIconValue)
         {
             <div class="list-icon-spacer"></div>
         }

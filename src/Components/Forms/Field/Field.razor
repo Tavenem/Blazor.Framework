@@ -1,0 +1,35 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <div id="@Id" class="input" tabindex="@(Disabled ? null : TabIndex)">
+        @if (ChildContent is not null)
+        {
+            @ChildContent
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if (!string.IsNullOrEmpty(HelpText)
+        || (!IsValid && ValidationMessages is not null))
+    {
+        <div class="@HelpersClass">
+            @if (!IsValid && ValidationMessages is not null)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in ValidationMessages)
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,29 @@
+﻿@page "/components/toolbar"
+
+<PageTitle>Toolbar - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Toolbar</Heading>
+
+<p>
+    The toolbar component is a simple container which applies some layout properties. It is
+    particularly designed to help arrange control buttons and status information, but can be used
+    for any content.
+</p>
+
+<p>
+    To create a toolbar, add the <code>toolbar</code> class to an element (usually a
+    <code>div</code>). It is recommended that you also add the <code>aria-role</code> attribute with
+    a value of <code>toolbar</code>.
+</p>
+
+<CodeExample Code="@(@"<div class=""toolbar w-100"" aria-role=""toolbar"">
+    <div class=""btn btn-icon me-4""><tf-icon>menu</tf-icon></div>
+    <div class=""btn btn-icon""><tf-icon>add</tf-icon></div>
+    <div class=""btn btn-icon""><tf-icon>edit</tf-icon></div>
+    <div class=""btn btn-icon""><tf-icon>remove</tf-icon></div>
+    <div class=""btn btn-icon""><tf-icon>settings</tf-icon></div>
+    <div class=""btn btn-icon ms-auto""><tf-icon>notifications</tf-icon></div>
+    <div class=""btn btn-icon""><tf-icon>push_pin</tf-icon></div>
+    <div class=""btn btn-icon""><tf-icon>people_alt</tf-icon></div>
+    <div class=""btn btn-icon ms-4""><tf-icon>more_vert</tf-icon></div>
+</div>")" />

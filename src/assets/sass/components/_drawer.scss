@@ -395,7 +395,8 @@
                 max-width: 15rem;
                 transform: translateX(0);
 
-                &.closed:not(.icon-drawer) {
+                &.closed:not(.icon-drawer),
+                &.open:not(.icon-drawer) {
                     animation: none;
                 }
 
@@ -428,8 +429,12 @@
             display: none;
         }
 
-        .drawer-container-#{$breakpoint} > .overlay.drawer-overlay {
-            display: none;
+        .drawer-container-#{$breakpoint} {
+            &, &.drawer-open {
+                > .overlay.drawer-overlay {
+                    display: none;
+                }
+            }
         }
     }
 }

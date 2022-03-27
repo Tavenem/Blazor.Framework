@@ -7,8 +7,6 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class MessageBox
 {
-    private bool _isVisible;
-
     /// <summary>
     /// <para>
     /// The text to display on the alternative choice button.
@@ -40,21 +38,7 @@ public partial class MessageBox
     /// cref="Framework.DialogService"/>.
     /// </para>
     /// </summary>
-    [Parameter]
-    public bool IsVisible
-    {
-        get => _isVisible;
-        set
-        {
-            if (_isVisible == value)
-            {
-                return;
-            }
-
-            _isVisible = value;
-            IsVisibleChanged.InvokeAsync(value);
-        }
-    }
+    [Parameter] public bool IsVisible { get; set; }
 
     /// <summary>
     /// Raised when an inline message box's visibility changes.
@@ -100,6 +84,24 @@ public partial class MessageBox
     [CascadingParameter] private DialogInstance? DialogInstance { get; set; }
 
     [Inject] private DialogService DialogService { get; set; } = default!;
+
+    /// <inheritdoc/>
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var visibleChanged = false;
+        if (parameters.TryGetValue<bool>(nameof(IsVisible), out var isVisible)
+            && isVisible != IsVisible)
+        {
+            visibleChanged = true;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (visibleChanged)
+        {
+            await IsVisibleChanged.InvokeAsync(IsVisible);
+        }
+    }
 
     private async Task OnAltClicked()
     {

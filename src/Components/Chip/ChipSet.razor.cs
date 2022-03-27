@@ -29,11 +29,11 @@ public partial class ChipSet<TChip>
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("chipset")
-        .Add("can-drag", IsDragStart)
+    protected override string? CssClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("chipset")
+        .Add("can-drag", IsDragStartValue)
         .Add(CanDropClass, HasValidDrop)
         .Add(NoDropClass, DragDropListener.DropValid == false)
-        .Add(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -33,52 +33,90 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="Microsoft.AspNetCore.ClientAssets" Version="0.1.0-alpha.21528.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.2.22153.2" />
   </ItemGroup>
 	
   <ItemGroup>
-    <Content Update="assets\**" Pack="false">
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
     <None Include="tavenem_128.png" Pack="true" PackagePath="\" />
-    <ClientAssetsInputs Include="assets\sass\**\*.scss" Exclude="assets\sass\**\_*.scss" />
-    <ClientAssetsInputs Remove="assets\package.json" />
-    <ClientAssetsInputs Remove="assets\postcss.config.js" />
-    <ClientAssetsInputs Remove="assets\rollup.config.js" />
-    <ClientAssetsInputs Remove="assets\tsconfig.json" />
-    <ClientAssetsInputs Remove="assets\scripts\*.ts" />
-    <Content Include="assets\sass\framework.scss" />
-    <ScssFiles Include="assets\**\*.scss" Exclude="assets\**\_*.scss" />
   </ItemGroup>
 	
   <PropertyGroup>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <ClientAssetsBuildOutputParameter>-d</ClientAssetsBuildOutputParameter>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <ClientAssetsDirectory>assets\</ClientAssetsDirectory>
+    <ClientAssetsRestoreInputs>$(MSBuildProjectFile);$(ClientAssetsDirectory)package-lock.json;$(ClientAssetsDirectory)package.json</ClientAssetsRestoreInputs>
+    <ClientAssetsRestoreOutputs>$(ClientAssetsDirectory)node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
+
+    <!-- Run restore only once for multi targeting builds -->
+    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
+    <!-- If multitargeting, set this value to true only for a given target framework -->
+    <ShouldRunClientAssetsBuild>true</ShouldRunClientAssetsBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Update="$(ClientAssetsDirectory)**" Pack="false">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.js;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes)" />
+    <ScssFiles Include="$(ClientAssetsDirectory)**\*.scss" Exclude="$(ClientAssetsDirectory)**\_*.scss" />
+  </ItemGroup>
+
+  <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
+    <Message Importance="high" Text="Running npm install..." />
+    <Exec Command="npm install" WorkingDirectory="$(ClientAssetsDirectory)" />
+  </Target>
+  
+  <Target Name="ClientAssetsBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
+    <PropertyGroup>
+      <_ClientAssetsOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)clientassets'))/</_ClientAssetsOutputFullPath>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_ClientAssetsOutputFullPath)" />
+    
+    <Message Importance="high" Text="Running npm run build:$(Configuration)..." />
+    <Exec Command="npm run build:$(Configuration) -- -d $(_ClientAssetsOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
+
+    <ItemGroup>
+      <_ClientAssetsBuildOutput Include="$(IntermediateOutputPath)clientassets\**"></_ClientAssetsBuildOutput>
+    </ItemGroup>
+
+    <WriteLinesToFile File="$(IntermediateOutputPath)clientassetsbuild.complete.txt" Lines="@(_ClientAssetsBuildOutput)" />
+  </Target>
+  
+  <Target Name="DefineClientAssets" AfterTargets="ClientAssetsBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <FileWrites Include="@(_ClientAssetsBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)clientassetsbuild.complete.txt" />
+    </ItemGroup>
+    
+    <DefineStaticWebAssets CandidateAssets="@(_ClientAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_ClientAssetsOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
+  </Target>
 	
-  <Target Name="SassBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+  <Target Name="SassBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
     <PropertyGroup>
       <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
       <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))</_SassOutputFullPath>
       <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>
     </PropertyGroup>
+    
     <MakeDir Directories="$(_SassOutputFolderPath)" />
     <MakeDir Directories="$(_CssOutputFolderPath)" />
 
     <Message Importance="high" Text="Running npm run sass..." />
-    <Exec Command="npm run sass -- $(_SassOutputFullPath)" WorkingDirectory="assets\" />
+    <Exec Command="npm run sass -- $(_SassOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
 
     <Message Importance="high" Text="Running npm run postcss..." />
-    <Exec Command="npm run postcss -- $(_SassOutputFullPath) -d $(_CssOutputFolderPath)" WorkingDirectory="assets\" />
+    <Exec Command="npm run postcss -- $(_SassOutputFullPath) -d $(_CssOutputFolderPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
 
     <ItemGroup>
       <_CssBuildOutput Include="$(IntermediateOutputPath)css\**"></_CssBuildOutput>
     </ItemGroup>
+    
     <WriteLinesToFile File="$(IntermediateOutputPath)stylebuild.complete.txt" Lines="@(_CssBuildOutput)" />
   </Target>
   
@@ -86,11 +124,9 @@
     <ItemGroup>
       <FileWrites Include="@(_CssBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />
-      
-      <Content Condition="'$(TargetFramework)' != 'net6.0'" Include="@(_CssBuildOutput)" Link="wwwroot\%(_CssBuildOutput.RecursiveDir)\%(_CssBuildOutput.FileName)%(_CssBuildOutput.Extension)" />
     </ItemGroup>
     
-    <DefineStaticWebAssets Condition="'$(TargetFramework)' == 'net6.0'" CandidateAssets="@(_CssBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_CssOutputFolderPath)" BasePath="$(StaticWebAssetBasePath)">
+    <DefineStaticWebAssets CandidateAssets="@(_CssBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_CssOutputFolderPath)" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>

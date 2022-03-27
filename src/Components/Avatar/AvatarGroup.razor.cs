@@ -9,9 +9,6 @@ public partial class AvatarGroup
 {
     private readonly List<Avatar> _avatars = new();
 
-    private bool _childrenNeedUpdates = false;
-
-    private int? _max;
     /// <summary>
     /// <para>
     /// The maximum number avatars to display.
@@ -22,18 +19,7 @@ public partial class AvatarGroup
     /// </para>
     /// </summary>
     [Parameter]
-    public int? Max
-    {
-        get => _max;
-        set
-        {
-            if (value != _max)
-            {
-                _max = value;
-                _childrenNeedUpdates = true;
-            }
-        }
-    }
+    public int? Max { get; set; }
 
     /// <summary>
     /// Custom CSS class(es) for the avatar displayed in place of any overflow.
@@ -45,7 +31,7 @@ public partial class AvatarGroup
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("avatar-group")
+    protected override string? CssClass => new CssBuilder("avatar-group")
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
@@ -53,27 +39,23 @@ public partial class AvatarGroup
     /// <summary>
     /// Custom CSS class(es) for the avatar displayed in place of any overflow.
     /// </summary>
-    protected string OverflowAvatarClassName => new CssBuilder("avatar")
+    protected string? OverflowAvatarClassName => new CssBuilder("avatar")
         .Add(OverflowAvatarClass)
         .ToString();
 
-    /// <summary>
-    /// Method invoked when the component has received parameters from its parent in
-    /// the render tree, and the incoming values have been assigned to properties.
-    /// </summary>
-    protected override void OnParametersSet()
+    /// <inheritdoc/>
+    public override Task SetParametersAsync(ParameterView parameters)
     {
-        base.OnParametersSet();
-
-        if (_childrenNeedUpdates)
+        if (parameters.TryGetValue<int?>(nameof(Max), out var max)
+            && max != Max)
         {
             foreach (var avatar in _avatars)
             {
                 avatar.ForceRedraw();
             }
-
-            _childrenNeedUpdates = false;
         }
+
+        return base.SetParametersAsync(parameters);
     }
 
     internal void Add(Avatar avatar)
@@ -95,5 +77,5 @@ public partial class AvatarGroup
 
     internal void Remove(Avatar avatar) => _avatars.Remove(avatar);
 
-    internal bool ShouldDisplay(Avatar avatar) => !_max.HasValue || _avatars.IndexOf(avatar) < _max;
+    internal bool ShouldDisplay(Avatar avatar) => !Max.HasValue || _avatars.IndexOf(avatar) < Max;
 }

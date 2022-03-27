@@ -98,6 +98,10 @@ h6, .h6 {
 p {
     margin-bottom: 1rem;
     margin-top: 0;
+
+    &:last-child {
+        margin-bottom: .25rem;
+    }
 }
 
 abbr[title] {

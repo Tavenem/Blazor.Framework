@@ -7,7 +7,6 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Dialog
 {
-    private bool _isVisible;
     private DialogReference? _reference;
 
     /// <summary>
@@ -44,32 +43,7 @@ public partial class Dialog
     /// cref="Framework.DialogService"/>.
     /// </para>
     /// </summary>
-    [Parameter]
-    public bool IsVisible
-    {
-        get => _isVisible;
-        set
-        {
-            if (_isVisible == value)
-            {
-                return;
-            }
-
-            _isVisible = value;
-            if (DialogInstance is null)
-            {
-                if (_isVisible)
-                {
-                    Show();
-                }
-                else
-                {
-                    Close();
-                }
-            }
-            IsVisibleChanged.InvokeAsync(value);
-        }
-    }
+    [Parameter] public bool IsVisible { get; set; }
 
     /// <summary>
     /// Raised when an inline dialog's visibility changes.
@@ -95,14 +69,14 @@ public partial class Dialog
     /// <summary>
     /// The final value assigned to the body class attribute.
     /// </summary>
-    protected string BodyCssClass => new CssBuilder("body")
+    protected string? BodyCssClass => new CssBuilder("body")
         .Add(BodyClass)
         .ToString();
 
     /// <summary>
     /// The final value assigned to the footer class attribute.
     /// </summary>
-    protected string FooterCssClass => new CssBuilder("footer")
+    protected string? FooterCssClass => new CssBuilder("footer")
         .Add(FooterClass)
         .ToString();
 
@@ -110,27 +84,39 @@ public partial class Dialog
 
     [Inject] private DialogService DialogService { get; set; } = default!;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
+    /// <inheritdoc/>
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var visibleChanged = false;
+        if (parameters.TryGetValue<bool>(nameof(IsVisible), out var isVisible)
+            && isVisible != IsVisible)
+        {
+            visibleChanged = true;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (visibleChanged)
+        {
+            if (DialogInstance is null)
+            {
+                if (IsVisible)
+                {
+                    Show();
+                }
+                else
+                {
+                    Close();
+                }
+            }
+            await IsVisibleChanged.InvokeAsync(IsVisible);
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void OnInitialized() => DialogInstance?.Register(this);
 
-    /// <summary>
-    /// Method invoked after each time the component has been rendered.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (DialogInstance is null
@@ -172,7 +158,7 @@ public partial class Dialog
         _reference = DialogService.Show<Dialog>(title, parameters, options ?? Options);
         _reference.Result.ContinueWith(t =>
         {
-            _isVisible = false;
+            IsVisible = false;
             InvokeAsync(() => IsVisibleChanged.InvokeAsync(false));
         });
         return _reference;

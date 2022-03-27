@@ -17,11 +17,11 @@
     <code>role="list"</code>, or <code>role="navigation"</code> for lists of links.
 </p>
 
-<CodeExample Code="@(@"<div class=""list"">
-    <span>Item 1</span>
-    <span>Item 2</span>
-    <span>Item 3</span>
-</div>")" />
+<CodeExample Code="@(@"<ul class=""list"">
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <p>
     To indicate that a non-button, non-link list item is interactive, add the <code>clickable</code>
@@ -32,17 +32,33 @@
     An active item can be indicated with the <code>active</code> class.
 </p>
 
-<CodeExample Code="@(@"<div class=""list clickable"">
-    <span>Item 1</span>
-    <span class=""active"">Item 2</span>
-    <span>Item 3</span>
-</div>")" />
+<CodeExample Code="@(@"<ul class=""list clickable"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <p>
     You can assign a theme class to a list to choose the color used to indicate active items.
 </p>
 
-<CodeExample Code="@(@"<ul class=""list secondary"">
+<p>
+    You can also assign the <code>filled</code> class to tint the background of the entire list, and
+    the <code>solid</code> class in combination with the <code>filled</code> class to give the list
+    a solid color background.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list clickable secondary"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>
+<ul class=""list clickable tertiary filled"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>
+<ul class=""list clickable info filled solid"">
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
     <li>Item 3</li>
@@ -52,11 +68,11 @@
     Use the <code>highlight-start</code> class to modify the active indicator's position.
 </p>
 
-<CodeExample Code="@(@"<div class=""list highlight-start"">
-    <span>Item 1</span>
-    <span class=""active"">Item 2</span>
-    <span>Item 3</span>
-</div>")" />
+<CodeExample Code="@(@"<ul class=""list highlight-start"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <p>
     You can add subheaders to your lists at any position. Give them the <code>inset</code> class to
@@ -64,34 +80,34 @@
     top of a list which is scrolled past the header's position.
 </p>
 
-<CodeExample Code="@(@"<div class=""list clickable"">
-    <span class=""subheader"">Subheader</span>
-    <span>Item 1</span>
-    <span class=""active"">Item 2</span>
-    <span class=""subheader inset"">Inset subheader</span>
-    <span>Item 3</span>
-</div>")" />
+<CodeExample Code="@(@"<ul class=""list"">
+    <li class=""subheader"">Subheader</li>
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li class=""subheader inset"">Inset subheader</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <p>
     Add the <code>disabled</code> class to change the style and color of the list and its items.
     Note, however, that this does not actually disable any list items such as buttons or links.
 </p>
 
-<CodeExample Code="@(@"<div class=""list disabled"">
-    <span>Item 1</span>
-    <span class=""active"">Item 2</span>
-    <span>Item 3</span>
-</div>")" />
+<CodeExample Code="@(@"<ul class=""list disabled"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <p>
     The internal padding of a list can be minimized with the <code>dense</code> class.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<div class=""list dense"">
-    <span>Item 1</span>
-    <span class=""active"">Item 2</span>
-    <span>Item 3</span>
-</div>")" />
+<CodeExample IsOpen="false" Code="@(@"<ul class=""list dense"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
 
 <Heading Level="HeadingLevel.H2">Bound Lists</Heading>
 
@@ -111,18 +127,24 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem1" />
+            <ElementList Items="_items" SelectionType="SelectionType.Single" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" />
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-    private string? _selectedItem;
 }")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note that the <code>SelectedItem</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
 
 <Heading Level="HeadingLevel.H3">Multiselect</Heading>
 
@@ -135,18 +157,24 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
+            <ElementList Items="_items" SelectionType="SelectionType.Multiple" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItems=""_selectedItems"" />
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-    private IEnumerable<string>? _selectedItems;
 }")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note that the <code>SelectedItems</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemsChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
 
 <Heading Level="HeadingLevel.H3">Required</Heading>
 
@@ -160,15 +188,14 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem2" Required="true" />
+            <ElementList Items="_items" SelectionType="SelectionType.Single" Required="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" Required=""true"" />
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" Required=""true"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-    private string? _selectedItem;
 }")
     </ChildContent>
 </Collapse>
@@ -216,6 +243,40 @@
     Note that the <code>ItemIsCollapsible</code> and <code>CollapsibleTemplate</code> properties can
     be used to create collapsible list items with content other than sublists, as well.
 </p>
+
+<p>
+    You can add the <code>tree</code> class to an <code>ElementList</code> to change the appearance
+    of collapsible sublists, moving the expansion icon to the beginning and rotating it.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Class="tree" Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
+                <Template>
+                    <span>@context</span>
+                </Template>
+                <CollapsibleTemplate>
+                    <ElementList Items="_items" />
+                </CollapsibleTemplate>
+            </ElementList>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Class=""tree"" Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
+    <Template>
+        <span>@context</span>
+    </Template>
+    <CollapsibleTemplate>
+        <ElementList Items=""_items"" />
+    </CollapsibleTemplate>
+</ElementList>
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
 
 <Heading Level="HeadingLevel.H3">Drag and Drop</Heading>
 
@@ -338,15 +399,36 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem3" ShowSelectionIcon="true" />
+            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" ShowSelectionIcon=""true"" />
+        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-    private string? _selectedItem;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    If you set the <code>SelectionIcons</code> property to <code>true</code>, both the selected and
+    unselected states will show an icon, and only that icon will respond to click events to change
+    the selection state. This can be helpful when you want users to be able to select the text of
+    your items, or when they require their own interactions.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" SelectionType="SelectionType.Single" SelectionIcons="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" SelectionIcons=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
 }")
     </ChildContent>
 </Collapse>
@@ -362,7 +444,7 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="@(_ => _theme = ThemeColor.Secondary)" />
+            <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -371,6 +453,10 @@
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
     private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
 }")
     </ChildContent>
 </Collapse>
@@ -379,9 +465,9 @@
     private List<string> _items = new() { "Item 1", "Item 2", "Item 3" };
     private List<int> _items3 = new() { 1, 2, 3 };
     private List<string> _dragItems = new() { "Item 1", "Item 2", "Item 3" };
-    private string? _selectedItem1;
-    private string? _selectedItem2;
-    private string? _selectedItem3;
-    private IEnumerable<string>? _selectedItems;
     private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
 }

@@ -1,0 +1,55 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits InputComponentBase<string>
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+    <div class="input">
+        <textarea @ref="ElementReference"
+                  class="@InputCssClass"
+                  style="@InputCssStyle"
+                  autocomplete="@AutocompleteValue"
+                  autocorrect="@AutocorrectValue"
+                  disabled="@Disabled"
+                  maxlength="@MaxLength"
+                  placeholder="@Placeholder"
+                  readonly="@ReadOnly"
+                  required="@Required"
+                  rows="@Rows"
+                  tabindex="@TabIndex"
+                  value="@CurrentValue"
+                  @oninput="OnInput"
+                  @onchange="OnChangeAsync" />
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if ((ShowLength && MaxLength.HasValue)
+        || !string.IsNullOrEmpty(HelpText)
+        || !IsValid)
+    {
+        <div class="@HelpersClass">
+            @if (!IsValid)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+            @if (ShowLength && MaxLength.HasValue)
+            {
+                <div class="ml-auto">
+                    <span>@CurrentLength</span>
+                    <span>/</span>
+                    <span>@MaxLength</span>
+                </div>
+            }
+        </div>
+    }
+</div>

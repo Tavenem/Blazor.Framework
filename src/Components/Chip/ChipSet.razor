@@ -15,7 +15,7 @@
     {
         <CascadingValue Value="this as ElementList<TChip>" IsFixed="true">
         <CascadingValue Value="SelectedItems">
-            @if (Template is null)
+            @if (TemplateValue is null)
             {
                 foreach (var item in Items)
                 {
@@ -27,7 +27,7 @@
                 foreach (var item in Items)
                 {
                     <Chip TChip="TChip" Item="item">
-                        @Template(item)
+                        @TemplateValue(item)
                     </Chip>
                 }
             }

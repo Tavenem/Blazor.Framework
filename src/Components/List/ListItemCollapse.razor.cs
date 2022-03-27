@@ -10,17 +10,17 @@ public partial class ListItemCollapse<TListItem>
 {
     [Inject] private DragDropListener DragDropListener { get; set; } = default!;
 
-    private DragEffect DragEffectAllowed => ListItem?.DragEffectAllowed ?? DragEffect.CopyMove;
+    private DragEffect DragEffectAllowed => ListItem?.GetDragEffectAllowed() ?? DragEffect.CopyMove;
 
-    private bool IsDraggable => ListItem?.IsDraggable == true;
+    private bool IsDraggable => ListItem?.GetIsDraggable() == true;
 
-    private string HeaderClass => new CssBuilder("header")
+    private string? HeaderClass => new CssBuilder("header")
         .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
         .ToString();
 
     private string? Id { get; set; }
 
-    private bool IsDropTarget => ListItem?.IsDropTarget ?? false;
+    private bool IsDropTarget => ListItem?.GetIsDropTarget() ?? false;
 
     [CascadingParameter] private ListItem<TListItem>? ListItem { get; set; }
 
@@ -132,11 +132,7 @@ public partial class ListItemCollapse<TListItem>
 
         if (ListItem.OnDrop.HasDelegate)
         {
-            await ListItem.OnDrop.InvokeAsync(new()
-            {
-                Data = e,
-                Item = item,
-            });
+            await ListItem.OnDrop.InvokeAsync(new(e));
         }
         else if (item is not null)
         {

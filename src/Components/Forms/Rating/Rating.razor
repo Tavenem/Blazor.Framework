@@ -1,0 +1,28 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@ChildContent
+<span tabindex="@(Disabled ? -1 : 0)"
+      @attributes="AdditionalAttributes"
+      class="@CssClass"
+      style="@CssStyle">
+    @for (var i = 0; i < Max; i++)
+    {
+        var index = i;
+        <span @onclick="@(_ => OnRatingClickAsync(index))"
+              @onmouseout="OnMouseOutAsync"
+              @onmouseover="@(_ => OnMouseOverAsync(index))">
+            <input type="radio"
+                   tabindex="-1"
+                   value="@(index + 1)"
+                   name="@Name"
+                   disabled="@Disabled"
+                   readonly="@ReadOnly"
+                   checked="@(index < Value)" />
+            <button class="@RatingItemCssClass" style="@RatingItemStyle">
+                <tf-icon>@(IndexIsActive(index) ? ActiveIcon : InactiveIcon)</tf-icon>
+            </button>
+        </span>
+    }
+</span>

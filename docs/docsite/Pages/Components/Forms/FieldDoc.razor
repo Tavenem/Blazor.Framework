@@ -1,0 +1,333 @@
+﻿@page "/components/field"
+
+<PageTitle>Field - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Field</Heading>
+
+<p>
+    The <code>Field</code> component mimics the appearance of other Tavenem Blazor Framework input
+    components (particularly the <a href="./components/text-input"><code>TextInput</code></a>
+    component), while allowing you to place any custom content within.
+</p>
+
+<p>
+    It can be used to build your own input controls that have a similar look and feel to the Tavenem
+    Blazor Framework input components, or to create composite controls with the appearance of a
+    unified input.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    The simplest field is empty, and comes in the same three variations as the <a
+    href="./components/text-input"><code>TextInput</code></a> component:
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field />
+                <Field class="filled" />
+                <Field class="outlined" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Label" />
+                <Field Label="Label" class="filled" />
+                <Field Label="Label" class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field />
+    <Field class=""filled"" />
+    <Field class=""outlined"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Label"" />
+    <Field Label=""Label"" class=""filled"" />
+    <Field Label=""Label"" class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can add the <code>dense</code> class to any variant to reduce the margins and padding.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Normal" Class="dense" />
+                <Field Label="Filled" Class="filled dense" />
+                <Field Label="Outlined" Class="outlined dense" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Normal"" Class=""dense"" />
+    <Field Label=""Filled"" Class=""filled dense"" />
+    <Field Label=""Outlined"" Class=""outlined dense"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Add child content to move the label up and place the content where user input would normally appear.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Normal">Dummy input</Field>
+                <Field Label="Filled" Class="filled">Dummy input</Field>
+                <Field Label="Outlined" Class="outlined">Dummy input</Field>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Normal"">Dummy input</Field>
+    <Field Label=""Filled"" Class=""filled"">Dummy input</Field>
+    <Field Label=""Outlined"" Class=""outlined"">Dummy input</Field>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Disabled & read-only</Heading>
+
+<p>
+    Use the <code>Disabled</code> or <code>ReadOnly</code> properties to apply visual styles that
+    mimic those of a disabled or read-only input.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Disabled" Disabled="true">Disabled content</Field>
+                <Field Label="Disabled" Disabled="true" Class="filled">Disabled content</Field>
+                <Field Label="Disabled" Disabled="true" Class="outlined">Disabled content</Field>
+            </div>
+            <div class="row mt-3 fill align-items-center gap-2">
+                <Field Label="Read-only" ReadOnly="true">Read-only content</Field>
+                <Field Label="Read-only" ReadOnly="true" Class="filled">Read-only content</Field>
+                <Field Label="Read-only" ReadOnly="true" Class="outlined">Read-only content</Field>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Disabled"" Disabled=""true"">Disabled content</Field>
+    <Field Label=""Disabled"" Disabled=""true"" Class=""filled"">Disabled content</Field>
+    <Field Label=""Disabled"" Disabled=""true"" Class=""outlined"">Disabled content</Field>
+</div>
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <Field Label=""Read-only"" ReadOnly=""true"">Read-only content</Field>
+    <Field Label=""Read-only"" ReadOnly=""true"" Class=""filled"">Read-only content</Field>
+    <Field Label=""Read-only"" ReadOnly=""true"" Class=""outlined"">Read-only content</Field>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Label</Heading>
+
+<p>
+    The <code>Label</code> property assigns a label to the field. The label will appear within the
+    input like a placeholder when it has no child content and does not have focus.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Label" />
+                <Field Label="Label">Dummy input</Field>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Label"" />
+    <Field Label=""Label"">Dummy input</Field>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Help text</Heading>
+
+<p>
+    You can supply help text for the field with the <code>HelpText</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Normal" HelpText="Some help text" />
+                <Field Label="Filled" HelpText="Some help text" Class="filled" />
+                <Field Label="Outlined" HelpText="Some help text" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Normal"" HelpText=""Some help text"" />
+    <Field Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+    <Field Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can hide the help text until the input has focus by setting the
+    <code>DisplayHelpTextOnFocus</code> property to <code>true</code>.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true">Click here</Field>
+                <Field Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled">Click here</Field>
+                <Field Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined">Click here</Field>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Normal"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"">Click here</Field>
+    <Field Label=""Filled"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""filled"">Click here</Field>
+    <Field Label=""Outlined"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""outlined"">Click here</Field>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that help text is replaced by any field validation messages when the field is marked invalid.
+</p>
+
+<Heading Level="HeadingLevel.H2">Required</Heading>
+
+<p>
+    Set the <code>Required</code> property to <code>true</code> to add an indicator to the label.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Required" Required="true" />
+                <Field Label="Required" Required="true" Class="filled" />
+                <Field Label="Required" Required="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Required"" Required=""true"" />
+    <Field Label=""Required"" Required=""true"" Class=""filled"" />
+    <Field Label=""Required"" Required=""true"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Tab index</Heading>
+
+<p>
+    Set the <code>TabIndex</code> property to specify the value of the field's <code>tabindex</code>
+    attribute.
+</p>
+
+<p>
+    Note that this is set to zero by default, which makes fields focusable even if their content
+    isn't normally an interactive element. You can override this if necessary by assigning <code>null</code>.
+</p>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary">Dummy input</Field>
+                <Field Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled">Dummy input</Field>
+                <Field Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined">Dummy input</Field>
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary">Dummy input</Field>
+                <Field Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled">Dummy input</Field>
+                <Field Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined">Dummy input</Field>
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary">Dummy input</Field>
+                <Field Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled">Dummy input</Field>
+                <Field Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined">Dummy input</Field>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextInput Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"">Dummy input</Field>
+    <TextInput Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"">Dummy input</Field>
+    <TextInput Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"">Dummy input</Field>
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <TextInput Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"">Dummy input</Field>
+    <TextInput Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"">Dummy input</Field>
+    <TextInput Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"">Dummy input</Field>
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <TextInput Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"">Dummy input</Field>
+    <TextInput Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"">Dummy input</Field>
+    <TextInput Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"">Dummy input</Field>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Validation</Heading>
+
+<p>
+    Although a field cannot be validated in the same way as a real input component (since its
+    content is unknown), you can set the <code>IsValid</code> property to <code>false</code>
+    manually to give it the same visual appearance as an input which failed validation.
+</p>
+
+<p>
+    You can also assign an enumeration of strings to the <code>ValidationMessages</code> property to
+    display them just as normal validation messages would be displayed for an input. They will only
+    appear when <code>IsValid</code> is set to <code>false</code>.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Field Label="Invalid" IsValid="false">Failed input</Field>
+                <Field Label="Invalid" IsValid="false" ValidationMessages="_validationMessages">Failed input</Field>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Field Label=""Invalid"" IsValid=""false"">Failed input</Field>
+    <Field Label=""Invalid"" IsValid=""false"" ValidationMessages=""_validationMessages"">Failed input</Field>
+</div>
+
+@code {
+    private string[] _validationMessages = new[] { ""This input is wrong"" };
+}")
+    </ChildContent>
+</Collapse>
+
+@code {
+    private string[] _validationMessages = new[] { "This input is wrong" };
+}

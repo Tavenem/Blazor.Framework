@@ -1,46 +1,108 @@
 ﻿.checkbox {
-    @include ripple;
+    --button-inherited-padding-y-icon: 6px;
     --checkbox-inherited-color: var(--tavenem-color-action);
-    --checkbox-inherited-content-color: var(--tavenem-color-text);
     --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-    align-items: center;
-    color: var(--tavenem-color-action);
-    cursor: pointer;
     display: inline-flex;
-    vertical-align: middle;
-    -webkit-tap-highlight-color: transparent;
+    flex-direction: column;
 
-    &:after {
-        transform: scale(7,7);
-    }
+    label {
+        @include ripple;
+        align-items: center;
+        color: var(--tavenem-color-action);
+        cursor: pointer;
+        display: inline-flex;
+        vertical-align: middle;
+        -webkit-tap-highlight-color: transparent;
 
-    > .content {
-        color: var(--checkbox-inherited-content-color);
-    }
+        &:after {
+            transform: scale(7,7);
+        }
 
-    &:disabled, &.disabled {
-        &, &:hover, &:focus-visible {
-            color: var(--tavenem-color-action-disabled);
+        > .btn {
+            background-color: transparent;
+            color: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            vertical-align: middle;
 
-            &, * {
-                background-color: transparent !important;
-                cursor: default;
+            &:hover,
+            &:focus-visible {
+                background-color: var(--checkbox-inherited-hover-bg);
             }
 
-            * {
-                color: var(--tavenem-color-text-disabled);
+            > input[type="checkbox"] {
+                color: inherit;
+                cursor: inherit;
+                height: 100%;
+                left: 0;
+                margin: 0;
+                opacity: 0;
+                padding: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
+                z-index: 1;
+            }
+
+            > tf-icon {
+                color: var(--checkbox-inherited-color);
+
+                &:hover {
+                    background-color: var(--checkbox-inherited-hover-bg);
+                }
             }
         }
     }
 
-    &.readonly, &.readonly:hover {
+    .field-helpers {
+        color: var(--checkbox-inherited-color);
+        padding-inline-start: var(--button-inherited-padding-y-icon);
+    }
+
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.dense {
+        --button-inherited-padding-y-icon: 4px;
+    }
+
+    &.disabled {
+        --checkbox-inherited-color: var(--tavenem-color-action-disabled);
+        --checkbox-inherited-hover-bg: transparent;
+
+        label {
+            &, &:hover, &:focus-visible {
+                color: var(--tavenem-color-action-disabled);
+
+                &, * {
+                    background-color: transparent !important;
+                    cursor: default;
+                }
+
+                * {
+                    color: var(--tavenem-color-text-disabled);
+                }
+
+                tf-icon {
+                    color: var(--tavenem-color-action-disabled);
+                }
+            }
+        }
+    }
+
+    &.read-only, &.read-only:hover {
+        --checkbox-inherited-hover-bg: transparent;
+
         &, * {
             cursor: default;
         }
-    }
-
-    &.dense, .dense > & .checkbox-icons {
-        padding: 4px;
     }
 
     &.filled {
@@ -52,60 +114,30 @@
         border: none;
     }
 
+    &.required .label:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
     &.bg-alt {
         background-color: transparent;
     }
 
+    &.invalid {
+        --checkbox-inherited-color: var(--tavenem-color-error);
+        --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
+
+        label {
+            color: var(--tavenem-color-error);
+        }
+    }
+
     @each $theme in $theme-colors {
-        &.#{$theme} {
+        &:where(.#{$theme}) {
             --checkbox-inherited-color: var(--tavenem-theme-color);
-            --checkbox-inherited-content-color: var(--tavenem-theme-color);
             --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
             color: var(--tavenem-color-action);
         }
-    }
-}
-
-.checkbox-span {
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: middle;
-    width: 100%;
-
-    > input[type="checkbox"] {
-        color: inherit;
-        cursor: inherit;
-        height: 100%;
-        left: 0;
-        margin: 0;
-        opacity: 0;
-        padding: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        z-index: 1;
-    }
-}
-
-.checkbox-icons {
-    color: var(--checkbox-inherited-color);
-    display: flex;
-    position: relative;
-
-    &:hover {
-        background-color: var(--checkbox-inherited-hover-bg);
-    }
-
-    .icon-checked {
-        left: 0;
-        position: absolute;
-        transform: scale(0);
-        transition: transform 150ms cubic-bezier(0.4, 0, 1, 1) 0ms;
-    }
-
-    :checked + & .icon-checked {
-        transform: scale(1);
-        transition: transform 150ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
     }
 }
 

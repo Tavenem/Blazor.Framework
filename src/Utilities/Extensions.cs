@@ -83,6 +83,42 @@ internal static class Extensions
     }
 
     [return: NotNullIfNotNull("value")]
+    public static string? ToHumanReadable(this string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        var sb = new StringBuilder();
+        var whitespace = false;
+        for (var i = 0; i < value.Length; i++)
+        {
+            if (value[i] == '_')
+            {
+                sb.Append(' ');
+                whitespace = false;
+            }
+            else if (whitespace && char.IsUpper(value[i]))
+            {
+                sb.Append(' ')
+                    .Append(value[i]);
+                whitespace = false;
+            }
+            else
+            {
+                sb.Append(value[i]);
+                whitespace = char.IsWhiteSpace(value[i]);
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    public static string ToHumanReadable(this Enum value)
+        => ToHumanReadable(value.ToString());
+
+    [return: NotNullIfNotNull("value")]
     public static string? ToJsString(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -104,7 +140,9 @@ internal static class Extensions
         _ => "all",
     };
 
-    public static string ToPixels(this double value) => $"{value.ToString("N5").TrimEnd('0')}px";
+    public static string ToPixels(this double value) => value is < 0.00001 and > -0.00001
+        ? "0px"
+        : $"{value.ToString("F5").TrimEnd('0').TrimEnd('.')}px";
 
     public static Dictionary<TKey, TValue> With<TKey, TValue>(
         this Dictionary<TKey, TValue> dictionary,

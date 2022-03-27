@@ -5,6 +5,7 @@
     color: var(--tavenem-color-text);
     display: flex;
     flex-direction: column;
+    max-width: 100%;
 
     &:not(.bottom, .left, .right) .tab-slider {
         bottom: 0;
@@ -111,6 +112,14 @@
 .tabs-toolbar-inner {
     display: flex;
     min-height: 3rem;
+
+    .add-btn {
+        align-self: center;
+    }
+}
+
+.tab-scroll-btn {
+    border-radius: 0;
 }
 
 .tabs-toolbar-content {
@@ -143,6 +152,7 @@
     font-family: var(--tavenem-font-family-title);
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight-semibold);
+    gap: .5rem;
     justify-content: center;
     line-height: 1.75;
     min-height: 3rem;
@@ -171,7 +181,6 @@
 
     &.active {
         background-color: var(--tab-active-bg);
-        border-color: var(--tab-active-color);
         color: var(--tab-active-color);
 
         &:hover {
@@ -185,8 +194,8 @@
         pointer-events: none;
     }
 
-    tf-icon {
-        margin-inline-end: .5rem;
+    tf-close {
+        align-self: center;
     }
 }
 

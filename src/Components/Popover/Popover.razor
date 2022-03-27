@@ -1,0 +1,15 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @ref="ElementReference"
+     id="@Id"
+     @attributes="AdditionalAttributes"
+     class="@CssClass"
+     style="@CssStyle"
+     @onfocusout="OnFocusOutAsync">
+    @if (IsOpen)
+    {
+        @ChildContent
+    }
+</div>

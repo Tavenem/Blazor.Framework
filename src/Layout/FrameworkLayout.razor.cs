@@ -65,7 +65,7 @@ public partial class FrameworkLayout : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("framework")
+    protected override string? CssClass => new CssBuilder("framework")
         .Add(DrawerContainerClass)
         .Add("drawer-open", HasOpenDrawer)
         .Add(Class)
@@ -197,7 +197,7 @@ public partial class FrameworkLayout : IDisposable
     {
         ActiveHeading = string.IsNullOrEmpty(id)
             ? null
-            : Headings.Find(x => x.Id == id);
+            : Headings.Find(x => x.IdValue == id);
         RefreshContents();
     }
 

@@ -43,7 +43,7 @@ public interface IResizeObserver : IAsyncDisposable
     /// </summary>
     /// <param name="element">An element reference.</param>
     /// <returns>The current bounding area.</returns>
-    Task<BoundingClientRect> Observe(ElementReference element);
+    Task<BoundingClientRect?> Observe(ElementReference element);
 
     /// <summary>
     /// Observe the given list of elements for resize events.

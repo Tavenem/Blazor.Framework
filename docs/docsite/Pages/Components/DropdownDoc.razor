@@ -55,17 +55,17 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Dropdown Text="Right-click me" ActivationType="MouseEvent.RightClick">
+            <Dropdown Text="Right-click me" ActivationType="MouseEvent.RightClick" ThemeColor="ThemeColor.Primary">
                 <span>First choice</span>
                 <span>Second choice</span>
                 <span>Third choice</span>
             </Dropdown>
-            <Dropdown Text="Hover over me" ActivationType="MouseEvent.MouseOver">
+            <Dropdown Text="Hover over me" ActivationType="MouseEvent.MouseOver" ThemeColor="ThemeColor.Secondary">
                 <span>First choice</span>
                 <span>Second choice</span>
                 <span>Third choice</span>
             </Dropdown>
-            <Dropdown Text="Click or hover over me" ActivationType="MouseEvent.Any">
+            <Dropdown Text="Click or hover over me" ActivationType="MouseEvent.Any" ThemeColor="ThemeColor.Tertiary">
                 <span>First choice</span>
                 <span>Second choice</span>
                 <span>Third choice</span>
@@ -73,17 +73,17 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Click me"" ActivationType=""MouseEvent.RightClick"">
+        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Click me"" ActivationType=""MouseEvent.RightClick"" ThemeColor=""ThemeColor.Primary"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
 </Dropdown>
-<Dropdown Text=""Hover over me"" ActivationType=""MouseEvent.MouseOver"">
+<Dropdown Text=""Hover over me"" ActivationType=""MouseEvent.MouseOver"" ThemeColor=""ThemeColor.Secondary"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
 </Dropdown>
-<Dropdown Text=""Click or hover over me"" ActivationType=""MouseEvent.Any"">
+<Dropdown Text=""Click or hover over me"" ActivationType=""MouseEvent.Any"" ThemeColor=""ThemeColor.Tertiary"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
@@ -221,19 +221,19 @@
 @code {
     private Dropdown? _dropdown, _dropdown2;
 
-    private void Open(MouseEventArgs e)
+    private async Task Open(MouseEventArgs e)
     {
         if (_dropdown2 is not null)
         {
-            _dropdown2.Open(e);
+            await _dropdown2.OpenAsync(e);
         }
     }
 
-    private void Toggle(MouseEventArgs e)
+    private async Task Toggle(MouseEventArgs e)
     {
         if (_dropdown is not null)
         {
-            _dropdown.Toggle(e);
+            await _dropdown.ToggleAsync(e);
         }
     }
 }

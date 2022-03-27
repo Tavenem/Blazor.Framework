@@ -122,7 +122,7 @@ internal class ResizeObserver : IResizeObserver
     /// </summary>
     /// <param name="element">An element reference.</param>
     /// <returns>The current bounding area.</returns>
-    public async Task<BoundingClientRect> Observe(ElementReference element) => (await Observe(new[] { element })).First();
+    public async Task<BoundingClientRect?> Observe(ElementReference element) => (await Observe(new[] { element })).FirstOrDefault();
 
     /// <summary>
     /// Invoked by JS interop.

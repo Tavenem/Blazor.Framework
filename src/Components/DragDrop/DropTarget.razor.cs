@@ -49,9 +49,8 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// Defaults to "can-drop" but can be overridden with <see langword="null"/> to disable.
     /// </para>
     /// </summary>
-    [Parameter] public virtual string? CanDropClass { get; set; } = "can-drop";
+    [Parameter] public string? CanDropClass { get; set; } = "can-drop";
 
-    private DragEffect _dropEffect = DragEffect.All;
     /// <summary>
     /// <para>
     /// The drop effect allowed on this drop target.
@@ -65,21 +64,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// value has no effect.
     /// </para>
     /// </summary>
-    [Parameter]
-    public virtual DragEffect DropEffect
-    {
-        get => _dropEffect;
-        set
-        {
-            if (value is DragEffect.Copy
-                or DragEffect.Link
-                or DragEffect.Move
-                or DragEffect.All)
-            {
-                _dropEffect = value;
-            }
-        }
-    }
+    [Parameter] public DragEffect DropEffect { get; set; } = DragEffect.All;
 
     /// <summary>
     /// <para>
@@ -110,7 +95,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// the allowed effects, the agent will automatically choose a fallback effect.
     /// </para>
     /// </summary>
-    public virtual GetDropEffectDelegate<TDropItem>? GetDropEffect { get; set; }
+    public GetDropEffectDelegate<TDropItem>? GetDropEffect { get; set; }
 
     /// <summary>
     /// Indicates whether this item currently has a valid dragged item over it.
@@ -136,7 +121,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// Defaults to <see langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter] public virtual bool IsDropTarget { get; set; } = true;
+    [Parameter] public bool IsDropTarget { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -146,18 +131,15 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// Defaults to "no-drop" but can be overridden with <see langword="null"/> to disable.
     /// </para>
     /// </summary>
-    [Parameter] public virtual string? NoDropClass { get; set; } = "no-drop";
+    [Parameter] public string? NoDropClass { get; set; } = "no-drop";
 
     /// <summary>
     /// Invoked when an item is dropped on this target.
     /// </summary>
-    [Parameter] public EventCallback<DropEventArgs<TDropItem>> OnDrop { get; set; }
+    [Parameter] public EventCallback<DropEventArgs> OnDrop { get; set; }
 
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values.
-    /// </summary>
-    protected override string CssClass => new CssBuilder("border-transparent")
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder("border-transparent")
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, DragDropListener.DropValid == false)
         .Add(Class)
@@ -166,10 +148,21 @@ public partial class DropTarget<TDropItem> : IDisposable
 
     [Inject] private protected DragDropListener DragDropListener { get; set; } = default!;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
+    /// <inheritdoc/>
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+
+        if (DropEffect is not DragEffect.Copy
+            and not DragEffect.Link
+            and not DragEffect.Move
+            and not DragEffect.All)
+        {
+            DropEffect = DragEffect.All;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void OnInitialized()
     {
         DragDropListener.DropValidChanged += OnDropValidChanged;
@@ -185,21 +178,7 @@ public partial class DropTarget<TDropItem> : IDisposable
         }
     }
 
-    /// <summary>
-    /// Method invoked after each time the component has been rendered.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -210,16 +189,15 @@ public partial class DropTarget<TDropItem> : IDisposable
         }
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
+    /// <inheritdoc/>
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+
+    internal virtual bool GetIsDropTarget() => IsDropTarget;
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
@@ -241,22 +219,15 @@ public partial class DropTarget<TDropItem> : IDisposable
 
     private protected virtual async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
-        if (!IsDropTarget)
+        if (GetIsDropTarget())
         {
-            return;
+            await OnDrop.InvokeAsync(new(e));
         }
-
-        var item = DragDropService.TryGetData<TDropItem>(e);
-        await OnDrop.InvokeAsync(new()
-        {
-            Data = e,
-            Item = item,
-        });
     }
 
     private protected virtual DragEffect GetDropEffectInternal(string[] types)
     {
-        if (!IsDropTarget || !OnDrop.HasDelegate)
+        if (!GetIsDropTarget() || !OnDrop.HasDelegate)
         {
             return DragEffect.None;
         }

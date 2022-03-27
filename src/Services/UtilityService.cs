@@ -135,15 +135,4 @@ public class UtilityService : IAsyncDisposable
             .InvokeVoidAsync("registerComponents")
             .ConfigureAwait(false);
     }
-
-    internal async ValueTask StartOutsideEventListener(
-        DotNetObjectReference<OutsideEventListener> dotNetRef,
-        string elementId)
-    {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "notifyOutsideEvent",
-            dotNetRef,
-            elementId);
-    }
 }

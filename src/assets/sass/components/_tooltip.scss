@@ -1,6 +1,10 @@
 ﻿.tooltip-root {
-    display: inline-block;
+    position: relative;
     width: fit-content;
+
+    &.inline {
+        display: inline-block;
+    }
 }
 
 .tooltip {
@@ -12,19 +16,36 @@
     font-weight: var(--tavenem-font-weight-semibold);
     justify-content: center;
     line-height: 1.4rem;
-    padding: 4px 8px;
+    padding: .25rem .5rem;
     text-align: center;
     z-index: var(--tavenem-zindex-tooltip);
 
-    &.arrow:after {
-        border-color: var(--tavenem-color-dark) transparent transparent transparent;
-        border-style: solid;
-        border-width: 6px;
-        content: "";
-        position: absolute;
+    &.top-center,
+    &.bottom-center,
+    &.center-left,
+    &.center-right {
+        &.arrow:after {
+            border-color: var(--tavenem-color-dark) transparent transparent transparent;
+            border-style: solid;
+            border-width: 6px;
+            content: "";
+            position: absolute;
+        }
     }
 
-    &.top-center:not([data-popover-flip]), &.bottom-center[data-popover-flip] {
+    &.bottom-center, &.top-center {
+        &.arrow:after {
+            left: calc(50% - 3px);
+        }
+    }
+
+    &.center-right, &.center-left {
+        &.arrow:after {
+            top: calc(50% - 3px);
+        }
+    }
+
+    &.bottom-center:not([data-popover-flip]), &.top-center[data-popover-flip] {
         transform: translateY(-10px);
 
         &.arrow:after {
@@ -33,7 +54,7 @@
         }
     }
 
-    &.center-left:not([data-popover-flip]), &.center-right[data-popover-flip] {
+    &.center-right:not([data-popover-flip]), &.center-left[data-popover-flip] {
         transform: translateX(-10px);
 
         &.arrow:after {
@@ -42,7 +63,7 @@
         }
     }
 
-    &.center-right:not([data-popover-flip]), &.center-left[data-popover-flip] {
+    &.center-left:not([data-popover-flip]), &.center-right[data-popover-flip] {
         transform: translateX(10px);
 
         &.arrow:after {
@@ -51,7 +72,7 @@
         }
     }
 
-    &.bottom-center:not([data-popover-flip]), &.top-center[data-popover-flip] {
+    &.top-center:not([data-popover-flip]), &.bottom-center[data-popover-flip] {
         transform: translateY(10px);
 
         &.arrow:after {

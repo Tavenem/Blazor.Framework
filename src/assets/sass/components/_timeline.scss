@@ -1,7 +1,12 @@
 ﻿.timeline {
+    --dot-color: var(--tavenem-color-default);
+    --dot-text: var(--tavenem-color-default-text);
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
     position: relative;
+    width: 100%;
 
     &:before {
         background: var(--tavenem-color-divider);
@@ -11,11 +16,7 @@
         top: 0;
     }
 
-    &.end, &.start {
-        .timeline-item-content {
-            max-width: calc(100% - 6rem);
-        }
-
+    &.align-end, &.align-start {
         .timeline-item-opposite {
             display: none;
         }
@@ -30,106 +31,30 @@
         }
 
         .timeline-item {
+            align-items: center;
             padding-bottom: 1.5rem;
         }
 
-        .timeline-item-content {
-            max-width: calc(50% - 3rem);
-        }
-
         .timeline-item-divider {
-            min-width: 6rem;
+            min-width: 4.375rem;
         }
 
-        .timeline-item-opposite {
-            flex: 1 1 auto;
-            max-width: calc(50% - 3rem);
-        }
-
-        &.end {
+        &.align-end {
             &:before {
-                left: auto;
-                right: calc(3rem - 1px);
+                left: calc(2.1625rem - 1px);
             }
 
             .timeline-item {
-                flex-direction: row;
+                grid-template-areas: "divider content";
+                grid-template-columns: 4.375rem 1fr;
             }
 
-            .timeline-item-content > .card {
-                &:before, &:after {
-                    left: auto;
-                    right: -1rem;
-                    transform: rotate(180deg);
-                }
+            .timeline-item-content {
+                justify-self: start;
 
-                &.outlined:after {
-                    right: calc(-1rem + 1px);
-                }
-            }
+                > .card {
+                    margin-left: 0;
 
-            .timeline-item-divider {
-                align-items: flex-end;
-            }
-        }
-
-        &.start {
-            &:before {
-                left: calc(3rem - 1px);
-                right: auto;
-            }
-
-            .timeline-item {
-                flex-direction: row-reverse;
-            }
-
-            .timeline-item-content > .card {
-                &:before, &:after {
-                    left: -1rem;
-                    right: auto;
-                }
-
-                &.outlined:after {
-                    left: calc(-1rem + 1px);
-                }
-            }
-
-            .timeline-item-divider {
-                align-items: flex-start;
-            }
-        }
-    }
-
-    &:not(.horizontal, .end, .start) {
-        &:before {
-            left: auto;
-            right: calc(50% - 1px);
-        }
-
-        .timeline-item {
-            &:nth-child(odd):not(.align-start), &.align-end {
-                flex-direction: row-reverse;
-
-                .timeline-item-content > .card {
-                    &:before, &:after {
-                        left: -1rem;
-                        right: auto;
-                    }
-
-                    &.outlined:after {
-                        left: calc(-1rem + 1px);
-                    }
-                }
-
-                .timeline-item-opposite {
-                    text-align: end;
-                }
-            }
-
-            &:nth-child(2n):not(.align-end) {
-                flex-direction: row;
-
-                .timeline-item-content > .card {
                     &:before, &:after {
                         left: auto;
                         right: -1rem;
@@ -140,9 +65,94 @@
                         right: calc(-1rem + 1px);
                     }
                 }
+            }
+        }
+
+        &.align-start {
+            &:before {
+                right: calc(2.1625rem - 1px);
+            }
+
+            .timeline-item {
+                grid-template-areas: "content divider";
+                grid-template-columns: 1fr 4.375rem;
+            }
+
+            .timeline-item-content {
+                justify-self: end;
+
+                > .card {
+                    margin-right: 0;
+
+                    &:before, &:after {
+                        left: -1rem;
+                        right: auto;
+                    }
+
+                    &.outlined:after {
+                        left: calc(-1rem + 1px);
+                    }
+                }
+            }
+        }
+    }
+
+    &:not(.horizontal, .align-end, .align-start) {
+        &:before {
+            right: calc(50% - 1px);
+        }
+
+        .timeline-item {
+            grid-template-columns: 1fr 4.375rem 1fr;
+
+            &:nth-child(odd):not(.align-start), &.align-end {
+                grid-template-areas: "opposite divider content";
+
+                .timeline-item-content {
+                    justify-self: start;
+
+                    > .card {
+                        margin-left: 0;
+
+                        &:before, &:after {
+                            left: -1rem;
+                            right: auto;
+                        }
+
+                        &.outlined:after {
+                            left: calc(-1rem + 1px);
+                        }
+                    }
+                }
 
                 .timeline-item-opposite {
-                    text-align: start;
+                    justify-self: end;
+                }
+            }
+
+            &:nth-child(2n):not(.align-end), &.align-start {
+                grid-template-areas: "content divider opposite";
+
+                .timeline-item-content {
+                    justify-self: end;
+
+                    > .card {
+                        margin-right: 0;
+
+                        &:before, &:after {
+                            left: auto;
+                            right: -1rem;
+                            transform: rotate(180deg);
+                        }
+
+                        &.outlined:after {
+                            right: calc(-1rem + 1px);
+                        }
+                    }
+                }
+
+                .timeline-item-opposite {
+                    justify-self: start;
                 }
             }
         }
@@ -150,6 +160,7 @@
 
     &.horizontal {
         flex-direction: row;
+        justify-content: space-evenly;
 
         &:before {
             height: 2px;
@@ -157,77 +168,85 @@
         }
 
         .timeline-item {
+            grid-auto-flow: column;
+            justify-items: center;
             padding-left: 1.5rem;
             padding-right: 1.5rem;
-            width: 100%;
-        }
-
-        .timeline-item-content {
-            max-height: calc(50% - 3rem);
         }
 
         .timeline-item-divider {
-            min-height: 6rem;
+            min-height: 4.375rem;
         }
 
-        &:not(.end, .start) {
+        &:not(.align-end, .align-start) {
             &:before {
                 bottom: calc(50% - 1px);
                 top: auto;
             }
 
             .timeline-item {
-                &:nth-child(odd):not(.align-start), &.align-end {
-                    flex-direction: column-reverse;
+                grid-template-rows: 1fr 4.375rem 1fr;
 
-                    .timeline-item-content > .card {
-                        &:before, &:after {
-                            bottom: -1.5rem;
-                            left: calc(50% - .5rem);
-                            top: auto;
-                            transform: rotate(270deg);
-                        }
+                .timeline-item-content > .card {
+                    &:before, &:after {
+                        left: calc(50% - .5rem);
+                    }
 
-                        &.outlined:after {
-                            bottom: calc(-1.5rem + 1px);
-                        }
+                    &.outlined:after {
+                        bottom: calc(-1.5rem + 1px);
                     }
                 }
 
-                &:nth-child(2n):not(.align-end) {
-                    flex-direction: column;
+                &:nth-child(odd):not(.align-start), &.align-end {
+                    grid-template-areas: "opposite" "divider" "content";
 
-                    .timeline-item-content > .card {
-                        &:before, &:after {
-                            bottom: auto;
-                            left: calc(50% - .5rem);
-                            top: -1.5rem;
-                            transform: rotate(270deg);
-                        }
+                    .timeline-item-content {
+                        align-self: start;
 
-                        &.outlined:after {
-                            top: calc(-1.5rem + 1px);
+                        > .card {
+                            margin-top: 0;
+
+                            &:before, &:after {
+                                bottom: auto;
+                                top: -1.5rem;
+                                transform: rotate(90deg);
+                            }
                         }
+                    }
+
+                    .timeline-item-opposite {
+                        align-self: end;
+                    }
+                }
+
+                &:nth-child(2n):not(.align-end), &.align-start {
+                    grid-template-areas: "content" "divider" "opposite";
+
+                    .timeline-item-content {
+                        align-self: end;
+
+                        > .card {
+                            margin-bottom: 0;
+
+                            &:before, &:after {
+                                bottom: -1.5rem;
+                                top: auto;
+                                transform: rotate(270deg);
+                            }
+                        }
+                    }
+
+                    .timeline-item-opposite {
+                        align-self: start;
                     }
                 }
             }
         }
 
-        &.end {
-            &:before {
-                bottom: calc(3rem - 1px);
-                top: auto;
-            }
-
-            .timeline-item {
-                flex-direction: column;
-            }
-
+        &.align-start, &.align-end {
             .timeline-item-content > .card {
                 &:before, &:after {
-                    bottom: -1.5rem;
                     left: calc(50% - .5rem);
-                    top: auto;
                     transform: rotate(90deg);
                 }
 
@@ -235,64 +254,79 @@
                     bottom: calc(-1.5rem + 1px);
                 }
             }
-
-            .timeline-item-divider {
-                justify-content: flex-end;
-            }
         }
 
-        &.start {
+        &.align-end {
             &:before {
-                bottom: auto;
-                top: calc(3rem - 1px);
+                top: calc(2.1625rem - 1px);
             }
 
             .timeline-item {
-                flex-direction: column-reverse;
+                grid-template-areas: "divider" "content";
+                grid-template-rows: 4.375rem 1fr;
             }
 
-            .timeline-item-content > .card {
-                &:before, &:after {
-                    bottom: auto;
-                    left: calc(50% - .5rem);
-                    top: -1.5em;
-                    transform: rotate(90deg);
+            .timeline-item-content {
+                align-self: start;
+
+                > .card {
+                    margin-top: 0;
+
+                    &:before, &:after {
+                        bottom: auto;
+                        top: -1.5em;
+                    }
                 }
+            }
+        }
 
-                &.outlined:after {
-                    top: calc(-1.5rem + 1px);
+        &.align-start {
+            &:before {
+                bottom: calc(2.1625rem - 1px);
+            }
+
+            .timeline-item {
+                grid-template-areas: "content" "divider";
+                grid-template-rows: 1fr 4.375rem;
+            }
+
+            .timeline-item-content {
+                align-self: end;
+
+                > .card {
+                    margin-bottom: 0;
+
+                    &:before, &:after {
+                        bottom: -1.5rem;
+                        top: auto;
+                    }
                 }
             }
+        }
+    }
 
-            .timeline-item-divider {
-                justify-content: flex-start;
-            }
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            --dot-color: var(--tavenem-theme-color);
+            --dot-text: var(--tavenem-theme-color-text);
         }
     }
 }
 
 .timeline-item {
-    --dot-color: var(--tavenem-color-default);
-    --dot-text: var(--tavenem-color-default-text);
-    display: flex;
+    display: grid;
 
-    &.small .timeline-item-divider .dot {
-        height: 1.5rem;
-        width: 1.5rem;
-
-        .inner {
-            height: 1.125rem;
-            width: 1.125rem;
-        }
+    &.hide-dot .timeline-item-divider .dot {
+        display: none;
     }
 
     &.large .timeline-item-divider .dot {
-        height: 3.25rem;
-        width: 3.25rem;
+        height: 2.375rem;
+        width: 2.375rem;
 
         .inner {
-            height: 2.625rem;
-            width: 2.625rem;
+            height: 1.875rem;
+            width: 1.875rem;
         }
     }
 
@@ -319,8 +353,8 @@
 }
 
 .timeline-item-content {
-    flex: 1 1 auto;
-    height: 100%;
+    display: flex;
+    grid-area: content;
     position: relative;
 
     > .card {
@@ -331,14 +365,14 @@
 
         &:before {
             border-bottom: 1rem solid transparent;
-            border-right: 1rem solid rgba(0,0,0,.10);
+            border-right: 1rem solid rgba(0,0,0,.2);
             border-top: 1rem solid transparent;
             top: calc(50% - .875rem);
         }
 
         &:after {
             border-bottom: 1rem solid transparent;
-            border-right: 1rem solid var(--tavenem-color-bg-surface);
+            border-right: 1rem solid var(--tavenem-color-bg-alt);
             border-top: 1rem solid transparent;
             top: calc(50% - 1rem);
         }
@@ -351,35 +385,39 @@
 }
 
 .timeline-item-divider {
-    align-items: center;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-area: divider;
+    place-items: center;
+    place-content: center;
     position: relative;
 
     .dot {
-        align-items: center;
-        background-color: transparent;
+        background-color: var(--tavenem-color-bg);
         border-radius: 50%;
         box-shadow: var(--tavenem-shadow-1);
-        display: flex;
-        height: 2.375rem;
-        justify-content: center;
-        left: calc(50% - 19px);
-        width: 2.375rem;
+        display: grid;
+        height: 1.5rem;
+        place-items: center;
+        place-content: center;
+        width: 1.5rem;
 
         .inner {
-            align-items: center;
             background-color: var(--dot-color);
             border-radius: 50%;
             color: var(--dot-text);
-            display: flex;
-            height: 1.875rem;
-            justify-content: center;
-            width: 1.875rem;
+            display: grid;
+            height: 1.125rem;
+            place-items: center;
+            place-content: center;
+            width: 1.125rem;
+
+            tf-icon {
+                line-height: 1.125;
+            }
         }
     }
 }
 
 .timeline-item-opposite {
-    align-self: center;
+    grid-area: opposite;
 }

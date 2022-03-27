@@ -128,18 +128,24 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ChipSet TChip="string" Items="_chips" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedChip1" />
+            <ChipSet Items="_chips" SelectionType="SelectionType.Single" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet TChip=""string"" Items=""_chips"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedChip"" />
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-    private string? _selectedChip;
 }")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note that the <code>SelectedItem</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
 
 <Heading Level="HeadingLevel.H3">Multiselect</Heading>
 
@@ -152,18 +158,24 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedChips" />
+            <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItems=""_selectedChips"" />
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Multiple"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-    private IEnumerable<string>? _selectedChips;
 }")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note that the <code>SelectedItems</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemsChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
 
 <Heading Level="HeadingLevel.H3">Required</Heading>
 
@@ -177,15 +189,14 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ChipSet TChip="string" Items="_chips" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedChip2" Required="true" />
+            <ChipSet Items="_chips" SelectionType="SelectionType.Single" Required="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet TChip=""string"" Items=""_chips"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedChip"" Required=""true"" />
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" Required=""true"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-    private string? _selectedChip;
 }")
     </ChildContent>
 </Collapse>
@@ -345,15 +356,14 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ChipSet TChip="string" Items="_chips" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedChip3" ShowSelectionIcon="true" />
+            <ChipSet Items="_chips" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet TChip=""string"" Items=""_chips"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedChip"" ShowSelectionIcon=""true"" />
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-    private string? _selectedChip;
 }")
     </ChildContent>
 </Collapse>
@@ -369,7 +379,7 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="@(_ => _theme = ThemeColor.Secondary)" />
+            <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -378,6 +388,10 @@
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
     private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
 }")
     </ChildContent>
 </Collapse>
@@ -385,9 +399,9 @@
 @code {
     private List<string> _chips = new() { "Chip 1", "Chip 2", "Chip 3" };
     private List<string> _dragChips = new() { "Chip 1", "Chip 2", "Chip 3" };
-    private string? _selectedChip1;
-    private string? _selectedChip2;
-    private string? _selectedChip3;
-    private IEnumerable<string>? _selectedChips;
     private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
 }

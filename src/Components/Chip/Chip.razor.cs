@@ -22,14 +22,14 @@ public partial class Chip<TChip>
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("chip")
+    protected override string? CssClass => new CssBuilder("chip")
         .Add(ThemeColor.ToCSS())
         .Add(
             "clickable",
             ElementList?.OnItemClick.HasDelegate == true
                 || ElementList?.SelectionType != SelectionType.None)
         .Add("selected", IsSelected)
-        .Add("no-drag", !IsDraggable)
+        .Add("no-drag", !GetIsDraggable())
         .Add("d-none", IsClosed)
         .Add(ClassName)
         .ToString();

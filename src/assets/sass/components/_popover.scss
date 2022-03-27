@@ -1,10 +1,12 @@
 ﻿.popover {
+    --popover-color: var(--tavenem-color-text);
+    --popover-color-bg: var(--tavenem-color-bg-surface);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    background-color: var(--tavenem-color-bg-surface);
+    background-color: var(--popover-color-bg);
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-2);
-    color: var(--tavenem-color-text);
+    color: var(--popover-color);
     max-width: 100vw;
     opacity: 0;
     outline: 0;
@@ -31,5 +33,17 @@
     .list {
         max-height: inherit;
         overflow-y: auto;
+    }
+
+    &.filled {
+        --popover-color: var(--tavenem-theme-color-text, var(--tavenem-color-text));
+        --popover-color-bg: var(--tavenem-theme-color, var(--tavenem-color-bg-alt));
+    }
+
+    @each $theme in $theme-colors {
+        &:where(.#{$theme}) {
+            --popover-color: var(--tavenem-theme-color-text);
+            --popover-color-bg: var(--tavenem-theme-color-hover);
+        }
     }
 }

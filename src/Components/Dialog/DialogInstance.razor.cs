@@ -62,7 +62,7 @@ public partial class DialogInstance
     /// <summary>
     /// The final value assigned to the container's class attribute.
     /// </summary>
-    protected string ContainerCssClass => new CssBuilder("dialog-container")
+    protected string? ContainerCssClass => new CssBuilder("dialog-container")
         .Add(Options.Origin.ToCSS())
         .ToString();
 
@@ -71,7 +71,7 @@ public partial class DialogInstance
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("dialog")
+    protected override string? CssClass => new CssBuilder("dialog")
         .Add("fullscreen", Options.FullScreen)
         .Add($"dialog-{Options.Breakpoint.ToCSS()}", Options.Breakpoint != Breakpoint.None && !Options.FullScreen)
         .Add(Class)

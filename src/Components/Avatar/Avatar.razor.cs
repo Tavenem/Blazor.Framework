@@ -35,7 +35,7 @@ public partial class Avatar : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssClass => new CssBuilder("avatar")
+    protected override string? CssClass => new CssBuilder("avatar")
         .Add(ThemeColor.ToCSS())
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
@@ -46,7 +46,7 @@ public partial class Avatar : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string CssStyle => new CssBuilder(Style)
+    protected override string? CssStyle => new CssBuilder(Style)
         .AddStyle("z-index", AvatarGroup?.ZIndex(this))
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();

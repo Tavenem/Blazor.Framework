@@ -8,7 +8,7 @@ internal class SnackbarProperties
     public static readonly TimeSpan ShowDuration = TimeSpan.FromMilliseconds(250);
     public static readonly TimeSpan HideDuration = TimeSpan.FromSeconds(1);
 
-    public string Class => new CssBuilder("snackbar")
+    public string? Class => new CssBuilder("snackbar")
         .Add(Options.ThemeColor.ToCSS())
         .Add("clickable", Options.OnClick is not null)
         .ToString();

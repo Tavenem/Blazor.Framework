@@ -40,8 +40,10 @@
         --tavenem-color-#{$theme}-lighten-2: hsl(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 20%));
         --tavenem-color-#{$theme}-hover: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .06);
         --tavenem-color-#{$theme}-hover-bright: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .12);
+        --tavenem-color-#{$theme}-hover-bright-2: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--tavenem-color-#{$theme}-lightness), .24);
         --tavenem-color-#{$theme}-hover-dark: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) - 12%), .06);
         --tavenem-color-#{$theme}-hover-light: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 12%), .06);
+        --tavenem-color-#{$theme}-hover-light-bright: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), calc(var(--tavenem-color-#{$theme}-lightness) + 12%), .75);
     }
 
     :where(.#{$theme}) {
@@ -50,8 +52,10 @@
         --tavenem-theme-color-darken-2: var(--tavenem-color-#{$theme}-darken-2);
         --tavenem-theme-color-hover-base: var(--tavenem-color-#{$theme}-hover);
         --tavenem-theme-color-hover-bright: var(--tavenem-color-#{$theme}-hover-bright);
+        --tavenem-theme-color-hover-bright-2: var(--tavenem-color-#{$theme}-hover-bright-2);
         --tavenem-theme-color-hover-dark: var(--tavenem-color-#{$theme}-hover-dark);
         --tavenem-theme-color-hover-light: var(--tavenem-color-#{$theme}-hover-light);
+        --tavenem-theme-color-hover-light-bright: var(--tavenem-color-#{$theme}-hover-light-bright);
         --tavenem-theme-color-lighten-base: var(--tavenem-color-#{$theme}-lighten);
         --tavenem-theme-color-lighten-2: var(--tavenem-color-#{$theme}-lighten-2);
         --tavenem-theme-color-text: var(--tavenem-color-#{$theme}-text);

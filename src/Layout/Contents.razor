@@ -17,7 +17,7 @@
         {
             foreach (var heading in Framework.Headings)
             {
-                <AnchorLink href="@($"#{heading.Id}")" Class="@(heading == ActiveHeading ? "active" : null)"><span style="@HeadingStyle(heading)">@heading.Title</span></AnchorLink>
+                <AnchorLink href="@($"#{heading.IdValue}")" Class="@(heading == ActiveHeading ? "active" : null)"><span style="@HeadingStyle(heading)">@heading.Title</span></AnchorLink>
             }
         }
     </nav>

@@ -1,0 +1,38 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @attributes="AdditionalAttributes"
+     class="@CssClass"
+     style="@CssStyle"
+     @onfocusin="OnMouseOver"
+     @onfocusout="OnMouseOut"
+     @onmouseover="OnMouseOver"
+     @onmouseout="OnMouseOut">
+    @ChildContent
+    @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
+    {
+        <Popover AnchorOrigin="AnchorOrigin"
+                 Class="@TooltipCssClass"
+                 Delay="Delay"
+                 FlipBehavior="FlipBehavior.Flip_Always"
+                 IsOpen="_visible"
+                 MaxHeight="@MaxHeight"
+                 PopoverOrigin="PopoverOrigin"
+                 Style="@TooltipStyle"
+                 ThemeColor="ThemeColor">
+            @if (TooltipContent is not null)
+            {
+                @TooltipContent
+            }
+            else if (TooltipMarkup.HasValue)
+            {
+                @TooltipMarkup.Value
+            }
+            else
+            {
+                @TooltipText
+            }
+        </Popover>
+    }
+</div>
