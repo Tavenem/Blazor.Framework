@@ -829,15 +829,15 @@ dl.inline {
 }
 
 .can-drop {
-    background-color: var(--tavenem-color-success-hover);
-    border-color: var(--tavenem-color-success) !important;
+    background-color: var(--tavenem-color-valid-hover);
+    border-color: var(--tavenem-color-valid) !important;
     border-style: solid;
     border-width: 1px;
 }
 
 .no-drop {
-    background-color: var(--tavenem-color-danger-hover);
-    border-color: var(--tavenem-color-danger) !important;
+    background-color: var(--tavenem-color-error-hover);
+    border-color: var(--tavenem-color-error) !important;
     border-style: solid;
     border-width: 1px;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
 
@@ -32,11 +31,6 @@ public abstract class BoolInputComponentBase<TValue> : FormComponentBase<TValue>
     /// Whether the input is disabled.
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
-
-    /// <inheritdoc/>
-    public override bool HasValue => RequiresTrue
-        ? IsChecked == true
-        : Value is not null;
 
     /// <summary>
     /// <para>
@@ -72,13 +66,6 @@ public abstract class BoolInputComponentBase<TValue> : FormComponentBase<TValue>
     /// Whether the input is read-only.
     /// </summary>
     [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
-    /// Whether a <see cref="InputBase{TValue}.Value"/> of <see langword="true"/> is required to
-    /// fulfill the <see cref="FormComponentBase{TValue}.Required"/> requirement (rather than a
-    /// non-<see langword="null"/> value, which is the default behavior).
-    /// </summary>
-    [Parameter] public bool RequiresTrue { get; set; }
 
     /// <summary>
     /// The tabindex of the input element.

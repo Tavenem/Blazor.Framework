@@ -122,6 +122,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// </summary>
     protected virtual new string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
+        .Add("form-field")
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
         .Add("invalid", !IsValid)

@@ -1,0 +1,108 @@
+﻿@mixin meter-bar {
+    &::-webkit-meter-bar {
+        @content
+    }
+
+    &::-moz-meter-bar {
+        @content
+    }
+}
+
+@mixin optimum {
+    &::-webkit-meter-optimum-value {
+        @content
+    }
+
+    &::-moz-meter-optimum {
+        @content
+    }
+}
+
+@mixin sub-optimum {
+    &::-webkit-meter-suboptimum-value {
+        @content
+    }
+
+    &::-moz-meter-sub-optimum {
+        @content
+    }
+}
+
+@mixin sub-sub-optimum {
+    &::-webkit-meter-even-less-good-value {
+        @content
+    }
+
+    &::-moz-meter-sub-sub-optimum {
+        @content
+    }
+}
+
+.meter {
+    --meter-color-bg: var(--tavenem-color-action-hover-bg);
+    --meter-color-border: var(--tavenem-color-border-input);
+    align-items: center;
+    display: inline-flex;
+    gap: .5rem;
+    width: 100%;
+
+    > :not(label) {
+        flex-grow: 1;
+    }
+
+    meter {
+        flex-grow: 1;
+        height: 1rem;
+
+        @include meter-bar {
+            background: none;
+            background-color: var(--meter-color-bg);
+            border: 1px solid var(--meter-color-border);
+            border-radius: 9999px;
+            box-shadow: var(--tavenem-shadow-inset);
+            transition: width .5s;
+        }
+
+        @include optimum {
+            background: none;
+            background-color: var(--tavenem-color-success);
+            box-shadow: var(--tavenem-shadow-inset);
+            transition: width .5s;
+        }
+
+        @include sub-optimum {
+            background: none;
+            background-color: var(--tavenem-color-warning);
+            box-shadow: var(--tavenem-shadow-inset);
+            transition: width .5s;
+        }
+
+        @include sub-sub-optimum {
+            background: none;
+            background-color: var(--tavenem-color-danger);
+            box-shadow: var(--tavenem-shadow-inset);
+            transition: width .5s;
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-text);
+    }
+
+    &.outlined {
+        border: 0;
+    }
+
+    &.bg-alt {
+        --meter-color-bg: var(--tavenem-color-bg-input);
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        &:where(.#{$theme}) {
+            --meter-color-bg: var(--tavenem-theme-color-hover);
+            --meter-color-border: var(--tavenem-theme-color);
+        }
+    }
+}

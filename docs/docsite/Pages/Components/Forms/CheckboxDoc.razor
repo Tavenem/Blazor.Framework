@@ -6,7 +6,7 @@
 
 <p>
     The <code>Checkbox</code> component is a rich wrapper for an input element with the checkbox
-    numeric type.
+    type.
 </p>
 
 <Heading Level="HeadingLevel.H2">Basics</Heading>
@@ -106,8 +106,8 @@
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row center-items gap-2"">
-    <Checkbox TValue=""bool"" />
-    <Checkbox TValue=""bool"" Label=""Label"" />
+    <Checkbox TValue=""bool?"" ThemeColor=""ThemeColor.Danger"" AllowNull=""true"" CheckedIcon=""favorite"" UncheckedIcon=""favorite_border"" IndeterminateIcon=""heart_broken"" />
+    <Checkbox TValue=""bool?"" AllowNull=""true"" CheckedIcon=""thumb_up"" UncheckedIcon=""thumb_down"" IndeterminateIcon=""thumbs_up_down"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -148,12 +148,6 @@
     the first time.
 </p>
 
-<p>
-    Note that a checkbox bound to a non-nullable <code>bool</code> can never have a
-    <code>null</code> value, and so will not trigger a validation warning unless
-    <code>RequiresTrue</code> is <code>true</code>.
-</p>
-
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
@@ -166,7 +160,7 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row center-items gap-2"">
     <Checkbox TValue=""bool"" Label=""Required"" Required=""true"" />
-    <Checkbox TValue=""bool?"" Label=""Required"" Required=""true"" />
+    <Checkbox TValue=""bool?"" Label=""Required"" Required=""true"" AllowNull=""true"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -190,10 +184,16 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row center-items gap-2"">
     <Checkbox TValue=""bool"" Label=""Requires true"" Required=""true"" RequiresTrue=""true"" />
-    <Checkbox TValue=""bool?"" Label=""Requires true"" Required=""true"" RequiresTrue=""true"" />
+    <Checkbox TValue=""bool?"" Label=""Requires true"" Required=""true"" RequiresTrue=""true"" AllowNull=""true"" />
 </div>")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note that a checkbox bound to a non-nullable <code>bool</code> can never have a
+    <code>null</code> value, and so will not trigger a validation warning unless
+    <code>RequiresTrue</code> is <code>true</code>.
+</p>
 
 <Heading Level="HeadingLevel.H2">Tab index</Heading>
 
@@ -271,7 +271,8 @@
 
 <p>
     The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
-    CSS attributes of the input itself.
+    CSS attributes of the input itself, while the <code>InputAttributes</code> property can be used
+    to assign arbitrary attributes to it.
 </p>
 
 <Heading Level="HeadingLevel.H3">Validation</Heading>

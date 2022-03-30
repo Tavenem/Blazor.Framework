@@ -100,7 +100,15 @@
     negative signs and parenthesis for signed types, and decimal separators and exponential notation
     for floating-point types. It even accepts (and ignores) currency symbols, although in most cases
     you will need to specify a culture with the <code>FormatProvider</code> property, since the
-    invariant culture uses the international currency symbol: ¤. It will even recognize 
+    invariant culture uses the international currency symbol: ¤.
+</p>
+
+<p>
+    When bound to a floating-point type, it will even recognize the terms "Infinity" and "-Infinity"
+    for infinite values, and "NaN" for not-a-number values (none of these terms are case-sensitive).
+    Entering input which does not evaluate to a valid number results in the input being reset to the
+    last valid value, ensuring that the user can never mistakenly attempt to submit completely
+    invalid input.
 </p>
 
 <p>
@@ -462,7 +470,8 @@
 
 <p>
     The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
-    CSS attributes of the input itself.
+    CSS attributes of the input itself, while the <code>InputAttributes</code> property can be used
+    to assign arbitrary attributes to it.
 </p>
 
 <p>

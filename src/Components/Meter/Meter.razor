@@ -1,0 +1,31 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@inherits TavenemComponentBase
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    <Tooltip Inline="true"
+             ThemeColor="ThemeColor"
+             TooltipContent="TooltipContent!"
+             TooltipMarkup="TooltipMarkup"
+             TooltipText="@TooltipTextValue">
+        <meter @ref="ElementReference"
+               @attributes="MeterAttributes"
+               id="@Id"
+               class="@MeterClass"
+               style="@MeterStyle"
+               high="@HighString"
+               low="@LowString"
+               max="@MaxString"
+               min="@MinString"
+               optimum="@OptimumString"
+               value="@ValueString" />
+    </Tooltip>
+</div>
+
+

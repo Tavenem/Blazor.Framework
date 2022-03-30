@@ -1,0 +1,230 @@
+﻿@page "/components/meter"
+
+<PageTitle>Meter - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Meter</Heading>
+
+<p>
+    The <code>Meter</code> component is a rich wrapper for a meter element.
+</p>
+
+<p>
+    A meter can be presented in one of two ways: using a CSS class, or with a component.
+</p>
+
+<Heading Level="HeadingLevel.H2">CSS</Heading>
+
+<p>
+    To create a meter using only css, add the <code>meter</code> class to a <code>div</code> which
+    contains a <code>meter</code> element. The deefault browser styles for the meter will be
+    replaced with styles that better align with the rest of the Tavenem Blazor Framework's appearance.
+</p>
+
+<CodeExample IsOpen="true" Code="@(@"<div class=""meter"">
+    <meter value=""0.5"">half</meter>
+</div>
+<div class=""meter"">
+    <label for=""example"">Current level:</label>
+    <meter id=""example"" high=""0.667"" optimal="".5"" value=""0.75"">75%</meter>
+</div>")" />
+
+<Heading Level="HeadingLevel.H2">Component</Heading>
+
+<p>
+    You can also use the <code>Meter</code> component, which allows you to assign any numeric type
+    to the various boundary and value properties. The <code>Value</code> property indicates the
+    current value displayed by the meter, and is displayed in a tooltip which appears when the meter
+    is hovered.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Meter Value="_value1" Label="Int" />
+                <Meter Value="_value2" Label="Double" />
+                <Meter Value="_value3" Label="Byte" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Meter Value=""_value1"" Label=""Int"" />
+    <Meter Value=""_value2"" Label=""Double"" />
+    <Meter Value=""_value3"" Label=""Byte"" />
+</div>
+
+@code {
+    private int _value1 = 33;
+    private double _value2 = 0.5;
+    private byte _value3 = 75;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that it is possible to assign a nullable type, but the component will automatically convert
+    a <code>null</code> <code>Value</code> to the minimum value.
+</p>
+
+<Heading Level="HeadingLevel.H2">Value ranges</Heading>
+
+<Heading Level="HeadingLevel.H3">Min & Max</Heading>
+
+<p>
+    The <code>Min</code> and <code>Max</code> properties specify the allowed limits for the value.
+    When unset, zero is used for the minimum. A default maximum of 100 is used for integral types,
+    while 1 is used for the maximum of floating-point types.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Meter Min="5" Max="8" Value="6" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Meter Min=""5"" Max=""8"" Value=""6"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Low & High</Heading>
+
+<p>
+    The <code>Low</code> property indicates the upper bound of the lowest value range, with
+    <code>Min</code> as the lower bound. If no <code>Low</code> value is provided, it is the same as
+    <code>Min</code>.
+</p>
+
+<p>
+    The <code>High</code> property indicates the lower bound of the highest value range, with
+    <code>Max</code> as the upper bound. If no <code>High</code> value is provided, it is the same
+    as <code>Max</code>.
+</p>
+
+<p>
+    When these values are the same, there are two possible value ranges: low and high. When they are
+    different, there is a third possible value range between them.
+</p>
+
+<Heading Level="HeadingLevel.H3">Optimum</Heading>
+
+<p>
+    The <code>Optimum</code> property indicates which value range is considered optimal. If the
+    value is less than <code>Low</code>, the lowest value range is ideal. If it is higher than
+    <code>High</code>, the highest value range is best. If <code>Optimum</code> is between
+    <code>Low</code> and <code>High</code>, the range between them is optimal.
+</p>
+
+<p>
+    The meter is color-coded based on the relationship of the current <code>Value</code> and the
+    optimal range. Take a look at the examples below:
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="50" />
+                <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="20" />
+                <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="80" />
+                <Meter Min="0" Optimum="20" Low="25" High="75" Max="100" Value="80" />
+                <Meter Min="0" Low="25" High="75" Optimum="80" Max="100" Value="20" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""50"" />
+    <Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""20"" />
+    <Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""80"" />
+    <Meter Min=""0"" Optimum=""20"" Low=""25"" High=""75"" Max=""100"" Value=""80"" />
+    <Meter Min=""0"" Low=""25"" High=""75"" Optimum=""80"" Max=""100"" Value=""20"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Label</Heading>
+
+<p>
+    The <code>Label</code> property assigns a label to the meter.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Meter Value="50" Label="Label" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Meter Value=""50"" Label=""Label"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Meter Value="25" Label="Primary" ThemeColor="ThemeColor.Primary" />
+                <Meter Value="50" Label="Secondary" ThemeColor="ThemeColor.Secondary" />
+                <Meter Value="80" Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Meter Value=""25"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
+    <Meter Value=""50"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
+    <Meter Value=""80"" Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Add the <code>bg-alt</code> class to darken the background of the empty portion of the bar.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Meter Value="25" Class="bg-alt" />
+                <Meter Value="50" Label="Primary" ThemeColor="ThemeColor.Primary" Class="bg-alt" />
+                <Meter Value="80" Label="Secondary" ThemeColor="ThemeColor.Secondary" Class="bg-alt" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Meter Value=""25"" Class=""bg-alt"" />
+    <Meter Value=""50"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" Class=""bg-alt"" />
+    <Meter Value=""80"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" Class=""bg-alt"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>MeterClass</code> and <code>MeterStyle</code> properties can be used to control the
+    CSS attributes of the meter element itself, while the <code>MeterAttributes</code> property can
+    be used to assign arbitrary attributes to it.
+</p>
+
+@code {
+    private int _value1 = 33;
+    private double _value2 = 0.5;
+    private byte _value3 = 75;
+}

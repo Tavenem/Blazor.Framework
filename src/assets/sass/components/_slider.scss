@@ -17,17 +17,32 @@
 }
 
 .slider {
-    --thumb-color: unset;
+    --thumb-color: var(--tavenem-color-action);
+    --thumb-label-color: var(--tavenem-color-default-text);
+    --thumb-label-color-bg: var(--tavenem-color-default);
     --thumb-shadow-color: rgba(0,0,0,.24);
     --thumb-shadow: 0 0 0 2px var(--thumb-shadow-color);
-    --track-color: unset;
+    --track-color: rgba(var(--tavenem-color-action-rgb), .3);
     color: var(--tavenem-color-text);
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: column;
     user-select: none;
     width: 100%;
 
-    > *:not(input) {
-        margin-top: .625rem;
+    .input {
+        display: inline-block;
+        position: relative;
+        width: 100%;
+
+        > div {
+            align-items: center;
+            display: flex;
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
     }
 
     input {
@@ -41,6 +56,10 @@
 
         &:focus {
             outline: none;
+        }
+
+        &:active + .label {
+            opacity: 1;
         }
 
         @include slider-track {
@@ -57,9 +76,10 @@
             background-color: var(--thumb-color);
             border: none;
             border-radius: 50%;
+            cursor: pointer;
             height: 2px;
-            transform: scale(6, 6);
             transition: box-shadow 0.2s;
+            transform: scale(6, 6);
             width: 2px;
 
             &:hover {
@@ -74,52 +94,162 @@
         }
     }
 
-    &:disabled, &.disabled {
-        --thumb-shadow-color: rgba(255, 255, 255);
-        --thumb-shadow: 0 0 0 1px var(--thumb-shadow-color);
+    .label {
+        align-items: center;
+        background-color: var(--thumb-label-color-bg);
+        border-radius: 2px;
+        color: var(--thumb-label-color);
+        display: none;
+        font-size: .75rem;
+        justify-content: center;
+        line-height: normal;
+        opacity: 0;
+        padding: 4px 8px;
+        pointer-events: none;
+        position: absolute;
+        text-align: center;
+        top: 0;
+        transform: translate(-50%, -125%);
+        transition: opacity .2s ease-in-out;
+        user-select: none;
+    }
 
-        input {
-            --thumb-color: rgb(0, 0, 0);
-            --track-color: var(--tavenem-color-text-disabled);
-            cursor: default;
-            opacity: 0.38;
+    &.show-value .label {
+        display: block;
+    }
 
-            @include slider-thumb {
-                color: rgb(255, 255, 255);
-                box-shadow: var(--thumb-shadow);
-                transform: scale(4, 4);
+    .filler {
+        background-color: var(--thumb-color);
+        border-radius: 1px;
+        display: none;
+        height: 2px;
+    }
+
+    .hashes {
+        display: none;
+        flex-grow: 1;
+        justify-content: space-between;
+
+        div {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+
+            span:first-child {
+                background-color: var(--thumb-color);
+                border-radius: 9999px;
+                height: 2px;
+                width: 2px;
+            }
+
+            span + span {
+                left: 0;
+                position: absolute;
+                top: 0;
+                transform: translate(-50%, 50%);
             }
         }
     }
 
-    &.bg-alt {
-        background-color: transparent;
+    &.hashmarks .hashes {
+        display: flex;
+    }
+
+    .field-helpers {
+        color: var(--thumb-color);
+    }
+
+    &.disabled {
+        input {
+            &, &:active, &:focus-visible {
+                --thumb-color: var(--tavenem-color-action-disabled);
+                --track-color: var(--tavenem-color-action-disabled-bg);
+                cursor: default;
+                opacity: 0.38;
+
+                @include slider-thumb {
+                    box-shadow: none;
+                    cursor: default;
+                }
+            }
+
+            &:active + .label {
+                opacity: 0;
+            }
+        }
+
+        label {
+            color: var(--tavenem-color-text-disabled);
+        }
+    }
+
+    &.read-only input {
+        &, &:active, &:focus-visible {
+            cursor: default;
+
+            @include slider-thumb {
+                box-shadow: none;
+                cursor: default;
+            }
+        }
+
+        &:active + .label {
+            opacity: 0;
+        }
+    }
+
+    &.required label:after {
+        color: var(--tavenem-color-error);
+        content: " *";
     }
 
     &.filled {
         background-color: transparent;
-        color: var(--tavenem-color-action);
+        color: var(--tavenem-color-text);
+
+        .filler {
+            display: block;
+        }
     }
 
     &.outlined {
         border: 0;
     }
 
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --thumb-color: var(--tavenem-color-error);
+        --thumb-label-color: var(--tavenem-color-error-text);
+        --thumb-label-color-bg: var(--tavenem-color-error);
+        --thumb-shadow-color: var(--tavenem-color-error-hover-bright-2);
+        --track-lightness: var(--tavenem-color-error-lightness);
+        --track-color: hsla(var(--tavenem-color-error-hue), var(--tavenem-color-error-saturation), var(--track-lightness), 0.30);
+
+        label {
+            color: var(--tavenem-color-error);
+        }
+    }
+
     @each $theme in $theme-colors {
-        .#{$theme} {
-            --track-lightness: var(--tavenem-color-#{$theme}-lightness);
-            --track-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.30);
+        &:where(.#{$theme}) {
             --thumb-color: var(--tavenem-theme-color);
-            --thumb-shadow-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), 0.24);
+            --thumb-label-color: var(--tavenem-theme-color-text);
+            --thumb-label-color-bg: var(--tavenem-theme-color);
+            --thumb-shadow-color: var(--tavenem-theme-color-hover-bright-2);
+            --track-lightness: var(--tavenem-color-#{$theme}-lightness);
+            --track-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--track-lightness), .3);
             color: var(--tavenem-color-text);
+        }
 
-            &.darken {
-                --track-lightness: calc(var(--tavenem-color-#{$theme}-lightness) - 10%);
-            }
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-#{$theme}-lightness) - 10%);
+        }
 
-            &.lighten {
-                --track-lightness: calc(var(--tavenem-color-#{$theme}-lightness) + 10%);
-            }
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-#{$theme}-lightness) + 10%);
         }
     }
 }

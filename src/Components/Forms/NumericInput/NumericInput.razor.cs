@@ -158,8 +158,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     /// and a step value of "any" for floating-point types.
     /// </para>
     /// </summary>
-    [Parameter]
-    public TValue? Step { get; set; }
+    [Parameter] public TValue? Step { get; set; }
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
@@ -347,6 +346,13 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
             Min = _minDefault;
         }
 
+        if (Step is not null
+            && (ValueIsLess(Step, _zero)
+            || ValuesEqual(Step, _zero)))
+        {
+            Step = default;
+        }
+
         if (Value is not null)
         {
             if (ValueIsLess(Value, Min))
@@ -525,6 +531,8 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
             float @float => @float.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
             int @int => @int.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
             long @long => @long.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+            nint @nint => @nint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+            nuint @nuint => @nuint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
             sbyte @sbyte => @sbyte.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
             short @short => @short.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
             uint @uint => @uint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),

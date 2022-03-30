@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -17,6 +19,11 @@ public partial class Checkbox<TValue>
     /// </summary>
     public ElementReference ElementReference { get; set; }
 
+    /// <inheritdoc/>
+    public override bool HasValue => RequiresTrue
+        ? IsChecked == true
+        : Value is not null;
+
     /// <summary>
     /// <para>
     /// The icon to use for an indeterminate state.
@@ -26,6 +33,13 @@ public partial class Checkbox<TValue>
     /// </para>
     /// </summary>
     [Parameter] public string IndeterminateIcon { get; set; } = "indeterminate_check_box";
+
+    /// <summary>
+    /// Whether a <see cref="InputBase{TValue}.Value"/> of <see langword="true"/> is required to
+    /// fulfill the <see cref="FormComponentBase{TValue}.Required"/> requirement (rather than a
+    /// non-<see langword="null"/> value, which is the default behavior).
+    /// </summary>
+    [Parameter] public bool RequiresTrue { get; set; }
 
     /// <summary>
     /// The icon to use for the unchecked state.

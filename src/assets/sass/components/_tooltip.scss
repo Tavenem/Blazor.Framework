@@ -3,15 +3,18 @@
     width: fit-content;
 
     &.inline {
-        display: inline-block;
+        align-items: baseline;
+        display: inline-flex;
     }
 }
 
 .tooltip {
+    --tooltip-color: var(--tavenem-color-dark-text);
+    --tooltip-color-bg: var(--tavenem-color-dark);
     align-items: center;
-    background-color: var(--tavenem-color-dark);
+    background-color: var(--tooltip-color-bg);
     border-radius: var(--tavenem-border-radius);
-    color: var(--tavenem-color-dark-text);
+    color: var(--tooltip-color);
     font-size: .75rem;
     font-weight: var(--tavenem-font-weight-semibold);
     justify-content: center;
@@ -25,7 +28,7 @@
     &.center-left,
     &.center-right {
         &.arrow:after {
-            border-color: var(--tavenem-color-dark) transparent transparent transparent;
+            border-color: var(--tooltip-color-bg) transparent transparent transparent;
             border-style: solid;
             border-width: 6px;
             content: "";
@@ -78,6 +81,18 @@
         &.arrow:after {
             bottom: 100%;
             transform: rotate(180deg);
+        }
+    }
+
+    &.filled {
+        --tooltip-color: var(--tavenem-theme-color-text, var(--tavenem-color-text));
+        --tooltip-color-bg: var(--tavenem-theme-color, var(--tavenem-color-bg-alt));
+    }
+
+    @each $theme in $theme-colors {
+        &:where(.#{$theme}) {
+            --tooltip-color: var(--tavenem-theme-color-text);
+            --tooltip-color-bg: var(--tavenem-theme-color-darken);
         }
     }
 }

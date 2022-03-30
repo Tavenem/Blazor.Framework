@@ -1,13 +1,13 @@
-﻿.valid.modified:not(.field, .checkbox, [type=checkbox]) {
-    outline: 1px solid var(--tavenem-color-success);
+﻿.valid.modified:not(.form-field, [type=checkbox]) {
+    outline: 1px solid var(--tavenem-color-valid);
 }
 
-.invalid:not(.field, .checkbox) {
-    outline: 1px solid var(--tavenem-color-danger);
+.invalid:not(.form-field) {
+    outline: 1px solid var(--tavenem-color-error);
 }
 
 .validation-message {
-    color: var(--tavenem-color-danger);
+    color: var(--tavenem-color-error);
 }
 
 #blazor-error-ui {
