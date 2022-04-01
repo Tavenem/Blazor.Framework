@@ -4,13 +4,15 @@
 
 @inherits DraggableDropTarget<TListItem, TListItem>
 
-@if (SeparatorBefore)
+@if (SeparatorBeforeValue)
 {
     <hr />
 }
-@if (Item is not null && ElementList?.ItemIsCollapsible?.Invoke(Item) == true)
+@if (IsCollapsibleValue)
 {
-    <ListItemCollapse TListItem="TListItem"
+    <ListItemCollapse @ref="CollapseReference"
+                      TListItem="TListItem"
+                      Id="@Id"
                       Class="@CollapseClass"
                       Style="@Style"
                       Title="@(ChildContent is null ? Item?.ToString() : null)"
@@ -33,7 +35,9 @@
 }
 else
 {
-    <div id="@Id"
+    <div @ref="ElementReference"
+         @attributes="AdditionalAttributes"
+         id="@Id"
          role="listitem"
          class="@CssClass"
          style="@CssStyle"
@@ -63,7 +67,7 @@ else
         }
     </div>
 }
-@if (SeparatorAfter)
+@if (SeparatorAfterValue)
 {
     <hr />
 }

@@ -4,7 +4,7 @@
 
 @inherits ListItem<TChip>
 
-@if (SeparatorBefore)
+@if (SeparatorBeforeValue)
 {
     <div class="vr"></div>
 }
@@ -31,7 +31,7 @@
         <tf-close @onclick="OnClosedAsync" />
     }
 </div>
-@if (SeparatorAfter)
+@if (SeparatorAfterValue)
 {
     <div class="vr"></div>
 }

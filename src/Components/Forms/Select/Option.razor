@@ -1,0 +1,32 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@if (SeparatorBefore)
+{
+    <hr />
+}
+<div @ref="ElementReference"
+     @attributes="AdditionalAttributes"
+     id="@Id"
+     role="listitem"
+     class="@CssClass"
+     style="@CssStyle"
+     @onclick="OnClick">
+    @if (!string.IsNullOrWhiteSpace(IconName))
+    {
+        <tf-icon>@IconName</tf-icon>
+    }
+    @if (ChildContent is null)
+    {
+        @Label
+    }
+    else
+    {
+        @ChildContent(Value)
+    }
+</div>
+@if (SeparatorAfter)
+{
+    <hr />
+}

@@ -14,16 +14,22 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         public T? This_field { get; set; }
     }
 
+    private readonly AsyncAdjustableTimer _timer;
+
     private List<string>? _customValidationMessages;
     private bool _disposedValue;
     private DummyClass<TValue>? _dummyModel;
     private bool _initialParametersSet;
-    private Timer? _timer;
 
     /// <summary>
     /// Custom CSS class(es) for the component.
     /// </summary>
     [Parameter] public string? Class { get; set; }
+
+    /// <summary>
+    /// The name of the input element.
+    /// </summary>
+    [Parameter] public virtual string? Name { get; set; }
 
     /// <summary>
     /// Custom CSS style(s) for the component.
@@ -148,6 +154,11 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
 
     [CascadingParameter] private Form? Form { get; set; }
 
+    /// <summary>
+    /// Constructs a new instance of <see cref="FormComponentBase{TValue}"/>.
+    /// </summary>
+    protected FormComponentBase() => _timer = new(OnTimerAsync, 300);
+
     /// <inheritdoc/>
     public override Task SetParametersAsync(ParameterView parameters)
     {
@@ -204,62 +215,11 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// <summary>
     /// Performs validation on this field.
     /// </summary>
-    public async Task ValidateAsync()
-    {
-        var value = Value;
-
-        var valid = EditContext?
-            .GetValidationMessages(FieldIdentifier)
-            .Any() != true;
-
-        valid = valid
-            && !HasConversionError
-            && (!IsTouched || !Required || HasValue);
-
-        var fieldMessages = new List<string>();
-        if (Validation is not null)
-        {
-            await foreach (var error in Validation(Value, Form?.Model ?? EditContext?.Model))
-            {
-                if (!string.IsNullOrEmpty(error))
-                {
-                    fieldMessages.Add(error);
-                    valid = false;
-                }
-            }
-        }
-
-        var messagesChanged = fieldMessages.Count == 0
-            ? (_customValidationMessages?.Count ?? 0) > 0
-            : _customValidationMessages?.SequenceEqual(fieldMessages) != true;
-        _customValidationMessages = fieldMessages.Count == 0
-            ? null
-            : fieldMessages;
-
-        if (!EqualityComparer<TValue>.Default.Equals(value, Value))
-        {
-            return;
-        }
-
-        var update = false;
-        if (messagesChanged)
-        {
-            update = true;
-            EditContext?.NotifyValidationStateChanged();
-        }
-
-        if (IsValid != valid)
-        {
-            update = true;
-            IsValid = valid;
-            await IsValidChanged.InvokeAsync(IsValid);
-        }
-
-        if (update)
-        {
-            StateHasChanged();
-        }
-    }
+    /// <remarks>
+    /// Required fields without values will be considered invalid even if they have not yet been
+    /// touched.
+    /// </remarks>
+    public Task ValidateAsync() => ValidateAsync(true);
 
     /// <summary>
     /// <para>
@@ -317,6 +277,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         {
             if (disposing)
             {
+                _timer.Dispose();
                 Form?.Remove(this);
                 DetachValidationStateChangedListener();
             }
@@ -365,17 +326,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         return success;
     }
 
-    private protected void EvaluateDebounced()
-    {
-        if (_timer is null)
-        {
-            _timer = new Timer(OnTimerAsync, null, 300, Timeout.Infinite);
-        }
-        else
-        {
-            _timer.Change(300, Timeout.Infinite);
-        }
-    }
+    private protected void EvaluateDebounced() => _timer.Start();
 
     private protected string GetConversionValidationMessage()
         => string.Format(ConversionValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
@@ -392,7 +343,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         ? null
         : string.Format(RequiredValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
 
-    private async void OnTimerAsync(object? state) => await InvokeAsync(ValidateAsync);
+    private Task OnTimerAsync() => InvokeAsync(ValidateAutoAsync);
 
     private void OnValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
     {
@@ -401,4 +352,63 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
             EvaluateDebounced();
         }
     }
+
+    private async Task ValidateAsync(bool ignoreTouched)
+    {
+        var value = Value;
+
+        var valid = EditContext?
+            .GetValidationMessages(FieldIdentifier)
+            .Any() != true;
+
+        valid = valid
+            && !HasConversionError
+            && ((!ignoreTouched && !IsTouched) || !Required || HasValue);
+
+        var fieldMessages = new List<string>();
+        if (Validation is not null)
+        {
+            await foreach (var error in Validation(Value, Form?.Model ?? EditContext?.Model))
+            {
+                if (!string.IsNullOrEmpty(error))
+                {
+                    fieldMessages.Add(error);
+                    valid = false;
+                }
+            }
+        }
+
+        var messagesChanged = fieldMessages.Count == 0
+            ? (_customValidationMessages?.Count ?? 0) > 0
+            : _customValidationMessages?.SequenceEqual(fieldMessages) != true;
+        _customValidationMessages = fieldMessages.Count == 0
+            ? null
+            : fieldMessages;
+
+        if (!EqualityComparer<TValue>.Default.Equals(value, Value))
+        {
+            return;
+        }
+
+        var update = false;
+        if (messagesChanged)
+        {
+            update = true;
+            EditContext?.NotifyValidationStateChanged();
+        }
+
+        if (IsValid != valid)
+        {
+            update = true;
+            IsValid = valid;
+            await IsValidChanged.InvokeAsync(IsValid);
+        }
+
+        if (update)
+        {
+            StateHasChanged();
+        }
+    }
+
+    private Task ValidateAutoAsync() => ValidateAsync(false);
 }

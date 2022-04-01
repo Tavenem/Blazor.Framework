@@ -556,14 +556,14 @@ public partial class ElementList<TListItem>
 
     internal async Task RemoveItemAsync(TListItem item)
     {
+        if (_selectedItems.Contains(item))
+        {
+            _selectedItems.Remove(item);
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        }
         if (Items?.Contains(item) == true)
         {
-            if (_selectedItems.Contains(item))
-            {
-                _selectedItems.Remove(item);
-                await SelectedItemChanged.InvokeAsync(SelectedItem);
-                await SelectedItemsChanged.InvokeAsync(SelectedItems);
-            }
             Items.Remove(item);
             await ItemsChanged.InvokeAsync(Items);
         }

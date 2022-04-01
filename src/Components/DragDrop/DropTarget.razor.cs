@@ -111,7 +111,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string? Id { get; set; }
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// <para>
@@ -149,6 +149,17 @@ public partial class DropTarget<TDropItem> : IDisposable
     [Inject] private protected DragDropListener DragDropListener { get; set; } = default!;
 
     /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+    }
+
+    /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         await base.SetParametersAsync(parameters);
@@ -163,20 +174,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized()
-    {
-        DragDropListener.DropValidChanged += OnDropValidChanged;
-        if (AdditionalAttributes.TryGetValue("id", out var value)
-            && value is string id
-            && !string.IsNullOrWhiteSpace(id))
-        {
-            Id = id;
-        }
-        else if (string.IsNullOrWhiteSpace(Id))
-        {
-            Id = Guid.NewGuid().ToString();
-        }
-    }
+    protected override void OnInitialized() => DragDropListener.DropValidChanged += OnDropValidChanged;
 
     /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)

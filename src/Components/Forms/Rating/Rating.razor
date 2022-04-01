@@ -1,28 +1,65 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
-@inherits TavenemComponentBase
+@inherits FormComponentBase<byte>
 
-@ChildContent
-<span tabindex="@(Disabled ? -1 : 0)"
-      @attributes="AdditionalAttributes"
-      class="@CssClass"
-      style="@CssStyle">
-    @for (var i = 0; i < Max; i++)
+<fieldset tabindex="@(Disabled ? -1 : 0)"
+          @attributes="AdditionalAttributes"
+          class="@CssClass"
+          style="@CssStyle"
+          aria-required="@Required"
+          @onkeydown="OnKeyDown">
+    @if (!string.IsNullOrEmpty(Label))
     {
-        var index = i;
-        <span @onclick="@(_ => OnRatingClickAsync(index))"
-              @onmouseout="OnMouseOutAsync"
-              @onmouseover="@(_ => OnMouseOverAsync(index))">
-            <input type="radio"
-                   tabindex="-1"
-                   value="@(index + 1)"
-                   name="@Name"
-                   disabled="@Disabled"
-                   readonly="@ReadOnly"
-                   checked="@(index < Value)" />
-            <button class="@RatingItemCssClass" style="@RatingItemStyle">
-                <tf-icon>@(IndexIsActive(index) ? ActiveIcon : InactiveIcon)</tf-icon>
-            </button>
-        </span>
+        <legend>@Label</legend>
     }
-</span>
+    @if (Max > 0)
+    {
+        <div class="rating-buttons">
+            <span @onclick="@(_ => OnRatingClick(0))"
+                  @onmouseout="OnMouseOutAsync"
+                  @onmouseover="@(_ => OnMouseOverAsync(0))">
+                <input @ref="ElementReference"
+                       type="radio"
+                       autofocus="@AutoFocus"
+                       checked="@(0 < Value)"
+                       disabled="@Disabled"
+                       name="@Name"
+                       readonly="@ReadOnly"
+                       tabindex="-1"
+                       value="1" />
+                <button class="@RatingItemCssClass" style="@RatingItemStyle" tabindex="@TabIndex">
+                    <tf-icon>@(IndexIsActive(0) ? ActiveIcon : InactiveIcon)</tf-icon>
+                </button>
+            </span>
+            @for (var i = 1; i < Max; i++)
+            {
+                var index = i;
+                <span @onclick="@(_ => OnRatingClick(index))"
+                      @onmouseout="OnMouseOutAsync"
+                      @onmouseover="@(_ => OnMouseOverAsync(index))">
+                    <input type="radio"
+                   checked="@(index < Value)"
+                   disabled="@Disabled"
+                   name="@Name"
+                   readonly="@ReadOnly"
+                   tabindex="-1"
+                   value="@(index + 1)" />
+                    <button class="@RatingItemCssClass" style="@RatingItemStyle">
+                        <tf-icon>@(IndexIsActive(index) ? ActiveIcon : InactiveIcon)</tf-icon>
+                    </button>
+                </span>
+            }
+        </div>
+    }
+    @if (!IsValid)
+    {
+        <div class="field-helpers">
+            <ul class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </div>
+    }
+</fieldset>

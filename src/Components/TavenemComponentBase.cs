@@ -11,7 +11,7 @@ public abstract class TavenemComponentBase : ComponentBase
     /// Custom HTML attributes for the component.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
-    public Dictionary<string, object> AdditionalAttributes { get; set; } = new();
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <summary>
     /// The child content of this component.

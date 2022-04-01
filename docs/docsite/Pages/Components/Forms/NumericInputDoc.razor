@@ -381,6 +381,12 @@
     attribute.
 </p>
 
+<Heading Level="HeadingLevel.H2">Name</Heading>
+
+<p>
+    The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
 <Heading Level="HeadingLevel.H2">Auto-focus</Heading>
 
 <p>
@@ -508,8 +514,8 @@
     href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">standard</a>
     or <a
     href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">custom
-    numeric format string</a> supported for the bound numeric type. This format will be used both to
-    format the displayed value, and to parse user input.
+    numeric format string</a> supported for the bound numeric type. This format will be used to
+    format the displayed value.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -519,12 +525,20 @@
                 <NumericInput @bind-Value="_value7" Label="en-US" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US")" />
                 <NumericInput @bind-Value="_value8" Label="de-DE" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("de-DE")" />
             </div>
+            <div class="row fill align-items-center gap-2">
+                <span>Bound value: @_value7</span>
+                <span>Bound value: @_value8</span>
+            </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
     <NumericInput @bind-Value=""_value1"" Label=""en-US"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""en-US"")"" />
     <NumericInput @bind-Value=""_value2"" Label=""de-DE"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""de-DE"")"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <span>Bound value: @_value1</span>
+    <span>Bound value: @_value2</span>
 </div>
 
 @code {
@@ -533,6 +547,12 @@
 }")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note that the value set to a <code>form</code> element on submission will use the standard
+    number format for HTML input elements, regardless of the input or display format chosen. This
+    can help with binding and serialization when using standard form submission mechanisms.
+</p>
 
 <Heading Level="HeadingLevel.H3">Prefix</Heading>
 

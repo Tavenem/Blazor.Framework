@@ -12,7 +12,7 @@ public partial class Checkbox<TValue>
     /// <summary>
     /// The icon to use for the checked state.
     /// </summary>
-    [Parameter] public string CheckedIcon { get; set; } = "check_box";
+    [Parameter] public string CheckedIcon { get; set; } = DefaultIcons.CheckBox_Checked;
 
     /// <summary>
     /// A reference to the input element.
@@ -32,7 +32,7 @@ public partial class Checkbox<TValue>
     /// Applies only to checkboxes bound to nullable <see cref="bool"/> values.
     /// </para>
     /// </summary>
-    [Parameter] public string IndeterminateIcon { get; set; } = "indeterminate_check_box";
+    [Parameter] public string IndeterminateIcon { get; set; } = DefaultIcons.CheckBox_Indeterminate;
 
     /// <summary>
     /// Whether a <see cref="InputBase{TValue}.Value"/> of <see langword="true"/> is required to
@@ -44,7 +44,7 @@ public partial class Checkbox<TValue>
     /// <summary>
     /// The icon to use for the unchecked state.
     /// </summary>
-    [Parameter] public string UncheckedIcon { get; set; } = "check_box_outline_blank";
+    [Parameter] public string UncheckedIcon { get; set; } = DefaultIcons.CheckBox_Unchecked;
 
     /// <summary>
     /// Focuses this input.

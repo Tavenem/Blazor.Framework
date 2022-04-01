@@ -139,7 +139,7 @@
         }
     }
 
-    &.clickable > * {
+    &.clickable > *:not(hr) {
         border: 0;
         border-radius: 0;
         cursor: pointer;
@@ -167,7 +167,7 @@
     .tree &.clickable,
     &.tree,
     &.tree.clickable {
-        > * {
+        > *:not(hr) {
             margin-inline-start: 1.5rem;
         }
 
@@ -176,12 +176,12 @@
         }
     }
 
-    .tree & > * {
+    .tree & > *:not(hr) {
         margin-inline-start: 2.5rem;
     }
 
     &.disabled > {
-        * {
+        *:not(hr) {
             color: var(--tavenem-color-action-disabled) !important;
             cursor: default !important;
             pointer-events: none !important;

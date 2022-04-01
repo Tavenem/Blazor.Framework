@@ -11,6 +11,7 @@
                   autocorrect="@AutocorrectValue"
                   disabled="@Disabled"
                   maxlength="@MaxLength"
+                  name="@Name"
                   placeholder="@Placeholder"
                   readonly="@ReadOnly"
                   required="@Required"
@@ -18,7 +19,7 @@
                   tabindex="@TabIndex"
                   value="@CurrentValue"
                   @oninput="OnInput"
-                  @onchange="OnChangeAsync" />
+                  @onchange="OnChange" />
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {

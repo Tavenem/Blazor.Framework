@@ -6,18 +6,19 @@
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <label>
-        <span class="@IconClass" tabindex="@TabIndex">
+        <span class="@IconClass">
             <input @ref="ElementReference"
                    @attributes="InputAttributes"
                    id="@Id"
                    type="checkbox"
-                   tabindex="-1"
                    class="@InputCssClass"
                    style="@InputCssStyle"
                    autofocus="@AutoFocus"
                    checked="@IsChecked"
                    disabled="@Disabled"
+                   name="@Name"
                    readonly="@ReadOnly"
+                   tabindex="@TabIndex"
                    @onchange="@OnChange"
                    @onclick:preventDefault="@ReadOnly" />
             <tf-icon>@Icon</tf-icon>

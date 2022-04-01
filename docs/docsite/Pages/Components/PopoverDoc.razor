@@ -26,7 +26,7 @@
                 </div>
             </Popover>
             <button @onclick="Toggle" class="btn primary">Toggle</button>
-            @*<Switch @bind-IsChecked="_isOpen" ThemeColor="ThemeColor.Primary" />*@
+            <Switch @bind-Value="_isOpen" ThemeColor="ThemeColor.Primary" />
             <button @onclick="Toggle" class="btn btn-icon primary">
                 <tf-icon>@ToggleIcon</tf-icon>
             </button>
@@ -40,7 +40,7 @@
     </div>
 </Popover>
 <button @onclick=""Toggle"" class=""btn primary"">Toggle</button>
-<Switch @bind-IsChecked=""_isOpen"" ThemeColor=""ThemeColor.Primary"" />
+<Switch @bind-Value=""_isOpen"" ThemeColor=""ThemeColor.Primary"" />
 <button @onclick=""Toggle"" class=""btn btn-icon primary"">
     <tf-icon>@ToggleIcon</tf-icon>
 </button>
@@ -65,17 +65,7 @@
 <div class="row bg-alt rounded outlined p-4">
     <div class="flex-grow-1 center-items">
         <h6>Anchor Origin</h6>
-        @*<RadioGroup @bind-SelectedItem="_anchorOrigin" class="d-flex flex-column">
-            <Radio Value="Origin.Top_Left" ThemeColor="ThemeColor.Primary" class="dense">Top-Left</Radio>
-            <Radio Value="Origin.Top_Center" ThemeColor="ThemeColor.Primary" class="dense">Top-Center</Radio>
-            <Radio Value="Origin.Top_Right" ThemeColor="ThemeColor.Primary" class="dense">Top-Right</Radio>
-            <Radio Value="Origin.Center_Left" ThemeColor="ThemeColor.Primary" class="dense">Center-Left</Radio>
-            <Radio Value="Origin.Center_Center" ThemeColor="ThemeColor.Primary" class="dense">Center-Center</Radio>
-            <Radio Value="Origin.Center_Right" ThemeColor="ThemeColor.Primary" class="dense">Center-Right</Radio>
-            <Radio Value="Origin.Bottom_Left" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Left</Radio>
-            <Radio Value="Origin.Bottom_Center" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Center</Radio>
-            <Radio Value="Origin.Bottom_Right" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Right</Radio>
-        </RadioGroup>*@
+        <RadioGroup @bind-Value="_anchorOrigin" ValuePairs="_origins" ThemeColor="ThemeColor.Primary" Class="dense" />
     </div>
     <div class="d-flex flex-grow-1 center-items">
         <div id="popover-origin-demo" class="rounded outlined position-relative" style="height:8rem;width:8rem">
@@ -90,17 +80,7 @@
     </div>
     <div class="flex-grow-1 center-items">
         <h6>Popover Origin</h6>
-        @*<RadioGroup @bind-SelectedItem="_popoverOrigin" class="d-flex flex-column">
-            <Radio Value="Origin.Top_Left" ThemeColor="ThemeColor.Primary" class="dense">Top-Left</Radio>
-            <Radio Value="Origin.Top_Center" ThemeColor="ThemeColor.Primary" class="dense">Top-Center</Radio>
-            <Radio Value="Origin.Top_Right" ThemeColor="ThemeColor.Primary" class="dense">Top-Right</Radio>
-            <Radio Value="Origin.Center_Left" ThemeColor="ThemeColor.Primary" class="dense">Center-Left</Radio>
-            <Radio Value="Origin.Center_Center" ThemeColor="ThemeColor.Primary" class="dense">Center-Center</Radio>
-            <Radio Value="Origin.Center_Right" ThemeColor="ThemeColor.Primary" class="dense">Center-Right</Radio>
-            <Radio Value="Origin.Bottom_Left" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Left</Radio>
-            <Radio Value="Origin.Bottom_Center" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Center</Radio>
-            <Radio Value="Origin.Bottom_Right" ThemeColor="ThemeColor.Primary" class="dense">Bottom-Right</Radio>
-        </RadioGroup>*@
+        <RadioGroup @bind-Value="_popoverOrigin" ValuePairs="_origins" ThemeColor="ThemeColor.Primary" Class="dense" />
     </div>
 </div>
 
@@ -253,4 +233,12 @@
 
         return $"position-absolute h-100 w-100 d-flex {align} {justify}";
     }
+}
+
+@code {
+    private IEnumerable<KeyValuePair<Origin, string?>> _origins = Enum
+        .GetValues<Origin>()
+        .ToList()
+        .Where(x => x != Origin.None)
+        .Select(x => new KeyValuePair<Origin, string?>(x, x.ToHumanReadable()));
 }

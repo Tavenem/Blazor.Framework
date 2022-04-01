@@ -9,6 +9,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Dropdown : IAsyncDisposable
 {
+    private readonly AdjustableTimer _timer;
+
     private MouseEvent _activation;
     private int _buttonMouseEnterListenerId;
     private int _buttonMouseLeaveListenerId;
@@ -18,8 +20,6 @@ public partial class Dropdown : IAsyncDisposable
     private bool _isOpen;
     private int _popoverMouseEnterListenerId;
     private int _popoverMouseLeaveListenerId;
-    private Timer? _timer;
-    private bool _timerCanceled;
 
     /// <summary>
     /// <para>
@@ -83,7 +83,7 @@ public partial class Dropdown : IAsyncDisposable
     /// splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string? Id { get; set; }
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// Invoked when the dropdown opens or closes.
@@ -200,6 +200,11 @@ public partial class Dropdown : IAsyncDisposable
 
     [Inject] private UtilityService UtilityService { get; set; } = default!;
 
+    /// <summary>
+    /// Constructs a new instance of <see cref="Dropdown"/>.
+    /// </summary>
+    public Dropdown() => _timer = new(Close, 100);
+
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
@@ -207,23 +212,12 @@ public partial class Dropdown : IAsyncDisposable
         {
             Close();
         }
-    }
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
-    {
-        if (AdditionalAttributes.TryGetValue("id", out var value)
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
             && value is string id
             && !string.IsNullOrWhiteSpace(id))
         {
             Id = id;
-        }
-        else if (string.IsNullOrWhiteSpace(Id))
-        {
-            Id = Guid.NewGuid().ToString();
         }
     }
 
@@ -292,8 +286,7 @@ public partial class Dropdown : IAsyncDisposable
     /// </summary>
     public void Close()
     {
-        _timerCanceled = true;
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _timer.Cancel();
         _isMouseOver = false;
         _activation = MouseEvent.None;
         _isOpen = false;
@@ -365,8 +358,7 @@ public partial class Dropdown : IAsyncDisposable
     /// <param name="e">An instance of <see cref="MouseEventArgs"/>.</param>
     public async Task OpenAsync(MouseEventArgs? e)
     {
-        _timerCanceled = true;
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _timer.Cancel();
         if (Disabled)
         {
             return;
@@ -437,7 +429,7 @@ public partial class Dropdown : IAsyncDisposable
             if (disposing)
             {
                 _dotNetRef?.Dispose();
-                _timer?.Dispose();
+                _timer.Dispose();
 
                 IJSObjectReference? module = null;
                 try
@@ -485,14 +477,6 @@ public partial class Dropdown : IAsyncDisposable
         }
     }
 
-    private void CloseTimed(object? _)
-    {
-        if (!_timerCanceled)
-        {
-            Close();
-        }
-    }
-
     private static MouseEvent GetMouseButton(MouseEventArgs? e) => e is null
         ? MouseEvent.None
         : e.Button switch
@@ -502,22 +486,7 @@ public partial class Dropdown : IAsyncDisposable
             _ => MouseEvent.None,
         };
 
-    private void OnMouseDown()
-    {
-        _timerCanceled = true;
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
-    }
+    private void OnMouseDown() => _timer.Cancel();
 
-    private void StartClosing()
-    {
-        _timerCanceled = false;
-        if (_timer is null)
-        {
-            _timer = new Timer(CloseTimed, null, 100, Timeout.Infinite);
-        }
-        else
-        {
-            _timer.Change(100, Timeout.Infinite);
-        }
-    }
+    private void StartClosing() => _timer.Start();
 }

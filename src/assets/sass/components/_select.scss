@@ -1,12 +1,21 @@
 ﻿.select {
-    .selected-item {
-        background-color: var(--tavenem-color-primary-hover);
-        color: var(--tavenem-color-primary);
+    color: var(--tavenem-color-text);
+
+    .expand {
+        transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
     }
 
-    .select-all {
-        margin-top: .625rem;
-        border-bottom: 1px solid var(--tavenem-color-border);
-        padding-bottom: calc(1rem + 2px);
+    &.open .expand {
+        transform: rotate(-180deg);
+    }
+
+    &.filled {
+        .expand {
+            margin-top: -11px;
+        }
+
+        &.dense .expand {
+            margin-top: -7px;
+        }
     }
 }

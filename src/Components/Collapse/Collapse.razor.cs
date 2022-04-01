@@ -123,7 +123,7 @@ public partial class Collapse : IDisposable
     /// <summary>
     /// The expansion icon displayed in the header.
     /// </summary>
-    protected string IconClass => IsLoading ? "sync" : "expand_more";
+    protected string IconName => IsLoading ? DefaultIcons.Loading : DefaultIcons.Expand;
 
     /// <summary>
     /// The final value assigned to the footer's class attribute.

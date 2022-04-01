@@ -7,18 +7,15 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class LightDarkToggle
 {
-    private const string DefaultDarkModeIcon = "dark_mode";
-    private const string DefaultLightModeIcon = "light_mode";
-
     /// <summary>
     /// Custom icon when set to dark mode.
     /// </summary>
-    [Parameter] public string? DarkModeIcon { get; set; } = DefaultDarkModeIcon;
+    [Parameter] public string DarkModeIcon { get; set; } = DefaultIcons.DarkMode;
 
     /// <summary>
     /// Custom icon when set to light mode.
     /// </summary>
-    [Parameter] public string? LightModeIcon { get; set; } = DefaultLightModeIcon;
+    [Parameter] public string LightModeIcon { get; set; } = DefaultIcons.LightMode;
 
     /// <summary>
     /// Whether the app is current set to a dark color scheme.
@@ -48,8 +45,8 @@ public partial class LightDarkToggle
         .ToString();
 
     private string Icon => IsDarkMode
-        ? (DarkModeIcon ?? LightModeIcon ?? DefaultDarkModeIcon)
-        : (LightModeIcon ?? DarkModeIcon ?? DefaultLightModeIcon);
+        ? (DarkModeIcon ?? LightModeIcon)
+        : (LightModeIcon ?? DarkModeIcon);
 
     [Inject] private ThemeService ThemeService { get; set; } = default!;
 

@@ -21,6 +21,16 @@
                 <span>@PrefixText</span>
             }
         }
+        <input type="number"
+               disabled="@Disabled"
+               hidden
+               inputmode="@InputMode"
+               name="@Name"
+               readonly="@ReadOnly"
+               required="@Required"
+               step="@StepString"
+               tabindex="@TabIndex"
+               value="@CurrentValueAsString" />
         <input @ref="ElementReference"
                @attributes="InputAttributes"
                id="@Id"
@@ -34,9 +44,9 @@
                required="@Required"
                step="@StepString"
                tabindex="@TabIndex"
-               value="@CurrentValueAsString"
+               value="@DisplayString"
                @oninput="OnInput"
-               @onchange="OnChangeAsync" />
+               @onchange="OnChange" />
         @if (PostfixContent is not null)
         {
             @PostfixContent(Value)

@@ -36,7 +36,7 @@ public partial class Pagination
     /// Defaults to "first_page".
     /// </para>
     /// </summary>
-    [Parameter] public string FirstPageIcon { get; set; } = "first_page";
+    [Parameter] public string FirstPageIcon { get; set; } = DefaultIcons.Page_First;
 
     /// <summary>
     /// <para>
@@ -64,7 +64,7 @@ public partial class Pagination
     /// Defaults to "last_page".
     /// </para>
     /// </summary>
-    [Parameter] public string LastPageIcon { get; set; } = "last_page";
+    [Parameter] public string LastPageIcon { get; set; } = DefaultIcons.Page_Last;
 
     /// <summary>
     /// <para>
@@ -95,7 +95,7 @@ public partial class Pagination
     /// Defaults to "navigate_next".
     /// </para>
     /// </summary>
-    [Parameter] public string NextPageIcon { get; set; } = "navigate_next";
+    [Parameter] public string NextPageIcon { get; set; } = DefaultIcons.Page_Next;
 
     /// <summary>
     /// <para>
@@ -146,7 +146,7 @@ public partial class Pagination
     /// Defaults to "navigate_before".
     /// </para>
     /// </summary>
-    [Parameter] public string PreviousPageIcon { get; set; } = "navigate_before";
+    [Parameter] public string PreviousPageIcon { get; set; } = DefaultIcons.Page_Previous;
 
     /// <summary>
     /// Custom CSS style(s) for the page button elements.

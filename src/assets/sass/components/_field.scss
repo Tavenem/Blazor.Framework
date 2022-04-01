@@ -107,7 +107,7 @@
                 background-color: rgba(0, 0, 0, 0.12);
             }
 
-            input, .input {
+            input {
                 &:-webkit-autofill {
                     border-top-left-radius: inherit;
                     border-top-right-radius: inherit;
@@ -149,7 +149,7 @@
                 border-color: var(--tavenem-color-action-disabled) !important;
             }
 
-            input, .input {
+            input {
                 &:-webkit-autofill {
                     border-radius: inherit;
                 }
@@ -326,21 +326,17 @@
                 pointer-events: none;
             }
 
-            input, .input {
+            input {
                 opacity: 1;
             }
         }
 
-        &.filled {
-            .input {
-                background-color: rgba(0, 0, 0, 0.12) !important;
-            }
+        &.filled .input {
+            background-color: rgba(0, 0, 0, 0.12) !important;
         }
 
-        &.outlined {
-            .input {
-                border-color: var(--tavenem-color-action-disabled) !important;
-            }
+        &.outlined .input {
+            border-color: var(--tavenem-color-action-disabled) !important;
         }
     }
 
@@ -393,7 +389,7 @@
     padding-top: 6px;
     position: relative;
 
-    input, .input {
+    input, .input-core {
         background: none;
         border: 0;
         box-sizing: content-box;
@@ -401,8 +397,8 @@
         display: block;
         font: inherit;
         height: 1.1875rem;
-        min-width: 0;
         margin: 0;
+        min-width: 0;
         padding: 0;
         position: relative;
         width: 100%;
@@ -438,28 +434,10 @@
     }
 
     textarea {
-        background: none;
-        border: 0;
-        box-sizing: content-box;
-        color: currentColor;
         cursor: auto;
-        display: block;
-        font: inherit;
         height: auto;
         letter-spacing: inherit;
-        margin: 0;
-        min-width: 0;
-        padding: 0;
-        position: relative;
         resize: none;
-        width: 100%;
-        -webkit-tap-highlight-color: transparent;
-
-        &::placeholder {
-            color: currentColor;
-            opacity: 0.42;
-            transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-        }
 
         &::-webkit-scrollbar {
             cursor: crosshair;
@@ -475,19 +453,6 @@
 
         &::-webkit-scrollbar-track {
             background: transparent;
-        }
-
-        &:focus {
-            outline: 0;
-        }
-
-        &:invalid {
-            box-shadow: none;
-            color: var(--tavenem-color-error);
-        }
-
-        &:disabled {
-            opacity: 1;
         }
     }
 
@@ -534,11 +499,11 @@
     }
 
     &.show-steppers {
-        .input {
+        .input-core {
             padding-inline-end: 1.5rem;
         }
 
-        &.dense .input {
+        &.dense .input-core {
             padding-inline-end: 1.25rem;
         }
     }

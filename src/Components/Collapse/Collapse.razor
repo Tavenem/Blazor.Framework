@@ -8,7 +8,7 @@
         {
             <div class="expand" @onclick="OnToggleAsync">
                 <span>@Title</span>
-                <tf-icon class="ms-2">@IconClass</tf-icon>
+                <tf-icon class="ms-2">@IconName</tf-icon>
             </div>
         }
         else if (TitleIsToggle)
@@ -16,14 +16,14 @@
             <div class="d-flex flex-column flex-grow-1 clickable" style="min-width:0" @onclick="OnToggleAsync">
                  @TitleContent
             </div>
-            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconClass</tf-icon>
+            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
         }
         else
         {
             <div class="d-flex flex-column flex-grow-1" style="min-width:0">
                 @TitleContent
             </div>
-            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconClass</tf-icon>
+            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
         }
     </div>
     <div class="@BodyCssClass">

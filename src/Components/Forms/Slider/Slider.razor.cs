@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -14,10 +15,10 @@ namespace Tavenem.Blazor.Framework;
 public partial class Slider<TValue>
 {
     private readonly TValue _maxDefault, _maxType, _minDefault, _minType, _zero;
+    private readonly AdjustableTimer _timer;
 
     private bool _disposedValue;
     private int _tickCount;
-    private Timer? _timer;
 
     /// <summary>
     /// Whether this input should receive focus on page load.
@@ -58,7 +59,7 @@ public partial class Slider<TValue>
     /// Set to a random GUID if not provided.
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// Custom HTML attributes for the input element.
@@ -173,9 +174,9 @@ public partial class Slider<TValue>
         get
         {
             if (Step is not null
-                && !ValuesEqual(Step, _zero))
+                && !FormExtensions.ValuesEqual(Step, _zero))
             {
-                return SuppressScientificFormat(Step);
+                return FormExtensions.SuppressScientificFormat(Step);
             }
 
             return IsFloatingPointType
@@ -189,6 +190,8 @@ public partial class Slider<TValue>
     /// </summary>
     public Slider()
     {
+        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -308,19 +311,19 @@ public partial class Slider<TValue>
     {
         base.OnParametersSet();
 
-        if (ValueIsMore(Max, _maxType))
+        if (FormExtensions.ValueIsMore(Max, _maxType))
         {
             Max = _maxType;
         }
 
-        if (ValueIsLess(Min, _minType))
+        if (FormExtensions.ValueIsLess(Min, _minType))
         {
             Min = _minType;
         }
 
         if (Step is not null
-            && (ValueIsLess(Step, _zero)
-            || ValuesEqual(Step, _zero)))
+            && (FormExtensions.ValueIsLess(Step, _zero)
+            || FormExtensions.ValuesEqual(Step, _zero)))
         {
             Step = default;
         }
@@ -329,11 +332,11 @@ public partial class Slider<TValue>
         {
             Value = Min;
         }
-        else if (ValueIsLess(Value, Min))
+        else if (FormExtensions.ValueIsLess(Value, Min))
         {
             CurrentValue = Min;
         }
-        else if (ValueIsMore(Value, Max))
+        else if (FormExtensions.ValueIsMore(Value, Max))
         {
             CurrentValue = Max;
         }
@@ -360,7 +363,7 @@ public partial class Slider<TValue>
         {
             if (disposing)
             {
-                _timer?.Dispose();
+                _timer.Dispose();
             }
 
             _disposedValue = true;
@@ -395,7 +398,7 @@ public partial class Slider<TValue>
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
         validationErrorMessage = null;
-        var success = TryParseValue(value, out result);
+        var success = value.TryParseValue(Min, Max, out result);
 
         HasConversionError = !success;
         if (success)
@@ -425,612 +428,6 @@ public partial class Slider<TValue>
         return success;
     }
 
-    /// <summary>
-    /// Format for min, max, and step which prevents representing large or small floating point
-    /// values in scientific notation.
-    /// </summary>
-    private static string? SuppressScientificFormat(TValue? value) => (value as IFormattable)?.ToString(
-        "0.###################################################################################################################################################################################################################################################################################################################################################",
-        CultureInfo.InvariantCulture.NumberFormat);
-
-    private bool TryParseValue(string? value, [MaybeNullWhen(false)] out TValue result)
-    {
-        result = default;
-
-#pragma warning disable CS8762 // Parameter must have a non-null value when exiting in some condition.
-        if (string.IsNullOrEmpty(value))
-        {
-            return true;
-        }
-#pragma warning restore CS8762 // Parameter must have a non-null value when exiting in some condition.
-
-        var success = false;
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(decimal))
-        {
-            if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
-            {
-                success = true;
-            }
-            if (success)
-            {
-                result = (TValue)(object)parsed;
-                if (result is not null)
-                {
-                    if (ValueIsLess(result, Min))
-                    {
-                        result = Min;
-                    }
-                    else if (ValueIsMore(result, Max))
-                    {
-                        result = Max;
-                    }
-                }
-            }
-        }
-        else if (targetType == typeof(double))
-        {
-            if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
-            {
-                result = (TValue)(object)parsed;
-                success = true;
-            }
-            if (success)
-            {
-                result = (TValue)(object)parsed;
-                if (result is not null)
-                {
-                    if (ValueIsLess(result, Min))
-                    {
-                        result = Min;
-                    }
-                    else if (ValueIsMore(result, Max))
-                    {
-                        result = Max;
-                    }
-                }
-            }
-        }
-        else if (targetType == typeof(float))
-        {
-            if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed))
-            {
-                result = (TValue)(object)parsed;
-                success = true;
-            }
-            if (success)
-            {
-                result = (TValue)(object)parsed;
-                if (result is not null)
-                {
-                    if (ValueIsLess(result, Min))
-                    {
-                        result = Min;
-                    }
-                    else if (ValueIsMore(result, Max))
-                    {
-                        result = Max;
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (long.TryParse(value, NumberStyles.Currency, CultureInfo.InvariantCulture, out var parsed))
-            {
-                success = true;
-            }
-            if (success)
-            {
-                if (ValueIsLess(parsed, Min))
-                {
-                    result = Min;
-                }
-                else if (ValueIsMore(parsed, Max))
-                {
-                    result = Max;
-                }
-                else
-                {
-                    result = (TValue)Convert.ChangeType(parsed, targetType);
-                }
-            }
-            else
-            {
-                if (ulong.TryParse(value, NumberStyles.Currency, CultureInfo.InvariantCulture, out var unsignedParsed))
-                {
-                    success = true;
-                }
-                if (success)
-                {
-                    if (ValueIsLess(unsignedParsed, Min))
-                    {
-                        result = Min;
-                    }
-                    else if (ValueIsMore(unsignedParsed, Max))
-                    {
-                        result = Max;
-                    }
-                    else
-                    {
-                        result = (TValue)Convert.ChangeType(unsignedParsed, targetType);
-                    }
-                }
-            }
-        }
-
-        return success;
-    }
-
-    private static bool ValuesEqual(TValue first, TValue second)
-    {
-        if (first is null)
-        {
-            return second is null;
-        }
-        else if (second is null)
-        {
-            return false;
-        }
-
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (byte)(object)first == (byte)(object)second;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (decimal)(object)first == (decimal)(object)second;
-        }
-        else if (targetType == typeof(double))
-        {
-            return (double)(object)first == (double)(object)second;
-        }
-        else if (targetType == typeof(float))
-        {
-            return (float)(object)first == (float)(object)second;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)first == (int)(object)second;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)first == (long)(object)second;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)first == (nint)(object)second;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (nuint)(object)first == (nuint)(object)second;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)first == (sbyte)(object)second;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)first == (short)(object)second;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (uint)(object)first == (uint)(object)second;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (ulong)(object)first == (ulong)(object)second;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (ushort)(object)first == (ushort)(object)second;
-        }
-        else if (first is IEquatable<TValue> equatable)
-        {
-            return equatable.Equals(second);
-        }
-        else
-        {
-            return Equals(first, second);
-        }
-    }
-
-    private static bool ValueIsLess(TValue first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (byte)(object)first! < (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (decimal)(object)first! < (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return (double)(object)first! < (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return (float)(object)first! < (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)first! < (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)first! < (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)first! < (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (nuint)(object)first! < (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)first! < (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)first! < (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (uint)(object)first! < (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (ulong)(object)first! < (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (ushort)(object)first! < (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsLess(long first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first < (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first < (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first < (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first < (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return first < (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return first < (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return first < (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            if (first < 0)
-            {
-                return true;
-            }
-            return (nuint)(object)second! > long.MaxValue
-                || first < (long)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return first < (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return first < (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            if (first < 0)
-            {
-                return true;
-            }
-            return (ulong)(object)second! > long.MaxValue
-                || first < (long)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first < (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsLess(ulong first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first < (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first < (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first < (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first < (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)second! >= 0
-                && first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)second! >= 0
-                && first < (ulong)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (long)(object)second! >= 0
-                && first < (nuint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return first < (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)second! >= 0
-                && first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            var s = (short)(object)second!;
-            return s >= 0
-                && first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return first < (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first < (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsMore(TValue first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (byte)(object)first! > (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (decimal)(object)first! > (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return (double)(object)first! > (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return (float)(object)first! > (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)first! > (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)first! > (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)first! > (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (nuint)(object)first! > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)first! > (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)first! > (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (uint)(object)first! > (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (ulong)(object)first! > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (ushort)(object)first! > (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsMore(long first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first > (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first > (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first > (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first > (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return first > (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return first > (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return first > (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            if (first < 0)
-            {
-                return false;
-            }
-            return (ulong)first > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return first > (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return first > (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            if (first < 0)
-            {
-                return false;
-            }
-            return (ulong)first > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first > (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsMore(ulong first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first > (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first > (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first > (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first > (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)second! < 0
-                || first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)second! < 0
-                || first > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)second! < 0
-                || first > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return first > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)second! < 0
-                || first > (byte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)second! < 0
-                || first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return first > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first > (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
     private void OnInput(ChangeEventArgs e)
     {
         InputValue = e.Value as string;
@@ -1041,7 +438,7 @@ public partial class Slider<TValue>
 
         if (!UpdateOnInput)
         {
-            if (TryParseValue(InputValue, out var result))
+            if (InputValue.TryParseValue(Min, Max, out var result))
             {
                 BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(result) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
             }
@@ -1051,19 +448,12 @@ public partial class Slider<TValue>
 
         if (UpdateOnInputDebounce > 0)
         {
-            if (TryParseValue(InputValue, out var result))
+            if (InputValue.TryParseValue(Min, Max, out var result))
             {
                 BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(result) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
             }
 
-            if (_timer is null)
-            {
-                _timer = new Timer(OnTimer, null, UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
-            else
-            {
-                _timer.Change(UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
+            _timer.Change(UpdateOnInputDebounce.Value);
         }
         else
         {
@@ -1073,7 +463,7 @@ public partial class Slider<TValue>
 
     private async Task OnChangeAsync(ChangeEventArgs e)
     {
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _timer.Cancel();
 
         var str = e.Value as string;
         CurrentValueAsString = str;
@@ -1089,7 +479,7 @@ public partial class Slider<TValue>
         }
     }
 
-    private void OnTimer(object? state)
+    private void OnTimer()
     {
         CurrentValueAsString = InputValue;
         StateHasChanged();

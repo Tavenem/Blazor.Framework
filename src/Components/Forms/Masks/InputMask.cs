@@ -337,4 +337,243 @@ public class InputMask
 
         return sb.ToString();
     }
+
+    /// <summary>
+    /// Gets a string which represents the given <paramref name="input"/> with the mask's delimiter
+    /// characters stripped out.
+    /// </summary>
+    /// <param name="input">The raw input string.</param>
+    /// <returns>
+    /// The input string with the mask's delimiter characters stripped out. Or, if the input does
+    /// not conform to the mask's pattern, the unaltered input.
+    /// </returns>
+    public string? UnmaskInput(string? input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return null;
+        }
+
+        var mask = Mask;
+        if (Options is not null)
+        {
+            foreach (var option in Options)
+            {
+                if (option.Length.HasValue)
+                {
+                    var length = LengthWithoutDelimiters(option.Mask);
+                    if (input.Length == length
+                        && option.Pattern?.IsMatch(input) != false)
+                    {
+                        mask = option.Mask;
+                        break;
+                    }
+                }
+                else if (option.Pattern?.IsMatch(input) == true)
+                {
+                    mask = option.Mask;
+                    break;
+                }
+            }
+        }
+        if (string.IsNullOrEmpty(mask))
+        {
+            return input;
+        }
+
+        var sb = new StringBuilder();
+        var i = 0;
+        var m = 0;
+        var escaped = false;
+        bool newEscape;
+        for (; m < mask.Length && i < input.Length; m++)
+        {
+            newEscape = false;
+            switch (mask[m])
+            {
+                case CharMask:
+                    if (escaped)
+                    {
+                        if (input[i] == CharMask)
+                        {
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(input[i]);
+                        i++;
+                    }
+                    break;
+                case DigitMask:
+                    if (escaped)
+                    {
+                        if (input[i] == DigitMask)
+                        {
+                            i++;
+                        }
+                    }
+                    else if (!char.IsDigit(input[i]))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(input[i]);
+                        i++;
+                    }
+                    break;
+                case LetterMask:
+                    if (escaped)
+                    {
+                        if (input[i] == LetterMask)
+                        {
+                            i++;
+                        }
+                    }
+                    else if (!char.IsLetter(input[i]))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(input[i]);
+                        i++;
+                    }
+                    break;
+                case LetterMaskAlt:
+                    if (escaped)
+                    {
+                        if (input[i] == LetterMaskAlt)
+                        {
+                            i++;
+                        }
+                    }
+                    else if (!char.IsLetter(input[i]))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(input[i]);
+                        i++;
+                    }
+                    break;
+                case LowerMask:
+                    if (escaped)
+                    {
+                        if (input[i] == LowerMask)
+                        {
+                            i++;
+                        }
+                    }
+                    else if (!char.IsLetter(input[i])
+                        || char.IsUpper(input[i]))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(input[i]);
+                        i++;
+                    }
+                    break;
+                case UpperMask:
+                    if (escaped)
+                    {
+                        if (input[i] == UpperMask)
+                        {
+                            i++;
+                        }
+                    }
+                    else if (!char.IsLetter(input[i])
+                        || char.IsLower(input[i]))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(input[i]);
+                        i++;
+                    }
+                    break;
+                case '\\':
+                    if (escaped)
+                    {
+                        if (input[i] == '\\')
+                        {
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        newEscape = true;
+                    }
+                    break;
+                default:
+                    if (escaped && input[i] == '\\')
+                    {
+                        i++;
+                    }
+                    if (input[i] == mask[m])
+                    {
+                        i++;
+                    }
+                    break;
+            }
+            escaped = newEscape;
+        }
+
+        for (; i < input.Length; i++)
+        {
+            sb.Append(input[i]);
+        }
+
+        return sb.ToString();
+    }
+
+    private static int LengthWithoutDelimiters(string? mask)
+    {
+        if (mask is null)
+        {
+            return 0;
+        }
+
+        var length = 0;
+        var escaped = false;
+        var newEscape = false;
+        for (var i = 0; i < mask.Length; i++)
+        {
+            switch (mask[i])
+            {
+                case CharMask:
+                case DigitMask:
+                case LetterMask:
+                case LetterMaskAlt:
+                case LowerMask:
+                case UpperMask:
+                    if (!escaped)
+                    {
+                        length++;
+                    }
+                    break;
+                case '\\':
+                    if (escaped)
+                    {
+                        length++;
+                    }
+                    else
+                    {
+                        newEscape = true;
+                    }
+                    break;
+                default:
+                    length++;
+                    break;
+            }
+            escaped = newEscape;
+        }
+
+        return length;
+    }
 }

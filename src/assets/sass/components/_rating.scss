@@ -3,8 +3,13 @@
     --button-inherited-hover-bg: transparent;
     --button-inherited-hover-color: var(--button-inherited-color);
     --button-inherited-hover-shadow: none;
+    --rating-color: var(--tavenem-color-text);
     color: var(--rating-color);
     display: inline-flex;
+
+    legend, .field-helpers {
+        color: var(--rating-color);
+    }
 
     &:focus-visible {
         outline: none;
@@ -13,6 +18,72 @@
             background-color: var(--tavenem-color-action-hover-bg);
         }
     }
+
+    &.disabled {
+        --button-inherited-color: var(--tavenem-color-text-disabled);
+
+        .btn-icon {
+            color: var(--tavenem-color-text-disabled) !important;
+            cursor: default;
+            pointer-events: none;
+
+            &:hover, :focus-within {
+                transform: none;
+            }
+        }
+    }
+
+    &.readonly .btn-icon {
+        cursor: default;
+        pointer-events: none;
+
+        &:hover, :focus-within {
+            transform: none;
+        }
+    }
+
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--rating-color);
+    }
+
+    &.outlined {
+        border: none;
+    }
+
+    &.required legend:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --button-inherited-color: var(--tavenem-color-error);
+        --rating-color: var(--tavenem-color-error);
+    }
+
+    @each $theme in $theme-colors {
+        &:where(.#{$theme}) {
+            --button-inherited-color: var(--tavenem-theme-color);
+        }
+    }
+}
+
+.rating-buttons {
+    display: inline-flex;
 
     input {
         border: 0;
@@ -34,47 +105,6 @@
 
         &:hover, :focus-within {
             transform: scale(1.2);
-        }
-    }
-
-    &.disabled {
-        --button-inherited-color: var(--tavenem-color-text-disabled);
-
-        .btn-icon {
-            color: var(--tavenem-color-text-disabled) !important;
-            cursor: default;
-            pointer-events: none;
-
-            &:hover, :focus-within {
-                transform: none;
-            }
-        }
-    }
-
-    &.readonly {
-        .btn-icon {
-            cursor: default;
-            pointer-events: none;
-
-            &:hover, :focus-within {
-                transform: none;
-            }
-        }
-    }
-
-    &.small {
-        --button-inherited-font-size-icon: 1.25rem;
-        --button-inherited-padding-y-icon: 5px;
-    }
-
-    &.large {
-        --button-inherited-font-size-icon: 2rem;
-        --button-inherited-padding-y-icon: 5px;
-    }
-
-    @each $theme in $theme-colors {
-        &.#{$theme} {
-            --button-inherited-color: var(--tavenem-theme-color);
         }
     }
 }

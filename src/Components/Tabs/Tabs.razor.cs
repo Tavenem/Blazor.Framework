@@ -54,12 +54,12 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// <summary>
     /// The icon to use for the "new tab" button.
     /// </summary>
-    [Parameter] public string AddIcon { get; set; } = "add";
+    [Parameter] public string AddIcon { get; set; } = DefaultIcons.Add;
 
     /// <summary>
     /// The icon to use for scrolling back through the tabs.
     /// </summary>
-    [Parameter] public string BackIcon { get; set; } = "chevron_left";
+    [Parameter] public string BackIcon { get; set; } = DefaultIcons.Back;
 
     /// <summary>
     /// Can be set to <see langword="true"/> to indicate that non-staic tabs (i.e. those generated
@@ -128,7 +128,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// <summary>
     /// The icon to use for scrolling forward through the tabs.
     /// </summary>
-    [Parameter] public string ForwardIcon { get; set; } = "chevron_right";
+    [Parameter] public string ForwardIcon { get; set; } = DefaultIcons.Forward;
 
     /// <summary>
     /// <para>
@@ -359,7 +359,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         .Add(NoDropClass, DragDropListener.DropValid == false)
         .ToString();
 
-    private string ToolbarId { get; } = Guid.NewGuid().ToString();
+    private string ToolbarId { get; } = Guid.NewGuid().ToString("N");
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)

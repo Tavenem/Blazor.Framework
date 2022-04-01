@@ -9,11 +9,11 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class TextInput : InputComponentBase<string?>
 {
+    private readonly AdjustableTimer _focusTimer;
+    private readonly AdjustableTimer _inputTimer;
+    private readonly AsyncAdjustableTimer _suggestionTimer;
+
     private bool _disposedValue;
-    private Timer? _focusTimer;
-    private Timer? _inputTimer;
-    private Timer? _suggestionTimer;
-    private bool _suggestionTimerCanceled;
 
     /// <summary>
     /// <para>
@@ -51,7 +51,7 @@ public partial class TextInput : InputComponentBase<string?>
     /// Default is <see langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter, NotNull] public bool Clearable { get; set; } = true;
+    [Parameter] public bool Clearable { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -61,7 +61,7 @@ public partial class TextInput : InputComponentBase<string?>
     /// Default is "clear".
     /// </para>
     /// </summary>
-    [Parameter] public string ClearIcon { get; set; } = "clear";
+    [Parameter] public string ClearIcon { get; set; } = DefaultIcons.Clear;
 
     /// <summary>
     /// A reference to the input element.
@@ -249,14 +249,15 @@ public partial class TextInput : InputComponentBase<string?>
     /// </summary>
     [Parameter] public IEnumerable<KeyValuePair<string, object>>? SuggestionValues { get; set; }
 
-    private string? _dataListId;
     /// <summary>
-    /// The id of the <c>datalist</c> element, if <see cref="Suggestions"/> is non-empty.
+    /// The text displayed and edited in the input.
     /// </summary>
-    protected string? DataListId => InputType != InputType.Password
-        && Suggestions?.Any() == true
-        ? (_dataListId ??= Guid.NewGuid().ToString())
-        : null;
+    protected string? DisplayString { get; set; }
+
+    /// <inheritdoc/>
+    protected override string? InputCssClass => new CssBuilder(InputClass)
+        .Add("input-core")
+        .ToString();
 
     private protected override bool ShrinkWhen => base.ShrinkWhen
         || PrefixContent is not null
@@ -393,14 +394,31 @@ public partial class TextInput : InputComponentBase<string?>
         }
     }
 
-    private bool SuggestionsClosed { get; set; }
+    private bool SuggestionsClosed { get; set; } = true;
+
+    /// <summary>
+    /// Constructs a new instance of <see cref="TextInput"/>.
+    /// </summary>
+    public TextInput()
+    {
+        _focusTimer = new(ClearFocus, 200);
+        _inputTimer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+        _suggestionTimer = new(GetSuggestionsAsync, 300);
+    }
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
+        var original = Value;
         base.OnParametersSet();
 
-        CurrentInput = Value;
+        if (!string.Equals(Value, original))
+        {
+            CurrentInput = Value;
+            DisplayString = Mask is null
+                ? CurrentValue
+                : Mask.FormatInput(CurrentValue);
+        }
     }
 
     /// <summary>
@@ -408,10 +426,13 @@ public partial class TextInput : InputComponentBase<string?>
     /// </summary>
     public void Clear()
     {
+        _inputTimer.Cancel();
+        _suggestionTimer.Cancel();
         _canClear = false;
         CurrentLength = 0;
         CurrentValueAsString = null;
         CurrentInput = null;
+        DisplayString = null;
     }
 
     /// <summary>
@@ -446,9 +467,9 @@ public partial class TextInput : InputComponentBase<string?>
         {
             if (disposing)
             {
-                _focusTimer?.Dispose();
-                _inputTimer?.Dispose();
-                _suggestionTimer?.Dispose();
+                _focusTimer.Dispose();
+                _inputTimer.Dispose();
+                _suggestionTimer.Dispose();
             }
 
             _disposedValue = true;
@@ -505,16 +526,16 @@ public partial class TextInput : InputComponentBase<string?>
         return true;
     }
 
-    private void ClearFocus(object? _)
+    private void ClearFocus()
     {
         HasFocus = false;
+        SuggestionsClosed = true;
         StateHasChanged();
     }
 
-    private async void GetSuggestions(object? _)
+    private async Task GetSuggestionsAsync()
     {
-        if (LoadSuggestions is null
-            || _suggestionTimerCanceled)
+        if (LoadSuggestions is null)
         {
             return;
         }
@@ -528,22 +549,19 @@ public partial class TextInput : InputComponentBase<string?>
 
     private void OnClick() => SuggestionsClosed = false;
 
-    private void OnFocusIn() => HasFocus = true;
+    private void OnFocusIn()
+    {
+        _focusTimer.Cancel();
+        HasFocus = true;
+    }
 
     private void OnFocusOut()
     {
-        _suggestionTimerCanceled = true;
-        if (_focusTimer is null)
-        {
-            _focusTimer = new Timer(ClearFocus, null, 200, Timeout.Infinite);
-        }
-        else
-        {
-            _focusTimer.Change(200, Timeout.Infinite);
-        }
+        _suggestionTimer.Cancel();
+        _focusTimer.Start();
     }
 
-    private void OnInput(ChangeEventArgs e)
+    private async Task OnInputAsync(ChangeEventArgs e)
     {
         SuggestionsClosed = false;
         LoadedSuggestions = null;
@@ -562,37 +580,22 @@ public partial class TextInput : InputComponentBase<string?>
 
         if (UpdateOnInputDebounce > 0)
         {
-            if (_inputTimer is null)
-            {
-                _inputTimer = new Timer(OnTimer, null, UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
-            else
-            {
-                _inputTimer.Change(UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
+            _inputTimer.Change(UpdateOnInputDebounce.Value);
         }
         else
         {
-            CurrentValueAsString = CurrentInput;
+            await SetValueAsync(CurrentInput);
         }
 
         if (LoadSuggestions is not null)
         {
-            _suggestionTimerCanceled = false;
-            if (_suggestionTimer is null)
-            {
-                _suggestionTimer = new Timer(GetSuggestions, null, 300, Timeout.Infinite);
-            }
-            else
-            {
-                _suggestionTimer.Change(300, Timeout.Infinite);
-            }
+            _suggestionTimer.Start();
         }
     }
 
     private Task OnChangeAsync(ChangeEventArgs e) => SetValueAsync(e.Value as string);
 
-    private void OnTimer(object? state)
+    private void OnTimer()
     {
         CurrentValueAsString = CurrentInput;
         StateHasChanged();
@@ -600,26 +603,29 @@ public partial class TextInput : InputComponentBase<string?>
 
     private async Task SetValueAsync(string? value)
     {
-        _inputTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _inputTimer.Cancel();
 
         CurrentInput = value;
 
-        _canClear = value?.Length > 0;
+        var str = Mask is null
+            ? value
+            : Mask.UnmaskInput(value);
 
-        CurrentLength = value?.Length ?? 0;
+        CurrentLength = str?.Length ?? 0;
 
-        CurrentValueAsString = Mask is null
+        CurrentValueAsString = str;
+
+        var display = Mask is null
             ? value
             : Mask.FormatInput(value);
-        if (CurrentValueAsString != value)
-        {
-            var x = CurrentValueAsString;
-            CurrentValueAsString = string.IsNullOrEmpty(Value)
-                ? " "
-                : null;
-            await Task.Delay(1);
 
-            CurrentValueAsString = x;
+        _canClear = display?.Length > 0;
+
+        DisplayString = value;
+        if (!string.Equals(display, value))
+        {
+            await Task.Delay(1);
+            DisplayString = display;
         }
     }
 

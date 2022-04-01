@@ -19,6 +19,14 @@
                 <span>@PrefixText</span>
             }
         }
+        <input type="@InputType.ToCSS()"
+               disabled="@Disabled"
+               hidden
+               maxlength="@MaxLength"
+               name="@Name"
+               readonly="@ReadOnly"
+               required="@Required"
+               value="@CurrentValue" />
         <input @ref="ElementReference"
                @attributes="InputAttributes"
                id="@Id"
@@ -29,7 +37,6 @@
                autocorrect="@AutocorrectValue"
                autofocus="@AutoFocus"
                disabled="@Disabled"
-               list="@DataListId"
                maxlength="@MaxLength"
                pattern="@Pattern"
                placeholder="@Placeholder"
@@ -37,10 +44,10 @@
                required="@Required"
                spellcheck="@SpellcheckValue"
                tabindex="@TabIndex"
-               value="@CurrentValue"
+               value="@DisplayString"
                @onclick="OnClick"
                @onclick:stopPropagation="true"
-               @oninput="OnInput"
+               @oninput="OnInputAsync"
                @onchange="OnChangeAsync"
                @onfocusin="OnFocusIn"
                @onfocusout="OnFocusOut" />

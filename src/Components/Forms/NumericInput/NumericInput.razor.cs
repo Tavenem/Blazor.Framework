@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -14,10 +15,10 @@ namespace Tavenem.Blazor.Framework;
 public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
 {
     private readonly TValue _maxDefault, _minDefault, _one, _zero;
+    private readonly AdjustableTimer _timer;
 
     private bool _disposedValue;
     private string? _newValue;
-    private Timer? _timer;
 
     /// <summary>
     /// <para>
@@ -134,20 +135,20 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     /// The icon used for the decrement stepper.
     /// </para>
     /// <para>
-    /// Default is "keyboard_arrow_down".
+    /// Default is <see cref="DefaultIcons.Down"/>.
     /// </para>
     /// </summary>
-    [Parameter] public string StepDownIcon { get; set; } = "keyboard_arrow_down";
+    [Parameter] public string StepDownIcon { get; set; } = DefaultIcons.Down;
 
     /// <summary>
     /// <para>
     /// The icon used for the increment stepper.
     /// </para>
     /// <para>
-    /// Default is "keyboard_arrow_up".
+    /// Default is <see cref="DefaultIcons.Up"/>.
     /// </para>
     /// </summary>
-    [Parameter] public string StepUpIcon { get; set; } = "keyboard_arrow_up";
+    [Parameter] public string StepUpIcon { get; set; } = DefaultIcons.Up;
 
     /// <summary>
     /// <para>
@@ -160,10 +161,20 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     /// </summary>
     [Parameter] public TValue? Step { get; set; }
 
+    /// <summary>
+    /// The text displayed and edited in the input.
+    /// </summary>
+    protected string? DisplayString { get; set; }
+
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("number-field")
         .Add("show-steppers", ShowStepButtons && !ReadOnly)
+        .ToString();
+
+    /// <inheritdoc/>
+    protected override string? InputCssClass => new CssBuilder(InputClass)
+        .Add("input-core")
         .ToString();
 
     private static string InputMode => IsFloatingPointType ? "decimal" : "numeric";
@@ -190,14 +201,14 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     private bool DecrementDisabled => Disabled
         || ReadOnly
         || (CurrentValue is not null
-        && (ValuesEqual(CurrentValue, Min)
-        || ValueIsLess(CurrentValue, Min)));
+        && (FormExtensions.ValuesEqual(CurrentValue, Min)
+        || FormExtensions.ValueIsLess(CurrentValue, Min)));
 
     private bool IncrementDisabled => Disabled
         || ReadOnly
         || (CurrentValue is not null
-        && (ValuesEqual(CurrentValue, Max)
-        || ValueIsMore(CurrentValue, Max)));
+        && (FormExtensions.ValuesEqual(CurrentValue, Max)
+        || FormExtensions.ValueIsMore(CurrentValue, Max)));
 
     private protected override bool ShrinkWhen => base.ShrinkWhen
         || PrefixContent is not null
@@ -209,9 +220,9 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         get
         {
             if (Step is not null
-                && !ValuesEqual(Step, _zero))
+                && !FormExtensions.ValuesEqual(Step, _zero))
             {
-                return SuppressScientificFormat(Step);
+                return FormExtensions.SuppressScientificFormat(Step);
             }
 
             return IsFloatingPointType
@@ -221,7 +232,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     }
 
     private protected TValue StepValue => Step is not null
-        && !ValuesEqual(Step, _zero)
+        && !FormExtensions.ValuesEqual(Step, _zero)
         ? Step
         : _one;
 
@@ -230,6 +241,8 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     /// </summary>
     public NumericInput()
     {
+        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -336,30 +349,30 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     {
         base.OnParametersSet();
 
-        if (ValueIsMore(Max, _maxDefault))
+        if (FormExtensions.ValueIsMore(Max, _maxDefault))
         {
             Max = _maxDefault;
         }
 
-        if (ValueIsLess(Min, _minDefault))
+        if (FormExtensions.ValueIsLess(Min, _minDefault))
         {
             Min = _minDefault;
         }
 
         if (Step is not null
-            && (ValueIsLess(Step, _zero)
-            || ValuesEqual(Step, _zero)))
+            && (FormExtensions.ValueIsLess(Step, _zero)
+            || FormExtensions.ValuesEqual(Step, _zero)))
         {
             Step = default;
         }
 
         if (Value is not null)
         {
-            if (ValueIsLess(Value, Min))
+            if (FormExtensions.ValueIsLess(Value, Min))
             {
                 CurrentValue = Min;
             }
-            else if (ValueIsMore(Value, Max))
+            else if (FormExtensions.ValueIsMore(Value, Max))
             {
                 CurrentValue = Max;
             }
@@ -368,7 +381,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         if (string.IsNullOrEmpty(Format)
             && IsFloatingPointType
             && Step is not null
-            && !ValuesEqual(Step, _zero))
+            && !FormExtensions.ValuesEqual(Step, _zero))
         {
             var stepLength = Step?
                 .ToString()?
@@ -377,12 +390,18 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
                 .Length ?? 0;
             Format = $"F{stepLength}";
         }
+
+        SetDisplay();
     }
 
     /// <summary>
     /// Clears the current input text.
     /// </summary>
-    public void Clear() => CurrentValueAsString = null;
+    public void Clear()
+    {
+        _timer.Cancel();
+        CurrentValueAsString = null;
+    }
 
     /// <summary>
     /// <para>
@@ -405,27 +424,27 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     public void Decrement()
     {
         if (CurrentValue is not null
-            && (ValuesEqual(CurrentValue, Min)
-            || ValueIsLess(CurrentValue, Min)))
+            && (FormExtensions.ValuesEqual(CurrentValue, Min)
+            || FormExtensions.ValueIsLess(CurrentValue, Min)))
         {
             return;
         }
 
         try
         {
-            var newValue = SubtractValues(CurrentValue ?? _zero, StepValue);
-            if (ValueIsMore(newValue, Min))
+            var newValue = FormExtensions.SubtractValues(CurrentValue ?? _zero, StepValue);
+            if (FormExtensions.ValueIsMore(newValue, Min))
             {
-                CurrentValue = newValue;
+                SetValue(newValue);
             }
             else
             {
-                CurrentValue = Min;
+                SetValue(Min);
             }
         }
         catch (OverflowException)
         {
-            CurrentValue = Min;
+            SetValue(Min);
         }
     }
 
@@ -455,26 +474,26 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     public void Increment()
     {
         if (CurrentValue is not null
-            && (ValuesEqual(CurrentValue, Max)
-            || ValueIsMore(CurrentValue, Max)))
+            && (FormExtensions.ValuesEqual(CurrentValue, Max)
+            || FormExtensions.ValueIsMore(CurrentValue, Max)))
         {
             return;
         }
         try
         {
-            var newValue = AddValues(CurrentValue ?? _zero, StepValue);
-            if (ValueIsLess(newValue, Max))
+            var newValue = FormExtensions.AddValues(CurrentValue ?? _zero, StepValue);
+            if (FormExtensions.ValueIsLess(newValue, Max))
             {
-                CurrentValue = newValue;
+                SetValue(newValue);
             }
             else
             {
-                CurrentValue = Max;
+                SetValue(Max);
             }
         }
         catch (OverflowException)
         {
-            CurrentValue = Max;
+            SetValue(Max);
         }
     }
 
@@ -505,7 +524,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         {
             if (disposing)
             {
-                _timer?.Dispose();
+                _timer.Dispose();
             }
 
             _disposedValue = true;
@@ -522,25 +541,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         {
             return input;
         }
-
-        return value switch
-        {
-            byte @byte => @byte.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            decimal @decimal => @decimal.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            double @double => @double.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            float @float => @float.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            int @int => @int.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            long @long => @long.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            nint @nint => @nint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            nuint @nuint => @nuint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            sbyte @sbyte => @sbyte.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            short @short => @short.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            uint @uint => @uint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            ulong @ulong => @ulong.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            ushort @ushort => @ushort.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            IFormattable formattable => formattable.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
-            _ => value?.ToString(),
-        };
+        return base.FormatValueAsString(value);
     }
 
     /// <inheritdoc/>
@@ -551,7 +552,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
     {
         result = default;
         validationErrorMessage = null;
-        var success = false;
+        bool success;
 
         if (Converter is not null
             && Converter.TryGetValue(value, out result))
@@ -564,146 +565,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         }
         else
         {
-            var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-            if (targetType == typeof(decimal))
-            {
-                if (decimal.TryParse(value, NumberStyles.Any, FormatProvider ?? CultureInfo.InvariantCulture, out var parsed))
-                {
-                    success = true;
-                }
-                else if (FormatProvider is not null
-                    && decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out parsed))
-                {
-                    success = true;
-                }
-                if (success)
-                {
-                    result = (TValue)(object)parsed;
-                    if (result is not null)
-                    {
-                        if (ValueIsLess(result, Min))
-                        {
-                            result = Min;
-                        }
-                        else if (ValueIsMore(result, Max))
-                        {
-                            result = Max;
-                        }
-                    }
-                }
-            }
-            else if (targetType == typeof(double))
-            {
-                if (double.TryParse(value, NumberStyles.Any, FormatProvider ?? CultureInfo.InvariantCulture, out var parsed))
-                {
-                    result = (TValue)(object)parsed;
-                    success = true;
-                }
-                else if (FormatProvider is not null
-                    && double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out parsed))
-                {
-                    result = (TValue)(object)parsed;
-                    success = true;
-                }
-                if (success)
-                {
-                    result = (TValue)(object)parsed;
-                    if (result is not null)
-                    {
-                        if (ValueIsLess(result, Min))
-                        {
-                            result = Min;
-                        }
-                        else if (ValueIsMore(result, Max))
-                        {
-                            result = Max;
-                        }
-                    }
-                }
-            }
-            else if (targetType == typeof(float))
-            {
-                if (float.TryParse(value, NumberStyles.Any, FormatProvider ?? CultureInfo.InvariantCulture, out var parsed))
-                {
-                    result = (TValue)(object)parsed;
-                    success = true;
-                }
-                else if (FormatProvider is not null
-                    && float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out parsed))
-                {
-                    result = (TValue)(object)parsed;
-                    success = true;
-                }
-                if (success)
-                {
-                    result = (TValue)(object)parsed;
-                    if (result is not null)
-                    {
-                        if (ValueIsLess(result, Min))
-                        {
-                            result = Min;
-                        }
-                        else if (ValueIsMore(result, Max))
-                        {
-                            result = Max;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (long.TryParse(value, NumberStyles.Currency, FormatProvider ?? CultureInfo.InvariantCulture, out var parsed))
-                {
-                    success = true;
-                }
-                else if (FormatProvider is not null
-                    && long.TryParse(value, NumberStyles.Currency, CultureInfo.InvariantCulture, out parsed))
-                {
-                    success = true;
-                }
-                if (success)
-                {
-                    if (ValueIsLess(parsed, Min))
-                    {
-                        result = Min;
-                    }
-                    else if (ValueIsMore(parsed, Max))
-                    {
-                        result = Max;
-                    }
-                    else
-                    {
-                        result = (TValue)Convert.ChangeType(parsed, targetType);
-                    }
-                }
-                else
-                {
-                    if (ulong.TryParse(value, NumberStyles.Currency, FormatProvider ?? CultureInfo.InvariantCulture, out var unsignedParsed))
-                    {
-                        success = true;
-                    }
-                    else if (FormatProvider is not null
-                        && ulong.TryParse(value, NumberStyles.Currency, CultureInfo.InvariantCulture, out unsignedParsed))
-                    {
-                        success = true;
-                    }
-                    if (success)
-                    {
-                        if (ValueIsLess(unsignedParsed, Min))
-                        {
-                            result = Min;
-                        }
-                        else if (ValueIsMore(unsignedParsed, Max))
-                        {
-                            result = Max;
-                        }
-                        else
-                        {
-                            result = (TValue)Convert.ChangeType(unsignedParsed, targetType);
-                        }
-                    }
-                }
-            }
+            success = value.TryParseValue(Min, Max, out result, FormatProvider);
         }
 
         HasConversionError = !success;
@@ -730,597 +592,6 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         return success;
     }
 
-    private static TValue AddValues(TValue first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (TValue)(object)(byte)((byte)(object)first! + (byte)(object)second!);
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (TValue)(object)((decimal)(object)first! + (decimal)(object)second!);
-        }
-        else if (targetType == typeof(double))
-        {
-            return (TValue)(object)((double)(object)first! + (double)(object)second!);
-        }
-        else if (targetType == typeof(float))
-        {
-            return (TValue)(object)((float)(object)first! + (float)(object)second!);
-        }
-        else if (targetType == typeof(int))
-        {
-            return (TValue)(object)((int)(object)first! + (int)(object)second!);
-        }
-        else if (targetType == typeof(long))
-        {
-            return (TValue)(object)((long)(object)first! + (long)(object)second!);
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (TValue)(object)((nint)(object)first! + (nint)(object)second!);
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (TValue)(object)((nuint)(object)first! + (nuint)(object)second!);
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (TValue)(object)(sbyte)((sbyte)(object)first! + (sbyte)(object)second!);
-        }
-        else if (targetType == typeof(short))
-        {
-            return (TValue)(object)(short)((short)(object)first! + (short)(object)second!);
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (TValue)(object)((uint)(object)first! + (uint)(object)second!);
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (TValue)(object)((ulong)(object)first! + (ulong)(object)second!);
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (TValue)(object)(ushort)((ushort)(object)first! + (ushort)(object)second!);
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static TValue SubtractValues(TValue first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (TValue)(object)(byte)((byte)(object)first! - (byte)(object)second!);
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (TValue)(object)((decimal)(object)first! - (decimal)(object)second!);
-        }
-        else if (targetType == typeof(double))
-        {
-            return (TValue)(object)((double)(object)first! - (double)(object)second!);
-        }
-        else if (targetType == typeof(float))
-        {
-            return (TValue)(object)((float)(object)first! - (float)(object)second!);
-        }
-        else if (targetType == typeof(int))
-        {
-            return (TValue)(object)((int)(object)first! - (int)(object)second!);
-        }
-        else if (targetType == typeof(long))
-        {
-            return (TValue)(object)((long)(object)first! - (long)(object)second!);
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (TValue)(object)(sbyte)((sbyte)(object)first! - (sbyte)(object)second!);
-        }
-        else if (targetType == typeof(short))
-        {
-            return (TValue)(object)(short)((short)(object)first! - (short)(object)second!);
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (TValue)(object)((uint)(object)first! - (uint)(object)second!);
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (TValue)(object)((ulong)(object)first! - (ulong)(object)second!);
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (TValue)(object)(ushort)((ushort)(object)first! - (ushort)(object)second!);
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    /// <summary>
-    /// Format for min, max, and step which prevents representing large or small floating point
-    /// values in scientific notation.
-    /// </summary>
-    private static string? SuppressScientificFormat(TValue? value) => (value as IFormattable)?.ToString(
-        "0.###################################################################################################################################################################################################################################################################################################################################################",
-        CultureInfo.InvariantCulture.NumberFormat);
-
-    private static bool ValuesEqual(TValue first, TValue second)
-    {
-        if (first is null)
-        {
-            return second is null;
-        }
-        else if (second is null)
-        {
-            return false;
-        }
-
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (byte)(object)first == (byte)(object)second;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (decimal)(object)first == (decimal)(object)second;
-        }
-        else if (targetType == typeof(double))
-        {
-            return (double)(object)first == (double)(object)second;
-        }
-        else if (targetType == typeof(float))
-        {
-            return (float)(object)first == (float)(object)second;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)first == (int)(object)second;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)first == (long)(object)second;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)first == (nint)(object)second;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (nuint)(object)first == (nuint)(object)second;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)first == (sbyte)(object)second;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)first == (short)(object)second;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (uint)(object)first == (uint)(object)second;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (ulong)(object)first == (ulong)(object)second;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (ushort)(object)first == (ushort)(object)second;
-        }
-        else if (first is IEquatable<TValue> equatable)
-        {
-            return equatable.Equals(second);
-        }
-        else
-        {
-            return Equals(first, second);
-        }
-    }
-
-    private static bool ValueIsLess(TValue first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (byte)(object)first! < (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (decimal)(object)first! < (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return (double)(object)first! < (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return (float)(object)first! < (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)first! < (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)first! < (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)first! < (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (nuint)(object)first! < (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)first! < (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)first! < (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (uint)(object)first! < (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (ulong)(object)first! < (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (ushort)(object)first! < (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsLess(long first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first < (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first < (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first < (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first < (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return first < (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return first < (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return first < (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            if (first < 0)
-            {
-                return true;
-            }
-            return (nuint)(object)second! > long.MaxValue
-                || first < (long)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return first < (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return first < (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            if (first < 0)
-            {
-                return true;
-            }
-            return (ulong)(object)second! > long.MaxValue
-                || first < (long)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first < (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsLess(ulong first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first < (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first < (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first < (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first < (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)second! >= 0
-                && first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)second! >= 0
-                && first < (ulong)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (long)(object)second! >= 0
-                && first < (nuint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return first < (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)second! >= 0
-                && first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            var s = (short)(object)second!;
-            return s >= 0
-                && first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first < (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return first < (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first < (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsMore(TValue first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return (byte)(object)first! > (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return (decimal)(object)first! > (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return (double)(object)first! > (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return (float)(object)first! > (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)first! > (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)first! > (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)first! > (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return (nuint)(object)first! > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)first! > (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)first! > (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return (uint)(object)first! > (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return (ulong)(object)first! > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return (ushort)(object)first! > (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsMore(long first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first > (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first > (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first > (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first > (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return first > (int)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return first > (long)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return first > (nint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            if (first < 0)
-            {
-                return false;
-            }
-            return (ulong)first > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return first > (sbyte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return first > (short)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            if (first < 0)
-            {
-                return false;
-            }
-            return (ulong)first > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first > (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
-    private static bool ValueIsMore(ulong first, TValue second)
-    {
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-        if (targetType == typeof(byte))
-        {
-            return first > (byte)(object)second!;
-        }
-        else if (targetType == typeof(decimal))
-        {
-            return first > (decimal)(object)second!;
-        }
-        else if (targetType == typeof(double))
-        {
-            return first > (double)(object)second!;
-        }
-        else if (targetType == typeof(float))
-        {
-            return first > (float)(object)second!;
-        }
-        else if (targetType == typeof(int))
-        {
-            return (int)(object)second! < 0
-                || first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(long))
-        {
-            return (long)(object)second! < 0
-                || first > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(nint))
-        {
-            return (nint)(object)second! < 0
-                || first > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(nuint))
-        {
-            return first > (nuint)(object)second!;
-        }
-        else if (targetType == typeof(sbyte))
-        {
-            return (sbyte)(object)second! < 0
-                || first > (byte)(object)second!;
-        }
-        else if (targetType == typeof(short))
-        {
-            return (short)(object)second! < 0
-                || first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(uint))
-        {
-            return first > (uint)(object)second!;
-        }
-        else if (targetType == typeof(ulong))
-        {
-            return first > (ulong)(object)second!;
-        }
-        else if (targetType == typeof(ushort))
-        {
-            return first > (ushort)(object)second!;
-        }
-        else
-        {
-            return default!;
-        }
-    }
-
     private void OnInput(ChangeEventArgs e)
     {
         if (!UpdateOnInput
@@ -1332,14 +603,7 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         if (UpdateOnInputDebounce > 0)
         {
             _newValue = e.Value as string;
-            if (_timer is null)
-            {
-                _timer = new Timer(OnTimer, null, UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
-            else
-            {
-                _timer.Change(UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
+            _timer.Change(UpdateOnInputDebounce.Value);
         }
         else
         {
@@ -1347,27 +611,59 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
         }
     }
 
-    private async Task OnChangeAsync(ChangeEventArgs e)
+    private void OnChange(ChangeEventArgs e)
     {
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
-
-        var str = e.Value as string;
-        CurrentValueAsString = str;
-        if (CurrentValueAsString != str)
-        {
-            var x = CurrentValueAsString;
-            CurrentValueAsString = Equals(Value, _zero)
-                ? "1"
-                : "0";
-            await Task.Delay(1);
-
-            CurrentValueAsString = x;
-        }
+        _timer.Cancel();
+        CurrentValueAsString = e.Value as string;
+        SetDisplay();
     }
 
-    private void OnTimer(object? state)
+    private void OnTimer()
     {
         CurrentValueAsString = _newValue;
         StateHasChanged();
+    }
+
+    private void SetDisplay() => DisplayString = Value switch
+    {
+        byte @byte => @byte.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        decimal @decimal => @decimal.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        double @double => @double.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        float @float => @float.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        int @int => @int.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        long @long => @long.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        nint @nint => @nint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        nuint @nuint => @nuint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        sbyte @sbyte => @sbyte.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        short @short => @short.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        uint @uint => @uint.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        ulong @ulong => @ulong.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        ushort @ushort => @ushort.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        IFormattable formattable => formattable.ToString(Format, FormatProvider ?? CultureInfo.InvariantCulture),
+        _ => Value?.ToString(),
+    };
+
+    private void SetValue(TValue? value)
+    {
+        if (EqualityComparer<TValue>.Default.Equals(value, CurrentValue))
+        {
+            return;
+        }
+
+        CurrentValue = value;
+        SetDisplay();
+        HasConversionError = false;
+
+        if (!IsTouched
+            && !EqualityComparer<TValue>.Default.Equals(value, InitialValue))
+        {
+            IsTouched = true;
+            _ = IsTouchedChanged.InvokeAsync(true);
+        }
+
+        if (!IsNested)
+        {
+            EvaluateDebounced();
+        }
     }
 }

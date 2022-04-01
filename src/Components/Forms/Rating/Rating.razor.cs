@@ -17,12 +17,22 @@ public partial class Rating
     /// The default is "star".
     /// </para>
     /// </summary>
-    [Parameter] public string ActiveIcon { get; set; } = "star";
+    [Parameter] public string ActiveIcon { get; set; } = DefaultIcons.Star_Full;
 
     /// <summary>
-    /// If <see langword="true"/>, the component will be disabled.
+    /// Whether this input should receive focus on page load.
+    /// </summary>
+    [Parameter] public bool AutoFocus { get; set; }
+
+    /// <summary>
+    /// Whether the input is disabled.
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// A reference to the first input element.
+    /// </summary>
+    public ElementReference ElementReference { get; set; }
 
     /// <summary>
     /// The value being hovered over by the user.
@@ -43,7 +53,12 @@ public partial class Rating
     /// The default is "star_border".
     /// </para>
     /// </summary>
-    [Parameter] public string InactiveIcon { get; set; } = "star_border";
+    [Parameter] public string InactiveIcon { get; set; } = DefaultIcons.Star_Empty;
+
+    /// <summary>
+    /// A label which describes the field.
+    /// </summary>
+    [Parameter] public string? Label { get; set; }
 
     /// <summary>
     /// <para>
@@ -66,7 +81,7 @@ public partial class Rating
     /// Defaults to a random <see cref="Guid"/>.
     /// </para>
     /// </summary>
-    [Parameter] public string Name { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public override string? Name { get; set; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// Custom CSS class(es) for the rating item controls.
@@ -79,44 +94,29 @@ public partial class Rating
     [Parameter] public string? RatingItemStyle { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, the component will not be editable, but will not have the dim
-    /// color of a disabled component.
+    /// Whether the input is read-only.
     /// </summary>
     [Parameter] public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// The tabindex of the input element.
+    /// </summary>
+    [Parameter] public int TabIndex { get; set; }
 
     /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    /// <summary>
-    /// The value of this input.
-    /// </summary>
-    [Parameter] public byte Value { get; set; }
-
-    /// <summary>
-    /// Invoked when <see cref="Value"/> changes.
-    /// </summary>
-    [Parameter] public EventCallback<byte> ValueChanged { get; set; }
-
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
-    protected override string? CssClass => new CssBuilder("rating")
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("rating")
         .Add(ThemeColor.ToCSS())
         .Add("disabled", Disabled)
         .Add("readonly", ReadOnly)
-        .Add(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    /// <summary>
-    /// The final value assigned to the style attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
+    /// <inheritdoc/>
     protected override string? CssStyle => new CssBuilder()
         .Add(Style)
         .AddStyleFromDictionary(AdditionalAttributes)
@@ -141,11 +141,16 @@ public partial class Rating
         }
     }
 
+    /// <summary>
+    /// Focuses the first input.
+    /// </summary>
+    public ValueTask FocusAsync() => ElementReference.FocusAsync();
+
     private bool IndexIsActive(int index) => HoveredValue.HasValue
         ? index < HoveredValue.Value
         : index < Value;
 
-    private async Task OnKeyDownAsync(KeyboardEventArgs e)
+    private void OnKeyDown(KeyboardEventArgs e)
     {
         if (Disabled || ReadOnly)
         {
@@ -157,21 +162,21 @@ public partial class Rating
             case "ArrowLeft":
                 if (e.ShiftKey)
                 {
-                    await OnValueDownAsync(Value);
+                    OnValueDown(Value);
                 }
                 else
                 {
-                    await OnValueDownAsync(1);
+                    OnValueDown(1);
                 }
                 break;
             case "ArrowRight":
                 if (e.ShiftKey)
                 {
-                    await OnValueUpAsync(Max - Value);
+                    OnValueUp(Max - Value);
                 }
                 else
                 {
-                    await OnValueUpAsync(1);
+                    OnValueUp(1);
                 }
                 break;
             default:
@@ -201,17 +206,16 @@ public partial class Rating
         await HoveredValueChanged.InvokeAsync(HoveredValue);
     }
 
-    private async Task OnRatingClickAsync(int index)
+    private void OnRatingClick(int index)
     {
         if (Disabled || ReadOnly)
         {
             return;
         }
-        Value = (byte)(index + 1);
-        await ValueChanged.InvokeAsync(Value);
+        SetValue((byte)(index + 1));
     }
 
-    private async Task OnValueDownAsync(int value)
+    private void OnValueDown(int value)
     {
         if (Value == 0)
         {
@@ -219,16 +223,15 @@ public partial class Rating
         }
         if (Value >= value)
         {
-            Value = (byte)(Value - value);
+            SetValue((byte)(Value - value));
         }
         else
         {
-            Value = 0;
+            SetValue(0);
         }
-        await ValueChanged.InvokeAsync(Value);
     }
 
-    private async Task OnValueUpAsync(int value)
+    private void OnValueUp(int value)
     {
         if (Value >= Max)
         {
@@ -236,12 +239,34 @@ public partial class Rating
         }
         if (Value < Max - value)
         {
-            Value = (byte)(Value + value);
+            SetValue((byte)(Value + value));
         }
         else
         {
-            Value = Max;
+            SetValue(Max);
         }
-        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private void SetValue(byte value)
+    {
+        if (Equals(value, CurrentValue))
+        {
+            return;
+        }
+
+        CurrentValue = value;
+        HasConversionError = false;
+
+        if (!IsTouched
+            && !Equals(value, InitialValue))
+        {
+            IsTouched = true;
+            _ = IsTouchedChanged.InvokeAsync(true);
+        }
+
+        if (!IsNested)
+        {
+            EvaluateDebounced();
+        }
     }
 }

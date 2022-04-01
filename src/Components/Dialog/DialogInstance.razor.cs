@@ -14,7 +14,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class DialogInstance
 {
-    private readonly string _elementId = string.Concat("dialog_", Guid.NewGuid().ToString().AsSpan(0, 8));
+    private readonly string _elementId = string.Concat("dialog_", Guid.NewGuid().ToString("N").AsSpan(0, 8));
 
     private Dialog? _dialog;
 

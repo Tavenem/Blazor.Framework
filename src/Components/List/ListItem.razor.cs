@@ -5,12 +5,49 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// <summary>
 /// Displays an item in a list, with support for simple theming.
 /// </summary>
-public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListItem>
+public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListItem>, IAsyncDisposable
 {
+    private protected bool _disposedAsyncValue;
+
+    /// <summary>
+    /// Whether this item is disabled.
+    /// </summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// The name of the icon to be displayed before this item's content.
+    /// </summary>
+    [Parameter] public string? Icon { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether this item is collapsible.
+    /// </para>
+    /// <para>
+    /// Useful for items which contain their own sublists.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool IsCollapsible { get; set; }
+
     /// <summary>
     /// Indicates whether this item has been selected.
     /// </summary>
     public bool IsSelected => ParentSelectedItems?.Contains(Item) == true;
+
+    /// <summary>
+    /// Whether to show a separator after this item.
+    /// </summary>
+    [Parameter] public bool SeparatorAfter { get; set; }
+
+    /// <summary>
+    /// Whether to show a separator before this item.
+    /// </summary>
+    [Parameter] public bool SeparatorBefore { get; set; }
+
+    /// <summary>
+    /// One of the built-in color themes.
+    /// </summary>
+    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     internal string? DropPlaceholderClass => ElementList?.DropPlaceholderClass;
 
@@ -21,7 +58,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     /// indicate a list of child items, including component values.
     /// </summary>
     protected string? CollapseClass => new CssBuilder()
-        .Add(ThemeColor.ToCSS())
+        .Add(ThemeColorValue.ToCSS())
         .Add(ClassName)
         .ToString();
 
@@ -29,9 +66,10 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     /// The final value assigned to the class attribute, including component
     /// values.
     /// </summary>
-    protected override string? CssClass => new CssBuilder()
+    protected override string? CssClass => new CssBuilder(Class)
         .Add(ClassName)
-        .Add(ThemeColor.ToCSS())
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add(ThemeColorValue.ToCSS())
         .Add(
             "clickable",
             ElementList?.OnItemClick.HasDelegate == true
@@ -40,8 +78,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         .Add("selectable", ElementList?.SelectionIcons == true)
         .Add("active", IsSelected)
         .Add("no-drag", IsListDraggable && !GetIsDraggable())
-        .Add("disabled", Item is not null
-            && ElementList?.ItemIsDisabled?.Invoke(Item) == true)
+        .Add("disabled", DisabledValue)
         .ToString();
 
     /// <summary>
@@ -66,6 +103,10 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
             return ElementList.ItemClass(Item);
         }
     }
+
+    private protected bool DisabledValue => Disabled
+        || (Item is not null
+        && ElementList?.ItemIsDisabled?.Invoke(Item) == true);
 
     private protected string? IconClassName
     {
@@ -96,46 +137,96 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
             if (ElementList?.SelectionIcons == true)
             {
                 return IsSelected
-                    ? "check_box"
-                    : "check_box_outline_blank";
+                    ? DefaultIcons.CheckBox_Checked
+                    : DefaultIcons.CheckBox_Unchecked;
             }
             if (ElementList?.ShowSelectionIconValue == true
                 && IsSelected)
             {
-                return "done";
+                return DefaultIcons.Selected;
             }
-            if (Item is null
-                || ElementList?.Icon is null)
+            if (string.IsNullOrEmpty(Icon))
             {
-                return null;
+                if (Item is null
+                    || ElementList?.Icon is null)
+                {
+                    return null;
+                }
+                return ElementList.Icon(Item);
             }
-            return ElementList.Icon(Item);
+            else
+            {
+                return Icon;
+            }
         }
     }
 
-    private protected bool SeparatorAfter => Item is not null
-        && (ElementList?.SeparatorAfter?.Invoke(Item) ?? false);
+    private protected bool IsCollapsibleValue => IsCollapsible
+        || (Item is not null
+        && ElementList?.ItemIsCollapsible?.Invoke(Item) == true);
 
-    private protected bool SeparatorBefore => Item is not null
-        && (ElementList?.SeparatorBefore?.Invoke(Item) ?? false);
+    private protected bool SeparatorAfterValue => SeparatorAfter
+        || (Item is not null
+        && (ElementList?.SeparatorAfter?.Invoke(Item) ?? false));
 
-    private protected ThemeColor ThemeColor
+    private protected bool SeparatorBeforeValue => SeparatorBefore
+        || (Item is not null
+        && (ElementList?.SeparatorBefore?.Invoke(Item) ?? false));
+
+    private protected ThemeColor ThemeColorValue
     {
         get
         {
             if (Item is null
                 || ElementList is null)
             {
-                return ThemeColor.None;
+                return ThemeColor;
             }
             if (IsSelected
                 && ElementList.ThemeColor != ThemeColor.None)
             {
                 return ElementList.ThemeColor;
             }
-            return ElementList.ItemThemeColor?.Invoke(Item)
-                ?? ThemeColor.None;
+            if (ThemeColor == ThemeColor.None)
+            {
+                return ElementList.ItemThemeColor?.Invoke(Item)
+                    ?? ThemeColor.None;
+            }
+            else
+            {
+                return ThemeColor;
+            }
         }
+    }
+
+    private ListItemCollapse<TListItem>? CollapseReference { get; set; }
+
+    private ElementReference ElementReference { get; set; }
+
+    [Inject] private ScrollService ScrollService { get; set; } = default!;
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        await DisposeAsync(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Focuses on this list item, and scrolls to it.
+    /// </summary>
+    public async ValueTask FocusAsync()
+    {
+        if (CollapseReference is null)
+        {
+            await ElementReference.FocusAsync();
+        }
+        else
+        {
+            await CollapseReference.FocusAsync();
+        }
+        await ScrollService.ScrollToId(Id);
     }
 
     internal async Task DropItemAsync(TListItem item)
@@ -175,6 +266,26 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
             && ElementList is not null)
         {
             await ElementList.RemoveItemAsync(Item);
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting
+    /// unmanaged resources asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    protected virtual async ValueTask DisposeAsync(bool disposing)
+    {
+        if (!_disposedAsyncValue)
+        {
+            if (disposing
+                && Item is not null
+                && ElementList is not null)
+            {
+                await ElementList.RemoveItemAsync(Item);
+            }
+
+            _disposedAsyncValue = true;
         }
     }
 

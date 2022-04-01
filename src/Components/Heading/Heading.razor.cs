@@ -60,24 +60,24 @@ public partial class Heading : IDisposable
 
     internal string? IdValue => Id ?? CalculatedId;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
     {
-        CalculatedId = FrameworkLayout is null
-            ? Guid.NewGuid().ToString()
-            : FrameworkLayout.Add(this);
-
-        if (string.IsNullOrWhiteSpace(Id)
-            && AdditionalAttributes.TryGetValue("id", out var value)
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
             && value is string id
             && !string.IsNullOrWhiteSpace(id))
         {
             Id = id;
         }
     }
+
+    /// <summary>
+    /// Method invoked when the component is ready to start, having received its
+    /// initial parameters from its parent in the render tree.
+    /// </summary>
+    protected override void OnInitialized() => CalculatedId = FrameworkLayout is null
+        ? Guid.NewGuid().ToString("N")
+        : FrameworkLayout.Add(this);
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note that the component does

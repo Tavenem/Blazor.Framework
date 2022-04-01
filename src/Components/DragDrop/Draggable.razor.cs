@@ -44,7 +44,7 @@ public partial class Draggable<TDragItem> : IDisposable
     /// splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string? Id { get; set; }
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// <para>
@@ -100,39 +100,18 @@ public partial class Draggable<TDragItem> : IDisposable
 
     [Inject] private DragDropListener DragDropListener { get; set; } = default!;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
     {
-        if (AdditionalAttributes.TryGetValue("id", out var value)
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
             && value is string id
             && !string.IsNullOrWhiteSpace(id))
         {
             Id = id;
         }
-        else if (string.IsNullOrWhiteSpace(Id))
-        {
-            Id = Guid.NewGuid().ToString();
-        }
     }
 
-    /// <summary>
-    /// Method invoked after each time the component has been rendered.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -143,10 +122,7 @@ public partial class Draggable<TDragItem> : IDisposable
         }
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
+    /// <inheritdoc/>
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

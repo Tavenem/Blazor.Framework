@@ -9,9 +9,10 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class TextArea : InputComponentBase<string?>
 {
+    private readonly AdjustableTimer _timer;
+
     private bool _disposedValue;
     private string? _newValue;
-    private Timer? _timer;
 
     /// <summary>
     /// <para>
@@ -91,6 +92,13 @@ public partial class TextArea : InputComponentBase<string?>
     /// </summary>
     [Parameter] public bool? Spellcheck { get; set; }
 
+    /// <summary>
+    /// The final value assigned to the input element's class attribute, including component values.
+    /// </summary>
+    protected override string? InputCssClass => new CssBuilder(InputClass)
+        .Add("input-core")
+        .ToString();
+
     private string? AutocompleteValue
     {
         get
@@ -132,6 +140,11 @@ public partial class TextArea : InputComponentBase<string?>
         }
     }
 
+    /// <summary>
+    /// Constructs a new instance of <see cref="TextArea"/>.
+    /// </summary>
+    public TextArea() => _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
@@ -148,6 +161,7 @@ public partial class TextArea : InputComponentBase<string?>
     /// </summary>
     public void Clear()
     {
+        _timer.Cancel();
         CurrentLength = 0;
         CurrentValueAsString = null;
     }
@@ -184,7 +198,7 @@ public partial class TextArea : InputComponentBase<string?>
         {
             if (disposing)
             {
-                _timer?.Dispose();
+                _timer.Dispose();
             }
 
             _disposedValue = true;
@@ -256,14 +270,7 @@ public partial class TextArea : InputComponentBase<string?>
         if (UpdateOnInputDebounce > 0)
         {
             _newValue = str;
-            if (_timer is null)
-            {
-                _timer = new Timer(OnTimer, null, UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
-            else
-            {
-                _timer.Change(UpdateOnInputDebounce.Value, Timeout.Infinite);
-            }
+            _timer.Change(UpdateOnInputDebounce.Value);
         }
         else
         {
@@ -271,18 +278,16 @@ public partial class TextArea : InputComponentBase<string?>
         }
     }
 
-    private async Task OnChangeAsync(ChangeEventArgs e)
+    private void OnChange(ChangeEventArgs e)
     {
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _timer.Cancel();
 
         var str = e.Value as string;
 
         CurrentLength = str?.Length ?? 0;
 
         CurrentValueAsString = str;
-
-        await ValidateAsync();
     }
 
-    private void OnTimer(object? state) => CurrentValueAsString = _newValue;
+    private void OnTimer() => CurrentValueAsString = _newValue;
 }

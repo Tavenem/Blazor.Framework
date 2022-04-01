@@ -418,6 +418,12 @@
     </ChildContent>
 </Collapse>
 
+<Heading Level="HeadingLevel.H2">Name</Heading>
+
+<p>
+    The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
 <Heading Level="HeadingLevel.H2">Auto-focus</Heading>
 
 <p>
@@ -575,8 +581,11 @@
 </p>
 
 <p>
-    Note that masks do not contribute to input validation. Use patterns and/or validation rules to
-    validate input.
+    The mask is also used to strip the typed (and displayed) input of delimiter characters. The
+    bound input value receives a "sanitized" version, with all mask characters removed. For example,
+    a US phone number entered with parenthesis and hyphens might be reduced to a series of digits.
+    Be careful to note, however, that masks are simple formatting constructs, and are no
+    substitution for proper server-side input sanitization or validation.
 </p>
 
 <Heading Level="HeadingLevel.H3">Mask rules</Heading>
@@ -631,21 +640,34 @@
     more difficult for the user to fix their input.
 </p>
 
+<p>
+    When stripping a mask out of an input to bind the underlying value, however, any mask characters
+    encountered in the proper order are removed, even if the entire input does not match the mask.
+    This allows partial input to be cleaned.
+</p>
+
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <TextInput Label="US Phone" Mask="_mask" Placeholder="(000)-000-0000" HelpText="(000)-000-0000" />
+                <TextInput @bind-Value="_masked" Label="US Phone" Mask="_mask" Placeholder="(000)-000-0000" HelpText="(000)-000-0000" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <span>Bound value: @_masked</span>
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""US Phone"" Mask=""_mask"" Placeholder=""(000)-000-0000"" HelpText=""(000)-000-0000"" />
+    <TextInput @bind-Value=""_masked"" Label=""US Phone"" Mask=""_mask"" Placeholder=""(000)-000-0000"" HelpText=""(000)-000-0000"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <span>Bound value: @_masked</span>
 </div>
 
 @code {
     private InputMask _mask = new(""(000)-000-0000"");
+    private string? _masked;
 }")
     </ChildContent>
 </Collapse>
@@ -888,6 +910,7 @@
         "0000 0000 0000 0000",
         new MaskOption("0000 000000 00000", 15, "^(34|37)"),
         new MaskOption("0000 000000 0000", 14, "^(30[0-59])"));
+    private string? _masked;
     private IEnumerable<KeyValuePair<string, object>> _suggestedValues = Enumerable
         .Range(1, 5)
         .Select(x => new KeyValuePair<string, object>($"Suggestion {x}", x));

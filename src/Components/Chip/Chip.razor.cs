@@ -23,7 +23,7 @@ public partial class Chip<TChip>
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected override string? CssClass => new CssBuilder("chip")
-        .Add(ThemeColor.ToCSS())
+        .Add(ThemeColorValue.ToCSS())
         .Add(
             "clickable",
             ElementList?.OnItemClick.HasDelegate == true

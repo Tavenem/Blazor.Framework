@@ -8,7 +8,7 @@ internal class DynamicTabInfo<TTabItem>
 
     public ElementReference ElementReference { get; set; }
 
-    public string Id { get; } = Guid.NewGuid().ToString();
+    public string Id { get; } = Guid.NewGuid().ToString("N");
 
     public bool Observed { get; set; }
 

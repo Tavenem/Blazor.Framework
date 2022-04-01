@@ -14,10 +14,10 @@ public class Form : EditForm, IDisposable
 {
     private readonly List<IFormComponent> _fields = new();
     private readonly Func<Task> _handleSubmitDelegate;
+    private readonly AsyncAdjustableTimer _timer;
 
     private List<string>? _customValidationMessages;
     private bool _disposedValue;
-    private Timer? _timer;
 
     /// <summary>
     /// <para>
@@ -97,7 +97,11 @@ public class Form : EditForm, IDisposable
     /// <summary>
     /// Constructs an instance of <see cref="Form"/>.
     /// </summary>
-    public Form() => _handleSubmitDelegate = HandleSubmitAsync;
+    public Form()
+    {
+        _handleSubmitDelegate = HandleSubmitAsync;
+        _timer = new(OnTimerAsync, 300);
+    }
 
     /// <inheritdoc />
     protected override void OnParametersSet()
@@ -238,7 +242,7 @@ public class Form : EditForm, IDisposable
     /// </remarks>
     public async Task ResetAsync()
     {
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
+        _timer.Cancel();
         await Task.WhenAll(_fields.Select(x => x.ResetAsync()));
     }
 
@@ -289,7 +293,7 @@ public class Form : EditForm, IDisposable
         {
             if (disposing)
             {
-                _timer?.Dispose();
+                _timer.Dispose();
                 if (EditContext is not null)
                 {
                     EditContext.OnFieldChanged -= Update;
@@ -314,17 +318,7 @@ public class Form : EditForm, IDisposable
         }
     }
 
-    private void EvaluateDebounced()
-    {
-        if (_timer is null)
-        {
-            _timer = new Timer(OnTimerAsync, null, 300, Timeout.Infinite);
-        }
-        else
-        {
-            _timer.Change(300, Timeout.Infinite);
-        }
-    }
+    private void EvaluateDebounced() => _timer.Start();
 
     private async Task HandleSubmitAsync()
     {
@@ -350,5 +344,5 @@ public class Form : EditForm, IDisposable
         }
     }
 
-    private async void OnTimerAsync(object? state) => await InvokeAsync(ValidateAsync);
+    private Task OnTimerAsync() => InvokeAsync(ValidateAsync);
 }

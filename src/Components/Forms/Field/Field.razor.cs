@@ -35,7 +35,7 @@ public partial class Field
     /// Set to a random GUID if not provided.
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
     /// <summary>
     /// Whether this field is currently valid.

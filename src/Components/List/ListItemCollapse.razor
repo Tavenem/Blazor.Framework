@@ -4,7 +4,11 @@
 
 @inherits Collapse
 
-<div @attributes="AdditionalAttributes" role="group" class="@CssClass" style="@CssStyle">
+<div @ref="ElementReference"
+     @attributes="AdditionalAttributes"
+     role="group"
+     class="@CssClass"
+     style="@CssStyle">
     <div id="@Id"
          class="@HeaderClass"
          draggable="@(IsDraggable ? "true" : "false")">
@@ -16,7 +20,7 @@
         {
             <div class="expand" @onclick="OnToggleAsync">
                 <span>@Title</span>
-                <tf-icon class="ms-2">@IconClass</tf-icon>
+                <tf-icon class="ms-2">@IconName</tf-icon>
             </div>
         }
         else if (TitleIsToggle)
@@ -25,12 +29,12 @@
                  @onclick="OnToggleAsync">
                  @TitleContent
             </div>
-            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconClass</tf-icon>
+            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
         }
         else
         {
             <div class="d-flex flex-column flex-grow-1">@TitleContent</div>
-            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconClass</tf-icon>
+            <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
         }
     </div>
     <div class="@BodyCssClass">

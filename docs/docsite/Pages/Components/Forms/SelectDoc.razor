@@ -1,0 +1,459 @@
+﻿@page "/components/select"
+
+<PageTitle>Select - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Select</Heading>
+
+<p>
+    The <code>Select</code> component is a rich wrapper for a select element.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    Selects come in three styles. The default uses a simple underline. Add the <code>filled</code>
+    class to give it a shaded background. Add the <code>outlined</code> class to use a full outline.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Normal" />
+                <Select Options="_options" Label="Filled" Class="filled" />
+                <Select Options="_options" Label="Outlined" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Normal"" />
+    <Select Options=""_options"" Label=""Filled"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Outlined"" Class=""outlined"" />
+</div>
+
+@code {
+    private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also add the <code>dense</code> class to any variant to reduce the margins and padding.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Normal" Class="dense" />
+                <Select Options="_options" Label="Filled" Class="filled dense" />
+                <Select Options="_options" Label="Outlined" Class="outlined dense" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Normal"" Class=""dense"" />
+    <Select Options=""_options"" Label=""Filled"" Class=""filled dense"" />
+    <Select Options=""_options"" Label=""Outlined"" Class=""outlined dense"" />
+</div>
+
+@code {
+    private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>Value</code> property can be bound to any data type. Most native data types are
+    supported by default, but custom data types may require a converter. This can take the form of a
+    <code>TypeConverter</code> attribute directly on the data type to support conversion to and from
+    a <code>string</code> directly, or a special converter class assigned to the
+    <code>Converter</code> property of the select component which can perform bespoke conversions
+    for that particular component.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" @bind-Value="_value" Label="Bound" Class="w-100" />
+                <span>Bound value: @_value</span>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" @bind-Value=""_value"" Label=""Bound"" Class=""w-100"" />
+    <span>Bound value: @_value</span>
+</div>
+
+@code {
+    private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
+    private string? _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Options</Heading>
+
+<p>
+    The list of options for the select can be assigned in up to three ways.
+</p>
+
+<Heading Level="HeadingLevel.H3">Manual</Heading>
+
+<p>
+    You can add <code>Option</code> components within the select. Each should have a
+    <code>Value</code> and either a <code>Label</code> or a <code>ChildContent RenderFragment</code>
+    (which receives the current value as a context parameter) to set the displayed content.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Select TValue="int">
+                <Option Value="1" Label="Option 1" />
+                <Option Value="2" Label="Option 2" />
+                <Option Value="3">
+                    Option <strong>3</strong>
+                </Option>
+            </Select>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Select TValue=""int"">
+    <Option Value=""1"" Label=""Option 1"" />
+    <Option Value=""2"" Label=""Option 2"" />
+    <Option Value=""3"">
+        Option <strong>3</strong>
+    </Option>
+</Select>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can add a separator before or after a manual option by setting its
+    <code>SeparatorBefore</code> or <code>SeparatorAfter</code> properties to <code>true</code>.
+</p>
+
+<p>
+    You can disable a manual option with its <code>Disabled</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Select TValue="int">
+                <Option Value="1" Label="Option 1" SeparatorAfter="true" />
+                <Option Value="2" Label="Option 2" />
+                <Option Value="3" Label="Option 3" Disabled="true" />
+            </Select>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Select TValue=""int"">
+    <Option Value=""1"" Label=""Option 1"" SeparatorAfter=""true"" />
+    <Option Value=""2"" Label=""Option 2"" />
+    <Option Value=""3"" Label=""Option 3"" Disabled=""true"" />
+</Select>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Options property</Heading>
+
+<p>
+    You can also assign an enumertaion of values to the <code>Options</code> property. If you
+    provide a <code>RenderFragment</code> for the <code>OptionTemplate</code> property, it will
+    be used to render each value. If not, <code>ToString</code> will be called on the values.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Select Options="_options1">
+                <OptionTemplate>
+                    Option @context
+                </OptionTemplate>
+            </Select>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"">
+    <OptionTemplate>
+        Option @context
+    </OptionTemplate>
+</Select>
+
+@code {
+    private int[] _options = new[] { 1, 2, 3 };
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">OptionPairs property</Heading>
+
+<p>
+    Finally, you can assign an enumertaion of <code>KeyValuePair&lt;TOption, string></code> to the
+    <code>OptionPairs</code> property. The <code>Key</code> of each item should contain the value of
+    each option, and the <code>Value</code> should contain its label.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Select Options="_options2" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"" />
+
+@code {
+    private List<KeyValuePair<int, string>> _options = new() { new(1, ""Option 1""), new(2, ""Option 2""), new(3, ""Option 3"") };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that all three potential option sources work together. You can have manual
+    <code>Option</code> components, <code>Options</code>, <em>and</em> <code>OptionPairs</code> if
+    you wish. The dropdown will show all the results in a combined list (in that order).
+</p>
+
+<Heading Level="HeadingLevel.H2">Multiselect</Heading>
+
+<p>
+    To permit multiple selections, use the <code>MultiSelect</code> component, and bind
+    <code>Value</code> to any enumerable type.
+</p>
+
+<p>
+    Multiselects automatically include a special option, placed at the beginning of the list, which
+    selects all other available options.
+</p>
+
+<Heading Level="HeadingLevel.H2">Disabled & read-only</Heading>
+
+<p>
+    The select can be set as disabled or read-only by setting the properties of the same names.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+                <Select Options="_options" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+                <Select Options="_options" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+            </div>
+            <div class="row mt-3 fill align-items-center gap-2">
+                <Select Options="_options" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+                <Select Options="_options" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+                <Select Options="_options" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
+    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
+    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
+</div>
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
+    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
+    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
+</div>
+
+@code {
+    private string _disabled = ""Option 2"";
+    private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Label</Heading>
+
+<p>
+    The <code>Label</code> property assigns a label to the input. The label will appear within the
+    input like a placeholder when it is empty.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Select Options="_options" Label="Label" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"" Label=""Label"" />")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Help text</Heading>
+
+<p>
+    You can supply help text for the field with the <code>HelpText</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Normal" HelpText="Some help text" />
+                <Select Options="_options" Label="Filled" HelpText="Some help text" Class="filled" />
+                <Select Options="_options" Label="Outlined" HelpText="Some help text" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Normal"" HelpText=""Some help text"" />
+    <Select Options=""_options"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that help text is replaced by any field validation errors.
+</p>
+
+<Heading Level="HeadingLevel.H2">Required</Heading>
+
+<p>
+    Set the <code>Required</code> property to specify whether the field is required. This adds an
+    indicator to the label, and automatic verification rules which warn the user when the select is
+    empty. The warning will only appear after the user has interacted with the select for the first
+    time.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Required" Required="true" />
+                <Select Options="_options" Label="Required" Required="true" Class="filled" />
+                <Select Options="_options" Label="Required" Required="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Required"" Required=""true"" />
+    <Select Options=""_options"" Label=""Required"" Required=""true"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Required"" Required=""true"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Tab index</Heading>
+
+<p>
+    Set the <code>TabIndex</code> property to specify the value of the select's <code>tabindex</code>
+    attribute.
+</p>
+
+<Heading Level="HeadingLevel.H2">Clear button</Heading>
+
+<p>
+    If your bound data type is a reference type, or a nullable value type, the select will have a
+    button that allows the user to clear the selected value. The button will only appear when there
+    is currently a selected value, and it is not disabled, read-only, or required.
+</p>
+
+<Heading Level="HeadingLevel.H2">Name</Heading>
+
+<p>
+    The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
+<Heading Level="HeadingLevel.H2">Auto-focus</Heading>
+
+<p>
+    Set the <code>AutoFocus</code> property to <code>true</code> to automatically focus the input on
+    page load. Setting this on more than one component will cause the first one in the DOM layout
+    order to receive focus.
+</p>
+
+<p>
+    Be cautious when using this property. It can be unfriendly to users who use screen-reading
+    technology.
+</p>
+
+<Heading Level="HeadingLevel.H2">Methods</Heading>
+
+<p>
+    The <code>Clear</code> method will clear the current selection.
+</p>
+
+<p>
+    The <code>FocusAsync</code> method will give the select focus.
+</p>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
+                <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
+                <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
+                <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
+                <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
+                <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
+                <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
+    <Select Options=""_options"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" />
+    <Select Options=""_options"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
+    <Select Options=""_options"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
+    CSS attributes of the select itself, while the <code>InputAttributes</code> property can be used
+    to assign arbitrary attributes to it.
+</p>
+
+<Heading Level="HeadingLevel.H3">Validation</Heading>
+
+<p>
+    See <a href="./components/validation">Validation</a> for information about validating Tavenem
+    Blazor Framework form components.
+</p>
+
+@code {
+    private string _disabled = "Option 2";
+    private string[] _options = new[] { "Option 1", "Option 2", "Option 3" };
+    private int[] _options1 = new[] { 1, 2, 3 };
+    private List<KeyValuePair<int, string>> _options2 = new() { new(1, "Option 1"), new(2, "Option 2"), new(3, "Option 3") };
+    private string? _value;
+}

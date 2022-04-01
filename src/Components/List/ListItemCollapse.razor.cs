@@ -8,43 +8,28 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// </summary>
 public partial class ListItemCollapse<TListItem>
 {
+    /// <summary>
+    /// The id of the header element.
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+
     [Inject] private DragDropListener DragDropListener { get; set; } = default!;
 
     private DragEffect DragEffectAllowed => ListItem?.GetDragEffectAllowed() ?? DragEffect.CopyMove;
 
-    private bool IsDraggable => ListItem?.GetIsDraggable() == true;
+    internal ElementReference ElementReference { get; set; }
 
     private string? HeaderClass => new CssBuilder("header")
         .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
         .ToString();
 
-    private string? Id { get; set; }
+    private bool IsDraggable => ListItem?.GetIsDraggable() == true;
 
     private bool IsDropTarget => ListItem?.GetIsDropTarget() ?? false;
 
     [CascadingParameter] private ListItem<TListItem>? ListItem { get; set; }
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized() => Id = Guid.NewGuid().ToString();
-
-    /// <summary>
-    /// Method invoked after each time the component has been rendered.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -56,6 +41,8 @@ public partial class ListItemCollapse<TListItem>
             DragDropListener.OnDropped += OnDroppedAsync;
         }
     }
+
+    internal ValueTask FocusAsync() => ElementReference.FocusAsync();
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,

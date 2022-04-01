@@ -58,10 +58,15 @@ public partial class AnchorLink : IDisposable
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private protected Dictionary<string, object> Attributes
+    private protected Dictionary<string, object>? Attributes
     {
         get
         {
+            if (AdditionalAttributes is null)
+            {
+                return null;
+            }
+
             var attributes = AdditionalAttributes;
             if (!string.IsNullOrEmpty(LocalLink))
             {
@@ -108,8 +113,7 @@ public partial class AnchorLink : IDisposable
     protected override void OnParametersSet()
     {
         string? href = null;
-        if (AdditionalAttributes is not null
-            && AdditionalAttributes.TryGetValue("href", out var obj))
+        if (AdditionalAttributes?.TryGetValue("href", out var obj) == true)
         {
             href = Convert.ToString(obj, CultureInfo.InvariantCulture);
         }
