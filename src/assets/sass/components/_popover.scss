@@ -1,6 +1,10 @@
 ﻿.popover {
     --popover-color: var(--tavenem-color-text);
     --popover-color-bg: var(--tavenem-color-bg-surface);
+    --tavenem-theme-color: var(--tavenem-color-bg-alt);
+    --tavenem-theme-color-bg-alt: var(--tavenem-color-bg);
+    --tavenem-theme-color-hover: var(--tavenem-color-bg-surface);
+    --tavenem-theme-color-text: var(--tavenem-color-text);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     background-color: var(--popover-color-bg);

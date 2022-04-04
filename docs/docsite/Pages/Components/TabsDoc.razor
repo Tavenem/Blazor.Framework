@@ -117,12 +117,12 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            @*<Select TItem="@Side" @bind-Value="Side" Label="Side" Class="dense">
-                <SelectItem TItem="Side" Value="@Side.Top">Top</SelectItem>
-                <SelectItem TItem="Side" Value="@Side.Bottom">Bottom</SelectItem>
-                <SelectItem TItem="Side" Value="@Side.Left">Left</SelectItem>
-                <SelectItem TItem="Side" Value="@Side.Right">Right</SelectItem>
-            </Select>*@
+            <Select TValue="Side" @bind-Value="Side" Label="Side" Class="dense" Style="max-width:200px">
+                <Option Value="Side.Top" Label="Top" />
+                <Option Value="Side.Bottom" Label="Bottom" />
+                <Option Value="Side.Left" Label="Left" />
+                <Option Value="Side.Right" Label="Right" />
+            </Select>
             <Tabs TTabItem="string" TabSide="Side" Class="flex-grow-1">
                 <TabPanel Title="Tab One">
                     <div class="p-4">
@@ -143,7 +143,13 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tabs TTabItem=""string"" TabSide=""Side"" Class=""flex-grow-1"">
+        @CodeFormatter.CodeToMarkup(@"<Select TValue=""Side"" @bind-Value=""Side"" Label=""Side"" Class=""dense"" Style=""max-width:200px"">
+    <Option Value=""Side.Top"" Label=""Top"" />
+    <Option Value=""Side.Bottom"" Label=""Bottom"" />
+    <Option Value=""Side.Left"" Label=""Left"" />
+    <Option Value=""Side.Right"" Label=""Right"" />
+</Select>
+<Tabs TTabItem=""string"" TabSide=""Side"" Class=""flex-grow-1"">
     <TabPanel Title=""Tab One"">
         <div class=""p-4"">
             Content for Tab One

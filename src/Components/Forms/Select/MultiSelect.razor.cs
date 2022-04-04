@@ -16,116 +16,40 @@ namespace Tavenem.Blazor.Framework;
 public partial class MultiSelect<TValue>
 {
     private readonly object _selectAll = new();
-    private readonly HashSet<TValue> _selectedValues = new();
 
     /// <summary>
-    /// Whether all options are currently selected.
+    /// Whether this select allows multiple selections.
     /// </summary>
-    public override bool AllSelected => _selectedValues
-        .SetEquals(_options
-            .Select(x => x.Value)
-            .Where(x => x is not null)
-            .Cast<TValue>());
+    protected override bool IsMultiselect => true;
 
     /// <summary>
-    /// The text displayed in the input.
+    /// Constructs a new instance of <see cref="MultiSelect{TValue}"/>.
     /// </summary>
-    protected string? DisplayString
-    {
-        get
-        {
-            if (Value?.Any() != true)
-            {
-                return null;
-            }
-            var count = Value.Count();
-            if (count == 1)
-            {
-                return GetValueAsString(Value.First());
-            }
-            var sb = new StringBuilder(GetValueAsString(Value.First()))
-                .Append(" +")
-                .AppendFormat("N0", count);
-            return sb.ToString();
-        }
-    }
-
-    /// <summary>
-    /// The final value assigned to the input element's class attribute, including component values.
-    /// </summary>
-    protected string? InputCssClass => new CssBuilder(InputClass)
-        .Add("input-core")
-        .ToString();
-
-    private protected override string? OptionListCssClass => new CssBuilder(base.OptionListCssClass)
-        .Add("")
-        .ToString();
-
-    /// <summary>
-    /// <para>
-    /// Clears the current selected value.
-    /// </para>
-    /// <para>
-    /// If the bound type is non-nullable, this may set the default value.
-    /// </para>
-    /// </summary>
-    public override void Clear()
-    {
-        _selectedValues.Clear();
-        base.Clear();
-    }
-
-    /// <summary>
-    /// Determine whether the given value is currently selected.
-    /// </summary>
-    /// <param name="option">The value to check for selection.</param>
-    /// <returns>
-    /// <see langword="true"/> if the given value is currently selected; otherwise <see
-    /// langword="false"/>.
-    /// </returns>
-    public override bool IsSelected(TValue option) => Value?.Contains(option) == true;
+    public MultiSelect() => Clearable = true;
 
     /// <summary>
     /// Selects all options.
     /// </summary>
     public override void SelectAll()
     {
-        var all = new HashSet<TValue>();
-        foreach (var option in _options)
+        if (AllSelected)
         {
-            if (option.Value is not null)
-            {
-                all.Add(option.Value);
-            }
-        }
-        CurrentValue = all;
-        SelectedIndex = _options.Count - 1;
-    }
-
-    /// <summary>
-    /// Adds the given <paramref name="value"/> to the currect selection.
-    /// </summary>
-    /// <param name="value">The value to add to the selection.</param>
-    public override void SetValue(TValue? value)
-    {
-        if (value is null)
-        {
+            Clear();
             return;
         }
 
-        if (_selectedValues.Contains(value))
+        var count = _selectedOptions.Count;
+        foreach (var option in _options
+            .Where(x => !x.IsSelectAll
+            && !IsSelected(x.Value)))
         {
-            _selectedValues.Remove(value);
+            _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
         }
-        else
+        if (_selectedOptions.Count != count)
         {
-            _selectedValues.Add(value);
-            SelectedIndex = value is null
-                ? -1
-                : _options.FindIndex(x => x.Value?.Equals(value) == true);
+            UpdateCurrentValue();
+            SelectedIndex = _options.Count - 1;
         }
-
-        CurrentValue = _selectedValues;
     }
 
     /// <inheritdoc/>
@@ -177,33 +101,30 @@ public partial class MultiSelect<TValue>
         validationErrorMessage = null;
         var success = false;
 
-        if (Converter is not null)
+        if (string.IsNullOrEmpty(value))
         {
-            if (value is null)
-            {
-                result = Enumerable.Empty<TValue>();
-                success = true;
-            }
-            else
-            {
-                result = Enumerable.Empty<TValue>();
+            result = Enumerable.Empty<TValue>();
+            success = true;
+        }
+        else if (Converter is not null)
+        {
+            result = Enumerable.Empty<TValue>();
 
-                var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(value));
-                if (JsonDocument.TryParseValue(ref reader, out var doc)
-                    && doc.RootElement.ValueKind == JsonValueKind.Array)
+            var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(value));
+            if (JsonDocument.TryParseValue(ref reader, out var doc)
+                && doc.RootElement.ValueKind == JsonValueKind.Array)
+            {
+                var list = new List<TValue>();
+                foreach (var item in doc.RootElement.EnumerateArray())
                 {
-                    var list = new List<TValue>();
-                    foreach (var item in doc.RootElement.EnumerateArray())
+                    if (Converter.TryGetValue(item.ToString(), out var itemResult)
+                        && itemResult is not null)
                     {
-                        if (Converter.TryGetValue(item.ToString(), out var itemResult)
-                            && itemResult is not null)
-                        {
-                            list.Add(itemResult);
-                        }
+                        list.Add(itemResult);
                     }
-                    result = list;
-                    success = true;
                 }
+                result = list;
+                success = true;
             }
         }
         else if (value.TryParseSelectableValue(out result))
@@ -270,9 +191,10 @@ public partial class MultiSelect<TValue>
         {
             if (!e.ShiftKey)
             {
-                _selectedValues.Clear();
+                _selectedOptions.Clear();
             }
-            SetValue(_options[index].Value, index);
+
+            ToggleValue(_options[index]);
         }
 
         if (ShowOptions)
@@ -282,33 +204,23 @@ public partial class MultiSelect<TValue>
         }
     }
 
-    private string? GetValueAsString(TValue? value)
+    private protected override void UpdateCurrentValue() => CurrentValue = SelectedValues;
+
+    private protected override void UpdateSelectedFromValue()
     {
-        if (Converter is not null
-            && Converter.TrySetValue(value, out var input))
+        _selectedOptions.Clear();
+        if (Value is not null)
         {
-            return input;
+            foreach (var value in Value)
+            {
+                var option = _options
+                    .FirstOrDefault(x => x.Value?.Equals(value) == true);
+                if (option is not null)
+                {
+                    _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
+                }
+            }
         }
-        return value?.ToString();
-    }
-
-    private void SetValue(TValue? value, int index)
-    {
-        if (value is null)
-        {
-            return;
-        }
-
-        if (_selectedValues.Contains(value))
-        {
-            _selectedValues.Remove(value);
-        }
-        else
-        {
-            _selectedValues.Add(value);
-            SelectedIndex = index;
-        }
-
-        CurrentValue = _selectedValues;
+        StateHasChanged();
     }
 }

@@ -20,7 +20,13 @@ public partial class Option<TValue> : IDisposable
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     /// <summary>
-    /// Content for this option.
+    /// <para>
+    /// Content to display this option in the option list.
+    /// </para>
+    /// <para>
+    /// Note: even when using this property to define the content, you should still provide a value
+    /// for <see cref="Label"/> to define the content in the select field itself.
+    /// </para>
     /// </summary>
     [Parameter] public RenderFragment<TValue?>? ChildContent { get; set; }
 
@@ -81,12 +87,7 @@ public partial class Option<TValue> : IDisposable
     }
 
     /// <summary>
-    /// <para>
-    /// The text to display for this option.
-    /// </para>
-    /// <para>
-    /// Ignored if <see cref="ChildContent"/> is non-<see langword="null"/>.
-    /// </para>
+    /// The text to display for this option, both in the select and in the option list.
     /// </summary>
     [Parameter]
     public string? Label { get; set; }
@@ -112,9 +113,10 @@ public partial class Option<TValue> : IDisposable
     [Parameter]
     public TValue? Value { get; set; }
 
+    [CascadingParameter(Name = nameof(FromPopover))] private bool FromPopover { get; set; }
+
     private string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("clickable")
         .Add("active", IsSelected)
         .Add("disabled", Disabled)
         .ToString();
@@ -139,11 +141,16 @@ public partial class Option<TValue> : IDisposable
 
     private bool IsMultiselect => Select is MultiSelect<TValue>;
 
-    [CascadingParameter]
-    private ISelect<TValue>? Select { get; set; }
+    [CascadingParameter] private ISelect<TValue>? Select { get; set; }
 
     /// <inheritdoc/>
-    protected override void OnInitialized() => Select?.Add(this);
+    protected override void OnInitialized()
+    {
+        if (!FromPopover)
+        {
+            Select?.Add(this);
+        }
+    }
 
     /// <inheritdoc/>
     public void Dispose()
@@ -161,7 +168,7 @@ public partial class Option<TValue> : IDisposable
     {
         if (!_disposedValue)
         {
-            if (disposing)
+            if (disposing && !FromPopover)
             {
                 Select?.Remove(this);
             }
@@ -173,7 +180,14 @@ public partial class Option<TValue> : IDisposable
     {
         if (!Disabled)
         {
-            Select?.SetValue(Value);
+            if (IsSelectAll)
+            {
+                Select?.SelectAll();
+            }
+            else
+            {
+                Select?.ToggleValue(this);
+            }
         }
     }
 }

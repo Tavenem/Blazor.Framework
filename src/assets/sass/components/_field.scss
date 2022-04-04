@@ -314,20 +314,29 @@
     &:disabled,
     &.disabled,
     &.read-only {
-        --field-color: var(--tavenem-color-text-disabled);
-        --field-label-color: var(--tavenem-color-text-disabled);
-
         .input {
-            color: var(--tavenem-color-text-disabled) !important;
             cursor: default;
 
             tf-icon {
-                color: var(--tavenem-color-text-disabled) !important;
                 pointer-events: none;
             }
 
             input {
                 opacity: 1;
+            }
+        }
+    }
+
+    &:disabled,
+    &.disabled {
+        --field-color: var(--tavenem-color-text-disabled);
+        --field-label-color: var(--tavenem-color-text-disabled);
+
+        .input {
+            color: var(--tavenem-color-text-disabled) !important;
+
+            tf-icon {
+                color: var(--tavenem-color-text-disabled) !important;
             }
         }
 

@@ -18,29 +18,6 @@ public partial class Select<TValue>
     public Select() => Clearable = Nullable.GetUnderlyingType(typeof(TValue)) is not null
         || typeof(TValue).IsClass;
 
-    /// <summary>
-    /// Determine whether the given value is currently selected.
-    /// </summary>
-    /// <param name="option">The value to check for selection.</param>
-    /// <returns>
-    /// <see langword="true"/> if the given value is currently selected; otherwise <see
-    /// langword="false"/>.
-    /// </returns>
-    public override bool IsSelected(TValue option) => Value?.Equals(option) == true;
-
-    /// <summary>
-    /// Adds the given <paramref name="value"/> to the currect selection.
-    /// </summary>
-    /// <param name="value">The value to add to the selection.</param>
-    public override void SetValue(TValue? value)
-    {
-        OptionsClosed = true;
-        CurrentValue = value;
-        SelectedIndex = value is null
-            ? -1
-            : _options.FindIndex(x => x.Value?.Equals(value) == true);
-    }
-
     /// <inheritdoc/>
     protected override string? FormatValueAsString(TValue? value)
     {
@@ -106,7 +83,7 @@ public partial class Select<TValue>
         return success;
     }
 
-    private protected override void OnTypeClosed(TValue? value) => SetValue(value);
+    private protected override void OnTypeClosed(Option<TValue> option) => ToggleValue(option);
 
     private protected override async Task SelectIndexAsync(KeyboardEventArgs e, int index)
     {
@@ -121,18 +98,15 @@ public partial class Select<TValue>
 
         if (index < 0 || index >= _options.Count)
         {
-            SetValue(default);
+            Clear();
             return;
         }
 
-        if (_options[index].Disabled)
+        if (!_options[index].Disabled)
         {
-            SelectedIndex = index;
+            ToggleValue(_options[index]);
         }
-        else
-        {
-            SetValue(_options[index].Value, index);
-        }
+
         if (ShowOptions)
         {
             await _options[index].ElementReference.FocusAsync();
@@ -140,10 +114,21 @@ public partial class Select<TValue>
         }
     }
 
-    private void SetValue(TValue? value, int index)
+    private protected override void UpdateCurrentValue() => CurrentValue = _selectedOptions
+        .FirstOrDefault().Key;
+
+    private protected override void UpdateSelectedFromValue()
     {
-        OptionsClosed = true;
-        CurrentValue = value;
-        SelectedIndex = index;
+        _selectedOptions.Clear();
+        if (Value is not null)
+        {
+            var option = _options
+                .FirstOrDefault(x => x.Value?.Equals(Value) == true);
+            if (option is not null)
+            {
+                _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
+            }
+        }
+        StateHasChanged();
     }
 }

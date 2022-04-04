@@ -116,7 +116,7 @@
             <Select TValue="int">
                 <Option Value="1" Label="Option 1" />
                 <Option Value="2" Label="Option 2" />
-                <Option Value="3">
+                <Option Value="3" Label="Option 3">
                     Option <strong>3</strong>
                 </Option>
             </Select>
@@ -126,12 +126,19 @@
         @CodeFormatter.CodeToMarkup(@"<Select TValue=""int"">
     <Option Value=""1"" Label=""Option 1"" />
     <Option Value=""2"" Label=""Option 2"" />
-    <Option Value=""3"">
+    <Option Value=""3"" Label=""Option 3"">
         Option <strong>3</strong>
     </Option>
 </Select>")
     </ChildContent>
 </Collapse>
+
+<p>
+    Note: even when using <code>ChildContent</code> to define the label for the option list, you
+    should still supply a simple <code>Label</code> string, since that will be displayed in the
+    select control when the option is selected. If a label is omitted, <code>ToString</code> will be
+    called on the value to populate the select.
+</p>
 
 <p>
     You can add a separator before or after a manual option by setting its
@@ -164,15 +171,18 @@
 <Heading Level="HeadingLevel.H3">Options property</Heading>
 
 <p>
-    You can also assign an enumertaion of values to the <code>Options</code> property. If you
-    provide a <code>RenderFragment</code> for the <code>OptionTemplate</code> property, it will
-    be used to render each value. If not, <code>ToString</code> will be called on the values.
+    You can also assign an enumertaion of values to the <code>Options</code> property. You should
+    also supply a function for the <code>Labels</code> property, which will retrieve a label for
+    each option based on its value. If no <code>Labels</code> function is provided,
+    <code>ToString</code> will be called on the values. If you provide a <code>RenderFragment</code>
+    for the <code>OptionTemplate</code> property, it will be used instead of <code>Labels</code> to
+    render the values in the option list.
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Select Options="_options1">
+            <Select Options="_options1" Labels="@(x => $"Option {x}")">
                 <OptionTemplate>
                     Option @context
                 </OptionTemplate>
@@ -180,7 +190,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"">
+        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"" Labels=""@(x => $""Option {x}"")"">
     <OptionTemplate>
         Option @context
     </OptionTemplate>
@@ -203,11 +213,11 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Select Options="_options2" />
+            <Select OptionPairs="_options2" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"" />
+        @CodeFormatter.CodeToMarkup(@"<Select OptionPairs=""_options"" />
 
 @code {
     private List<KeyValuePair<int, string>> _options = new() { new(1, ""Option 1""), new(2, ""Option 2""), new(3, ""Option 3"") };
@@ -233,6 +243,29 @@
     selects all other available options.
 </p>
 
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <MultiSelect Options="_options1" Labels="@(x => $"Option {x}")">
+                <OptionTemplate>
+                    Option @context
+                </OptionTemplate>
+            </MultiSelect>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<MultiSelect Options=""_options"" Labels=""@(x => $""Option {x}"")"">
+    <OptionTemplate>
+        Option @context
+    </OptionTemplate>
+</MultiSelect>
+
+@code {
+    private int[] _options = new[] { 1, 2, 3 };
+}")
+    </ChildContent>
+</Collapse>
+
 <Heading Level="HeadingLevel.H2">Disabled & read-only</Heading>
 
 <p>
@@ -243,32 +276,32 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <Select Options="_options" @bind-Value="_disabled" Label="Disabled" Disabled="true" />
-                <Select Options="_options" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
-                <Select Options="_options" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
             </div>
             <div class="row mt-3 fill align-items-center gap-2">
-                <Select Options="_options" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
-                <Select Options="_options" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
-                <Select Options="_options" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
-    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
-    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
+    <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
+    <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
+    <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
 </div>
 <div class=""row mt-3 fill align-items-center gap-2"">
-    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
-    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
-    <Select Options=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
+    <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
+    <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
+    <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
 </div>
 
 @code {
-    private string _disabled = ""Option 2"";
-    private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
+    private int _disabled = 2;
+    private List<KeyValuePair<int, string>> _options = new() { new(1, ""Option 1""), new(2, ""Option 2""), new(3, ""Option 3"") };
 }")
     </ChildContent>
 </Collapse>
@@ -277,17 +310,48 @@
 
 <p>
     The <code>Label</code> property assigns a label to the input. The label will appear within the
-    input like a placeholder when it is empty.
+    input like a placeholder when it is empty, and has no explicit placeholder.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Select Options="_options" Label="Label" />
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Label" />
+                <Select Options="_options" Label="Label" Placeholder="Placeholder" />
+            </div>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"" Label=""Label"" />")
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Label"" />
+    <Select Options=""_options"" Label=""Label"" Placeholder=""Placeholder"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Placeholder</Heading>
+
+<p>
+    The <code>Placeholder</code> property assigns a placeholder to the select.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <Select Options="_options" Label="Normal" Placeholder="Placeholder" />
+                <Select Options="_options" Label="Filled" Placeholder="Placeholder" Class="filled" />
+                <Select Options="_options" Label="Outlined" Placeholder="Placeholder" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <Select Options=""_options"" Label=""Normal"" Placeholder=""Placeholder"" />
+    <Select Options=""_options"" Label=""Filled"" Placeholder=""Placeholder"" Class=""filled"" />
+    <Select Options=""_options"" Label=""Outlined"" Placeholder=""Placeholder"" Class=""outlined"" />
+</div>")
     </ChildContent>
 </Collapse>
 
@@ -451,7 +515,7 @@
 </p>
 
 @code {
-    private string _disabled = "Option 2";
+    private int _disabled = 2;
     private string[] _options = new[] { "Option 1", "Option 2", "Option 3" };
     private int[] _options1 = new[] { 1, 2, 3 };
     private List<KeyValuePair<int, string>> _options2 = new() { new(1, "Option 1"), new(2, "Option 2"), new(3, "Option 3") };

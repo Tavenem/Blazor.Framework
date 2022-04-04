@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Globalization;
+using System.Text;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
 
@@ -16,14 +17,18 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, ISelect<TOption>
 {
     private protected readonly List<Option<TOption>> _options = new();
+    private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = new();
     private readonly AdjustableTimer _focusTimer, _typeTimer;
 
     private bool _disposedValue;
+    private bool _valueUpdated;
 
     /// <summary>
-    /// Whether all options are currently selected.
+    /// Whether all (non-<see langword="null"/>) options are currently selected.
     /// </summary>
-    public virtual bool AllSelected { get; }
+    public bool AllSelected => _options
+        .Where(x => x.Value is not null)
+        .All(x => SelectedValues.Contains(x.Value));
 
     /// <summary>
     /// Whether the select should receive focus on page load.
@@ -117,6 +122,11 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     [Parameter] public string? Label { get; set; }
 
     /// <summary>
+    /// A function to retrieve labels for the values in <see cref="Options"/>.
+    /// </summary>
+    [Parameter] public Func<TOption?, string>? Labels { get; set; }
+
+    /// <summary>
     /// <para>
     /// If provided, this function receives the text a user types when the select has focus, and a
     /// candidate value, and should return a boolean indicating whether that value matches the input
@@ -162,12 +172,31 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     /// A template for the content of dynamic options generated from the <see cref="Options"/>
     /// collection.
     /// </summary>
-    [Parameter] public RenderFragment<TOption?>? OptionTemplate { get; set; }
+    [Parameter] public RenderFragment<TOption>? OptionTemplate { get; set; }
 
     /// <summary>
     /// Whether the select is read-only.
     /// </summary>
     [Parameter] public bool ReadOnly { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The currently selected values.
+    /// </para>
+    /// <para>
+    /// This list contains only distinct values, even if multiple options with identical values are
+    /// currently selected.
+    /// </para>
+    /// <para>
+    /// This list also omits <see langword="null"/> values, even if some selected options contain a
+    /// <see langword="null"/> value.
+    /// </para>
+    /// </summary>
+    public IEnumerable<TOption> SelectedValues => _selectedOptions
+        .Select(x => x.Key)
+        .Distinct()
+        .Where(x => x is not null)
+        .Cast<TOption>();
 
     /// <summary>
     /// The tabindex of the select element.
@@ -191,15 +220,59 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         .Add("open", ShowOptions)
         .ToString();
 
-    private protected bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString);
+    /// <summary>
+    /// The display text for the current selection.
+    /// </summary>
+    protected string? DisplayString
+    {
+        get
+        {
+            if (_selectedOptions.Count == 0)
+            {
+                return null;
+            }
 
-    private bool _canClear = false;
+            var first = _selectedOptions[0].Value;
+            if (_selectedOptions.Count == 1)
+            {
+                return first;
+            }
+
+            var sb = new StringBuilder(first);
+            if (sb.Length > 0)
+            {
+                sb.Append(" +")
+                    .Append((_selectedOptions.Count - 1).ToString("N0"));
+            }
+            else
+            {
+                sb.Append(_selectedOptions.Count.ToString("N0"));
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    /// <summary>
+    /// The final value assigned to the input element's class attribute, including component values.
+    /// </summary>
+    protected string? InputCssClass => new CssBuilder(InputClass)
+        .Add("input-core")
+        .ToString();
+
+    /// <summary>
+    /// Whether this select allows multiple selections.
+    /// </summary>
+    protected virtual bool IsMultiselect => false;
+
+    private protected bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString)
+        || !string.IsNullOrEmpty(Placeholder);
+
     private protected bool CanClear => Clearable
         && !Disabled
         && !ReadOnly
         && !Required
-        && (!string.IsNullOrEmpty(CurrentValueAsString)
-        || _canClear);
+        && _selectedOptions.Count > 0;
 
     private protected bool Clearable { get; set; }
 
@@ -210,6 +283,11 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         .ToString();
 
     private protected bool OptionsClosed { get; set; } = true;
+
+    /// <summary>
+    /// The placeholder value.
+    /// </summary>
+    [Parameter] public string? Placeholder { get; set; }
 
     [Inject] private protected ScrollService ScrollService { get; set; } = default!;
 
@@ -230,6 +308,22 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     }
 
     /// <inheritdoc/>
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var oldValue = Value;
+
+        await base.SetParametersAsync(parameters);
+
+        if (((oldValue is null) != (Value is null))
+            || (oldValue is not null
+            && Value is not null
+            && !oldValue.Equals(Value)))
+        {
+            _valueUpdated = true;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -247,6 +341,16 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         }
     }
 
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_valueUpdated && _options.Count > 0)
+        {
+            _valueUpdated = false;
+            UpdateSelectedFromValue();
+        }
+    }
+
     /// <summary>
     /// Called internally.
     /// </summary>
@@ -260,9 +364,9 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public virtual void Clear()
+    public void Clear()
     {
-        _canClear = false;
+        _selectedOptions.Clear();
         CurrentValueAsString = null;
         SelectedIndex = -1;
     }
@@ -280,12 +384,27 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     /// <see langword="true"/> if the given value is currently selected; otherwise <see
     /// langword="false"/>.
     /// </returns>
-    public abstract bool IsSelected(TOption option);
+    public bool IsSelected(TOption? option)
+    {
+        if (option is null)
+        {
+            return _selectedOptions.Any(x => x.Key is null);
+        }
+        return _selectedOptions.Any(x => x.Key is not null && x.Key.Equals(option));
+    }
 
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void Remove(Option<TOption> option) => _options.Remove(option);
+    public virtual void Remove(Option<TOption> option)
+    {
+        _options.Remove(option);
+        if (!_options.Any(x => option.Value is null ? x.Value is null : x.Value?.Equals(option.Value) == true))
+        {
+            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
+            UpdateCurrentValue();
+        }
+    }
 
     /// <summary>
     /// <para>
@@ -298,10 +417,27 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     public virtual void SelectAll() { }
 
     /// <summary>
-    /// Adds the given <paramref name="value"/> to the currect selection.
+    /// Toggle the given option's selected state.
     /// </summary>
-    /// <param name="value">The value to add to the selection.</param>
-    public abstract void SetValue(TOption? value);
+    /// <param name="option">The option to toggle.</param>
+    public void ToggleValue(Option<TOption> option)
+    {
+        OptionsClosed = true;
+        SelectedIndex = _options.IndexOf(option);
+        if (IsSelected(option.Value))
+        {
+            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
+        }
+        else
+        {
+            if (!IsMultiselect)
+            {
+                _selectedOptions.Clear();
+            }
+            _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
+        }
+        UpdateCurrentValue();
+    }
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
@@ -324,7 +460,22 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
 
     private protected Task OnArrowUpAsync(KeyboardEventArgs e) => SelectIndexAsync(e, SelectedIndex - 1);
 
-    private protected void OnClick() => OptionsClosed = !OptionsClosed;
+    private protected void OnClick()
+    {
+        if (!Disabled && !ReadOnly)
+        {
+            OptionsClosed = !OptionsClosed;
+        }
+    }
+
+    private protected async Task OnClickContainerAsync()
+    {
+        if (!Disabled && !ReadOnly)
+        {
+            await ElementReference.FocusAsync();
+            OptionsClosed = !OptionsClosed;
+        }
+    }
 
     private protected void OnFocusIn()
     {
@@ -380,9 +531,13 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         }
     }
 
-    private protected virtual void OnTypeClosed(TOption? value) { }
+    private protected virtual void OnTypeClosed(Option<TOption> option) { }
 
     private protected abstract Task SelectIndexAsync(KeyboardEventArgs e, int index);
+
+    private protected abstract void UpdateCurrentValue();
+
+    private protected abstract void UpdateSelectedFromValue();
 
     private void ClearFocus()
     {
@@ -421,7 +576,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
                 }
                 else
                 {
-                    OnTypeClosed(option.Value);
+                    OnTypeClosed(option);
                 }
             }
         }

@@ -14,12 +14,6 @@ public interface ISelect<TOption>
     public bool AllSelected { get; }
 
     /// <summary>
-    /// Adds the given <paramref name="value"/> to the currect selection.
-    /// </summary>
-    /// <param name="value">The value to add to the selection.</param>
-    public void SetValue(TOption? value);
-
-    /// <summary>
     /// Called internally.
     /// </summary>
     public void Add(Option<TOption> option);
@@ -48,4 +42,10 @@ public interface ISelect<TOption>
     /// </para>
     /// </summary>
     public void SelectAll();
+
+    /// <summary>
+    /// Toggle the given option's selected state.
+    /// </summary>
+    /// <param name="option">The option to toggle.</param>
+    public void ToggleValue(Option<TOption> option);
 }

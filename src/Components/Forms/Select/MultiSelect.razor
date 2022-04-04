@@ -5,13 +5,13 @@
 
 @inherits SelectBase<IEnumerable<TValue>, TValue>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClickContainerAsync">
     <div class="input"
          @onfocusin="OnFocusIn"
          @onfocusout="OnFocusOut">
         <input disabled="@Disabled"
-               hidden
                name="@Name"
+               hidden
                readonly
                required="@Required"
                value="@CurrentValueAsString" />
@@ -22,6 +22,7 @@
                style="@InputStyle"
                autofocus="@AutoFocus"
                disabled="@Disabled"
+               placeholder="@Placeholder"
                readonly
                required="@Required"
                tabindex="@TabIndex"
@@ -59,42 +60,73 @@
             }
         </div>
     }
-    <Popover Class="filled"
-             AnchorId="@Id"
-             IsOpen="ShowOptions"
-             MatchWidth="true">
-        <div class="@OptionListCssClass"
-             @onclick:stopPropagation="true">
-            <CascadingValue Value="this" IsFixed="true">
-                <Option @key="_selectAll" TValue="TValue" Value="default" Label="Select All" IsSelectAll="true" SeparatorAfter="true" />
-                @ChildContent
-                @if (Options is not null)
+    <CascadingValue Value="this" IsFixed="true">
+        <div class="d-none">
+            @ChildContent
+            @if (Options is not null)
+            {
+                if (OptionTemplate is null)
                 {
-                    if (OptionTemplate is null)
+                    foreach (var value in Options)
                     {
-                        foreach (var value in Options)
-                        {
-                            <Option @key="value" Value="value" Label="@value?.ToString()" />
-                        }
-                    }
-                    else
-                    {
-                        foreach (var value in Options)
-                        {
-                            <Option @key="value" Value="value">
-                                @OptionTemplate(context)
-                            </Option>
-                        }
+                        <Option @key="value" Value="value" Label="@value?.ToString()" />
                     }
                 }
-                @if (OptionPairs is not null)
+                else
                 {
-                    foreach (var (key, value) in OptionPairs)
+                    foreach (var value in Options)
                     {
-                        <Option @key="key" Value="key" Label="@value" />
+                        <Option @key="value" Value="value">
+                            @OptionTemplate(context)
+                        </Option>
                     }
                 }
-            </CascadingValue>
+            }
+            @if (OptionPairs is not null)
+            {
+                foreach (var (key, value) in OptionPairs)
+                {
+                    <Option @key="key" Value="key" Label="@value" />
+                }
+            }
         </div>
-    </Popover>
+        <Popover Class="filled"
+                 AnchorId="@Id"
+                 IsOpen="ShowOptions"
+                 MatchWidth="true">
+            <div class="@OptionListCssClass"
+                 @onclick:stopPropagation="true">
+                <CascadingValue Value="true" IsFixed="true" Name="FromPopover">
+                    <Option @key="_selectAll" TValue="TValue" Value="default" Label="Select All" IsSelectAll="true" SeparatorAfter="true" />
+                    @ChildContent
+                    @if (Options is not null)
+                    {
+                        if (OptionTemplate is null)
+                        {
+                            foreach (var value in Options)
+                            {
+                                <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value.ToString())" />
+                            }
+                        }
+                        else
+                        {
+                            foreach (var value in Options)
+                            {
+                                <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value.ToString())">
+                                    @OptionTemplate(context)
+                                </Option>
+                            }
+                        }
+                    }
+                    @if (OptionPairs is not null)
+                    {
+                        foreach (var (key, value) in OptionPairs)
+                        {
+                            <Option @key="key" Value="key" Label="@value" />
+                        }
+                    }
+                </CascadingValue>
+            </div>
+        </Popover>
+    </CascadingValue>
 </div>

@@ -522,22 +522,18 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value7" Label="en-US" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US")" />
-                <NumericInput @bind-Value="_value8" Label="de-DE" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("de-DE")" />
-            </div>
-            <div class="row fill align-items-center gap-2">
+                <NumericInput @bind-Value="_value7" Label="en-US" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US")" Class="w-100" />
                 <span>Bound value: @_value7</span>
+                <NumericInput @bind-Value="_value8" Label="de-DE" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("de-DE")" Class="w-100" />
                 <span>Bound value: @_value8</span>
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput @bind-Value=""_value1"" Label=""en-US"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""en-US"")"" />
-    <NumericInput @bind-Value=""_value2"" Label=""de-DE"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""de-DE"")"" />
-</div>
-<div class=""row fill align-items-center gap-2"">
+    <NumericInput @bind-Value=""_value1"" Label=""en-US"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""en-US"")"" Class=""w-100"" />
     <span>Bound value: @_value1</span>
+    <NumericInput @bind-Value=""_value2"" Label=""de-DE"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""de-DE"")"" Class=""w-100"" />
     <span>Bound value: @_value2</span>
 </div>
 
