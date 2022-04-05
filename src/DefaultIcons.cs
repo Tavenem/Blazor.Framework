@@ -51,6 +51,11 @@ public static class DefaultIcons
     public static string Clear { get; set; } = "clear";
 
     /// <summary>
+    /// An icon for color selection.
+    /// </summary>
+    public static string ColorSelect { get; set; } = "palette";
+
+    /// <summary>
     /// Indicates dark mode.
     /// </summary>
     public static string DarkMode { get; set; } = "dark_mode";
@@ -99,6 +104,16 @@ public static class DefaultIcons
     /// </para>
     /// </summary>
     public static string Loading { get; set; } = "sync";
+
+    /// <summary>
+    /// <para>
+    /// An icon for changing modes.
+    /// </para>
+    /// <para>
+    /// The default is two vertical arrows pointing in opposite directions.
+    /// </para>
+    /// </summary>
+    public static string ModeSwitch { get; set; } = "swap_vert";
 
     /// <summary>
     /// An icon for buttons which move to a first page.

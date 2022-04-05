@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -82,6 +83,14 @@ internal static class Extensions
             .Replace('_', '-');
     }
 
+    public static string ToCSS(this double value, int precision = 5) => value is < 0.00001 and > -0.00001
+        ? "0"
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}";
+
+    public static string ToCSS(this float value, int precision = 5) => value is < 0.00001f and > -0.00001f
+        ? "0px"
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}";
+
     [return: NotNullIfNotNull("value")]
     public static string? ToHumanReadable(this string? value)
     {
@@ -140,9 +149,13 @@ internal static class Extensions
         _ => "all",
     };
 
-    public static string ToPixels(this double value) => value is < 0.00001 and > -0.00001
+    public static string ToPixels(this double value, int precision = 5) => value is < 0.00001 and > -0.00001
         ? "0px"
-        : $"{value.ToString("F5").TrimEnd('0').TrimEnd('.')}px";
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}px";
+
+    public static string ToPixels(this float value, int precision = 5) => value is < 0.00001f and > -0.00001f
+        ? "0px"
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}px";
 
     public static Dictionary<TKey, TValue> With<TKey, TValue>(
         this Dictionary<TKey, TValue> dictionary,

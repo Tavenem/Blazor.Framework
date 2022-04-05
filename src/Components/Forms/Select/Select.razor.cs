@@ -107,7 +107,7 @@ public partial class Select<TValue>
             ToggleValue(_options[index]);
         }
 
-        if (ShowOptions)
+        if (ShowPicker)
         {
             await _options[index].ElementReference.FocusAsync();
             await ScrollService.ScrollToId(_options[index].Id);

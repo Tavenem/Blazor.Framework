@@ -216,8 +216,7 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
 
         if (!IsNested
             && (HasConversionError
-            || (Validation is not null
-            && !EqualityComparer<TValue>.Default.Equals(result, CurrentValue))))
+            || !EqualityComparer<TValue>.Default.Equals(result, CurrentValue)))
         {
             EvaluateDebounced();
         }

@@ -1,4 +1,14 @@
-﻿.field {
+﻿@mixin slider-track {
+    &::-webkit-slider-runnable-track {
+        @content
+    }
+
+    &::-moz-range-track {
+        @content
+    }
+}
+
+.field {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
     --field-active-label-color: var(--tavenem-color-primary);
@@ -7,6 +17,7 @@
     --field-color: var(--tavenem-color-text);
     --field-label-color: var(--tavenem-color-text-secondary);
     border: 0;
+    color: var(--tavenem-color-text);
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -112,6 +123,10 @@
                     border-top-left-radius: inherit;
                     border-top-right-radius: inherit;
                 }
+            }
+
+            .btn, tf-icon {
+                margin-top: -11px;
             }
         }
 
@@ -242,6 +257,10 @@
             .input {
                 padding-bottom: 6px;
                 padding-top: calc(1rem + 7px);
+
+                .btn, tf-icon {
+                    margin-top: -7px;
+                }
             }
 
             label {
@@ -545,6 +564,93 @@
         &:hover,
         &:focus-visible {
             background-color: var(--number-field-inherited-hover-bg);
+        }
+    }
+}
+
+.select {
+    .expand {
+        transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+    }
+
+    &.open .expand {
+        transform: rotate(-180deg);
+    }
+}
+
+.color-picker {
+    height: 250px;
+    overflow: hidden;
+    position: relative;
+    width: 312px;
+
+    .color-overlay {
+        height: 100%;
+        width: 100%;
+
+        &.white {
+            background: linear-gradient(to right, white 0%, rgba(255,255,255,0) 100%);
+        }
+
+        &.black {
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, black 100%);
+        }
+    }
+
+    .color-selector {
+        left: -13px;
+        position: absolute;
+        top: -13px;
+    }
+}
+
+.color-controls {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    width: 312px;
+
+    .color-swatch {
+        background-image: linear-gradient(45deg, #eee 25%, #111 25%), linear-gradient(-45deg, #eee 25%, #111 25%), linear-gradient(45deg, #111 75%, #eee 75%), linear-gradient(-45deg, #111 75%, #eee 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        border-radius: var(--tavenem-border-radius);
+        box-shadow: 0 0 6px rgba(127, 130, 134, 0.18);
+        height: 2.375rem;
+        transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        width: 2.375rem;
+
+        &:hover {
+            box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+        }
+
+        .swatch-fill {
+            height: 100%;
+            width: 100%;
+        }
+    }
+
+    .color-sliders {
+        display: flex;
+        flex: 1 0 auto;
+        flex-direction: column;
+        gap: 1.125rem;
+        margin-left: 1rem;
+
+        input {
+            @include slider-track {
+                background-color: initial;
+            }
+        }
+
+        &.hue .input {
+            background: linear-gradient( 90deg, #FF0000, #ff0 16.66%, #0f0 33.33%,#0ff 50%, #00f 66.66%, #f0f 83.33%, #FF0000);
+        }
+
+        &.alpha .input {
+            background-image: linear-gradient(45deg, #eee 25%, #111 25%), linear-gradient(-45deg, #eee 25%, #111 25%), linear-gradient(45deg, #111 75%, #eee 75%), linear-gradient(-45deg, #111 75%, #eee 75%);
+            background-size: 10px 10px;
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using System.Globalization;
 using System.Text;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
@@ -14,11 +13,11 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// <typeparam name="TOption">
 /// The type of option values.
 /// </typeparam>
-public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, ISelect<TOption>
+public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>, ISelect<TOption>
 {
     private protected readonly List<Option<TOption>> _options = new();
     private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = new();
-    private readonly AdjustableTimer _focusTimer, _typeTimer;
+    private readonly AdjustableTimer _typeTimer;
 
     private bool _disposedValue;
     private bool _valueUpdated;
@@ -31,24 +30,9 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         .All(x => SelectedValues.Contains(x.Value));
 
     /// <summary>
-    /// Whether the select should receive focus on page load.
-    /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
-
-    /// <summary>
     /// The child content of this component.
     /// </summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The icon displayed for the clear button.
-    /// </para>
-    /// <para>
-    /// Default is "clear".
-    /// </para>
-    /// </summary>
-    [Parameter] public string ClearIcon { get; set; } = DefaultIcons.Clear;
 
     /// <summary>
     /// <para>
@@ -59,67 +43,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     /// can supply your own for custom data.
     /// </para>
     /// </summary>
-    [Parameter] public InputValueConverter<TOption>? Converter { get; set; }
-
-    /// <summary>
-    /// Whether the select is disabled.
-    /// </summary>
-    [Parameter] public bool Disabled { get; set; }
-
-    /// <summary>
-    /// A reference to the select element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
-
-    /// <summary>
-    /// The format string to use for conversion.
-    /// </summary>
-    [Parameter] public string? Format { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The <see cref="IFormatProvider"/> to use for conversion.
-    /// </para>
-    /// <para>
-    /// Default is <see cref="CultureInfo.CurrentCulture"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public IFormatProvider? FormatProvider { get; set; }
-
-    /// <summary>
-    /// Any help text displayed below the select.
-    /// </summary>
-    [Parameter] public string? HelpText { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The id of the select element.
-    /// </para>
-    /// <para>
-    /// Set to a random GUID if not provided.
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
-
-    /// <summary>
-    /// Custom HTML attributes for the select element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = new();
-
-    /// <summary>
-    /// Custom CSS class(es) for the select element.
-    /// </summary>
-    [Parameter] public string? InputClass { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the select element.
-    /// </summary>
-    [Parameter] public string? InputStyle { get; set; }
-
-    /// <summary>
-    /// A label which describes the field.
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
+    [Parameter] public new InputValueConverter<TOption>? Converter { get; set; }
 
     /// <summary>
     /// A function to retrieve labels for the values in <see cref="Options"/>.
@@ -175,11 +99,6 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     [Parameter] public RenderFragment<TOption>? OptionTemplate { get; set; }
 
     /// <summary>
-    /// Whether the select is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
     /// <para>
     /// The currently selected values.
     /// </para>
@@ -198,32 +117,15 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         .Where(x => x is not null)
         .Cast<TOption>();
 
-    /// <summary>
-    /// The tabindex of the select element.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
-
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")
-        .Add(ThemeColor.ToCSS())
-        .Add("disabled", Disabled)
-        .Add("read-only", ReadOnly)
-        .Add("field")
-        .Add("shrink", ShrinkWhen)
-        .Add("required", Required)
-        .Add("open", ShowOptions)
         .ToString();
 
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
-    protected string? DisplayString
+    protected override string? DisplayString
     {
         get
         {
@@ -254,58 +156,30 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     }
 
     /// <summary>
-    /// The final value assigned to the input element's class attribute, including component values.
-    /// </summary>
-    protected string? InputCssClass => new CssBuilder(InputClass)
-        .Add("input-core")
-        .ToString();
-
-    /// <summary>
     /// Whether this select allows multiple selections.
     /// </summary>
     protected virtual bool IsMultiselect => false;
 
-    private protected bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString)
-        || !string.IsNullOrEmpty(Placeholder);
-
-    private protected bool CanClear => Clearable
+    private protected override bool CanClear => Clearable
         && !Disabled
         && !ReadOnly
         && !Required
         && _selectedOptions.Count > 0;
 
-    private protected bool Clearable { get; set; }
-
-    private protected bool HasFocus { get; set; }
-
     private protected virtual string? OptionListCssClass => new CssBuilder("list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
 
-    private protected bool OptionsClosed { get; set; } = true;
-
-    /// <summary>
-    /// The placeholder value.
-    /// </summary>
-    [Parameter] public string? Placeholder { get; set; }
-
     [Inject] private protected ScrollService ScrollService { get; set; } = default!;
 
     private protected int SelectedIndex { get; set; } = -1;
-
-    private protected bool ShowOptions => HasFocus
-        && !OptionsClosed;
 
     private protected string? TypedValue { get; set; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="SelectBase{TValue, TOption}"/>.
     /// </summary>
-    protected SelectBase()
-    {
-        _focusTimer = new(ClearFocus, 200);
-        _typeTimer = new(ClearTyped, 2000);
-    }
+    protected SelectBase() => _typeTimer = new(ClearTyped, 2000);
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -364,17 +238,12 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public void Clear()
+    public override void Clear()
     {
         _selectedOptions.Clear();
         CurrentValueAsString = null;
         SelectedIndex = -1;
     }
-
-    /// <summary>
-    /// Focuses this select.
-    /// </summary>
-    public async Task FocusAsync() => await ElementReference.FocusAsync();
 
     /// <summary>
     /// Determine whether the given value is currently selected.
@@ -422,7 +291,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
     /// <param name="option">The option to toggle.</param>
     public void ToggleValue(Option<TOption> option)
     {
-        OptionsClosed = true;
+        PopoverClosed = true;
         SelectedIndex = _options.IndexOf(option);
         if (IsSelected(option.Value))
         {
@@ -446,7 +315,6 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         {
             if (disposing)
             {
-                _focusTimer.Dispose();
                 _typeTimer.Dispose();
             }
 
@@ -460,32 +328,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
 
     private protected Task OnArrowUpAsync(KeyboardEventArgs e) => SelectIndexAsync(e, SelectedIndex - 1);
 
-    private protected void OnClick()
-    {
-        if (!Disabled && !ReadOnly)
-        {
-            OptionsClosed = !OptionsClosed;
-        }
-    }
-
-    private protected async Task OnClickContainerAsync()
-    {
-        if (!Disabled && !ReadOnly)
-        {
-            await ElementReference.FocusAsync();
-            OptionsClosed = !OptionsClosed;
-        }
-    }
-
-    private protected void OnFocusIn()
-    {
-        _focusTimer.Cancel();
-        HasFocus = true;
-    }
-
-    private protected void OnFocusOut() => _focusTimer.Start();
-
-    private protected async Task OnKeyDownAsync(KeyboardEventArgs e)
+    private protected override async Task OnKeyDownAsync(KeyboardEventArgs e)
     {
         if (Disabled || ReadOnly)
         {
@@ -497,7 +340,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
         {
             case "escape":
             case "tab":
-                OptionsClosed = true;
+                PopoverClosed = true;
                 break;
             case "arrowdown":
                 await OnArrowDownAsync(e);
@@ -507,7 +350,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
                 break;
             case " ":
             case "enter":
-                OptionsClosed = !OptionsClosed;
+                PopoverClosed = !PopoverClosed;
                 break;
             case "a":
                 if (e.CtrlKey)
@@ -539,13 +382,6 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
 
     private protected abstract void UpdateSelectedFromValue();
 
-    private void ClearFocus()
-    {
-        HasFocus = false;
-        OptionsClosed = true;
-        StateHasChanged();
-    }
-
     private void ClearTyped() => TypedValue = null;
 
     private async Task OnTypeAsync(string value)
@@ -569,7 +405,7 @@ public abstract class SelectBase<TValue, TOption> : FormComponentBase<TValue>, I
             }
             if (matched)
             {
-                if (ShowOptions)
+                if (ShowPicker)
                 {
                     await option.ElementReference.FocusAsync();
                     await ScrollService.ScrollToId(option.Id);

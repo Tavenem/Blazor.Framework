@@ -64,6 +64,10 @@
     <ScssFiles Include="$(ClientAssetsDirectory)**\*.scss" Exclude="$(ClientAssetsDirectory)**\_*.scss" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ClientAssetsInputs Remove="assets\scripts\tavenem-events.ts" />
+  </ItemGroup>
+
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
     <Message Importance="high" Text="Running npm install..." />
     <Exec Command="npm install" WorkingDirectory="$(ClientAssetsDirectory)" />

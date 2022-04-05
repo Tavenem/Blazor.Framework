@@ -1,0 +1,154 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@inherits PickerComponentBase<TValue>
+
+@code {
+    private RenderFragment _contentRenderFragment =>
+@<CascadingValue Value="this" IsFixed="true">
+    <CascadingValue Name="IsNested" Value="true" IsFixed="true">
+        <div class="color-picker">
+            <div class="color-overlay">
+                <div class="color-overlay white">
+                    <div id="@_overlayIdString" class="color-overlay black" @onclick="OnColorOverlayInteract">
+                        <svg class="color-selector"
+                             height="26"
+                             width="26"
+                             style="@GetSelectorStyle()"
+                             @onclick="OnSelectorClicked" @onclick:stopPropagation="true">
+                            <defs>
+                                <filter id="color-selector-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
+                                    <feOffset dx="0" dy="5" result="offsetblur" />
+                                    <feOffset dx="0" dy="-5" result="offsetblur" />
+                                    <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                                </filter>
+                            </defs>
+                            <circle r="10" cx="13" cy="13" stroke="white" stroke-width="1" fill="transparent" style="filter: url(#color-selector-shadow)" />
+                            <circle r="11" cx="13" cy="13" stroke="white" stroke-width="1.5" fill="transparent" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="color-controls">
+            <div class="d-flex align-items-center">
+                <div class="color-swatch">
+                    <div class="swatch-fill" style="@($"background:{HexColor}")"></div>
+                </div>
+                <div class="color-sliders">
+                    <Slider TValue="ushort" @bind-Value="Hue" Max="359" Class="hue" />
+                    @if (ShowAlpha)
+                    {
+                        <Slider TValue="float" @bind-Value="Alpha" Max="1f" Class="alpha" Style="@AlphaSliderStyle" />
+                    }
+                </div>
+            </div>
+            <div class="d-flex flex-fill align-items-center gap-2 mt-4">
+                @switch (ColorMode)
+                {
+                    case ColorMode.Hex:
+                        <TextInput @bind-Value="@HexInput" HelpText="HEX" InputClass="text-center" Class="outlined" />
+                        break;
+                    case ColorMode.HSL:
+                        <NumericInput TValue="ushort" @bind-Value="Hue" Max="359" HelpText="H" Class="outlined" ShowStepButtons="false" />
+                        <NumericInput TValue="byte" @bind-Value="Saturation" Max="100" HelpText="S" Class="outlined" ShowStepButtons="false" />
+                        <NumericInput TValue="byte" @bind-Value="Lightness" Max="100" HelpText="L" Class="outlined" ShowStepButtons="false" />
+                        break;
+                    case ColorMode.RGB:
+                        <NumericInput TValue="byte" @bind-Value="Red" HelpText="R" Class="outlined" ShowStepButtons="false" />
+                        <NumericInput TValue="byte" @bind-Value="Green" HelpText="G" Class="outlined" ShowStepButtons="false" />
+                        <NumericInput TValue="byte" @bind-Value="Blue" HelpText="B" Class="outlined" ShowStepButtons="false" />
+                        break;
+                }
+                @if (ShowAlpha && ColorMode != ColorMode.Hex)
+                {
+                    <NumericInput TValue="float" @bind-Value="Alpha" Min="0" Max="1" Step="0.01f" HelpText="A" Class="outlined" ShowStepButtons="false" />
+                }
+                <button class="btn btn-icon" @onclick="OnCycleMode">
+                    <tf-icon>@DefaultIcons.ModeSwitch</tf-icon>
+                </button>
+            </div>
+        </div>
+    </CascadingValue>
+</CascadingValue>;
+}
+
+<div @attributes="AdditionalAttributes"
+     class="@CssClass"
+     style="@CssStyle"
+     @onclick="OnClickContainerAsync"
+     @onkeydown="OnKeyDownAsync">
+    <div class="input"
+         style="@(Inline ? "display:none" : null)"
+         @onfocusin="OnFocusIn"
+         @onfocusout="OnFocusOut">
+        <input disabled="@Disabled"
+               name="@Name"
+               hidden
+               readonly
+               required="@Required"
+               value="@CurrentValueAsString" />
+        <input @ref="ElementReference"
+               @attributes="InputAttributes"
+               id="@Id"
+               class="@InputCssClass"
+               style="@InputStyle"
+               autofocus="@AutoFocus"
+               disabled="@Disabled"
+               placeholder="@Placeholder"
+               readonly
+               required="@Required"
+               tabindex="@TabIndex"
+               value="@DisplayString"
+               @onclick="OnClick"
+               @onclick:stopPropagation="true" />
+        @if (CanClear)
+        {
+            <button class="btn btn-icon small" @onclick="Clear">
+                <tf-icon>@ClearIcon</tf-icon>
+            </button>
+        }
+        <tf-icon @onclick="OnClick">@DefaultIcons.ColorSelect</tf-icon>
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if (Inline)
+    {
+        @_contentRenderFragment
+    }
+    else
+    {
+        <Popover Class="filled"
+                 AnchorId="@Id"
+                 AnchorOrigin="Origin.Bottom_Left"
+                 IsOpen="ShowPicker"
+                 PopoverOrigin="Origin.Top_Left">
+            @_contentRenderFragment
+        </Popover>
+    }
+    @if (!string.IsNullOrEmpty(HelpText)
+        || !IsValid)
+    {
+        <div class="field-helpers">
+            @if (!IsValid)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+        </div>
+    }
+</div>
+
+
