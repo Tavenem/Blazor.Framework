@@ -61,6 +61,11 @@ public static class DefaultIcons
     public static string DarkMode { get; set; } = "dark_mode";
 
     /// <summary>
+    /// An icon for date/time selection.
+    /// </summary>
+    public static string DateTimeSelect { get; set; } = "calendar_month";
+
+    /// <summary>
     /// <para>
     /// An downward directional indicator.
     /// </para>
@@ -116,6 +121,11 @@ public static class DefaultIcons
     public static string ModeSwitch { get; set; } = "swap_vert";
 
     /// <summary>
+    /// An icon for the current time.
+    /// </summary>
+    public static string Now { get; set; } = "schedule";
+
+    /// <summary>
     /// An icon for buttons which move to a first page.
     /// </summary>
     public static string Page_First { get; set; } = "first_page";
@@ -159,6 +169,16 @@ public static class DefaultIcons
     /// A full (solid) star. Used by the <see cref="Rating"/> component.
     /// </summary>
     public static string Star_Full { get; set; } = "star";
+
+    /// <summary>
+    /// An icon for time-only selection.
+    /// </summary>
+    public static string TimeSelect { get; set; } = "schedule";
+
+    /// <summary>
+    /// An icon for today's date.
+    /// </summary>
+    public static string Today { get; set; } = "today";
 
     /// <summary>
     /// <para>

@@ -123,7 +123,8 @@
 </Collapse>
 
 <p>
-    An overlay can contain any content you wish.
+    You can use the <code>transparent</code> class to create an overlay that does not alter the
+    background at all, but still prevents interacting with anything beneath it.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -133,7 +134,36 @@
 
             @if (_showOverlay4)
             {
-                <div @onclick="@(_ => _showOverlay4 = false)" class="overlay">
+                <div @onclick="@(_ => _showOverlay4 = false)" class="overlay transparent" />
+            }
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
+
+@if (_showOverlay)
+{
+    <div @onclick=""@(_ => _showOverlay = false)"" class=""overlay light"" />
+}
+
+@code {
+    private bool _showOverlay;
+}", true)
+    </ChildContent>
+</Collapse>
+
+<p>
+    An overlay can contain any content you wish.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center py-5">
+            <button @onclick="@(_ => _showOverlay5 = true)" class="btn primary">Show overlay</button>
+
+            @if (_showOverlay5)
+            {
+                <div @onclick="@(_ => _showOverlay5 = false)" class="overlay">
                     Click here to dismiss this overlay
                 </div>
             }
@@ -156,5 +186,5 @@
 </Collapse>
 
 @code {
-    private bool _showOverlay,  _showOverlay2,  _showOverlay3,  _showOverlay4;
+    private bool _showOverlay,  _showOverlay2,  _showOverlay3,  _showOverlay4, _showOverlay5;
 }

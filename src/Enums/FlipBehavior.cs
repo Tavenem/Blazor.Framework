@@ -13,7 +13,7 @@ public enum FlipBehavior
     /// <summary>
     /// Flips when opened.
     /// </summary>
-    Filp_OnOpen = 1,
+    Flip_OnOpen = 1,
 
     /// <summary>
     /// Flips whenever the main body is scrolled, or the window is resized.

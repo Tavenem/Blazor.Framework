@@ -29,22 +29,22 @@ public struct ColorFormatConverter
     /// <summary>
     /// The alpha component of this color, as an integral value in the range [0-255].
     /// </summary>
-    public byte AlphaByte { get; set; }
+    public byte AlphaByte { get; }
 
     /// <summary>
     /// The alpha component of this color, as a floating-point value in the range [0-1].
     /// </summary>
-    public float AlphaFloat { get; set; }
+    public float AlphaFloat { get; }
 
     /// <summary>
     /// The blue component of this color, as an integral value in the range [0-255].
     /// </summary>
-    public byte Blue { get; set; }
+    public byte Blue { get; }
 
     /// <summary>
     /// The <see cref="System.Drawing.Color"/> equivalent of this color.
     /// </summary>
-    public Color Color { get; set; }
+    public Color Color { get; }
 
     /// <summary>
     /// <para>
@@ -73,7 +73,7 @@ public struct ColorFormatConverter
     /// <remarks>
     /// Alpha is represented with a precision of 2 decimal places.
     /// </remarks>
-    public string CssHSLA => $"hsl({Hue},{Saturation}%,{Lightness}%,{AlphaFloat.ToCSS(2)})";
+    public string CssHSLA => $"hsla({Hue},{Saturation}%,{Lightness}%,{AlphaFloat.ToCSS(2)})";
 
     /// <summary>
     /// The shortest CSS-style hsl(a) string which accurately represents the color (between hsl and
@@ -108,7 +108,7 @@ public struct ColorFormatConverter
     /// <summary>
     /// The green component of this color, as an integral value in the range [0-255].
     /// </summary>
-    public byte Green { get; set; }
+    public byte Green { get; }
 
     /// <summary>
     /// <para>
@@ -139,7 +139,7 @@ public struct ColorFormatConverter
     /// equivalent value of zero in this property.
     /// </para>
     /// </remarks>
-    public ushort Hue { get; set; }
+    public ushort Hue { get; }
 
     /// <summary>
     /// If this color is equivalent to a CSS color keyword, this gets that keyword. Otherwise, it is
@@ -1000,17 +1000,17 @@ public struct ColorFormatConverter
     /// <summary>
     /// The lightness of this color, as an integral percentage in the range [0-100].
     /// </summary>
-    public byte Lightness { get; set; }
+    public byte Lightness { get; }
 
     /// <summary>
     /// The red component of this color, as an integral value in the range [0-255].
     /// </summary>
-    public byte Red { get; set; }
+    public byte Red { get; }
 
     /// <summary>
     /// The saturation of this color, as an integral percentage in the range [0-100].
     /// </summary>
-    public byte Saturation { get; set; }
+    public byte Saturation { get; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="ColorFormatConverter"/> with the given values.
@@ -3135,7 +3135,7 @@ public struct ColorFormatConverter
 
         var q = lightness < 50
             ? lightness / 100.0 * (1 + (saturation / 100.0))
-            : lightness + saturation - ((double)lightness * saturation);
+            : ((lightness + saturation) / 100.0) - (lightness / 100.0 * (saturation / 100.0));
         var p = (lightness / 50.0) - q;
 
         var T = new double[3];

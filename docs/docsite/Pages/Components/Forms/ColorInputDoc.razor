@@ -9,6 +9,12 @@
     color type.
 </p>
 
+<p>
+    It provides a color spectrum, hue slider, optional alpha slider, and manual inputs which allows
+    users to define a color in terms of named colors, hexadecimal strings, RGB values, or HSL
+    values.
+</p>
+
 <Heading Level="HeadingLevel.H2">Basics</Heading>
 
 <p>
@@ -21,17 +27,17 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" />
-                <NumericInput TValue="int" Label="Filled" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" Class="outlined" />
+                <ColorInput TValue="string" Label="Normal" />
+                <ColorInput TValue="string" Label="Filled" Class="filled" />
+                <ColorInput TValue="string" Label="Outlined" Class="outlined" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Normal"" />
-    <NumericInput TValue=""int"" Label=""Filled"" Class=""filled"" />
-    <NumericInput TValue=""int"" Label=""Outlined"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Normal"" />
+    <ColorInput TValue=""string"" Label=""Filled"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Outlined"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -44,182 +50,147 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" Class="dense" />
-                <NumericInput TValue="int" Label="Filled" Class="filled dense" />
-                <NumericInput TValue="int" Label="Outlined" Class="outlined dense" />
+                <ColorInput TValue="string" Label="Normal" Class="dense" />
+                <ColorInput TValue="string" Label="Filled" Class="filled dense" />
+                <ColorInput TValue="string" Label="Outlined" Class="outlined dense" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Normal"" Class=""dense"" />
-    <NumericInput TValue=""int"" Label=""Filled"" Class=""filled dense"" />
-    <NumericInput TValue=""int"" Label=""Outlined"" Class=""outlined dense"" />
+    <ColorInput TValue=""string"" Label=""Normal"" Class=""dense"" />
+    <ColorInput TValue=""string"" Label=""Filled"" Class=""filled dense"" />
+    <ColorInput TValue=""string"" Label=""Outlined"" Class=""outlined dense"" />
 </div>")
     </ChildContent>
 </Collapse>
 
 <p>
-    Bind the input value to any numeric value with the <code>Value</code> property. All standard
-    numeric types are valid, as well as their nullable counterparts.
+    A <code>ColorInput</code>'s <code>Value</code> property can be bound to either a string or a
+    <code>System.Drawing.Color</code> structure (including a nullable version).
+</p>
+
+<p>
+    When binding to a string, any of the following notations are accepted as input:
+</p>
+
+<dl>
+    <dt>Keyword</dt>
+    <dd>A CSS color keyword.</dd>
+       
+    <dt>Hexadecimal</dt>
+    <dd>A 3-, 6-, or 8-character CSS-style hexadecimal string (with or without leading '#').</dd>
+       
+    <dt>RGB(A)</dt>
+    <dd>
+        An <code>rgb</code> or <code>rgba</code> function with comma- or space-separated values
+        enclosed in parentheses (the alpha component is separated by a forward slash ('/') in
+        space-separated notation.
+    </dd>
+       
+    <dt>HSL(A)</dt>
+    <dd>
+        An <code>hsl</code> or <code>hsla</code> function with comma- or space-separated values
+        enclosed in parentheses (the alpha component is separated by a forward slash ('/') in
+        space-separated notation.
+    </dd>
+       
+    <dt>Hexadecimal</dt>
+    <dd>A 3-, 6-, or 8-character CSS-style hexadecimal string (with or without leading '#').</dd>
+</dl>
+
+<p>
+    The string returned will always be a hexadecimal string for colors with no alpha component, or
+    an <code>rgba</code> function for colors with an alpha component. 
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value1" Label="Int" Class="w-100" />
+                <ColorInput @bind-Value="_value1" Label="String" Class="w-100" />
                 <span>Bound value: @_value1</span>
-                <NumericInput @bind-Value="_value2" Label="Double" Class="w-100" />
+                <ColorInput @bind-Value="_value2" Label="Color" Class="w-100" />
                 <span>Bound value: @_value2</span>
-                <NumericInput @bind-Value="_value3" Label="Byte" Class="w-100" />
-                <span>Bound value: @_value3</span>
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput @bind-Value=""_value1"" Label=""Int"" Class=""w-100"" />
+    <ColorInput @bind-Value=""_value1"" Label=""String"" Class=""w-100"" />
     <span>Bound value: @_value1</span>
-    <NumericInput @bind-Value=""_value2"" Label=""Double"" Class=""w-100"" />
+    <ColorInput @bind-Value=""_value2"" Label=""Color"" Class=""w-100"" />
     <span>Bound value: @_value2</span>
-    <NumericInput @bind-Value=""_value3"" Label=""Byte"" Class=""w-100"" />
-    <span>Bound value: @_value3</span>
 </div>
 
 @code {
-    private int _value1 = -2;
-    private double _value2 = 4.5;
-    private byte _value3;
+    private string _value1 = ""#f00"";
+    private System.Drawing.Color _value2 = System.Drawing.Color.RebeccaPurple;
 }")
     </ChildContent>
 </Collapse>
-
-<p>
-    The input understands most number formatting, including group separators, positive signs,
-    negative signs and parenthesis for signed types, and decimal separators and exponential notation
-    for floating-point types. It even accepts (and ignores) currency symbols, although in most cases
-    you will need to specify a culture with the <code>FormatProvider</code> property, since the
-    invariant culture uses the international currency symbol: ¤.
-</p>
-
-<p>
-    When bound to a floating-point type, it will even recognize the terms "Infinity" and "-Infinity"
-    for infinite values, and "NaN" for not-a-number values (none of these terms are case-sensitive).
-    Entering input which does not evaluate to a valid number results in the input being reset to the
-    last valid value, ensuring that the user can never mistakenly attempt to submit completely
-    invalid input.
-</p>
 
 <p>
     Note that when bound to a nullable type, clearing the input results in a <code>null</code>
-    value. Clearing the input when bound to a non-nullable type results in the default value (zero).
+    value. Clearing the input when bound to a non-nullable type results in a default value
+    (transparent when alpha is allowed, and black when it isn't).
 </p>
 
 <p>
-    Normally binding updates occur in response to the input element's <code>onchange</code> event,
-    which fires when the input loses focus, and when the enter key is pressed. If you set the
-    <code>UpdateOnInput</code> property to <code>true</code>, updates will occur in response to the
-    <code>oninput</code> event instead, which fires every time the input value changes.
+    Note that the underlying <code>input</code> element always receives a <code>string</code> value
+    for use with standard HTML form submission operations. This string is normally a CSS-style color
+    string when the control is bound to a <code>string</code>. When bound to a
+    <code>System.Drawing.Color</code> it is the result of <code>ToArgb</code> (an integer), as this
+    value is a more compact representation than a JSON serialization of the entire color structure.
 </p>
 
 <p>
-    If you need to update as the user types, but want to avoid excessive calls, you can set the
-    <code>UpdateOnInputDebounce</code> property to a number of milliseconds that the component will
-    wait before updating the bound value.
+    You can override the default behavior by assigning a special converter class to the
+    <code>Converter</code> property which can perform bespoke conversions. Only the
+    <code>setter</code> parameter of the converter requires implementation, as the
+    <code>getter</code> is not used for color pickers.
+</p>
+
+<Heading Level="HeadingLevel.H2">Inline</Heading>
+
+<p>
+    If you set the <code>Inline</code> property to <code>true</code> the full color picker is
+    displayed in the document flow, instead of a field which triggers a popover containing the
+    picker.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value4" Label="On Change" HelpText="@_value4.ToString()" />
-                <NumericInput @bind-Value="_value5" UpdateOnInput="true" Label="On Input" HelpText="@_value5.ToString()" />
-                <NumericInput @bind-Value="_value6" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="Debounced" HelpText="@_value6.ToString()" />
-            </div>
+            <ColorInput TValue="string" Label="Inline" Inline="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput @bind-Value=""_value1"" Label=""On Change"" HelpText=""@_value1.ToString()"" />
-    <NumericInput @bind-Value=""_value2"" UpdateOnInput=""true"" Label=""On Input"" HelpText=""@_value2.ToString()"" />
-    <NumericInput @bind-Value=""_value3"" UpdateOnInput=""true"" UpdateOnInputDebounce=""500"" Label=""Debounced"" HelpText=""@_value3.ToString()"" />
-</div>
-
-@code {
-    private int _value1;
-    private int _value2;
-    private int _value3;
-}")
+        @CodeFormatter.CodeToMarkup(@"<ColorInput TValue=""string"" Label=""Inline"" Inline=""true"" />")
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H2">Min & Max</Heading>
+<Heading Level="HeadingLevel.H2">Alpha</Heading>
 
 <p>
-    The <code>Min</code> and <code>Max</code> properties specify the allowed limits for the value.
-    When unset, the type's own <code>MinValue</code> and <code>MaxValue</code> are used.
+    Set the <code>ShowAlpha</code> property to <code>false</code> to hide the controls for alpha
+    values, and to make black the default color when clearing the value (rather than transparent).
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="double" Label="5-8" Min="5" Max="8" />
+            <ColorInput TValue="string" ShowAlpha="false" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""double"" Label=""5-8"" Min=""5"" Max=""8"" />
+    <ColorInput TValue=""string"" ShowAlpha=""false"" />
 </div>")
     </ChildContent>
 </Collapse>
-
-<Heading Level="HeadingLevel.H2">Step</Heading>
-
-<p>
-    The <code>Step</code> property specifies the amount by which the value increases or decreases
-    when the stepper buttons are used, and also the precision allowed. By default, the steppers
-    always change the value by 1, but floating-point types allow any degree of precision.
-</p>
-
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="double" Label="Default double" HelpText="Try typing a fractional value" />
-                <NumericInput TValue="double" Label="Step 0.1" Step="0.1" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""double"" Label=""Default double"" HelpText=""Try typing a fractional value"" />
-    <NumericInput TValue=""double"" Label=""Step 0.1"" Step=""0.1"" />
-</div>")
-    </ChildContent>
-</Collapse>
-
-<p>
-    If your <code>Min</code> value is set to a non-integral number, it will be used as the basis to
-    which <code>Step</code> is added to determine allowed values.
-</p>
-
-<Heading Level="HeadingLevel.H3">Floating point errors</Heading>
-
-<p>
-    Floating point numbers like <code>decimal</code>, <code>double</code>, and <code>float</code>
-    can produce precision errors during math operations, including the addition and subtraction
-    performed by the steppers.
-</p>
-
-<p>
-    When <code>Step</code> is a specific value, the display formats the underlying value with the
-    specified number of decimal places (unless you explicitly override the <code>Format</code>
-    property). However, when <code>Step</code> defaults to "any" you may see surprising, long tails
-    of decimal places after incrementing or decrementing the value.
-</p>
 
 <Heading Level="HeadingLevel.H2">Disabled & read-only</Heading>
 
@@ -231,31 +202,39 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_disabled" Label="Disabled" Disabled="true" />
-                <NumericInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
-                <NumericInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
             </div>
             <div class="row mt-3 fill align-items-center gap-2">
-                <NumericInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
-                <NumericInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
-                <NumericInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+            </div>
+            <div class="row mt-3 fill align-items-center gap-2">
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Inline="true" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Inline="true" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
-    <NumericInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
-    <NumericInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
 </div>
 <div class=""row mt-3 fill align-items-center gap-2"">
-    <NumericInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
-    <NumericInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
-    <NumericInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
+</div>
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Inline=""true"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Inline=""true"" />
 </div>
 
 @code {
-    private int _disabled = 3;
+    private string _disabled = ""#0f0"";
 }")
     </ChildContent>
 </Collapse>
@@ -268,22 +247,23 @@
 </p>
 
 <p>
-    Note that only nullable types allow an empty value.
+    Note that while a <code>ColorInput</code> bound to a <code>string</code> or a nullable
+    <code>System.Drawing.Color</code> will allow an empty value, one bound to a non-nullable
+    <code>System.Drawing.Color</code> will never be empty, since the bound <code>struct</code> will
+    always have a value.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int?" Label="Label" />
-                <NumericInput TValue="int" Label="Label" />
+                <ColorInput TValue="string" Label="Label" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int?"" Label=""Label"" />
-    <NumericInput TValue=""int"" Label=""Label"" />
+    <ColorInput TValue=""string"" Label=""Label"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -298,41 +278,17 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" HelpText="Some help text" />
-                <NumericInput TValue="int" Label="Filled" HelpText="Some help text" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" HelpText="Some help text" Class="outlined" />
+                <ColorInput TValue="string" Label="Normal" HelpText="Some help text" />
+                <ColorInput TValue="string" Label="Filled" HelpText="Some help text" Class="filled" />
+                <ColorInput TValue="string" Label="Outlined" HelpText="Some help text" Class="outlined" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Normal"" HelpText=""Some help text"" />
-    <NumericInput TValue=""int"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
-    <NumericInput TValue=""int"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
-
-<p>
-    You can hide the help text until the input has focus by setting the
-    <code>DisplayHelpTextOnFocus</code> property to <code>true</code>.
-</p>
-
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true" />
-                <NumericInput TValue="int" Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Normal"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" />
-    <NumericInput TValue=""int"" Label=""Filled"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""filled"" />
-    <NumericInput TValue=""int"" Label=""Outlined"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Normal"" HelpText=""Some help text"" />
+    <ColorInput TValue=""string"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -354,24 +310,23 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int?" Label="Required" Required="true" />
-                <NumericInput TValue="int?" Label="Required" Required="true" Class="filled" />
-                <NumericInput TValue="int?" Label="Required" Required="true" Class="outlined" />
+                <ColorInput TValue="string" Label="Required" Required="true" />
+                <ColorInput TValue="string" Label="Required" Required="true" Class="filled" />
+                <ColorInput TValue="string" Label="Required" Required="true" Class="outlined" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int?"" Label=""Required"" Required=""true"" />
-    <NumericInput TValue=""int?"" Label=""Required"" Required=""true"" Class=""filled"" />
-    <NumericInput TValue=""int?"" Label=""Required"" Required=""true"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Required"" Required=""true"" />
+    <ColorInput TValue=""string"" Label=""Required"" Required=""true"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Required"" Required=""true"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
 
 <p>
-    Note that value types will always have a value. A nullable type permits the input to be cleared,
-    however (which sets a <code>null</code> value).
+    Note that a non-nullable type will always have a value.
 </p>
 
 <Heading Level="HeadingLevel.H2">Tab index</Heading>
@@ -381,10 +336,20 @@
     attribute.
 </p>
 
+<p>
+    When <code>Inline</code> is <code>true</code>, this sets the <code>tabindex</code> of the hue
+    slider.
+</p>
+
 <Heading Level="HeadingLevel.H2">Name</Heading>
 
 <p>
     The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
+<p>
+    Note: even when <code>Inline</code> is <code>true</code>, a hidden <code>input</code> element
+    still exists which receives this name, enabling native form submission.
 </p>
 
 <Heading Level="HeadingLevel.H2">Auto-focus</Heading>
@@ -400,33 +365,21 @@
     technology.
 </p>
 
-<Heading Level="HeadingLevel.H2">Typing assistance</Heading>
-
 <p>
-    You can set the <code>Autocomplete</code> property to a boolean value to set the attribute of
-    the same name on the input. You can also assign <code>null</code> (the default value), which
-    uses the browser's default behavior.
+    When <code>Inline</code> is <code>true</code>, this sets the <code>AutoFocus</code> of the hue
+    slider.
 </p>
 
 <Heading Level="HeadingLevel.H2">Methods</Heading>
 
 <p>
-    The <code>Clear</code> method will clear the current input text. For non-nullable types, this
-    will result in the default value (zero).
+    The <code>Clear</code> method will clear the current value. For non-nullable types, this will
+    result in the default value (transparent when alpha is allowed, and black when it isn't).
 </p>
 
 <p>
-    The <code>FocusAsync</code> method will give the input focus.
-</p>
-
-<p>
-    The <code>SelectAsync</code> method will select all the current input text.
-</p>
-
-<p>
-    The <code>SelectRangeAsync</code> method accepts a start and optional end index, and will select
-    the input text in that range. If the <code>end</code> parameter is omitted, everything from the
-    start index to the end of the input is selected.
+    The <code>FocusAsync</code> method will give the input focus. When <code>Inline</code> is
+    <code>true</code>, this sets the focus on the hue slider.
 </p>
 
 <Heading Level="HeadingLevel.H2">Customization</Heading>
@@ -439,37 +392,37 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
-                <NumericInput TValue="int" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
-                <NumericInput TValue="int" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
+                <ColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
+                <ColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
+                <ColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
             </div>
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
-                <NumericInput TValue="int" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
-                <NumericInput TValue="int" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
+                <ColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
+                <ColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
+                <ColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
             </div>
             <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
-                <NumericInput TValue="int" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
-                <NumericInput TValue="int" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
+                <ColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
+                <ColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
+                <ColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
-    <NumericInput TValue=""int"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
-    <NumericInput TValue=""int"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
+    <ColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
 </div>
 <div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" />
-    <NumericInput TValue=""int"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
-    <NumericInput TValue=""int"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" />
+    <ColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"" />
 </div>
 <div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
-    <NumericInput TValue=""int"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
-    <NumericInput TValue=""int"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
+    <ColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -480,190 +433,6 @@
     to assign arbitrary attributes to it.
 </p>
 
-<p>
-    The <code>ShowStepButtons</code> property can be set to <code>false</code> to remove the up/down
-    stepper buttons. You can also set the <code>StepDownIcon</code> and <code>StepUpIcon</code>
-    properties to configure the icons used for the buttons.
-</p>
-
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="No Steppers" ShowStepButtons="false" />
-                <NumericInput TValue="int" Label="Custom Steppers" StepDownIcon="arrow_drop_down" StepUpIcon="arrow_drop_up" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""No Steppers"" ShowStepButtons=""false"" />
-    <NumericInput TValue=""int"" Label=""Custom Steppers"" StepDownIcon=""arrow_drop_down"" StepUpIcon=""arrow_drop_up"" />
-</div>")
-    </ChildContent>
-</Collapse>
-
-<p>
-    The <code>FormatProvider</code> property can be set to any <code>IFormatProvider</code> (such as
-    a <code>CultureInfo</code> instance). This format provider will be used both to format the
-    displayed value, and to parse user input.
-</p>
-
-<p>
-    The <code>Format</code> property can be set to any <a
-    href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">standard</a>
-    or <a
-    href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">custom
-    numeric format string</a> supported for the bound numeric type. This format will be used to
-    format the displayed value.
-</p>
-
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value7" Label="en-US" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US")" Class="w-100" />
-                <span>Bound value: @_value7</span>
-                <NumericInput @bind-Value="_value8" Label="de-DE" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("de-DE")" Class="w-100" />
-                <span>Bound value: @_value8</span>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput @bind-Value=""_value1"" Label=""en-US"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""en-US"")"" Class=""w-100"" />
-    <span>Bound value: @_value1</span>
-    <NumericInput @bind-Value=""_value2"" Label=""de-DE"" Format=""F2"" FormatProvider=""@System.Globalization.CultureInfo.GetCultureInfo(""de-DE"")"" Class=""w-100"" />
-    <span>Bound value: @_value2</span>
-</div>
-
-@code {
-    private double _value1 = 1234.56789;
-    private double _value2 = 1234.56789;
-}")
-    </ChildContent>
-</Collapse>
-
-<p>
-    Note that the value set to a <code>form</code> element on submission will use the standard
-    number format for HTML input elements, regardless of the input or display format chosen. This
-    can help with binding and serialization when using standard form submission mechanisms.
-</p>
-
-<Heading Level="HeadingLevel.H3">Prefix</Heading>
-
-<p>
-    You can add custom content before the input.
-</p>
-
-<p>
-    To add an icon before the input text, set the <code>PrefixIcon</code> property to the name of
-    the icon.
-</p>
-
-<p>
-    To add text before the input text, set the <code>PrefixText</code> property. If both
-    <code>PrefixText</code> and <code>PrefixIcon</code> have been set, the icon will appear first.
-</p>
-
-<p>
-    You can take complete control of the content before the input with the <code>PrefixContent
-    RenderFragment</code>, which receives the current value as a context parameter. If you supply
-    <code>PrefixContent</code>, <code>PrefixText</code> and <code>PrefixIcon</code> are ignored.
-</p>
-
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Idea" PrefixIcon="lightbulb" />
-                <NumericInput TValue="int" Label="Amount" PrefixText="$" />
-                <NumericInput TValue="int" Label="Click">
-                    <PrefixContent>
-                        <button class="@_class" @onclick="@(_ => _class = "btn btn-icon success")">
-                            <tf-icon>verified</tf-icon>
-                        </button>
-                    </PrefixContent>
-                </NumericInput>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Idea"" PrefixIcon=""lightbulb"" />
-    <NumericInput TValue=""int"" Label=""Amount"" PrefixText=""$"" />
-    <NumericInput TValue=""int"" Label=""Click"">
-        <PrefixContent>
-            <button class=""@_class"" @onclick=""@(_ => _class = ""btn btn-icon success"")"">
-                <tf-icon>verified</tf-icon>
-            </button>
-        </PrefixContent>
-    </NumericInput>
-</div>
-
-@code {
-    private string _class = ""btn btn-icon"";
-}")
-    </ChildContent>
-</Collapse>
-
-<Heading Level="HeadingLevel.H3">Postfix</Heading>
-
-<p>
-    You can also add custom content after the input.
-</p>
-
-<p>
-    To add an icon after the input text, set the <code>PostfixIcon</code> property to the name of
-    the icon.
-</p>
-
-<p>
-    To add text after the input text, set the <code>PostfixText</code> property. If both
-    <code>PostfixText</code> and <code>PostfixIcon</code> have been set, the icon will appear first.
-</p>
-
-<p>
-    You can take complete control of the content after the input with the <code>PostfixContent
-    RenderFragment</code>, which receives the current value as a context parameter. If you supply
-    <code>PostfixContent</code>, <code>PostfixText</code> and <code>PostfixIcon</code> are ignored.
-</p>
-
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Idea" PostfixIcon="lightbulb" />
-                <NumericInput TValue="int" Label="Program" PostfixText=".exe" />
-                <NumericInput TValue="int" Label="Click">
-                    <PostfixContent>
-                        <button class="@_class2" @onclick="@(_ => _class2 = "btn btn-icon success")">
-                            <tf-icon>verified</tf-icon>
-                        </button>
-                    </PostfixContent>
-                </NumericInput>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NumericInput TValue=""int"" Label=""Idea"" PostfixIcon=""lightbulb"" />
-    <NumericInput TValue=""int"" Label=""Program"" PostfixText="".exe"" />
-    <NumericInput TValue=""int"" Label=""Click"">
-        <PostfixContent>
-            <button class=""@_class"" @onclick=""@(_ => _class = ""btn btn-icon success"")"">
-                <tf-icon>verified</tf-icon>
-            </button>
-        </PostfixContent>
-    </NumericInput>
-</div>
-
-@code {
-    private string _class = ""btn btn-icon"";
-}")
-    </ChildContent>
-</Collapse>
-
 <Heading Level="HeadingLevel.H3">Validation</Heading>
 
 <p>
@@ -672,15 +441,7 @@
 </p>
 
 @code {
-    private string _class = "btn btn-icon";
-    private string _class2 = "btn btn-icon";
-    private int _disabled = 3;
-    private int _value1 = -2;
-    private double _value2 = 4.5;
-    private byte _value3;
-    private int _value4;
-    private int _value5;
-    private int _value6;
-    private double _value7 = 1234.56789;
-    private double _value8 = 1234.56789;
+    private string _disabled = "#0f0";
+    private string _value1 = "#f00";
+    private System.Drawing.Color _value2 = System.Drawing.Color.RebeccaPurple;
 }

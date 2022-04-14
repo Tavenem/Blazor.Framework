@@ -1,0 +1,451 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@inherits PickerComponentBase<TValue>
+
+@code {
+    private RenderFragment _contentRenderFragment =>
+@<CascadingValue Name="IsNested" Value="true" IsFixed="true">
+    <div class="date-picker input-content" @onclick:stopPropagation="true">
+        <div class="date-picker-header">
+            @if (Calendars.Count > 1 || (HasTime && ShowTimeZone && TimeZones.Count > 1))
+            {
+                <div class="d-flex flex-column align-self-stretch">
+                    @if (Calendars.Count > 1)
+                    {
+                        <Select TValue="System.Globalization.Calendar"
+                                Value="Calendar"
+                                ValueChanged="SetCalendar"
+                                Disabled="Disabled"
+                                Options="Calendars"
+                                Labels="@(c => CalendarNames[Calendars.IndexOf(c)])"
+                                AllowClear="false" />
+                    }
+                    @if (HasTime && ShowTimeZone && TimeZones.Count > 1)
+                    {
+                        <Select TValue="TimeZoneInfo"
+                                Value="TimeZone"
+                                ValueChanged="SetTimeZone"
+                                Disabled="Disabled"
+                                Options="TimeZones"
+                                Labels="@(t => t.DisplayName.ToHumanReadable())"
+                                AllowClear="false" />
+                    }
+                </div>
+            }
+            <div class="d-flex flex-wrap align-self-stretch gap-2">
+                @if (HasDate)
+                {
+                    <div class="d-flex flex-column align-items-start flex-grow-1">
+                        <button @ref="YearButton"
+                                class="btn btn-text"
+                                autofocus="@Inline"
+                                disabled="@Disabled"
+                                tabindex="@(Inline ? TabIndex : 0)"
+                                @onclick="@(_ => SetViewAsync(DatePickerView.Decade))">@YearTitle</button>
+                        @if (DateType != DateType.Year)
+                        {
+                            <button class="btn btn-text current flex-grow-1"
+                                    disabled="@Disabled"
+                                    @onclick="OnSelectCurent">@Title</button>
+                        }
+                    </div>
+                }
+                @if (HasTime)
+                {
+                    <div class="date-picker-current-time">
+                        <button class="@HourClass"
+                                disabled="@Disabled"
+                                @onclick="SetHour">@HourTitle</button>
+                        <span class="d-grid center-items current">@TimeSeparator</span>
+                        <button class="@MinuteClass"
+                                disabled="@Disabled"
+                                @onclick="SetMinutes">@MinuteTitle</button>
+                        @if (ShowSeconds)
+                        {
+                            <span class="current">@TimeSeparator</span>
+                            <button class="@SecondClass"
+                                    disabled="@Disabled"
+                                    @onclick="SetSeconds">@SecondTitle</button>
+                        }
+                        @if (ShowAMPM)
+                        {
+                            <div class="d-flex flex-column">
+                                <button class="@AMClass"
+                                        disabled="@Disabled"
+                                        @onclick="OnSelectAM">@AMString</button>
+                                <button class="@PMClass"
+                                        disabled="@Disabled"
+                                        @onclick="OnSelectPM">@PMString</button>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="date-picker-controls">
+            @if (HasDate)
+            {
+                <div class="date-picker-date-controls">
+                    @switch (View)
+                    {
+                        case DatePickerView.Date:
+                            <div class="date-picker-nav">
+                                <button class="btn btn-icon" disabled="@(!CanGoBackMonth)" @onclick="OnPreviousMonth">
+                                    <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                </button>
+                                <button class="@GetMonthClass(Month)"
+                                        disabled="@Disabled"
+                                        @onclick="@(_ => SetViewAsync(DatePickerView.Month))">
+                                    @MonthTitle
+                                </button>
+                                <button class="btn btn-icon" disabled="@(!CanGoForwardMonth)" @onclick="OnNextMonth">
+                                    <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                </button>
+                            </div>
+                            <div class="date-picker-selection date-picker-calendar" style="@CalendarStyle">
+                                @if (DateType == DateType.Week)
+                                {
+                                    <span class="@CalendarLabelsClass" style="@CalendarLabelsStyle">W</span>
+                                }
+                                @for (var i = 0; i < 7; i++)
+                                {
+                                    var index = i;
+                                    <span class="@CalendarLabelsClass" style="@CalendarLabelsStyle">
+                                        @WeekdayNames[index]
+                                    </span>
+                                }
+                                @for (var i = 0; i < WeeksInMonth; i++)
+                                {
+                                    var week = i;
+                                    var weekOfYear = Calendar.GetWeekOfYear(
+                                        FirstDateInMonth,
+                                        Culture.DateTimeFormat.CalendarWeekRule,
+                                        Culture.DateTimeFormat.FirstDayOfWeek);
+                                    @if (DateType == DateType.Week)
+                                    {
+                                        <span class="@CalendarLabelsClass" style="@CalendarLabelsStyle">
+                                            @((weekOfYear + week).ToString(Culture))
+                                        </span>
+                                    }
+                                    @for (var j = 0; j < 7; j++)
+                                    {
+                                        var day = j;
+                                        if (Weeks[week][day].HasValue)
+                                        {
+                                            <button class="@GetDayClass(week, day)"
+                                                    disabled="@IsDayOutOfRange(week, day)"
+                                                    @onclick="@(_ => OnSelectDayAsync(week, day))">
+                                                @(Weeks[week][day]!.Value.ToString("dd", Culture).TrimStart('0'))
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span></span>
+                                        }
+                                    }
+                                }
+                            </div>
+                            break;
+                        case DatePickerView.Month:
+                            <div class="date-picker-nav">
+                                <button class="btn btn-icon" disabled="@(!CanGoBackYear)" @onclick="OnPreviousYear">
+                                    <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                </button>
+                                <button class="@GetYearClass(Year)" @onclick="@(_ => SetViewAsync(DatePickerView.Year))">
+                                    @YearTitle
+                                </button>
+                                <button class="btn btn-icon" disabled="@(!CanGoForwardYear)" @onclick="OnNextYear">
+                                    <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                </button>
+                            </div>
+                            <div class="date-picker-selection date-picker-months">
+                                @for (var i = 0; i < 12; i++)
+                                {
+                                    var month = (byte)(i + 1);
+                                    <button class="@GetMonthClass(month)"
+                                            disabled="@IsMonthOutOfRange(month)"
+                                            @onclick="@(_ => OnSelectMonthAsync(month))">
+                                        @(new DateTime(Year, month, 1).ToString("MMM", Culture))
+                                    </button>
+                                }
+                            </div>
+                            break;
+                        case DatePickerView.Year:
+                            <div class="date-picker-nav">
+                                <button class="btn btn-icon" disabled="@(!CanGoBackDecade)" @onclick="OnPreviousDecade">
+                                    <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                </button>
+                                <button class="@GetDecadeClass(Decade)"
+                                        disabled="@Disabled"
+                                        @onclick="@(_ => SetViewAsync(DatePickerView.Decade))">
+                                    @DecadeTitle
+                                </button>
+                                <button class="btn btn-icon" disabled="@(!CanGoForwardDecade)" @onclick="OnNextDecade">
+                                    <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                </button>
+                            </div>
+                            <div class="date-picker-selection">
+                                @for (var i = 0; i < YearCountInDecade; i++)
+                                {
+                                    var index = i;
+                                    var year = FirstYearInDecade + index;
+                                    <button id="@($"date-picker-year-{year}")"
+                                            disabled="@IsYearOutOfRange(year)"
+                                            class="@GetYearClass(year)"
+                                            @onclick="@(_ => OnSelectYearAsync(year))">
+                                        @(new DateTime(year, 1, 1).ToString("yyy", Culture))
+                                    </button>
+                                }
+                            </div>
+                            break;
+                        case DatePickerView.Decade:
+                            <div class="date-picker-nav">
+                                <button class="btn btn-icon" disabled="@(!CanGoBackCentury)" @onclick="OnPreviousCentury">
+                                    <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                </button>
+                                <button class="@GetCenturyClass(Century)"
+                                        disabled="@Disabled"
+                                        @onclick="@(_ => SetViewAsync(DatePickerView.Century))">
+                                    @CenturyTitle
+                                </button>
+                                <button class="btn btn-icon" disabled="@(!CanGoForwardCentury)" @onclick="OnNextCentury">
+                                    <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                </button>
+                            </div>
+                            <div class="date-picker-selection">
+                                @for (byte i = 0; i < DecadeCount; i++)
+                                {
+                                    var index = i;
+                                    var firstYear = FirstYearInCentury + (index * 10);
+                                    var lastYear = Math.Min(Calendar.MaxSupportedDateTime.Year, FirstYearInCentury + (index * 10) + 9);
+                                    <button id="@($"date-picker-decade-{index}")"
+                                            class="@GetDecadeClass(index)"
+                                            disabled="@IsDecadeOutOfRange(index)"
+                                            @onclick="@(_ => OnSelectDecadeAsync(index))">
+                                        @($"{new DateTime(firstYear, 1, 1).ToString("yyy", Culture)}-{new DateTime(lastYear, 1, 1).ToString("yyy", Culture)}")
+                                    </button>
+                                }
+                            </div>
+                            break;
+                        case DatePickerView.Century:
+                            <div class="date-picker-selection">
+                                @for (var i = 0; i < CenturyCount; i++)
+                                {
+                                    var index = i;
+                                    var firstYear = Math.Max(
+                                        Calendar.MinSupportedDateTime.Year,
+                                        Calendar.MinSupportedDateTime.Year + (index * 100) - 1);
+                                    var lastYear = Math.Min(
+                                        Calendar.MaxSupportedDateTime.Year,
+                                        Calendar.MinSupportedDateTime.Year + (index * 100) + 98);
+                                    <button id="@($"date-picker-century-{index}")"
+                                            class="@GetCenturyClass(index)"
+                                            disabled="@IsCenturyOutOfRange(index)"
+                                            @onclick="@(_ => OnSelectCenturyAsync(index))">
+                                        @($"{new DateTime(firstYear, 1, 1).ToString("yyy", Culture)}-{new DateTime(lastYear, 1, 1).ToString("yyy", Culture)}")
+                                    </button>
+                                }
+                            </div>
+                            break;
+                    }
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-icon"
+                                disabled="@IsTodayDisabled"
+                                @onclick="OnSelectTodayAsync">
+                            <tf-icon>@DefaultIcons.Today</tf-icon>
+                        </button>
+                    </div>
+                </div>
+            }
+            @if (HasTime)
+            {
+                <div class="date-picker-time-controls">
+                    <div class="date-picker-clock">
+                        <div tabindex="-1" @onmousedown="OnClockMouseDown" @onmouseup="OnClockMouseUp">
+                            <div class="pin"></div>
+                            <div class="@PointerClass" style="@PointerStyle"><div class="@PointerThumbClass"></div></div>
+                            <div class="@HourDialClass">
+                                @if (ShowAMPM)
+                                {
+                                    @for (byte i = 0; i < 12; i++)
+                                    {
+                                        var index = i;
+                                        var hour = Hour < 12 ? index : (byte)(index + 12);
+                                        <span class="@GetHourClass(hour)" style="@GetTransform((6 - index) * 30, 109, 0, 5)">
+                                            @(new DateTime(1, 1, 1, hour, 0, 0).ToString("%h", Culture))
+                                        </span>
+                                        <div class="time-picker hour"
+                                             style="@($"transform:rotateZ({index * 30}deg)")"
+                                             @onclick="@(_ => OnSelectHour(hour))"
+                                             @onclick:stopPropagation="true"
+                                             @onmouseover="@(_ => OnMouseOverHour(hour))"></div>
+                                    }
+                                }
+                                else
+                                {
+                                    @for (byte i = 0; i < 12; i++)
+                                    {
+                                        var hour = i;
+                                        var pmHour = (byte)(hour + 12);
+                                        var angle = (6 - hour) * 30;
+                                        <span class="@GetHourClass(hour)" style="@GetTransform(angle, 109, 0, 5)">
+                                            @(new TimeSpan(hour, 0, 0).ToString("hh", Culture))
+                                        </span>
+                                        <span class="@GetHourClass(pmHour)" style="@GetTransform(angle, 74, 0, 40)">
+                                            @(new TimeSpan(hour + 12, 0, 0).ToString("hh", Culture))
+                                        </span>
+                                        <div class="time-picker hours"
+                                             style="@($"transform:rotateZ({hour * 30}deg)")">
+                                            <div class="outer"
+                                                 @onclick="@(_ => OnSelectHour(hour))"
+                                                 @onclick:stopPropagation="true"
+                                                 @onmouseover="@(_ => OnMouseOverHour(hour))"></div>
+                                            <div class="inner"
+                                                 @onclick="@(_ => OnSelectHour(pmHour))"
+                                                 @onclick:stopPropagation="true"
+                                                 @onmouseover="@(_ => OnMouseOverHour(pmHour))"></div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="@MinuteDialClass">
+                                @for (byte i = 0; i < 12; i++)
+                                {
+                                    var index = i;
+                                    var minute = (byte)(index * 5);
+                                    <span class="@GetMinuteClass(minute)" style="@GetTransform((6 - index) * 30, 109, 0, 5)">
+                                        @(new TimeSpan(0, minute, 0).ToString("mm", Culture))
+                                    </span>
+                                }
+                                @for (byte i = 0; i < 60; i++)
+                                {
+                                    var minute = i;
+                                    <div class="time-picker"
+                                         style="@($"transform:rotateZ({minute * 6}deg)")"
+                                         @onclick="@(_ => OnSelectMinuteAsync(minute))"
+                                         @onclick:stopPropagation="true"
+                                         @onmouseover="@(_ => OnMouseOverMinute(minute))"></div>
+                                }
+                            </div>
+                            @if (ShowSeconds)
+                            {
+                                <div class="@SecondDialClass">
+                                    @for (byte i = 0; i < 12; i++)
+                                    {
+                                        var index = i;
+                                        var second = (byte)(index * 5);
+                                        <span class="@GetSecondClass(second)" style="@GetTransform((6 - index) * 30, 109, 0, 5)">
+                                            @(new TimeSpan(0, 0, second).ToString("ss", Culture))
+                                        </span>
+                                    }
+                                    @for (byte i = 0; i < 60; i++)
+                                    {
+                                        var second = i;
+                                        <div class="time-picker"
+                                             style="@($"transform:rotateZ({second * 6}deg)")"
+                                             @onclick="@(_ => OnSelectSecondAsync(second))"
+                                             @onclick:stopPropagation="true"
+                                             @onmouseover="@(_ => OnMouseOverSecond(second))"></div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end align-self-stretch mt-n4">
+                        <button class="btn btn-icon"
+                                disabled="@IsNowDisabled"
+                                @onclick="OnSelectNowAsync">
+                            <tf-icon>@DefaultIcons.Now</tf-icon>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</CascadingValue>;
+}
+
+<div @attributes="AdditionalAttributes"
+     class="@CssClass"
+     style="@CssStyle"
+     @onclick="OnClickContainerAsync"
+     @onkeydown="OnKeyDownAsync">
+    <div class="input"
+         style="@(Inline ? "display:none" : null)"
+         @onfocusin="OnFocusIn"
+         @onfocusout="OnFocusOut">
+        <input disabled="@Disabled"
+               type="@InputType"
+               name="@Name"
+               hidden
+               readonly
+               required="@Required"
+               step="@(ShowSeconds ? "any" : null)"
+               value="@CurrentValueAsString" />
+        <input @ref="ElementReference"
+               @attributes="InputAttributes"
+               id="@Id"
+               class="@InputCssClass"
+               style="@InputStyle"
+               autofocus="@(Inline ? false : AutoFocus)"
+               disabled="@Disabled"
+               placeholder="@Placeholder"
+               readonly
+               required="@Required"
+               tabindex="@(Inline ? -1 : TabIndex)"
+               value="@DisplayString"
+               @onclick="TogglePopover"
+               @onclick:stopPropagation="true" />
+        @if (CanClear)
+        {
+            <button class="btn btn-icon small" disabled="@(Disabled || ReadOnly)" @onclick="Clear">
+                <tf-icon>@ClearIcon</tf-icon>
+            </button>
+        }
+        <tf-icon class="expand" @onclick="TogglePopover" @onclick:stopPropagation="true">@Icon</tf-icon>
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if (Inline)
+    {
+        @_contentRenderFragment
+    }
+    else
+    {
+        <Popover Class="filled"
+                 AnchorId="@Id"
+                 AnchorOrigin="Origin.Bottom_Left"
+                 IsOpen="ShowPicker"
+                 LimitWidth="true"
+                 PopoverOrigin="Origin.Top_Left">
+            @_contentRenderFragment
+        </Popover>
+        @if (ShowPicker)
+        {
+            <div @onclick="ClosePopoverAsync" @onclick:stopPropagation="true" class="overlay transparent" style="z-index:1499" />
+        }
+    }
+    @if (!string.IsNullOrEmpty(HelpText)
+        || !IsValid)
+    {
+        <div class="field-helpers">
+            @if (!IsValid)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+        </div>
+    }
+</div>

@@ -43,7 +43,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// can supply your own for custom data.
     /// </para>
     /// </summary>
-    [Parameter] public new InputValueConverter<TOption>? Converter { get; set; }
+    [Parameter] public InputValueConverter<TOption>? Converter { get; set; }
 
     /// <summary>
     /// A function to retrieve labels for the values in <see cref="Options"/>.
@@ -160,7 +160,8 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// </summary>
     protected virtual bool IsMultiselect => false;
 
-    private protected override bool CanClear => Clearable
+    private protected override bool CanClear => AllowClear
+        && Clearable
         && !Disabled
         && !ReadOnly
         && !Required
@@ -265,15 +266,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// <summary>
     /// Called internally.
     /// </summary>
-    public virtual void Remove(Option<TOption> option)
-    {
-        _options.Remove(option);
-        if (!_options.Any(x => option.Value is null ? x.Value is null : x.Value?.Equals(option.Value) == true))
-        {
-            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
-            UpdateCurrentValue();
-        }
-    }
+    public virtual void Remove(Option<TOption> option) => _options.Remove(option);
 
     /// <summary>
     /// <para>
@@ -291,7 +284,10 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// <param name="option">The option to toggle.</param>
     public void ToggleValue(Option<TOption> option)
     {
-        PopoverClosed = true;
+        if (PopoverOpen)
+        {
+            TogglePopover();
+        }
         SelectedIndex = _options.IndexOf(option);
         if (IsSelected(option.Value))
         {
@@ -340,7 +336,10 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
         {
             case "escape":
             case "tab":
-                PopoverClosed = true;
+                if (PopoverOpen)
+                {
+                    TogglePopover();
+                }
                 break;
             case "arrowdown":
                 await OnArrowDownAsync(e);
@@ -350,7 +349,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
                 break;
             case " ":
             case "enter":
-                PopoverClosed = !PopoverClosed;
+                TogglePopover();
                 break;
             case "a":
                 if (e.CtrlKey)

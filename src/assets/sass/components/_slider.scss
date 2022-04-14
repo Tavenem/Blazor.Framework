@@ -31,6 +31,8 @@
 
     .input {
         display: inline-block;
+        line-height: 12px;
+        min-height: 12px;
         position: relative;
         width: 100%;
 
@@ -51,6 +53,7 @@
         background-color: transparent;
         cursor: pointer;
         display: block;
+        height: 12px;
         position: relative;
         width: 100%;
 

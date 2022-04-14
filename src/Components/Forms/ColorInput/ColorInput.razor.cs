@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
@@ -12,8 +11,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 /// <typeparam name="TValue">
 /// <para>
-/// The type of bound value. May be either <see cref="System.Drawing.Color"/>, or <see
-/// cref="string"/>.
+/// The type of bound value. May be either a <see cref="string"/> or a <see
+/// cref="System.Drawing.Color"/> (including a nullable version).
 /// </para>
 /// <para>
 /// When binding to a string, any of the following notations are accepted as input:
@@ -57,6 +56,8 @@ public partial class ColorInput<TValue>
     private const int OverlayWidth = 312;
     private const int HalfSelectorSize = 13;
 
+    private readonly Type _baseType;
+    private readonly Type? _nullableType;
     private readonly Guid _overlayId = Guid.NewGuid();
     private readonly string _overlayIdString;
 
@@ -64,6 +65,16 @@ public partial class ColorInput<TValue>
     private bool _disposedValue;
     private Guid? _eventListenerId;
     private double _selectorX, _selectorY;
+
+    /// <summary>
+    /// The alpha value of the currently selected color, as a value in the range [0-1].
+    /// </summary>
+    public float Alpha { get; private set; }
+
+    /// <summary>
+    /// The blue component of the currently selected color.
+    /// </summary>
+    public byte Blue { get; private set; }
 
     /// <summary>
     /// <para>
@@ -80,6 +91,32 @@ public partial class ColorInput<TValue>
 
     /// <summary>
     /// <para>
+    /// The converter used to convert bound values to HTML input element values, and vice versa.
+    /// </para>
+    /// <para>
+    /// Built-in input components have reasonable default converters for most data types, but you
+    /// can supply your own for custom data.
+    /// </para>
+    /// </summary>
+    [Parameter] public InputValueConverter<TValue>? Converter { get; set; }
+
+    /// <summary>
+    /// The green component of the currently selected color.
+    /// </summary>
+    public byte Green { get; private set; }
+
+    /// <summary>
+    /// A CSS-style hexadecimal string which represents the currently selected color.
+    /// </summary>
+    public string HexColor { get; private set; }
+
+    /// <summary>
+    /// The hue of the currently selected color, in degrees.
+    /// </summary>
+    public ushort Hue { get; private set; }
+
+    /// <summary>
+    /// <para>
     /// Whether to display this picker as an inline component.
     /// </para>
     /// <para>
@@ -93,69 +130,97 @@ public partial class ColorInput<TValue>
     [Parameter] public bool Inline { get; set; }
 
     /// <summary>
-    /// Whether to display controls for the alpha component of the color.
+    /// The lightness of the currently selected color, as a percentage in the range [0-100].
     /// </summary>
-    [Parameter] public bool ShowAlpha { get; set; }
+    public byte Lightness { get; private set; }
+
+    /// <summary>
+    /// The red component of the currently selected color.
+    /// </summary>
+    public byte Red { get; private set; }
+
+    /// <summary>
+    /// The saturation of the currently selected color, as a percentage in the range [0-100].
+    /// </summary>
+    public byte Saturation { get; private set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether to display controls for the alpha component of the color.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool ShowAlpha { get; set; } = true;
 
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
-    protected override string? DisplayString => Color.Keyword ?? Color.Css;
+    protected override string? DisplayString => CurrentValue is null
+        ? null
+        : (Color.Keyword ?? Color.Css);
 
     private protected override bool ShrinkWhen => Inline
-        || base.ShrinkWhen;
+        || CurrentValue is not null;
 
-    private float Alpha { get; set; }
-
-    private string AlphaSliderStyle => new StringBuilder("background-image:linear-gradient(to right, transparent, ")
-        .Append(Color.Css)
-        .Append(')')
+    private string AlphaSliderStyle => new StringBuilder("--alpha-background:linear-gradient(to right, transparent, ")
+        .Append("hsl(")
+        .Append(Hue)
+        .Append(",100%,50%))")
         .ToString();
 
-    private byte Blue { get; set; }
+    private ColorFormatConverter Color { get; set; }
 
-    private ColorFormatConverter Color { get; set; } = ColorFormatConverter.DefaultPrimary;
-
-    private byte Green { get; set; }
-
-    private string HexColor { get; set; }
+    private string? CycleButtonClass => new CssBuilder("btn btn-icon")
+        .Add(ThemeColor.ToCSS())
+        .ToString();
 
     private string? HexInput { get; set; }
 
-    private ushort Hue { get; set; }
+    private Slider<ushort>? HueSlider { get; set; }
 
     [Inject] IJSEventListener JSEventListener { get; set; } = default!;
 
-    private byte Lightness { get; set; }
+    private string OverlayStyle => Disabled
+        ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"
+        : $"background-color:hsl({Hue},100%,50%)";
 
-    private byte Red { get; set; }
+    private string SelectorStyle => $"transform:translate({_selectorX.ToPixels(2)}, {_selectorY.ToPixels(2)})";
 
-    private byte Saturation { get; set; }
+    private string SwatchStyle => Disabled
+        ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"
+        : $"background:{Color.Css}";
 
     /// <summary>
     /// Constructs a new instance of <see cref="ColorInput{TValue}"/>.
     /// </summary>
     public ColorInput()
     {
-        var targetType = typeof(TValue);
-        if (targetType != typeof(string)
-            && targetType != typeof(Color))
+        _nullableType = Nullable.GetUnderlyingType(typeof(TValue));
+        _baseType = _nullableType ?? typeof(TValue);
+        if (_baseType != typeof(string)
+            && _baseType != typeof(Color))
         {
-            throw new InvalidOperationException($"Type {targetType.Name} is not supported");
+            throw new InvalidOperationException($"Type {_baseType.Name} is not supported. Only string and System.Drawing.Color are supported.");
         }
 
         _overlayIdString = _overlayId.ToString("N");
 
-        Clearable = targetType == typeof(string);
+        Clearable = _nullableType is not null
+            || _baseType == typeof(string);
 
-        Red = ColorFormatConverter.DefaultPrimary.Red;
-        Green = ColorFormatConverter.DefaultPrimary.Green;
-        Blue = ColorFormatConverter.DefaultPrimary.Blue;
-        Hue = ColorFormatConverter.DefaultPrimary.Hue;
-        Saturation = ColorFormatConverter.DefaultPrimary.Saturation;
-        Lightness = ColorFormatConverter.DefaultPrimary.Lightness;
-        Alpha = ColorFormatConverter.DefaultPrimary.AlphaFloat;
-        HexColor = ColorFormatConverter.DefaultPrimary.HexCompact;
+        if (Clearable)
+        {
+            Color = ColorFormatConverter.Transparent;
+        }
+        else
+        {
+            Color = ColorFormatConverter.Black;
+        }
+        Alpha = Color.AlphaFloat;
+        HexColor = Color.HexCompact;
+        HexInput = Color.HexCompact;
     }
 
     /// <inheritdoc/>
@@ -168,39 +233,9 @@ public partial class ColorInput<TValue>
             Alpha = 1;
         }
 
-        var updated = false;
-        if (parameters.TryGetValue<byte>(nameof(Red), out _)
-            || parameters.TryGetValue<byte>(nameof(Green), out _)
-            || parameters.TryGetValue<byte>(nameof(Blue), out _))
+        if (parameters.TryGetValue<TValue>(nameof(Value), out var value))
         {
-            updated = true;
-            try
-            {
-                Color = new ColorFormatConverter(Red, Green, Blue, Alpha);
-            }
-            catch
-            {
-                Color = ShowAlpha ? ColorFormatConverter.Transparent : ColorFormatConverter.Black;
-            }
-        }
-        else if (parameters.TryGetValue<ushort>(nameof(Hue), out _)
-            || parameters.TryGetValue<byte>(nameof(Saturation), out _)
-            || parameters.TryGetValue<byte>(nameof(Lightness), out _))
-        {
-            updated = true;
-            try
-            {
-                Color = ColorFormatConverter.FromHSLA(Hue, Saturation, Lightness, Alpha);
-            }
-            catch
-            {
-                Color = ShowAlpha ? ColorFormatConverter.Transparent : ColorFormatConverter.Black;
-            }
-        }
-        else if (parameters.TryGetValue<string>(nameof(HexInput), out _))
-        {
-            updated = true;
-            if (string.IsNullOrWhiteSpace(HexInput))
+            if (value is null)
             {
                 Color = ShowAlpha ? ColorFormatConverter.Transparent : ColorFormatConverter.Black;
             }
@@ -208,36 +243,25 @@ public partial class ColorInput<TValue>
             {
                 try
                 {
-                    Color = new ColorFormatConverter(HexInput);
+                    if (_baseType == typeof(string))
+                    {
+                        Color = new((string)(object)value);
+                    }
+                    else if (_baseType == typeof(Color))
+                    {
+                        Color = new((Color)(object)value);
+                    }
+                    if (!ShowAlpha && Color.AlphaByte < 255)
+                    {
+                        Color = new(Color.Red, Color.Green, Color.Blue, 255);
+                    }
                 }
                 catch
                 {
                     Color = ShowAlpha ? ColorFormatConverter.Transparent : ColorFormatConverter.Black;
                 }
             }
-        }
-        else if (parameters.TryGetValue<TValue>(nameof(Value), out _))
-        {
-            updated = true;
-            if (string.IsNullOrWhiteSpace(HexInput))
-            {
-                Color = ShowAlpha ? ColorFormatConverter.Transparent : ColorFormatConverter.Black;
-            }
-            else
-            {
-                try
-                {
-                    Color = new ColorFormatConverter(HexInput);
-                }
-                catch
-                {
-                    Color = ShowAlpha ? ColorFormatConverter.Transparent : ColorFormatConverter.Black;
-                }
-            }
-        }
 
-        if (updated)
-        {
             Red = Color.Red;
             Green = Color.Green;
             Blue = Color.Blue;
@@ -246,6 +270,25 @@ public partial class ColorInput<TValue>
             Lightness = Color.Lightness;
             Alpha = Color.AlphaFloat;
             HexColor = Color.HexCompact;
+            HexInput = Color.HexCompact;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Converter is not null)
+        {
+            if (Format?.Equals(Converter.Format) != true)
+            {
+                Converter.Format = Format;
+            }
+            if (FormatProvider?.Equals(Converter.FormatProvider) != true)
+            {
+                Converter.FormatProvider = FormatProvider;
+            }
         }
     }
 
@@ -285,6 +328,11 @@ public partial class ColorInput<TValue>
     /// </summary>
     public override void Clear()
     {
+        if (Disabled || ReadOnly)
+        {
+            return;
+        }
+
         Color = ShowAlpha
             ? ColorFormatConverter.Transparent
             : ColorFormatConverter.Black;
@@ -298,13 +346,35 @@ public partial class ColorInput<TValue>
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
 
-        if (typeof(TValue) == typeof(string))
+        if (_nullableType is null)
         {
-            CurrentValue = (TValue)(object)Color.Css;
+            if (_baseType == typeof(string))
+            {
+                CurrentValue = (TValue)(object)Color.Css;
+            }
+            else if (_baseType == typeof(Color))
+            {
+                CurrentValue = (TValue)(object)Color.Color;
+            }
         }
-        else if (typeof(TValue) == typeof(Color))
+        else
         {
-            CurrentValue = (TValue)(object)Color.Color;
+            CurrentValue = default;
+        }
+    }
+
+    /// <summary>
+    /// Focuses this element.
+    /// </summary>
+    public override async Task FocusAsync()
+    {
+        if (Inline && HueSlider is not null)
+        {
+            await HueSlider.FocusAsync();
+        }
+        else
+        {
+            await ElementReference.FocusAsync();
         }
     }
 
@@ -338,81 +408,6 @@ public partial class ColorInput<TValue>
         }
     }
 
-    /// <inheritdoc/>
-    protected override bool TryParseValueFromString(
-        string? value,
-        [MaybeNullWhen(false)] out TValue result,
-        [NotNullWhen(false)] out string? validationErrorMessage)
-    {
-        result = default;
-        validationErrorMessage = null;
-        var success = false;
-
-        if (Converter is not null
-            && Converter.TryGetValue(value, out result))
-        {
-            success = true;
-        }
-        else if (typeof(TValue) == typeof(Color))
-        {
-            if (int.TryParse(value, CultureInfo.InvariantCulture, out var input))
-            {
-                result = (TValue)(object)System.Drawing.Color.FromArgb(input);
-                success = true;
-            }
-            else
-            {
-                validationErrorMessage = GetConversionValidationMessage();
-            }
-        }
-        else if (typeof(TValue) == typeof(string))
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                result = ShowAlpha
-                    ? (TValue)(object)ColorFormatConverter.Transparent.Css
-                    : (TValue)(object)ColorFormatConverter.Black.Css;
-                success = true;
-            }
-            else
-            {
-                try
-                {
-                    var css = new ColorFormatConverter(value).Css;
-                    result = (TValue)(object)css;
-                    success = true;
-                }
-                catch
-                {
-                    validationErrorMessage = GetConversionValidationMessage();
-                }
-            }
-        }
-        else
-        {
-            validationErrorMessage = GetConversionValidationMessage();
-        }
-
-        HasConversionError = !success;
-
-        if (!IsTouched
-            && (!EqualityComparer<TValue>.Default.Equals(result, InitialValue)
-            || HasConversionError))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && (HasConversionError
-            || !EqualityComparer<TValue>.Default.Equals(result, CurrentValue)))
-        {
-            EvaluateDebounced();
-        }
-
-        return success;
-    }
-
     private protected override Task OnClosePopoverAsync()
         => RemoveMouseOverEventAsync();
 
@@ -438,11 +433,39 @@ public partial class ColorInput<TValue>
             }
         });
 
-    private string GetSelectorStyle() => $"transform:translate({_selectorX.ToPixels(2)}, {_selectorY.ToPixels(2)})";
+    private void OnAlphaSliderChanged(float alpha)
+    {
+        if (Alpha == 0 && alpha > 0)
+        {
+            Saturation = 100;
+            Lightness = 50;
+        }
+        Alpha = alpha;
+        OnHSLChanged();
+    }
+
+    private void OnAlphaValueChanged(float alpha)
+    {
+        Alpha = alpha;
+        if (ColorMode == ColorMode.RGB)
+        {
+            OnRGBChanged();
+        }
+        else
+        {
+            OnHSLChanged();
+        }
+    }
+
+    private void OnBlueChanged(byte blue)
+    {
+        Blue = blue;
+        OnRGBChanged();
+    }
 
     private void OnColorOverlayInteract(MouseEventArgs e)
     {
-        if (e.Buttons != 1)
+        if (Disabled || ReadOnly || e.Buttons != 1)
         {
             return;
         }
@@ -452,12 +475,104 @@ public partial class ColorInput<TValue>
         UpdateColor();
     }
 
-    private void OnCycleMode() => ColorMode = ColorMode switch
+    private void OnCycleMode()
     {
-        ColorMode.HSL => ColorMode.Hex,
-        ColorMode.RGB => ColorMode.HSL,
-        _ => ColorMode.RGB,
-    };
+        if (Disabled)
+        {
+            return;
+        }
+
+        ColorMode = ColorMode switch
+        {
+            ColorMode.HSL => ColorMode.Hex,
+            ColorMode.RGB => ColorMode.HSL,
+            _ => ColorMode.RGB,
+        };
+    }
+
+    private void OnGreenChanged(byte green)
+    {
+        Green = green;
+        OnRGBChanged();
+    }
+
+    private void OnHSLChanged()
+    {
+        try
+        {
+            Color = ColorFormatConverter.FromHSLA(Hue, Saturation, Lightness, Alpha);
+            Red = Color.Red;
+            Green = Color.Green;
+            Blue = Color.Blue;
+            HexColor = Color.HexCompact;
+            HexInput = Color.HexCompact;
+            SetValue();
+        }
+        catch { }
+    }
+
+    private void OnHexChanged(string? hex)
+    {
+        HexInput = hex;
+        if (string.IsNullOrWhiteSpace(HexInput))
+        {
+            return;
+        }
+
+        try
+        {
+            Color = new ColorFormatConverter(HexInput);
+            Red = Color.Red;
+            Green = Color.Green;
+            Blue = Color.Blue;
+            Hue = Color.Hue;
+            Saturation = Color.Saturation;
+            Lightness = Color.Lightness;
+            Alpha = Color.AlphaFloat;
+            HexColor = Color.HexCompact;
+            SetValue();
+        }
+        catch { }
+    }
+
+    private void OnHueChanged(ushort hue)
+    {
+        Hue = hue;
+        OnHSLChanged();
+    }
+
+    private void OnLightnessChanged(byte lightness)
+    {
+        Lightness = lightness;
+        OnHSLChanged();
+    }
+
+    private void OnRedChanged(byte red)
+    {
+        Red = red;
+        OnRGBChanged();
+    }
+
+    private void OnRGBChanged()
+    {
+        try
+        {
+            Color = new ColorFormatConverter(Red, Green, Blue, Alpha);
+            Hue = Color.Hue;
+            Saturation = Color.Saturation;
+            Lightness = Color.Lightness;
+            HexColor = Color.HexCompact;
+            HexInput = Color.HexCompact;
+            SetValue();
+        }
+        catch { }
+    }
+
+    private void OnSaturationChanged(byte saturation)
+    {
+        Saturation = saturation;
+        OnHSLChanged();
+    }
 
     private void OnSelectorClicked(MouseEventArgs e)
     {
@@ -472,6 +587,38 @@ public partial class ColorInput<TValue>
         {
             await JSEventListener.UnsubscribeAsync(_eventListenerId.Value);
         }
+    }
+
+    private void SetValue()
+    {
+        TValue? newValue;
+        if (_baseType == typeof(string))
+        {
+            newValue = (TValue)(object)Color.Css;
+        }
+        else if (_baseType == typeof(Color))
+        {
+            newValue = (TValue)(object)Color.Color;
+        }
+        else
+        {
+            newValue = default;
+        }
+
+        if (!IsTouched
+            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
+        {
+            IsTouched = true;
+            _ = IsTouchedChanged.InvokeAsync(true);
+        }
+
+        if (!IsNested
+            && !EqualityComparer<TValue>.Default.Equals(newValue, CurrentValue))
+        {
+            EvaluateDebounced();
+        }
+
+        CurrentValue = newValue;
     }
 
     private void UpdateColor()
@@ -499,13 +646,6 @@ public partial class ColorInput<TValue>
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
 
-        if (typeof(TValue) == typeof(string))
-        {
-            CurrentValue = (TValue)(object)Color.Css;
-        }
-        else if (typeof(TValue) == typeof(Color))
-        {
-            CurrentValue = (TValue)(object)Color.Color;
-        }
+        SetValue();
     }
 }

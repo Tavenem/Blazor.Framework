@@ -4,8 +4,8 @@ using Tavenem.Blazor.Framework.Services;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// Provides viewport scrolling services, including <see cref="ScrollToId(string?)"/> and <see
-/// cref="ScrollToTop(string?)"/>.
+/// Provides viewport scrolling services, including <see cref="ScrollToId(string?,
+/// ScrollLogicalPosition)"/> and <see cref="ScrollToTop(string?)"/>.
 /// </summary>
 public class ScrollService : IAsyncDisposable
 {
@@ -43,11 +43,12 @@ public class ScrollService : IAsyncDisposable
     /// Scroll to the HTML element with the given id.
     /// </summary>
     /// <param name="elementId">The id of an HTML element.</param>
-    public async ValueTask ScrollToId(string? elementId)
+    /// <param name="position">The position to which scrolling should occur.</param>
+    public async ValueTask ScrollToId(string? elementId, ScrollLogicalPosition position = ScrollLogicalPosition.Start)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module
-            .InvokeVoidAsync("scrollToId", elementId)
+            .InvokeVoidAsync("scrollToId", elementId, position.ToString().ToLowerInvariant())
             .ConfigureAwait(false);
     }
 

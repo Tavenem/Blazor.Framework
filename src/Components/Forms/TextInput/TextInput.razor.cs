@@ -407,17 +407,16 @@ public partial class TextInput : InputComponentBase<string?>
     }
 
     /// <inheritdoc/>
-    protected override void OnParametersSet()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var original = Value;
-        base.OnParametersSet();
+        await base.SetParametersAsync(parameters);
 
-        if (!string.Equals(Value, original))
+        if (parameters.TryGetValue<string>(nameof(Value), out var value))
         {
-            CurrentInput = Value;
+            CurrentInput = value;
             DisplayString = Mask is null
-                ? CurrentValue
-                : Mask.FormatInput(CurrentValue);
+                ? value
+                : Mask.FormatInput(value);
         }
     }
 

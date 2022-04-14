@@ -52,10 +52,10 @@ public partial class Popover : IAsyncDisposable
     /// direction it would normally open.
     /// </para>
     /// <para>
-    /// Defaults to <see cref="FlipBehavior.Filp_OnOpen"/>.
+    /// Defaults to <see cref="FlipBehavior.Flip_OnOpen"/>.
     /// </para>
     /// </summary>
-    [Parameter] public FlipBehavior FlipBehavior { get; set; } = FlipBehavior.Filp_OnOpen;
+    [Parameter] public FlipBehavior FlipBehavior { get; set; } = FlipBehavior.Flip_OnOpen;
 
     /// <summary>
     /// Raised when the popover loses focus.
@@ -73,7 +73,22 @@ public partial class Popover : IAsyncDisposable
     [Parameter] public bool IsOpen { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Whether the popover should have its max-width set to the width of its anchor element.
+    /// </para>
+    /// <para>
+    /// Always <see langword="true"/> when <see cref="MatchWidth"/> is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool LimitWidth { get; set; }
+
+    /// <summary>
+    /// <para>
     /// Whether the popover should have the same width at its anchor element.
+    /// </para>
+    /// <para>
+    /// Implies <see cref="LimitWidth"/>.
+    /// </para>
     /// </summary>
     [Parameter] public bool MatchWidth { get; set; }
 
@@ -129,6 +144,7 @@ public partial class Popover : IAsyncDisposable
         .Add(ThemeColor.ToCSS())
         .Add("open", IsOpen)
         .Add("match-width", MatchWidth)
+        .Add("limit-width", !MatchWidth && LimitWidth)
         .ToString();
 
     /// <summary>

@@ -33,7 +33,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.2.22153.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.3.22178.4" />
   </ItemGroup>
 	
   <ItemGroup>

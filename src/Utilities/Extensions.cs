@@ -85,11 +85,11 @@ internal static class Extensions
 
     public static string ToCSS(this double value, int precision = 5) => value is < 0.00001 and > -0.00001
         ? "0"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}";
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
 
     public static string ToCSS(this float value, int precision = 5) => value is < 0.00001f and > -0.00001f
-        ? "0px"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}";
+        ? "0"
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
 
     [return: NotNullIfNotNull("value")]
     public static string? ToHumanReadable(this string? value)
@@ -100,24 +100,24 @@ internal static class Extensions
         }
 
         var sb = new StringBuilder();
-        var whitespace = false;
+        var lower = false;
         for (var i = 0; i < value.Length; i++)
         {
             if (value[i] == '_')
             {
                 sb.Append(' ');
-                whitespace = false;
+                lower = false;
             }
-            else if (whitespace && char.IsUpper(value[i]))
+            else if (lower && char.IsUpper(value[i]))
             {
                 sb.Append(' ')
                     .Append(value[i]);
-                whitespace = false;
+                lower = false;
             }
             else
             {
                 sb.Append(value[i]);
-                whitespace = char.IsWhiteSpace(value[i]);
+                lower = char.IsLower(value[i]);
             }
         }
 
@@ -151,11 +151,11 @@ internal static class Extensions
 
     public static string ToPixels(this double value, int precision = 5) => value is < 0.00001 and > -0.00001
         ? "0px"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}px";
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
 
     public static string ToPixels(this float value, int precision = 5) => value is < 0.00001f and > -0.00001f
         ? "0px"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')}px";
+        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
 
     public static Dictionary<TKey, TValue> With<TKey, TValue>(
         this Dictionary<TKey, TValue> dictionary,

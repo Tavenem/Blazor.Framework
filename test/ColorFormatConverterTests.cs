@@ -56,7 +56,7 @@ public class ColorFormatConverterTests
     [TestMethod]
     public void CssHex8()
     {
-        var result = new ColorFormatConverter("#ff00007f");
+        var result = new ColorFormatConverter("#ff000080");
         Assert.AreEqual((byte)255, result.Red);
         Assert.AreEqual((byte)0, result.Green);
         Assert.AreEqual((byte)0, result.Blue);
@@ -64,7 +64,7 @@ public class ColorFormatConverterTests
         Assert.AreEqual((ushort)100, result.Saturation);
         Assert.AreEqual((byte)50, result.Lightness);
         Assert.AreEqual((byte)128, result.AlphaByte);
-        Assert.AreEqual(0.5f, result.AlphaFloat);
+        Assert.IsTrue(Math.Abs(0.5f - result.AlphaFloat) <= 0.01f);
         Assert.IsNull(result.CssHSL);
         Assert.AreEqual("hsla(0,100%,50%,.5)", result.CssHSLA);
         Assert.AreEqual("hsla(0,100%,50%,.5)", result.CssHSLCompact);
@@ -72,8 +72,8 @@ public class ColorFormatConverterTests
         Assert.AreEqual("rgba(255,0,0,.5)", result.CssRGBA);
         Assert.AreEqual("rgba(255,0,0,.5)", result.CssRGBCompact);
         Assert.IsNull(result.Hex6);
-        Assert.AreEqual("#ff00007f", result.Hex8);
-        Assert.AreEqual("#ff00007f", result.HexCompact);
+        Assert.AreEqual("#ff000080", result.Hex8);
+        Assert.AreEqual("#ff000080", result.HexCompact);
         Assert.AreEqual("rgba(255,0,0,.5)", result.Css);
     }
 
@@ -144,8 +144,8 @@ public class ColorFormatConverterTests
         Assert.AreEqual("rgba(0,255,0,.5)", result.CssRGBA);
         Assert.AreEqual("rgba(0,255,0,.5)", result.CssRGBCompact);
         Assert.IsNull(result.Hex6);
-        Assert.AreEqual("#00ff007f", result.Hex8);
-        Assert.AreEqual("#00ff007f", result.HexCompact);
+        Assert.AreEqual("#00ff0080", result.Hex8);
+        Assert.AreEqual("#00ff0080", result.HexCompact);
         Assert.AreEqual("rgba(0,255,0,.5)", result.Css);
     }
 
@@ -168,8 +168,8 @@ public class ColorFormatConverterTests
         Assert.AreEqual("rgba(0,255,0,.5)", result.CssRGBA);
         Assert.AreEqual("rgba(0,255,0,.5)", result.CssRGBCompact);
         Assert.IsNull(result.Hex6);
-        Assert.AreEqual("#00ff007f", result.Hex8);
-        Assert.AreEqual("#00ff007f", result.HexCompact);
+        Assert.AreEqual("#00ff0080", result.Hex8);
+        Assert.AreEqual("#00ff0080", result.HexCompact);
         Assert.AreEqual("rgba(0,255,0,.5)", result.Css);
     }
     [TestMethod]
@@ -230,7 +230,7 @@ public class ColorFormatConverterTests
         Assert.AreEqual((byte)0, result.Hue);
         Assert.AreEqual((ushort)100, result.Saturation);
         Assert.AreEqual((byte)50, result.Lightness);
-        Assert.AreEqual((byte)128, result.AlphaByte);
+        Assert.AreEqual((byte)127, result.AlphaByte);
         Assert.AreEqual(0.5f, result.AlphaFloat);
         Assert.IsNull(result.CssHSL);
         Assert.AreEqual("hsla(0,100%,50%,.5)", result.CssHSLA);
@@ -254,7 +254,7 @@ public class ColorFormatConverterTests
         Assert.AreEqual((byte)0, result.Hue);
         Assert.AreEqual((ushort)100, result.Saturation);
         Assert.AreEqual((byte)50, result.Lightness);
-        Assert.AreEqual((byte)128, result.AlphaByte);
+        Assert.AreEqual((byte)127, result.AlphaByte);
         Assert.AreEqual(0.5f, result.AlphaFloat);
         Assert.IsNull(result.CssHSL);
         Assert.AreEqual("hsla(0,100%,50%,.5)", result.CssHSLA);
@@ -311,8 +311,8 @@ public class ColorFormatConverterTests
         Assert.AreEqual("rgba(0,255,0,.5)", result.CssRGBA);
         Assert.AreEqual("rgba(0,255,0,.5)", result.CssRGBCompact);
         Assert.IsNull(result.Hex6);
-        Assert.AreEqual("#00ff007f", result.Hex8);
-        Assert.AreEqual("#00ff007f", result.HexCompact);
+        Assert.AreEqual("#00ff0080", result.Hex8);
+        Assert.AreEqual("#00ff0080", result.HexCompact);
         Assert.AreEqual("rgba(0,255,0,.5)", result.Css);
     }
 
@@ -359,8 +359,8 @@ public class ColorFormatConverterTests
         Assert.AreEqual("rgba(255,0,0,.5)", result.CssRGBA);
         Assert.AreEqual("rgba(255,0,0,.5)", result.CssRGBCompact);
         Assert.IsNull(result.Hex6);
-        Assert.AreEqual("#ff00007f", result.Hex8);
-        Assert.AreEqual("#ff00007f", result.HexCompact);
+        Assert.AreEqual("#ff000080", result.Hex8);
+        Assert.AreEqual("#ff000080", result.HexCompact);
         Assert.AreEqual("rgba(255,0,0,.5)", result.Css);
     }
 }

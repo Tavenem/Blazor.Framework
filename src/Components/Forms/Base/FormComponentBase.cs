@@ -326,7 +326,13 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         return success;
     }
 
-    private protected void EvaluateDebounced() => _timer.Start();
+    private protected void EvaluateDebounced()
+    {
+        if (!_disposedValue)
+        {
+            _timer.Start();
+        }
+    }
 
     private protected string GetConversionValidationMessage()
         => string.Format(ConversionValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());

@@ -1,30 +1,4 @@
-﻿interface IPopoverPosition {
-    left: number;
-    offsetX: number;
-    offsetY: number;
-    top: number;
-}
-
-interface IPopoverScroller extends HTMLElement {
-    listeningForPopoverScroll?: boolean | undefined | null;
-}
-
-interface IPopoverElement extends HTMLElement {
-    anchorId?: string | null;
-    offsetX?: number;
-    offsetY?: number;
-    popoverFlipped?: string | null;
-    popoverMark?: string;
-}
-
-interface IPopoverMapItem {
-    anchorId: string | null;
-    mutationObserver: MutationObserver;
-    parentResizeObserver: ResizeObserver;
-    resizeObserver: ResizeObserver;
-}
-
-const flipClassReplacements: Record<string, Record<string, string>> = {
+const flipClassReplacements = {
     'top': {
         'top-left': 'bottom-left',
         'top-center': 'bottom-center',
@@ -60,38 +34,30 @@ const flipClassReplacements: Record<string, Record<string, string>> = {
     },
     'bottom-and-right': {
         'bottom-right': 'top-left',
-     },
+    },
 };
-
 class Popover {
-    contentObserver: ResizeObserver | null;
-    map: Record<string, IPopoverMapItem>;
-
     constructor() {
         this.map = {};
         this.contentObserver = null;
     }
-
-    callback(mutationsList: MutationRecord[]): void {
+    callback(mutationsList) {
         for (const mutation of mutationsList) {
             if (mutation.type === 'attributes'
                 && mutation.target instanceof HTMLElement) {
-                const target = mutation.target as IPopoverElement;
+                const target = mutation.target;
                 if (target.classList.contains('flip-onopen') &&
                     target.classList.contains('open') == false) {
                     target.popoverFlipped = null;
                     target.removeAttribute('data-popover-flip');
                 }
-
                 this.placePopover(target);
             }
         }
     }
-
-    connect(id: string, anchorId: string | null = null): void {
+    connect(id, anchorId = null) {
         this.initialize();
-
-        const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
+        const popoverNode = document.getElementById('popover-' + id);
         if (!popoverNode
             || !popoverNode.offsetParent
             || !(popoverNode.offsetParent instanceof Element)) {
@@ -99,16 +65,11 @@ class Popover {
         }
         popoverNode.anchorId = anchorId;
         this.placePopover(popoverNode);
-
         const observer = new MutationObserver(this.callback.bind(this));
-        observer.observe(
-            popoverNode,
-            { attributeFilter: ['class'] });
-
+        observer.observe(popoverNode, { attributeFilter: ['class'] });
         const parentResizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 const target = entry.target;
-
                 for (let i = 0; i < target.childNodes.length; i++) {
                     const childNode = target.childNodes[i];
                     if (childNode instanceof HTMLElement
@@ -120,7 +81,6 @@ class Popover {
             }
         });
         parentResizeObserver.observe(popoverNode.offsetParent);
-
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 let target = entry.target;
@@ -130,18 +90,17 @@ class Popover {
             }
         });
         resizeObserver.observe(popoverNode);
-
         let style = getComputedStyle(popoverNode);
         if (style.position != 'fixed') {
             const overflowRegex = /(auto|scroll)/;
-            let parent = popoverNode.parentElement as IPopoverScroller;
+            let parent = popoverNode.parentElement;
             while (parent) {
                 if (parent.listeningForPopoverScroll) {
                     break;
                 }
                 style = getComputedStyle(parent);
                 if (style.position === 'static') {
-                    parent = parent.parentElement as IPopoverScroller;
+                    parent = parent.parentElement;
                     continue;
                 }
                 if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
@@ -150,10 +109,9 @@ class Popover {
                     });
                     parent.listeningForPopoverScroll = true;
                 }
-                parent = parent.parentElement as IPopoverScroller;
+                parent = parent.parentElement;
             }
         }
-
         this.map[id] = {
             anchorId: anchorId,
             mutationObserver: observer,
@@ -161,61 +119,50 @@ class Popover {
             resizeObserver: resizeObserver,
         };
     }
-
-    disconnect(id: string): void {
+    disconnect(id) {
         if (this.map[id]) {
-            const item = this.map[id]
+            const item = this.map[id];
             item.resizeObserver.disconnect();
             item.mutationObserver.disconnect();
             item.parentResizeObserver.disconnect();
             delete this.map[id];
         }
     }
-
-    dispose(): void {
+    dispose() {
         for (let i in this.map) {
             this.disconnect(i);
         }
-
         if (this.contentObserver) {
             this.contentObserver.disconnect();
             this.contentObserver = null;
         }
     }
-
-    getAllObservedContainers(): string[] {
+    getAllObservedContainers() {
         const result = [];
         for (let i in this.map) {
             result.push(i);
         }
-
         return result;
     }
-
-    initialize(): void {
-        const mainContent = document.getElementById('main-container') as IPopoverElement;
+    initialize() {
+        const mainContent = document.getElementById('main-container');
         if (!mainContent) {
             return;
         }
-
         if (!mainContent.popoverMark) {
             mainContent.popoverMark = "marked";
             if (this.contentObserver != null) {
                 this.contentObserver.disconnect();
                 this.contentObserver = null;
             }
-
             this.contentObserver = new ResizeObserver(entries => {
                 this.placePopoverByClassSelector();
             });
-
             this.contentObserver.observe(mainContent);
         }
     }
-
-    placePopoverByClassSelector(classSelector: string | null = null): void {
+    placePopoverByClassSelector(classSelector = null) {
         var items = this.getAllObservedContainers();
-
         for (let i = 0; i < items.length; i++) {
             const popoverNode = document.getElementById('popover-' + items[i]);
             if (popoverNode) {
@@ -223,18 +170,14 @@ class Popover {
             }
         }
     }
-
-    setOffset(id: string, offsetX: number | null, offsetY: number | null) {
-        const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
+    setOffset(id, offsetX, offsetY) {
+        const popoverNode = document.getElementById('popover-' + id);
         if (popoverNode && popoverNode.offsetParent) {
             const boundingRect = popoverNode.offsetParent.getBoundingClientRect();
-
             const prevX = popoverNode.offsetX;
             const prevY = popoverNode.offsetY;
-
             popoverNode.offsetX = offsetX ? offsetX : undefined;
             popoverNode.offsetY = offsetY ? offsetY : undefined;
-
             if (prevX || popoverNode.offsetX) {
                 let left = 0;
                 if (popoverNode.style.left) {
@@ -248,7 +191,6 @@ class Popover {
                 }
                 popoverNode.style.left = +left.toFixed(2) + 'px';
             }
-
             if (prevY || popoverNode.offsetY) {
                 let top = 0;
                 if (popoverNode.style.top) {
@@ -264,87 +206,88 @@ class Popover {
             }
         }
     }
-
-    private calculatePopoverPosition(
-            list: string[],
-            boundingRect: DOMRect,
-            anchorOffsetLeft: number,
-            anchorOffsetTop: number,
-            selfRect: DOMRect): IPopoverPosition {
+    calculatePopoverPosition(list, boundingRect, anchorOffsetLeft, anchorOffsetTop, selfRect) {
         let top = anchorOffsetLeft;
         let left = anchorOffsetTop;
         if (list.indexOf('anchor-top-left') >= 0) {
             left = anchorOffsetLeft;
             top = anchorOffsetTop;
-        } else if (list.indexOf('anchor-top-center') >= 0) {
+        }
+        else if (list.indexOf('anchor-top-center') >= 0) {
             left = anchorOffsetLeft + boundingRect.width / 2;
             top = anchorOffsetTop;
-        } else if (list.indexOf('anchor-top-right') >= 0) {
+        }
+        else if (list.indexOf('anchor-top-right') >= 0) {
             left = anchorOffsetLeft + boundingRect.width;
             top = anchorOffsetTop;
-        } else if (list.indexOf('anchor-center-left') >= 0) {
+        }
+        else if (list.indexOf('anchor-center-left') >= 0) {
             left = anchorOffsetLeft;
             top = anchorOffsetTop + boundingRect.height / 2;
-        } else if (list.indexOf('anchor-center-center') >= 0) {
+        }
+        else if (list.indexOf('anchor-center-center') >= 0) {
             left = anchorOffsetLeft + boundingRect.width / 2;
             top = anchorOffsetTop + boundingRect.height / 2;
-        } else if (list.indexOf('anchor-center-right') >= 0) {
+        }
+        else if (list.indexOf('anchor-center-right') >= 0) {
             left = anchorOffsetLeft + boundingRect.width;
             top = anchorOffsetTop + boundingRect.height / 2;
-        } else if (list.indexOf('anchor-bottom-left') >= 0) {
+        }
+        else if (list.indexOf('anchor-bottom-left') >= 0) {
             left = anchorOffsetLeft;
             top = anchorOffsetTop + boundingRect.height;
-        } else if (list.indexOf('anchor-bottom-center') >= 0) {
+        }
+        else if (list.indexOf('anchor-bottom-center') >= 0) {
             left = anchorOffsetLeft + boundingRect.width / 2;
             top = anchorOffsetTop + boundingRect.height;
-        } else if (list.indexOf('anchor-bottom-right') >= 0) {
+        }
+        else if (list.indexOf('anchor-bottom-right') >= 0) {
             left = anchorOffsetLeft + boundingRect.width;
             top = anchorOffsetTop + boundingRect.height;
         }
-
         let offsetX = 0;
         let offsetY = 0;
         if (list.indexOf('top-left') >= 0) {
             offsetX = 0;
             offsetY = 0;
-        } else if (list.indexOf('top-center') >= 0) {
+        }
+        else if (list.indexOf('top-center') >= 0) {
             offsetX = -selfRect.width / 2;
             offsetY = 0;
-        } else if (list.indexOf('top-right') >= 0) {
+        }
+        else if (list.indexOf('top-right') >= 0) {
             offsetX = -selfRect.width;
             offsetY = 0;
-        } else if (list.indexOf('center-left') >= 0) {
+        }
+        else if (list.indexOf('center-left') >= 0) {
             offsetX = 0;
             offsetY = -selfRect.height / 2;
-        } else if (list.indexOf('center-center') >= 0) {
+        }
+        else if (list.indexOf('center-center') >= 0) {
             offsetX = -selfRect.width / 2;
             offsetY = -selfRect.height / 2;
-        } else if (list.indexOf('center-right') >= 0) {
+        }
+        else if (list.indexOf('center-right') >= 0) {
             offsetX = -selfRect.width;
             offsetY = -selfRect.height / 2;
-        } else if (list.indexOf('bottom-left') >= 0) {
+        }
+        else if (list.indexOf('bottom-left') >= 0) {
             offsetX = 0;
             offsetY = -selfRect.height;
-        } else if (list.indexOf('bottom-center') >= 0) {
+        }
+        else if (list.indexOf('bottom-center') >= 0) {
             offsetX = -selfRect.width / 2;
             offsetY = -selfRect.height;
-        } else if (list.indexOf('bottom-right') >= 0) {
+        }
+        else if (list.indexOf('bottom-right') >= 0) {
             offsetX = -selfRect.width;
             offsetY = -selfRect.height;
         }
-
         return {
             top: top, left: left, offsetX: offsetX, offsetY: offsetY
         };
     }
-
-    private getPositionForFlippedPopver(
-        inputArray: string[],
-        selector: string,
-        boundingRect: DOMRect,
-        anchorOffsetLeft: number,
-        anchorOffsetTop: number,
-        selfRect: DOMRect): IPopoverPosition {
+    getPositionForFlippedPopver(inputArray, selector, boundingRect, anchorOffsetLeft, anchorOffsetTop, selfRect) {
         const classList = [];
         for (let i = 0; i < inputArray.length; i++) {
             const item = inputArray[i];
@@ -356,30 +299,19 @@ class Popover {
                 classList.push(item);
             }
         }
-
-        return this.calculatePopoverPosition(
-            classList,
-            boundingRect,
-            anchorOffsetLeft,
-            anchorOffsetTop,
-            selfRect);
+        return this.calculatePopoverPosition(classList, boundingRect, anchorOffsetLeft, anchorOffsetTop, selfRect);
     }
-
-    private placePopover(
-        popoverNode: IPopoverElement,
-        classSelector: string | null = null): void {
+    placePopover(popoverNode, classSelector = null) {
         if (!popoverNode
             || !popoverNode.classList.contains('open')
             || !popoverNode.offsetParent
             || !(popoverNode.offsetParent instanceof HTMLElement)) {
             return;
         }
-
         if (classSelector
             && !popoverNode.classList.contains(classSelector)) {
             return;
         }
-
         const anchorElementId = popoverNode.anchorId;
         let anchorElement = anchorElementId ? document.getElementById(anchorElementId) : null;
         let anchorOffsetLeft = 0;
@@ -387,57 +319,46 @@ class Popover {
         if (anchorElement) {
             if (anchorElement.offsetParent != popoverNode.offsetParent) {
                 anchorElement = null;
-            } else {
+            }
+            else {
                 anchorOffsetLeft = anchorElement.offsetLeft;
                 anchorOffsetTop = anchorElement.offsetTop;
             }
         }
-
         const boundingRect = popoverNode.offsetParent.getBoundingClientRect();
         const anchorBoundingRect = anchorElement
             ? anchorElement.getBoundingClientRect()
             : boundingRect;
-
         if (popoverNode.classList.contains('match-width')) {
             popoverNode.style.width = anchorBoundingRect.width + 'px';
             popoverNode.style.minWidth = anchorBoundingRect.width + 'px';
             popoverNode.style.maxWidth = anchorBoundingRect.width + 'px';
-        } else if (popoverNode.classList.contains('limit-width')) {
+        }
+        else if (popoverNode.classList.contains('limit-width')) {
             popoverNode.style.maxWidth = anchorBoundingRect.width + 'px';
         }
-
         const selfRect = popoverNode.getBoundingClientRect();
         const classList = popoverNode.classList;
         const classListArray = Array.from(popoverNode.classList);
-
-        const postion = this.calculatePopoverPosition(
-            classListArray,
-            anchorBoundingRect,
-            anchorOffsetLeft,
-            anchorOffsetTop,
-            selfRect);
+        const postion = this.calculatePopoverPosition(classListArray, anchorBoundingRect, anchorOffsetLeft, anchorOffsetTop, selfRect);
         let left = postion.left;
         let top = postion.top;
         let offsetX = postion.offsetX;
         let offsetY = postion.offsetY;
-
         if (classList.contains('flip-onopen')
             || classList.contains('flip-always')) {
             const appBarElements = document.getElementsByClassName('appbar');
             const appBarArray = Array.from(appBarElements);
-
-            const topAppBar = appBarArray.find((v) => { v.classList.contains('top') });
+            const topAppBar = appBarArray.find((v) => { v.classList.contains('top'); });
             let topAppBarOffset = 0;
             if (topAppBar) {
                 topAppBarOffset = topAppBar.getBoundingClientRect().height;
             }
-
-            const bottomAppBar = appBarArray.find((v) => { v.classList.contains('bottom') });
+            const bottomAppBar = appBarArray.find((v) => { v.classList.contains('bottom'); });
             let bottomAppBarOffset = 0;
             if (bottomAppBar) {
                 bottomAppBarOffset = bottomAppBar.getBoundingClientRect().height;
             }
-
             const absLeft = boundingRect.left + left;
             const absTop = boundingRect.top + top;
             const deltaToLeft = absLeft + offsetX;
@@ -445,89 +366,93 @@ class Popover {
             const deltaTop = absTop - selfRect.height - topAppBarOffset;
             const spaceToTop = absTop - topAppBarOffset;
             const deltaBottom = window.innerHeight - bottomAppBarOffset - absTop - selfRect.height;
-
-            let selector = popoverNode.popoverFlipped as string;
-
+            let selector = popoverNode.popoverFlipped;
             if (!selector) {
                 if (classList.contains('top-left')) {
                     if (deltaBottom < 0 && deltaToRight < 0 && spaceToTop >= selfRect.height && deltaToLeft >= selfRect.width) {
                         selector = 'top-and-left';
-                    } else if (deltaBottom < 0 && spaceToTop >= selfRect.height) {
+                    }
+                    else if (deltaBottom < 0 && spaceToTop >= selfRect.height) {
                         selector = 'top';
-                    } else if (deltaToRight < 0 && deltaToLeft >= selfRect.width) {
+                    }
+                    else if (deltaToRight < 0 && deltaToLeft >= selfRect.width) {
                         selector = 'left';
                     }
-                } else if (classList.contains('top-center')) {
+                }
+                else if (classList.contains('top-center')) {
                     if (deltaBottom < 0 && spaceToTop >= selfRect.height) {
                         selector = 'top';
                     }
-                } else if (classList.contains('top-right')) {
+                }
+                else if (classList.contains('top-right')) {
                     if (deltaBottom < 0 && deltaToLeft < 0 && spaceToTop >= selfRect.height && deltaToRight >= selfRect.width) {
                         selector = 'top-and-right';
-                    } else if (deltaBottom < 0 && spaceToTop >= selfRect.height) {
+                    }
+                    else if (deltaBottom < 0 && spaceToTop >= selfRect.height) {
                         selector = 'top';
-                    } else if (deltaToLeft < 0 && deltaToRight >= selfRect.width) {
+                    }
+                    else if (deltaToLeft < 0 && deltaToRight >= selfRect.width) {
                         selector = 'right';
                     }
-                } else if (classList.contains('center-left')) {
+                }
+                else if (classList.contains('center-left')) {
                     if (deltaToRight < 0 && deltaToLeft >= selfRect.width) {
                         selector = 'left';
                     }
-                } else if (classList.contains('center-right')) {
+                }
+                else if (classList.contains('center-right')) {
                     if (deltaToLeft < 0 && deltaToRight >= selfRect.width) {
                         selector = 'right';
                     }
-                } else if (classList.contains('bottom-left')) {
+                }
+                else if (classList.contains('bottom-left')) {
                     if (deltaTop < 0 && deltaToRight < 0 && deltaBottom >= 0 && deltaToLeft >= selfRect.width) {
                         selector = 'bottom-and-left';
-                    } else if (deltaTop < 0 && deltaBottom >= 0) {
+                    }
+                    else if (deltaTop < 0 && deltaBottom >= 0) {
                         selector = 'bottom';
-                    } else if (deltaToRight < 0 && deltaToLeft >= selfRect.width) {
+                    }
+                    else if (deltaToRight < 0 && deltaToLeft >= selfRect.width) {
                         selector = 'left';
                     }
-                } else if (classList.contains('bottom-center')) {
+                }
+                else if (classList.contains('bottom-center')) {
                     if (deltaTop < 0 && deltaBottom >= 0) {
                         selector = 'bottom';
                     }
-                } else if (classList.contains('bottom-right')) {
+                }
+                else if (classList.contains('bottom-right')) {
                     if (deltaTop < 0 && deltaToLeft < 0 && deltaBottom >= 0 && deltaToRight >= selfRect.width) {
                         selector = 'bottom-and-right';
-                    } else if (deltaTop < 0 && deltaBottom >= 0) {
+                    }
+                    else if (deltaTop < 0 && deltaBottom >= 0) {
                         selector = 'bottom';
-                    } else if (deltaToLeft < 0 && deltaToRight >= selfRect.width) {
+                    }
+                    else if (deltaToLeft < 0 && deltaToRight >= selfRect.width) {
                         selector = 'right';
                     }
                 }
             }
-
             if (selector && selector != 'none') {
-                const newPosition = this.getPositionForFlippedPopver(
-                    classListArray,
-                    selector,
-                    anchorBoundingRect,
-                    anchorOffsetLeft,
-                    anchorOffsetTop,
-                    selfRect);
+                const newPosition = this.getPositionForFlippedPopver(classListArray, selector, anchorBoundingRect, anchorOffsetLeft, anchorOffsetTop, selfRect);
                 left = newPosition.left;
                 top = newPosition.top;
                 offsetX = newPosition.offsetX;
                 offsetY = newPosition.offsetY;
                 popoverNode.setAttribute('data-popover-flip', 'flipped');
-            } else {
+            }
+            else {
                 popoverNode.removeAttribute('data-popover-flip');
             }
-
             if (classList.contains('flip-onopen')
                 && !popoverNode.popoverFlipped) {
                 popoverNode.popoverFlipped = selector || 'none';
             }
         }
-
         if (window.getComputedStyle(popoverNode).position == 'fixed') {
             offsetX += boundingRect.left;
             offsetY += boundingRect.top;
         }
-
         if (popoverNode.offsetX) {
             offsetX += popoverNode.offsetX - boundingRect.left;
         }
@@ -539,27 +464,22 @@ class Popover {
     }
 }
 const popover = new Popover();
-
-export function popoverConnect(id: string, anchorId: string | null) {
+export function popoverConnect(id, anchorId) {
     popover.connect(id, anchorId);
 }
-
-export function popoverDisconnect(id: string) {
+export function popoverDisconnect(id) {
     popover.disconnect(id);
 }
-
 export function popoverDispose() {
     popover.dispose();
 }
-
 export function popoverInitialize() {
     popover.initialize();
 }
-
-export function setPopoverOffset(id: string, offsetX: number | null, offsetY: number | null) {
+export function setPopoverOffset(id, offsetX, offsetY) {
     popover.setOffset(id, offsetX, offsetY);
 }
-
 window.addEventListener('resize', () => {
     popover.placePopoverByClassSelector();
 });
+//# sourceMappingURL=tavenem-popover.js.map

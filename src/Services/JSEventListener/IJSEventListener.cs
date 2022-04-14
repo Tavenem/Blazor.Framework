@@ -34,7 +34,7 @@ public interface IJSEventListener
         string elementId,
         bool correctOffset,
         int throttle,
-        Func<object, Task> callback);
+        Func<object?, Task> callback);
 
     /// <summary>
     /// Stop listening for javascript events.

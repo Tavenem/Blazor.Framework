@@ -10,11 +10,6 @@ public partial class Contents : IDisposable
     private bool _disposedValue;
 
     /// <summary>
-    /// The currenly active heading.
-    /// </summary>
-    public Heading? ActiveHeading { get; private set; }
-
-    /// <summary>
     /// <para>
     /// The breakpoint at which the list should be visible.
     /// </para>
@@ -35,7 +30,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("list contents highlight-start darken")
+    protected override string? CssClass => new CssBuilder("list contents highlight-start dense")
         .Add(ThemeColor.ToCSS())
         .Add(BreakpointClass)
         .Add(Class)

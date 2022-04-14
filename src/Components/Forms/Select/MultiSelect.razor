@@ -15,7 +15,7 @@
         {
             foreach (var value in Options)
             {
-                <Option @key="value" Value="value" Label="@value?.ToString()" />
+                <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value?.ToString())" />
             }
         }
         else
@@ -64,7 +64,7 @@
                required="@Required"
                tabindex="@TabIndex"
                value="@DisplayString"
-               @onclick="OnClick"
+               @onclick="TogglePopover"
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
@@ -72,7 +72,7 @@
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
-        <tf-icon class="expand" @onclick="OnClick">@DefaultIcons.Expand</tf-icon>
+        <tf-icon class="expand" @onclick="TogglePopover" @onclick:stopPropagation="true">@DefaultIcons.Expand</tf-icon>
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {

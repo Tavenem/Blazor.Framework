@@ -1,10 +1,11 @@
 ﻿using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace Tavenem.Blazor.Framework.Services;
 
 internal class JSEventListener : IJSEventListener, IAsyncDisposable
 {
-    private readonly Dictionary<Guid, (Type eventType, Func<object, Task> callback)> _callbackResolver = new();
+    private readonly Dictionary<Guid, (Type eventType, Func<object?, Task> callback)> _callbackResolver = new();
     private readonly DotNetObjectReference<JSEventListener> _dotNetRef;
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
 
@@ -47,6 +48,31 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
     }
 
     /// <summary>
+    /// Invoked by javascript.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnEventOccur(Guid key, string @eventData)
+    {
+        if (!_callbackResolver.ContainsKey(key))
+        {
+            return;
+        }
+
+        var (eventType, callback) = _callbackResolver[key];
+
+        var @event = JsonSerializer.Deserialize(eventData, eventType, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true,
+        });
+
+        if (callback is not null)
+        {
+            await callback.Invoke(@event);
+        }
+    }
+
+    /// <summary>
     /// Begin listening to the given javascript event for the given element.
     /// </summary>
     /// <typeparam name="T">The type of event args expected.</typeparam>
@@ -75,7 +101,7 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
         string elementId,
         bool correctOffset,
         int throttle,
-        Func<object, Task> callback)
+        Func<object?, Task> callback)
     {
         var key = Guid.NewGuid();
         var type = typeof(T);

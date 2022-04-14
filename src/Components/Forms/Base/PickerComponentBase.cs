@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using System.Globalization;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
 
@@ -12,6 +11,25 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     private readonly AdjustableTimer _focusTimer;
 
     private bool _disposedValue;
+
+    /// <summary>
+    /// <para>
+    /// Whether to allow the user to clear the current value.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// <para>
+    /// This property is ignored if <typeparamref name="TValue"/> is not nullable, or if any of <see
+    /// cref="Disabled"/>, <see cref="ReadOnly"/>, or <see
+    /// cref="FormComponentBase{TValue}.Required"/> are <see langword="true"/>.
+    /// </para>
+    /// <para>
+    /// Note that even when this property is <see langword="false"/>, a <see langword="null"/> value
+    /// can still be set programmatically. This property only affects the presence of the clear button.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool AllowClear { get; set; } = true;
 
     /// <summary>
     /// Whether the select should receive focus on page load.
@@ -29,17 +47,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     [Parameter] public string ClearIcon { get; set; } = DefaultIcons.Clear;
 
     /// <summary>
-    /// <para>
-    /// The converter used to convert bound values to HTML input element values, and vice versa.
-    /// </para>
-    /// <para>
-    /// Built-in input components have reasonable default converters for most data types, but you
-    /// can supply your own for custom data.
-    /// </para>
-    /// </summary>
-    [Parameter] public InputValueConverter<TValue>? Converter { get; set; }
-
-    /// <summary>
     /// Whether the select is disabled.
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
@@ -55,12 +62,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     [Parameter] public string? Format { get; set; }
 
     /// <summary>
-    /// <para>
     /// The <see cref="IFormatProvider"/> to use for conversion.
-    /// </para>
-    /// <para>
-    /// Default is <see cref="CultureInfo.CurrentCulture"/>.
-    /// </para>
     /// </summary>
     [Parameter] public IFormatProvider? FormatProvider { get; set; }
 
@@ -142,7 +144,8 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         .Add("input-core")
         .ToString();
 
-    private protected virtual bool CanClear => Clearable
+    private protected virtual bool CanClear => AllowClear
+        && Clearable
         && !Disabled
         && !ReadOnly
         && !Required
@@ -152,10 +155,11 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected bool HasFocus { get; set; }
 
-    private protected bool PopoverClosed { get; set; } = true;
+    private protected bool PopoverOpen { get; set; }
 
-    private protected bool ShowPicker => HasFocus
-        && !PopoverClosed;
+    private protected bool ShowPicker => PopoverOpen
+        && !Disabled
+        && !ReadOnly;
 
     private protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString)
         || !string.IsNullOrEmpty(Placeholder);
@@ -165,24 +169,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     protected PickerComponentBase() => _focusTimer = new(ClearFocus, 200);
 
-    /// <inheritdoc/>
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-
-        if (Converter is not null)
-        {
-            if (Format?.Equals(Converter.Format) != true)
-            {
-                Converter.Format = Format;
-            }
-            if (FormatProvider?.Equals(Converter.FormatProvider) != true)
-            {
-                Converter.FormatProvider = FormatProvider;
-            }
-        }
-    }
-
     /// <summary>
     /// <para>
     /// Clears the current selected value.
@@ -191,12 +177,18 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public virtual void Clear() => CurrentValueAsString = null;
+    public virtual void Clear()
+    {
+        if (!Disabled && !ReadOnly)
+        {
+            CurrentValueAsString = null;
+        }
+    }
 
     /// <summary>
     /// Focuses this element.
     /// </summary>
-    public async Task FocusAsync() => await ElementReference.FocusAsync();
+    public virtual async Task FocusAsync() => await ElementReference.FocusAsync();
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
@@ -214,23 +206,31 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         base.Dispose(disposing);
     }
 
-    private protected void OnClick()
+    private protected async Task ClosePopoverAsync()
     {
-        if (!Disabled && !ReadOnly)
+        if (PopoverOpen)
         {
-            var wasShown = ShowPicker;
-            PopoverClosed = !PopoverClosed;
-            if (ShowPicker != wasShown)
-            {
-                if (ShowPicker)
-                {
-                    OnOpenPopover();
-                }
-                else
-                {
-                    OnClosePopoverAsync();
-                }
-            }
+            PopoverOpen = false;
+            await OnClosePopoverAsync();
+            StateHasChanged();
+        }
+    }
+
+    private protected void TogglePopover()
+    {
+        if (Disabled || ReadOnly)
+        {
+            return;
+        }
+
+        PopoverOpen = !PopoverOpen;
+        if (PopoverOpen)
+        {
+            OnOpenPopover();
+        }
+        else
+        {
+            OnClosePopoverAsync();
         }
     }
 
@@ -239,7 +239,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         if (!Disabled && !ReadOnly)
         {
             await ElementReference.FocusAsync();
-            PopoverClosed = !PopoverClosed;
+            TogglePopover();
         }
     }
 
@@ -249,13 +249,15 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     {
         _focusTimer.Cancel();
         HasFocus = true;
-        if (!PopoverClosed)
-        {
-            OnOpenPopover();
-        }
     }
 
-    private protected void OnFocusOut() => _focusTimer.Start();
+    private protected void OnFocusOut()
+    {
+        if (HasFocus)
+        {
+            _focusTimer.Start();
+        }
+    }
 
     private protected virtual Task OnKeyDownAsync(KeyboardEventArgs e)
     {
@@ -268,11 +270,14 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         {
             case "escape":
             case "tab":
-                PopoverClosed = true;
+                if (PopoverOpen)
+                {
+                    TogglePopover();
+                }
                 break;
             case " ":
             case "enter":
-                PopoverClosed = !PopoverClosed;
+                TogglePopover();
                 break;
         }
 
@@ -281,11 +286,5 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected virtual void OnOpenPopover() { }
 
-    private void ClearFocus()
-    {
-        HasFocus = false;
-        PopoverClosed = true;
-        OnClosePopoverAsync();
-        StateHasChanged();
-    }
+    private void ClearFocus() => HasFocus = false;
 }

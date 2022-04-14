@@ -6,28 +6,31 @@
 
 @code {
     private RenderFragment _contentRenderFragment =>
-@<CascadingValue Value="this" IsFixed="true">
-    <CascadingValue Name="IsNested" Value="true" IsFixed="true">
+@<CascadingValue Name="IsNested" Value="true" IsFixed="true">
+    <div class="input-content" @onclick:stopPropagation="true">
         <div class="color-picker">
-            <div class="color-overlay">
+            <div class="color-overlay" style="@OverlayStyle">
                 <div class="color-overlay white">
                     <div id="@_overlayIdString" class="color-overlay black" @onclick="OnColorOverlayInteract">
-                        <svg class="color-selector"
-                             height="26"
-                             width="26"
-                             style="@GetSelectorStyle()"
-                             @onclick="OnSelectorClicked" @onclick:stopPropagation="true">
-                            <defs>
-                                <filter id="color-selector-shadow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
-                                    <feOffset dx="0" dy="5" result="offsetblur" />
-                                    <feOffset dx="0" dy="-5" result="offsetblur" />
-                                    <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-                                </filter>
-                            </defs>
-                            <circle r="10" cx="13" cy="13" stroke="white" stroke-width="1" fill="transparent" style="filter: url(#color-selector-shadow)" />
-                            <circle r="11" cx="13" cy="13" stroke="white" stroke-width="1.5" fill="transparent" />
-                        </svg>
+                        @if (!Disabled && !ReadOnly)
+                        {
+                            <svg class="color-selector"
+                                    height="26"
+                                    width="26"
+                                    style="@SelectorStyle"
+                                    @onclick="OnSelectorClicked" @onclick:stopPropagation="true">
+                                <defs>
+                                    <filter id="color-selector-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
+                                        <feOffset dx="0" dy="5" result="offsetblur" />
+                                        <feOffset dx="0" dy="-5" result="offsetblur" />
+                                        <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                                    </filter>
+                                </defs>
+                                <circle r="10" cx="13" cy="13" stroke="white" stroke-width="1" fill="transparent" style="filter: url(#color-selector-shadow)" />
+                                <circle r="11" cx="13" cy="13" stroke="white" stroke-width="1.5" fill="transparent" />
+                            </svg>
+                        }
                     </div>
                 </div>
             </div>
@@ -35,13 +38,31 @@
         <div class="color-controls">
             <div class="d-flex align-items-center">
                 <div class="color-swatch">
-                    <div class="swatch-fill" style="@($"background:{HexColor}")"></div>
+                    <div class="swatch-fill" style="@SwatchStyle"></div>
                 </div>
                 <div class="color-sliders">
-                    <Slider TValue="ushort" @bind-Value="Hue" Max="359" Class="hue" />
+                    <Slider @ref="HueSlider"
+                            TValue="ushort"
+                            Value="Hue"
+                            ValueChanged="OnHueChanged"
+                            AutoFocus="@(Inline ? AutoFocus : false)"
+                            Class="hue"
+                            Disabled="Disabled"
+                            Max="359"
+                            ReadOnly="ReadOnly"
+                            TabIndex="@(Inline ? TabIndex : 0)"
+                            UpdateOnInput="true" />
                     @if (ShowAlpha)
                     {
-                        <Slider TValue="float" @bind-Value="Alpha" Max="1f" Class="alpha" Style="@AlphaSliderStyle" />
+                        <Slider TValue="float"
+                                Value="Alpha"
+                                ValueChanged="OnAlphaSliderChanged"
+                                Max="1f"
+                                Disabled="Disabled"
+                                ReadOnly="ReadOnly"
+                                Class="alpha"
+                                Style="@AlphaSliderStyle"
+                                UpdateOnInput="true" />
                     }
                 </div>
             </div>
@@ -49,29 +70,99 @@
                 @switch (ColorMode)
                 {
                     case ColorMode.Hex:
-                        <TextInput @bind-Value="@HexInput" HelpText="HEX" InputClass="text-center" Class="outlined" />
+                        <TextInput Value="@HexInput"
+                                    ValueChanged="OnHexChanged"
+                                    HelpText="HEX"
+                                    InputClass="text-center"
+                                    Clearable="false"
+                                    Disabled="Disabled"
+                                    ReadOnly="ReadOnly"
+                                    ThemeColor="ThemeColor"
+                                    Class="outlined dense" />
                         break;
                     case ColorMode.HSL:
-                        <NumericInput TValue="ushort" @bind-Value="Hue" Max="359" HelpText="H" Class="outlined" ShowStepButtons="false" />
-                        <NumericInput TValue="byte" @bind-Value="Saturation" Max="100" HelpText="S" Class="outlined" ShowStepButtons="false" />
-                        <NumericInput TValue="byte" @bind-Value="Lightness" Max="100" HelpText="L" Class="outlined" ShowStepButtons="false" />
+                        <NumericInput TValue="ushort"
+                                        Value="Hue"
+                                        ValueChanged="OnHueChanged"
+                                        Max="359"
+                                        HelpText="H"
+                                        Disabled="Disabled"
+                                        ReadOnly="ReadOnly"
+                                        Class="outlined dense"
+                                        ShowStepButtons="false"
+                                        ThemeColor="ThemeColor" />
+                        <NumericInput TValue="byte"
+                                        Value="Saturation"
+                                        ValueChanged="OnSaturationChanged"
+                                        Max="100"
+                                        HelpText="S"
+                                        Disabled="Disabled"
+                                        ReadOnly="ReadOnly"
+                                        Class="outlined dense"
+                                        ShowStepButtons="false"
+                                        ThemeColor="ThemeColor" />
+                        <NumericInput TValue="byte"
+                                        Value="Lightness"
+                                        ValueChanged="OnLightnessChanged"
+                                        Max="100"
+                                        HelpText="L"
+                                        Disabled="Disabled"
+                                        ReadOnly="ReadOnly"
+                                        Class="outlined dense"
+                                        ShowStepButtons="false"
+                                        ThemeColor="ThemeColor" />
                         break;
                     case ColorMode.RGB:
-                        <NumericInput TValue="byte" @bind-Value="Red" HelpText="R" Class="outlined" ShowStepButtons="false" />
-                        <NumericInput TValue="byte" @bind-Value="Green" HelpText="G" Class="outlined" ShowStepButtons="false" />
-                        <NumericInput TValue="byte" @bind-Value="Blue" HelpText="B" Class="outlined" ShowStepButtons="false" />
+                        <NumericInput TValue="byte"
+                                        Value="Red"
+                                        ValueChanged="OnRedChanged"
+                                        HelpText="R"
+                                        Disabled="Disabled"
+                                        ReadOnly="ReadOnly"
+                                        Class="outlined dense"
+                                        ShowStepButtons="false"
+                                        ThemeColor="ThemeColor" />
+                        <NumericInput TValue="byte"
+                                        Value="Green"
+                                        ValueChanged="OnGreenChanged"
+                                        HelpText="G"
+                                        Disabled="Disabled"
+                                        ReadOnly="ReadOnly"
+                                        Class="outlined dense"
+                                        ShowStepButtons="false"
+                                        ThemeColor="ThemeColor" />
+                        <NumericInput TValue="byte"
+                                        Value="Blue"
+                                        ValueChanged="OnBlueChanged"
+                                        HelpText="B"
+                                        Disabled="Disabled"
+                                        ReadOnly="ReadOnly"
+                                        Class="outlined dense"
+                                        ShowStepButtons="false"
+                                        ThemeColor="ThemeColor" />
                         break;
                 }
                 @if (ShowAlpha && ColorMode != ColorMode.Hex)
                 {
-                    <NumericInput TValue="float" @bind-Value="Alpha" Min="0" Max="1" Step="0.01f" HelpText="A" Class="outlined" ShowStepButtons="false" />
+                    <NumericInput TValue="float"
+                                    Value="Alpha"
+                                    ValueChanged="OnAlphaValueChanged"
+                                    Min="0"
+                                    Max="1"
+                                    Step="0.01f"
+                                    HelpText="A"
+                                    Disabled="Disabled"
+                                    ReadOnly="ReadOnly"
+                                    Class="outlined dense"
+                                    ShowStepButtons="false"
+                                    ThemeColor="ThemeColor" />
                 }
-                <button class="btn btn-icon" @onclick="OnCycleMode">
+                <button class="@CycleButtonClass" @onclick="OnCycleMode">
                     <tf-icon>@DefaultIcons.ModeSwitch</tf-icon>
                 </button>
             </div>
         </div>
-    </CascadingValue>
+    </div>
 </CascadingValue>;
 }
 
@@ -95,22 +186,22 @@
                id="@Id"
                class="@InputCssClass"
                style="@InputStyle"
-               autofocus="@AutoFocus"
+               autofocus="@(Inline ? false : AutoFocus)"
                disabled="@Disabled"
                placeholder="@Placeholder"
                readonly
                required="@Required"
-               tabindex="@TabIndex"
+               tabindex="@(Inline ? -1 : TabIndex)"
                value="@DisplayString"
-               @onclick="OnClick"
+               @onclick="TogglePopover"
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
-            <button class="btn btn-icon small" @onclick="Clear">
+            <button class="btn btn-icon small" disabled="@(Disabled || ReadOnly)" @onclick="Clear">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
-        <tf-icon @onclick="OnClick">@DefaultIcons.ColorSelect</tf-icon>
+        <tf-icon class="expand" @onclick="TogglePopover" @onclick:stopPropagation="true">@DefaultIcons.ColorSelect</tf-icon>
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {
@@ -129,6 +220,10 @@
                  PopoverOrigin="Origin.Top_Left">
             @_contentRenderFragment
         </Popover>
+        @if (ShowPicker)
+        {
+            <div @onclick="ClosePopoverAsync" @onclick:stopPropagation="true" class="overlay transparent" style="z-index:1499" />
+        }
     }
     @if (!string.IsNullOrEmpty(HelpText)
         || !IsValid)
