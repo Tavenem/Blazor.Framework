@@ -1,0 +1,337 @@
+﻿@using Tavenem.Blazor.Framework.InternalComponents.DataGrid
+
+@namespace Tavenem.Blazor.Framework
+
+@attribute [CascadingTypeParameter(nameof(TDataItem))]
+@typeparam TDataItem
+
+@inherits TavenemComponentBase
+
+<div class="d-none">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <div class="datagrid-toolbar">
+        @ToolbarContent
+        @if (AllowAdd)
+        {
+            <button class="btn btn-icon" @onclick="OnShowExportDialog"><tf-icon class="success">@DefaultIcons.Add</tf-icon></button>
+        }
+        <button class="btn btn-icon" @onclick="OnShowExportDialog"><tf-icon>@DefaultIcons.ImportExport</tf-icon></button>
+        <button class="btn btn-icon" @onclick="@(_ => _isColumnFilterDialogVisible = true)"><tf-icon>@DefaultIcons.Filter</tf-icon></button>
+    </div>
+    <table class="@TableCssClass">
+        <colgroup>
+            @if (HasRowExpansion)
+            {
+                <col />
+            }
+            @foreach (var column in _columns.Where(x => x.ActualIsShown))
+            {
+                <col @key="column" class="@column.ColumnCssClass" />
+            }
+        </colgroup>
+        <thead>
+            <tr>
+                @if (HasRowExpansion)
+                {
+                    <th></th>
+                }
+                @foreach (var column in _columns.Where(x => x.ActualIsShown))
+                {
+                    <th @key="column">
+                        <span class="d-inline-flex justify-content-space-between align-items-end">
+                            if (column.LabelContent is null)
+                            {
+                                <span class="@column.AlignClass">
+                                    @column.ActualLabel
+                                </span>
+                            }
+                            else
+                            {
+                                @column.LabelContent
+                            }
+                            if (column.CanSort)
+                            {
+                                <button class="btn btn-icon" @onclick="@(_ => OnColumnSortAsync(column))">
+                                    <tf-icon>@(column.SortDescending ? DefaultIcons.Sort_Descending : DefaultIcons.Sort_Ascending)</tf-icon>
+                                </button>
+                            }
+                        </span>
+                    </th>
+                }
+            </tr>
+            <tr style="height:.25rem;background-color:var(--table-stripe-color)">
+                @foreach (var column in _columns.Where(x => x.ActualIsShown))
+                {
+                    <th @key="column">
+                        <span class="d-inline-flex justify-content-space-between align-items-end">
+                            @if (column == EditingFilterColumn)
+                            {
+                                <TextInput Value="@column.CurrentFilter"
+                                           ValueChanged="@(v => OnFilterChangedAsync(column, v))"
+                                           LostFocus="@(_ => EditingFilterColumn = null)"
+                                           UpdateOnInput="true"
+                                           UpdateOnInputDebounce="500" />
+                            }
+                            else
+                            {
+                                <span>@column.CurrentFilter</span>
+                                if (column.CanFilter)
+                                {
+                                    <button class="btn btn-icon" @onclick="@(_ => EditingFilterColumn = column)">
+                                        <tf-icon>@DefaultIcons.Search</tf-icon>
+                                    </button>
+                                }
+                            }
+                        </span>
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background-color:var(--table-stripe-color);height:.25rem">
+                <td colspan="1000">
+                    @if (IsLoading)
+                    {
+                        <tf-progress-linear class="@LoadingClass"></tf-progress-linear>
+                    }
+                </td>
+            </tr>
+            @if (DataGroups is null)
+            {
+                if (Rows.Count == 0)
+                {
+                    <tr>
+                        <td colspan="1000" style="text-align:center;vertical-align:middle">
+                            <div class="my-3">
+                                @if (IsLoading)
+                                {
+                                    <tf-progress-circle class="@ThemeColor.ToCSS()"></tf-progress-circle>
+                                }
+                                else if (NoDataContent is null)
+                                {
+                                    <span>No Data</span>
+                                }
+                                else
+                                {
+                                    @NoDataContent
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var row in Rows)
+                    {
+                        <tr @key="row.Item"
+                        class="@RowClass?.Invoke(row.Item!)"
+                        @onclick="@(_ => OnRowClick(row))">
+                            @if (HasRowExpansion)
+                            {
+                                <td>
+                                    @if (AllRowsExpand || HasExpandedContent?.Invoke(row.Item!) == true)
+                                    {
+                                        <button class="btn btn-icon" @onclick="@(_ => row.IsExpanded = !row.IsExpanded)">
+                                            <tf-icon class="@GetRowExpandClass(row)">@DefaultIcons.Expand</tf-icon>
+                                        </button>
+                                    }
+                                </td>
+                            }
+                            @foreach (var column in _columns.Where(x => x.ActualIsShown))
+                            {
+                                <Cell @key="column"
+                                    Column="column"
+                                    Editing="row.Equals(EditingRow)"
+                                    Row="row" />
+                            }
+                        </tr>
+                        @if (ExpandedContent is not null && row.IsExpanded)
+                        {
+                            <tr @key="@($"{row.Item!.GetHashCode()}-expand")">
+                                <td colspan="1000">
+                                    @ExpandedContent(row.Item!)
+                                </td>
+                            </tr>
+                        }
+                    }
+                    @if (_columns.Any(x => x.FooterContent is not null))
+                    {
+                        <tr>
+                            @if (HasRowExpansion)
+                            {
+                                <td></td>
+                            }
+                            @foreach (var column in _columns.Where(x => x.ActualIsShown))
+                            {
+                                <td @key="column">
+                                    @if (column.FooterContent is not null)
+                                    {
+                                        @column.FooterContent(CurrentPageItems)
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    }
+                }
+            }
+            else if (DataGroups.Count == 0)
+            {
+                <tr>
+                    <td colspan="1000" style="text-align:center;vertical-align:middle">
+                        <div class="my-3">
+                            @if (IsLoading)
+                            {
+                                <tf-progress-circle class="@ThemeColor.ToCSS()"></tf-progress-circle>
+                            }
+                            else if (NoDataContent is null)
+                            {
+                                <span>No Data</span>
+                            }
+                            else
+                            {
+                                @NoDataContent
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var group in DataGroups.Where(x => x.Rows is not null))
+                {
+                    <tr @key="group">
+                        <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
+                            <span class="d-inline-flex align-items-center">
+                                <button class="btn btn-icon" @onclick="@(_ => group.IsExpanded = !group.IsExpanded)">
+                                    <tf-icon class="@GetGroupExpandClass(group)">@DefaultIcons.Expand</tf-icon>
+                                </button>
+                                @if (GroupContent is null)
+                                {
+                                    if (GroupLabel is null)
+                                    {
+                                        <span><strong>@group.Key?.ToString()</strong></span>
+                                    }
+                                    else
+                                    {
+                                        <span><strong>@GroupLabel(group.Key)</strong></span>
+                                    }
+                                    if (group.Count > 1)
+                                    {
+                                        <span>(@(group.Count.ToString("N0")))</span>
+                                    }
+                                }
+                                else
+                                {
+                                    @GroupContent(group.Key)
+                                }
+                            </span>
+                        </td>
+                    </tr>
+                    @if (group.IsExpanded)
+                    {
+                        foreach (var row in group.Rows!)
+                        {
+                            <tr @key="row.Item"
+                                class="@RowClass?.Invoke(row.Item!)"
+                                @onclick="@(_ => OnRowClick(row))">
+                                @if (HasRowExpansion)
+                                {
+                                    <td>
+                                        @if (AllRowsExpand || HasExpandedContent?.Invoke(row.Item!) == true)
+                                        {
+                                            <button class="btn btn-icon" @onclick="@(_ => row.IsExpanded = !row.IsExpanded)">
+                                                <tf-icon class="@GetRowExpandClass(row)">@DefaultIcons.Expand</tf-icon>
+                                            </button>
+                                        }
+                                    </td>
+                                }
+                                @foreach (var column in _columns.Where(x => x.ActualIsShown))
+                                {
+                                    <Cell @key="column"
+                                          Column="column"
+                                          Editing="row.Equals(EditingRow)"
+                                          Row="row" />
+                                }
+                            </tr>
+                            @if (ExpandedContent is not null && row.IsExpanded)
+                            {
+                                <tr @key="@($"{row.Item!.GetHashCode()}-expand")">
+                                    <td colspan="1000">
+                                        @ExpandedContent(row.Item!)
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        @if (_columns.Any(x => x.FooterContent is not null))
+                        {
+                            <tr>
+                                @if (HasRowExpansion)
+                                {
+                                    <td></td>
+                                }
+                                @foreach (var column in _columns.Where(x => x.ActualIsShown))
+                                {
+                                    <td @key="column">
+                                        @if (column.FooterContent is not null)
+                                        {
+                                            @column.FooterContent(group.Rows.Select(x => x.Item!))
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                }
+            }
+        </tbody>
+    </table>
+    @if ((LoadItems is null
+        && Items.Count > RowsPerPage)
+        || CurrentDataPage?.TotalCount > RowsPerPage)
+    {
+        <div class="d-flex justify-content-end align-items-center">
+            <span>Items per page:</span>
+            <Select TValue="ushort"
+                    Value="RowsPerPage"
+                    ValueChanged="OnChangeRowsPerPage"
+                    Options="RowsPerPageOptions" />
+            <span>@((Offset - 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)CurrentPageItems.Count()).ToString("N0"))</span>
+            @if (LoadItems is null || CurrentDataPage?.TotalCount.HasValue == true)
+            {
+                <span>of</span>
+                <span>@((LoadItems is null ? (ulong)Items.Count : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
+            }
+            <Pagination CurrentPage="CurrentPage"
+                        CurrentPageChanged="OnPageChangedAsync"
+                        LastRequested="OnLastPageAsync"
+                        NextRequested="OnNextPageAsync"
+                        PageCount="PageCount"
+                        ThemeColor="ThemeColor" />
+        </div>
+    }
+</div>
+
+<Dialog @bind-IsVisible="_isColumnFilterDialogVisible">
+    <TitleContent>
+        <h6>Select Columns</h6>
+    </TitleContent>
+    <ChildContent>
+        <div class="d-flex flex-column mx-auto">
+            <Checkbox TValue="bool"
+                      Value="_columns.Where(x => x.CanHide).All(y => y.IsShown)"
+                      ValueChanged="OnSetAllColumnsVisiblity"
+                      Label="All" />
+            @foreach (var column in _columns.Where(x => x.CanHide))
+            {
+                <Checkbox @bind-Value="column.IsShown" Label="@column.ActualLabel" />
+            }
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <button class="btn btn-text" @onclick="@(_ => _isColumnFilterDialogVisible = false)">Close</button>
+    </FooterContent>
+</Dialog>

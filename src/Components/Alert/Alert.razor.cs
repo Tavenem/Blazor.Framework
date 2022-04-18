@@ -44,17 +44,13 @@ public partial class Alert
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
-    protected override string? CssClass => new CssBuilder("alert")
+    /// <inheritdoc />
+    protected override string? CssClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
         .Add(ThemeColor.ToCSS())
+        .Add("alert")
         .Add("clickable", OnClick.HasDelegate)
         .Add("d-none", IsClosed)
-        .Add(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
     private string Icon => ThemeColor switch

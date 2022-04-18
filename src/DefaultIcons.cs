@@ -86,6 +86,11 @@ public static class DefaultIcons
     public static string Expand { get; set; } = "expand_more";
 
     /// <summary>
+    /// A filter icon.
+    /// </summary>
+    public static string Filter { get; set; } = "filter_alt";
+
+    /// <summary>
     /// <para>
     /// A forward directional indicator.
     /// </para>
@@ -94,6 +99,16 @@ public static class DefaultIcons
     /// </para>
     /// </summary>
     public static string Forward { get; set; } = "chevron_right";
+
+    /// <summary>
+    /// <para>
+    /// An import/export icon.
+    /// </para>
+    /// <para>
+    /// The default is two vertical arrows pointing in opposite directions.
+    /// </para>
+    /// </summary>
+    public static string ImportExport { get; set; } = "import_export";
 
     /// <summary>
     /// Indicates light mode.
@@ -156,9 +171,39 @@ public static class DefaultIcons
     public static string Radio_Unchecked { get; set; } = "radio_button_unchecked";
 
     /// <summary>
+    /// A search icon: the default is a magnifying glass.
+    /// </summary>
+    public static string Search { get; set; } = "search";
+
+    /// <summary>
     /// An icon which indicates selection: the default is a checkmark.
     /// </summary>
     public static string Selected { get; set; } = "done";
+
+    /// <summary>
+    /// A settings icon.
+    /// </summary>
+    public static string Settings { get; set; } = "settings";
+
+    /// <summary>
+    /// <para>
+    /// A sort ascending icon.
+    /// </para>
+    /// <para>
+    /// The default is an arrow pointing down.
+    /// </para>
+    /// </summary>
+    public static string Sort_Ascending { get; set; } = "arrow_downward";
+
+    /// <summary>
+    /// <para>
+    /// A sort descending icon.
+    /// </para>
+    /// <para>
+    /// The default is an arrow pointing up.
+    /// </para>
+    /// </summary>
+    public static string Sort_Descending { get; set; } = "arrow_upward";
 
     /// <summary>
     /// An empty (outlined) star. Used by the <see cref="Rating"/> component.

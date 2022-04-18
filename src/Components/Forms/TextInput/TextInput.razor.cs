@@ -100,6 +100,11 @@ public partial class TextInput : InputComponentBase<string?>
     [Parameter] public Func<string?, Task<IEnumerable<KeyValuePair<string, object>>>>? LoadSuggestions { get; set; }
 
     /// <summary>
+    /// Invoked when the input loses focus.
+    /// </summary>
+    [Parameter] public EventCallback LostFocus { get; set; }
+
+    /// <summary>
     /// <para>
     /// An optional mask which will be used to format the input.
     /// </para>
@@ -530,6 +535,7 @@ public partial class TextInput : InputComponentBase<string?>
         HasFocus = false;
         SuggestionsClosed = true;
         StateHasChanged();
+        _ = LostFocus.InvokeAsync();
     }
 
     private async Task GetSuggestionsAsync()

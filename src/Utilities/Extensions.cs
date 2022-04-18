@@ -83,13 +83,27 @@ internal static class Extensions
             .Replace('_', '-');
     }
 
-    public static string ToCSS(this double value, int precision = 5) => value is < 0.00001 and > -0.00001
-        ? "0"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
+    public static string ToCSS(this double value, int precision = 5)
+    {
+        if (value is < 0.00001 and > -0.00001)
+        {
+            return "0";
+        }
+        return precision <= 0
+            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}"
+            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
+    }
 
-    public static string ToCSS(this float value, int precision = 5) => value is < 0.00001f and > -0.00001f
-        ? "0"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
+    public static string ToCSS(this float value, int precision = 5)
+    {
+        if (value is < 0.00001f and > -0.00001f)
+        {
+            return "0";
+        }
+        return precision <= 0
+            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}"
+            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
+    }
 
     [return: NotNullIfNotNull("value")]
     public static string? ToHumanReadable(this string? value)
@@ -149,13 +163,27 @@ internal static class Extensions
         _ => "all",
     };
 
-    public static string ToPixels(this double value, int precision = 5) => value is < 0.00001 and > -0.00001
-        ? "0px"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
+    public static string ToPixels(this double value, int precision = 5)
+    {
+        if (value is < 0.00001 and > -0.00001)
+        {
+            return "0px";
+        }
+        return precision <= 0
+            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}px"
+            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
+    }
 
-    public static string ToPixels(this float value, int precision = 5) => value is < 0.00001f and > -0.00001f
-        ? "0px"
-        : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
+    public static string ToPixels(this float value, int precision = 5)
+    {
+        if (value is < 0.00001f and > -0.00001f)
+        {
+            return "0px";
+        }
+        return precision <= 0
+            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}px"
+            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
+    }
 
     public static Dictionary<TKey, TValue> With<TKey, TValue>(
         this Dictionary<TKey, TValue> dictionary,

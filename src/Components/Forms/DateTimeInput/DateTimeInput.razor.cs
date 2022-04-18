@@ -239,7 +239,7 @@ public partial class DateTimeInput<TValue>
                 DateType.Month => DateTimeOffset.ToString(Format ?? "y", Culture),
                 DateType.Week => $"Week {Calendar.GetWeekOfYear(DateTimeOffset.DateTime, Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)}, {DateTimeOffset.ToString(Format ?? "yyy", Culture)}",
                 DateType.Date => ShowTime
-                    ? DateTimeOffset.ToString(Format ?? "g", Culture)
+                    ? DateTimeOffset.ToString(Format ?? (ShowSeconds ? "G" : "g"), Culture)
                     : DateTimeOffset.ToString(Format ?? "d", Culture),
                 _ => ShowTime
                     ? DateTimeOffset.ToString(Format ?? (ShowSeconds ? "T" : "t"), Culture)

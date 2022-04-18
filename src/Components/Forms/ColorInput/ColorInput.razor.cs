@@ -53,9 +53,9 @@ namespace Tavenem.Blazor.Framework;
 public partial class ColorInput<TValue>
 {
     private const int OverlayHeight = 250;
+    private const int OverlayMargin = 40;
     private const int OverlayWidth = 312;
     private const int HalfSelectorSize = 13;
-
     private readonly Type _baseType;
     private readonly Type? _nullableType;
     private readonly Guid _overlayId = Guid.NewGuid();
@@ -64,7 +64,8 @@ public partial class ColorInput<TValue>
     private bool _addMouseOverEvent;
     private bool _disposedValue;
     private Guid? _eventListenerId;
-    private double _selectorX, _selectorY;
+    private double _selectorX;
+    private double _selectorY = OverlayHeight;
 
     /// <summary>
     /// The alpha value of the currently selected color, as a value in the range [0-1].
@@ -186,7 +187,7 @@ public partial class ColorInput<TValue>
         ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"
         : $"background-color:hsl({Hue},100%,50%)";
 
-    private string SelectorStyle => $"transform:translate({_selectorX.ToPixels(2)}, {_selectorY.ToPixels(2)})";
+    private string SelectorStyle => $"transform:translate({_selectorX.ToPixels(0)}, {_selectorY.ToPixels(0)})";
 
     private string SwatchStyle => Disabled
         ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"
@@ -271,6 +272,8 @@ public partial class ColorInput<TValue>
             Alpha = Color.AlphaFloat;
             HexColor = Color.HexCompact;
             HexInput = Color.HexCompact;
+            _selectorX = Saturation / 100.0 * OverlayWidth;
+            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
         }
     }
 
@@ -345,6 +348,8 @@ public partial class ColorInput<TValue>
         Lightness = Color.Lightness;
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
+        _selectorX = Saturation / 100.0 * OverlayWidth;
+        _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
 
         if (_nullableType is null)
         {
@@ -417,21 +422,25 @@ public partial class ColorInput<TValue>
         StateHasChanged();
     }
 
-    private async Task AddMouseOverEventAsync() => _eventListenerId = await JSEventListener
-        .SubscribeAsync<MouseEventArgs>(
-        "mousemove",
-        _overlayIdString,
-        true,
-        10,
-        async e =>
-        {
-            var args = e as MouseEventArgs;
-            if (args is not null)
+    private async Task AddMouseOverEventAsync()
+    {
+        _addMouseOverEvent = false;
+        _eventListenerId = await JSEventListener
+            .SubscribeAsync<MouseEventArgs>(
+            "mousemove",
+            _overlayIdString,
+            true,
+            10,
+            async e =>
             {
-                await InvokeAsync(() => OnColorOverlayInteract(args));
-                StateHasChanged();
-            }
-        });
+                var args = e as MouseEventArgs;
+                if (args is not null)
+                {
+                    await InvokeAsync(() => OnColorOverlayInteract(args));
+                    StateHasChanged();
+                }
+            });
+    }
 
     private void OnAlphaSliderChanged(float alpha)
     {
@@ -463,16 +472,24 @@ public partial class ColorInput<TValue>
         OnRGBChanged();
     }
 
-    private void OnColorOverlayInteract(MouseEventArgs e)
+    private void OnColorOverlayClick(MouseEventArgs e)
     {
-        if (Disabled || ReadOnly || e.Buttons != 1)
+        if (Disabled || ReadOnly)
         {
             return;
         }
 
-        _selectorX = Math.Clamp(e.OffsetX, 0, OverlayWidth);
-        _selectorY = Math.Clamp(e.OffsetY, 0, OverlayHeight);
+        _selectorX = Math.Clamp(e.OffsetX - OverlayMargin, 0, OverlayWidth);
+        _selectorY = Math.Clamp(e.OffsetY - OverlayMargin, 0, OverlayHeight);
         UpdateColor();
+    }
+
+    private void OnColorOverlayInteract(MouseEventArgs e)
+    {
+        if (e.Buttons == 1)
+        {
+            OnColorOverlayClick(e);
+        }
     }
 
     private void OnCycleMode()
@@ -506,6 +523,8 @@ public partial class ColorInput<TValue>
             Blue = Color.Blue;
             HexColor = Color.HexCompact;
             HexInput = Color.HexCompact;
+            _selectorX = Saturation / 100.0 * OverlayWidth;
+            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
             SetValue();
         }
         catch { }
@@ -530,6 +549,8 @@ public partial class ColorInput<TValue>
             Lightness = Color.Lightness;
             Alpha = Color.AlphaFloat;
             HexColor = Color.HexCompact;
+            _selectorX = Saturation / 100.0 * OverlayWidth;
+            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
             SetValue();
         }
         catch { }
@@ -563,6 +584,8 @@ public partial class ColorInput<TValue>
             Lightness = Color.Lightness;
             HexColor = Color.HexCompact;
             HexInput = Color.HexCompact;
+            _selectorX = Saturation / 100.0 * OverlayWidth;
+            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
             SetValue();
         }
         catch { }
@@ -619,24 +642,19 @@ public partial class ColorInput<TValue>
         }
 
         CurrentValue = newValue;
+        StateHasChanged();
     }
 
     private void UpdateColor()
     {
-        var x = _selectorX / OverlayWidth;
+        var x = Math.Clamp(_selectorX / OverlayWidth, 0, 1);
+        var y = Math.Clamp(1 - (_selectorY / OverlayHeight), 0, 1);
 
-        var r_x = 255 - (int)((255 - Red) * x);
-        var g_x = 255 - (int)((255 - Green) * x);
-        var b_x = 255 - (int)((255 - Blue) * x);
-
-        var y = 1.0 - (_selectorY / OverlayHeight);
-
-        var r = (byte)Math.Clamp((int)Math.Round(r_x * y), 0, 255);
-        var g = (byte)Math.Clamp((int)Math.Round(g_x * y), 0, 255);
-        var b = (byte)Math.Clamp((int)Math.Round(b_x * y), 0, 255);
-        Color = ShowAlpha
-            ? new ColorFormatConverter(r, g, b, Alpha)
-            : new ColorFormatConverter(r, g, b);
+        var saturation = (int)Math.Round(100 * x);
+        var lightness = (int)Math.Round(100 * y);
+        Color = ShowAlpha && Alpha > 0
+            ? ColorFormatConverter.FromHSLA(Hue, saturation, lightness, Alpha)
+            : ColorFormatConverter.FromHSLA(Hue, saturation, lightness);
         Red = Color.Red;
         Green = Color.Green;
         Blue = Color.Blue;

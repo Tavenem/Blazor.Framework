@@ -9,7 +9,7 @@
     offsetY?: number;
     properties?: string[];
     reference?: DotNet.DotNetObject;
-    timerId?: number;
+    debounce?: boolean;
 }
 
 class ThrottledEventManager {
@@ -44,7 +44,6 @@ class ThrottledEventManager {
             handler: handlerRef,
             properties: properties,
             reference: dotNetReference,
-            timerId: -1,
         };
     }
 
@@ -67,6 +66,13 @@ class ThrottledEventManager {
         delete this.eventMap[key];
     }
 
+    private clearDebounce(key: string) {
+        const entry = this.eventMap[key];
+        if (entry && entry.debounce) {
+            delete entry.debounce;
+        }
+    }
+
     private correctOffset(eventEntry: IEventInfo, event: Event) {
         const target = event.target;
         if (!(target instanceof Element)) {
@@ -85,19 +91,22 @@ class ThrottledEventManager {
         }
     }
 
-    private eventHandler(key: string, event: Event) {
+    private throttleEventHandler(key: string, event: Event) {
         const entry = this.eventMap[key];
         if (!entry
+            || entry.debounce
             || !entry.elementId
             || !entry.reference
             || !entry.properties) {
             return;
         }
 
-        var element = document.getElementById(entry.elementId);
+        const element = document.getElementById(entry.elementId);
         if (element != event.srcElement) {
             return;
         }
+
+        entry.debounce = true;
 
         const eventEntry: IEventInfo = {};
         for (var i = 0; i < entry.properties.length; i++) {
@@ -109,17 +118,9 @@ class ThrottledEventManager {
         }
 
         entry.reference.invokeMethodAsync('OnEventOccur', key, JSON.stringify(eventEntry));
-    }
 
-    private throttleEventHandler(key: string, event: Event) {
-        const entry = this.eventMap[key];
-        if (!entry) {
-            return;
-        }
-
-        clearTimeout(entry.timerId);
-        entry.timerId = window.setTimeout(
-            this.eventHandler.bind(this, key, event),
+        window.setTimeout(
+            this.clearDebounce.bind(this, key),
             entry.delay);
     }
 }

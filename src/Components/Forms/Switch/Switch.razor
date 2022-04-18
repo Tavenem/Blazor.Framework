@@ -4,7 +4,11 @@
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <label>
-        <span>
+        @if (!string.IsNullOrEmpty(UncheckedLabel))
+        {
+            <span class="label">@UncheckedLabel</span>
+        }
+        <span class="toggle">
             <span class="@ButtonClass" tabindex="@TabIndex">
                 <input @ref="ElementReference"
                        @attributes="InputAttributes"

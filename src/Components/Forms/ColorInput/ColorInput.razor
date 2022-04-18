@@ -9,16 +9,17 @@
 @<CascadingValue Name="IsNested" Value="true" IsFixed="true">
     <div class="input-content" @onclick:stopPropagation="true">
         <div class="color-picker">
-            <div class="color-overlay" style="@OverlayStyle">
-                <div class="color-overlay white">
-                    <div id="@_overlayIdString" class="color-overlay black" @onclick="OnColorOverlayInteract">
-                        @if (!Disabled && !ReadOnly)
-                        {
+            <div style="@OverlayStyle">
+                <div id="@_overlayIdString" @onclick="OnColorOverlayClick">
+                    @if (!Disabled && !ReadOnly)
+                    {
+                        <div>
                             <svg class="color-selector"
-                                    height="26"
-                                    width="26"
-                                    style="@SelectorStyle"
-                                    @onclick="OnSelectorClicked" @onclick:stopPropagation="true">
+                                 height="26"
+                                 width="26"
+                                 style="@SelectorStyle"
+                                 @onclick="OnSelectorClicked"
+                                 @onclick:stopPropagation="true">
                                 <defs>
                                     <filter id="color-selector-shadow" x="-50%" y="-50%" width="200%" height="200%">
                                         <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
@@ -30,14 +31,14 @@
                                 <circle r="10" cx="13" cy="13" stroke="white" stroke-width="1" fill="transparent" style="filter: url(#color-selector-shadow)" />
                                 <circle r="11" cx="13" cy="13" stroke="white" stroke-width="1.5" fill="transparent" />
                             </svg>
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
         <div class="color-controls">
             <div class="d-flex align-items-center">
-                <div class="color-swatch">
+                <div class="color-picker-swatch">
                     <div class="swatch-fill" style="@SwatchStyle"></div>
                 </div>
                 <div class="color-sliders">
@@ -82,80 +83,80 @@
                         break;
                     case ColorMode.HSL:
                         <NumericInput TValue="ushort"
-                                        Value="Hue"
-                                        ValueChanged="OnHueChanged"
-                                        Max="359"
-                                        HelpText="H"
-                                        Disabled="Disabled"
-                                        ReadOnly="ReadOnly"
-                                        Class="outlined dense"
-                                        ShowStepButtons="false"
-                                        ThemeColor="ThemeColor" />
+                                      Value="Hue"
+                                      ValueChanged="OnHueChanged"
+                                      Max="359"
+                                      HelpText="H"
+                                      Disabled="Disabled"
+                                      ReadOnly="ReadOnly"
+                                      Class="outlined dense"
+                                      ShowStepButtons="false"
+                                      ThemeColor="ThemeColor" />
                         <NumericInput TValue="byte"
-                                        Value="Saturation"
-                                        ValueChanged="OnSaturationChanged"
-                                        Max="100"
-                                        HelpText="S"
-                                        Disabled="Disabled"
-                                        ReadOnly="ReadOnly"
-                                        Class="outlined dense"
-                                        ShowStepButtons="false"
-                                        ThemeColor="ThemeColor" />
+                                      Value="Saturation"
+                                      ValueChanged="OnSaturationChanged"
+                                      Max="100"
+                                      HelpText="S"
+                                      Disabled="Disabled"
+                                      ReadOnly="ReadOnly"
+                                      Class="outlined dense"
+                                      ShowStepButtons="false"
+                                      ThemeColor="ThemeColor" />
                         <NumericInput TValue="byte"
-                                        Value="Lightness"
-                                        ValueChanged="OnLightnessChanged"
-                                        Max="100"
-                                        HelpText="L"
-                                        Disabled="Disabled"
-                                        ReadOnly="ReadOnly"
-                                        Class="outlined dense"
-                                        ShowStepButtons="false"
-                                        ThemeColor="ThemeColor" />
+                                      Value="Lightness"
+                                      ValueChanged="OnLightnessChanged"
+                                      Max="100"
+                                      HelpText="L"
+                                      Disabled="Disabled"
+                                      ReadOnly="ReadOnly"
+                                      Class="outlined dense"
+                                      ShowStepButtons="false"
+                                      ThemeColor="ThemeColor" />
                         break;
                     case ColorMode.RGB:
                         <NumericInput TValue="byte"
-                                        Value="Red"
-                                        ValueChanged="OnRedChanged"
-                                        HelpText="R"
-                                        Disabled="Disabled"
-                                        ReadOnly="ReadOnly"
-                                        Class="outlined dense"
-                                        ShowStepButtons="false"
-                                        ThemeColor="ThemeColor" />
+                                      Value="Red"
+                                      ValueChanged="OnRedChanged"
+                                      HelpText="R"
+                                      Disabled="Disabled"
+                                      ReadOnly="ReadOnly"
+                                      Class="outlined dense"
+                                      ShowStepButtons="false"
+                                      ThemeColor="ThemeColor" />
                         <NumericInput TValue="byte"
-                                        Value="Green"
-                                        ValueChanged="OnGreenChanged"
-                                        HelpText="G"
-                                        Disabled="Disabled"
-                                        ReadOnly="ReadOnly"
-                                        Class="outlined dense"
-                                        ShowStepButtons="false"
-                                        ThemeColor="ThemeColor" />
+                                      Value="Green"
+                                      ValueChanged="OnGreenChanged"
+                                      HelpText="G"
+                                      Disabled="Disabled"
+                                      ReadOnly="ReadOnly"
+                                      Class="outlined dense"
+                                      ShowStepButtons="false"
+                                      ThemeColor="ThemeColor" />
                         <NumericInput TValue="byte"
-                                        Value="Blue"
-                                        ValueChanged="OnBlueChanged"
-                                        HelpText="B"
-                                        Disabled="Disabled"
-                                        ReadOnly="ReadOnly"
-                                        Class="outlined dense"
-                                        ShowStepButtons="false"
-                                        ThemeColor="ThemeColor" />
+                                      Value="Blue"
+                                      ValueChanged="OnBlueChanged"
+                                      HelpText="B"
+                                      Disabled="Disabled"
+                                      ReadOnly="ReadOnly"
+                                      Class="outlined dense"
+                                      ShowStepButtons="false"
+                                      ThemeColor="ThemeColor" />
                         break;
                 }
                 @if (ShowAlpha && ColorMode != ColorMode.Hex)
                 {
                     <NumericInput TValue="float"
-                                    Value="Alpha"
-                                    ValueChanged="OnAlphaValueChanged"
-                                    Min="0"
-                                    Max="1"
-                                    Step="0.01f"
-                                    HelpText="A"
-                                    Disabled="Disabled"
-                                    ReadOnly="ReadOnly"
-                                    Class="outlined dense"
-                                    ShowStepButtons="false"
-                                    ThemeColor="ThemeColor" />
+                                  Value="Alpha"
+                                  ValueChanged="OnAlphaValueChanged"
+                                  Min="0"
+                                  Max="1"
+                                  Step="0.01f"
+                                  HelpText="A"
+                                  Disabled="Disabled"
+                                  ReadOnly="ReadOnly"
+                                  Class="outlined dense"
+                                  ShowStepButtons="false"
+                                  ThemeColor="ThemeColor" />
                 }
                 <button class="@CycleButtonClass" @onclick="OnCycleMode">
                     <tf-icon>@DefaultIcons.ModeSwitch</tf-icon>
@@ -175,6 +176,12 @@
          style="@(Inline ? "display:none" : null)"
          @onfocusin="OnFocusIn"
          @onfocusout="OnFocusOut">
+        @if (CurrentValue is not null && Alpha > 0)
+        {
+            <div class="color-picker-swatch small">
+                <div class="swatch-fill" style="@SwatchStyle"></div>
+            </div>
+        }
         <input disabled="@Disabled"
                name="@Name"
                hidden

@@ -160,7 +160,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     protected FormComponentBase() => _timer = new(OnTimerAsync, 300);
 
     /// <inheritdoc/>
-    public override Task SetParametersAsync(ParameterView parameters)
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
         if (ValueExpression is null)
         {
@@ -168,7 +168,17 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
             ValueExpression = () => _dummyModel.This_field!;
         }
 
-        return base.SetParametersAsync(parameters);
+        await base.SetParametersAsync(parameters);
+
+        if (!_initialParametersSet)
+        {
+            InitialValue = Value;
+            if (EditContext is not null)
+            {
+                EditContext.OnValidationStateChanged += OnValidationStateChanged;
+            }
+            _initialParametersSet = true;
+        }
     }
 
     /// <inheritdoc/>
@@ -177,16 +187,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         if (!IsNested)
         {
             Form?.Add(this);
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnParametersSet()
-    {
-        if (!_initialParametersSet)
-        {
-            InitialValue = Value;
-            _initialParametersSet = true;
         }
     }
 
@@ -279,7 +279,10 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
             {
                 _timer.Dispose();
                 Form?.Remove(this);
-                DetachValidationStateChangedListener();
+                if (EditContext is not null)
+                {
+                    EditContext.OnValidationStateChanged -= OnValidationStateChanged;
+                }
             }
 
             _disposedValue = true;
@@ -336,14 +339,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
 
     private protected string GetConversionValidationMessage()
         => string.Format(ConversionValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
-
-    private void DetachValidationStateChangedListener()
-    {
-        if (EditContext is not null)
-        {
-            EditContext.OnValidationStateChanged -= OnValidationStateChanged;
-        }
-    }
 
     private string? GetRequiredValidationMessage() => string.IsNullOrEmpty(RequiredValidationMessage)
         ? null

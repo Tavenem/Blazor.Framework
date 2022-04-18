@@ -57,6 +57,22 @@
     </ChildContent>
 </Collapse>
 
+<p>
+    You can assign an additional <code>UncheckedLabel</code>, which will appear to the left side of
+    the switch, for switches whose two states require individual labels.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Switch Label="Hot" UncheckedLabel="Cold" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Switch Label=""Hot"" UncheckedLabel=""Cold"" />")
+    </ChildContent>
+</Collapse>
+
 <Heading Level="HeadingLevel.H2">Disabled & read-only</Heading>
 
 <p>

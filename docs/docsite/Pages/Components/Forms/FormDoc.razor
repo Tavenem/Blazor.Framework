@@ -1,0 +1,100 @@
+﻿@page "/components/form"
+
+<PageTitle>Form - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Form</Heading>
+
+<p>
+    Tavenem Blazor Framework form components support three methods of form validation and submission.
+</p>
+
+<p>
+    They can also be used without any containing form element at all. Even <a
+    href="./components/validation">validation</a> can be used on a Tavenem Blazor Framework form
+    component without a containing form.
+</p>
+
+<Heading Level="HeadingLevel.H2">The Form component</Heading>
+
+<p>
+    The Tavenem Blazor Framework includes a <code>Form</code> component which wraps a native
+    <code>form</code> element, and also inherits from the built-in Blazor <code>EditForm</code>
+    component, in addition to powerful validation and data handling features of its own.
+</p>
+
+<p>
+    Unlike the built-in <code>EditForm</code> component, the Tavenem Blazor Framework
+    <code>Form</code> component does not require a <code>Model</code> or an
+    <code>EditContext</code>. Although it supports either, they are optional. When neither is
+    provided, a default <code>EditContext</code> is supplied to descendant form components.
+</p>
+
+<p>
+    For details on the validation capabilities of a <code>Form</code> component, see <a
+    href="./components/validation">validation</a>.
+</p>
+
+<p>
+    Forms provide a <code>FieldChanged</code> event callback which is raised whenever a contained
+    form component is modified. This works for both Tavenem Blazor Framework form components,
+    and also built-in Blazor form components.
+</p>
+
+<Heading Level="HeadingLevel.H3">Methods</Heading>
+
+<p>
+    The <code>IsModified</code> method determines whether any fields within the form have been
+    modified from their initial state. This works for both Tavenem Blazor Framework form components,
+    and also built-in Blazor form components. Modification of third-party input components
+    <em>may</em> be detected, if those components are designed to interact as expected with a
+    containing <code>EditContext</code>.
+</p>
+
+<p>
+    The <code>MarkAsUnmodified</code> method will reset the <code>IsTouched</code> property of all
+    Tavenem Blazor Framework form components within the form to <code>false</code>, which affects
+    how the <code>Required</code> property is treated during validation.
+</p>
+
+<p>
+    The <code>ResetAsync</code> method will reset all Tavenem Blazor Framework form components
+    within the form to their initial states. This also resets the fields' <code>IsTouched</code>
+    value to <code>false</code>.
+</p>
+
+<p>
+    Note that the <code>MarkAsUnmodified</code> and <code>ResetAsync</code> methods have no effect
+    on controls which do not implemnent the Tavenem Blazor Framework <code>IFormComponent</code>
+    interface, such as the native Blazor input components, or components from other libraries.
+</p>
+
+<Heading Level="HeadingLevel.H2">Blazor EditForm support</Heading>
+
+<p>
+    Tavenem Blazor Framework form components are designed to integrate fully with Blazor's built-in
+    <a
+    href="https://docs.microsoft.com/en-us/aspnet/core/blazor/forms-validation"><code>EditForm</code>
+    component</a>. If you are already using <code>EditForm</code>s for validation and form
+    submission, you can start using Tavenem Blazor Framework form components alongside the built-in
+    Blazor form components, or as replacements for the built-in components.
+</p>
+
+<Heading Level="HeadingLevel.H2">Native HTML forms</Heading>
+
+<p>
+    The simplest way to use Tavenem Blazor Framework form components is to include them in a native
+    HTML <code>form</code> element, with a <code>button</code> that has its <code>type</code>
+    attribute set to <code>submit</code>. All Tavenem Blazor Framework form components contain
+    native <code>input</code> elements at their core, with appropriate input types, and values in
+    the format expected for the input type, to facilitate basic data parsing and binding.
+</p>
+
+<p>
+    Set the <code>Name</code> property on your input components to ensure that their values
+    will be included in form submission events.
+</p>
+
+<p>
+    Note that submitting a native form usually causes a page redirect or refresh, which is not
+    usually desirable for single page applications such as Blazor.
+</p>

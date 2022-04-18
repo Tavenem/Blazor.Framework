@@ -26,6 +26,11 @@ public partial class Switch
     [Parameter] public string? UncheckedIcon { get; set; }
 
     /// <summary>
+    /// An optional label for the unchecked state.
+    /// </summary>
+    [Parameter] public string? UncheckedLabel { get; set; }
+
+    /// <summary>
     /// Focuses this input.
     /// </summary>
     public ValueTask FocusAsync() => ElementReference.FocusAsync();

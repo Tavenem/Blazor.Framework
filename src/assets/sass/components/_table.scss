@@ -1,22 +1,112 @@
 ﻿.table {
     --table-action-color: var(--tavenem-color-action);
     --table-bg-color: transparent;
+    --table-color-text: var(--tavenem-color-text);
     --table-border-color: var(--tavenem-color-border-table);
     --table-hover-color: var(--tavenem-color-table-hover);
-    --table-stripe-color: var(--tavenem-light-color-table-stripe);
+    --table-stripe-color: var(--tavenem-color-table-stripe);
     border-collapse: collapse;
     border-spacing: 0;
     display: table;
     overflow: auto;
-    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     width: 100%;
 
     thead {
         display: table-header-group;
+
+        tr:first-child {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+
+            > {
+                td, th {
+                    &:first-child {
+                        border-top-left-radius: inherit;
+                    }
+
+                    &:last-child {
+                        border-top-right-radius: inherit;
+                    }
+                }
+            }
+        }
     }
 
     tbody {
         display: table-row-group;
+
+        &:first-child {
+            tr:first-child {
+                border-top-left-radius: inherit;
+                border-top-right-radius: inherit;
+
+                > td {
+                    &:first-child {
+                        border-top-left-radius: inherit;
+                    }
+
+                    &:last-child {
+                        border-top-right-radius: inherit;
+                    }
+                }
+            }
+        }
+
+        &:last-child {
+            tr:last-child {
+                border-bottom: none;
+                border-bottom-left-radius: inherit;
+                border-bottom-right-radius: inherit;
+
+                > td {
+                    border-bottom: none;
+
+                    &:first-child {
+                        border-bottom-left-radius: inherit;
+                    }
+
+                    &:last-child {
+                        border-bottom-right-radius: inherit;
+                    }
+                }
+            }
+        }
+
+        tr:last-child {
+            border-bottom: none;
+
+            > td {
+                border-bottom: none;
+            }
+        }
+    }
+
+    tfoot {
+        tr:first-child > {
+            td, th {
+                border-top: 1px solid var(--table-border-color);
+            }
+        }
+
+        tr:last-child {
+            border-bottom: none;
+            border-bottom-left-radius: inherit;
+            border-bottom-right-radius: inherit;
+
+            > {
+                td, th {
+                    border-bottom: none;
+
+                    &:first-child {
+                        border-bottom-left-radius: inherit;
+                    }
+
+                    &:last-child {
+                        border-bottom-right-radius: inherit;
+                    }
+                }
+            }
+        }
     }
 
     tr {
@@ -102,42 +192,6 @@
                 }
             }
         }
-
-        &:last-child > td {
-            border-bottom: none;
-        }
-
-        &:first-child {
-            border-top: none;
-            border-top-left-radius: inherit;
-            border-top-right-radius: inherit;
-
-            > td {
-                &:first-child {
-                    border-top-left-radius: inherit;
-                }
-
-                &:last-child {
-                    border-top-right-radius: inherit;
-                }
-            }
-        }
-
-        &:last-child {
-            border-bottom: none;
-            border-bottom-left-radius: inherit;
-            border-bottom-right-radius: inherit;
-
-            > td {
-                &:first-child {
-                    border-bottom-left-radius: inherit;
-                }
-
-                &:last-child {
-                    border-bottom-right-radius: inherit;
-                }
-            }
-        }
     }
 
     &.dense tr > {
@@ -159,7 +213,7 @@
         border-color: var(--table-border-color) !important;
 
         tr {
-            td {
+            td, th {
                 border-right: 1px solid var(--table-border-color);
 
                 &:last-child {
@@ -169,7 +223,7 @@
         }
     }
 
-    &.striped tr:nth-of-type(odd) {
+    &.striped tr:nth-of-type(even) {
         background-color: var(--table-stripe-color);
 
         &:hover {
@@ -183,18 +237,23 @@
         max-height: 100%;
     }
 
-    &.sticky-header thead > th {
-        background-color: var(--table-bg-color);
-        position: sticky;
-        top: 0;
-        z-index: 2;
+    &.sticky-header thead {
+        td, th {
+            background-color: var(--tavenem-color-bg-alt);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
     }
 
-    &.sticky-footer tfoot > td {
-        background-color: var(--table-bg-color);
-        bottom: 0;
-        position: sticky;
-        z-index: 2;
+    &.sticky-footer tfoot {
+        td, th {
+            background-color: var(--tavenem-color-bg-alt);
+            color: var(--table-color-solid);
+            bottom: 0;
+            position: sticky;
+            z-index: 2;
+        }
     }
 
     > *:first-child {
@@ -283,6 +342,69 @@
             &.dense tr > td {
                 padding: 6px 1em;
             }
+        }
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    .table colgroup .column-#{$breakpoint} {
+        visibility: collapse;
+
+        @media (max-width: $min-width) {
+            visibility: visible;
+        }
+    }
+}
+
+.datagrid-toolbar {
+    align-items: center;
+    display: flex;
+    gap: .5rem;
+    justify-content: end;
+}
+
+.datagrid {
+    thead tf-icon {
+        color: var(--tavenem-color-action);
+        opacity: 0.4;
+        transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    .field.dense {
+        margin-bottom: 0;
+        margin-top: 0;
+
+        &:not(.filled, .outlined) > {
+            .input, .input-content {
+                margin-top: 0;
+            }
+        }
+
+        &:not(.outlined) > .input {
+            &:before {
+                content: none;
+            }
+
+            &:after {
+                content: none;
+            }
+        }
+
+        .input, .input-content {
+            font-size: inherit;
+        }
+    }
+
+    .expand-row {
+        transform: rotate(-90deg);
+        transition: .3s cubic-bezier(.25,.8,.5,1);
+
+        &.open {
+            transform: rotate(0deg);
         }
     }
 }
