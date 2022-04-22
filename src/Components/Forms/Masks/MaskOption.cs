@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -46,7 +47,7 @@ public record MaskOption
     /// <param name="pattern">
     /// A regular expression which the input must match in order for the corresponding mask to be applied.
     /// </param>
-    public MaskOption(string mask, int length, string? pattern = null)
+    public MaskOption(string mask, int length, [StringSyntax(StringSyntaxAttribute.Regex)] string? pattern = null)
     {
         Mask = mask;
         Length = length;
@@ -64,7 +65,7 @@ public record MaskOption
     /// <param name="pattern">
     /// A regular expression which the input must match in order for the corresponding mask to be applied.
     /// </param>
-    public MaskOption(string mask, string pattern)
+    public MaskOption(string mask, [StringSyntax(StringSyntaxAttribute.Regex)] string pattern)
     {
         Mask = mask;
         Pattern = string.IsNullOrEmpty(pattern)

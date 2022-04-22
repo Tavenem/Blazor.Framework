@@ -26,6 +26,11 @@ public static class DefaultIcons
     public static string Back { get; set; } = "chevron_left";
 
     /// <summary>
+    /// An icon for cancel buttons.
+    /// </summary>
+    public static string Cancel { get; set; } = "cancel";
+
+    /// <summary>
     /// A checked checkbox.
     /// </summary>
     public static string CheckBox_Checked { get; set; } = "check_box";
@@ -76,6 +81,11 @@ public static class DefaultIcons
     public static string Down { get; set; } = "keyboard_arrow_down";
 
     /// <summary>
+    /// An icon for edit buttons.
+    /// </summary>
+    public static string Edit { get; set; } = "edit";
+
+    /// <summary>
     /// <para>
     /// An icon for buttons which expand a region.
     /// </para>
@@ -84,6 +94,16 @@ public static class DefaultIcons
     /// </para>
     /// </summary>
     public static string Expand { get; set; } = "expand_more";
+
+    /// <summary>
+    /// <para>
+    /// An icon which indicates a false boolean value.
+    /// </para>
+    /// <para>
+    /// The default is an X.
+    /// </para>
+    /// </summary>
+    public static string False { get; set; } = "clear";
 
     /// <summary>
     /// A filter icon.
@@ -109,6 +129,16 @@ public static class DefaultIcons
     /// </para>
     /// </summary>
     public static string ImportExport { get; set; } = "import_export";
+
+    /// <summary>
+    /// <para>
+    /// An icon which indicates an indeterminate boolean value.
+    /// </para>
+    /// <para>
+    /// The default is a question mark.
+    /// </para>
+    /// </summary>
+    public static string Indeterminate { get; set; } = "question_mark";
 
     /// <summary>
     /// Indicates light mode.
@@ -171,6 +201,11 @@ public static class DefaultIcons
     public static string Radio_Unchecked { get; set; } = "radio_button_unchecked";
 
     /// <summary>
+    /// An icon for save buttons.
+    /// </summary>
+    public static string Save { get; set; } = "save";
+
+    /// <summary>
     /// A search icon: the default is a magnifying glass.
     /// </summary>
     public static string Search { get; set; } = "search";
@@ -224,6 +259,16 @@ public static class DefaultIcons
     /// An icon for today's date.
     /// </summary>
     public static string Today { get; set; } = "today";
+
+    /// <summary>
+    /// <para>
+    /// An icon which indicates a true boolean value.
+    /// </para>
+    /// <para>
+    /// The default is a checkmark.
+    /// </para>
+    /// </summary>
+    public static string True { get; set; } = "done";
 
     /// <summary>
     /// <para>

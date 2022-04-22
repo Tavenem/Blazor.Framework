@@ -85,6 +85,66 @@ public class DialogService
     /// <summary>
     /// Display a dialog.
     /// </summary>
+    /// <param name="type">The type of component to display as a dialog.</param>
+    /// <param name="title">The title to show in the header.</param>
+    /// <param name="parameters">
+    /// The parameters to pass to the dialog component.
+    /// </param>
+    /// <param name="options">The options to configure the dialog.</param>
+    /// <returns>A reference to the dialog.</returns>
+    public DialogReference Show(
+        Type type,
+        string? title = null,
+        DialogParameters? parameters = null,
+        DialogOptions? options = null)
+    {
+        if (!type.IsAssignableTo(typeof(ComponentBase)))
+        {
+            throw new ArgumentException($"{nameof(type)} must inherit from {typeof(ComponentBase).FullName}", nameof(type));
+        }
+        var reference = new DialogReference(this);
+        var content = new RenderFragment(builder =>
+        {
+            var i = 0;
+            builder.OpenComponent(i++, type);
+            if (parameters is not null)
+            {
+                if (!reference.AreParametersRendered)
+                {
+                    foreach (var parameter in parameters)
+                    {
+                        builder.AddAttribute(i++, parameter.Key, parameter.Value);
+                    }
+                    reference.AreParametersRendered = true;
+                }
+                else
+                {
+                    i += parameters.Count;
+                }
+            }
+            builder.AddComponentReferenceCapture(i++, component => reference.InjectDialog(component));
+            builder.CloseComponent();
+        });
+        var instance = new RenderFragment(builder =>
+        {
+            builder.OpenComponent<DialogInstance>(0);
+            builder.SetKey(reference.Id);
+            builder.AddAttribute(1, nameof(DialogInstance.ChildContent), content);
+            builder.AddAttribute(2, nameof(DialogInstance.Id), reference.Id);
+            builder.AddAttribute(3, nameof(DialogInstance.Options), options ?? new());
+            builder.AddAttribute(4, nameof(DialogInstance.Title), title);
+            builder.CloseComponent();
+        });
+        reference.InjectRenderFragment(instance);
+
+        OnDialogAdded?.Invoke(reference);
+
+        return reference;
+    }
+
+    /// <summary>
+    /// Display a dialog.
+    /// </summary>
     /// <typeparam name="TComponent">
     /// The type of component to display as a dialog.
     /// </typeparam>

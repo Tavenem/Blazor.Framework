@@ -11,6 +11,10 @@ interface IBoundingClientRect extends DOMRect {
     windowWidth: number;
 }
 
+interface DotNetStreamReference {
+    arrayBuffer(): Promise<ArrayBuffer>;
+}
+
 class ElementReference {
     eventListeners: Record<number, EventListener>;
     listenerId: number;
@@ -207,6 +211,25 @@ export function changeCssVariable(element: HTMLElement, name: string, newValue: 
     elementReference.changeCssVariable(element, name, newValue);
 }
 
+export async function downloadStream(fileName: string, fileType: string, streamReference: DotNetStreamReference) {
+    const buffer = await streamReference.arrayBuffer();
+    const file = new File([buffer], fileName, { type: fileType });
+    const url = URL.createObjectURL(file);
+    downloadUrl(fileName, url);
+    URL.revokeObjectURL(url);
+}
+
+export function downloadUrl(fileName: string, url: string, open?: boolean) {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.target = "_blank";
+    if (!open) {
+        anchor.download = fileName ?? '';
+    }
+    anchor.click();
+    anchor.remove();
+}
+
 export function focusFirstElement(element: HTMLElement, skip = 0, min = 0) {
     elementReference.focusFirst(element, skip, min);
 }
@@ -237,6 +260,19 @@ export function elementHasFixedAncestors(element: Node | null) {
 
 export function open(url?: string, target?: string, features?: string) {
     window.open(url, target, features);
+}
+
+export async function openStream(fileName: string, fileType: string, streamReference: DotNetStreamReference, revoke: boolean) {
+    const buffer = await streamReference.arrayBuffer();
+    const file = new File([buffer], fileName, { type: fileType });
+    const url = URL.createObjectURL(file);
+    downloadUrl(fileName, url, true);
+    if (revoke) {
+        URL.revokeObjectURL(url);
+        return '';
+    } else {
+        return url;
+    }
 }
 
 export function registerComponents() {
@@ -679,6 +715,10 @@ export function removeEventListenerById(elementId: string, event: string, eventI
 
 export function restoreElementFocus(element: IFocusableElement) {
     elementReference.restoreFocus(element);
+}
+
+export function revokeURL(url: string) {
+    URL.revokeObjectURL(url);
 }
 
 export function saveElementFocus(element: IFocusableElement) {

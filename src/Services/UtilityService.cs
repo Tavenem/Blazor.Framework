@@ -38,6 +38,59 @@ public class UtilityService : IAsyncDisposable
     }
 
     /// <summary>
+    /// Downloads the given stream to the client.
+    /// </summary>
+    /// <param name="fileName">The name for the file.</param>
+    /// <param name="fileType">The mime type of the file.</param>
+    /// <param name="streamReference">
+    /// A <see cref="DotNetStreamReference"/> wrapping a stream.
+    /// </param>
+    public async ValueTask DownloadAsync(string fileName, string fileType, DotNetStreamReference streamReference)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module
+            .InvokeVoidAsync("downloadStream", fileName, fileType, streamReference)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Downloads the given URL to the client.
+    /// </summary>
+    /// <param name="fileName">The name for the file.</param>
+    /// <param name="url">
+    /// A URL which points to a downloadable file.
+    /// </param>
+    public async ValueTask DownloadAsync(string fileName, string url)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module
+            .InvokeVoidAsync("downloadUrl", fileName, url)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Opens the given stream in a new window, if the browser supports viewing the file type.
+    /// Otherwise the file is normally downloaded.
+    /// </summary>
+    /// <param name="fileName">The name for the file.</param>
+    /// <param name="fileType">The mime type of the file.</param>
+    /// <param name="streamReference">
+    /// A <see cref="DotNetStreamReference"/> wrapping a stream.
+    /// </param>
+    /// <param name="revoke">Whether to immediately revoke the allocated object URL.</param>
+    public async ValueTask<string?> OpenAsync(
+        string fileName,
+        string fileType,
+        DotNetStreamReference streamReference,
+        bool revoke = true)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        return await module
+            .InvokeAsync<string>("openStream", fileName, fileType, streamReference, revoke)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Open a link.
     /// </summary>
     /// <param name="url">
@@ -107,6 +160,18 @@ public class UtilityService : IAsyncDisposable
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module
             .InvokeVoidAsync("open", url, target, features)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Revokes a previously allocated object URL.
+    /// </summary>
+    /// <param name="url">The URL to revoke.</param>
+    public async ValueTask RevokeURLAsync(string url)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module
+            .InvokeVoidAsync("revokeURL", url)
             .ConfigureAwait(false);
     }
 

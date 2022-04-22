@@ -11,190 +11,198 @@
     overflow: auto;
     width: 100%;
 
-    thead {
-        display: table-header-group;
+    > {
+        thead {
+            display: table-header-group;
 
-        tr:first-child {
-            border-top-left-radius: inherit;
-            border-top-right-radius: inherit;
-
-            > {
-                td, th {
-                    &:first-child {
-                        border-top-left-radius: inherit;
-                    }
-
-                    &:last-child {
-                        border-top-right-radius: inherit;
-                    }
-                }
-            }
-        }
-    }
-
-    tbody {
-        display: table-row-group;
-
-        &:first-child {
             tr:first-child {
                 border-top-left-radius: inherit;
                 border-top-right-radius: inherit;
 
-                > td {
-                    &:first-child {
-                        border-top-left-radius: inherit;
-                    }
+                > {
+                    td, th {
+                        &:first-child {
+                            border-top-left-radius: inherit;
+                        }
 
-                    &:last-child {
-                        border-top-right-radius: inherit;
+                        &:last-child {
+                            border-top-right-radius: inherit;
+                        }
                     }
                 }
             }
         }
 
-        &:last-child {
+        tbody {
+            display: table-row-group;
+
+            &:first-child {
+                tr:first-child {
+                    border-top-left-radius: inherit;
+                    border-top-right-radius: inherit;
+
+                    > td {
+                        &:first-child {
+                            border-top-left-radius: inherit;
+                        }
+
+                        &:last-child {
+                            border-top-right-radius: inherit;
+                        }
+                    }
+                }
+            }
+
+            &:last-child {
+                tr:last-child {
+                    border-bottom: none;
+                    border-bottom-left-radius: inherit;
+                    border-bottom-right-radius: inherit;
+
+                    > td {
+                        border-bottom: none;
+
+                        &:first-child {
+                            border-bottom-left-radius: inherit;
+                        }
+
+                        &:last-child {
+                            border-bottom-right-radius: inherit;
+                        }
+                    }
+                }
+            }
+
+            tr:last-child {
+                border-bottom: none;
+
+                > td {
+                    border-bottom: none;
+                }
+            }
+        }
+
+        tfoot {
+            tr:first-child > {
+                td, th {
+                    border-top: 1px solid var(--table-border-color);
+                }
+            }
+
             tr:last-child {
                 border-bottom: none;
                 border-bottom-left-radius: inherit;
                 border-bottom-right-radius: inherit;
 
-                > td {
-                    border-bottom: none;
+                > {
+                    td, th {
+                        border-bottom: none;
 
-                    &:first-child {
-                        border-bottom-left-radius: inherit;
-                    }
+                        &:first-child {
+                            border-bottom-left-radius: inherit;
+                        }
 
-                    &:last-child {
-                        border-bottom-right-radius: inherit;
+                        &:last-child {
+                            border-bottom-right-radius: inherit;
+                        }
                     }
                 }
             }
         }
 
-        tr:last-child {
-            border-bottom: none;
+        tr {
+            color: inherit;
+            display: table-row;
+            outline: 0;
+            vertical-align: middle;
 
-            > td {
-                border-bottom: none;
+            &.selected {
+                --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+                background-color: var(--tavenem-theme-color-hover, var(--table-bg-color));
+                color: var(--tavenem-theme-color, var(--tavenem-color-text));
             }
-        }
-    }
-
-    tfoot {
-        tr:first-child > {
-            td, th {
-                border-top: 1px solid var(--table-border-color);
-            }
-        }
-
-        tr:last-child {
-            border-bottom: none;
-            border-bottom-left-radius: inherit;
-            border-bottom-right-radius: inherit;
 
             > {
                 td, th {
-                    border-bottom: none;
+                    border-bottom: 1px solid var(--table-border-color);
+                    color: inherit;
+                    display: table-cell;
+                    font-size: 0.875em;
+                    font-weight: var(--tavenem-font-weight);
+                    line-height: 1.43;
+                    padding: 1rem;
+                    text-align: start;
+                    vertical-align: inherit;
 
-                    &:first-child {
-                        border-bottom-left-radius: inherit;
+                    .btn, .btn-text {
+                        margin: -1em;
+                        padding: 0;
                     }
 
-                    &:last-child {
-                        border-bottom-right-radius: inherit;
-                    }
-                }
-            }
-        }
-    }
-
-    tr {
-        color: inherit;
-        display: table-row;
-        outline: 0;
-        vertical-align: middle;
-
-        > {
-            td, th {
-                border-bottom: 1px solid var(--table-border-color);
-                color: inherit;
-                display: table-cell;
-                font-size: 0.875em;
-                font-weight: var(--tavenem-font-weight);
-                line-height: 1.43;
-                padding: 1rem;
-                text-align: start;
-                vertical-align: inherit;
-
-                .btn, .btn-text {
-                    margin: -1em;
-                    padding: 0;
-                }
-
-                .btn-icon {
-                    margin: -.75em;
-                    padding: 0;
-                }
-
-                .field {
-                    margin-bottom: 0;
-                    margin-top: 2px;
-
-                    > .input {
-                        font-size: .875em;
-                    }
-                }
-            }
-
-            th {
-                font-weight: var(--tavenem-font-weight-bold);
-                line-height: 1.5em;
-
-                &.column-header {
-                    align-items: center;
-                    display: flex;
-                    justify-content: space-between;
-
-                    &.clickable {
-                        cursor: pointer;
+                    .btn-icon {
+                        margin: -.75em;
+                        padding: 0;
                     }
 
-                    &:hover {
-                        color: var(--table-action-color);
+                    .field {
+                        margin-bottom: 0;
+                        margin-top: 2px;
 
-                        tf-icon:not(.active) {
-                            opacity: 0.8;
+                        > .input {
+                            font-size: .875em;
                         }
                     }
+                }
 
-                    tf-icon {
-                        font-size: 1.125em;
-                        margin-left: 4px;
-                        margin-right: 4px;
-                        opacity: 0;
-                        transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-                        user-select: none;
+                th {
+                    font-weight: var(--tavenem-font-weight-bold);
+                    line-height: 1.5em;
 
-                        &.active {
-                            opacity: 1;
-                        }
-
-                        &.desc {
-                            transform: rotate(180deg);
-                        }
-                    }
-
-                    > .options {
+                    &.column-header {
                         align-items: center;
-                        display: inline-flex;
+                        display: flex;
+                        justify-content: space-between;
+
+                        &.clickable {
+                            cursor: pointer;
+                        }
+
+                        &:hover {
+                            color: var(--table-action-color);
+
+                            tf-icon:not(.active) {
+                                opacity: 0.8;
+                            }
+                        }
+
+                        tf-icon {
+                            font-size: 1.125em;
+                            margin-left: 4px;
+                            margin-right: 4px;
+                            opacity: 0;
+                            transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+                            user-select: none;
+
+                            &.active {
+                                opacity: 1;
+                            }
+
+                            &.desc {
+                                transform: rotate(180deg);
+                            }
+                        }
+
+                        > .options {
+                            align-items: center;
+                            display: inline-flex;
+                        }
                     }
                 }
             }
         }
     }
 
-    &.dense tr > {
+    &.dense > tr > {
         td, th {
             padding-bottom: 6px;
             padding-top: 6px;
@@ -205,14 +213,14 @@
         }
     }
 
-    &.hover tr:hover {
+    &.hover > tr:hover {
         background-color: var(--table-hover-color);
     }
 
     &.border {
         border-color: var(--table-border-color) !important;
 
-        tr {
+        > tr {
             td, th {
                 border-right: 1px solid var(--table-border-color);
 
@@ -223,7 +231,7 @@
         }
     }
 
-    &.striped tr:nth-of-type(even) {
+    &.striped > tr:nth-of-type(even) {
         background-color: var(--table-stripe-color);
 
         &:hover {
@@ -237,7 +245,7 @@
         max-height: 100%;
     }
 
-    &.sticky-header thead {
+    &.sticky-header > thead {
         td, th {
             background-color: var(--tavenem-color-bg-alt);
             position: sticky;
@@ -246,7 +254,7 @@
         }
     }
 
-    &.sticky-footer tfoot {
+    &.sticky-footer > tfoot {
         td, th {
             background-color: var(--tavenem-color-bg-alt);
             color: var(--table-color-solid);
@@ -272,6 +280,12 @@
         --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
         background-color: var(--tavenem-theme-color-hover, var(--table-bg-color));
         color: var(--tavenem-theme-color, var(--tavenem-color-text));
+
+        > tr.selected {
+            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+            background-color: var(--tavenem-theme-color-hover-bright, var(--table-bg-color));
+            color: var(--tavenem-theme-color, var(--tavenem-color-text));
+        }
     }
 
     &.outlined {
@@ -301,57 +315,49 @@
 @each $breakpoint, $max-width in $breakpoint-maxs {
     .table-#{$breakpoint} {
         @media (max-width: $max-width) {
-            thead, tfoot {
-                display: none;
-            }
+            > {
+                thead, tfoot {
+                    display: none;
+                }
 
-            tbody {
-                border-top: 1px solid var(--table-border-color);
-            }
+                tbody {
+                    border-top: 1px solid var(--table-border-color);
+                }
 
-            tr {
-                display: initial;
+                tr {
+                    display: initial;
 
-                > td {
-                    align-items: center;
-                    border: none;
-                    display: flex;
-                    justify-content: space-between;
-                    padding: .875em 1em;
-                    text-align: start !important;
+                    > td {
+                        align-items: center;
+                        border: none;
+                        display: flex;
+                        justify-content: space-between;
+                        padding: .875em 1em;
+                        text-align: start !important;
 
-                    &:last-child {
-                        border-bottom: 1px solid var(--table-border-color);
-                    }
+                        &:last-child {
+                            border-bottom: 1px solid var(--table-border-color);
+                        }
 
-                    &:before {
-                        content: attr(data-label);
-                        font-weight: var(--tavenem-font-weight-bold);
-                        padding-inline-end: 1em;
-                    }
+                        &:before {
+                            content: attr(data-label);
+                            font-weight: var(--tavenem-font-weight-bold);
+                            padding-inline-end: 1em;
+                        }
 
-                    &.hide-xs {
-                        height: 0;
-                        margin: 0;
-                        padding: 0;
-                        visibility: collapse;
+                        &.hide-xs {
+                            height: 0;
+                            margin: 0;
+                            padding: 0;
+                            visibility: collapse;
+                        }
                     }
                 }
             }
 
-            &.dense tr > td {
+            &.dense > tr > td {
                 padding: 6px 1em;
             }
-        }
-    }
-}
-
-@each $breakpoint, $min-width in $breakpoints {
-    .table colgroup .column-#{$breakpoint} {
-        visibility: collapse;
-
-        @media (max-width: $min-width) {
-            visibility: visible;
         }
     }
 }

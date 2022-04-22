@@ -194,14 +194,13 @@ public partial class ElementList<TListItem>
     /// this will contain an arbitrary item among the selection.
     /// </para>
     /// </summary>
-    public TListItem? SelectedItem => _selectedItems.FirstOrDefault();
+    [Parameter] public TListItem? SelectedItem { get; set; }
 
     /// <summary>
     /// Invoked when <see cref="SelectedItem"/> changes.
     /// </summary>
     [Parameter] public EventCallback<TListItem?> SelectedItemChanged { get; set; }
 
-    private readonly List<TListItem> _selectedItems = new();
     /// <summary>
     /// <para>
     /// The currently-selected items.
@@ -215,7 +214,7 @@ public partial class ElementList<TListItem>
     /// this will always contain only one item.
     /// </para>
     /// </summary>
-    public IEnumerable<TListItem> SelectedItems => _selectedItems;
+    [Parameter] public List<TListItem> SelectedItems { get; set; } = new();
 
     /// <summary>
     /// Invoked when <see cref="SelectedItems"/> changes.
@@ -337,7 +336,7 @@ public partial class ElementList<TListItem>
     {
         var selectedItemChanged = false;
         TListItem? newSelectedItem = default;
-        if (!parameters.TryGetValue<IEnumerable<TListItem>>(nameof(SelectedItems), out var newSelectedItems)
+        if (!parameters.TryGetValue<List<TListItem>>(nameof(SelectedItems), out var newSelectedItems)
             && parameters.TryGetValue(nameof(SelectedItem), out newSelectedItem)
             && !EqualityComparer<TListItem>.Default.Equals(newSelectedItem, SelectedItem))
         {
@@ -356,31 +355,30 @@ public partial class ElementList<TListItem>
         }
     }
 
-    /// <summary>
-    /// Method invoked when the component has received parameters from its parent in the render
-    /// tree, and the incoming values have been assigned to properties.
-    /// </summary>
-    /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
+    /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
         if (Items is null)
         {
-            if (_selectedItems.Count > 0)
+            if (SelectedItems.Count > 0)
             {
-                _selectedItems.Clear();
+                SelectedItem = default;
+                SelectedItems.Clear();
                 await SelectedItemChanged.InvokeAsync(SelectedItem);
                 await SelectedItemsChanged.InvokeAsync(SelectedItems);
             }
             return;
         }
 
-        var remaining = _selectedItems.Intersect(Items).ToList();
-        if (remaining.Count == _selectedItems.Count)
+        var remaining = SelectedItems.Intersect(Items).ToList();
+        if (remaining.Count == SelectedItems.Count)
         {
             return;
         }
-        _selectedItems.Clear();
-        _selectedItems.AddRange(remaining);
+        SelectedItems.Clear();
+        SelectedItems.AddRange(remaining);
+        SelectedItem = SelectedItems.FirstOrDefault();
+
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
     }
@@ -399,20 +397,21 @@ public partial class ElementList<TListItem>
     /// </param>
     public async Task SetSelectionAsync(TListItem? selectedItem)
     {
-        if (_selectedItems.Count == 0
+        if (SelectedItems.Count == 0
             && selectedItem is null)
         {
             return;
         }
 
-        if (_selectedItems.Count == 1
-            && _selectedItems[0]?.Equals(selectedItem) == true)
+        if (SelectedItems.Count == 1
+            && SelectedItems[0]?.Equals(selectedItem) == true)
         {
             return;
         }
 
-        var hadSelection = _selectedItems.Count > 0;
-        _selectedItems.Clear();
+        var hadSelection = SelectedItems.Count > 0;
+        SelectedItems.Clear();
+        SelectedItem = default;
 
         if (selectedItem is null
             || Items?.Contains(selectedItem) != true)
@@ -426,7 +425,8 @@ public partial class ElementList<TListItem>
             return;
         }
 
-        _selectedItems.Add(selectedItem);
+        SelectedItem = selectedItem;
+        SelectedItems.Add(selectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -443,17 +443,20 @@ public partial class ElementList<TListItem>
     /// Any items not in the current set of <see cref="Items"/> is not added to the selection.
     /// </para>
     /// </param>
-    public async Task SetSelectionAsync(IEnumerable<TListItem> selectedItems)
+    public async Task SetSelectionAsync(List<TListItem>? selectedItems)
     {
+        selectedItems ??= new();
         if (Items is null
-            || (!_selectedItems.Except(selectedItems).Any()
-            && !selectedItems.Except(_selectedItems).Any()))
+            || (!SelectedItems.Except(selectedItems).Any()
+            && !selectedItems.Except(SelectedItems).Any()))
         {
             return;
         }
 
-        _selectedItems.Clear();
-        _selectedItems.AddRange(selectedItems.Intersect(Items));
+        SelectedItems.Clear();
+        SelectedItems.AddRange(selectedItems.Intersect(Items));
+        SelectedItem = SelectedItems.FirstOrDefault();
+
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -530,22 +533,27 @@ public partial class ElementList<TListItem>
             return;
         }
 
-        if (_selectedItems.Contains(item))
+        if (SelectedItems.Contains(item))
         {
-            if (force || !Required || _selectedItems.Count > 1)
+            if (force || !Required || SelectedItems.Count > 1)
             {
-                _selectedItems.Remove(item);
-                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                if (SelectedItems.IndexOf(item) == 0)
+                {
+                    SelectedItem = default;
+                    await SelectedItemChanged.InvokeAsync(SelectedItem);
+                }
+                SelectedItems.Remove(item);
                 await SelectedItemsChanged.InvokeAsync(SelectedItems);
             }
         }
         else
         {
-            if (SelectionType == SelectionType.Single && _selectedItems.Count > 0)
+            if (SelectionType == SelectionType.Single && SelectedItems.Count > 0)
             {
-                _selectedItems.Clear();
+                SelectedItems.Clear();
             }
-            _selectedItems.Add(item);
+            SelectedItems.Add(item);
+            SelectedItem = SelectedItems.FirstOrDefault();
             await SelectedItemChanged.InvokeAsync(SelectedItem);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
@@ -556,10 +564,14 @@ public partial class ElementList<TListItem>
 
     internal async Task RemoveItemAsync(TListItem item)
     {
-        if (_selectedItems.Contains(item))
+        if (SelectedItems.Contains(item))
         {
-            _selectedItems.Remove(item);
-            await SelectedItemChanged.InvokeAsync(SelectedItem);
+            if (SelectedItems.IndexOf(item) == 0)
+            {
+                SelectedItem = default;
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+            }
+            SelectedItems.Remove(item);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
         if (Items?.Contains(item) == true)

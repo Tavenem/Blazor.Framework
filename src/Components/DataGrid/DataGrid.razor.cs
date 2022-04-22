@@ -1,46 +1,62 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Reflection;
+using System.Text;
 using Tavenem.Blazor.Framework.Components.DataGrid;
 using Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// Invoked when a <see cref="DataGrid{TDataItem}"/> loads items.
+/// A rich data grid for displaying collections of items in rows and columns.
 /// </summary>
-/// <typeparam name="TDataItem">
-/// The type of data item.
-/// </typeparam>
-/// <param name="count">The number of items requested.</param>
-/// <param name="offset">The number of items to skip.</param>
-/// <param name="columns">
-/// <para>
-/// A list of property names which should be included.
-/// </para>
-/// <para>
-/// If omitted the results may contain all properties, or a predetermined selection of properties.
-/// </para>
-/// </param>
-/// <param name="sortBy">
-/// <para>
-/// A property by which the data should be sorted.
-/// </para>
-/// <para>
-/// If omitted the results may be unsorted, or sorted by a predetermined property.
-/// </para>
-/// </param>
-public delegate Task<DataPage<TDataItem>> GetDataItemsDelegate<TDataItem>(int count, int offset, string[]? columns, SortInfo? sortBy);
-
-public partial class DataGrid<TDataItem> where TDataItem : new()
+/// <typeparam name="TDataItem">The type of data item.</typeparam>
+public partial class DataGrid<TDataItem> : IAsyncDisposable
 {
-    private readonly List<Column<TDataItem>> _columns = new();
+    private const string HtmlTemplate = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <meta charset="utf-8"/>
+        <title>{0}</title>
+        </head>
+        <body style="margin:0;padding:0">
+        {1}
+        <table style="padding:2rem 2rem 0 2rem;width:100%">
+        <thead>
+        <tr>
+        {2}
+        </tbody>
+        </table>
+        </body>
+        </html>
+        """;
 
+    private readonly HashSet<int> _rowCurrentExpansion = new();
+    private readonly HashSet<int> _rowExpansion = new();
+    private readonly HashSet<int> _groupExpansion = new();
+    private readonly List<string> _objectUrls = new();
+    private readonly List<Guid> _sortOrder = new();
+
+    private bool _disposedValue;
     private bool _isColumnFilterDialogVisible;
+    private bool _isEditDialogVisible;
+    private bool _isExportDialogVisible;
+    private bool _isExportTooLargeDialogVisible;
+    private bool _nullGroupExpanded;
 
     /// <summary>
     /// <para>
-    /// When <see langword="true"/> an add button appears in the header which shows the edit dialog,
-    /// and invokes the <see cref="ItemAdded"/> callback if the dialog is submitted with valid data.
+    /// When <see langword="true"/> an add button appears in the header.
+    /// </para>
+    /// <para>
+    /// If a custom <see cref="EditDialog"/> has been provided, that dialog is displayed. It is up
+    /// to the implementer to perform appropriate actions in the custom dialog.
+    /// </para>
+    /// <para>
+    /// If no custom dialog is present, the default edit dialog is displayed, and the <see
+    /// cref="ItemAdded"/> callback is invoked if the dialog is submitted with valid data.
     /// </para>
     /// <para>
     /// Default is <see langword="false"/>.
@@ -50,13 +66,75 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
 
     /// <summary>
     /// <para>
-    /// Whether all rows have expanded content.
+    /// When <see langword="true"/> an edit button appears at the beginning of each row.
     /// </para>
     /// <para>
-    /// Ignored if <see cref="ExpandedContent"/> is <see langword="null"/>.
+    /// If a custom <see cref="EditDialog"/> has been provided, that dialog is displayed. It is up
+    /// to the implementer to perform appropriate actions in the custom dialog.
+    /// </para>
+    /// <para>
+    /// If no custom dialog is present, and <see cref="AllowInlineEdit"/> is <see langword="true"/>,
+    /// and all columns are currently shown, inline editing is enabled for the row. The <see
+    /// cref="ItemSaved"/> callback is invoked if the row's save button is activated with valid data
+    /// in all columns.
+    /// </para>
+    /// <para>
+    /// If any columns are currently hidden, the default edit dialog is displayed, and the <see
+    /// cref="ItemSaved"/> callback is invoked if the dialog is submitted with valid data.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
     /// </para>
     /// </summary>
-    [Parameter] public bool AllRowsExpand { get; set; }
+    [Parameter] public bool AllowEdit { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// When <see langword="true"/> an export button appears in the header which displays an export
+    /// dialog.
+    /// </para>
+    /// <para>
+    /// Exporting to CSV, Excel, and HTML formats is supported by default. These formats include the
+    /// current set of visible columns, plus any columns with <see
+    /// cref="IColumn{TDataItem}.ExportHidden"/> set to <see langword="true"/>. All data which
+    /// matches the current set of filters is included, in the curent sort order. If <see
+    /// cref="LoadItems"/> is not <see langword="null"/> a new call is made which attempts to fetch
+    /// all matching items, rather than just the items for the current page.
+    /// </para>
+    /// <para>
+    /// Exporting to PDF is also supported if the <see cref="PdfExport"/> property is assigned.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool AllowExport { get; set; } = true;
+
+    /// <summary>
+    /// <para>
+    /// When this property and <see cref="AllowEdit"/> are both <see langword="true"/>, and <see
+    /// cref="EditDialog"/> is <see langword="null"/>, and when all columns are currently shown,
+    /// inline editing is enabled. The <see cref="ItemAdded"/> callback is invoked if the row's save
+    /// button is activated with valid data in all columns.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool AllowInlineEdit { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// When <see langword="true"/>, if any column has <see
+    /// cref="IColumn{TDataItem}.IsQuickFilter"/> set to <see langword="true"/>, a universal search
+    /// box will appear in the data table header and will filter the data by items which have each
+    /// (space delimited) term in the query in at least one quick filter column.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool AllowSearch { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -70,14 +148,23 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
 
     /// <summary>
     /// <para>
-    /// A component to use as the edit dialog for a row.
+    /// The type of a component to use as the edit dialog for a row.
     /// </para>
     /// <para>
-    /// If a component is provided inline editing is disabled. Initiating a row edit will display
+    /// Must descend from <see cref="ComponentBase"/>.
+    /// </para>
+    /// <para>
+    /// Should have an optional (i.e. nullable) parameter of type <typeparamref name="TDataItem"/>
+    /// with the name "Item" which receives the item to be edited. This parameter is expected to be
+    /// <see langword="null"/> when the dialog is used to create a new item (if <see
+    /// cref="AllowAdd"/> is <see langword="true"/>).
+    /// </para>
+    /// <para>
+    /// If a component is provided, inline editing is disabled. Initiating a row edit will display
     /// this component as a dialog.
     /// </para>
     /// </summary>
-    [Parameter] public ComponentBase? EditDialog { get; set; }
+    [Parameter] public Type? EditDialog { get; set; }
 
     /// <summary>
     /// This optional content is displayed when a row is expanded.
@@ -120,8 +207,8 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     /// This optional function is used to determine which rows have expanded content.
     /// </para>
     /// <para>
-    /// Alternatively, the <see cref="AllRowsExpand"/> property can be set to <see langword="true"/>
-    /// to bypass case-by-case invocation of this function.
+    /// If left <see langword="null"/> and <see cref="ExpandedContent"/> is not <see
+    /// langword="null"/>, it is assumed that all rows can expand.
     /// </para>
     /// <para>
     /// Ignored if <see cref="ExpandedContent"/> is <see langword="null"/>.
@@ -130,9 +217,24 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     [Parameter] public Func<TDataItem, bool>? HasExpandedContent { get; set; }
 
     /// <summary>
+    /// Optional content to display in the header.
+    /// </summary>
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Optional content to include as a header in HTML-format exports.
+    /// </para>
+    /// <para>
+    /// Can include HTML markupm, but take care to sanitize any user-provided content.
+    /// </para>
+    /// </summary>
+    [Parameter] public string? HtmlHeaderContent { get; set; }
+
+    /// <summary>
     /// Whether the table is currently loading data via <see cref="LoadItems"/>.
     /// </summary>
-    public bool IsLoading { get; set; }
+    public bool IsLoading { get; protected set; }
 
     /// <summary>
     /// <para>
@@ -141,8 +243,14 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     /// <para>
     /// This can only be invoked if <see cref="AllowAdd"/> has been set to <see langword="true"/>.
     /// </para>
+    /// <para>
+    /// Note: when <see cref="LoadItems"/> is <see langword="null"/> the newly added item is added
+    /// to the <see cref="Items"/> list. The item will appear in its proper place in the grid. When
+    /// <see cref="LoadItems"/> <em>is</em> set, however, the newly added item is simply added to
+    /// the current page, to avoid a potentially expensive call.
+    /// </para>
     /// </summary>
-    [Parameter] public Action<TDataItem>? ItemAdded { get; set; }
+    [Parameter] public EventCallback<TDataItem> ItemAdded { get; set; }
 
     /// <summary>
     /// <para>
@@ -153,12 +261,22 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     /// cref="LoadItems"/>.
     /// </para>
     /// </summary>
-    public List<TDataItem> Items { get; set; } = new();
+    [Parameter] public List<TDataItem> Items { get; set; } = new();
+
+    /// <summary>
+    /// <para>
+    /// Raised when an item has been edited and the changes are being committed.
+    /// </para>
+    /// <para>
+    /// This can only be invoked if <see cref="AllowEdit"/> has been set to <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public EventCallback<TDataItem> ItemSaved { get; set; }
 
     /// <summary>
     /// A function to load data items asynchronously.
     /// </summary>
-    [Parameter] public GetDataItemsDelegate<TDataItem>? LoadItems { get; set; }
+    [Parameter] public Func<DataGridRequest, Task<DataPage<TDataItem>>>? LoadItems { get; set; }
 
     /// <summary>
     /// <para>
@@ -169,6 +287,30 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     /// </para>
     /// </summary>
     [Parameter] public RenderFragment? NoDataContent { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// If provided, an option to export a PDF is available (as well as CSV or Excel, which are
+    /// built-in).
+    /// </para>
+    /// <para>
+    /// The function should return a <see cref="Task{TResult}"/> which resolves to a <see
+    /// cref="Stream"/> containing the PDF bytes.
+    /// </para>
+    /// </summary>
+    [Parameter] public Func<DataGridRequest, Task<Stream>>? PdfExport { get; set; }
+
+    /// <summary>
+    /// If any column has <see cref="IColumn{TDataItem}.IsQuickFilter"/> set to <see
+    /// langword="true"/>, the data will include only items which have each (space delimited) term
+    /// in this value in at least one quick filter column.
+    /// </summary>
+    [Parameter] public string? QuickFilter { get; set; }
+
+    /// <summary>
+    /// An optional function which gets a CSS class for a given data item (row).
+    /// </summary>
+    [Parameter] public Func<TDataItem, string?>? RowClass { get; set; }
 
     /// <summary>
     /// <para>
@@ -183,12 +325,7 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     /// Ignored if <see cref="ExpandedContent"/> is <see langword="null"/>.
     /// </para>
     /// </summary>
-    [Parameter] public EventCallback<TDataItem>? OnRowExpanded { get; set; }
-
-    /// <summary>
-    /// An optional function which gets a CSS class for a given data item (row).
-    /// </summary>
-    [Parameter] public Func<TDataItem, string?>? RowClass { get; set; }
+    [Parameter] public EventCallback<TDataItem> RowExpanded { get; set; }
 
     /// <summary>
     /// <para>
@@ -215,19 +352,71 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     [Parameter] public ushort[] RowsPerPageOptions { get; set; } = new ushort[] { 10, 25, 50, 100 };
 
     /// <summary>
+    /// <para>
+    /// The currently-selected item.
+    /// </para>
+    /// <para>
+    /// If <see cref="SelectionType"/> is <see cref="SelectionType.None"/> (the
+    /// default) this will always be <see langword="null"/>.
+    /// </para>
+    /// <para>
+    /// If <see cref="SelectionType"/> is <see cref="SelectionType.Multiple"/>
+    /// this will contain an arbitrary item among the selection.
+    /// </para>
+    /// </summary>
+    [Parameter] public TDataItem? SelectedItem { get; set; }
+
+    /// <summary>
+    /// Invoked when <see cref="SelectedItem"/> changes.
+    /// </summary>
+    [Parameter] public EventCallback<TDataItem?> SelectedItemChanged { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The currently-selected items.
+    /// </para>
+    /// <para>
+    /// If <see cref="SelectionType"/> is <see cref="SelectionType.None"/> (the
+    /// default) this will always be empty.
+    /// </para>
+    /// <para>
+    /// If <see cref="SelectionType"/> is <see cref="SelectionType.Single"/>
+    /// this will always contain only one item.
+    /// </para>
+    /// </summary>
+    [Parameter] public List<TDataItem> SelectedItems { get; set; } = new();
+
+    /// <summary>
+    /// Invoked when <see cref="SelectedItems"/> changes.
+    /// </summary>
+    [Parameter] public EventCallback<IEnumerable<TDataItem>> SelectedItemsChanged { get; set; }
+
+    /// <summary>
+    /// The type of item selection from this data grid.
+    /// </summary>
+    [Parameter] public SelectionType SelectionType { get; set; }
+
+    /// <summary>
     /// Any CSS classes to assign to the table element.
     /// </summary>
     [Parameter] public string? TableClass { get; set; }
+
+    /// <summary>
+    /// An optional title to display in the header.
+    /// </summary>
+    [Parameter] public string? Title { get; set; }
 
     /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    /// <summary>
-    /// Optional content to display in the header.
-    /// </summary>
-    [Parameter] public RenderFragment? ToolbarContent { get; set; }
+    private readonly List<IColumn<TDataItem>> _columns = new();
+    internal IEnumerable<IColumn<TDataItem>> Columns => _columns;
+
+    internal TDataItem? EditedItem { get; set; }
+
+    internal Row<TDataItem>? EditingRow { get; set; }
 
     /// <inheritdoc />
     protected override string? CssStyle => new CssBuilder(Style)
@@ -240,12 +429,12 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
     /// The final value assigned to the table element's class attribute, including component values.
     /// </summary>
     protected string? TableCssClass => new CssBuilder(TableClass)
-        .Add("table datagrid")
+        .Add("table datagrid sticky-header sticky-footer")
         .Add(ThemeColor.ToCSS())
         .Add($"table-{Breakpoint.ToCSS()}", Breakpoint != Breakpoint.None)
         .ToString();
 
-    private List<DataGroup<TDataItem>>? DataGroups { get; set; }
+    private List<IGrouping<object, TDataItem>>? DataGroups { get; set; }
 
     private DataPage<TDataItem>? CurrentDataPage { get; set; }
 
@@ -255,27 +444,50 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
         {
             if (LoadItems is not null)
             {
-                return Items;
+                return CurrentDataPage?.Items ?? Enumerable.Empty<TDataItem>();
             }
 
             IEnumerable<TDataItem> items = Items;
-            foreach (var column in _columns)
+            foreach (var column in _columns
+                .Where(x => x.GetIsShown()))
             {
-                if (column.FilterExpression is not null
-                    && !string.IsNullOrEmpty(column.CurrentFilter))
-                {
-                    items = items.Where(x => column.FilterExpression.Invoke(x, column.CurrentFilter));
-                }
+                items = items.Where(column.FilterMatches);
             }
 
-            if (SortColumn is not null && items.Any())
+            var quickFilter = QuickFilter?.Trim('"').Trim();
+            if (!string.IsNullOrEmpty(QuickFilter))
             {
-                var sortBy = SortColumn.ActualSortBy;
-                if (sortBy is not null)
+                items = items.Where(x => _columns
+                    .Where(y => y.IsString && y.IsQuickFilter)
+                    .Any(y => y.FilterMatches(x, QuickFilter)));
+            }
+
+            if (_sortOrder.Count > 0)
+            {
+                IOrderedEnumerable<TDataItem>? sorted = null;
+                foreach (var id in _sortOrder)
                 {
-                    return SortColumn.SortDescending
-                        ? items.OrderByDescending(sortBy)
-                        : items.OrderBy(sortBy);
+                    var column = _columns.Find(x => x.Id == id);
+                    if (column?.GetIsShown() != true)
+                    {
+                        continue;
+                    }
+                    if (sorted is null)
+                    {
+                        sorted = column.SortDescending
+                            ? items.OrderByDescending(column.GetCellObjectValue)
+                            : items.OrderBy(column.GetCellObjectValue);
+                    }
+                    else
+                    {
+                        sorted = column.SortDescending
+                            ? sorted.ThenByDescending(column.GetCellObjectValue)
+                            : sorted.ThenBy(column.GetCellObjectValue);
+                    }
+                }
+                if (sorted is not null)
+                {
+                    items = sorted;
                 }
             }
 
@@ -289,16 +501,13 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
         .Skip((int)Offset)
         .Take(RowsPerPage);
 
+    [Inject] private DialogService DialogService { get; set; } = default!;
+
     private Form? EditForm { get; set; }
 
-    private Column<TDataItem>? EditingFilterColumn { get; set; }
+    private ExportFileType ExportFileType { get; set; } = ExportFileType.CSV;
 
-    private Row<TDataItem>? EditingRow { get; set; }
-
-    private Column<TDataItem>? GroupColumn { get; set; }
-
-    private bool HasRowExpansion
-        => ExpandedContent is not null && (AllRowsExpand || HasExpandedContent is not null);
+    private string? ExportName { get; set; }
 
     private string? LoadingClass => new CssBuilder("small")
         .Add(ThemeColor.ToCSS())
@@ -308,74 +517,888 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
 
     private ulong? PageCount { get; set; }
 
-    private List<Row<TDataItem>> Rows { get; set; } = new();
+    private bool? SelectAllValue
+    {
+        get
+        {
+            if (CurrentPageItems.All(x => x is not null && SelectedItems.Contains(x)))
+            {
+                return true;
+            }
+            if (CurrentPageItems.All(x => x is null || !SelectedItems.Contains(x)))
+            {
+                return false;
+            }
+            return null;
+        }
+    }
 
-    private Column<TDataItem>? SortColumn { get; set; }
+    private bool UseEditDialog => !AllowInlineEdit
+        || EditDialog is not null
+        || _columns.Any(x => !x.GetIsShown());
 
-    private bool UseEditDialog => EditDialog is not null || _columns.Any(x => !x.ActualIsShown);
+    [Inject] private UtilityService UtilityService { get; set; } = default!;
 
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
-        if (_columns.Count == 0)
+        if (_columns.Count != 0)
         {
-            var dataType = typeof(TDataItem);
-            dataType = Nullable.GetUnderlyingType(dataType) ?? dataType;
-            foreach (var property in dataType
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(x => x.CanRead))
-            {
-                _columns.Add(new Column<TDataItem>
-                {
-                    ActualProperty = property,
-                    IsDefault = true,
-                });
-            }
+            return;
+        }
+
+        var dataType = typeof(TDataItem);
+        dataType = Nullable.GetUnderlyingType(dataType) ?? dataType;
+
+        foreach (var property in dataType
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => x.CanRead))
+        {
+            var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), property.PropertyType);
+            var ctor = columnType.GetConstructor(new[] { typeof(PropertyInfo) })!;
+            _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { property }));
+        }
+
+        foreach (var field in dataType
+            .GetFields(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => x.IsPublic))
+        {
+            var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), field.FieldType);
+            var ctor = columnType.GetConstructor(new[] { typeof(FieldInfo) })!;
+            _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { field }));
         }
     }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var selectedItemChanged = false;
+        TDataItem? newSelectedItem = default;
+        if (!parameters.TryGetValue<List<TDataItem>>(nameof(SelectedItems), out var newSelectedItems)
+            && parameters.TryGetValue(nameof(SelectedItem), out newSelectedItem)
+            && !EqualityComparer<TDataItem>.Default.Equals(newSelectedItem, SelectedItem))
+        {
+            selectedItemChanged = true;
+        }
+
         await base.SetParametersAsync(parameters);
 
+        if (parameters.TryGetValue<string?>(nameof(QuickFilter), out _))
+        {
+            await LoadItemsAsync();
+        }
         if (parameters.TryGetValue<Func<TDataItem, object>?>(nameof(RowsPerPage), out _))
         {
-            await OnChangeRowsPerPage(RowsPerPage);
+            await OnChangeRowsPerPageAsync(RowsPerPage);
         }
-        else if (parameters.TryGetValue<Func<TDataItem, object>?>(nameof(GroupBy), out _)
-            || parameters.TryGetValue<Func<TDataItem, object>?>(nameof(Items), out _))
+        else
         {
-            Regroup();
+            var newGroups = parameters.TryGetValue<Func<TDataItem, object>?>(nameof(GroupBy), out _);
+            var newItems = parameters.TryGetValue<List<TDataItem>>(nameof(Items), out _);
+            if (newGroups
+                || newItems)
+            {
+                if (newItems)
+                {
+                    RecalculatePaging();
+                }
+                Regroup();
+            }
+        }
+
+        if (newSelectedItems is not null)
+        {
+            await SetSelectionAsync(newSelectedItems);
+        }
+        else if (selectedItemChanged)
+        {
+            await SetSelectionAsync(newSelectedItem);
         }
     }
 
-    internal void AddColumn(Column<TDataItem> column)
+    /// <inheritdoc/>
+    protected override async Task OnParametersSetAsync()
     {
-        _columns.RemoveAll(x => x.IsDefault && x.ActualProperty == column.ActualProperty);
-        _columns.Add(column);
+        if (LoadItems is not null)
+        {
+            return;
+        }
+
+        if (Items is null)
+        {
+            if (SelectedItems.Count > 0)
+            {
+                SelectedItem = default;
+                SelectedItems.Clear();
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            }
+            return;
+        }
+
+        var remaining = SelectedItems.Intersect(Items).ToList();
+        if (remaining.Count == SelectedItems.Count)
+        {
+            return;
+        }
+        SelectedItems.Clear();
+        SelectedItems.AddRange(remaining);
+        SelectedItem = SelectedItems.FirstOrDefault();
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
     }
 
-    internal void RemoveColumn(Column<TDataItem> column) => _columns.Remove(column);
-
-    internal void InvokeStateChange() => StateHasChanged();
-
-    private static string? GetGroupExpandClass(DataGroup<TDataItem> group) => new CssBuilder("expand-row")
-        .Add("open", group.IsExpanded)
-        .ToString();
-
-    private static string? GetRowExpandClass(Row<TDataItem> row) => new CssBuilder("expand-row")
-        .Add("open", row.IsExpanded)
-        .ToString();
-
-    private async Task LoadItemsAsync()
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
     {
-        throw new NotImplementedException();
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        await DisposeAsync(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Loads the current set of data from <see cref="LoadItems"/>,if it has been configured.
+    /// </summary>
+    public async Task LoadItemsAsync()
+    {
+        if (LoadItems is null)
+        {
+            return;
+        }
+
+        IsLoading = true;
+        StateHasChanged();
+
+        CurrentDataPage = await LoadItems.Invoke(new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
 
         Regroup();
     }
 
-    private async Task OnChangeRowsPerPage(ushort value)
+    /// <summary>
+    /// Sets the current page to the given value.
+    /// </summary>
+    /// <param name="value">
+    /// <para>
+    /// The zero-based index of the page to view.
+    /// </para>
+    /// <para>
+    /// If the given index is greater than or equal to the total number of pages, nagivates to the
+    /// last page instead.
+    /// </para>
+    /// <para>
+    /// If <see cref="LoadItems"/> is not <see langword="null"/>, and the most recently returned
+    /// result did not have a set <see cref="DataPage{TDataItem}.TotalCount"/>, and the value given
+    /// is more than the current number of pages, this results in advancing to the next page if <see
+    /// cref="DataPage{TDataItem}.HasMore"/> is <see langword="true"/>, or the last page if not.
+    /// </para>
+    /// </param>
+    public async Task SetPageAsync(ulong value)
+    {
+        if (value == CurrentPage)
+        {
+            return;
+        }
+        else if (value < CurrentPage)
+        {
+            CurrentPage = value;
+        }
+        else if (PageCount.HasValue)
+        {
+            CurrentPage = Math.Min(PageCount.Value, value) - 1;
+        }
+        else if (CurrentDataPage?.HasMore != false)
+        {
+            Offset += RowsPerPage;
+            CurrentPage++;
+            await LoadItemsAsync();
+        }
+    }
+
+    /// <summary>
+    /// Sets the currently selected item.
+    /// </summary>
+    /// <param name="selectedItem">
+    /// <para>
+    /// The item to set as the current selection.
+    /// </para>
+    /// <para>
+    /// The currently selected item is set to the default (e.g. <see langword="null"/>) if <paramref
+    /// name="selectedItem"/> is not in the current set of <see cref="Items"/>.
+    /// </para>
+    /// </param>
+    public async Task SetSelectionAsync(TDataItem? selectedItem)
+    {
+        if (SelectedItems.Count == 0
+            && selectedItem is null)
+        {
+            return;
+        }
+
+        if (SelectedItems.Count == 1
+            && SelectedItem?.Equals(selectedItem) == true)
+        {
+            return;
+        }
+
+        var hadSelection = SelectedItems.Count > 0;
+        SelectedItems.Clear();
+        SelectedItem = default;
+
+        if (selectedItem is null)
+        {
+            if (hadSelection)
+            {
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                await SelectedItemsChanged.InvokeAsync(SelectedItems);
+                StateHasChanged();
+            }
+            return;
+        }
+
+        SelectedItem = selectedItem;
+        SelectedItems.Add(selectedItem);
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Sets the currently selected items.
+    /// </summary>
+    /// <param name="selectedItems">
+    /// <para>
+    /// The items to set as the current selection.
+    /// </para>
+    /// <para>
+    /// Any items not in the current set of <see cref="Items"/> is not added to the selection.
+    /// </para>
+    /// </param>
+    public async Task SetSelectionAsync(List<TDataItem>? selectedItems)
+    {
+        selectedItems ??= new();
+        if (!SelectedItems.Except(selectedItems).Any()
+            && !selectedItems.Except(SelectedItems).Any())
+        {
+            return;
+        }
+
+        SelectedItems.Clear();
+        SelectedItems.AddRange(selectedItems.Intersect(Items));
+        SelectedItem = SelectedItems.FirstOrDefault();
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        StateHasChanged();
+    }
+
+    internal void AddColumn(IColumn<TDataItem> column)
+    {
+        if (!column.IsDefault)
+        {
+            _columns.RemoveAll(x => x.IsDefault);
+        }
+        _columns.Add(column);
+    }
+
+    internal void RemoveColumn(IColumn<TDataItem> column)
+    {
+        _columns.Remove(column);
+        _sortOrder.Remove(column.Id);
+    }
+
+    internal bool GetRowIsExpanded(TDataItem? item) => item is not null
+        && _rowCurrentExpansion.Contains(item.GetHashCode());
+
+    internal bool GetRowWasExpanded(TDataItem? item) => item is not null
+        && _rowExpansion.Contains(item.GetHashCode());
+
+    internal void InvokeStateChange() => StateHasChanged();
+
+    internal Task OnColumnSortedAsync(IColumn<TDataItem> column)
+    {
+        _sortOrder.Remove(column.Id);
+        _sortOrder.Insert(0, column.Id);
+        if (LoadItems is not null)
+        {
+            return LoadItemsAsync();
+        }
+        return Task.CompletedTask;
+    }
+
+    internal async Task OnEditAsync(Row<TDataItem> row)
+    {
+        if (EditingRow is not null
+            || EditedItem is not null)
+        {
+            var couldSave = await TrySaveEditAsync();
+            if (!couldSave)
+            {
+                await OnCancelEditAsync();
+            }
+        }
+
+        if (EditDialog is not null)
+        {
+            DialogService.Show(
+                EditDialog,
+                "Edit",
+                new DialogParameters
+                {
+                    { nameof(Row<TDataItem>.Item), row.Item }
+                });
+        }
+        else if (UseEditDialog)
+        {
+            EditedItem = row.Item;
+            EditingRow = row;
+            _isEditDialogVisible = true;
+        }
+        else
+        {
+            EditingRow = row;
+        }
+    }
+
+    internal async Task OnToggleRowExpansionAsync(Row<TDataItem> row)
+    {
+        if (row.Item is null)
+        {
+            return;
+        }
+
+        var hash = row.Item.GetHashCode();
+        var rowIsExpanded = _rowCurrentExpansion.Contains(hash);
+        if (rowIsExpanded)
+        {
+            _rowCurrentExpansion.Remove(hash);
+        }
+        else
+        {
+            _rowExpansion.Add(hash);
+            _rowCurrentExpansion.Add(hash);
+        }
+        if (!rowIsExpanded && RowExpanded.HasDelegate)
+        {
+            row.IsLoading = true;
+            StateHasChanged();
+            await RowExpanded.InvokeAsync(row.Item);
+            row.IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    internal async Task OnSaveEditAsync() => await TrySaveEditAsync();
+
+    internal async Task OnSelectAsync(Row<TDataItem> row)
+    {
+        if (EditingRow is not null)
+        {
+            await OnSaveEditAsync();
+        }
+        EditingRow = null;
+
+        if (SelectionType == SelectionType.Single
+            && row.Item is not null)
+        {
+            if (SelectedItems.Contains(row.Item))
+            {
+                if (SelectedItem?.Equals(row.Item) == true)
+                {
+                    SelectedItem = default;
+                }
+                SelectedItems.Remove(row.Item);
+            }
+            else
+            {
+                SelectedItem = row.Item;
+                SelectedItems.Clear();
+                SelectedItems.Add(row.Item);
+            }
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        }
+    }
+
+    internal async Task OnSelectAsync(Row<TDataItem> row, bool value)
+    {
+        if (EditingRow is not null)
+        {
+            await OnSaveEditAsync();
+        }
+        EditingRow = null;
+
+        if (row.Item is null)
+        {
+            return;
+        }
+
+        var changed = false;
+        if (value)
+        {
+            if (SelectedItems.Remove(row.Item))
+            {
+                if (SelectedItem?.Equals(row.Item) == true)
+                {
+                    SelectedItem = default;
+                }
+                changed = true;
+            }
+        }
+        else if (!SelectedItems.Contains(row.Item))
+        {
+            SelectedItems.Add(row.Item);
+            SelectedItem = SelectedItems.FirstOrDefault();
+            changed = true;
+        }
+        if (changed)
+        {
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting
+    /// unmanaged resources asynchronously.
+    /// </summary>
+    /// <returns>
+    /// A task that represents the asynchronous dispose operation.
+    /// </returns>
+    protected virtual async ValueTask DisposeAsync(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                foreach (var url in _objectUrls)
+                {
+                    await UtilityService.RevokeURLAsync(url);
+                }
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    private async Task<IEnumerable<TDataItem>?> TryGetAllItemsAsync()
+    {
+        if (LoadItems is null)
+        {
+            return CurrentItems;
+        }
+
+        var results = await LoadItems.Invoke(new(
+            0,
+            0,
+            GetFilterInfo(true),
+            GetSortInfo(true)));
+        if (results.HasMore)
+        {
+            return null;
+        }
+        return results.Items;
+    }
+
+    private async Task<Stream?> GetCSVAsync()
+    {
+        var columns = _columns
+            .Where(x => x.ExportHidden || x.GetIsShown())
+            .ToList();
+        if (columns.Count == 0)
+        {
+            return null;
+        }
+
+        var items = await TryGetAllItemsAsync();
+        if (items is null)
+        {
+            return null;
+        }
+
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < columns.Count; i++)
+        {
+            if (sb.Length > 0)
+            {
+                sb.Append(',');
+            }
+
+            var label = columns[i].GetLabel()?.Trim();
+            if (label?.Contains('\'') == true)
+            {
+                sb.Append('"')
+                    .Append(label?.Replace("\"", "\"\""))
+                    .Append('"');
+            }
+            else
+            {
+                sb.Append(label);
+            }
+
+            if (i == columns.Count - 1)
+            {
+                sb.AppendLine();
+            }
+        }
+
+        foreach (var item in items)
+        {
+            for (var i = 0; i < columns.Count; i++)
+            {
+                if (i > 0)
+                {
+                    sb.Append(',');
+                }
+
+                var content = columns[i].ToString(item);
+                if (content?.Contains('\'') == true)
+                {
+                    sb.Append('"')
+                        .Append(content?.Replace("\"", "\"\""))
+                        .Append('"');
+                }
+                else
+                {
+                    sb.Append(content);
+                }
+
+                if (i == columns.Count - 1)
+                {
+                    sb.AppendLine();
+                }
+            }
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+        var stream = new MemoryStream();
+        using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
+        {
+            writer.Write(Encoding.UTF8.GetPreamble());
+            writer.Write(bytes);
+        }
+        stream.Position = 0;
+        return stream;
+    }
+
+    private async Task<Stream?> GetExcelAsync()
+    {
+        var columns = _columns
+            .Where(x => x.ExportHidden || x.GetIsShown())
+            .ToList();
+        if (columns.Count == 0)
+        {
+            return null;
+        }
+
+        var items = await TryGetAllItemsAsync();
+        if (items is null)
+        {
+            return null;
+        }
+
+        var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Data");
+
+        var headingRow = worksheet.Row(1);
+        headingRow.Style.Font.Bold = true;
+        headingRow.Style.Border.BottomBorder = XLBorderStyleValues.Medium;
+
+        for (var i = 0; i < columns.Count; i++)
+        {
+            var label = columns[i].GetLabel()?.Trim();
+            if (!string.IsNullOrEmpty(label))
+            {
+                worksheet.Cell(1, i).SetValue(label);
+            }
+        }
+
+        var row = 2;
+        foreach (var item in items)
+        {
+            if (item is null)
+            {
+                continue;
+            }
+
+            for (var i = 0; i < columns.Count; i++)
+            {
+                var label = columns[i].ToString(item);
+                if (!string.IsNullOrEmpty(label))
+                {
+                    worksheet.Cell(row, i).SetValue(label);
+                }
+            }
+
+            row++;
+        }
+
+        var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+        return stream;
+    }
+
+    private FilterInfo[]? GetFilterInfo(bool export = false)
+    {
+        List<FilterInfo>? filterInfo = null;
+        var quickFilter = QuickFilter?.Trim('"').Trim();
+        foreach (var column in _columns
+            .Where(x => (x.GetIsShown() || (export && x.ExportHidden))
+                && x.MemberName is not null))
+        {
+            if (column.IsString)
+            {
+                if (string.IsNullOrEmpty(column.TextFilter))
+                {
+                    continue;
+                }
+                var exact = column.TextFilter.Length >= 2
+                    && column.TextFilter[0] == '"'
+                    && column.TextFilter[^1] == '"';
+                (filterInfo ??= new()).Add(new(
+                    column.MemberName!,
+                    exact
+                        ? column.TextFilter[1..^1]
+                        : column.TextFilter,
+                    exact,
+                    column.IsString && column.IsQuickFilter ? quickFilter : null,
+                    null,
+                    null,
+                    null,
+                    null));
+            }
+            else if (column.IsBool)
+            {
+                if (!column.BoolFilter.HasValue)
+                {
+                    continue;
+                }
+                (filterInfo ??= new()).Add(new(
+                    column.MemberName!,
+                    null,
+                    false,
+                    null,
+                    column.BoolFilter,
+                    null,
+                    null,
+                    null));
+            }
+            else if (column.IsNumeric)
+            {
+                if (!column.NumberFilter.HasValue)
+                {
+                    continue;
+                }
+                (filterInfo ??= new()).Add(new(
+                    column.MemberName!,
+                    null,
+                    false,
+                    null,
+                    null,
+                    column.NumberFilter,
+                    null,
+                    null));
+            }
+            else if (column.IsDateTime)
+            {
+                if (!column.DateTimeFilter.HasValue)
+                {
+                    continue;
+                }
+                (filterInfo ??= new()).Add(new(
+                    column.MemberName!,
+                    null,
+                    false,
+                    null,
+                    null,
+                    null,
+                    column.DateTimeFilter,
+                    column.GetDateTimeFormat()));
+            }
+        }
+        return filterInfo?.ToArray();
+    }
+
+    private async Task<Stream?> GetHTMLAsync()
+    {
+        var items = await TryGetAllItemsAsync();
+        if (items is null)
+        {
+            return null;
+        }
+
+        var sb = new StringBuilder();
+
+        for (var i = 0; i < _columns.Count; i++)
+        {
+            sb.Append("<th>")
+                .Append(System.Net.WebUtility.HtmlEncode(_columns[i].GetLabel()?.Trim()))
+                .AppendLine("</th>");
+        }
+
+        sb.AppendLine("</tr>")
+            .AppendLine("</thead>")
+            .AppendLine("<tbody>");
+
+        foreach (var item in items)
+        {
+            sb.AppendLine("<tr>");
+
+            for (var i = 0; i < _columns.Count; i++)
+            {
+                sb.Append("<td>")
+                    .Append(System.Net.WebUtility.HtmlEncode(_columns[i].ToString(item)))
+                    .AppendLine("</td>");
+            }
+
+            sb.AppendLine("</tr>");
+        }
+
+        string title;
+        if (!string.IsNullOrWhiteSpace(ExportName))
+        {
+            title = ExportName.Trim();
+        }
+        else if (!string.IsNullOrWhiteSpace(Title))
+        {
+            title = Title.Trim();
+        }
+        else
+        {
+            title = $"{typeof(TDataItem).Name} Data";
+        }
+        var html = string.Format(HtmlTemplate, title, HtmlHeaderContent, sb.ToString());
+        var bytes = Encoding.UTF8.GetBytes(html);
+        var stream = new MemoryStream();
+        using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
+        {
+            writer.Write(Encoding.UTF8.GetPreamble());
+            writer.Write(bytes);
+        }
+        stream.Position = 0;
+        return stream;
+    }
+
+    private string? GetGroupExpandClass(object? key) => new CssBuilder("expand-row")
+        .Add("open", GetGroupIsExpanded(key))
+        .ToString();
+
+    private bool GetGroupIsExpanded(object? key) => key is null
+        ? _nullGroupExpanded
+        : _groupExpansion.Contains(key.GetHashCode());
+
+    private async Task<Stream?> GetPDFAsync()
+    {
+        if (PdfExport is null)
+        {
+            return null;
+        }
+
+        return await PdfExport.Invoke(new(
+            0,
+            0,
+            GetFilterInfo(true),
+            GetSortInfo(true)));
+    }
+
+    private SortInfo[]? GetSortInfo(bool export = false)
+    {
+        if (_sortOrder.Count == 0)
+        {
+            return null;
+        }
+
+        List<SortInfo>? sortInfo = null;
+        foreach (var id in _sortOrder)
+        {
+            var column = _columns.Find(x => x.Id == id);
+            if (column is null
+                || (!column.GetIsShown() && (!export || !column.ExportHidden))
+                || column.MemberName is null)
+            {
+                continue;
+            }
+
+            (sortInfo ??= new()).Add(new(
+                column.MemberName,
+                column.SortDescending));
+        }
+        return sortInfo?.ToArray();
+    }
+
+    private async Task OnAddAsync()
+    {
+        if (EditingRow is not null)
+        {
+            await OnSaveEditAsync();
+        }
+        EditingRow = null;
+
+        if (EditDialog is not null)
+        {
+            DialogService.Show(
+                EditDialog,
+                "Add");
+        }
+        else
+        {
+            TDataItem? newItem;
+            try
+            {
+                newItem = (TDataItem?)typeof(TDataItem).GetConstructor(Type.EmptyTypes)?.Invoke(null);
+            }
+            catch
+            {
+                newItem = default;
+            }
+            EditedItem = newItem;
+            if (newItem is not null)
+            {
+                _isEditDialogVisible = true;
+            }
+        }
+    }
+
+    private Task OnBoolFilterChangedAsync(IColumn<TDataItem> column, bool? value)
+    {
+        column.BoolFilter = value;
+        if (LoadItems is not null)
+        {
+            return LoadItemsAsync();
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task OnCancelEditAsync()
+    {
+        if (EditedItem is not null)
+        {
+            EditForm?.ResetAsync();
+            _isEditDialogVisible = false;
+            EditedItem = default;
+        }
+        else if (EditingRow is not null)
+        {
+            await EditingRow.CancelEditAsync();
+            EditingRow = null;
+        }
+    }
+
+    private Task OnChangeQuickFilterAsync(string? value)
+    {
+        QuickFilter = value;
+        if (LoadItems is not null)
+        {
+            return LoadItemsAsync();
+        }
+        return Task.CompletedTask;
+    }
+
+    private async Task OnChangeRowsPerPageAsync(ushort value)
     {
         if (RowsPerPage == value)
         {
@@ -415,8 +1438,11 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
 
             if (decrease)
             {
-                Items = Items.Take(RowsPerPage).ToList();
-                Regroup();
+                if (CurrentDataPage is not null)
+                {
+                    CurrentDataPage = CurrentDataPage with { Items = CurrentDataPage.Items.Take(RowsPerPage).ToList() };
+                    Regroup();
+                }
             }
             else
             {
@@ -425,17 +1451,22 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
         }
     }
 
-    private Task OnColumnSortAsync(Column<TDataItem> column)
+    private Task OnColumnSortAsync(IColumn<TDataItem> column)
     {
-        if (column == SortColumn)
+        if (_sortOrder.Contains(column.Id))
         {
             column.SortDescending = !column.SortDescending;
         }
         else
         {
-            SortColumn = column;
             column.SortDescending = false;
         }
+        return OnColumnSortedAsync(column);
+    }
+
+    private Task OnDateTimeFilterChangedAsync(IColumn<TDataItem> column, DateTimeOffset? value)
+    {
+        column.DateTimeFilter = value;
         if (LoadItems is not null)
         {
             return LoadItemsAsync();
@@ -443,9 +1474,88 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
         return Task.CompletedTask;
     }
 
-    private Task OnFilterChangedAsync(Column<TDataItem> column, string? value)
+    private async Task OnExportAsync()
     {
-        column.CurrentFilter = value;
+        IsLoading = true;
+        _isExportDialogVisible = false;
+        StateHasChanged();
+
+        var stream = ExportFileType switch
+        {
+            ExportFileType.CSV => await GetCSVAsync(),
+            ExportFileType.Excel => await GetExcelAsync(),
+            ExportFileType.HTML => await GetHTMLAsync(),
+            ExportFileType.PDF => await GetPDFAsync(),
+            _ => null,
+        };
+        if (stream is null)
+        {
+            if (ExportFileType != ExportFileType.PDF)
+            {
+                _isExportTooLargeDialogVisible = true;
+            }
+            return;
+        }
+
+        var type = ExportFileType switch
+        {
+            ExportFileType.CSV => "text/csv",
+            ExportFileType.Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ExportFileType.HTML => "text/html",
+            ExportFileType.PDF => "application/pdf",
+            _ => "text/plain",
+        };
+        var extension = ExportFileType switch
+        {
+            ExportFileType.CSV => "csv",
+            ExportFileType.Excel => "xlsx",
+            ExportFileType.HTML => "html",
+            ExportFileType.PDF => "pdf",
+            _ => "txt",
+        };
+
+        string title;
+        if (!string.IsNullOrWhiteSpace(ExportName))
+        {
+            title = ExportName.Trim();
+        }
+        else if (!string.IsNullOrWhiteSpace(Title))
+        {
+            title = Title.Trim();
+        }
+        else
+        {
+            title = $"exported_{typeof(TDataItem).Name}_data";
+        }
+        var fileName = $"{title}.{extension}";
+        using var streamReference = new DotNetStreamReference(stream);
+        try
+        {
+            if (ExportFileType is ExportFileType.HTML
+                or ExportFileType.PDF)
+            {
+                var url = await UtilityService.OpenAsync(fileName, type, streamReference, false);
+                if (!string.IsNullOrEmpty(url))
+                {
+                    _objectUrls.Add(url);
+                }
+            }
+            else
+            {
+                await UtilityService.DownloadAsync(fileName, type, streamReference);
+            }
+        }
+        finally
+        {
+            stream.Dispose();
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task OnFilterChangedAsync(IColumn<TDataItem> column, string? value)
+    {
+        column.TextFilter = value;
         if (LoadItems is not null)
         {
             return LoadItemsAsync();
@@ -485,12 +1595,24 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
         if (LoadItems is null)
         {
             Offset += RowsPerPage;
+            CurrentPage++;
         }
         else if (CurrentDataPage?.HasMore != false)
         {
             Offset += RowsPerPage;
+            CurrentPage++;
             await LoadItemsAsync();
         }
+    }
+
+    private Task OnNumberFilterChangedAsync(IColumn<TDataItem> column, double? value)
+    {
+        column.NumberFilter = value;
+        if (LoadItems is not null)
+        {
+            return LoadItemsAsync();
+        }
+        return Task.CompletedTask;
     }
 
     private async Task OnPageChangedAsync(ulong value)
@@ -503,97 +1625,141 @@ public partial class DataGrid<TDataItem> where TDataItem : new()
         }
     }
 
-    private async Task OnPreviousPageAsync()
-    {
-        if (Offset <= 0)
-        {
-            return;
-        }
-
-        Offset = Math.Max(0, Offset - RowsPerPage);
-        if (LoadItems is not null)
-        {
-            await LoadItemsAsync();
-        }
-    }
-
-    private void OnRowClick(Row<TDataItem> row) => throw new NotImplementedException();
-
-    private void OnShowExportDialog() => throw new NotImplementedException();
-
     private void OnSetAllColumnsVisiblity(bool value)
     {
         foreach (var column in _columns.Where(x => x.CanHide))
         {
-            column.ActualIsShown = value;
+            column.SetIsShown(value);
         }
     }
 
-    private void Regroup()
+    private async Task OnSetSelectAllAsync(bool? value)
     {
-        if (GroupBy is null)
+        var changed = false;
+        if (value == true)
         {
-            DataGroups = null;
-            var newRows = CurrentPageItems
-                .Select(x => new Row<TDataItem> { Item = x })
-                .ToList();
-            foreach (var row in newRows)
+            foreach (var item in CurrentPageItems)
             {
-                var match = Rows?.Find(x => x.Item?.Equals(row.Item) == true);
-                if (match is not null)
+                if (item is not null
+                    && !SelectedItems.Contains(item))
                 {
-                    row.IsExpanded = match.IsExpanded;
+                    SelectedItems.Add(item);
+                    SelectedItem = SelectedItems.FirstOrDefault();
+                    changed = true;
                 }
             }
-            Rows = newRows;
+        }
+        else if (value == false)
+        {
+            foreach (var item in CurrentPageItems)
+            {
+                var removed = item is not null
+                    && SelectedItems.Remove(item);
+                if (removed && SelectedItem?.Equals(item) == true)
+                {
+                    SelectedItem = default;
+                }
+                changed |= removed;
+            }
+        }
+        if (changed)
+        {
+            await SelectedItemChanged.InvokeAsync(SelectedItem);
+            await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        }
+    }
+
+    private void OnToggleGroupExpansion(IGrouping<object, TDataItem> group)
+    {
+        if (group.Key is null)
+        {
+            _nullGroupExpanded = !_nullGroupExpanded;
             return;
         }
 
-        Rows.Clear();
-
-        var newGroups = new List<DataGroup<TDataItem>>();
-        var totalCount = 0;
-        foreach (var group in CurrentPageItems.GroupBy(GroupBy))
+        var hash = group.Key.GetHashCode();
+        var groupIsExpanded = _groupExpansion.Contains(hash);
+        if (groupIsExpanded)
         {
-            var max = RowsPerPage - totalCount;
-            var items = group
-                .Select(x => new Row<TDataItem> { Item = x })
-                .ToList();
-            var count = Math.Min(items.Count, max);
-            newGroups.Add(new()
-            {
-                Count = count,
-                Rows = items.Count <= count
-                    ? items
-                    : items.Take(count).ToList(),
-                Key = group.Key,
-            });
-            totalCount += count;
-            if (totalCount >= RowsPerPage)
-            {
-                break;
-            }
+            _groupExpansion.Remove(hash);
+        }
+        else
+        {
+            _groupExpansion.Add(hash);
+        }
+    }
+
+    private void RecalculatePaging()
+    {
+        if (LoadItems is not null)
+        {
+            return;
         }
 
-        if (DataGroups is not null)
+        if (Offset > (ulong)Items.Count)
         {
-            foreach (var group in DataGroups)
+            Offset = 0;
+            CurrentPage = 0;
+        }
+        PageCount = (ulong)Items.Count / RowsPerPage;
+        if (Items.Count % RowsPerPage != 0)
+        {
+            PageCount++;
+        }
+    }
+
+    private void Regroup() => DataGroups = GroupBy is null
+        ? null
+        : CurrentPageItems
+            .GroupBy(GroupBy)
+            .ToList();
+
+    private async Task<bool> TrySaveEditAsync()
+    {
+        if (UseEditDialog)
+        {
+            if (EditForm is not null)
             {
-                var match = newGroups.Find(x => x.Key?.Equals(group.Key) == true);
-                if (match is not null)
+                var valid = await EditForm.ValidateAsync();
+                if (!valid)
                 {
-                    match.IsExpanded = group.IsExpanded;
-                    foreach (var row in match.Rows!)
+                    return false;
+                }
+            }
+            _isEditDialogVisible = false;
+        }
+
+        if (EditingRow is null)
+        {
+            if (EditedItem is not null)
+            {
+                if (EditForm is not null)
+                {
+                    var valid = await EditForm.ValidateAsync();
+                    if (!valid)
                     {
-                        var groupRow = group.Rows?.Find(x => x.Item?.Equals(row.Item) == true);
-                        if (groupRow is not null)
-                        {
-                            row.IsExpanded = groupRow.IsExpanded;
-                        }
+                        return false;
                     }
+                }
+                await ItemAdded.InvokeAsync(EditedItem);
+                if (LoadItems is null)
+                {
+                    Items.Add(EditedItem);
+                }
+                else if (CurrentDataPage is null)
+                {
+                    await LoadItemsAsync();
+                }
+                else
+                {
+                    CurrentDataPage.Items.Add(EditedItem);
                 }
             }
         }
-        DataGroups = newGroups;
+        else
+        {
+            await ItemSaved.InvokeAsync(EditingRow.Item);
+        }
+        return true;
     }
 }
