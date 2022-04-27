@@ -74,9 +74,9 @@ public readonly record struct DataGridRequest(
     {
         if (request.Filters?
             .Select(x => x.Property)
-            .Any(x => x.Any(y => !char.IsLetter(y) || !char.IsAscii(y))) == true)
+            .Any(x => x.Any(y => !char.IsAscii(y) || (!char.IsLetter(y) && !char.IsNumber(y)))) == true)
         {
-            throw new ArgumentException("A property contains a character which is not an ASCII letter", nameof(request));
+            throw new ArgumentException("A property contains a character which is not an ASCII letter or number", nameof(request));
         }
 
         var sb = new StringBuilder("SELECT COUNT(1) FROM {0}");
@@ -151,17 +151,17 @@ public readonly record struct DataGridRequest(
             .Union(request.Order?
                 .Select(x => x.Property)
                 ?? Enumerable.Empty<string>())
-            .Any(x => x.Any(y => !char.IsLetter(y) || !char.IsAscii(y))) == true)
+            .Any(x => x.Any(y => !char.IsAscii(y) || (!char.IsLetter(y) && !char.IsNumber(y)))) == true)
         {
-            throw new ArgumentException("A property contains a character which is not an ASCII letter", nameof(request));
+            throw new ArgumentException("A property contains a character which is not an ASCII letter or number", nameof(request));
         }
 
         IEnumerable<string> primarySortTerms = primaryKey.Split(
             ',',
             StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (primarySortTerms.Any(x => x.Any(y => !char.IsLetter(y) || !char.IsAscii(y))))
+        if (primarySortTerms.Any(x => x.Any(y => !char.IsAscii(y) || (!char.IsLetter(y) && !char.IsNumber(y)))))
         {
-            throw new ArgumentException("A property contains a character which is not an ASCII letter", nameof(primaryKey));
+            throw new ArgumentException("A property contains a character which is not an ASCII letter or number", nameof(primaryKey));
         }
         var primarySortTermList = request.Order is not null
             ? primarySortTerms.Except(request.Order.Select(x => x.Property)).ToList()
@@ -180,8 +180,9 @@ public readonly record struct DataGridRequest(
                 {
                     sb.Append(',');
                 }
-                sb.Append(' ')
-                    .Append(request.Order[i].Property);
+                sb.Append(" [")
+                    .Append(request.Order[i].Property)
+                    .Append(']');
                 if (request.Order[i].Descending)
                 {
                     sb.Append(" DESC");
@@ -194,8 +195,9 @@ public readonly record struct DataGridRequest(
             {
                 sb.Append(',');
             }
-            sb.Append(' ')
-                .Append(primarySortTermList[i]);
+            sb.Append(" [")
+                .Append(primarySortTermList[i])
+                .Append(']');
         }
 
         if (request.Count > 0 || limit > 0)
@@ -350,9 +352,14 @@ public readonly record struct DataGridRequest(
         {
             if (i > 0)
             {
-                sb.Append(" AND (");
+                sb.Append(" AND ");
             }
-            else if (quickFilterTerms.Length > 1)
+            else if (!any)
+            {
+                sb.Append(' ');
+            }
+
+            if (request.Filters.Length > 1)
             {
                 sb.Append('(');
             }
@@ -367,20 +374,19 @@ public readonly record struct DataGridRequest(
 
                 if (anyQuick)
                 {
-                    sb.Append(" OR");
+                    sb.Append(" OR ");
                 }
-                sb.Append(' ');
 
-                sb.Append(' ')
+                sb.Append('[')
                     .Append(request.Filters[j].Property)
-                    .Append(" LIKE '%' + @")
+                    .Append("] LIKE '%' + @")
                     .Append(quickFilterParameters[i].name)
                     .Append(" + '%' COLLATE Latin1_general_CI_AI");
 
                 anyQuick = true;
             }
 
-            if (quickFilterTerms.Length > 1)
+            if (request.Filters.Length > 1)
             {
                 sb.Append(')');
             }
@@ -397,35 +403,39 @@ public readonly record struct DataGridRequest(
     {
         if (filter.NumberFilter.HasValue)
         {
-            sb.Append("ABS(")
+            sb.Append("ABS([")
                 .Append(filter.Property)
-                .Append(" - ")
+                .Append("] - ")
                 .Append(filter.NumberFilter!.Value.ToString("g5"))
                 .Append(") < 0.00001");
         }
         else if (filter.BoolFilter.HasValue)
         {
-            sb.Append(filter.Property)
-                .Append(" = ")
+            sb.Append('[')
+                .Append(filter.Property)
+                .Append("] = ")
                 .Append(filter.BoolFilter!.Value ? '1' : '0');
         }
         else if (filter.DateTimeFilter.HasValue)
         {
-            sb.Append(filter.Property)
-                .Append(" = ")
-                .Append(filter.DateTimeFilter!.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture));
+            sb.Append('[')
+                .Append(filter.Property)
+                .Append(filter.DateTimeFilterIsBefore ? "] <= '" : "] >= '")
+                .Append(filter.DateTimeFilter!.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture))
+                .Append('\'');
         }
         else if (!string.IsNullOrEmpty(filter.TextFilter))
         {
-            sb.Append(filter.Property);
+            sb.Append('[')
+                .Append(filter.Property);
             if (filter.ExactMatch)
             {
-                sb.Append(" = @")
+                sb.Append("] = @")
                     .Append(filter.Property);
             }
             else
             {
-                sb.Append(" LIKE '%' + @")
+                sb.Append("] LIKE '%' + @")
                     .Append(filter.Property)
                     .Append(" + '%' COLLATE Latin1_general_CI_AI");
             }

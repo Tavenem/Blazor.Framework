@@ -36,6 +36,10 @@
     width: 100%;
 }
 
+#main-container {
+    padding-bottom: 6rem;
+}
+
 @each $breakpoint, $min-width in $breakpoints {
     .container-#{$breakpoint} {
         align-self: stretch;

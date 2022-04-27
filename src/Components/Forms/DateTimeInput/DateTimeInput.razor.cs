@@ -701,6 +701,8 @@ public partial class DateTimeInput<TValue>
             else if (value is DateTimeOffset dto)
             {
                 DateTimeOffset = dto;
+                TimeZone = TimeZones.FirstOrDefault(x => x.BaseUtcOffset == dto.Offset)
+                    ?? TimeZoneInfo.Local;
             }
             else if (value is DateOnly dateOnly)
             {
@@ -756,11 +758,11 @@ public partial class DateTimeInput<TValue>
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public override void Clear()
+    public override Task ClearAsync()
     {
         if (Disabled || ReadOnly)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         DateTimeOffset = DateTimeOffset.Now;
@@ -773,6 +775,8 @@ public partial class DateTimeInput<TValue>
         {
             CurrentValue = default;
         }
+
+        return Task.CompletedTask;
     }
 
     /// <summary>

@@ -36,7 +36,21 @@
                         <tf-icon>@DefaultIcons.Edit</tf-icon>
                     </button>
                 }
+                @if (DataGrid.AllowDelete)
+                {
+                    <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
+                        <tf-icon>@DefaultIcons.Delete</tf-icon>
+                    </button>
+                }
             </span>
+        </td>
+    }
+    else if (DataGrid.AllowDelete)
+    {
+        <td>
+            <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
+                <tf-icon>@DefaultIcons.Delete</tf-icon>
+            </button>
         </td>
     }
     @if (HasRowExpansion)
@@ -50,452 +64,450 @@
             }
         </td>
     }
-    <Form @ref="EditForm">
-        @foreach (var column in DataGrid.Columns.Where(x => x.GetIsShown()))
-        {
-            <td class="@column.CellClass?.Invoke(Item)">
-                @if (IsEditing
-                    && column.GetCanEdit())
+    @foreach (var column in DataGrid.Columns.Where(x => x.GetIsShown()))
+    {
+        <td class="@column.GetCellClass(Item)">
+            @if (IsEditing
+                && column.GetCanEdit())
+            {
+                if (column.EditContent is not null)
                 {
-                    if (column.EditContent is not null)
-                    {
-                        @column.EditContent(Item)
-                    }
-                    else if (column is Column<TDataItem, string> stringColumn)
-                    {
-                        <TextInput Value="@stringColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => stringColumn.SetCellValue(EditedItem, v))"
-                                    Format="@column.Format"
-                                    FormatProvider="column.FormatProvider"
-                                    Validation="@((v, _) => stringColumn.Validate(v, EditedItem))"
-                                    Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, bool> boolColumn)
-                    {
-                        <Checkbox TValue="bool"
-                                    Value="@boolColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => boolColumn.SetCellValue(EditedItem, v))"
-                                    Validation="@((v, _) => boolColumn.Validate(v, EditedItem))"
-                                    Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, bool?> nullableBoolColumn)
-                    {
-                        <Checkbox TValue="bool?"
-                                    Value="@nullableBoolColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => nullableBoolColumn.SetCellValue(EditedItem, v))"
-                                    AllowNull="true"
-                                    Validation="@((v, _) => nullableBoolColumn.Validate(v, EditedItem))"
-                                    Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, byte> byteColumn)
-                    {
-                        <NumericInput TValue="byte"
-                                        Value="@byteColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => byteColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => byteColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, byte?> nullableByteColumn)
-                    {
-                        <NumericInput TValue="byte?"
-                                        Value="@nullableByteColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableByteColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableByteColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, decimal> decimalColumn)
-                    {
-                        <NumericInput TValue="decimal"
-                                        Value="@decimalColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => decimalColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => decimalColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, decimal?> nullableDecimalColumn)
-                    {
-                        <NumericInput TValue="decimal?"
-                                        Value="@nullableDecimalColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableDecimalColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableDecimalColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, double> doubleColumn)
-                    {
-                        <NumericInput TValue="double"
-                                        Value="@doubleColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => doubleColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => doubleColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, double?> nullableDoubleColumn)
-                    {
-                        <NumericInput TValue="double?"
-                                        Value="@nullableDoubleColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableDoubleColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableDoubleColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, float> floatColumn)
-                    {
-                        <NumericInput TValue="float"
-                                        Value="@floatColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => floatColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => floatColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, float?> nullableFloatColumn)
-                    {
-                        <NumericInput TValue="float?"
-                                        Value="@nullableFloatColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableFloatColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableFloatColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, int> intColumn)
-                    {
-                        <NumericInput TValue="int"
-                                        Value="@intColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => intColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => intColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, int?> nullableIntColumn)
-                    {
-                        <NumericInput TValue="int?"
-                                        Value="@nullableIntColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableIntColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableIntColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, long> longColumn)
-                    {
-                        <NumericInput TValue="long"
-                                        Value="@longColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => longColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => longColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, long?> nullableLongColumn)
-                    {
-                        <NumericInput TValue="long?"
-                                        Value="@nullableLongColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableLongColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableLongColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, nint> nintColumn)
-                    {
-                        <NumericInput TValue="nint"
-                                        Value="@nintColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nintColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nintColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, nint?> nullableNintColumn)
-                    {
-                        <NumericInput TValue="nint?"
-                                        Value="@nullableNintColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableNintColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableNintColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, nuint> nuintColumn)
-                    {
-                        <NumericInput TValue="nuint"
-                                        Value="@nuintColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nuintColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nuintColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, nuint?> nullableNuintColumn)
-                    {
-                        <NumericInput TValue="nuint?"
-                                        Value="@nullableNuintColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableNuintColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableNuintColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, sbyte> sbyteColumn)
-                    {
-                        <NumericInput TValue="sbyte"
-                                        Value="@sbyteColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => sbyteColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => sbyteColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, sbyte?> nullableSbyteColumn)
-                    {
-                        <NumericInput TValue="sbyte?"
-                                        Value="@nullableSbyteColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableSbyteColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableSbyteColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, short> shortColumn)
-                    {
-                        <NumericInput TValue="short"
-                                        Value="@shortColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => shortColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => shortColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, short?> nullableShortColumn)
-                    {
-                        <NumericInput TValue="short?"
-                                        Value="@nullableShortColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableShortColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableShortColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, uint> uintColumn)
-                    {
-                        <NumericInput TValue="uint"
-                                        Value="@uintColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => uintColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => uintColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, uint?> nullableUintColumn)
-                    {
-                        <NumericInput TValue="uint?"
-                                        Value="@nullableUintColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableUintColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Label="@column.GetLabel()"
-                                        Validation="@((v, _) => nullableUintColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, ulong> ulongColumn)
-                    {
-                        <NumericInput TValue="ulong"
-                                        Value="@ulongColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => ulongColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => ulongColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, ulong?> nullableUlongColumn)
-                    {
-                        <NumericInput TValue="ulong?"
-                                        Value="@nullableUlongColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableUlongColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableUlongColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, ushort> ushortColumn)
-                    {
-                        <NumericInput TValue="ushort"
-                                        Value="@ushortColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => ushortColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => ushortColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, ushort?> nullableUshortColumn)
-                    {
-                        <NumericInput TValue="ushort?"
-                                        Value="@nullableUshortColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableUshortColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableUshortColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column.IsEnum)
-                    {
-                        <Select TValue="object"
-                                Value="@column.GetCellObjectValue(EditedItem)"
-                                ValueChanged="@(v => column.SetCellObjectValue(EditedItem, v))"
-                                OptionPairs="@column.GetEnumOptions()"
-                                Validation="@((v, _) => column.ValidateObject(v, EditedItem))"
+                    @column.EditContent(Item)
+                }
+                else if (column is Column<TDataItem, string> stringColumn)
+                {
+                    <TextInput Value="@stringColumn.GetCellValue(Item)"
+                                ValueChanged="@(v => stringColumn.SetCellValue(Item, v))"
+                                Format="@column.Format"
+                                FormatProvider="column.FormatProvider"
+                                Validation="@((v, _) => stringColumn.Validate(v, Item))"
                                 Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.DateTime> dateTimeColumn)
-                    {
-                        <DateTimeInput TValue="System.DateTime"
-                                        Value="@dateTimeColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => dateTimeColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => dateTimeColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.DateTime?> nullableDateTimeColumn)
-                    {
-                        <DateTimeInput TValue="System.DateTime?"
-                                        Value="@nullableDateTimeColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableDateTimeColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableDateTimeColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.DateTimeOffset> dateTimeOffsetColumn)
-                    {
-                        <DateTimeInput TValue="System.DateTimeOffset"
-                                        Value="@dateTimeOffsetColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => dateTimeOffsetColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => dateTimeOffsetColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.DateTimeOffset?> nullableDateTimeOffsetColumn)
-                    {
-                        <DateTimeInput TValue="System.DateTimeOffset?"
-                                        Value="@nullableDateTimeOffsetColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableDateTimeOffsetColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableDateTimeOffsetColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.DateOnly> dateOnlyColumn)
-                    {
-                        <DateTimeInput TValue="System.DateOnly"
-                                        Value="@dateOnlyColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => dateOnlyColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => dateOnlyColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.DateOnly?> nullableDateOnlyColumn)
-                    {
-                        <DateTimeInput TValue="System.DateOnly?"
-                                        Value="@nullableDateOnlyColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableDateOnlyColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableDateOnlyColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.TimeOnly> timeOnlyColumn)
-                    {
-                        <DateTimeInput TValue="System.TimeOnly"
-                                        Value="@timeOnlyColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => timeOnlyColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => timeOnlyColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.TimeOnly?> nullableTimeOnlyColumn)
-                    {
-                        <DateTimeInput TValue="System.TimeOnly?"
-                                        Value="@nullableTimeOnlyColumn.GetCellValue(EditedItem)"
-                                        ValueChanged="@(v => nullableTimeOnlyColumn.SetCellValue(EditedItem, v))"
-                                        Format="@column.Format"
-                                        FormatProvider="column.FormatProvider"
-                                        Validation="@((v, _) => nullableTimeOnlyColumn.Validate(v, EditedItem))"
-                                        Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.Drawing.Color> colorColumn)
-                    {
-                        <ColorInput TValue="System.Drawing.Color"
-                                    Value="@colorColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => colorColumn.SetCellValue(EditedItem, v))"
-                                    ColorMode="ColorMode.RGB"
+                }
+                else if (column is Column<TDataItem, bool> boolColumn)
+                {
+                    <Checkbox TValue="bool"
+                                Value="@boolColumn.GetCellValue(Item)"
+                                ValueChanged="@(v => boolColumn.SetCellValue(Item, v))"
+                                Validation="@((v, _) => boolColumn.Validate(v, Item))"
+                                Class="dense" />
+                }
+                else if (column is Column<TDataItem, bool?> nullableBoolColumn)
+                {
+                    <Checkbox TValue="bool?"
+                                Value="@nullableBoolColumn.GetCellValue(Item)"
+                                ValueChanged="@(v => nullableBoolColumn.SetCellValue(Item, v))"
+                                AllowNull="true"
+                                Validation="@((v, _) => nullableBoolColumn.Validate(v, Item))"
+                                Class="dense" />
+                }
+                else if (column is Column<TDataItem, byte> byteColumn)
+                {
+                    <NumericInput TValue="byte"
+                                    Value="@byteColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => byteColumn.SetCellValue(Item, v))"
                                     Format="@column.Format"
                                     FormatProvider="column.FormatProvider"
-                                    Validation="@((v, _) => colorColumn.Validate(v, EditedItem))"
+                                    Validation="@((v, _) => byteColumn.Validate(v, Item))"
                                     Class="dense" />
-                    }
-                    else if (column is Column<TDataItem, System.Drawing.Color?> nullableColorColumn)
-                    {
-                        <ColorInput TValue="System.Drawing.Color?"
-                                    Value="@nullableColorColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => nullableColorColumn.SetCellValue(EditedItem, v))"
-                                    ColorMode="ColorMode.RGB"
+                }
+                else if (column is Column<TDataItem, byte?> nullableByteColumn)
+                {
+                    <NumericInput TValue="byte?"
+                                    Value="@nullableByteColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableByteColumn.SetCellValue(Item, v))"
                                     Format="@column.Format"
                                     FormatProvider="column.FormatProvider"
-                                    Validation="@((v, _) => nullableColorColumn.Validate(v, EditedItem))"
+                                    Validation="@((v, _) => nullableByteColumn.Validate(v, Item))"
                                     Class="dense" />
-                    }
-                    else if (column.ChildContent is null)
-                    {
-                        <span class="@column.AlignClass">
-                            @column.ToString(Item)
-                        </span>
-                    }
-                    else
-                    {
-                        @column.ChildContent(Item)
-                    }
+                }
+                else if (column is Column<TDataItem, decimal> decimalColumn)
+                {
+                    <NumericInput TValue="decimal"
+                                    Value="@decimalColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => decimalColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => decimalColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, decimal?> nullableDecimalColumn)
+                {
+                    <NumericInput TValue="decimal?"
+                                    Value="@nullableDecimalColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableDecimalColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableDecimalColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, double> doubleColumn)
+                {
+                    <NumericInput TValue="double"
+                                    Value="@doubleColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => doubleColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => doubleColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, double?> nullableDoubleColumn)
+                {
+                    <NumericInput TValue="double?"
+                                    Value="@nullableDoubleColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableDoubleColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableDoubleColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, float> floatColumn)
+                {
+                    <NumericInput TValue="float"
+                                    Value="@floatColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => floatColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => floatColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, float?> nullableFloatColumn)
+                {
+                    <NumericInput TValue="float?"
+                                    Value="@nullableFloatColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableFloatColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableFloatColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, int> intColumn)
+                {
+                    <NumericInput TValue="int"
+                                    Value="@intColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => intColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => intColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, int?> nullableIntColumn)
+                {
+                    <NumericInput TValue="int?"
+                                    Value="@nullableIntColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableIntColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableIntColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, long> longColumn)
+                {
+                    <NumericInput TValue="long"
+                                    Value="@longColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => longColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => longColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, long?> nullableLongColumn)
+                {
+                    <NumericInput TValue="long?"
+                                    Value="@nullableLongColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableLongColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableLongColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, nint> nintColumn)
+                {
+                    <NumericInput TValue="nint"
+                                    Value="@nintColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nintColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nintColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, nint?> nullableNintColumn)
+                {
+                    <NumericInput TValue="nint?"
+                                    Value="@nullableNintColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableNintColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableNintColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, nuint> nuintColumn)
+                {
+                    <NumericInput TValue="nuint"
+                                    Value="@nuintColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nuintColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nuintColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, nuint?> nullableNuintColumn)
+                {
+                    <NumericInput TValue="nuint?"
+                                    Value="@nullableNuintColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableNuintColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableNuintColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, sbyte> sbyteColumn)
+                {
+                    <NumericInput TValue="sbyte"
+                                    Value="@sbyteColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => sbyteColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => sbyteColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, sbyte?> nullableSbyteColumn)
+                {
+                    <NumericInput TValue="sbyte?"
+                                    Value="@nullableSbyteColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableSbyteColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableSbyteColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, short> shortColumn)
+                {
+                    <NumericInput TValue="short"
+                                    Value="@shortColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => shortColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => shortColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, short?> nullableShortColumn)
+                {
+                    <NumericInput TValue="short?"
+                                    Value="@nullableShortColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableShortColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableShortColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, uint> uintColumn)
+                {
+                    <NumericInput TValue="uint"
+                                    Value="@uintColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => uintColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => uintColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, uint?> nullableUintColumn)
+                {
+                    <NumericInput TValue="uint?"
+                                    Value="@nullableUintColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableUintColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Label="@column.GetLabel()"
+                                    Validation="@((v, _) => nullableUintColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, ulong> ulongColumn)
+                {
+                    <NumericInput TValue="ulong"
+                                    Value="@ulongColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => ulongColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => ulongColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, ulong?> nullableUlongColumn)
+                {
+                    <NumericInput TValue="ulong?"
+                                    Value="@nullableUlongColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableUlongColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableUlongColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, ushort> ushortColumn)
+                {
+                    <NumericInput TValue="ushort"
+                                    Value="@ushortColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => ushortColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => ushortColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column is Column<TDataItem, ushort?> nullableUshortColumn)
+                {
+                    <NumericInput TValue="ushort?"
+                                    Value="@nullableUshortColumn.GetCellValue(Item)"
+                                    ValueChanged="@(v => nullableUshortColumn.SetCellValue(Item, v))"
+                                    Format="@column.Format"
+                                    FormatProvider="column.FormatProvider"
+                                    Validation="@((v, _) => nullableUshortColumn.Validate(v, Item))"
+                                    Class="dense" />
+                }
+                else if (column.IsEnum)
+                {
+                    <Select TValue="object"
+                            Value="@column.GetCellObjectValue(Item)"
+                            ValueChanged="@(v => column.SetCellObjectValue(Item, v))"
+                            OptionPairs="@column.GetEnumOptions()"
+                            Validation="@((v, _) => column.ValidateObject(v, Item))"
+                            Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.DateTime> dateTimeColumn)
+                {
+                    <DateTimeInput TValue="System.DateTime"
+                                   Value="@dateTimeColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => dateTimeColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   ShowTime="true"
+                                   Validation="@((v, _) => dateTimeColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.DateTime?> nullableDateTimeColumn)
+                {
+                    <DateTimeInput TValue="System.DateTime?"
+                                   Value="@nullableDateTimeColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => nullableDateTimeColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   ShowTime="true"
+                                   Validation="@((v, _) => nullableDateTimeColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.DateTimeOffset> dateTimeOffsetColumn)
+                {
+                    <DateTimeInput TValue="System.DateTimeOffset"
+                                   Value="@dateTimeOffsetColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => dateTimeOffsetColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   ShowTime="true"
+                                   ShowTimeZone="true"
+                                   Validation="@((v, _) => dateTimeOffsetColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.DateTimeOffset?> nullableDateTimeOffsetColumn)
+                {
+                    <DateTimeInput TValue="System.DateTimeOffset?"
+                                   Value="@nullableDateTimeOffsetColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => nullableDateTimeOffsetColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   ShowTime="true"
+                                   ShowTimeZone="true"
+                                   Validation="@((v, _) => nullableDateTimeOffsetColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.DateOnly> dateOnlyColumn)
+                {
+                    <DateTimeInput TValue="System.DateOnly"
+                                   Value="@dateOnlyColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => dateOnlyColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   Validation="@((v, _) => dateOnlyColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.DateOnly?> nullableDateOnlyColumn)
+                {
+                    <DateTimeInput TValue="System.DateOnly?"
+                                   Value="@nullableDateOnlyColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => nullableDateOnlyColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   Validation="@((v, _) => nullableDateOnlyColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.TimeOnly> timeOnlyColumn)
+                {
+                    <DateTimeInput TValue="System.TimeOnly"
+                                   Value="@timeOnlyColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => timeOnlyColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   Validation="@((v, _) => timeOnlyColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.TimeOnly?> nullableTimeOnlyColumn)
+                {
+                    <DateTimeInput TValue="System.TimeOnly?"
+                                   Value="@nullableTimeOnlyColumn.GetCellValue(Item)"
+                                   ValueChanged="@(v => nullableTimeOnlyColumn.SetCellValue(Item, v))"
+                                   Format="@column.Format"
+                                   FormatProvider="column.FormatProvider"
+                                   Validation="@((v, _) => nullableTimeOnlyColumn.Validate(v, Item))"
+                                   Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.Drawing.Color> colorColumn)
+                {
+                    <ColorInput TValue="System.Drawing.Color"
+                                Value="@colorColumn.GetCellValue(Item)"
+                                ValueChanged="@(v => colorColumn.SetCellValue(Item, v))"
+                                ColorMode="ColorMode.RGB"
+                                Format="@column.Format"
+                                FormatProvider="column.FormatProvider"
+                                Validation="@((v, _) => colorColumn.Validate(v, Item))"
+                                Class="dense" />
+                }
+                else if (column is Column<TDataItem, System.Drawing.Color?> nullableColorColumn)
+                {
+                    <ColorInput TValue="System.Drawing.Color?"
+                                Value="@nullableColorColumn.GetCellValue(Item)"
+                                ValueChanged="@(v => nullableColorColumn.SetCellValue(Item, v))"
+                                ColorMode="ColorMode.RGB"
+                                Format="@column.Format"
+                                FormatProvider="column.FormatProvider"
+                                Validation="@((v, _) => nullableColorColumn.Validate(v, Item))"
+                                Class="dense" />
                 }
                 else if (column.ChildContent is null)
                 {
-                    if (column.IsBool)
-                    {
-                        if (column.IsNullable
-                            || column.IsTrue(Item))
-                        {
-                            <span class="@column.AlignClass">
-                                <tf-icon>@column.GetBoolIcon(Item)</tf-icon>
-                            </span>
-                        }
-                    }
-                    else
-                    {
-                        <span class="@column.AlignClass">
-                            @column.ToString(Item)
-                        </span>
-                    }
+                    @column.ToString(Item)
                 }
                 else
                 {
                     @column.ChildContent(Item)
                 }
-            </td>
-        }
-    </Form>
+            }
+            else if (column.ChildContent is null)
+            {
+                if (column.IsBool)
+                {
+                    if (column.IsNullable
+                        || column.IsTrue(Item))
+                    {
+                        <tf-icon>@column.GetBoolIcon(Item)</tf-icon>
+                    }
+                }
+                else
+                {
+                    @column.ToString(Item)
+                }
+            }
+            else
+            {
+                @column.ChildContent(Item)
+            }
+        </td>
+    }
 </tr>
 @if (DataGrid.ExpandedContent is not null && IsExpanded)
 {

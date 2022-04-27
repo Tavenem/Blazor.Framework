@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 /// Represents a row in a <see cref="DataGrid{TDataItem}"/>.
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public partial class Row<TDataItem>
+public partial class Row<TDataItem> where TDataItem : notnull
 {
     /// <summary>
     /// Gets whether the row is expanded.
@@ -27,15 +27,15 @@ public partial class Row<TDataItem>
     /// <summary>
     /// Gets the data item bound to this row.
     /// </summary>
-    [Parameter] public TDataItem? Item { get; set; }
+    [Parameter] public TDataItem Item { get; set; } = default!;
+
+    [CascadingParameter] private Form? TableEditForm { get; set; }
 
     private string? ThemeButtonClass => new CssBuilder("btn btn-icon small")
         .Add(ThemeColor.ToCSS())
         .ToString();
 
     [CascadingParameter] private DataGrid<TDataItem>? DataGrid { get; set; }
-
-    private Form? EditForm { get; set; }
 
     private string? ExpandClass => new CssBuilder("expand-row")
         .Add("open", IsExpanded)
@@ -51,13 +51,33 @@ public partial class Row<TDataItem>
         .ToString();
 
     private string? RowCssClass => new CssBuilder()
-        .Add(DataGrid!.RowClass!.Invoke(Item!), DataGrid?.RowClass is not null && Item is not null)
+        .Add(DataGrid?.RowClass?.Invoke(Item), DataGrid?.RowClass is not null)
         .Add("selected", IsSelected)
         .ToString();
 
     private ThemeColor ThemeColor => DataGrid?.ThemeColor ?? ThemeColor.None;
 
-    internal Task CancelEditAsync() => EditForm?.ResetAsync() ?? Task.CompletedTask;
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (Item is null)
+        {
+            throw new InvalidOperationException($"{nameof(Item)} may not be null");
+        }
+    }
+
+    internal async Task CancelEditAsync()
+    {
+        if (DataGrid is null)
+        {
+            return;
+        }
+        if (DataGrid.TableEditForm is not null)
+        {
+            await DataGrid.TableEditForm.ResetAsync();
+        }
+        DataGrid.EditingRow = null;
+    }
 
     private async Task OnClickAsync()
     {
@@ -69,6 +89,8 @@ public partial class Row<TDataItem>
         await DataGrid.OnSelectAsync(this);
     }
 
+    private Task OnDeleteAsync() => DataGrid?.OnDeleteAsync(this) ?? Task.CompletedTask;
+
     private Task OnEditAsync() => DataGrid?.OnEditAsync(this) ?? Task.CompletedTask;
 
     private async Task OnSaveAsync()
@@ -78,9 +100,9 @@ public partial class Row<TDataItem>
             return;
         }
 
-        if (EditForm is not null)
+        if (DataGrid.TableEditForm is not null)
         {
-            var valid = await EditForm.ValidateAsync();
+            var valid = await DataGrid.TableEditForm.ValidateAsync();
             if (!valid)
             {
                 return;

@@ -13,6 +13,7 @@ interface IPopoverElement extends HTMLElement {
     anchorId?: string | null;
     offsetX?: number;
     offsetY?: number;
+    parent?: HTMLElement | null;
     popoverFlipped?: string | null;
     popoverMark?: string;
 }
@@ -92,12 +93,26 @@ class Popover {
         this.initialize();
 
         const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
-        if (!popoverNode
-            || !popoverNode.offsetParent
-            || !(popoverNode.offsetParent instanceof Element)) {
+        if (!popoverNode) {
             return;
         }
+
         popoverNode.anchorId = anchorId;
+        const anchor = anchorId ? document.getElementById(anchorId) : null;
+
+        let containingParent = anchor
+            ? anchor.parentElement
+            : popoverNode.parentElement;
+        while (containingParent
+            && (!containingParent.contains(popoverNode)
+            || getComputedStyle(containingParent).position == 'static')) {
+            containingParent = containingParent.parentElement;
+        }
+        if (!containingParent) {
+            return;
+        }
+        popoverNode.parent = containingParent;
+
         this.placePopover(popoverNode);
 
         const observer = new MutationObserver(this.callback.bind(this));
@@ -119,7 +134,7 @@ class Popover {
                 }
             }
         });
-        parentResizeObserver.observe(popoverNode.offsetParent);
+        parentResizeObserver.observe(containingParent);
 
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
@@ -132,26 +147,24 @@ class Popover {
         resizeObserver.observe(popoverNode);
 
         let style = getComputedStyle(popoverNode);
-        if (style.position != 'fixed') {
-            const overflowRegex = /(auto|scroll)/;
-            let parent = popoverNode.parentElement as IPopoverScroller;
-            while (parent) {
-                if (parent.listeningForPopoverScroll) {
-                    break;
-                }
-                style = getComputedStyle(parent);
-                if (style.position === 'static') {
-                    parent = parent.parentElement as IPopoverScroller;
-                    continue;
-                }
-                if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
-                    parent.addEventListener('scroll', () => {
-                        this.placePopoverByClassSelector('flip-always');
-                    });
-                    parent.listeningForPopoverScroll = true;
-                }
-                parent = parent.parentElement as IPopoverScroller;
+        const overflowRegex = /(auto|scroll)/;
+        let parent = popoverNode.parentElement as IPopoverScroller;
+        while (parent) {
+            if (parent.listeningForPopoverScroll) {
+                break;
             }
+            style = getComputedStyle(parent);
+            if (style.position === 'static') {
+                parent = parent.parentElement as IPopoverScroller;
+                continue;
+            }
+            if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
+                parent.addEventListener('scroll', () => {
+                    this.placePopoverByClassSelector('flip-always');
+                });
+                parent.listeningForPopoverScroll = true;
+            }
+            parent = parent.parentElement as IPopoverScroller;
         }
 
         this.map[id] = {
@@ -226,42 +239,44 @@ class Popover {
 
     setOffset(id: string, offsetX: number | null, offsetY: number | null) {
         const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
-        if (popoverNode && popoverNode.offsetParent) {
-            const boundingRect = popoverNode.offsetParent.getBoundingClientRect();
+        if (!popoverNode
+            || !popoverNode.parent) {
+            return;
+        }
+        const boundingRect = popoverNode.parent.getBoundingClientRect();
 
-            const prevX = popoverNode.offsetX;
-            const prevY = popoverNode.offsetY;
+        const prevX = popoverNode.offsetX;
+        const prevY = popoverNode.offsetY;
 
-            popoverNode.offsetX = offsetX ? offsetX : undefined;
-            popoverNode.offsetY = offsetY ? offsetY : undefined;
+        popoverNode.offsetX = offsetX ? offsetX : undefined;
+        popoverNode.offsetY = offsetY ? offsetY : undefined;
 
-            if (prevX || popoverNode.offsetX) {
-                let left = 0;
-                if (popoverNode.style.left) {
-                    left = Number.parseFloat(popoverNode.style.left.substr(0, popoverNode.style.left.length - 2));
-                }
-                if (prevX || prevX === 0) {
-                    left -= prevX - boundingRect.left;
-                }
-                if (popoverNode.offsetX || popoverNode.offsetX === 0) {
-                    left += popoverNode.offsetX - boundingRect.left;
-                }
-                popoverNode.style.left = +left.toFixed(2) + 'px';
+        if (prevX || popoverNode.offsetX) {
+            let left = 0;
+            if (popoverNode.style.left) {
+                left = Number.parseFloat(popoverNode.style.left.substr(0, popoverNode.style.left.length - 2));
             }
-
-            if (prevY || popoverNode.offsetY) {
-                let top = 0;
-                if (popoverNode.style.top) {
-                    top = Number.parseFloat(popoverNode.style.top.substr(0, popoverNode.style.top.length - 2));
-                }
-                if (prevY || prevY === 0) {
-                    top -= prevY - boundingRect.top;
-                }
-                if (popoverNode.offsetY || popoverNode.offsetY === 0) {
-                    top += popoverNode.offsetY - boundingRect.top;
-                }
-                popoverNode.style.top = +top.toFixed(2) + 'px';
+            if (prevX || prevX === 0) {
+                left -= prevX - boundingRect.left;
             }
+            if (popoverNode.offsetX || popoverNode.offsetX === 0) {
+                left += popoverNode.offsetX - boundingRect.left;
+            }
+            popoverNode.style.left = +left.toFixed(2) + 'px';
+        }
+
+        if (prevY || popoverNode.offsetY) {
+            let top = 0;
+            if (popoverNode.style.top) {
+                top = Number.parseFloat(popoverNode.style.top.substr(0, popoverNode.style.top.length - 2));
+            }
+            if (prevY || prevY === 0) {
+                top -= prevY - boundingRect.top;
+            }
+            if (popoverNode.offsetY || popoverNode.offsetY === 0) {
+                top += popoverNode.offsetY - boundingRect.top;
+            }
+            popoverNode.style.top = +top.toFixed(2) + 'px';
         }
     }
 
@@ -370,8 +385,7 @@ class Popover {
         classSelector: string | null = null): void {
         if (!popoverNode
             || !popoverNode.classList.contains('open')
-            || !popoverNode.offsetParent
-            || !(popoverNode.offsetParent instanceof HTMLElement)) {
+            || !popoverNode.parent) {
             return;
         }
 
@@ -385,7 +399,7 @@ class Popover {
         let anchorOffsetLeft = 0;
         let anchorOffsetTop = 0;
         if (anchorElement) {
-            if (anchorElement.offsetParent != popoverNode.offsetParent) {
+            if (anchorElement.offsetParent != popoverNode.parent) {
                 anchorElement = null;
             } else {
                 anchorOffsetLeft = anchorElement.offsetLeft;
@@ -393,7 +407,7 @@ class Popover {
             }
         }
 
-        const boundingRect = popoverNode.offsetParent.getBoundingClientRect();
+        const boundingRect = popoverNode.parent.getBoundingClientRect();
         const anchorBoundingRect = anchorElement
             ? anchorElement.getBoundingClientRect()
             : boundingRect;
@@ -523,10 +537,8 @@ class Popover {
             }
         }
 
-        if (window.getComputedStyle(popoverNode).position == 'fixed') {
-            offsetX += boundingRect.left;
-            offsetY += boundingRect.top;
-        }
+        offsetX += boundingRect.left;
+        offsetY += boundingRect.top;
 
         if (popoverNode.offsetX) {
             offsetX += popoverNode.offsetX - boundingRect.left;

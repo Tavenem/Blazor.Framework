@@ -113,8 +113,6 @@ public partial class Option<TValue> : IDisposable
     [Parameter]
     public TValue? Value { get; set; }
 
-    [CascadingParameter(Name = nameof(FromPopover))] private bool FromPopover { get; set; }
-
     private string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("active", IsSelected)
@@ -146,7 +144,7 @@ public partial class Option<TValue> : IDisposable
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
-        if (!FromPopover)
+        if (!IsSelectAll)
         {
             Select?.Add(this);
         }
@@ -160,6 +158,8 @@ public partial class Option<TValue> : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    internal void InvokeStateChange() => StateHasChanged();
+
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting
     /// unmanaged resources.
@@ -168,7 +168,7 @@ public partial class Option<TValue> : IDisposable
     {
         if (!_disposedValue)
         {
-            if (disposing && !FromPopover)
+            if (disposing && !IsSelectAll)
             {
                 Select?.Remove(this);
             }
@@ -176,17 +176,17 @@ public partial class Option<TValue> : IDisposable
         }
     }
 
-    private void OnClick()
+    private async Task OnClickAsync()
     {
-        if (!Disabled)
+        if (!Disabled && Select is not null)
         {
             if (IsSelectAll)
             {
-                Select?.SelectAll();
+                await Select.SelectAllAsync();
             }
             else
             {
-                Select?.ToggleValue(this);
+                Select.ToggleValue(this);
             }
         }
     }

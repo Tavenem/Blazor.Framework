@@ -17,7 +17,7 @@
     <code>Items</code> property.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" />
@@ -30,18 +30,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -213,10 +215,10 @@
     You can control which properties are included by setting the columns explicitly.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid TDataItem="DataItem" Items="_items">
+            <DataGrid Title="Employees" Items="_items">
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false">
@@ -229,7 +231,7 @@
                     <FooterContent>
                         <div class="d-flex flex-column">
                             <span>Longest tenure: @(((DateTime.Now - context.Min(x => x.HireDate)).Days / 365.25).ToString("F1")) years</span>
-                            <span>Average: @((new DateTime(context.Average(x => x.HireDate.Ticks)).Days / 365.25).ToString("F1")) years</span>
+                            <span>Average: @((new TimeSpan((long)Math.Round(context.Average(x => (DateTime.Now - x.HireDate).Ticks))).Days / 365.25).ToString("F1")) years</span>
                         </div>
                     </FooterContent>
                 </Column>
@@ -237,7 +239,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid TDataItem=""DataItem"" Items=""_items"">
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Title=""Employees"" Items=""_items"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"">
@@ -260,18 +262,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -331,7 +335,7 @@
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid TDataItem="DataItem" Items="_items">
+            <DataGrid Items="_items">
                 <ChildContent>
                     <Column Label="Last" Value="@(x => x.LastName)" />
                     <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" />
@@ -350,7 +354,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid TDataItem=""DataItem"" Items=""_items"">
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"">
     <ChildContent>
         <Column Label=""Last"" Value=""@(x => x.LastName)"" />
         <Column Label=""Hire date"" Value=""@(x => x.HireDate)"" Format=""d"" CanFilter=""false"" />
@@ -371,18 +375,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -468,7 +474,7 @@
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid TDataItem="DataItem" Items="_items" GroupBy="@(x => x.IsExecutive)">
+            <DataGrid Items="_items" GroupBy="@(x => x.IsExecutive)">
                 <GroupContent>
                     @if (context is bool b && b)
                     {
@@ -485,24 +491,26 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid TDataItem=""DataItem"" Items=""_items"" GroupBy=""@(x => x.IsExecutive)"" />
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" GroupBy=""@(x => x.IsExecutive)"" />
 
 @code {
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -516,6 +524,60 @@
 <p>
     Or, the <code>GroupContent RenderFragment</code> can display custom content in the group header.
     It receives the group key as its context parameter.
+</p>
+
+<Heading Level="HeadingLevel.H2">Pagination</Heading>
+
+<p>
+    The <code>DataGrid</code> contains a built-in <a href="./components/pagination">Pagination</a>
+    control. You can set the initial number of items displayed per page with the
+    <code>RowsPerPage</code> property (the default is 10). The user can change this value by
+    selecting an option from a select populated by the <code>RowsPerPageOptions</code> property (the
+    default options are 10, 25, 50, and 100).
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <DataGrid Items="_items2" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" />
+
+@code {
+    private class DataItem
+    {
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
+    }
+    private List<DataItem> _items = new()
+    {
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+        new DataItem { Id = 7, FirstName = ""Linda"", LastName = ""Davis"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(1372) },
+        new DataItem { Id = 8, FirstName = ""William"", LastName = ""Rodriguez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(150) },
+        new DataItem { Id = 9, FirstName = ""Elizabeth"", LastName = ""Martinez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(650) },
+        new DataItem { Id = 10, FirstName = ""David"", LastName = ""Hernandez"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1000) },
+        new DataItem { Id = 11, FirstName = ""Barbara"", LastName = ""Lopez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(1759) },
+        new DataItem { Id = 12, FirstName = ""Richard"", LastName = ""Gonzales"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(2007) },
+        new DataItem { Id = 13, FirstName = ""Susan"", LastName = ""Wilson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1847) },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    If the number of items available is less than the number of items per page, the pagination
+    controls are not displayed.
 </p>
 
 <Heading Level="HeadingLevel.H2">Selection</Heading>
@@ -535,30 +597,32 @@
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem" />
+            <DataGrid TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem" />
             <span>Selected employee: @(_selectedItem?.LastName ?? "none")</span>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" />
+        @CodeFormatter.CodeToMarkup(@"<DataGrid TDataItem=""DataItem"" Items=""_items"" SelectionType=""SelectionType.Single"" @bind-SelectedItem=""_selectedItem"" />
 <span>Selected employee: @(_selectedItem?.LastName ?? ""none"")</span>
 
 @code {
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
     private DataItem? _selectedItem;
 }")
@@ -578,30 +642,32 @@
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
+            <DataGrid TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
             <span>Selected employees: @_selectedItems.Count</span>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItem=""_selectedItem"" />
+        @CodeFormatter.CodeToMarkup(@"<DataGrid TDataItem=""DataItem"" Items=""_items"" SelectionType=""SelectionType.Multiple"" @bind-SelectedItem=""_selectedItem"" />
 <span>Selected employee: @_selectedItems.Count</span>
 
 @code {
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
     private List<DataItem> _selectedItems = new();
 }")
@@ -666,7 +732,7 @@
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_editableItems" AllowEdit="true" />
+            <DataGrid Items="_editableItems1" AllowEdit="true" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -676,18 +742,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -730,7 +798,9 @@
 </p>
 
 <p>
-    When an edit is complete, the <code>ItemSaved</code> callback is invoked.
+    When an edit is complete, the <code>ItemSaved</code> function is invoked (if defined). If this
+    callback returns <code>false</code>, the item's edited properties are reverted to their original
+    values.
 </p>
 
 <Heading Level="HeadingLevel.H3">Inline editing</Heading>
@@ -750,6 +820,38 @@
     edit dialog, this reset only works for <code>IFormComponent</code> inputs.
 </p>
 
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <DataGrid Items="_editableItems2" AllowEdit="true" AllowInlineEdit="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" AllowInlineEdit=""true"" />
+
+@code {
+    private class DataItem
+    {
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
+    }
+    private List<DataItem> _items = new()
+    {
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
 <Heading Level="HeadingLevel.H3">Adding items</Heading>
 
 <p>
@@ -760,15 +862,118 @@
 </p>
 
 <p>
-    When the dialog is submitted the <code>ItemAdded</code> callback is invoked. If the
-    <code>Items</code> collection is set, the new item is added to its proper place in the data set
-    (possibly on a different page). If <code>LoadItems</code> is set, however, the item is simply
-    added to the current page, to avoid a potentially expensive call. If this behavior is
-    undesirable, your <code>ItemAdded</code> callback can invoke <code>LoadItemsAsync</code>
-    manually to force a refresh.
+    When the dialog is submitted the <code>ItemAdded</code> function is invoked (if defined). If
+    this retuns false, no further action is taken. Otherwise, if the <code>Items</code> collection
+    is set, the new item is added to its proper place in the data set (possibly on a different
+    page). If <code>LoadItems</code> is set, however, the item is simply added to the current page,
+    to avoid a potentially expensive call. If this behavior is undesirable, your
+    <code>ItemAdded</code> callback can invoke <code>LoadItemsAsync</code> manually to force a
+    refresh.
 </p>
 
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <DataGrid Items="_editableItems3" AllowEdit="true" AllowAdd="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" AllowAdd=""true"" />
+
+@code {
+    private class DataItem
+    {
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
+    }
+    private List<DataItem> _items = new()
+    {
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H3">Deleting items</Heading>
+
+<p>
+    You can enable adding new items by setting the <code>AllowDelete</code> property to
+    <code>true</code>. This enables a delete button on each row. When activated, this displays a
+    confirmation dialog. If accepted, the <code>ItemDeleted</code> function is invoked (if defined).
+    If this returns false no further action is taken. Otherwise, if the <code>Items</code>
+    collection is set, the item is removed. If <code>LoadItems</code> is set, the item is removed
+    from the current page (if present).
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <DataGrid Items="_editableItems3" AllowEdit="true" AllowDelete="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" AllowDelete=""true"" />
+
+@code {
+    private class DataItem
+    {
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
+    }
+    private List<DataItem> _items = new()
+    {
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
 <Heading Level="HeadingLevel.H3">Validation</Heading>
+
+<p>
+    When editing or adding new items, the values in each cell (i.e. each property of the item) can
+    be validated prior to saving by assigning a function to the <code>CellValidation</code> property
+    of its <code>Column</code>.
+</p>
+
+<p>
+    The function is similar to the <code>Validation</code> function of an input component: it
+    receives the new value being assigned, the data item (row), and should return an enumeration of
+    validation messages, which should be empty if the validation passes.
+</p>
+
+<p>
+    If validation fails the edit or add operation will not be allowed. If the edit dialog is being
+    used, the dialog will not close if the user attempts to sumit it with invalid data. This allows
+    the user to see the validation messages for each input control, and correct any mistakes.
+</p>
+
+<p>
+    If inline editing is enabled, any action which would end inline edit initiates validation
+    (including an explicit save operation, or starting inline editing on a different row). If
+    validation fails for an explicit save, the save operation does not continue, and the user will
+    be able to see invalid cells and correct any mistakes. If validation fails due to an implit save
+    prior to editing a different row, the original edit is canceled, and all cells revert to their
+    original values.
+</p>
 
 <Heading Level="HeadingLevel.H2">Customization</Heading>
 
@@ -803,18 +1008,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -827,30 +1034,32 @@
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" ThemeColor="ThemeColor.Primary" TableClass="striped hover" />
-            <DataGrid Items="_items" ThemeColor="ThemeColor.Secondary" TableClass="striped hover" />
+            <DataGrid Items="_items" Title="Primary" ThemeColor="ThemeColor.Primary" SelectionType="SelectionType.Single" TableClass="striped hover" />
+            <DataGrid Items="_items" Title="Secondary" ThemeColor="ThemeColor.Secondary" SelectionType="SelectionType.Single" TableClass="striped hover" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" ThemeColor=""ThemeColor.Primary"" TableClass=""striped hover"" />
-<DataGrid Items=""_items"" ThemeColor=""ThemeColor.Secondary"" TableClass=""striped hover"" />
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" Title=""Primary"" ThemeColor=""ThemeColor.Primary"" SelectionType=""SelectionType.Single"" TableClass=""striped hover"" />
+<DataGrid Items=""_items"" Title=""Secondary"" ThemeColor=""ThemeColor.Secondary"" SelectionType=""SelectionType.Single"" TableClass=""striped hover"" />
 
 @code {
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -878,18 +1087,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -912,18 +1123,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -947,18 +1160,20 @@
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
 }")
     </ChildContent>
@@ -966,42 +1181,44 @@
 
 <p>
     The <code>DataGrid</code> components adds the <code>sticky-header</code> and
-    <code>sticky-footer</code> classes automatically. Apply a fixed or maximum <code>height</code>
-    to see this in action.
+    <code>sticky-footer</code> classes automatically. Specify a value for the <code>MaxHeight</code>
+    property to see this in action.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items2" Style="height:300px" />
+            <DataGrid Items="_items2" MaxHeight="300px" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" Style=""height:300px"" />
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" MaxHeight=""300px"" />
 
 @code {
     private class DataItem
     {
         public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Title { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public bool IsExecutive { get; set; }
+        public DateTime HireDate { get; set; }
     }
-    private DataItem[] _items = new[]
+    private List<DataItem> _items = new()
     {
-        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = ""James"", LastName = ""Smith"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = ""Mary"", LastName = ""Johnson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = ""Robert"", LastName = ""Williams"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = ""Patricia"", LastName = ""Brown"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = ""John"", LastName = ""Jones"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
-        new DataItem { Id = 7, FirstName = ""Linda"", LastName = ""Davis"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(200) },
+        new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+        new DataItem { Id = 7, FirstName = ""Linda"", LastName = ""Davis"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(1372) },
         new DataItem { Id = 8, FirstName = ""William"", LastName = ""Rodriguez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(150) },
         new DataItem { Id = 9, FirstName = ""Elizabeth"", LastName = ""Martinez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(650) },
         new DataItem { Id = 10, FirstName = ""David"", LastName = ""Hernandez"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1000) },
-        new DataItem { Id = 11, FirstName = ""Barbara"", LastName = ""Lopez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(630) },
-        new DataItem { Id = 12, FirstName = ""Richard"", LastName = ""Gonzales"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(430) },
-        new DataItem { Id = 13, FirstName = ""Susan"", LastName = ""Wilson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(130) },
+        new DataItem { Id = 11, FirstName = ""Barbara"", LastName = ""Lopez"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(1759) },
+        new DataItem { Id = 12, FirstName = ""Richard"", LastName = ""Gonzales"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(2007) },
+        new DataItem { Id = 13, FirstName = ""Susan"", LastName = ""Wilson"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1847) },
     };
 }")
     </ChildContent>
@@ -1031,59 +1248,72 @@
         public bool IsExecutive { get; set; }
         public DateTime HireDate { get; set; }
     }
-    private DataItem[] _editableItems = new[]
+    private List<DataItem> _editableItems1 = new()
     {
-        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
+        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
-    DataItem[] _items2 =
+    private List<DataItem> _editableItems2 = new()
     {
-        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
+        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
         new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
         new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
         new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
         new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
-        new DataItem { Id = 7, FirstName = "Linda", LastName = "Davis", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(200) },
+        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+    private List<DataItem> _editableItems3 = new()
+    {
+        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+    private List<DataItem> _editableItems4 = new()
+    {
+        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+    private List<DataItem> _items = new()
+    {
+        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+    };
+    private List<DataItem> _items2 = new()
+    {
+        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
+        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121) },
+        new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
+        new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
+        new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
+        new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
+        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
+        new DataItem { Id = 7, FirstName = "Linda", LastName = "Davis", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(1372) },
         new DataItem { Id = 8, FirstName = "William", LastName = "Rodriguez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(150) },
         new DataItem { Id = 9, FirstName = "Elizabeth", LastName = "Martinez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(650) },
         new DataItem { Id = 10, FirstName = "David", LastName = "Hernandez", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1000) },
-        new DataItem { Id = 11, FirstName = "Barbara", LastName = "Lopez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(630) },
-        new DataItem { Id = 12, FirstName = "Richard", LastName = "Gonzales", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(430) },
-        new DataItem { Id = 13, FirstName = "Susan", LastName = "Wilson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(130) },
-    };
-    private DataItem[] _items = new[]
-    {
-        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
-        new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
-        new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
-        new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
-        new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
-    };
-    DataItem[] _items2 =
-    {
-        new DataItem { Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(450) },
-        new DataItem { Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(600) },
-        new DataItem { Id = 2, FirstName = "Robert", LastName = "Williams", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(210) },
-        new DataItem { Id = 3, FirstName = "Patricia", LastName = "Brown", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(720) },
-        new DataItem { Id = 4, FirstName = "John", LastName = "Jones", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(550) },
-        new DataItem { Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
-        new DataItem { Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(280) },
-        new DataItem { Id = 7, FirstName = "Linda", LastName = "Davis", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(200) },
-        new DataItem { Id = 8, FirstName = "William", LastName = "Rodriguez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(150) },
-        new DataItem { Id = 9, FirstName = "Elizabeth", LastName = "Martinez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(650) },
-        new DataItem { Id = 10, FirstName = "David", LastName = "Hernandez", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1000) },
-        new DataItem { Id = 11, FirstName = "Barbara", LastName = "Lopez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(630) },
-        new DataItem { Id = 12, FirstName = "Richard", LastName = "Gonzales", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(430) },
-        new DataItem { Id = 13, FirstName = "Susan", LastName = "Wilson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(130) },
+        new DataItem { Id = 11, FirstName = "Barbara", LastName = "Lopez", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(1759) },
+        new DataItem { Id = 12, FirstName = "Richard", LastName = "Gonzales", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(2007) },
+        new DataItem { Id = 13, FirstName = "Susan", LastName = "Wilson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1847) },
     };
     private DataItem? _selectedItem;
     private List<DataItem> _selectedItems = new();

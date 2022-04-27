@@ -329,11 +329,11 @@ public partial class ColorInput<TValue>
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public override void Clear()
+    public override Task ClearAsync()
     {
         if (Disabled || ReadOnly)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         Color = ShowAlpha
@@ -366,6 +366,8 @@ public partial class ColorInput<TValue>
         {
             CurrentValue = default;
         }
+
+        return Task.CompletedTask;
     }
 
     /// <summary>

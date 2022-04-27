@@ -1,4 +1,5 @@
-﻿@using Tavenem.Blazor.Framework.InternalComponents.DataGrid
+﻿@using Tavenem.Blazor.Framework.Components.DataGrid
+@using Tavenem.Blazor.Framework.InternalComponents.DataGrid
 
 @namespace Tavenem.Blazor.Framework
 
@@ -8,165 +9,210 @@
 @inherits TavenemComponentBase
 
 <div class="d-none">
-    <CascadingValue Value="this" IsFixed="true">
+    <CascadingValue Value="this" TValue="IDataGrid<TDataItem>" IsFixed="true">
         @ChildContent
     </CascadingValue>
 </div>
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="datagrid-toolbar">
-        @if (!string.IsNullOrWhiteSpace(Title))
-        {
-            <span class="h4">@Title</span>
-        }
-        @HeaderContent
-        @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
-        {
-            <TextInput Value="@QuickFilter"
-                       ValueChanged="OnChangeQuickFilterAsync"
-                       PostfixIcon="@DefaultIcons.Search"
-                       UpdateOnInput="true"
-                       UpdateOnInputDebounce="500" />
-        }
-        @if (AllowAdd)
-        {
-            <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon class="success">@DefaultIcons.Add</tf-icon></button>
-        }
-        @if (AllowExport)
-        {
-            <button class="btn btn-icon small" @onclick="@(_ => _isExportDialogVisible = true)">
-                <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+        <div>
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <span class="@TitleClass">@Title</span>
+            }
+            @HeaderContent
+        </div>
+        <div>
+            @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
+            {
+                <TextInput Value="@QuickFilter"
+                           ValueChanged="OnChangeQuickFilterAsync"
+                           PostfixIcon="@DefaultIcons.Search"
+                           UpdateOnInput="true"
+                           UpdateOnInputDebounce="500" />
+            }
+            @if (AllowAdd)
+            {
+                <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
+            }
+            @if (AllowExport)
+            {
+                <button class="btn btn-icon small" @onclick="@(_ => _isExportDialogVisible = true)">
+                    <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+                </button>
+            }
+            <button class="btn btn-icon small" @onclick="@(_ => _isColumnFilterDialogVisible = true)">
+                <tf-icon>@DefaultIcons.Filter</tf-icon>
             </button>
-        }
-        <button class="btn btn-icon small" @onclick="@(_ => _isColumnFilterDialogVisible = true)">
-            <tf-icon>@DefaultIcons.Filter</tf-icon>
-        </button>
+        </div>
     </div>
-    <table class="@TableCssClass">
-        <colgroup>
-            @if (SelectionType == SelectionType.Multiple)
-            {
-                <col />
-            }
-            @if (AllowEdit)
-            {
-                <col />
-            }
-            @if (ExpandedContent is not null)
-            {
-                <col />
-            }
-            @foreach (var column in _columns.Where(x => x.GetIsShown()))
-            {
-                <col @key="column" class="@column.ColumnClass" />
-            }
-        </colgroup>
-        <thead>
-            <tr>
+    <Form @ref="TableEditForm" Style="@FormStyle">
+        <table class="@TableCssClass">
+            <colgroup>
                 @if (SelectionType == SelectionType.Multiple)
                 {
-                    <th></th>
+                    <col />
                 }
-                @if (AllowEdit)
+                @if (AllowEdit || AllowDelete)
                 {
-                    <th></th>
+                    <col />
                 }
                 @if (ExpandedContent is not null)
                 {
-                    <th></th>
+                    <col />
                 }
                 @foreach (var column in _columns.Where(x => x.GetIsShown()))
                 {
-                    <th @key="column">
-                        <span class="d-inline-flex justify-content-space-between align-items-end">
-                            @if (column.LabelContent is null)
-                            {
-                                <span class="@column.GetAlignClass()">
-                                    @column.GetLabel()
-                                </span>
-                            }
-                            else
-                            {
-                                @column.LabelContent
-                            }
-                            @if (column.GetIsSortable())
-                            {
-                                <button class="btn btn-icon small" @onclick="@(_ => OnColumnSortAsync(column))">
-                                    <tf-icon>@(column.SortDescending ? DefaultIcons.Sort_Descending : DefaultIcons.Sort_Ascending)</tf-icon>
-                                </button>
-                            }
-                        </span>
-                    </th>
+                    <col @key="column" class="@column.ColumnClass" />
                 }
-            </tr>
-            <tr style="background-color:var(--table-stripe-color)">
-                @if (SelectionType == SelectionType.Multiple)
-                {
-                    <th>
-                        <Checkbox TValue="bool?"
-                                  Value="SelectAllValue"
-                                  ValueChanged="OnSetSelectAllAsync"
-                                  ThemeColor="ThemeColor" />
-                    </th>
-                }
-                @if (AllowEdit)
-                {
-                    <th></th>
-                }
-                @if (ExpandedContent is not null)
-                {
-                    <th></th>
-                }
-                @foreach (var column in _columns.Where(x => x.GetIsShown()))
-                {
-                    <th @key="column">
-                        <span class="d-inline-flex justify-content-space-between align-items-end">
-                            @if (column.IsBool)
-                            {
-                                <Checkbox TValue="bool?"
-                                          Value="@column.BoolFilter"
-                                          ValueChanged="@(v => OnBoolFilterChangedAsync(column, v))"
-                                          AllowNull="column.IsNullable" />
-                            }
-                            else if (column.IsNumeric)
-                            {
-                                <NumericInput TValue="double?"
-                                              Value="@column.NumberFilter"
-                                              ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))" />
-                            }
-                            else if (column.IsDateTime)
-                            {
-                                <DateTimeInput TValue="DateTimeOffset?"
-                                               Value="@column.DateTimeFilter"
-                                               ValueChanged="@(v => OnDateTimeFilterChangedAsync(column, v))"
-                                               DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
-                                               ShowTime="@(column is not Column<TDataItem, DateOnly>)" />
-                            }
-                            else if (column.CanFilter)
-                            {
-                                <TextInput Value="@column.TextFilter"
-                                           ValueChanged="@(v => OnFilterChangedAsync(column, v))"
-                                           PostfixIcon="@DefaultIcons.Search"
-                                           UpdateOnInput="true"
-                                           UpdateOnInputDebounce="500" />
-                            }
-                        </span>
-                    </th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="background-color:var(--table-stripe-color);height:.25rem">
-                <td colspan="1000">
-                    @if (IsLoading)
+            </colgroup>
+            <thead>
+                <tr>
+                    @if (SelectionType == SelectionType.Multiple)
                     {
-                        <tf-progress-linear class="@LoadingClass"></tf-progress-linear>
+                        <th class="input">
+                            <Checkbox TValue="bool?"
+                                      Value="SelectAllValue"
+                                      ValueChanged="OnSetSelectAllAsync"
+                                      ThemeColor="ThemeColor"
+                                      Class="dense" />
+                        </th>
                     }
-                </td>
-            </tr>
-            @if (DataGroups is null)
-            {
-                if (!CurrentPageItems.Any()
-                    || !_columns.Any(x => x.GetIsShown()))
+                    @if (AllowEdit || AllowDelete)
+                    {
+                        <th></th>
+                    }
+                    @if (ExpandedContent is not null)
+                    {
+                        <th></th>
+                    }
+                    @foreach (var column in _columns.Where(x => x.GetIsShown()))
+                    {
+                        <th @key="column" class="@GetColumnHeaderClass(column)">
+                            <div @onclick="@(_ => OnColumnSortAsync(column))">
+                                @if (column.LabelContent is null)
+                                {
+                                    <span style="white-space:nowrap">
+                                        @column.GetLabel()
+                                    </span>
+                                }
+                                else
+                                {
+                                    @column.LabelContent
+                                }
+                                @if (column.GetIsSortable())
+                                {
+                                    <tf-icon class="@GetColumnHeaderIconClass(column)">
+                                        @DefaultIcons.Sort_Ascending
+                                    </tf-icon>
+                                }
+                            </div>
+                            @if (column.CanFilter)
+                            {
+                                <div>
+                                    @if (column.IsString)
+                                    {
+                                        <TextInput Value="@column.TextFilter"
+                                                    ValueChanged="@(v => OnFilterChangedAsync(column, v))"
+                                                    PostfixIcon="@DefaultIcons.Search"
+                                                    UpdateOnInput="true"
+                                                    UpdateOnInputDebounce="500"
+                                                    Class="dense" />
+                                    }
+                                    else if (column.IsBool)
+                                    {
+                                        <Checkbox TValue="bool?"
+                                                    Value="@column.BoolFilter"
+                                                    ValueChanged="@(v => OnBoolFilterChangedAsync(column, v))"
+                                                    AllowNull="true"
+                                                    Class="dense" />
+                                    }
+                                    else if (column.IsNumeric)
+                                    {
+                                        <NumericInput TValue="double?"
+                                                        Value="@column.NumberFilter"
+                                                        ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))"
+                                                        UpdateOnInput="true"
+                                                        UpdateOnInputDebounce="500"
+                                                        Class="dense" />
+                                    }
+                                    else if (column.IsDateTime)
+                                    {
+                                        <Switch @bind-Value="column.DateTimeFilterIsBefore"
+                                                UncheckedLabel="After"
+                                                Label="Before"
+                                                Class="dense" />
+                                        <DateTimeInput TValue="DateTimeOffset?"
+                                                        Value="@column.DateTimeFilter"
+                                                        ValueChanged="@(v => OnDateTimeFilterChangedAsync(column, v))"
+                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
+                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
+                                                        Class="dense" />
+                                    }
+                                </div>
+                            }
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="loading-row">
+                    <td colspan="1000">
+                        @if (IsLoading)
+                        {
+                            <tf-progress-linear class="@LoadingClass"></tf-progress-linear>
+                        }
+                    </td>
+                </tr>
+                @if (DataGroups is null)
+                {
+                    if (!AnyItems)
+                    {
+                        <tr>
+                            <td colspan="1000" style="text-align:center;vertical-align:middle">
+                                <div class="my-3">
+                                    @if (IsLoading)
+                                    {
+                                        <tf-progress-circle class="@ThemeColor.ToCSS()"></tf-progress-circle>
+                                    }
+                                    else if (NoDataContent is null)
+                                    {
+                                        <span>No Data</span>
+                                    }
+                                    else
+                                    {
+                                        @NoDataContent
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else if (!_columns.Any(x => x.GetIsShown()))
+                    {
+                        <tr>
+                            <td colspan="1000" style="text-align:center;vertical-align:middle">
+                                <div class="d-flex align-items-center my-3 gap-2">
+                                    <span>No columns displayed</span>
+                                    <button class="btn btn-icon small" @onclick="@(_ => _isColumnFilterDialogVisible = true)">
+                                        <tf-icon>@DefaultIcons.Filter</tf-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <CascadingValue Value="this" IsFixed="true">
+                            <CascadingValue Value="TableEditForm" IsFixed="true">
+                                @foreach (TDataItem item in CurrentPageItems)
+                                {
+                                    <Row TDataItem="TDataItem" Item="item" />
+                                }
+                            </CascadingValue>
+                        </CascadingValue>
+                    }
+                }
+                else if (DataGroups.Count == 0)
                 {
                     <tr>
                         <td colspan="1000" style="text-align:center;vertical-align:middle">
@@ -187,148 +233,85 @@
                         </td>
                     </tr>
                 }
-                if (!_columns.Any(x => x.GetIsShown()))
-                {
-                    <tr>
-                        <td colspan="1000" style="text-align:center;vertical-align:middle">
-                            <div class="d-flex align-items-center my-3 gap-2">
-                                <span>No columns displayed</span>
-                                <button class="btn btn-icon small" @onclick="@(_ => _isColumnFilterDialogVisible = true)">
-                                    <tf-icon>@DefaultIcons.Filter</tf-icon>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                }
                 else
                 {
-                    <CascadingValue Value="this" IsFixed="true">
-                        @foreach (var item in CurrentPageItems)
-                        {
-                            <Row TDataItem="TDataItem" Item="item" />
-                        }
-                    </CascadingValue>
-                    @if (_columns.Any(x => x.FooterContent is not null))
+                    @foreach (var group in DataGroups)
                     {
-                        <tr>
-                            @if (SelectionType == SelectionType.Multiple)
-                            {
-                                <td></td>
-                            }
-                            @if (AllowEdit)
-                            {
-                                <td></td>
-                            }
-                            @if (ExpandedContent is not null)
-                            {
-                                <td></td>
-                            }
-                            @foreach (var column in _columns.Where(x => x.GetIsShown()))
-                            {
-                                <td @key="column">
-                                    @if (column.FooterContent is not null)
+                        <tr @key="group">
+                            <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
+                                <span class="d-inline-flex align-items-center gap-2">
+                                    <button class="btn btn-icon small" @onclick="@(_ => OnToggleGroupExpansion(group))">
+                                        <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                    </button>
+                                    @if (GroupContent is null)
                                     {
-                                        @column.FooterContent(CurrentPageItems)
-                                    }
-                                </td>
-                            }
-                        </tr>
-                    }
-                }
-            }
-            else if (DataGroups.Count == 0)
-            {
-                <tr>
-                    <td colspan="1000" style="text-align:center;vertical-align:middle">
-                        <div class="my-3">
-                            @if (IsLoading)
-                            {
-                                <tf-progress-circle class="@ThemeColor.ToCSS()"></tf-progress-circle>
-                            }
-                            else if (NoDataContent is null)
-                            {
-                                <span>No Data</span>
-                            }
-                            else
-                            {
-                                @NoDataContent
-                            }
-                        </div>
-                    </td>
-                </tr>
-            }
-            else
-            {
-                @foreach (var group in DataGroups)
-                {
-                    <tr @key="group">
-                        <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
-                            <span class="d-inline-flex align-items-center gap-2">
-                                <button class="btn btn-icon small" @onclick="@(_ => OnToggleGroupExpansion(group))">
-                                    <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
-                                </button>
-                                @if (GroupContent is null)
-                                {
-                                    if (GroupLabel is null)
-                                    {
-                                        <span><strong>@group.Key?.ToString()</strong></span>
+                                        if (GroupLabel is null)
+                                        {
+                                            <span><strong>@group.Key?.ToString()</strong></span>
+                                        }
+                                        else
+                                        {
+                                            <span><strong>@GroupLabel(group.Key)</strong></span>
+                                        }
                                     }
                                     else
                                     {
-                                        <span><strong>@GroupLabel(group.Key)</strong></span>
+                                        @GroupContent(group.Key)
                                     }
-                                }
-                                else
-                                {
-                                    @GroupContent(group.Key)
-                                }
-                            </span>
-                        </td>
-                    </tr>
-                    @if (GetGroupIsExpanded(group.Key))
-                    {
-                        <CascadingValue Value="this" IsFixed="true">
-                            @foreach (var item in group)
-                            {
-                                <Row TDataItem="TDataItem" Item="item" />
-                            }
-                        </CascadingValue>
-                        @if (_columns.Any(x => x.FooterContent is not null))
+                                </span>
+                            </td>
+                        </tr>
+                        @if (GetGroupIsExpanded(group.Key))
                         {
-                            <tr>
-                                @if (SelectionType == SelectionType.Multiple)
-                                {
-                                    <td></td>
-                                }
-                                @if (AllowEdit)
-                                {
-                                    <td></td>
-                                }
-                                @if (ExpandedContent is not null)
-                                {
-                                    <td></td>
-                                }
-                                @foreach (var column in _columns.Where(x => x.GetIsShown()))
-                                {
-                                    <td @key="column">
-                                        @if (column.FooterContent is not null)
-                                        {
-                                            @column.FooterContent(group)
-                                        }
-                                    </td>
-                                }
-                            </tr>
+                            <CascadingValue Value="this" IsFixed="true">
+                                <CascadingValue Value="TableEditForm" IsFixed="true">
+                                    @foreach (TDataItem item in group)
+                                    {
+                                        <Row TDataItem="TDataItem" Item="item" />
+                                    }
+                                </CascadingValue>
+                            </CascadingValue>
+                            @if (group.Any()
+                                && _columns.Any(x => x.FooterContent is not null))
+                            {
+                                <tr>
+                                    @if (SelectionType == SelectionType.Multiple)
+                                    {
+                                        <td></td>
+                                    }
+                                    @if (AllowEdit || AllowDelete)
+                                    {
+                                        <td></td>
+                                    }
+                                    @if (ExpandedContent is not null)
+                                    {
+                                        <td></td>
+                                    }
+                                    @foreach (var column in _columns.Where(x => x.GetIsShown()))
+                                    {
+                                        <td @key="column">
+                                            @if (column.FooterContent is not null)
+                                            {
+                                                @column.FooterContent(group)
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
                         }
                     }
                 }
-                @if (_columns.Any(x => x.FooterContent is not null))
+            </tbody>
+            <tfoot>
+                @if (AnyItems
+                    && _columns.Any(x => x.FooterContent is not null))
                 {
                     <tr>
                         @if (SelectionType == SelectionType.Multiple)
                         {
                             <td></td>
                         }
-                        @if (AllowEdit)
+                        @if (AllowEdit || AllowDelete)
                         {
                             <td></td>
                         }
@@ -347,24 +330,28 @@
                         }
                     </tr>
                 }
-            }
-        </tbody>
-    </table>
+            </tfoot>
+        </table>
+    </Form>
     @if ((LoadItems is null
-        && Items.Count > RowsPerPage)
+        && CurrentItems.Count() > RowsPerPage)
         || CurrentDataPage?.TotalCount > RowsPerPage)
     {
-        <div class="d-flex justify-content-end align-items-center">
-            <span>Items per page:</span>
-            <Select TValue="ushort"
-                    Value="RowsPerPage"
-                    ValueChanged="OnChangeRowsPerPageAsync"
-                    Options="RowsPerPageOptions" />
-            <span>@((Offset - 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)CurrentPageItems.Count()).ToString("N0"))</span>
+        <div class="datagrid-pagination">
+            @if (ShowRowsPerPage)
+            {
+                <span>Items per page:</span>
+                <Select TValue="ushort"
+                        Value="RowsPerPage"
+                        ValueChanged="OnChangeRowsPerPageAsync"
+                        Options="RowsPerPageOptions"
+                        InputClass="text-center" />
+            }
+            <span>@((Offset + 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)CurrentPageItems.Count()).ToString("N0"))</span>
             @if (LoadItems is null || CurrentDataPage?.TotalCount.HasValue == true)
             {
                 <span>of</span>
-                <span>@((LoadItems is null ? (ulong)Items.Count : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
+                <span>@((LoadItems is null ? (ulong)CurrentItems.Count() : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
             }
             <Pagination CurrentPage="CurrentPage"
                         CurrentPageChanged="OnPageChangedAsync"
@@ -405,8 +392,8 @@
         <div class="d-flex flex-column mx-auto">
             <TextInput @bind-Value="ExportName" Label="File name" />
             <Select @bind-Value="ExportFileType" Label="File type">
-                <Option Value="@ExportFileType.CSV" Label="CSV" />
                 <Option Value="@ExportFileType.Excel" Label="Excel" />
+                <Option Value="@ExportFileType.CSV" Label="CSV" />
                 <Option Value="@ExportFileType.HTML" Label="HTML" />
                 @if (PdfExport is not null)
                 {
@@ -439,14 +426,31 @@
     </FooterContent>
 </Dialog>
 
-<Dialog @bind-IsVisible="_isEditDialogVisible">
+<Dialog @bind-IsVisible="_isDeleteDialogVisible">
     <TitleContent>
-        <h6>Edit</h6>
+        <h6>Confirm Delete</h6>
     </TitleContent>
     <ChildContent>
-        @if (EditedItem is not null)
+        <p>
+            Are you sure you want to delete this item?
+        </p>
+    </ChildContent>
+    <FooterContent>
+        <button class="btn btn-text" @onclick="@(_ => _isDeleteDialogVisible = false)">Cancel</button>
+        <button class="btn btn-text danger" @onclick="@OnConfirmDeleteAsync">Delete</button>
+    </FooterContent>
+</Dialog>
+
+<Dialog @bind-IsVisible="_isEditDialogVisible">
+    <TitleContent>
+        <h6>@(IsAdding ? "Add" : "Edit")</h6>
+    </TitleContent>
+    <ChildContent>
+        @if (EditedItem is not null
+            && _isEditDialogVisible
+            && EditDialog is null)
         {
-            <Form @ref="EditForm" Class="d-flex flex-column mx-3" Style="max-height:300px;overflow:auto">
+            <Form @ref="DialogEditForm" Class="d-flex flex-column mx-3" Style="max-height:300px;min-height:47rem;min-width:310px;overflow:auto">
                 @foreach (var column in _columns)
                 {
                     @if (column.GetCanEdit())
@@ -787,6 +791,7 @@
                                            ValueChanged="@(v => dateTimeColumn.SetCellValue(EditedItem, v))"
                                            Format="@column.Format"
                                            FormatProvider="column.FormatProvider"
+                                           ShowTime="true"
                                            Label="@column.GetLabel()"
                                            Validation="@((v, _) => dateTimeColumn.Validate(v, EditedItem))"
                                            Class="dense" />
@@ -798,6 +803,7 @@
                                            ValueChanged="@(v => nullableDateTimeColumn.SetCellValue(EditedItem, v))"
                                            Format="@column.Format"
                                            FormatProvider="column.FormatProvider"
+                                           ShowTime="true"
                                            Label="@column.GetLabel()"
                                            Validation="@((v, _) => nullableDateTimeColumn.Validate(v, EditedItem))"
                                            Class="dense" />
@@ -809,6 +815,8 @@
                                            ValueChanged="@(v => dateTimeOffsetColumn.SetCellValue(EditedItem, v))"
                                            Format="@column.Format"
                                            FormatProvider="column.FormatProvider"
+                                           ShowTime="true"
+                                           ShowTimeZone="true"
                                            Label="@column.GetLabel()"
                                            Validation="@((v, _) => dateTimeOffsetColumn.Validate(v, EditedItem))"
                                            Class="dense" />
@@ -820,6 +828,8 @@
                                            ValueChanged="@(v => nullableDateTimeOffsetColumn.SetCellValue(EditedItem, v))"
                                            Format="@column.Format"
                                            FormatProvider="column.FormatProvider"
+                                           ShowTime="true"
+                                           ShowTimeZone="true"
                                            Label="@column.GetLabel()"
                                            Validation="@((v, _) => nullableDateTimeOffsetColumn.Validate(v, EditedItem))"
                                            Class="dense" />

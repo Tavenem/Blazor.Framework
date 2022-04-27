@@ -177,12 +177,13 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public virtual void Clear()
+    public virtual Task ClearAsync()
     {
         if (!Disabled && !ReadOnly)
         {
             CurrentValueAsString = null;
         }
+        return Task.CompletedTask;
     }
 
     /// <summary>

@@ -89,6 +89,16 @@
 /// each in the given format is a match.
 /// </para>
 /// </param>
+/// <param name="DateTimeFilterIsBefore">
+/// <para>
+/// Whether the current <see cref="DateTimeFilter"/> refers to a date/time that all values should be
+/// equal to or before (rather than equal to or after).
+/// </para>
+/// <para>
+/// Should be ignored for non-date-time data, or when <see cref="DateTimeFilter"/> is <see
+/// langword="null"/>.
+/// </para>
+/// </param>
 public record FilterInfo(
 string Property,
 string? TextFilter,
@@ -97,4 +107,5 @@ string? QuickFilter,
 bool? BoolFilter,
 double? NumberFilter,
 DateTimeOffset? DateTimeFilter,
-string? DateFormat);
+string? DateFormat,
+bool DateTimeFilterIsBefore);

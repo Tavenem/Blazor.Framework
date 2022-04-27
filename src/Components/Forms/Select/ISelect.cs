@@ -41,7 +41,7 @@ public interface ISelect<TOption>
     /// Has no effect on single-select components.
     /// </para>
     /// </summary>
-    public void SelectAll();
+    public Task SelectAllAsync();
 
     /// <summary>
     /// Toggle the given option's selected state.

@@ -239,11 +239,12 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// If the bound type is non-nullable, this may set the default value.
     /// </para>
     /// </summary>
-    public override void Clear()
+    public override Task ClearAsync()
     {
         _selectedOptions.Clear();
         CurrentValueAsString = null;
         SelectedIndex = -1;
+        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -276,7 +277,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// Has no effect on single-select components.
     /// </para>
     /// </summary>
-    public virtual void SelectAll() { }
+    public virtual Task SelectAllAsync() => Task.CompletedTask;
 
     /// <summary>
     /// Toggle the given option's selected state.
@@ -354,7 +355,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
             case "a":
                 if (e.CtrlKey)
                 {
-                    SelectAll();
+                    await SelectAllAsync();
                 }
                 else
                 {
@@ -374,6 +375,8 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     }
 
     private protected virtual void OnTypeClosed(Option<TOption> option) { }
+
+    private protected void RefreshOptions() => _options.ForEach(x => x.InvokeStateChange());
 
     private protected abstract Task SelectIndexAsync(KeyboardEventArgs e, int index);
 

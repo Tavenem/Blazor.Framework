@@ -1,10 +1,17 @@
-﻿@namespace Tavenem.Blazor.Framework
+﻿@using Tavenem.Blazor.Framework.Components.DataGrid
 
-@attribute [CascadingTypeParameter(nameof(TValue))]
-@typeparam TValue
+@namespace Tavenem.Blazor.Framework
 
-@inherits SelectBase<TValue, TValue>
+@attribute [CascadingTypeParameter(nameof(TDataItem))]
+@typeparam TDataItem
 
+@inherits DataGridSelectBase<TDataItem, TDataItem>
+
+<div class="d-none">
+    <CascadingValue Value="this" TValue="IDataGrid<TDataItem>" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
 <div @attributes="AdditionalAttributes"
      class="@CssClass"
      style="@CssStyle"
@@ -68,37 +75,17 @@
              AnchorId="@Id"
              IsOpen="ShowPicker"
              MatchWidth="true">
-        <div class="@OptionListCssClass"
-             @onclick:stopPropagation="true">
-            <CascadingValue Value="this" IsFixed="true">
-                @ChildContent
-                @if (Options is not null)
-                {
-                    if (OptionTemplate is null)
-                    {
-                        foreach (var value in Options)
-                        {
-                            <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value?.ToString())" />
-                        }
-                    }
-                    else
-                    {
-                        foreach (var value in Options)
-                        {
-                            <Option @key="value" Value="value">
-                                @OptionTemplate(context)
-                            </Option>
-                        }
-                    }
-                }
-                @if (OptionPairs is not null)
-                {
-                    foreach (var (key, value) in OptionPairs)
-                    {
-                        <Option @key="key" Value="key" Label="@value" />
-                    }
-                }
-            </CascadingValue>
+        <div @onclick:stopPropagation="true">
+            <DataGrid @ref="DataGrid"
+                      TDataItem="TDataItem"
+                      AllowExport="false"
+                      Items="Items"
+                      LoadItems="LoadItems"
+                      RowsPerPage="5"
+                      SelectionType="SelectionType.Single"
+                      SelectedItemChanged="UpdateCurrentValue"
+                      ShowRowsPerPage="false"
+                      ThemeColor="ThemeColor" />
         </div>
     </Popover>
     @if (ShowPicker)
@@ -106,3 +93,5 @@
         <div @onclick="ClosePopoverAsync" @onclick:stopPropagation="true" class="overlay transparent" style="z-index:1499" />
     }
 </div>
+
+

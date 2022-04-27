@@ -12,7 +12,7 @@ namespace Tavenem.Blazor.Framework;
 /// A rich data grid for displaying collections of items in rows and columns.
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public partial class DataGrid<TDataItem> : IAsyncDisposable
+public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposable where TDataItem : notnull
 {
     private const string HtmlTemplate = """
         <!DOCTYPE html>
@@ -41,6 +41,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
 
     private bool _disposedValue;
     private bool _isColumnFilterDialogVisible;
+    private bool _isDeleteDialogVisible;
     private bool _isEditDialogVisible;
     private bool _isExportDialogVisible;
     private bool _isExportTooLargeDialogVisible;
@@ -56,13 +57,23 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// </para>
     /// <para>
     /// If no custom dialog is present, the default edit dialog is displayed, and the <see
-    /// cref="ItemAdded"/> callback is invoked if the dialog is submitted with valid data.
+    /// cref="ItemAdded"/> function is invoked if the dialog is submitted with valid data.
     /// </para>
     /// <para>
     /// Default is <see langword="false"/>.
     /// </para>
     /// </summary>
     [Parameter] public bool AllowAdd { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// When <see langword="true"/> a delete button appears at the beginning of each row.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool AllowDelete { get; set; }
 
     /// <summary>
     /// <para>
@@ -75,12 +86,12 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// <para>
     /// If no custom dialog is present, and <see cref="AllowInlineEdit"/> is <see langword="true"/>,
     /// and all columns are currently shown, inline editing is enabled for the row. The <see
-    /// cref="ItemSaved"/> callback is invoked if the row's save button is activated with valid data
+    /// cref="ItemSaved"/> function is invoked if the row's save button is activated with valid data
     /// in all columns.
     /// </para>
     /// <para>
     /// If any columns are currently hidden, the default edit dialog is displayed, and the <see
-    /// cref="ItemSaved"/> callback is invoked if the dialog is submitted with valid data.
+    /// cref="ItemSaved"/> function is invoked if the dialog is submitted with valid data.
     /// </para>
     /// <para>
     /// Default is <see langword="false"/>.
@@ -114,7 +125,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// <para>
     /// When this property and <see cref="AllowEdit"/> are both <see langword="true"/>, and <see
     /// cref="EditDialog"/> is <see langword="null"/>, and when all columns are currently shown,
-    /// inline editing is enabled. The <see cref="ItemAdded"/> callback is invoked if the row's save
+    /// inline editing is enabled. The <see cref="ItemAdded"/> function is invoked if the row's save
     /// button is activated with valid data in all columns.
     /// </para>
     /// <para>
@@ -135,6 +146,13 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public bool AllowSearch { get; set; } = true;
+
+    /// <summary>
+    /// Whether this grid is displaying any items.
+    /// </summary>
+    public bool AnyItems => LoadItems is null
+        ? Items.Count > 0
+        : CurrentDataPage?.Items.Count > 0;
 
     /// <summary>
     /// <para>
@@ -241,6 +259,14 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// Invoked when a new item is added.
     /// </para>
     /// <para>
+    /// Should return <see langword="true"/> if the item is added successfully, and <see
+    /// langword="false"/> if not.
+    /// </para>
+    /// <para>
+    /// If the item should simply be added to a list associated with the <see cref="Items"/>
+    /// property, this function can be omitted.
+    /// </para>
+    /// <para>
     /// This can only be invoked if <see cref="AllowAdd"/> has been set to <see langword="true"/>.
     /// </para>
     /// <para>
@@ -250,7 +276,26 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// the current page, to avoid a potentially expensive call.
     /// </para>
     /// </summary>
-    [Parameter] public EventCallback<TDataItem> ItemAdded { get; set; }
+    [Parameter] public Func<TDataItem, Task<bool>>? ItemAdded { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Raised when an item has been deleted.
+    /// </para>
+    /// <para>
+    /// Should return <see langword="true"/> if the item is removed successfully, and <see
+    /// langword="false"/> if not.
+    /// </para>
+    /// <para>
+    /// If the item should simply be removed from a list associated with the <see cref="Items"/>
+    /// property, this function can be omitted.
+    /// </para>
+    /// <para>
+    /// This can only be invoked if <see cref="AllowDelete"/> has been set to <see
+    /// langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public Func<TDataItem, Task<bool>>? ItemDeleted { get; set; }
 
     /// <summary>
     /// <para>
@@ -268,15 +313,33 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// Raised when an item has been edited and the changes are being committed.
     /// </para>
     /// <para>
+    /// Should return <see langword="true"/> if the item is updated successfully, and <see
+    /// langword="false"/> if not.
+    /// </para>
+    /// <para>
+    /// If the item should simply be modified in a list associated with the <see cref="Items"/>
+    /// property, this function can be omitted.
+    /// </para>
+    /// <para>
     /// This can only be invoked if <see cref="AllowEdit"/> has been set to <see langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter] public EventCallback<TDataItem> ItemSaved { get; set; }
+    [Parameter] public Func<TDataItem, Task<bool>>? ItemSaved { get; set; }
 
     /// <summary>
     /// A function to load data items asynchronously.
     /// </summary>
     [Parameter] public Func<DataGridRequest, Task<DataPage<TDataItem>>>? LoadItems { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Sets the max-height CSS style for the table.
+    /// </para>
+    /// <para>
+    /// Should include a unit, such as "200px" or "10rem."
+    /// </para>
+    /// </summary>
+    [Parameter] public string? MaxHeight { get; set; }
 
     /// <summary>
     /// <para>
@@ -389,12 +452,17 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     /// <summary>
     /// Invoked when <see cref="SelectedItems"/> changes.
     /// </summary>
-    [Parameter] public EventCallback<IEnumerable<TDataItem>> SelectedItemsChanged { get; set; }
+    [Parameter] public EventCallback<List<TDataItem>> SelectedItemsChanged { get; set; }
 
     /// <summary>
     /// The type of item selection from this data grid.
     /// </summary>
     [Parameter] public SelectionType SelectionType { get; set; }
+
+    /// <summary>
+    /// Whether to permit the user to control the number of rows per page.
+    /// </summary>
+    [Parameter] public bool ShowRowsPerPage { get; set; }
 
     /// <summary>
     /// Any CSS classes to assign to the table element.
@@ -418,18 +486,19 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
 
     internal Row<TDataItem>? EditingRow { get; set; }
 
+    internal Form? TableEditForm { get; set; }
+
     /// <inheritdoc />
-    protected override string? CssStyle => new CssBuilder(Style)
-        .AddStyleFromDictionary(AdditionalAttributes)
-        .AddStyle("width", "100%")
-        .AddStyle("overflow", "auto")
+    protected override string? CssClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("datagrid")
         .ToString();
 
     /// <summary>
     /// The final value assigned to the table element's class attribute, including component values.
     /// </summary>
     protected string? TableCssClass => new CssBuilder(TableClass)
-        .Add("table datagrid sticky-header sticky-footer")
+        .Add("table sticky-header sticky-footer")
         .Add(ThemeColor.ToCSS())
         .Add($"table-{Breakpoint.ToCSS()}", Breakpoint != Breakpoint.None)
         .ToString();
@@ -501,13 +570,21 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         .Skip((int)Offset)
         .Take(RowsPerPage);
 
+    private TDataItem? DeleteItem { get; set; }
+
+    private Form? DialogEditForm { get; set; }
+
     [Inject] private DialogService DialogService { get; set; } = default!;
 
-    private Form? EditForm { get; set; }
-
-    private ExportFileType ExportFileType { get; set; } = ExportFileType.CSV;
+    private ExportFileType ExportFileType { get; set; } = ExportFileType.Excel;
 
     private string? ExportName { get; set; }
+
+    private string? FormStyle => new CssBuilder("overflow:auto")
+        .AddStyle("max-height", MaxHeight)
+        .ToString();
+
+    private bool IsAdding { get; set; }
 
     private string? LoadingClass => new CssBuilder("small")
         .Add(ThemeColor.ToCSS())
@@ -533,6 +610,10 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         }
     }
 
+    private string? TitleClass => new CssBuilder("h6")
+        .Add(ThemeColor.ToCSS())
+        .ToString();
+
     private bool UseEditDialog => !AllowInlineEdit
         || EditDialog is not null
         || _columns.Any(x => !x.GetIsShown());
@@ -555,7 +636,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             .Where(x => x.CanRead))
         {
             var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), property.PropertyType);
-            var ctor = columnType.GetConstructor(new[] { typeof(PropertyInfo) })!;
+            var ctor = columnType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, new[] { typeof(PropertyInfo) })!;
             _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { property }));
         }
 
@@ -564,9 +645,12 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             .Where(x => x.IsPublic))
         {
             var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), field.FieldType);
-            var ctor = columnType.GetConstructor(new[] { typeof(FieldInfo) })!;
+            var ctor = columnType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, new[] { typeof(FieldInfo) })!;
             _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { field }));
         }
+
+        RecalculatePaging();
+        Regroup();
     }
 
     /// <inheritdoc/>
@@ -587,7 +671,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         {
             await LoadItemsAsync();
         }
-        if (parameters.TryGetValue<Func<TDataItem, object>?>(nameof(RowsPerPage), out _))
+        if (parameters.TryGetValue<ushort>(nameof(RowsPerPage), out _))
         {
             await OnChangeRowsPerPageAsync(RowsPerPage);
         }
@@ -657,7 +741,26 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     }
 
     /// <summary>
-    /// Loads the current set of data from <see cref="LoadItems"/>,if it has been configured.
+    /// Adds a new column to this grid.
+    /// </summary>
+    /// <param name="column">The column to add.</param>
+    public void AddColumn(IColumn<TDataItem> column)
+    {
+        if (!column.IsDefault)
+        {
+            _columns.RemoveAll(x => x.IsDefault);
+        }
+        _columns.Add(column);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Notifies the grid that its state has been changed externally.
+    /// </summary>
+    public void InvokeStateChange() => StateHasChanged();
+
+    /// <summary>
+    /// Loads the current set of data from <see cref="LoadItems"/>, if it has been configured.
     /// </summary>
     public async Task LoadItemsAsync()
     {
@@ -676,6 +779,48 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             GetSortInfo()));
 
         Regroup();
+    }
+
+    /// <summary>
+    /// Called internally.
+    /// </summary>
+    public Task OnColumnSortedAsync(IColumn<TDataItem> column)
+    {
+        _sortOrder.Remove(column.Id);
+        _sortOrder.Insert(0, column.Id);
+        if (LoadItems is not null)
+        {
+            return LoadItemsAsync();
+        }
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Removes a column from this grid.
+    /// </summary>
+    /// <param name="column">The column to remove.</param>
+    public void RemoveColumn(IColumn<TDataItem> column)
+    {
+        _columns.Remove(column);
+        _sortOrder.Remove(column.Id);
+    }
+
+    /// <summary>
+    /// <para>
+    /// Selects all items on the current page.
+    /// </para>
+    /// <para>
+    /// Has no effect if <see cref="SelectionType"/> is not <see cref="SelectionType.Multiple"/>.
+    /// </para>
+    /// </summary>
+    public Task SelectAllAsync()
+    {
+        if (SelectionType != SelectionType.Multiple)
+        {
+            return Task.CompletedTask;
+        }
+
+        return OnSetSelectAllAsync(true);
     }
 
     /// <summary>
@@ -705,10 +850,12 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         else if (value < CurrentPage)
         {
             CurrentPage = value;
+            Offset = RowsPerPage * value;
         }
         else if (PageCount.HasValue)
         {
             CurrentPage = Math.Min(PageCount.Value, value) - 1;
+            Offset = RowsPerPage * CurrentPage;
         }
         else if (CurrentDataPage?.HasMore != false)
         {
@@ -794,38 +941,27 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         StateHasChanged();
     }
 
-    internal void AddColumn(IColumn<TDataItem> column)
-    {
-        if (!column.IsDefault)
-        {
-            _columns.RemoveAll(x => x.IsDefault);
-        }
-        _columns.Add(column);
-    }
-
-    internal void RemoveColumn(IColumn<TDataItem> column)
-    {
-        _columns.Remove(column);
-        _sortOrder.Remove(column.Id);
-    }
-
-    internal bool GetRowIsExpanded(TDataItem? item) => item is not null
+    internal bool GetRowIsExpanded(TDataItem item) => item is not null
         && _rowCurrentExpansion.Contains(item.GetHashCode());
 
-    internal bool GetRowWasExpanded(TDataItem? item) => item is not null
+    internal bool GetRowWasExpanded(TDataItem item) => item is not null
         && _rowExpansion.Contains(item.GetHashCode());
 
-    internal void InvokeStateChange() => StateHasChanged();
-
-    internal Task OnColumnSortedAsync(IColumn<TDataItem> column)
+    internal async Task OnDeleteAsync(Row<TDataItem> row)
     {
-        _sortOrder.Remove(column.Id);
-        _sortOrder.Insert(0, column.Id);
-        if (LoadItems is not null)
+        if (EditingRow?.Equals(row) == false
+            || EditedItem?.Equals(row.Item) == false)
         {
-            return LoadItemsAsync();
+            var couldSave = await TrySaveEditAsync();
+            if (!couldSave)
+            {
+                await OnCancelEditAsync();
+            }
         }
-        return Task.CompletedTask;
+
+        DeleteItem = row.Item;
+        _isDeleteDialogVisible = true;
+        StateHasChanged();
     }
 
     internal async Task OnEditAsync(Row<TDataItem> row)
@@ -853,8 +989,8 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         else if (UseEditDialog)
         {
             EditedItem = row.Item;
-            EditingRow = row;
             _isEditDialogVisible = true;
+            StateHasChanged();
         }
         else
         {
@@ -864,11 +1000,6 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
 
     internal async Task OnToggleRowExpansionAsync(Row<TDataItem> row)
     {
-        if (row.Item is null)
-        {
-            return;
-        }
-
         var hash = row.Item.GetHashCode();
         var rowIsExpanded = _rowCurrentExpansion.Contains(hash);
         if (rowIsExpanded)
@@ -894,14 +1025,17 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
 
     internal async Task OnSelectAsync(Row<TDataItem> row)
     {
-        if (EditingRow is not null)
+        if (EditingRow is not null
+            || EditedItem is not null)
         {
-            await OnSaveEditAsync();
+            var couldSave = await TrySaveEditAsync();
+            if (!couldSave)
+            {
+                await OnCancelEditAsync();
+            }
         }
-        EditingRow = null;
 
-        if (SelectionType == SelectionType.Single
-            && row.Item is not null)
+        if (SelectionType == SelectionType.Single)
         {
             if (SelectedItems.Contains(row.Item))
             {
@@ -919,38 +1053,38 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             }
             await SelectedItemChanged.InvokeAsync(SelectedItem);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            StateHasChanged();
         }
     }
 
     internal async Task OnSelectAsync(Row<TDataItem> row, bool value)
     {
-        if (EditingRow is not null)
+        if (EditingRow is not null
+            || EditedItem is not null)
         {
-            await OnSaveEditAsync();
-        }
-        EditingRow = null;
-
-        if (row.Item is null)
-        {
-            return;
+            var couldSave = await TrySaveEditAsync();
+            if (!couldSave)
+            {
+                await OnCancelEditAsync();
+            }
         }
 
         var changed = false;
         if (value)
         {
-            if (SelectedItems.Remove(row.Item))
+            if (!SelectedItems.Contains(row.Item))
             {
-                if (SelectedItem?.Equals(row.Item) == true)
-                {
-                    SelectedItem = default;
-                }
+                SelectedItems.Add(row.Item);
+                SelectedItem = SelectedItems.FirstOrDefault();
                 changed = true;
             }
         }
-        else if (!SelectedItems.Contains(row.Item))
+        else if (SelectedItems.Remove(row.Item))
         {
-            SelectedItems.Add(row.Item);
-            SelectedItem = SelectedItems.FirstOrDefault();
+            if (SelectedItem?.Equals(row.Item) == true)
+            {
+                SelectedItem = default;
+            }
             changed = true;
         }
         if (changed)
@@ -958,6 +1092,91 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             await SelectedItemChanged.InvokeAsync(SelectedItem);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
+    }
+
+    internal async Task SelectNext()
+    {
+        if (SelectedItem is null
+            || !CurrentPageItems.Any())
+        {
+            return;
+        }
+
+        TDataItem? next = default;
+        if (CurrentPageItems.Last().Equals(SelectedItem))
+        {
+            var hasNext = (PageCount.HasValue
+                && CurrentPage < PageCount - 1)
+                || CurrentDataPage?.HasMore == true;
+            if (hasNext)
+            {
+                await OnNextPageAsync();
+            }
+            next = CurrentPageItems.FirstOrDefault();
+        }
+        else
+        {
+            next = CurrentPageItems.SkipWhile(x => !x.Equals(SelectedItem)).Skip(1).FirstOrDefault();
+        }
+
+        if (next is not null)
+        {
+            await SetSelectionAsync(next);
+        }
+    }
+
+    internal async Task SelectPrevious()
+    {
+        if (SelectedItem is null
+            || !CurrentPageItems.Any())
+        {
+            return;
+        }
+
+        TDataItem? previous = default;
+        if (CurrentPageItems.First().Equals(SelectedItem))
+        {
+            if (CurrentPage > 0)
+            {
+                await SetPageAsync(CurrentPage - 1);
+            }
+            previous = CurrentPageItems.LastOrDefault();
+        }
+        else
+        {
+            previous = CurrentPageItems.TakeWhile(x => !x.Equals(SelectedItem)).LastOrDefault();
+        }
+
+        if (previous is not null)
+        {
+            await SetSelectionAsync(previous);
+        }
+    }
+
+    internal async Task ToggleSelectionAsync(TDataItem item)
+    {
+        if (SelectedItems.Contains(item))
+        {
+            if (SelectedItem?.Equals(item) == true)
+            {
+                SelectedItem = default;
+            }
+            SelectedItems.Remove(item);
+        }
+        else if (SelectionType == SelectionType.Single)
+        {
+            SelectedItem = item;
+            SelectedItems.Clear();
+            SelectedItems.Add(item);
+        }
+        else if (SelectionType == SelectionType.Multiple)
+        {
+            SelectedItems.Add(item);
+            SelectedItem = SelectedItems.FirstOrDefault();
+        }
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        StateHasChanged();
     }
 
     /// <summary>
@@ -983,6 +1202,10 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         }
     }
 
+    private static string? GetColumnHeaderClass(IColumn<TDataItem> column) => new CssBuilder("column-header")
+        .Add("clickable", column.GetIsSortable())
+        .ToString();
+
     private async Task<IEnumerable<TDataItem>?> TryGetAllItemsAsync()
     {
         if (LoadItems is null)
@@ -1001,6 +1224,11 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         }
         return results.Items;
     }
+
+    private string? GetColumnHeaderIconClass(IColumn<TDataItem> column) => new CssBuilder()
+        .Add("active", _sortOrder.Contains(column.Id))
+        .Add("desc", column.SortDescending)
+        .ToString();
 
     private async Task<Stream?> GetCSVAsync()
     {
@@ -1073,15 +1301,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             }
         }
 
-        var bytes = Encoding.UTF8.GetBytes(sb.ToString());
-        var stream = new MemoryStream();
-        using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
-        {
-            writer.Write(Encoding.UTF8.GetPreamble());
-            writer.Write(bytes);
-        }
-        stream.Position = 0;
-        return stream;
+        return new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
     }
 
     private async Task<Stream?> GetExcelAsync()
@@ -1103,6 +1323,8 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Data");
 
+        worksheet.SheetView.FreezeRows(1);
+
         var headingRow = worksheet.Row(1);
         headingRow.Style.Font.Bold = true;
         headingRow.Style.Border.BottomBorder = XLBorderStyleValues.Medium;
@@ -1112,7 +1334,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             var label = columns[i].GetLabel()?.Trim();
             if (!string.IsNullOrEmpty(label))
             {
-                worksheet.Cell(1, i).SetValue(label);
+                worksheet.Cell(1, i + 1).SetValue(label);
             }
         }
 
@@ -1129,7 +1351,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
                 var label = columns[i].ToString(item);
                 if (!string.IsNullOrEmpty(label))
                 {
-                    worksheet.Cell(row, i).SetValue(label);
+                    worksheet.Cell(row, i + 1).SetValue(label);
                 }
             }
 
@@ -1169,7 +1391,8 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
                     null,
                     null,
                     null,
-                    null));
+                    null,
+                    false));
             }
             else if (column.IsBool)
             {
@@ -1185,7 +1408,8 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
                     column.BoolFilter,
                     null,
                     null,
-                    null));
+                    null,
+                    false));
             }
             else if (column.IsNumeric)
             {
@@ -1201,7 +1425,8 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
                     null,
                     column.NumberFilter,
                     null,
-                    null));
+                    null,
+                    false));
             }
             else if (column.IsDateTime)
             {
@@ -1217,7 +1442,8 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
                     null,
                     null,
                     column.DateTimeFilter,
-                    column.GetDateTimeFormat()));
+                    column.GetDateTimeFormat(),
+                    column.DateTimeFilterIsBefore));
             }
         }
         return filterInfo?.ToArray();
@@ -1272,15 +1498,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             title = $"{typeof(TDataItem).Name} Data";
         }
         var html = string.Format(HtmlTemplate, title, HtmlHeaderContent, sb.ToString());
-        var bytes = Encoding.UTF8.GetBytes(html);
-        var stream = new MemoryStream();
-        using (var writer = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true))
-        {
-            writer.Write(Encoding.UTF8.GetPreamble());
-            writer.Write(bytes);
-        }
-        stream.Position = 0;
-        return stream;
+        return new MemoryStream(Encoding.UTF8.GetBytes(html));
     }
 
     private string? GetGroupExpandClass(object? key) => new CssBuilder("expand-row")
@@ -1332,11 +1550,15 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
 
     private async Task OnAddAsync()
     {
-        if (EditingRow is not null)
+        if (EditingRow is not null
+            || EditedItem is not null)
         {
-            await OnSaveEditAsync();
+            var couldSave = await TrySaveEditAsync();
+            if (!couldSave)
+            {
+                await OnCancelEditAsync();
+            }
         }
-        EditingRow = null;
 
         if (EditDialog is not null)
         {
@@ -1358,6 +1580,7 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
             EditedItem = newItem;
             if (newItem is not null)
             {
+                IsAdding = true;
                 _isEditDialogVisible = true;
             }
         }
@@ -1366,36 +1589,43 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     private Task OnBoolFilterChangedAsync(IColumn<TDataItem> column, bool? value)
     {
         column.BoolFilter = value;
-        if (LoadItems is not null)
+        if (LoadItems is null)
+        {
+            Regroup();
+            return Task.CompletedTask;
+        }
+        else
         {
             return LoadItemsAsync();
         }
-        return Task.CompletedTask;
     }
 
     private async Task OnCancelEditAsync()
     {
         if (EditedItem is not null)
         {
-            EditForm?.ResetAsync();
+            DialogEditForm?.ResetAsync();
             _isEditDialogVisible = false;
             EditedItem = default;
         }
         else if (EditingRow is not null)
         {
             await EditingRow.CancelEditAsync();
-            EditingRow = null;
         }
     }
 
     private Task OnChangeQuickFilterAsync(string? value)
     {
         QuickFilter = value;
-        if (LoadItems is not null)
+        if (LoadItems is null)
+        {
+            Regroup();
+            return Task.CompletedTask;
+        }
+        else
         {
             return LoadItemsAsync();
         }
-        return Task.CompletedTask;
     }
 
     private async Task OnChangeRowsPerPageAsync(ushort value)
@@ -1464,14 +1694,47 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
         return OnColumnSortedAsync(column);
     }
 
+    private async Task OnConfirmDeleteAsync()
+    {
+        _isDeleteDialogVisible = false;
+        if (DeleteItem is null)
+        {
+            return;
+        }
+        if (ItemDeleted is not null)
+        {
+            var success = await ItemDeleted.Invoke(DeleteItem);
+            if (!success)
+            {
+                return;
+            }
+        }
+        if (LoadItems is null)
+        {
+            Items.Remove(DeleteItem);
+        }
+        else if (CurrentDataPage is null)
+        {
+            await LoadItemsAsync();
+        }
+        else
+        {
+            CurrentDataPage.Items.Remove(DeleteItem);
+        }
+    }
+
     private Task OnDateTimeFilterChangedAsync(IColumn<TDataItem> column, DateTimeOffset? value)
     {
         column.DateTimeFilter = value;
-        if (LoadItems is not null)
+        if (LoadItems is null)
+        {
+            Regroup();
+            return Task.CompletedTask;
+        }
+        else
         {
             return LoadItemsAsync();
         }
-        return Task.CompletedTask;
     }
 
     private async Task OnExportAsync()
@@ -1556,11 +1819,15 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     private Task OnFilterChangedAsync(IColumn<TDataItem> column, string? value)
     {
         column.TextFilter = value;
-        if (LoadItems is not null)
+        if (LoadItems is null)
+        {
+            Regroup();
+            return Task.CompletedTask;
+        }
+        else
         {
             return LoadItemsAsync();
         }
-        return Task.CompletedTask;
     }
 
     private async Task OnLastPageAsync()
@@ -1608,11 +1875,15 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
     private Task OnNumberFilterChangedAsync(IColumn<TDataItem> column, double? value)
     {
         column.NumberFilter = value;
-        if (LoadItems is not null)
+        if (LoadItems is null)
+        {
+            Regroup();
+            return Task.CompletedTask;
+        }
+        else
         {
             return LoadItemsAsync();
         }
-        return Task.CompletedTask;
     }
 
     private async Task OnPageChangedAsync(ulong value)
@@ -1716,49 +1987,68 @@ public partial class DataGrid<TDataItem> : IAsyncDisposable
 
     private async Task<bool> TrySaveEditAsync()
     {
-        if (UseEditDialog)
-        {
-            if (EditForm is not null)
-            {
-                var valid = await EditForm.ValidateAsync();
-                if (!valid)
-                {
-                    return false;
-                }
-            }
-            _isEditDialogVisible = false;
-        }
-
         if (EditingRow is null)
         {
             if (EditedItem is not null)
             {
-                if (EditForm is not null)
+                if (DialogEditForm is not null)
                 {
-                    var valid = await EditForm.ValidateAsync();
+                    var valid = await DialogEditForm.ValidateAsync();
                     if (!valid)
                     {
                         return false;
                     }
                 }
-                await ItemAdded.InvokeAsync(EditedItem);
-                if (LoadItems is null)
+
+                if (IsAdding)
                 {
-                    Items.Add(EditedItem);
-                }
-                else if (CurrentDataPage is null)
-                {
-                    await LoadItemsAsync();
+                    var success = true;
+                    if (ItemAdded is not null)
+                    {
+                        success = await ItemAdded.Invoke(EditedItem);
+                    }
+                    if (success)
+                    {
+                        if (LoadItems is null)
+                        {
+                            Items.Add(EditedItem);
+                        }
+                        else if (CurrentDataPage is null)
+                        {
+                            await LoadItemsAsync();
+                        }
+                        else
+                        {
+                            CurrentDataPage.Items.Add(EditedItem);
+                        }
+                    }
                 }
                 else
                 {
-                    CurrentDataPage.Items.Add(EditedItem);
+                    if (ItemSaved is not null)
+                    {
+                        var success = await ItemSaved.Invoke(EditedItem);
+                        if (!success && DialogEditForm is not null)
+                        {
+                            await DialogEditForm.ResetAsync();
+                        }
+                    }
                 }
+                _isEditDialogVisible = false;
+                EditedItem = default;
             }
         }
         else
         {
-            await ItemSaved.InvokeAsync(EditingRow.Item);
+            if (ItemSaved is not null)
+            {
+                var success = await ItemSaved.Invoke(EditingRow.Item);
+                if (!success && TableEditForm is not null)
+                {
+                    await TableEditForm.ResetAsync();
+                }
+            }
+            EditingRow = null;
         }
         return true;
     }

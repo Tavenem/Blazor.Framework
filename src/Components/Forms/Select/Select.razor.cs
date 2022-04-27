@@ -98,7 +98,7 @@ public partial class Select<TValue>
 
         if (index < 0 || index >= _options.Count)
         {
-            Clear();
+            await ClearAsync();
             return;
         }
 
@@ -114,8 +114,11 @@ public partial class Select<TValue>
         }
     }
 
-    private protected override void UpdateCurrentValue() => CurrentValue = _selectedOptions
-        .FirstOrDefault().Key;
+    private protected override void UpdateCurrentValue()
+    {
+        CurrentValue = _selectedOptions.FirstOrDefault().Key;
+        RefreshOptions();
+    }
 
     private protected override void UpdateSelectedFromValue()
     {

@@ -5,6 +5,8 @@
     --button-default-color: var(--tavenem-color-default-text);
     --button-default-hover-bg: var(--tavenem-color-default-darken);
     --button-default-hover-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+    --button-default-padding-x: 16px;
+    --button-default-padding-y: 6px;
     --button-default-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
     --button-active-shadow: var(--button-inherited-active-shadow, var(--button-default-active-shadow));
     --button-bg: var(--button-inherited-bg, var(--button-default-bg));
@@ -15,8 +17,8 @@
     --button-hover-bg: var(--button-inherited-hover-bg, var(--button-default-hover-bg));
     --button-hover-color: var(--button-inherited-hover-color, var(--tavenem-color-default-text));
     --button-hover-shadow: var(--button-inherited-hover-shadow, var(--button-default-hover-shadow));
-    --button-padding-x: var(--button-inherited-padding-x, 16px);
-    --button-padding-y: var(--button-inherited-padding-y, 6px);
+    --button-padding-x: var(--button-inherited-padding-x, var(--button-default-padding-x));
+    --button-padding-y: var(--button-inherited-padding-y, var(--button-default-padding-y));
     --button-shadow: var(--button-inherited-shadow, var(--button-default-shadow));
     align-items: center;
     background-color: var(--button-bg);
@@ -92,14 +94,14 @@
 
     &.small {
         --button-font-size: calc(var(--tavenem-font-size-button) - 1px);
-        --button-padding-x: 10px;
-        --button-padding-y: 4px;
+        --button-default-padding-x: 10px;
+        --button-default-padding-y: 4px;
     }
 
     &.large {
         --button-font-size: calc(var(--tavenem-font-size-button) + 1px);
-        --button-padding-x: 22px;
-        --button-padding-y: 8px;
+        --button-default-padding-x: 22px;
+        --button-default-padding-y: 8px;
     }
 
     &.bg-alt {
@@ -209,11 +211,12 @@ a.btn-text:not(.disabled, :disabled) {
     --button-default-hover-shadow: none;
     --button-default-shadow: none;
     --button-font-size: var(--button-inherited-font-size-icon, 1.5rem);
-    --button-padding-y: var(--button-inherited-padding-y-icon, 6px);
+    --button-padding-x: var(--button-inherited-padding-x-icon, var(--button-default-padding-y));
+    --button-padding-y: var(--button-inherited-padding-y-icon, var(--button-default-padding-y));
     border-radius: 9999px;
     flex: 0 0 auto;
-    min-width: calc(var(--button-font-size) + (var(--button-padding-y) * 2));
-    padding: var(--button-padding-y) var(--button-padding-y);
+    min-width: calc(var(--button-font-size) + (var(--button-padding-x) * 2));
+    padding: var(--button-padding-y) var(--button-padding-x);
     text-align: center;
 
     &:after {
@@ -226,12 +229,12 @@ a.btn-text:not(.disabled, :disabled) {
 
     &.small {
         --button-font-size: 1.25rem;
-        --button-padding-y: 5px;
+        --button-default-padding-y: 5px;
     }
 
     &.large {
         --button-font-size: 2rem;
-        --button-padding-y: 5px;
+        --button-default-padding-y: 5px;
     }
 
     &.darken, &.lighten {

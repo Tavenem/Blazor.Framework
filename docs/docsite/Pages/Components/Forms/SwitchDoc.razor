@@ -188,6 +188,21 @@
 </Collapse>
 
 <p>
+    You can add the <code>dense</code> class to reduce vertical padding.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Switch Class="dense" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Switch Class=""dense"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
     The <code>CheckedIcon</code> and <code>UncheckedIcon</code> properties can be used to place an
     icon in the toggle thumb when it has a certain state.
 </p>

@@ -30,11 +30,11 @@ public partial class MultiSelect<TValue>
     /// <summary>
     /// Selects all options.
     /// </summary>
-    public override void SelectAll()
+    public override async Task SelectAllAsync()
     {
         if (AllSelected)
         {
-            Clear();
+            await ClearAsync();
             return;
         }
 
@@ -204,7 +204,11 @@ public partial class MultiSelect<TValue>
         }
     }
 
-    private protected override void UpdateCurrentValue() => CurrentValue = SelectedValues;
+    private protected override void UpdateCurrentValue()
+    {
+        CurrentValue = SelectedValues;
+        RefreshOptions();
+    }
 
     private protected override void UpdateSelectedFromValue()
     {

@@ -6,29 +6,7 @@ namespace Tavenem.Blazor.Framework;
 
 internal static class ColumnExtensions
 {
-    public static string GetAlignClass<TDataItem>(this IColumn<TDataItem> column)
-    {
-        if (column.Alignment == HorizontalAlignment.None)
-        {
-            if (column.IsNumeric)
-            {
-                return "text-right";
-            }
-            return column.IsBool
-                ? "text-center"
-                : "text-start";
-        }
-        return column.Alignment switch
-        {
-            HorizontalAlignment.Left => "text-left",
-            HorizontalAlignment.Center => "text-center",
-            HorizontalAlignment.End => "text-end",
-            HorizontalAlignment.Right => "text-right",
-            _ => "text-start",
-        };
-    }
-
-    public static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item)
+    public static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item) where TDataItem : notnull
     {
         if (column.IsString)
         {
@@ -49,7 +27,7 @@ internal static class ColumnExtensions
         return false;
     }
 
-    public static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem? item, string? filter)
+    public static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, string? filter) where TDataItem : notnull
     {
         if (string.IsNullOrEmpty(filter))
         {
@@ -77,7 +55,7 @@ internal static class ColumnExtensions
                 | CompareOptions.IgnoreWidth) != -1;
     }
 
-    public static string GetBoolIcon<TDataItem>(this IColumn<TDataItem> column, TDataItem item)
+    public static string GetBoolIcon<TDataItem>(this IColumn<TDataItem> column, TDataItem item) where TDataItem : notnull
     {
         if (!column.IsBool)
         {
@@ -106,7 +84,14 @@ internal static class ColumnExtensions
         return DefaultIcons.Indeterminate;
     }
 
-    public static string GetDateTimeFormat<TDataItem>(this IColumn<TDataItem> column)
+    public static string? GetCellClass<TDataItem>(this IColumn<TDataItem> column, TDataItem item) where TDataItem : notnull
+        => new CssBuilder()
+        .Add(column.CellClass?.Invoke(item))
+        .Add(column.GetAlignClass())
+        .Add("bool-cell", column.IsBool)
+        .ToString();
+
+    public static string GetDateTimeFormat<TDataItem>(this IColumn<TDataItem> column) where TDataItem : notnull
     {
         if (column is Column<TDataItem, DateTime>
             or Column<TDataItem, DateTime?>)
@@ -126,14 +111,14 @@ internal static class ColumnExtensions
         return "yyyy-MM-dd HH:mm:ss K";
     }
 
-    public static IEnumerable<KeyValuePair<object, string>> GetEnumOptions<TDataItem>(this IColumn<TDataItem> column)
+    public static IEnumerable<KeyValuePair<object, string>> GetEnumOptions<TDataItem>(this IColumn<TDataItem> column) where TDataItem : notnull
         => Enum.GetValues(column.GetBaseDataType())
         .Cast<object>()
         .Select((x, i) => new KeyValuePair<object, string>(
             x,
             x.ToString()?.ToHumanReadable() ?? i.ToString()));
 
-    public static bool IsTrue<TDataItem>(this IColumn<TDataItem> column, TDataItem item)
+    public static bool IsTrue<TDataItem>(this IColumn<TDataItem> column, TDataItem item) where TDataItem : notnull
     {
         if (!column.IsBool)
         {
@@ -150,7 +135,7 @@ internal static class ColumnExtensions
         return false;
     }
 
-    public static void OnSetValue<TDataItem, TValue>(this IColumn<TDataItem> column, TDataItem item, TValue? value)
+    public static void OnSetValue<TDataItem, TValue>(this IColumn<TDataItem> column, TDataItem item, TValue? value) where TDataItem : notnull
     {
         if (column is Column<TDataItem, TValue> valueColumn)
         {
@@ -158,13 +143,12 @@ internal static class ColumnExtensions
         }
     }
 
-    public static string? ToString<TDataItem>(this IColumn<TDataItem> column, TDataItem item)
+    public static string? ToString<TDataItem>(this IColumn<TDataItem> column, TDataItem item) where TDataItem : notnull
         => column.GetString(column.GetCellObjectValue(item));
 
-    private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem? item, bool? filter)
+    private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, bool? filter) where TDataItem : notnull
     {
-        if (item is null
-            || !column.IsBool)
+        if (!column.IsBool)
         {
             return false;
         }
@@ -172,6 +156,11 @@ internal static class ColumnExtensions
         bool? value = null;
         if (column is Column<TDataItem, bool> boolColumn)
         {
+            if (!filter.HasValue)
+            {
+                return true;
+            }
+
             value = boolColumn.GetCellValue(item);
         }
         else if (column is Column<TDataItem, bool?> nullableBoolColumn)
@@ -183,12 +172,8 @@ internal static class ColumnExtensions
             return !filter.HasValue;
         }
 
-        if (!filter.HasValue)
-        {
-            return false;
-        }
-
-        if (value is not bool b)
+        if (!filter.HasValue
+            || value is not bool b)
         {
             return false;
         }
@@ -196,21 +181,15 @@ internal static class ColumnExtensions
         return b == filter;
     }
 
-    private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem? item, double? filter)
+    private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, double? filter) where TDataItem : notnull
     {
-        if (item is null
-            || !column.IsFloat)
+        if (!filter.HasValue)
         {
-            return false;
+            return true;
         }
 
         var value = column.GetCellObjectValue(item);
         if (value is null)
-        {
-            return !filter.HasValue;
-        }
-
-        if (!filter.HasValue)
         {
             return false;
         }
@@ -236,10 +215,14 @@ internal static class ColumnExtensions
             .Equals(str);
     }
 
-    private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem? item, DateTimeOffset? filter)
+    private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, DateTimeOffset? filter) where TDataItem : notnull
     {
-        if (item is null
-            || !column.IsDateTime)
+        if (!filter.HasValue)
+        {
+            return true;
+        }
+
+        if (!column.IsDateTime)
         {
             return false;
         }
@@ -247,51 +230,69 @@ internal static class ColumnExtensions
         var value = column.GetCellObjectValue(item);
         if (value is null)
         {
-            return !filter.HasValue;
-        }
-
-        if (!filter.HasValue)
-        {
             return false;
         }
 
         if (value is DateTime dateTime)
         {
-            const string Format = "yyyy-MM-dd HH:mm:ss";
-            return dateTime
-                .ToString(Format, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(Format, CultureInfo.InvariantCulture));
+            return column.DateTimeFilterIsBefore
+                ? dateTime <= filter.Value.DateTime
+                : dateTime >= filter.Value.DateTime;
         }
         if (value is DateTimeOffset dateTimeOffset)
         {
-            const string Format = "yyyy-MM-dd HH:mm:ss K";
-            return dateTimeOffset
-                .ToString(Format, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(Format, CultureInfo.InvariantCulture));
+            return column.DateTimeFilterIsBefore
+                ? dateTimeOffset <= filter.Value
+                : dateTimeOffset >= filter.Value;
         }
         if (value is DateOnly dateOnly)
         {
-            const string Format = "yyyy-MM-dd";
-            return dateOnly
-                .ToString(Format, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(Format, CultureInfo.InvariantCulture));
+            return column.DateTimeFilterIsBefore
+                ? dateOnly <= DateOnly.FromDateTime(filter.Value.Date)
+                : dateOnly >= DateOnly.FromDateTime(filter.Value.Date);
         }
         if (value is TimeOnly timeOnly)
         {
-            const string Format = "HH:mm:ss";
-            return timeOnly
-                .ToString(Format, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(Format, CultureInfo.InvariantCulture));
+            return column.DateTimeFilterIsBefore
+                ? timeOnly <= TimeOnly.FromTimeSpan(filter.Value.TimeOfDay)
+                : timeOnly >= TimeOnly.FromTimeSpan(filter.Value.TimeOfDay);
         }
 
         return false;
     }
 
-    private static string? GetString<TDataItem>(this IColumn<TDataItem> column, object? value)
+    private static string GetAlignClass<TDataItem>(this IColumn<TDataItem> column) where TDataItem : notnull
+    {
+        if (column.Alignment == HorizontalAlignment.None)
+        {
+            if (column.IsNumeric)
+            {
+                return "text-right";
+            }
+            return column.IsBool
+                ? "text-center"
+                : "text-start";
+        }
+        return column.Alignment switch
+        {
+            HorizontalAlignment.Left => "text-left",
+            HorizontalAlignment.Center => "text-center",
+            HorizontalAlignment.End => "text-end",
+            HorizontalAlignment.Right => "text-right",
+            _ => "text-start",
+        };
+    }
+
+    private static string? GetString<TDataItem>(this IColumn<TDataItem> column, object? value) where TDataItem : notnull
     {
         if (value is null)
         {
             return null;
+        }
+
+        if (value is string str)
+        {
+            return str;
         }
 
         if (value is bool b)

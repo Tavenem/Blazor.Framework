@@ -177,9 +177,13 @@ public partial class Pagination
             if (MaxPagesDisplayed.HasValue)
             {
                 var half = (ulong)Math.Truncate(MaxPagesDisplayed.Value / 2.0);
-                var start = CurrentPage - half;
+                var start = half > CurrentPage
+                    ? 0
+                    : CurrentPage - half;
 
-                if (PageCount.HasValue && CurrentPage + half >= PageCount.Value)
+                if (start > 0
+                    && PageCount.HasValue
+                    && CurrentPage + half >= PageCount.Value)
                 {
                     start -= CurrentPage + half + 1 - PageCount.Value;
                 }
@@ -200,7 +204,7 @@ public partial class Pagination
                 if (PageCount.HasValue)
                 {
                     return Math.Min(
-                        FirstPage + (ulong)MaxPagesDisplayed.Value,
+                        FirstPage + (ulong)MaxPagesDisplayed.Value - 1,
                         PageCount.Value - 1);
                 }
 
@@ -227,8 +231,13 @@ public partial class Pagination
 
         await base.SetParametersAsync(parameters);
 
+        if (MaxPagesDisplayed < 1)
+        {
+            MaxPagesDisplayed = 1;
+        }
+
         if (PageCount.HasValue
-            && CurrentPage > PageCount.Value)
+            && CurrentPage >= PageCount.Value)
         {
             CurrentPage = PageCount.Value - 1;
             currentChanged = true;
@@ -244,11 +253,12 @@ public partial class Pagination
         }
     }
 
-    private void OnFirst()
+    private async Task OnFirstAsync()
     {
         if (CurrentPage > 0)
         {
             CurrentPage = 0;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
     }
 
@@ -256,7 +266,8 @@ public partial class Pagination
     {
         if (PageCount.HasValue)
         {
-            CurrentPage--;
+            CurrentPage++;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
         else
         {
@@ -269,6 +280,7 @@ public partial class Pagination
         if (PageCount.HasValue)
         {
             CurrentPage = PageCount.Value - 1;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
         else
         {
@@ -276,11 +288,18 @@ public partial class Pagination
         }
     }
 
-    private void OnPrevious()
+    private async Task OnPreviousAsync()
     {
         if (CurrentPage > 0)
         {
             CurrentPage--;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
+    }
+
+    private async Task OnSetPageAsync(ulong value)
+    {
+        CurrentPage = value;
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
     }
 }

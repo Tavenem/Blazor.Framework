@@ -5,39 +5,6 @@
 
 @inherits SelectBase<IEnumerable<TValue>, TValue>
 
-@code {
-    private RenderFragment _optionRenderFragment =>
-@<CascadingValue Value="this" IsFixed="true">
-    @ChildContent
-    @if (Options is not null)
-    {
-        if (OptionTemplate is null)
-        {
-            foreach (var value in Options)
-            {
-                <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value?.ToString())" />
-            }
-        }
-        else
-        {
-            foreach (var value in Options)
-            {
-                <Option @key="value" Value="value">
-                    @OptionTemplate(context)
-                </Option>
-            }
-        }
-    }
-    @if (OptionPairs is not null)
-    {
-        foreach (var (key, value) in OptionPairs)
-        {
-            <Option @key="key" Value="key" Label="@value" />
-        }
-    }
-</CascadingValue>;
-}
-
 <div @attributes="AdditionalAttributes"
      class="@CssClass"
      style="@CssStyle"
@@ -68,7 +35,7 @@
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
-            <button class="btn btn-icon small" @onclick="Clear">
+            <button class="btn btn-icon small" @onclick="ClearAsync">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
@@ -97,19 +64,46 @@
             }
         </div>
     }
-    <div class="d-none">
-        @_optionRenderFragment
-    </div>
     <Popover Class="filled"
-                AnchorId="@Id"
-                IsOpen="ShowPicker"
-                MatchWidth="true">
+             AnchorId="@Id"
+             IsOpen="ShowPicker"
+             MatchWidth="true">
         <div class="@OptionListCssClass"
-                @onclick:stopPropagation="true">
-            <CascadingValue Value="true" IsFixed="true" Name="FromPopover">
+             @onclick:stopPropagation="true">
+            <CascadingValue Value="this" IsFixed="true">
                 <Option @key="_selectAll" TValue="TValue" Value="default" Label="Select All" IsSelectAll="true" SeparatorAfter="true" />
-                @_optionRenderFragment
+                @ChildContent
+                @if (Options is not null)
+                {
+                    if (OptionTemplate is null)
+                    {
+                        foreach (var value in Options)
+                        {
+                            <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value?.ToString())" />
+                        }
+                    }
+                    else
+                    {
+                        foreach (var value in Options)
+                        {
+                            <Option @key="value" Value="value">
+                                @OptionTemplate(context)
+                            </Option>
+                        }
+                    }
+                }
+                @if (OptionPairs is not null)
+                {
+                    foreach (var (key, value) in OptionPairs)
+                    {
+                        <Option @key="key" Value="key" Label="@value" />
+                    }
+                }
             </CascadingValue>
         </div>
     </Popover>
+    @if (ShowPicker)
+    {
+        <div @onclick="ClosePopoverAsync" @onclick:stopPropagation="true" class="overlay transparent" style="z-index:1499" />
+    }
 </div>

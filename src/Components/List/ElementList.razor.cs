@@ -219,7 +219,7 @@ public partial class ElementList<TListItem>
     /// <summary>
     /// Invoked when <see cref="SelectedItems"/> changes.
     /// </summary>
-    [Parameter] public EventCallback<IEnumerable<TListItem>> SelectedItemsChanged { get; set; }
+    [Parameter] public EventCallback<List<TListItem>> SelectedItemsChanged { get; set; }
 
     /// <summary>
     /// If <see langword="true"/> an icon is shown before the content of list items which toggles

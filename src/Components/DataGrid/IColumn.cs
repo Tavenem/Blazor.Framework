@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework.Components.DataGrid;
 /// A column for a <see cref="DataGrid{TDataItem}"/>
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public interface IColumn<TDataItem> : IDisposable
+public interface IColumn<TDataItem> : IDisposable where TDataItem : notnull
 {
     /// <summary>
     /// <para>
@@ -116,6 +116,18 @@ public interface IColumn<TDataItem> : IDisposable
     /// </para>
     /// </summary>
     public DateTimeOffset? DateTimeFilter { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether the current <see cref="DateTimeFilter"/> refers to a date/time that all values
+    /// should be equal to or before (rather than equal to or after).
+    /// </para>
+    /// <para>
+    /// Ignored for columns that do not have date/time value types, or a non-<see langword="null"/>
+    /// <see cref="DateTimeFilter"/>.
+    /// </para>
+    /// </summary>
+    public bool DateTimeFilterIsBefore { get; set; }
 
     /// <summary>
     /// <para>
@@ -289,7 +301,7 @@ public interface IColumn<TDataItem> : IDisposable
     /// Gets the value of a cell in this column for a given data item (row), as an <see
     /// cref="object"/>.
     /// </summary>
-    public object? GetCellObjectValue(TDataItem? item);
+    public object? GetCellObjectValue(TDataItem item);
 
     /// <summary>
     /// Gets the current visibility of this column.
@@ -317,7 +329,7 @@ public interface IColumn<TDataItem> : IDisposable
     /// </summary>
     /// <param name="item">The data item (row) whose value should be set.</param>
     /// <param name="value">The value to assign.</param>
-    public void SetCellObjectValue(TDataItem? item, object? value);
+    public void SetCellObjectValue(TDataItem item, object? value);
 
     /// <summary>
     /// Sets this column's manual shown/hidden value.

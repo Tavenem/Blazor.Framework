@@ -71,6 +71,11 @@ public static class DefaultIcons
     public static string DateTimeSelect { get; set; } = "calendar_month";
 
     /// <summary>
+    /// An icon for delete buttons.
+    /// </summary>
+    public static string Delete { get; set; } = "delete";
+
+    /// <summary>
     /// <para>
     /// An downward directional indicator.
     /// </para>

@@ -18,7 +18,7 @@ namespace Tavenem.Blazor.Framework;
 /// </para>
 /// </typeparam>
 [CascadingTypeParameter(nameof(TValue))]
-public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
+public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where TDataItem : notnull
 {
     private bool _manualIsShown = true;
     private Action<TDataItem, TValue?>? _defaultSetValue;
@@ -144,6 +144,18 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// </para>
     /// </summary>
     public DateTimeOffset? DateTimeFilter { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether the current <see cref="DateTimeFilter"/> refers to a date/time that all values
+    /// should be equal to or before (rather than equal to or after).
+    /// </para>
+    /// <para>
+    /// Ignored for columns that do not have date/time value types, or a non-<see langword="null"/>
+    /// <see cref="DateTimeFilter"/>.
+    /// </para>
+    /// </summary>
+    public bool DateTimeFilterIsBefore { get; set; }
 
     /// <summary>
     /// <para>
@@ -332,7 +344,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
 
     private Func<TDataItem, TValue?>? ActualValue { get; set; }
 
-    [CascadingParameter] private DataGrid<TDataItem>? DataGrid { get; set; }
+    [CascadingParameter] private IDataGrid<TDataItem>? DataGrid { get; set; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="Column{TDataItem, TValue}"/>.
@@ -347,12 +359,14 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         {
             throw new ArgumentException($"{nameof(property)} was the wrong type", nameof(property));
         }
+        var parameter = Expression.Parameter(typeof(TDataItem));
         Value = (Expression<Func<TDataItem, TValue?>>)Expression.Lambda(
             Expression.GetFuncType(typeof(TDataItem), property.PropertyType),
             Expression.Property(
-                Expression.Parameter(typeof(TDataItem)),
+                parameter,
                 property),
-            Expression.Parameter(typeof(TDataItem)));
+            parameter);
+        ParseValue(Value);
     }
 
     internal Column(FieldInfo field)
@@ -363,12 +377,14 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         {
             throw new ArgumentException($"{nameof(field)} was the wrong type", nameof(field));
         }
+        var parameter = Expression.Parameter(typeof(TDataItem));
         Value = (Expression<Func<TDataItem, TValue?>>)Expression.Lambda(
             Expression.GetFuncType(typeof(TDataItem), field.FieldType),
             Expression.Field(
-                Expression.Parameter(typeof(TDataItem)),
+                parameter,
                 field),
-            Expression.Parameter(typeof(TDataItem)));
+            parameter);
+        ParseValue(Value);
     }
 
     /// <inheritdoc/>
@@ -439,14 +455,14 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// Gets the value of a cell in this column for a given data item (row), as an <see
     /// cref="object"/>.
     /// </summary>
-    public object? GetCellObjectValue(TDataItem? item) => ActualValue is null || item is null
+    public object? GetCellObjectValue(TDataItem item) => ActualValue is null || item is null
         ? default
         : ActualValue(item);
 
     /// <summary>
     /// Gets the value of a cell in this column for a given data item (row).
     /// </summary>
-    public TValue? GetCellValue(TDataItem? item) => ActualValue is null || item is null
+    public TValue? GetCellValue(TDataItem item) => ActualValue is null || item is null
         ? default
         : ActualValue(item);
 
@@ -488,7 +504,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// and is not <see langword="null"/>.
     /// </para>
     /// </remarks>
-    public void SetCellObjectValue(TDataItem? item, object? value)
+    public void SetCellObjectValue(TDataItem item, object? value)
     {
         if (item is null
             || ActualSetValue is null)
@@ -514,7 +530,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// Has no effect if <see cref="SetValue"/> is <see langword="null"/> and an automatic setter
     /// could not be inferred from <see cref="Value"/>.
     /// </remarks>
-    public void SetCellValue(TDataItem? item, TValue? value)
+    public void SetCellValue(TDataItem item, TValue? value)
     {
         if (item is null
             || ActualSetValue is null)
@@ -630,12 +646,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
 
         IsEnum = targetType.IsEnum;
 
-        if (value.Body is not LambdaExpression lambda)
-        {
-            return;
-        }
-
-        var body = lambda.Body;
+        var body = value.Body;
 
         // Unwrap cast and save the reverse operation
         Delegate? conversion = null;

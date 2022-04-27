@@ -1,12 +1,13 @@
 ﻿.table {
     --table-action-color: var(--tavenem-color-action);
-    --table-bg-color: transparent;
-    --table-color-text: var(--tavenem-color-text);
-    --table-border-color: var(--tavenem-color-border-table);
     --table-hover-color: var(--tavenem-color-table-hover);
+    --table-selected-bg-color: var(--tavenem-color-primary-hover);
+    --table-selected-color-text: var(--tavenem-color-primary);
+    --table-selected-hover-color: var(--tavenem-color-primary-hover-bright);
     --table-stripe-color: var(--tavenem-color-table-stripe);
     border-collapse: collapse;
     border-spacing: 0;
+    color: var(--tavenem-color-text);
     display: table;
     overflow: auto;
     width: 100%;
@@ -85,7 +86,7 @@
         tfoot {
             tr:first-child > {
                 td, th {
-                    border-top: 1px solid var(--table-border-color);
+                    border-top: 1px solid var(--tavenem-color-border-table);
                 }
             }
 
@@ -110,21 +111,20 @@
             }
         }
 
-        tr {
+        thead > tr, tbody > tr, tfoot > tr, tr {
             color: inherit;
             display: table-row;
             outline: 0;
             vertical-align: middle;
 
             &.selected {
-                --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
-                background-color: var(--tavenem-theme-color-hover, var(--table-bg-color));
-                color: var(--tavenem-theme-color, var(--tavenem-color-text));
+                background-color: var(--table-selected-bg-color);
+                color: var(--table-selected-color-text);
             }
 
             > {
                 td, th {
-                    border-bottom: 1px solid var(--table-border-color);
+                    border-bottom: 1px solid var(--tavenem-color-border-table);
                     color: inherit;
                     display: table-cell;
                     font-size: 0.875em;
@@ -134,22 +134,41 @@
                     text-align: start;
                     vertical-align: inherit;
 
-                    .btn, .btn-text {
-                        margin: -1em;
-                        padding: 0;
-                    }
-
-                    .btn-icon {
-                        margin: -.75em;
-                        padding: 0;
+                    .btn {
+                        --button-inherited-padding-x: .25em;
+                        --button-inherited-padding-x-icon: .25em;
+                        --button-inherited-padding-y: 0;
+                        --button-inherited-padding-y-icon: 0;
                     }
 
                     .field {
                         margin-bottom: 0;
                         margin-top: 2px;
 
-                        > .input {
+                        > .input, > .input-content {
                             font-size: .875em;
+                        }
+
+                        &:not(.filled, .outlined) > {
+                            .input, .input-content {
+                                margin-top: 0;
+                            }
+
+                            .input {
+                                padding-bottom: 3px;
+                            }
+                        }
+
+                        &:not(.outlined) > .input {
+                            background-color: var(--tavenem-color-bg-input);
+
+                            &:before {
+                                content: none;
+                            }
+
+                            &:after {
+                                content: none;
+                            }
                         }
                     }
                 }
@@ -159,42 +178,39 @@
                     line-height: 1.5em;
 
                     &.column-header {
-                        align-items: center;
-                        display: flex;
-                        justify-content: space-between;
+                        > div {
+                            align-items: center;
+                            display: flex;
+                            justify-content: space-between;
+
+                            > tf-icon {
+                                font-size: 1.125em;
+                                margin-left: 4px;
+                                margin-right: 4px;
+                                opacity: 0;
+                                transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+                                user-select: none;
+
+                                &.active {
+                                    opacity: 1;
+                                }
+
+                                &.desc {
+                                    transform: rotate(180deg);
+                                }
+                            }
+                        }
 
                         &.clickable {
                             cursor: pointer;
-                        }
 
-                        &:hover {
-                            color: var(--table-action-color);
+                            &:hover {
+                                color: var(--table-action-color);
 
-                            tf-icon:not(.active) {
-                                opacity: 0.8;
+                                > div > tf-icon:not(.active) {
+                                    opacity: 0.8;
+                                }
                             }
-                        }
-
-                        tf-icon {
-                            font-size: 1.125em;
-                            margin-left: 4px;
-                            margin-right: 4px;
-                            opacity: 0;
-                            transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-                            user-select: none;
-
-                            &.active {
-                                opacity: 1;
-                            }
-
-                            &.desc {
-                                transform: rotate(180deg);
-                            }
-                        }
-
-                        > .options {
-                            align-items: center;
-                            display: inline-flex;
                         }
                     }
                 }
@@ -202,40 +218,54 @@
         }
     }
 
-    &.dense > tr > {
-        td, th {
-            padding-bottom: 6px;
-            padding-top: 6px;
-
-            .btn-icon {
-                padding: 4px;
-            }
-        }
-    }
-
-    &.hover > tr:hover {
-        background-color: var(--table-hover-color);
-    }
-
-    &.border {
-        border-color: var(--table-border-color) !important;
-
-        > tr {
+    &.dense > {
+        thead > tr >, tbody > tr >, tfoot > tr >, tr > {
             td, th {
-                border-right: 1px solid var(--table-border-color);
+                padding-bottom: 6px;
+                padding-top: 6px;
 
-                &:last-child {
-                    border-right: none;
+                .btn-icon {
+                    padding: 4px;
                 }
             }
         }
     }
 
-    &.striped > tr:nth-of-type(even) {
-        background-color: var(--table-stripe-color);
-
-        &:hover {
+    &.hover > {
+        thead > tr:hover, tbody > tr:hover, tfoot > tr:hover, tr:hover {
             background-color: var(--table-hover-color);
+
+            &.selected {
+                background-color: var(--table-selected-hover-color);
+            }
+        }
+    }
+
+    &.border {
+        border-color: var(--tavenem-color-border-table) !important;
+
+        > {
+            thead > tr, tbody > tr, tfoot > tr, tr {
+                td, th {
+                    border-right: 1px solid var(--tavenem-color-border-table);
+
+                    &:last-child {
+                        border-right: none;
+                    }
+                }
+            }
+        }
+    }
+
+    &.striped > {
+        thead > tr, tbody > tr, tfoot > tr, tr {
+            &:nth-of-type(even) {
+                background-color: var(--table-stripe-color);
+
+                &:hover {
+                    background-color: var(--table-hover-color);
+                }
+            }
         }
     }
 
@@ -278,28 +308,24 @@
 
     &.filled {
         --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
-        background-color: var(--tavenem-theme-color-hover, var(--table-bg-color));
+        background-color: transparent;
         color: var(--tavenem-theme-color, var(--tavenem-color-text));
-
-        > tr.selected {
-            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
-            background-color: var(--tavenem-theme-color-hover-bright, var(--table-bg-color));
-            color: var(--tavenem-theme-color, var(--tavenem-color-text));
-        }
     }
 
     &.outlined {
-        border-color: var(--table-border-color);
+        border-color: var(--tavenem-color-border-table);
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
             --table-stripe-lightness: var(--tavenem-color-#{$theme}-lightness);
             --table-action-color: var(--tavenem-theme-color-lighten);
-            --table-bg-color: var(--tavenem-theme-color-hover);
-            --table-border-color: var(--tavenem-theme-color);
             --table-hover-color: var(--tavenem-theme-color-hover);
+            --table-selected-bg-color: var(--tavenem-theme-color-hover);
+            --table-selected-color-text: var(--tavenem-theme-color);
+            --table-selected-hover-color: var(--tavenem-theme-color-hover-bright);
             --table-stripe-color: hsla(var(--tavenem-color-#{$theme}-hue), var(--tavenem-color-#{$theme}-saturation), var(--table-stripe-lightness), .02);
+            color: var(--tavenem-color-text);
 
             &.darken {
                 --table-stripe-lightness: calc(var(--tavenem-color-#{$theme}-lightness) - 10%);
@@ -321,7 +347,7 @@
                 }
 
                 tbody {
-                    border-top: 1px solid var(--table-border-color);
+                    border-top: 1px solid var(--tavenem-color-border-table);
                 }
 
                 tr {
@@ -336,7 +362,7 @@
                         text-align: start !important;
 
                         &:last-child {
-                            border-bottom: 1px solid var(--table-border-color);
+                            border-bottom: 1px solid var(--tavenem-color-border-table);
                         }
 
                         &:before {
@@ -364,45 +390,48 @@
 
 .datagrid-toolbar {
     align-items: center;
+    background-color: var(--tavenem-color-bg-alt);
     display: flex;
     gap: .5rem;
-    justify-content: end;
-}
+    justify-content: space-between;
+    padding: .5rem;
+    width: 100%;
 
-.datagrid {
-    thead tf-icon {
-        color: var(--tavenem-color-action);
-        opacity: 0.4;
-        transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-        &:hover {
-            opacity: 1;
-        }
+    > div {
+        align-items: center;
+        display: flex;
+        gap: .5rem;
     }
 
-    .field.dense {
-        margin-bottom: 0;
-        margin-top: 0;
+    > div:last-child {
+        flex-grow: 1;
 
-        &:not(.filled, .outlined) > {
-            .input, .input-content {
+        .field {
+            margin: 0;
+
+            > .input {
                 margin-top: 0;
             }
         }
 
-        &:not(.outlined) > .input {
-            &:before {
-                content: none;
-            }
+        .btn {
+            margin-top: -.25rem;
 
-            &:after {
-                content: none;
+            &:last-child {
+                margin-inline-end: -.25rem;
             }
         }
+    }
+}
 
-        .input, .input-content {
-            font-size: inherit;
-        }
+.datagrid {
+    width: 100%;
+
+    thead tr th {
+        padding-bottom: 6px;
+        padding-left: 1em;
+        padding-right: 1em;
+        padding-top: 6px;
     }
 
     .expand-row {
@@ -411,6 +440,44 @@
 
         &.open {
             transform: rotate(0deg);
+        }
+    }
+
+    .loading-row {
+        background-color: var(--table-stripe-color);
+        height: .25rem;
+
+        td {
+            border: none;
+            line-height: 0;
+            padding: 0;
+        }
+    }
+
+    .bool-cell {
+        padding-bottom: calc(1rem - .25em);
+        padding-top: calc(1rem - .25em);
+    }
+}
+
+.datagrid-pagination {
+    align-items: center;
+    background-color: var(--tavenem-color-bg-alt);
+    border-top: 1px solid var(--tavenem-color-border-table);
+    display: flex;
+    gap: .5rem;
+    padding-bottom: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: .5rem;
+
+    > .field {
+        flex-grow: 0;
+        margin: 0;
+        width: 6rem;
+
+        > .input {
+            margin-top: 0;
         }
     }
 }

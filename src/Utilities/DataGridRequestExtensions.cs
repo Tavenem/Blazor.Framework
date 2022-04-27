@@ -22,7 +22,7 @@ public static class DataGridRequestExtensions
     /// </exception>
     public static long Count<TDataItem>(
         this IEnumerable<TDataItem> items,
-        DataGridRequest request) => items.Where(request).LongCount();
+        DataGridRequest request) where TDataItem : notnull => items.Where(request).LongCount();
 
     /// <summary>
     /// Performs a LINQ query based on the given request information.
@@ -54,7 +54,7 @@ public static class DataGridRequestExtensions
     public static IEnumerable<TDataItem> Query<TDataItem>(
         this IEnumerable<TDataItem> items,
         DataGridRequest request,
-        uint? limit = null)
+        uint? limit = null) where TDataItem : notnull
     {
         items = items.Where(request);
 
@@ -125,7 +125,7 @@ public static class DataGridRequestExtensions
         return items;
     }
 
-    private static bool FilterMatches<TDataItem>(TDataItem item, FilterInfo filter)
+    private static bool FilterMatches<TDataItem>(TDataItem item, FilterInfo filter) where TDataItem : notnull
     {
         var dataType = typeof(TDataItem);
         var propertyInfo = dataType.GetProperty(filter.Property);
@@ -176,7 +176,7 @@ public static class DataGridRequestExtensions
             || targetType == typeof(DateOnly)
             || targetType == typeof(TimeOnly))
         {
-            return FilterMatches(value, filter.DateTimeFilter, filter.DateFormat);
+            return FilterMatches(value, filter.DateTimeFilter, filter.DateTimeFilterIsBefore);
         }
         return false;
     }
@@ -250,7 +250,7 @@ public static class DataGridRequestExtensions
             .Equals(str);
     }
 
-    private static bool FilterMatches(object? value, DateTimeOffset? filter, string? dateTimeFormat)
+    private static bool FilterMatches(object? value, DateTimeOffset? filter, bool isBefore)
     {
         if (value is null)
         {
@@ -264,33 +264,33 @@ public static class DataGridRequestExtensions
 
         if (value is DateTime dateTime)
         {
-            return dateTime
-                .ToString(dateTimeFormat, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(dateTimeFormat, CultureInfo.InvariantCulture));
+            return isBefore
+                ? dateTime <= filter.Value.DateTime
+                : dateTime >= filter.Value.DateTime;
         }
         if (value is DateTimeOffset dateTimeOffset)
         {
-            return dateTimeOffset
-                .ToString(dateTimeFormat, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(dateTimeFormat, CultureInfo.InvariantCulture));
+            return isBefore
+                ? dateTimeOffset <= filter.Value
+                : dateTimeOffset >= filter.Value;
         }
         if (value is DateOnly dateOnly)
         {
-            return dateOnly
-                .ToString(dateTimeFormat, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(dateTimeFormat, CultureInfo.InvariantCulture));
+            return isBefore
+                ? dateOnly <= DateOnly.FromDateTime(filter.Value.Date)
+                : dateOnly >= DateOnly.FromDateTime(filter.Value.Date);
         }
         if (value is TimeOnly timeOnly)
         {
-            return timeOnly
-                .ToString(dateTimeFormat, CultureInfo.InvariantCulture)
-                .Equals(filter.Value.ToString(dateTimeFormat, CultureInfo.InvariantCulture));
+            return isBefore
+                ? timeOnly <= TimeOnly.FromTimeSpan(filter.Value.TimeOfDay)
+                : timeOnly >= TimeOnly.FromTimeSpan(filter.Value.TimeOfDay);
         }
 
         return false;
     }
 
-    private static bool QuickFilterMatches<TDataItem>(TDataItem item, FilterInfo filter, string term)
+    private static bool QuickFilterMatches<TDataItem>(TDataItem item, FilterInfo filter, string term) where TDataItem : notnull
     {
         if (string.IsNullOrEmpty(filter.QuickFilter))
         {
@@ -311,7 +311,7 @@ public static class DataGridRequestExtensions
         return FilterMatches(propertyInfo.GetValue(item) as string, term);
     }
 
-    private static IEnumerable<TDataItem> Where<TDataItem>(this IEnumerable<TDataItem> items, DataGridRequest request)
+    private static IEnumerable<TDataItem> Where<TDataItem>(this IEnumerable<TDataItem> items, DataGridRequest request) where TDataItem : notnull
     {
         if (request.Filters is null
             || request.Filters.Length == 0)

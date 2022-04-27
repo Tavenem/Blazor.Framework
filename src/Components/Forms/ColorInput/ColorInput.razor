@@ -204,7 +204,7 @@
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
-            <button class="btn btn-icon small" disabled="@(Disabled || ReadOnly)" @onclick="Clear">
+            <button class="btn btn-icon small" disabled="@(Disabled || ReadOnly)" @onclick="ClearAsync">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
