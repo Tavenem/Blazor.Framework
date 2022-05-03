@@ -201,7 +201,7 @@ public partial class TextInput : InputComponentBase<string?>
     /// Default is <see langword="true"/>
     /// </para>
     /// </summary>
-    [Parameter] public bool ShowLength { get; set; }
+    [Parameter] public bool ShowLength { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -412,17 +412,18 @@ public partial class TextInput : InputComponentBase<string?>
     }
 
     /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    public override Task SetParametersAsync(ParameterView parameters)
     {
-        await base.SetParametersAsync(parameters);
-
-        if (parameters.TryGetValue<string>(nameof(Value), out var value))
+        if (parameters.TryGetValue<string>(nameof(Value), out var value)
+            && value != Value)
         {
             CurrentInput = value;
             DisplayString = Mask is null
                 ? value
                 : Mask.FormatInput(value);
         }
+
+        return base.SetParametersAsync(parameters);
     }
 
     /// <summary>

@@ -366,7 +366,9 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     {
         var oldActivePanelIndex = ActivePanelIndex;
 
-        if (parameters.TryGetValue(nameof(Items), out List<TTabItem>? items))
+        if (parameters.TryGetValue(nameof(Items), out List<TTabItem?>? items)
+            && ((items is null) != (Items is null)
+            || (Items is not null && items?.SequenceEqual(Items) != true)))
         {
             if (items is null)
             {

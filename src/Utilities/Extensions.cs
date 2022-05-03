@@ -70,6 +70,27 @@ internal static class Extensions
             });
     }
 
+    public static IEnumerable<string> ReadLines(this string value)
+    {
+        string? line;
+        using var sr = new StringReader(value);
+        while ((line = sr.ReadLine()) is not null)
+        {
+            yield return line;
+        }
+    }
+
+    [return: NotNullIfNotNull("value")]
+    public static StringBuilder? Replace(this StringBuilder? value, string pattern, string replacement, RegexOptions options)
+    {
+        if (value is null || value.Length == 0)
+        {
+            return value;
+        }
+
+        return new StringBuilder(Regex.Replace(value.ToString(), pattern, replacement, options));
+    }
+
     public static string? ToCSS(this Enum value)
     {
         if (value is null || Convert.ToInt32(value) == 0)
@@ -183,6 +204,55 @@ internal static class Extensions
         return precision <= 0
             ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}px"
             : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
+    }
+
+    [return: NotNullIfNotNull("value")]
+    public static string? ToTrimmedString(this StringBuilder? value)
+    {
+        if (value is null || value.Length == 0)
+        {
+            return value?.ToString();
+        }
+
+        value = value.TrimEnd();
+
+        if (value.Length > 0
+            && char.IsWhiteSpace(value[0]))
+        {
+            for (var i = 0; i < value.Length; i++)
+            {
+                if (!char.IsWhiteSpace(value[i]))
+                {
+                    return value.ToString(i, value.Length - i);
+                }
+            }
+        }
+        return value.ToString();
+    }
+
+    [return: NotNullIfNotNull("value")]
+    public static StringBuilder? TrimEnd(this StringBuilder? value)
+    {
+        if (value is null || value.Length == 0)
+        {
+            return value;
+        }
+
+        var index = value.Length - 1;
+        for (; index >= 0; index--)
+        {
+            if (!char.IsWhiteSpace(value[index]))
+            {
+                break;
+            }
+        }
+
+        if (index < value.Length - 1)
+        {
+            value.Length = index + 1;
+        }
+
+        return value;
     }
 
     public static Dictionary<TKey, TValue> With<TKey, TValue>(

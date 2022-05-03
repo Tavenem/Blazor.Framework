@@ -16,10 +16,9 @@
      class="@CssClass"
      style="@CssStyle"
      @onclick="OnClickContainerAsync"
-     @onkeydown="OnKeyDownAsync">
-    <div class="input"
-         @onfocusin="OnFocusIn"
-         @onfocusout="OnFocusOut">
+     @onkeydown="OnKeyDownAsync"
+     @onmousedown="CancelClose">
+    <div class="input">
         <input disabled="@Disabled"
                name="@Name"
                hidden
@@ -38,7 +37,7 @@
                required="@Required"
                tabindex="@TabIndex"
                value="@DisplayString"
-               @onclick="TogglePopover"
+               @onclick="TogglePopoverAsync"
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
@@ -46,7 +45,7 @@
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
-        <tf-icon class="expand" @onclick="TogglePopover" @onclick:stopPropagation="true">@DefaultIcons.Expand</tf-icon>
+        <tf-icon class="expand" @onclick="TogglePopoverAsync" @onclick:stopPropagation="true">@DefaultIcons.Expand</tf-icon>
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {
@@ -71,10 +70,13 @@
             }
         </div>
     }
-    <Popover Class="filled"
+    <Popover @ref="Popover"
+             Class="filled"
              AnchorId="@Id"
+             FocusOut="StartClosing"
              IsOpen="ShowPicker"
-             MatchWidth="true">
+             MatchWidth="true"
+             tabindex="-1">
         <div @onclick:stopPropagation="true">
             <DataGrid @ref="DataGrid"
                       TDataItem="TDataItem"
@@ -88,8 +90,4 @@
                       ThemeColor="ThemeColor" />
         </div>
     </Popover>
-    @if (ShowPicker)
-    {
-        <div @onclick="ClosePopoverAsync" @onclick:stopPropagation="true" class="overlay transparent" style="z-index:1499" />
-    }
 </div>

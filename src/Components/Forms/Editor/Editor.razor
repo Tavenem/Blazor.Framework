@@ -1,0 +1,36 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits FormComponentBase<string>
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    <div id="@Id" class="@EditorClass" spellcheck="@SpellcheckValue"></div>
+    @if ((ShowLength && MaxLength.HasValue)
+        || !IsValid)
+    {
+        <div class="field-helpers">
+            @if (!IsValid)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            @if (ShowLength && MaxLength.HasValue)
+            {
+                <div class="ml-auto">
+                    <span>@CurrentLength</span>
+                    <span>/</span>
+                    <span>@MaxLength</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+

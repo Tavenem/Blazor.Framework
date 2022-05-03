@@ -304,10 +304,11 @@ public interface IColumn<TDataItem> : IDisposable where TDataItem : notnull
     public object? GetCellObjectValue(TDataItem item);
 
     /// <summary>
-    /// Gets the current visibility of this column.
+    /// Gets whether this column should be displayed.
     /// </summary>
     /// <returns>
-    /// <see langword="true"/> if this column should be visible; otherwise <see langword="false"/>.
+    /// <see langword="true"/> if this column should be displayed; otherwise <see
+    /// langword="false"/>.
     /// </returns>
     public bool GetIsShown();
 
@@ -332,7 +333,7 @@ public interface IColumn<TDataItem> : IDisposable where TDataItem : notnull
     public void SetCellObjectValue(TDataItem item, object? value);
 
     /// <summary>
-    /// Sets this column's manual shown/hidden value.
+    /// Sets this column's shown/hidden value.
     /// </summary>
     /// <param name="value">Whether the column should be displayed.</param>
     public void SetIsShown(bool value);

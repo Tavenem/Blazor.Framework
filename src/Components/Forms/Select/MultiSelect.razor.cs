@@ -194,7 +194,7 @@ public partial class MultiSelect<TValue>
                 _selectedOptions.Clear();
             }
 
-            ToggleValue(_options[index]);
+            await ToggleValueAsync(_options[index]);
         }
 
         if (ShowPicker)

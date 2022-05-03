@@ -76,7 +76,7 @@ public partial class TextArea : InputComponentBase<string?>
     /// Default is <see langword="true"/>
     /// </para>
     /// </summary>
-    [Parameter] public bool ShowLength { get; set; }
+    [Parameter] public bool ShowLength { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -128,17 +128,7 @@ public partial class TextArea : InputComponentBase<string?>
     private protected override bool ShrinkWhen => base.ShrinkWhen
         || !string.IsNullOrEmpty(Placeholder);
 
-    private protected string? SpellcheckValue
-    {
-        get
-        {
-            if (Spellcheck.HasValue)
-            {
-                return Spellcheck.Value ? "true" : "false";
-            }
-            return "default";
-        }
-    }
+    private protected string? SpellcheckValue => Spellcheck == true ? "true" : "false";
 
     /// <summary>
     /// Constructs a new instance of <see cref="TextArea"/>.

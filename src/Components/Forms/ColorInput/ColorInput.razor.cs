@@ -227,6 +227,9 @@ public partial class ColorInput<TValue>
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var newValue = parameters.TryGetValue<TValue>(nameof(Value), out var value)
+            && value?.Equals(Value) != true;
+
         await base.SetParametersAsync(parameters);
 
         if (!ShowAlpha)
@@ -234,7 +237,7 @@ public partial class ColorInput<TValue>
             Alpha = 1;
         }
 
-        if (parameters.TryGetValue<TValue>(nameof(Value), out var value))
+        if (newValue)
         {
             if (value is null)
             {

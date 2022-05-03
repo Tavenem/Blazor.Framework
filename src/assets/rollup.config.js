@@ -1,8 +1,10 @@
-﻿import typescript from '@rollup/plugin-typescript';
+﻿import commonjs from '@rollup/plugin-commonjs';
+import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
 let plugins = [
+    commonjs(),
     typescript(),
     nodeResolve({
         mainFields: ['module', 'main'],
@@ -22,6 +24,13 @@ export default [{
     plugins: plugins,
 }, {
     input: "./scripts/tavenem-dragdrop.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
+    input: "./scripts/tavenem-editor.ts",
     output: {
         format: 'es',
         sourcemap: true,

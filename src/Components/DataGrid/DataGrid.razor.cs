@@ -352,6 +352,11 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     [Parameter] public RenderFragment? NoDataContent { get; set; }
 
     /// <summary>
+    /// Invoked when the current page has changed.
+    /// </summary>
+    [Parameter] public EventCallback CurrentPageChanged { get; set; }
+
+    /// <summary>
     /// <para>
     /// If provided, an option to export a PDF is available (as well as CSV or Excel, which are
     /// built-in).
@@ -665,32 +670,58 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             selectedItemChanged = true;
         }
 
-        await base.SetParametersAsync(parameters);
+        var selectedItemsChanged = !selectedItemChanged
+            && newSelectedItems?.SequenceEqual(SelectedItems) != true;
 
-        if (parameters.TryGetValue<string?>(nameof(QuickFilter), out _))
+        var reload = false;
+        var newRowsPerPage = false;
+        var newGroups = false;
+        var newItems = false;
+
+        if (parameters.TryGetValue<string?>(nameof(QuickFilter), out var quickFilter)
+            && quickFilter != QuickFilter)
         {
-            await LoadItemsAsync();
+            reload = true;
         }
-        if (parameters.TryGetValue<ushort>(nameof(RowsPerPage), out _))
+        if (parameters.TryGetValue<ushort>(nameof(RowsPerPage), out var rowsPerPage)
+            && rowsPerPage != RowsPerPage)
         {
-            await OnChangeRowsPerPageAsync(RowsPerPage);
+            newRowsPerPage = true;
         }
         else
         {
-            var newGroups = parameters.TryGetValue<Func<TDataItem, object>?>(nameof(GroupBy), out _);
-            var newItems = parameters.TryGetValue<List<TDataItem>>(nameof(Items), out _);
-            if (newGroups
-                || newItems)
-            {
-                if (newItems)
-                {
-                    RecalculatePaging();
-                }
-                Regroup();
-            }
+            newGroups = parameters.TryGetValue<Func<TDataItem, object>?>(nameof(GroupBy), out var groupBy)
+                && groupBy != GroupBy;
+            newItems = parameters.TryGetValue<List<TDataItem>>(nameof(Items), out var items)
+                && !items.SequenceEqual(Items);
         }
 
-        if (newSelectedItems is not null)
+        await base.SetParametersAsync(parameters);
+
+        if (reload)
+        {
+            await LoadItemsAsync();
+        }
+        if (newRowsPerPage)
+        {
+            await OnChangeRowsPerPageAsync(RowsPerPage);
+        }
+        else if (newGroups
+            || newItems)
+        {
+            if (newItems)
+            {
+                var page = CurrentPage;
+                RecalculatePaging();
+                if (CurrentPage != page)
+                {
+                    await CurrentPageChanged.InvokeAsync();
+                }
+            }
+            Regroup();
+        }
+
+        if (selectedItemsChanged)
         {
             await SetSelectionAsync(newSelectedItems);
         }
@@ -863,6 +894,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             CurrentPage++;
             await LoadItemsAsync();
         }
+        await CurrentPageChanged.InvokeAsync();
     }
 
     /// <summary>
@@ -1679,6 +1711,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                 await LoadItemsAsync();
             }
         }
+        await CurrentPageChanged.InvokeAsync();
     }
 
     private Task OnColumnSortAsync(IColumn<TDataItem> column)
@@ -1853,8 +1886,13 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                 CurrentPage++;
                 Offset += RowsPerPage;
             }
+            else
+            {
+                return;
+            }
             await LoadItemsAsync();
         }
+        await CurrentPageChanged.InvokeAsync();
     }
 
     private async Task OnNextPageAsync()
@@ -1870,6 +1908,11 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             CurrentPage++;
             await LoadItemsAsync();
         }
+        else
+        {
+            return;
+        }
+        await CurrentPageChanged.InvokeAsync();
     }
 
     private Task OnNumberFilterChangedAsync(IColumn<TDataItem> column, double? value)
@@ -1894,6 +1937,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         {
             await LoadItemsAsync();
         }
+        await CurrentPageChanged.InvokeAsync();
     }
 
     private void OnSetAllColumnsVisiblity(bool value)

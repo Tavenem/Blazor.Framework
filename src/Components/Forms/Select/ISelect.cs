@@ -47,5 +47,5 @@ public interface ISelect<TOption>
     /// Toggle the given option's selected state.
     /// </summary>
     /// <param name="option">The option to toggle.</param>
-    public void ToggleValue(Option<TOption> option);
+    public Task ToggleValueAsync(Option<TOption> option);
 }

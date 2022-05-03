@@ -171,11 +171,9 @@
      class="@CssClass"
      style="@CssStyle"
      @onclick="OnClickContainerAsync"
-     @onkeydown="OnKeyDownAsync">
-    <div class="input"
-         style="@(Inline ? "display:none" : null)"
-         @onfocusin="OnFocusIn"
-         @onfocusout="OnFocusOut">
+     @onkeydown="OnKeyDownAsync"
+     @onmousedown="CancelClose">
+    <div class="input" style="@(Inline ? "display:none" : null)">
         @if (CurrentValue is not null && Alpha > 0)
         {
             <div class="color-picker-swatch small">
@@ -200,7 +198,7 @@
                required="@Required"
                tabindex="@(Inline ? -1 : TabIndex)"
                value="@DisplayString"
-               @onclick="TogglePopover"
+               @onclick="TogglePopoverAsync"
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
@@ -208,7 +206,7 @@
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
-        <tf-icon class="expand" @onclick="TogglePopover" @onclick:stopPropagation="true">@DefaultIcons.ColorSelect</tf-icon>
+        <tf-icon class="expand" @onclick="TogglePopoverAsync" @onclick:stopPropagation="true">@DefaultIcons.ColorSelect</tf-icon>
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {
@@ -220,17 +218,16 @@
     }
     else
     {
-        <Popover Class="filled"
+        <Popover @ref="Popover"
+                 Class="filled"
                  AnchorId="@Id"
                  AnchorOrigin="Origin.Bottom_Left"
+                 FocusOut="StartClosing"
                  IsOpen="ShowPicker"
-                 PopoverOrigin="Origin.Top_Left">
+                 PopoverOrigin="Origin.Top_Left"
+                 tabindex="-1">
             @_contentRenderFragment
         </Popover>
-        @if (ShowPicker)
-        {
-            <div @onclick="ClosePopoverAsync" @onclick:stopPropagation="true" class="overlay transparent" style="z-index:1499" />
-        }
     }
     @if (!string.IsNullOrEmpty(HelpText)
         || !IsValid)

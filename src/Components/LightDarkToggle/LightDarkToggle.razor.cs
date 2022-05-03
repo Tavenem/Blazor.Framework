@@ -50,26 +50,7 @@ public partial class LightDarkToggle
 
     [Inject] private ThemeService ThemeService { get; set; } = default!;
 
-    /// <summary>
-    /// Method invoked after each time the component has been rendered. Note
-    /// that the component does not automatically re-render after the completion
-    /// of any returned <see cref="Task" />, because that would cause an
-    /// infinite render loop.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <returns>A <see cref="Task" /> representing any asynchronous
-    /// operation.</returns>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

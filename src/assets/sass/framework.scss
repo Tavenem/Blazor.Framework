@@ -1,4 +1,11 @@
-﻿@import "variables";
+﻿@import '../css/prism.min.css';
+@import '../css/toastui-editor.css';
+@import '../css/toastui-editor-plugin-code-syntax-highlight.css';
+@import '../css/tui-color-picker.css';
+@import '../css/toastui-editor-plugin-color-syntax.css';
+@import '../css/toastui-editor-dark.css';
+
+@import "variables";
 @import "animations";
 @import "reset";
 @import "layout";

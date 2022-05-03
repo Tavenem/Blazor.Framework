@@ -83,7 +83,7 @@ public partial class Select<TValue>
         return success;
     }
 
-    private protected override void OnTypeClosed(Option<TValue> option) => ToggleValue(option);
+    private protected override Task OnTypeClosedAsync(Option<TValue> option) => ToggleValueAsync(option);
 
     private protected override async Task SelectIndexAsync(KeyboardEventArgs e, int index)
     {
@@ -104,7 +104,7 @@ public partial class Select<TValue>
 
         if (!_options[index].Disabled)
         {
-            ToggleValue(_options[index]);
+            await ToggleValueAsync(_options[index]);
         }
 
         if (ShowPicker)

@@ -253,7 +253,7 @@ public abstract class DataGridSelectBase<TDataItem, TValue>
     {
         if (PopoverOpen)
         {
-            TogglePopover();
+            await TogglePopoverAsync();
         }
         if (DataGrid is not null)
         {
@@ -274,7 +274,7 @@ public abstract class DataGridSelectBase<TDataItem, TValue>
             case "tab":
                 if (PopoverOpen)
                 {
-                    TogglePopover();
+                    await TogglePopoverAsync();
                 }
                 break;
             case "arrowdown":
@@ -285,7 +285,7 @@ public abstract class DataGridSelectBase<TDataItem, TValue>
                 break;
             case " ":
             case "enter":
-                TogglePopover();
+                await TogglePopoverAsync();
                 break;
             case "a":
                 if (e.CtrlKey)

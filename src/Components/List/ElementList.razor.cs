@@ -343,9 +343,12 @@ public partial class ElementList<TListItem>
             selectedItemChanged = true;
         }
 
+        var selectedItemsChanged = !selectedItemChanged
+            && newSelectedItems?.SequenceEqual(SelectedItems) != true;
+
         await base.SetParametersAsync(parameters);
 
-        if (newSelectedItems is not null)
+        if (selectedItemsChanged)
         {
             await SetSelectionAsync(newSelectedItems);
         }

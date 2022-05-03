@@ -186,7 +186,7 @@ public partial class Option<TValue> : IDisposable
             }
             else
             {
-                Select.ToggleValue(this);
+                await Select.ToggleValueAsync(this);
             }
         }
     }

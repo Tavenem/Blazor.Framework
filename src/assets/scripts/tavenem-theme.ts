@@ -1,5 +1,13 @@
-﻿let _manualColorTheme: boolean = false;
+﻿const _listeners: DotNet.DotNetObject[] = [];
+let _manualColorTheme: boolean = false;
 let _saved_theme: number;
+
+export function cancelListener(dotNetRef: DotNet.DotNetObject) {
+    const index = _listeners.indexOf(dotNetRef);
+    if (index >= 0) {
+        _listeners.splice(index, 1);
+    }
+}
 
 export function getPreferredColorScheme(): number {
     if (_manualColorTheme && _saved_theme) {
@@ -25,6 +33,10 @@ export function getPreferredColorScheme(): number {
     return 1;
 }
 
+export function listenForThemeChange(dotNetRef: DotNet.DotNetObject) {
+    _listeners.push(dotNetRef);
+}
+
 export function setColorScheme(theme: number, manual?: boolean) {
     if (manual) {
         _manualColorTheme = (theme !== 0);
@@ -48,6 +60,12 @@ export function setColorScheme(theme: number, manual?: boolean) {
 
     if (manual) {
         localStorage.setItem('tavenem-theme', theme.toString());
+    }
+
+    if (_listeners.length) {
+        for (let listener of _listeners) {
+            listener.invokeMethodAsync('NotifyThemeChanged', theme);
+        }
     }
 }
 

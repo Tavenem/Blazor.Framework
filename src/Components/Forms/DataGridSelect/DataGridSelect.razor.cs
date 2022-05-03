@@ -86,11 +86,11 @@ public partial class DataGridSelect<TDataItem> where TDataItem : notnull
         StateHasChanged();
     }
 
-    private void UpdateCurrentValue()
+    private async Task UpdateCurrentValueAsync()
     {
         if (PopoverOpen)
         {
-            TogglePopover();
+            await TogglePopoverAsync();
         }
         if (DataGrid is null)
         {

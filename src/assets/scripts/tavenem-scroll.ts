@@ -31,7 +31,7 @@ export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, class
     _spy(null as any);
 }
 
-export function scrollToId(elementId: string | null, block: ScrollLogicalPosition | null) {
+export function scrollToId(elementId: string | null, block: ScrollLogicalPosition | null, setHistory?: boolean) {
     let element = elementId
         ? document.getElementById(elementId)
         : document.documentElement;
@@ -44,10 +44,12 @@ export function scrollToId(elementId: string | null, block: ScrollLogicalPositio
             block: block || "start",
             inline: "nearest"
         });
-        if (elementId) {
-            history.replaceState(null, '', window.location.pathname + "#" + elementId);
-        } else {
-            history.replaceState(null, '', window.location.pathname);
+        if (setHistory) {
+            if (elementId) {
+                history.replaceState(null, '', window.location.pathname + "#" + elementId);
+            } else {
+                history.replaceState(null, '', window.location.pathname);
+            }
         }
     }
 }

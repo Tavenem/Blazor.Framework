@@ -323,7 +323,8 @@ public partial class Meter<TValue>
     /// <inheritdoc/>
     public override Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.TryGetValue(nameof(Optimum), out TValue? optimum))
+        if (parameters.TryGetValue(nameof(Optimum), out TValue? optimum)
+            && optimum?.Equals(Optimum) != true)
         {
             if (Nullable.GetUnderlyingType(typeof(TValue)) is not null)
             {

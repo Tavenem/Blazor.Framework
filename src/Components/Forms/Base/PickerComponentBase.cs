@@ -8,7 +8,7 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// </summary>
 public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 {
-    private readonly AdjustableTimer _focusTimer;
+    private readonly AsyncAdjustableTimer _timer;
 
     private bool _disposedValue;
 
@@ -144,6 +144,11 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         .Add("input-core")
         .ToString();
 
+    /// <summary>
+    /// The popover component.
+    /// </summary>
+    protected Popover? Popover { get; set; }
+
     private protected virtual bool CanClear => AllowClear
         && Clearable
         && !Disabled
@@ -152,8 +157,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         && !string.IsNullOrEmpty(CurrentValueAsString);
 
     private protected bool Clearable { get; set; }
-
-    private protected bool HasFocus { get; set; }
 
     private protected bool PopoverOpen { get; set; }
 
@@ -167,7 +170,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// <summary>
     /// Constructs a new instance of <see cref="PickerComponentBase{TValue}"/>.
     /// </summary>
-    protected PickerComponentBase() => _focusTimer = new(ClearFocus, 200);
+    protected PickerComponentBase() => _timer = new(ClosePopoverAsync, 100);
 
     /// <summary>
     /// <para>
@@ -198,7 +201,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         {
             if (disposing)
             {
-                _focusTimer.Dispose();
+                _timer.Dispose();
             }
 
             _disposedValue = true;
@@ -207,8 +210,15 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         base.Dispose(disposing);
     }
 
+    private protected void CancelClose()
+    {
+        Popover?.CancelFocusOut();
+        _timer.Cancel();
+    }
+
     private protected async Task ClosePopoverAsync()
     {
+        _timer.Cancel();
         if (PopoverOpen)
         {
             PopoverOpen = false;
@@ -217,7 +227,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         }
     }
 
-    private protected void TogglePopover()
+    private protected async Task TogglePopoverAsync()
     {
         if (Disabled || ReadOnly)
         {
@@ -227,12 +237,17 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         PopoverOpen = !PopoverOpen;
         if (PopoverOpen)
         {
+            if (Popover is not null)
+            {
+                await Popover.ElementReference.FocusAsync();
+            }
             OnOpenPopover();
         }
         else
         {
-            OnClosePopoverAsync();
+            await OnClosePopoverAsync();
         }
+        StateHasChanged();
     }
 
     private protected async Task OnClickContainerAsync()
@@ -240,25 +255,11 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         if (!Disabled && !ReadOnly)
         {
             await ElementReference.FocusAsync();
-            TogglePopover();
+            await TogglePopoverAsync();
         }
     }
 
     private protected virtual Task OnClosePopoverAsync() => Task.CompletedTask;
-
-    private protected void OnFocusIn()
-    {
-        _focusTimer.Cancel();
-        HasFocus = true;
-    }
-
-    private protected void OnFocusOut()
-    {
-        if (HasFocus)
-        {
-            _focusTimer.Start();
-        }
-    }
 
     private protected virtual Task OnKeyDownAsync(KeyboardEventArgs e)
     {
@@ -273,13 +274,12 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
             case "tab":
                 if (PopoverOpen)
                 {
-                    TogglePopover();
+                    return TogglePopoverAsync();
                 }
                 break;
             case " ":
             case "enter":
-                TogglePopover();
-                break;
+                return TogglePopoverAsync();
         }
 
         return Task.CompletedTask;
@@ -287,5 +287,5 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected virtual void OnOpenPopover() { }
 
-    private void ClearFocus() => HasFocus = false;
+    private protected void StartClosing() => _timer.Start();
 }

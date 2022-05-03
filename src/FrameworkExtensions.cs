@@ -24,6 +24,7 @@ public static class FrameworkExtensions
         services.AddScoped<DialogService>();
         services.AddScoped<SnackbarService>();
         services.AddTransient<DragDropListener>();
+        services.AddTransient<EditorService>();
         services.AddTransient<IJSEventListener, JSEventListener>();
         services.AddTransient<IKeyListener, KeyListener>();
         services.AddTransient<IResizeObserver, ResizeObserver>();

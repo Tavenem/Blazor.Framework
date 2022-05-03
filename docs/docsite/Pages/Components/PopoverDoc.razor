@@ -86,10 +86,10 @@
 
 <p>
     You can specify a particular element to which the popover should be anchored with the
-    <code>AnchorId</code> property. The anchoring element must have the same offset parent as the
-    popover (nearest positioned ancestor element in the containment hierarchy). When an anchor is
-    specified, the <code>AnchorOrigin</code> refers to the anchoring element. When it is
-    unspecified, <code>AnchorOrigin</code> refers to the containing positioned parent.
+    <code>AnchorId</code> property. The anchoring element's offset parent must be the popover's
+    nearest positioned ancestor element in the containment hierarchy. When an anchor is specified,
+    the <code>AnchorOrigin</code> refers to the anchoring element. When it is unspecified,
+    <code>AnchorOrigin</code> refers to the containing positioned parent.
 </p>
 
 <p>
@@ -130,13 +130,12 @@
 
 <p>
     Popovers can automatically flip to stay in view, when possible. Set the
-    <code>FlipBehavior</code> property to <code>Filp_OnOpen</code> to change the
-    direction the popover opens (the default), or to <code>Flip_Always</code> to
-    also flip anytime the window scrolls or resizes, if the popover would no
-    longer be fully in view. You can also set it to <code>Flip_Never</code> to
-    prevent the flipping behavior and always open in the direction specified by
-    <code>AnchorOrigin</code> and <code>PopoverOrigin</code>, regardless of
-    whether the popover would be visible in that position.
+    <code>FlipBehavior</code> property to <code>Filp_OnOpen</code> to change the direction the
+    popover opens (the default), or to <code>Flip_Always</code> to also flip anytime the window
+    scrolls or resizes, if the popover would no longer be fully in view. You can also set it to
+    <code>Flip_Never</code> to prevent the flipping behavior and always open in the direction
+    specified by <code>AnchorOrigin</code> and <code>PopoverOrigin</code>, regardless of whether the
+    popover would be visible in that position.
 </p>
 
 <div class="row bg-alt rounded outlined center-items p-6">

@@ -620,13 +620,6 @@ public partial class DateTimeInput<TValue>
         var setCalendar = false;
         var scrollToYear = false;
 
-        await base.SetParametersAsync(parameters);
-
-        if (FormatProvider is null)
-        {
-            FormatProvider = Culture;
-        }
-
         if (parameters.TryGetValue<DateTime>(nameof(Min), out var min))
         {
             _min = min;
@@ -636,35 +629,30 @@ public partial class DateTimeInput<TValue>
             _max = max;
         }
 
-        if (parameters.TryGetValue<DateType>(nameof(DateType), out var dateType))
+        if (parameters.TryGetValue<CultureInfo>(nameof(Culture), out var culture)
+            && culture != Culture)
         {
-            if (dateType == DateType.Year
-                && (int)View < (int)DatePickerView.Year)
-            {
-                View = DatePickerView.Year;
-                scrollToYear = true;
-            }
-            else if (dateType == DateType.Month
-                && (int)View < (int)DatePickerView.Month)
-            {
-                View = DatePickerView.Month;
-            }
-        }
-
-        if (parameters.TryGetValue<CultureInfo>(nameof(Culture), out _))
-        {
+            Culture = culture;
             SetCulture();
             setCalendar = true;
         }
 
-        if (parameters.TryGetValue<Calendar>(nameof(Calendar), out var calendar))
+        if (parameters.TryGetValue<Calendar>(nameof(Calendar), out var calendar)
+            && calendar != Calendar)
         {
             SetCalendar(calendar);
             setDate = true;
         }
 
+        if (parameters.TryGetValue<TimeZoneInfo>(nameof(TimeZone), out var timeZone)
+            && timeZone != TimeZone)
+        {
+            SetTimeZone(timeZone);
+        }
+
         if (parameters.TryGetValue<bool>(nameof(ShowTime), out var showTime)
-            && !showTime)
+            && !showTime
+            && showTime != ShowTime)
         {
             DateTimeOffset = new DateTimeOffset(
                 DateTimeOffset.Year,
@@ -674,12 +662,8 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Offset);
         }
 
-        if (parameters.TryGetValue<TimeZoneInfo>(nameof(TimeZone), out var timeZone))
-        {
-            SetTimeZone(timeZone);
-        }
-
-        if (parameters.TryGetValue<TValue>(nameof(Value), out var value))
+        if (parameters.TryGetValue<TValue>(nameof(Value), out var value)
+            && value?.Equals(Value) != true)
         {
             if (value is null)
             {
@@ -721,6 +705,29 @@ public partial class DateTimeInput<TValue>
             setDate = true;
         }
 
+        if (parameters.TryGetValue<DateType>(nameof(DateType), out var dateType)
+            && dateType != DateType)
+        {
+            if (dateType == DateType.Year
+                && (int)View < (int)DatePickerView.Year)
+            {
+                View = DatePickerView.Year;
+                scrollToYear = true;
+            }
+            else if (dateType == DateType.Month
+                && (int)View < (int)DatePickerView.Month)
+            {
+                View = DatePickerView.Month;
+            }
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (FormatProvider is null)
+        {
+            FormatProvider = Culture;
+        }
+
         if (!setCalendar && setDate)
         {
             SetDateValues();
@@ -728,7 +735,10 @@ public partial class DateTimeInput<TValue>
 
         if (scrollToYear)
         {
-            await ScrollService.ScrollToId($"date-picker-year-{Calendar.GetYear(FirstDateInMonth)}", ScrollLogicalPosition.Nearest);
+            await ScrollService.ScrollToId(
+                $"date-picker-year-{Calendar.GetYear(FirstDateInMonth)}",
+                ScrollLogicalPosition.Nearest,
+                false);
         }
     }
 
@@ -1232,10 +1242,17 @@ public partial class DateTimeInput<TValue>
         Century = century;
         SetCenturyDecadeValues();
         View = DatePickerView.Decade;
-        await ScrollService.ScrollToId($"date-picker-decade-{Decade}", ScrollLogicalPosition.Nearest);
+        if (Popover is not null)
+        {
+            await Popover.ElementReference.FocusAsync();
+        }
+        await ScrollService.ScrollToId(
+            $"date-picker-decade-{Decade}",
+            ScrollLogicalPosition.Nearest,
+            false);
     }
 
-    private void OnSelectCurent()
+    private async Task OnSelectCurentAsync()
     {
         Year = Calendar.GetYear(DateTimeOffset.DateTime);
         Month = (byte)Calendar.GetMonth(DateTimeOffset.DateTime);
@@ -1246,6 +1263,10 @@ public partial class DateTimeInput<TValue>
             || OnlyDate)))
         {
             View = DatePickerView.Date;
+            if (Popover is not null)
+            {
+                await Popover.ElementReference.FocusAsync();
+            }
         }
     }
 
@@ -1281,7 +1302,14 @@ public partial class DateTimeInput<TValue>
         Decade = value;
         SetCenturyDecadeValues();
         View = DatePickerView.Year;
-        await ScrollService.ScrollToId($"date-picker-year-{Year}", ScrollLogicalPosition.Nearest);
+        if (Popover is not null)
+        {
+            await Popover.ElementReference.FocusAsync();
+        }
+        await ScrollService.ScrollToId(
+            $"date-picker-year-{Year}",
+            ScrollLogicalPosition.Nearest,
+            false);
     }
 
     private void OnSelectHour(byte value)
@@ -1364,6 +1392,10 @@ public partial class DateTimeInput<TValue>
         else if (View == DatePickerView.Month)
         {
             View = DatePickerView.Date;
+            if (Popover is not null)
+            {
+                await Popover.ElementReference.FocusAsync();
+            }
         }
     }
 
@@ -1477,6 +1509,10 @@ public partial class DateTimeInput<TValue>
         else if ((int)DateType >= (int)DateType.Week)
         {
             View = DatePickerView.Date;
+            if (Popover is not null)
+            {
+                await Popover.ElementReference.FocusAsync();
+            }
         }
     }
 
@@ -1508,6 +1544,10 @@ public partial class DateTimeInput<TValue>
         else if (View == DatePickerView.Year)
         {
             View = DatePickerView.Month;
+            if (Popover is not null)
+            {
+                await Popover.ElementReference.FocusAsync();
+            }
         }
     }
 
@@ -1809,18 +1849,31 @@ public partial class DateTimeInput<TValue>
     private async Task SetViewAsync(DatePickerView view)
     {
         View = view;
+        if (Popover is not null)
+        {
+            await Popover.ElementReference.FocusAsync();
+        }
         await Task.Delay(1);
         if (View == DatePickerView.Year)
         {
-            await ScrollService.ScrollToId($"date-picker-year-{Year}", ScrollLogicalPosition.Nearest);
+            await ScrollService.ScrollToId(
+                $"date-picker-year-{Year}",
+                ScrollLogicalPosition.Nearest,
+                false);
         }
         else if (View == DatePickerView.Decade)
         {
-            await ScrollService.ScrollToId($"date-picker-decade-{Decade}", ScrollLogicalPosition.Nearest);
+            await ScrollService.ScrollToId(
+                $"date-picker-decade-{Decade}",
+                ScrollLogicalPosition.Nearest,
+                false);
         }
         else if (View == DatePickerView.Century)
         {
-            await ScrollService.ScrollToId($"date-picker-century-{Century}", ScrollLogicalPosition.Nearest);
+            await ScrollService.ScrollToId(
+                $"date-picker-century-{Century}",
+                ScrollLogicalPosition.Nearest,
+                false);
         }
     }
 }

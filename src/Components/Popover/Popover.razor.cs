@@ -9,6 +9,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Popover : IAsyncDisposable
 {
+    private readonly AsyncAdjustableTimer _timer;
+
     private bool _disposedValue;
     private PopoverHandler? _handler;
     private bool _initialized;
@@ -162,6 +164,11 @@ public partial class Popover : IAsyncDisposable
     [Inject] private PopoverService PopoverService { get; set; } = default!;
 
     /// <summary>
+    /// Constructs a new instance of <see cref="Popover"/>.
+    /// </summary>
+    public Popover() => _timer = new(FocusOutAsync, 100);
+
+    /// <summary>
     /// Sets parameters supplied by the component's parent in the render tree.
     /// </summary>
     /// <param name="parameters">The parameters.</param>
@@ -241,23 +248,14 @@ public partial class Popover : IAsyncDisposable
     /// <returns>
     /// A task that represents the asynchronous dispose operation.
     /// </returns>
-    protected virtual async ValueTask DisposeAsync(bool disposing)
+    public async ValueTask DisposeAsync()
     {
-        if (!_disposedValue)
-        {
-            if (disposing && _handler is not null)
-            {
-                try
-                {
-                    await PopoverService.UnregisterPopoverHandler(_handler);
-                }
-                catch (JSDisconnectedException) { }
-                catch (TaskCanceledException) { }
-            }
-
-            _disposedValue = true;
-        }
+        // Do not change this code. Put cleanup code in 'DisposeAsync(bool disposing)' method
+        await DisposeAsync(disposing: true);
+        GC.SuppressFinalize(this);
     }
+
+    internal void CancelFocusOut() => _timer.Cancel();
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
@@ -266,12 +264,30 @@ public partial class Popover : IAsyncDisposable
     /// <returns>
     /// A task that represents the asynchronous dispose operation.
     /// </returns>
-    public async ValueTask DisposeAsync()
+    protected virtual async ValueTask DisposeAsync(bool disposing)
     {
-        // Do not change this code. Put cleanup code in 'DisposeAsync(bool disposing)' method
-        await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                _timer.Dispose();
+
+                if (_handler is not null)
+                {
+                    try
+                    {
+                        await PopoverService.UnregisterPopoverHandler(_handler);
+                    }
+                    catch (JSDisconnectedException) { }
+                    catch (TaskCanceledException) { }
+                }
+            }
+
+            _disposedValue = true;
+        }
     }
 
-    private Task OnFocusOutAsync() => FocusOut.InvokeAsync();
+    private Task FocusOutAsync() => FocusOut.InvokeAsync();
+
+    private void OnFocusOut() => _timer.Start();
 }

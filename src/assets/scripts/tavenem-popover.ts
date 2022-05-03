@@ -160,7 +160,7 @@ class Popover {
             }
             if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
                 parent.addEventListener('scroll', () => {
-                    this.placePopoverByClassSelector('flip-always');
+                    this.placePopovers();
                 });
                 parent.listeningForPopoverScroll = true;
             }
@@ -219,20 +219,20 @@ class Popover {
             }
 
             this.contentObserver = new ResizeObserver(entries => {
-                this.placePopoverByClassSelector();
+                this.placePopovers();
             });
 
             this.contentObserver.observe(mainContent);
         }
     }
 
-    placePopoverByClassSelector(classSelector: string | null = null): void {
+    placePopovers(): void {
         var items = this.getAllObservedContainers();
 
         for (let i = 0; i < items.length; i++) {
             const popoverNode = document.getElementById('popover-' + items[i]);
             if (popoverNode) {
-                this.placePopover(popoverNode, classSelector);
+                this.placePopover(popoverNode);
             }
         }
     }
@@ -380,17 +380,10 @@ class Popover {
             selfRect);
     }
 
-    private placePopover(
-        popoverNode: IPopoverElement,
-        classSelector: string | null = null): void {
+    private placePopover(popoverNode: IPopoverElement): void {
         if (!popoverNode
             || !popoverNode.classList.contains('open')
             || !popoverNode.parent) {
-            return;
-        }
-
-        if (classSelector
-            && !popoverNode.classList.contains(classSelector)) {
             return;
         }
 
@@ -573,5 +566,5 @@ export function setPopoverOffset(id: string, offsetX: number | null, offsetY: nu
 }
 
 window.addEventListener('resize', () => {
-    popover.placePopoverByClassSelector();
+    popover.placePopovers();
 });

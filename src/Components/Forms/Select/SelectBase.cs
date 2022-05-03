@@ -283,11 +283,11 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// Toggle the given option's selected state.
     /// </summary>
     /// <param name="option">The option to toggle.</param>
-    public void ToggleValue(Option<TOption> option)
+    public async Task ToggleValueAsync(Option<TOption> option)
     {
         if (PopoverOpen)
         {
-            TogglePopover();
+            await TogglePopoverAsync();
         }
         SelectedIndex = _options.IndexOf(option);
         if (IsSelected(option.Value))
@@ -339,7 +339,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
             case "tab":
                 if (PopoverOpen)
                 {
-                    TogglePopover();
+                    await TogglePopoverAsync();
                 }
                 break;
             case "arrowdown":
@@ -350,7 +350,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
                 break;
             case " ":
             case "enter":
-                TogglePopover();
+                await TogglePopoverAsync();
                 break;
             case "a":
                 if (e.CtrlKey)
@@ -374,7 +374,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
         }
     }
 
-    private protected virtual void OnTypeClosed(Option<TOption> option) { }
+    private protected virtual Task OnTypeClosedAsync(Option<TOption> option) => Task.CompletedTask;
 
     private protected void RefreshOptions() => _options.ForEach(x => x.InvokeStateChange());
 
@@ -414,7 +414,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
                 }
                 else
                 {
-                    OnTypeClosed(option);
+                    await OnTypeClosedAsync(option);
                 }
             }
         }

@@ -20,7 +20,6 @@ namespace Tavenem.Blazor.Framework;
 [CascadingTypeParameter(nameof(TValue))]
 public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where TDataItem : notnull
 {
-    private bool _manualIsShown = true;
     private Action<TDataItem, TValue?>? _defaultSetValue;
     private bool _disposedValue;
 
@@ -249,6 +248,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     /// </summary>
     [Parameter] public bool IsQuickFilter { get; set; }
 
+    private bool _isShown = true;
     /// <summary>
     /// Whether this column is currently displayed.
     /// </summary>
@@ -388,7 +388,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized() => DataGrid?.AddColumn(this);
+    protected override void OnInitialized()
+    {
+        DataGrid?.AddColumn(this);
+        _isShown = IsShown;
+    }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -398,9 +402,39 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
             _defaultSetValue = setValue;
         }
 
-        if (parameters.TryGetValue<Expression<Func<TDataItem, TValue?>>?>(nameof(Value), out var value))
+        if (parameters.TryGetValue<Expression<Func<TDataItem, TValue?>>?>(nameof(Value), out var value)
+            && value != Value)
         {
             ParseValue(value);
+        }
+
+        var resort = false;
+        var reload = false;
+        var stateChange = false;
+        if (DataGrid is not null)
+        {
+            if (parameters.TryGetValue<bool>(nameof(SortDescending), out var sortDescending)
+                && sortDescending != SortDescending)
+            {
+                resort = true;
+            }
+            else if ((parameters.TryGetValue<bool?>(nameof(BoolFilter), out var boolFilter)
+                && boolFilter != BoolFilter)
+                || (parameters.TryGetValue<DateTimeOffset?>(nameof(DateTimeFilter), out var dateTimeFilter)
+                && dateTimeFilter != DateTimeFilter)
+                || (parameters.TryGetValue<double?>(nameof(NumberFilter), out var numberFilter)
+                && numberFilter != NumberFilter)
+                || (parameters.TryGetValue<string?>(nameof(TextFilter), out var textFilter)
+                && textFilter != TextFilter))
+            {
+                reload = true;
+            }
+            else if (parameters.TryGetValue<bool>(nameof(IsShown), out var isShown)
+                && isShown != IsShown)
+            {
+                _isShown = isShown;
+                stateChange = true;
+            }
         }
 
         await base.SetParametersAsync(parameters);
@@ -409,19 +443,15 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
         {
             return;
         }
-
-        if (parameters.TryGetValue<bool>(nameof(SortDescending), out _))
+        if (resort)
         {
             await DataGrid.OnColumnSortedAsync(this);
         }
-        else if (parameters.TryGetValue<bool?>(nameof(BoolFilter), out _)
-            || parameters.TryGetValue<DateTimeOffset?>(nameof(DateTimeFilter), out _)
-            || parameters.TryGetValue<double?>(nameof(NumberFilter), out _)
-            || parameters.TryGetValue<string?>(nameof(TextFilter), out _))
+        else if (reload)
         {
             await DataGrid.LoadItemsAsync();
         }
-        else if (parameters.TryGetValue<bool>(nameof(IsShown), out _))
+        else if (stateChange)
         {
             DataGrid.InvokeStateChange();
         }
@@ -467,12 +497,13 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
         : ActualValue(item);
 
     /// <summary>
-    /// Gets the current visibility of this column.
+    /// Gets whether this column should be displayed.
     /// </summary>
     /// <returns>
-    /// <see langword="true"/> if this column should be visible; otherwise <see langword="false"/>.
+    /// <see langword="true"/> if this column should be displayed; otherwise <see
+    /// langword="false"/>.
     /// </returns>
-    public bool GetIsShown() => _manualIsShown && IsShown;
+    public bool GetIsShown() => _isShown;
 
     /// <summary>
     /// Gets the current sortability of this column.
@@ -544,7 +575,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     /// Sets this column's manual shown/hidden value.
     /// </summary>
     /// <param name="value">Whether the column should be displayed.</param>
-    public void SetIsShown(bool value) => _manualIsShown = value;
+    public void SetIsShown(bool value)
+    {
+        _isShown = value;
+        DataGrid?.InvokeStateChange();
+    }
 
     /// <summary>
     /// Validates the content of a cell.

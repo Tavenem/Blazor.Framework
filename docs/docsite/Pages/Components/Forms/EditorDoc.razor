@@ -1,0 +1,491 @@
+﻿@page "/components/editor"
+
+<PageTitle>Editor - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Editor</Heading>
+
+<p>
+    The <code>Editor</code> component is a rich text editor capable of editing various forms text content.
+</p>
+
+<p>
+    There are three content types supported by the <code>Editor</code>:
+</p>
+
+<ul>
+    <li>Plain text
+        <p>
+            This mode supports syntax highlighting for a variety of programming languages.
+        </p>
+        <p>
+            This mode utilizes the <a href="https://codemirror.net/">CodeMirror</a> text editor.
+        </p>
+    </li>
+    <li>HTML
+        <p>
+            This mode supports both 
+        </p>
+    </li>
+    <li>Markdown</li>
+</ul>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    Text areas come in three styles. The default uses a simple underline. Add the
+    <code>filled</code> class to give it a shaded background. Add the <code>outlined</code> class to
+    use a full outline.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Normal" />
+                <TextArea Label="Filled" Class="filled" />
+                <TextArea Label="Outlined" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Normal"" />
+    <TextArea Label=""Filled"" Class=""filled"" />
+    <TextArea Label=""Outlined"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also add the <code>dense</code> class to any variant to reduce the margins and padding.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Normal" Class="dense" />
+                <TextArea Label="Filled" Class="filled dense" />
+                <TextArea Label="Outlined" Class="outlined dense" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Normal"" Class=""dense"" />
+    <TextArea Label=""Filled"" Class=""filled dense"" />
+    <TextArea Label=""Outlined"" Class=""outlined dense"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Bind the input value to any <code>string</code> with the <code>Value</code> property. You should
+    bind to a nullable <code>string?</code> if your project supports nullable reference types, as an
+    empty input may be represented either by a <code>null</code> value or the empty string,
+    depending on the situation.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea @bind-Value="_value" Label="Bound" Class="w-100" />
+                <span>Bound value: @_value</span>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea @bind-Value=""_value"" Label=""Bound"" Class=""w-100"" />
+    <span>Bound value: @_value</span>
+</div>
+
+@code {
+    private string? _value = ""Example"";
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Normally binding updates occur in response to the textarea's <code>onchange</code> event, which
+    fires when the textarea loses focus. If you set the <code>UpdateOnInput</code> property to
+    <code>true</code>, updates will occur in response to the <code>oninput</code> event instead,
+    which fires every time the textarea value changes.
+</p>
+
+<p>
+    If you need to update as the user types, but want to avoid excessive calls, you can set the
+    <code>UpdateOnInputDebounce</code> property to a number of milliseconds that the component will
+    wait before updating the bound value.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea @bind-Value="_value2" Label="On Change" HelpText="@_value2" />
+                <TextArea @bind-Value="_value3" UpdateOnInput="true" Label="On Input" HelpText="@_value3" />
+                <TextArea @bind-Value="_value4" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="Debounced" HelpText="@_value4" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea @bind-Value=""_value1"" Label=""On Change"" HelpText=""@_value1"" />
+    <TextArea @bind-Value=""_value2"" UpdateOnInput=""true"" Label=""On Input"" HelpText=""@_value2"" />
+    <TextArea @bind-Value=""_value3"" UpdateOnInput=""true"" UpdateOnInputDebounce=""500"" Label=""Debounced"" HelpText=""@_value3"" />
+</div>
+
+@code {
+    private string? _value1 = ""Start typing..."";
+    private string? _value2 = ""Start typing..."";
+    private string? _value3 = ""Start typing..."";
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Rows</Heading>
+
+<p>
+    The <code>Rows</code> property indicates the number of rows of text the textarea will display (2
+    by default). Note that the user may input more lines of text than this, which will cause a
+    vertical scrollbar will appear.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="2 Lines" />
+                <TextArea Label="4 lines" Rows="4" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""2 Lines"" />
+    <TextArea Label=""4 lines"" Rows=""4"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Disabled & read-only</Heading>
+
+<p>
+    The textarea can be set as disabled or read-only by setting the properties of the same names.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+                <TextArea @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+                <TextArea @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+            </div>
+            <div class="row mt-3 fill align-items-center gap-2">
+                <TextArea @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+                <TextArea @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+                <TextArea @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
+    <TextArea @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
+    <TextArea @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
+</div>
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <TextArea @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
+    <TextArea @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
+    <TextArea @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
+</div>
+
+@code {
+    private string? _disabled = ""Can select but not edit"";
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Label</Heading>
+
+<p>
+    The <code>Label</code> property assigns a label to the textarea. The label will appear within the
+    textarea like a placeholder when it is empty, does not have focus, and has no explicit placeholder.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Label" />
+                <TextArea Label="Label" Placeholder="Placeholder" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Label"" />
+    <TextArea Label=""Label"" Placeholder=""Placeholder"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Placeholder</Heading>
+
+<p>
+    The <code>Placeholder</code> property assigns a placeholder to the textarea.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Normal" Placeholder="Placeholder" />
+                <TextArea Label="Filled" Placeholder="Placeholder" Class="filled" />
+                <TextArea Label="Outlined" Placeholder="Placeholder" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Normal"" Placeholder=""Placeholder"" />
+    <TextArea Label=""Filled"" Placeholder=""Placeholder"" Class=""filled"" />
+    <TextArea Label=""Outlined"" Placeholder=""Placeholder"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Help text</Heading>
+
+<p>
+    You can supply help text for the field with the <code>HelpText</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Normal" HelpText="Some help text" />
+                <TextArea Label="Filled" HelpText="Some help text" Class="filled" />
+                <TextArea Label="Outlined" HelpText="Some help text" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Normal"" HelpText=""Some help text"" />
+    <TextArea Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+    <TextArea Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can hide the help text until the textarea has focus by setting the
+    <code>DisplayHelpTextOnFocus</code> property to <code>true</code>.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true" />
+                <TextArea Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled" />
+                <TextArea Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Normal"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" />
+    <TextArea Label=""Filled"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""filled"" />
+    <TextArea Label=""Outlined"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that help text is replaced by any field validation errors.
+</p>
+
+<Heading Level="HeadingLevel.H2">Max length</Heading>
+
+<p>
+    You can specify a maximum length for the textarea with the <code>MaxLength</code> property.
+</p>
+
+<p>
+    If you do specify a maximum length, you can also set the <code>ShowLength</code> property to
+    <code>true</code> to display the current and maximum character count.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Normal" MaxLength="12" ShowLength="true" />
+                <TextArea Label="Filled" MaxLength="12" ShowLength="true" Class="filled" />
+                <TextArea Label="Outlined" MaxLength="12" ShowLength="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Normal"" MaxLength=""12"" ShowLength=""true"" />
+    <TextArea Label=""Filled"" MaxLength=""12"" ShowLength=""true"" Class=""filled"" />
+    <TextArea Label=""Outlined"" MaxLength=""12"" ShowLength=""true"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Required</Heading>
+
+<p>
+    Set the <code>Required</code> property to specify whether the input is required. This adds an
+    indicator to the label, and automatic verification rules which warn the user when the input is
+    empty. The warning will only appear after the user has interacted with the input for the first
+    time.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Required" Required="true" />
+                <TextArea Label="Required" Required="true" Class="filled" />
+                <TextArea Label="Required" Required="true" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Required"" Required=""true"" />
+    <TextArea Label=""Required"" Required=""true"" Class=""filled"" />
+    <TextArea Label=""Required"" Required=""true"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Tab index</Heading>
+
+<p>
+    Set the <code>TabIndex</code> property to specify the value of the input's <code>tabindex</code>
+    attribute.
+</p>
+
+<Heading Level="HeadingLevel.H2">Name</Heading>
+
+<p>
+    The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
+<Heading Level="HeadingLevel.H2">Auto-focus</Heading>
+
+<p>
+    Set the <code>AutoFocus</code> property to <code>true</code> to automatically focus the input on
+    page load. Setting this on more than one component will cause the first one in the DOM layout
+    order to receive focus.
+</p>
+
+<p>
+    Be cautious when using this property. It can be unfriendly to users who use screen-reading
+    technology.
+</p>
+
+<Heading Level="HeadingLevel.H2">Typing assistance</Heading>
+
+<p>
+    You can set the <code>Autocomplete</code>, <code>Autocorrect</code>, and <code>Spellcheck</code>
+    properties to boolean value to set the attributes of the same name on the input. You can also
+    assign <code>null</code> to any of them (the default value), which uses the browser's default
+    behavior.
+</p>
+
+<Heading Level="HeadingLevel.H2">Methods</Heading>
+
+<p>
+    The <code>Clear</code> method will clear the current input text.
+</p>
+
+<p>
+    The <code>FocusAsync</code> method will give the input focus.
+</p>
+
+<p>
+    The <code>SelectAsync</code> method will select all the current input text.
+</p>
+
+<p>
+    The <code>SelectRangeAsync</code> method accepts a start and optional end index, and will select
+    the input text in that range. If the <code>end</code> parameter is omitted, everything from the
+    start index to the end of the input is selected.
+</p>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
+                <TextArea Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
+                <TextArea Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
+                <TextArea Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
+                <TextArea Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <TextArea Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
+                <TextArea Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
+                <TextArea Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
+    <TextArea Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
+    <TextArea Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" />
+    <TextArea Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
+    <TextArea Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <TextArea Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
+    <TextArea Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
+    <TextArea Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
+    CSS attributes of the textarea itself, while the <code>InputAttributes</code> property can be used
+    to assign arbitrary attributes to it.
+</p>
+
+<Heading Level="HeadingLevel.H3">Validation</Heading>
+
+<p>
+    See <a href="./components/validation">Validation</a> for information about validating Tavenem
+    Blazor Framework form components.
+</p>
+
+@code {
+    private string? _disabled = "Can select but not edit";
+    private string? _value = "Example";
+    private string? _value2 = "Start typing...";
+    private string? _value3 = "Start typing...";
+    private string? _value4 = "Start typing...";
+}
