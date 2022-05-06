@@ -5,14 +5,12 @@ namespace Tavenem.Blazor.Framework.Services;
 internal class EditorService : IAsyncDisposable
 {
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
+    private readonly ThemeService _themeService;
 
     private bool _disposedValue;
     private DotNetObjectReference<EditorService>? _dotNetRef;
     private EventHandler<string?>? _onInput;
-
     public bool AutoFocus { get; set; }
-
-    public EditorContentType ContentType { get; set; }
 
     public EditorMode EditMode { get; set; }
 
@@ -21,15 +19,13 @@ internal class EditorService : IAsyncDisposable
     /// </summary>
     public string? ElementId { get; set; }
 
-    public bool LockEditMode { get; set; }
-
-    public List<MarkdownEditorButton>? MarkdownEditorButtons { get; set; }
+    public string? InitialValue { get; set; }
 
     public string? Placeholder { get; set; }
 
-    public MarkdownPreviewStyle PreviewStyle { get; set; }
-
     public bool ReadOnly { get; set; }
+
+    public EditorSyntax Syntax { get; set; }
 
     public bool UpdateOnInput { get; set; }
 
@@ -43,14 +39,20 @@ internal class EditorService : IAsyncDisposable
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="ScrollService"/>.
+    /// Initializes a new instance of <see cref="EditorService"/>.
     /// </summary>
     /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    public EditorService(IJSRuntime jsRuntime) => _moduleTask = new(
-        () => jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-editor.js")
-        .AsTask());
+    /// <param name="themeService">An instance of <see cref="ThemeService"/>.</param>
+    public EditorService(IJSRuntime jsRuntime, ThemeService themeService)
+    {
+        _moduleTask = new(
+            () => jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/Tavenem.Blazor.Framework/tavenem-editor.js")
+            .AsTask());
+        _themeService = themeService;
+        _themeService.OnThemeChange += SetCodeEditorTheme;
+    }
 
     public async ValueTask DisposeAsync()
     {
@@ -68,59 +70,14 @@ internal class EditorService : IAsyncDisposable
 
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            ContentType switch
-            {
-                EditorContentType.HTML => "?",
-                EditorContentType.Markdown => "focusMarkdownEditor",
-                _ => "focusCodeEditor",
-            },
+            "focusEditor",
             ElementId).ConfigureAwait(false);
-    }
-
-    [JSInvokable]
-    public async Task InvokeCustomButton(string id, string? text)
-    {
-        if (string.IsNullOrEmpty(ElementId))
-        {
-            return;
-        }
-
-        var button = MarkdownEditorButtons?.Find(x => x.Id == id);
-        if (button is null
-            || (button.Action is null
-            && button.AsyncAction is null))
-        {
-            return;
-        }
-
-        string? newText;
-        if (button.Action is null)
-        {
-            newText = await button.AsyncAction!.Invoke(text);
-        }
-        else if (button.AsyncAction is null)
-        {
-            newText = button.Action(text);
-        }
-        else
-        {
-            newText = await button.AsyncAction(button.Action(text));
-        }
-
-        if (!string.Equals(newText, text, StringComparison.Ordinal))
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync(
-                "updateMarkdownEditorSelectedText",
-                ElementId,
-                newText).ConfigureAwait(false);
-        }
     }
 
     [JSInvokable]
     public void OnChangeInvoked(string? value) => _onInput?.Invoke(this, value);
 
-    public async ValueTask SetCodeEditorLanguage(string value)
+    public async ValueTask SetEditorMode(EditorMode value)
     {
         if (string.IsNullOrEmpty(ElementId))
         {
@@ -129,49 +86,7 @@ internal class EditorService : IAsyncDisposable
 
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            "setCodeEditorLanguage",
-            ElementId,
-            value).ConfigureAwait(false);
-    }
-
-    public async ValueTask SetCodeEditorTheme(ThemePreference value)
-    {
-        if (string.IsNullOrEmpty(ElementId))
-        {
-            return;
-        }
-
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setCodeEditorTheme",
-            ElementId,
-            value).ConfigureAwait(false);
-    }
-
-    public async ValueTask SetMarkdownEditorMode(EditorMode value)
-    {
-        if (string.IsNullOrEmpty(ElementId))
-        {
-            return;
-        }
-
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setMarkdownEditorMode",
-            ElementId,
-            value).ConfigureAwait(false);
-    }
-
-    public async ValueTask SetMarkdownEditorPreviewStyle(MarkdownPreviewStyle value)
-    {
-        if (string.IsNullOrEmpty(ElementId))
-        {
-            return;
-        }
-
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setMarkdownPreviewStyle",
+            "setEditorMode",
             ElementId,
             value).ConfigureAwait(false);
     }
@@ -185,14 +100,23 @@ internal class EditorService : IAsyncDisposable
 
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            ContentType switch
-            {
-                EditorContentType.HTML => "?",
-                EditorContentType.Markdown => "setMarkdownReadOnly",
-                _ => "setCodeEditorReadOnly",
-            },
+            "setReadOnly",
             ElementId,
             value).ConfigureAwait(false);
+    }
+
+    public async ValueTask SetSyntax(EditorSyntax value)
+    {
+        if (string.IsNullOrEmpty(ElementId))
+        {
+            return;
+        }
+
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module.InvokeVoidAsync(
+            "setSyntax",
+            ElementId,
+            value.ToString()).ConfigureAwait(false);
     }
 
     public async ValueTask SetValue(string? value)
@@ -204,12 +128,16 @@ internal class EditorService : IAsyncDisposable
 
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            ContentType switch
-            {
-                EditorContentType.HTML => "?",
-                EditorContentType.Markdown => "setMarkdownValue",
-                _ => "setCodeEditorValue",
-            },
+            "setValue",
+            ElementId,
+            value).ConfigureAwait(false);
+    }
+
+    public async Task UpdateWysiwygEditorSelectedText(string? value)
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module.InvokeVoidAsync(
+            "updateWysiwygEditorSelectedText",
             ElementId,
             value).ConfigureAwait(false);
     }
@@ -220,6 +148,7 @@ internal class EditorService : IAsyncDisposable
         {
             if (disposing)
             {
+                _themeService.OnThemeChange -= SetCodeEditorTheme;
                 if (_moduleTask.IsValueCreated)
                 {
                     var module = await _moduleTask.Value.ConfigureAwait(false);
@@ -243,90 +172,54 @@ internal class EditorService : IAsyncDisposable
         }
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            ContentType switch
-            {
-                EditorContentType.HTML => "?",
-                EditorContentType.Markdown => "disposeMarkdownEditor",
-                _ => "disposeCodeEditor",
-            },
+            "disposeEditor",
             ElementId);
     }
 
-    private async ValueTask<bool> InitializeCodeEditor()
+    private async void SetCodeEditorTheme(object? sender, ThemePreference value)
     {
-        if (string.IsNullOrEmpty(ElementId))
+        if (_onInput is null)
         {
-            return false;
+            return;
         }
-        _dotNetRef ??= DotNetObjectReference.Create(this);
         var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "initializeCodeEditor",
-            ElementId,
-            _dotNetRef,
-            new
-            {
-                AutoFocus,
-                Placeholder,
-                ReadOnly,
-                UpdateOnInput,
-            });
-        return true;
-    }
-
-    private async ValueTask<bool> InitializeMarkdownEditor()
-    {
-        if (string.IsNullOrEmpty(ElementId))
-        {
-            return false;
-        }
-        _dotNetRef ??= DotNetObjectReference.Create(this);
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "initializeMarkdownEditor",
-            ElementId,
-            _dotNetRef,
-            new
-            {
-                AutoFocus,
-                EditMode,
-                LockEditMode,
-                Placeholder,
-                PreviewStyle,
-                ReadOnly,
-                UpdateOnInput,
-            },
-            MarkdownEditorButtons?.Select(x => new CustomMarkdownEditorButton()
-            {
-                Id = x.Id,
-                Name = x.Text ?? x.Id,
-                Tooltip = x.Tooltip,
-            }));
-        return true;
+        await module
+            .InvokeVoidAsync("setCodeEditorTheme", value)
+            .ConfigureAwait(false);
     }
 
     private async void SubscribeInput(EventHandler<string?> value)
     {
+        if (string.IsNullOrEmpty(ElementId))
+        {
+            return;
+        }
+
         if (_onInput is null)
         {
-            switch (ContentType)
-            {
-                case EditorContentType.HTML:
-                    break;
-                case EditorContentType.Markdown:
-                    if (!await InitializeMarkdownEditor())
-                    {
-                        return;
-                    }
-                    break;
-                default:
-                    if (!await InitializeCodeEditor())
-                    {
-                        return;
-                    }
-                    break;
-            }
+            _dotNetRef ??= DotNetObjectReference.Create(this);
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "initializeEditor",
+                ElementId,
+                _dotNetRef,
+                new
+                {
+                    AutoFocus,
+                    InitialValue,
+                    Mode = EditMode,
+                    Placeholder,
+                    ReadOnly,
+                    Syntax = Syntax.ToString(),
+                    Theme = EditMode == EditorMode.WYSIWYG
+                        && (Syntax == EditorSyntax.HTML
+                        || Syntax == EditorSyntax.Markdown)
+                        ? ThemePreference.Auto
+                        : await _themeService.GetPreferredColorScheme(),
+                    UpdateOnInput,
+                });
         }
+
         _onInput += value;
     }
 

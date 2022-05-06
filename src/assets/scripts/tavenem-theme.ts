@@ -1,6 +1,12 @@
-﻿const _listeners: DotNet.DotNetObject[] = [];
+﻿enum ThemePreference {
+    Auto = 0,
+    Light = 1,
+    Dark = 2,
+}
+
+const _listeners: DotNet.DotNetObject[] = [];
 let _manualColorTheme: boolean = false;
-let _saved_theme: number;
+let _saved_theme: ThemePreference;
 
 export function cancelListener(dotNetRef: DotNet.DotNetObject) {
     const index = _listeners.indexOf(dotNetRef);
@@ -9,7 +15,7 @@ export function cancelListener(dotNetRef: DotNet.DotNetObject) {
     }
 }
 
-export function getPreferredColorScheme(): number {
+export function getPreferredColorScheme(): ThemePreference {
     if (_manualColorTheme && _saved_theme) {
         return _saved_theme;
     }
@@ -17,29 +23,30 @@ export function getPreferredColorScheme(): number {
     const local = localStorage.getItem('tavenem-theme');
     if (local) {
         const theme = parseInt(local);
-        if (theme === 1 || theme === 2) {
+        if (theme == ThemePreference.Light
+            || theme == ThemePreference.Dark) {
             return theme;
         }
     }
 
     if (window.matchMedia) {
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return 2;
+            return ThemePreference.Dark;
         } else {
-            return 1;
+            return ThemePreference.Light;
         }
     }
 
-    return 1;
+    return ThemePreference.Light;
 }
 
 export function listenForThemeChange(dotNetRef: DotNet.DotNetObject) {
     _listeners.push(dotNetRef);
 }
 
-export function setColorScheme(theme: number, manual?: boolean) {
+export function setColorScheme(theme: ThemePreference, manual?: boolean) {
     if (manual) {
-        _manualColorTheme = (theme !== 0);
+        _manualColorTheme = (theme != ThemePreference.Auto);
     } else {
         localStorage.removeItem('tavenem-theme');
         if (_manualColorTheme) {
@@ -48,13 +55,13 @@ export function setColorScheme(theme: number, manual?: boolean) {
     }
     _saved_theme = theme;
 
-    if (theme === 0) {
+    if (theme == ThemePreference.Auto) {
         theme = getPreferredColorScheme();
     }
 
-    if (theme === 2) { // dark
+    if (theme == ThemePreference.Dark) {
         document.documentElement.setAttribute('data-theme', 'dark');
-    } else { // light
+    } else {
         document.documentElement.setAttribute('data-theme', 'light');
     }
 
@@ -78,6 +85,6 @@ if (window.matchMedia) {
     colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
 }
 const currentScheme = getPreferredColorScheme();
-if (currentScheme === 2) {
+if (currentScheme == ThemePreference.Dark) {
     setColorScheme(currentScheme);
 }

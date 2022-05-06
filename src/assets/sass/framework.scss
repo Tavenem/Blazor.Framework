@@ -1,11 +1,4 @@
-﻿@import '../css/prism.min.css';
-@import '../css/toastui-editor.css';
-@import '../css/toastui-editor-plugin-code-syntax-highlight.css';
-@import '../css/tui-color-picker.css';
-@import '../css/toastui-editor-plugin-color-syntax.css';
-@import '../css/toastui-editor-dark.css';
-
-@import "variables";
+﻿@import "variables";
 @import "animations";
 @import "reset";
 @import "layout";
@@ -28,6 +21,7 @@
 @import "components/collapse";
 @import "components/dialog";
 @import "components/drawer";
+@import "components/editor";
 @import "components/field";
 @import "components/colorpicker";
 @import "components/datepicker";

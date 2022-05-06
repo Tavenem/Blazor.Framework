@@ -35,6 +35,7 @@
     --tavenem-dark-color-base-rgb: 41,41,61;
     --tavenem-dark-color-bg: #1a1a27;
     --tavenem-dark-color-bg-alt: #14141f;
+    --tavenem-dark-color-bg-highlight: #22263a;
     --tavenem-dark-color-bg-surface: #03000430;
     --tavenem-dark-color-bg-input: #121316;
     --tavenem-dark-color-divider: #ffffff1e;
@@ -86,6 +87,7 @@
     --tavenem-light-color-base-rgb: 255,255,255;
     --tavenem-light-color-bg: white;
     --tavenem-light-color-bg-alt: #ebebeb;
+    --tavenem-light-color-bg-highlight: #cde0ea;
     --tavenem-light-color-bg-surface: #05002008;
     --tavenem-light-color-bg-input: white;
     --tavenem-light-color-divider: #e0e0e0;
@@ -141,6 +143,7 @@
     --tavenem-color-base-rgb: var(--tavenem-light-color-base-rgb);
     --tavenem-color-bg: var(--tavenem-light-color-bg);
     --tavenem-color-bg-alt: var(--tavenem-light-color-bg-alt);
+    --tavenem-color-bg-highlight: var(--tavenem-light-color-bg-highlight);
     --tavenem-color-bg-surface: var(--tavenem-light-color-bg-surface);
     --tavenem-color-bg-input: var(--tavenem-light-color-bg-input);
     --tavenem-color-divider: var(--tavenem-light-color-divider);
@@ -229,6 +232,7 @@
     --tavenem-color-base-rgb: var(--tavenem-dark-color-base-rgb);
     --tavenem-color-bg: var(--tavenem-dark-color-bg);
     --tavenem-color-bg-alt: var(--tavenem-dark-color-bg-alt);
+    --tavenem-color-bg-highlight: var(--tavenem-dark-color-bg-highlight);
     --tavenem-color-bg-surface: var(--tavenem-dark-color-bg-surface);
     --tavenem-color-bg-input: var(--tavenem-dark-color-bg-input);
     --tavenem-color-divider: var(--tavenem-dark-color-divider);

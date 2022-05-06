@@ -42,7 +42,7 @@ class ElementReference {
         this.eventListeners[++this.listenerId] = listener;
         return this.listenerId;
     }
-
+    
     changeCssClassName(element: Element, className: string) {
         if (element) {
             element.className = className;

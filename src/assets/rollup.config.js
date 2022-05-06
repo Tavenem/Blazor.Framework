@@ -1,14 +1,23 @@
 ﻿import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
 import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 
 let plugins = [
+    json(),
     commonjs(),
     typescript(),
     nodeResolve({
         mainFields: ['module', 'main'],
-        extensions: '.ts'
+        extensions: ['.mjs', '.js', '.json', '.node', '.ts'],
+        dedupe: [
+            '@codemirror/language',
+            '@codemirror/state',
+            '@codemirror/view',
+            '@lezer/common',
+            '@lezer/lr',
+        ]
     }),
 ];
 if (process.env.build === 'Release') {

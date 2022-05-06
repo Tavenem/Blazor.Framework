@@ -373,20 +373,17 @@ button, select {
 }
 
 input {
-    appearance: none;
     background-clip: padding-box;
     background-color: var(--tavenem-color-bg-input);
     border: 1px solid var(--tavenem-color-border-input);
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-inset);
     color: var(--tavenem-color-text);
-    display: block;
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
     line-height: var(--tavenem-lineheight-body);
     padding: 6px .75rem;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    width: 100%;
 
     &[type="file"] {
         overflow: hidden;

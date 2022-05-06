@@ -31,7 +31,6 @@
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.95.4" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
-    <PackageReference Include="Markdig" Version="0.30.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -63,22 +62,14 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-    <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.js;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes)" />
+    <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.js;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
     <ScssFiles Include="$(ClientAssetsDirectory)**\*.scss" Exclude="$(ClientAssetsDirectory)**\_*.scss" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <CssAssets Include="assets\node_modules\prismjs/themes/prism.min.css" />
-    <CssAssets Include="assets\node_modules\@toast-ui/editor/dist/toastui-editor.css" />
-    <CssAssets Include="assets\node_modules\@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css" />
-    <CssAssets Include="assets\node_modules\tui-color-picker/dist/tui-color-picker.css" />
-    <CssAssets Include="assets\node_modules\@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css" />
-    <CssAssets Include="assets\node_modules\@toast-ui/editor/dist/theme/toastui-editor-dark.css" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
     <Message Importance="high" Text="Running npm install..." />
     <Exec Command="npm install" WorkingDirectory="$(ClientAssetsDirectory)" />
+    <Exec Command="npm dedupe" WorkingDirectory="$(ClientAssetsDirectory)" />
   </Target>
   
   <Target Name="ClientAssetsBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
@@ -109,7 +100,7 @@
     </DefineStaticWebAssets>
   </Target>
 	
-  <Target Name="SassBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" Inputs="@(ScssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+  <Target Name="SassBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
     <PropertyGroup>
       <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
       <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))</_SassOutputFullPath>
@@ -121,13 +112,7 @@
 
     <Message Importance="high" Text="Running npm run sass..." />
     <Exec Command="npm run sass -- $(_SassOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
-  </Target>
-  
-  <Target Name="CssAssetsCopy" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="SassBuild">
-    <Copy SourceFiles="@(CssAssets)" DestinationFolder="$(_CssOutputFolderPath)" />
-  </Target>
-	
-  <Target Name="PostCss" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="CssAssetsCopy" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles);@(CssAssets)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+    
     <Message Importance="high" Text="Running npm run postcss..." />
     <Exec Command="npm run postcss -- $(_SassOutputFullPath) -d $(_CssOutputFolderPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
 
@@ -138,7 +123,7 @@
     <WriteLinesToFile File="$(IntermediateOutputPath)stylebuild.complete.txt" Lines="@(_CssBuildOutput)" />
   </Target>
   
-  <Target Name="DefineCssAssets" AfterTargets="PostCss" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+  <Target Name="DefineCssAssets" AfterTargets="SassBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
     <ItemGroup>
       <FileWrites Include="@(_CssBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />

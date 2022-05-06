@@ -1,0 +1,140 @@
+﻿.editor-field {
+    --field-active-border-color: var(--tavenem-color-primary);
+    --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
+    --field-active-label-color: var(--tavenem-color-primary);
+    --field-border-color: var(--tavenem-color-border-input);
+    --field-border-hover-color: var(--tavenem-color-action);
+    --field-color: var(--tavenem-color-text);
+    --field-label-color: var(--tavenem-color-text-secondary);
+    border: 0;
+    color: var(--tavenem-color-text);
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    margin: 0;
+    margin-bottom: .5rem;
+    margin-top: 1rem;
+    max-width: 100%;
+    padding: 0;
+    position: relative;
+
+    > label {
+        color: var(--field-label-color);
+        display: block;
+        font-size: .75rem;
+        font-weight: var(--tavenem-font-weight);
+        line-height: 1;
+        padding: 0;
+        transition: color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    }
+
+    &.required > label:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
+    > .editor-toolbar {
+        background-color: var(--tavenem-color-bg-surface);
+        border-color: var(--field-border-color);
+        border-style: solid;
+        border-top-left-radius: var(--tavenem-border-radius);
+        border-top-right-radius: var(--tavenem-border-radius);
+        border-width: 1px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-top: .5rem;
+        padding: .5rem 1rem;
+        position: relative;
+
+        .field > .input {
+            margin-top: 0;
+        }
+    }
+
+    > .editor {
+        background-color: var(--tavenem-color-bg-input);
+        border-bottom-left-radius: var(--tavenem-border-radius);
+        border-bottom-right-radius: var(--tavenem-border-radius);
+        border-bottom-width: 1px;
+        border-color: var(--field-border-color);
+        border-left-width: 1px;
+        border-right-width: 1px;
+        border-style: solid;
+        border-top-width: 0;
+        color: var(--tavenem-color-text);
+        position: relative;
+        transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+        &.no-toolbar {
+            border-top-left-radius: var(--tavenem-border-radius);
+            border-top-right-radius: var(--tavenem-border-radius);
+            border-top-width: 1px;
+            margin-top: .5rem;
+        }
+
+        .cm-panel input[type=checkbox]:not(:checked):before {
+            background-color: var(--tavenem-color-bg-input);
+            content: "";
+            height: calc(100% - 2px);
+            left: 1px;
+            position: absolute;
+            top: 1px;
+            width: calc(100% - 2px);
+        }
+
+        .ProseMirror {
+            line-height: 1.2;
+            outline: none;
+            padding: .25rem .5rem .25rem 1rem;
+            position: relative;
+            white-space: break-spaces;
+            word-wrap: break-word;
+        }
+
+        &.set-height .ProseMirror {
+            overflow: auto;
+        }
+    }
+
+    &:not(.read-only) > .editor:hover {
+        border-color: var(--field-border-hover-color);
+    }
+
+    &:focus-within:not(.read-only) {
+        --field-border-color: var(--field-active-border-color);
+        --field-border-hover-color: var(--field-active-border-hover-color);
+        --field-label-color: var(--field-active-label-color);
+    }
+
+    &.invalid {
+        --field-active-border-color: var(--tavenem-color-error);
+        --field-active-border-hover-color: var(--tavenem-color-error);
+        --field-active-label-color: var(--tavenem-color-error);
+        --field-border-color: var(--tavenem-color-error);
+        --field-border-hover-color: var(--tavenem-color-error);
+        --field-color: var(--tavenem-color-error);
+        --field-label-color: var(--tavenem-color-error);
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:not(.invalid) {
+                --field-active-border-color: var(--tavenem-theme-color);
+                --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
+                --field-active-label-color: var(--tavenem-theme-color);
+                --field-border-color: var(--tavenem-theme-color);
+                --field-border-hover-color: var(--tavenem-theme-color-lighten);
+                --field-label-color: var(--tavenem-theme-color);
+            }
+
+            &.filled {
+                background-color: transparent;
+            }
+        }
+    }
+}

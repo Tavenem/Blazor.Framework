@@ -219,7 +219,8 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
-        if (_valueUpdated && _options.Count > 0)
+        if ((firstRender || _valueUpdated)
+            && _options.Count > 0)
         {
             _valueUpdated = false;
             UpdateSelectedFromValue();

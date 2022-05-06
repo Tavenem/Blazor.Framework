@@ -3,32 +3,86 @@
 @inherits FormComponentBase<string>
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <textarea name="@Name"
+              hidden
+              readonly
+              required="@Required"
+              value="@Value" />
     @if (!string.IsNullOrEmpty(Label))
     {
         <label for="@Id">@Label</label>
     }
-    <div id="@Id" class="@EditorClass" spellcheck="@SpellcheckValue"></div>
-    @if ((ShowLength && MaxLength.HasValue)
-        || !IsValid)
+    @if (DisplayToolbar)
+    {
+        <div class="editor-toolbar">
+            @if (!LockEditMode && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown)
+            {
+                <Tooltip TooltipText="@(EditMode == EditorMode.WYSIWYG ? "Edit source code" : "Edit in rich text mode")">
+                    <button class="btn btn-icon small" @onclick="ToggleModeAsync">
+                        <span class="d-inline-flex gap-1">
+                            @if (EditMode == EditorMode.WYSIWYG)
+                            {
+                                <tf-icon>source</tf-icon>
+                            }
+                            else
+                            {
+                                <tf-icon>preview</tf-icon>
+                            }
+                        </span>
+                    </button>
+                </Tooltip>
+            }
+            @if (!LockSyntax)
+            {
+                <Select TValue="EditorSyntax"
+                        Value="Syntax"
+                        ValueChanged="@(v => SetSyntax(v))"
+                        Disabled="ReadOnly"
+                        Class="dense">
+                    @foreach (var syntax in Enum.GetValues<EditorSyntax>())
+                    {
+                        switch (syntax)
+                        {
+                            case EditorSyntax.None:
+                                <Option Value="syntax" Label="Plain text" />
+                                break;
+                            case EditorSyntax.Cpp:
+                                <Option Value="syntax" Label="C++" />
+                                break;
+                            case EditorSyntax.CSharp:
+                                <Option Value="syntax" Label="C#" />
+                                break;
+                            case EditorSyntax.LaTeX:
+                                <Option Value="syntax" Label="LaTeX">
+                                    <span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span>
+                                </Option>
+                                break;
+                            case EditorSyntax.ObjectiveC:
+                                <Option Value="syntax" Label="Objective-C" />
+                                break;
+                            default:
+                                <Option Value="syntax" Label="@syntax.ToString()" />
+                                break;
+                        }
+                    }
+                </Select>
+            }
+        </div>
+    }
+    <div id="@Id"
+         class="@EditorClass"
+         style="@EditorStyle"
+         spellcheck="@SpellcheckValue"
+         tabindex="@TabIndex"></div>
+    @if (!IsValid)
     {
         <div class="field-helpers">
-            @if (!IsValid)
-            {
-                <ul class="mr-auto mb-0 pl-0">
-                    @foreach (var message in GetValidationMessages())
-                    {
-                        <li>@message</li>
-                    }
-                </ul>
-            }
-            @if (ShowLength && MaxLength.HasValue)
-            {
-                <div class="ml-auto">
-                    <span>@CurrentLength</span>
-                    <span>/</span>
-                    <span>@MaxLength</span>
-                </div>
-            }
+            <ul class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
         </div>
     }
 </div>

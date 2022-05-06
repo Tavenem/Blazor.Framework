@@ -50,7 +50,7 @@ class ResizeObserverInternal {
             }
         });
     }
-
+    
     resizeHandler(changes: ISizeChangeUpdateInfo[]) {
         if (this._dotNetRef) {
             try {
