@@ -274,45 +274,30 @@ class KeyListener {
     }
 }
 
-class KeyListenerFactory {
-    connect(dotNetRef: DotNet.DotNetObject, elementId: string, options: IKeyListenerOptions) {
-        if (!elementId) {
-            throw "elementId: expected element id!";
-        }
-        const element = document.getElementById(elementId) as IKeyListenerElement;
-        if (!element) {
-            throw "no element found for id: " + elementId;
-        }
-        if (!element.keyListener) {
-            element.keyListener = new KeyListener(dotNetRef, options);
-        }
-        element.keyListener.connect(element);
-    }
-
-    updateKey(elementId: string, option: IKeyOptions) {
-        const element = document.getElementById(elementId) as IKeyListenerElement;
-        if (element && element.keyListener) {
-            element.keyListener.setKeyOption(option);
-        }
-    }
-
-    disconnect(elementId: string) {
-        var element = document.getElementById(elementId) as IKeyListenerElement;
-        if (element && element.keyListener) {
-            element.keyListener.disconnect();
-        }
-    }
-}
-const keyListener = new KeyListenerFactory();
-
 export function listenForKeyEvent(dotNetRef: DotNet.DotNetObject, elementId: string, options: IKeyListenerOptions) {
-    keyListener.connect(dotNetRef, elementId, options);
+    if (!elementId) {
+        throw "elementId: expected element id!";
+    }
+    const element = document.getElementById(elementId) as IKeyListenerElement;
+    if (!element) {
+        throw "no element found for id: " + elementId;
+    }
+    if (!element.keyListener) {
+        element.keyListener = new KeyListener(dotNetRef, options);
+    }
+    element.keyListener.connect(element);
 }
 
 export function disconnectKeyEvent(elementId: string) {
-    keyListener.disconnect(elementId);
+    var element = document.getElementById(elementId) as IKeyListenerElement;
+    if (element && element.keyListener) {
+        element.keyListener.disconnect();
+    }
 }
 
 export function updateKeyEvent(elementId: string, option: IKeyOptions) {
-    keyListener.updateKey(elementId, option);
+    const element = document.getElementById(elementId) as IKeyListenerElement;
+    if (element && element.keyListener) {
+        element.keyListener.setKeyOption(option);
+    }
 }

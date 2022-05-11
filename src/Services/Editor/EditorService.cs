@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using Tavenem.Blazor.Framework.Services.Editor;
 
 namespace Tavenem.Blazor.Framework.Services;
 
@@ -7,10 +8,17 @@ internal class EditorService : IAsyncDisposable
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
     private readonly ThemeService _themeService;
 
+    private readonly Dictionary<EditorCommandType, bool> _commandsActive = new();
+    private readonly Dictionary<EditorCommandType, bool> _commandsEnabled = new();
     private bool _disposedValue;
     private DotNetObjectReference<EditorService>? _dotNetRef;
     private EventHandler<string?>? _onInput;
+
     public bool AutoFocus { get; set; }
+
+    public IReadOnlyDictionary<EditorCommandType, bool> CommandsActive { get; }
+
+    public IReadOnlyDictionary<EditorCommandType, bool> CommandsEnabled { get; }
 
     public EditorMode EditMode { get; set; }
 
@@ -45,6 +53,8 @@ internal class EditorService : IAsyncDisposable
     /// <param name="themeService">An instance of <see cref="ThemeService"/>.</param>
     public EditorService(IJSRuntime jsRuntime, ThemeService themeService)
     {
+        CommandsActive = _commandsActive.AsReadOnly();
+        CommandsEnabled = _commandsEnabled.AsReadOnly();
         _moduleTask = new(
             () => jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
@@ -52,6 +62,20 @@ internal class EditorService : IAsyncDisposable
             .AsTask());
         _themeService = themeService;
         _themeService.OnThemeChange += SetCodeEditorTheme;
+    }
+
+    public async ValueTask ActivateCommandAsync(EditorCommandType type)
+    {
+        if (string.IsNullOrEmpty(ElementId))
+        {
+            return;
+        }
+
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        await module.InvokeVoidAsync(
+            "activateCommand",
+            ElementId,
+            type).ConfigureAwait(false);
     }
 
     public async ValueTask DisposeAsync()
@@ -84,6 +108,9 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
+        _commandsActive.Clear();
+        _commandsEnabled.Clear();
+
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
             "setEditorMode",
@@ -112,6 +139,9 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
+        _commandsActive.Clear();
+        _commandsEnabled.Clear();
+
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
             "setSyntax",
@@ -131,6 +161,21 @@ internal class EditorService : IAsyncDisposable
             "setValue",
             ElementId,
             value).ConfigureAwait(false);
+    }
+
+    [JSInvokable]
+    public void UpdateCommands(EditorCommandUpdate update)
+    {
+        if (update.Commands is null)
+        {
+            return;
+        }
+
+        foreach (var command in update.Commands)
+        {
+            _commandsActive[command.Type] = command.Active ?? false;
+            _commandsEnabled[command.Type] = command.Enabled ?? false;
+        }
     }
 
     public async Task UpdateWysiwygEditorSelectedText(string? value)
@@ -211,11 +256,7 @@ internal class EditorService : IAsyncDisposable
                     Placeholder,
                     ReadOnly,
                     Syntax = Syntax.ToString(),
-                    Theme = EditMode == EditorMode.WYSIWYG
-                        && (Syntax == EditorSyntax.HTML
-                        || Syntax == EditorSyntax.Markdown)
-                        ? ThemePreference.Auto
-                        : await _themeService.GetPreferredColorScheme(),
+                    Theme = await _themeService.GetPreferredColorScheme(),
                     UpdateOnInput,
                 });
         }

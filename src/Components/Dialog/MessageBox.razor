@@ -10,14 +10,20 @@
         @Message
     </ChildContent>
     <FooterContent>
-        <button @onclick="OnOkClicked" class="btn btn-text primary">@OkText</button>
-        @if (!string.IsNullOrEmpty(AltText))
-        {
-            <button @onclick="OnAltClicked" class="btn btn-text danger">@AltText</button>
-        }
-        @if (!string.IsNullOrEmpty(CancelText))
-        {
-            <button @onclick="OnCancelClicked" class="btn btn-text default">@CancelText</button>
-        }
+        <div class="message-box-buttons">
+            @if (!string.IsNullOrEmpty(CancelText))
+            {
+                <button @onclick="OnCancelClicked" class="btn btn-text default">@CancelText</button>
+            }
+            @if (!string.IsNullOrEmpty(AltText))
+            {
+                <button @onclick="OnAltClicked" class="btn btn-text danger">@AltText</button>
+            }
+            @if (string.IsNullOrEmpty(CancelText) && string.IsNullOrEmpty(AltText))
+            {
+                <div></div>
+            }
+            <button @onclick="OnOkClicked" class="btn btn-text primary">@OkText</button>
+        </div>
     </FooterContent>
 </Dialog>

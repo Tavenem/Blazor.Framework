@@ -15,177 +15,9 @@ interface DotNetStreamReference {
     arrayBuffer(): Promise<ArrayBuffer>;
 }
 
-class ElementReference {
-    eventListeners: Record<number, EventListener>;
-    listenerId: number;
+const eventListeners: Record<number, EventListener> = {};
 
-    constructor() {
-        this.eventListeners = {};
-        this.listenerId = 0;
-    }
-
-    addEventListener(
-        element: Element,
-        dotNetRef: DotNet.DotNetObject,
-        event: string,
-        callback: string,
-        spec: Record<string, any>[],
-        stopPropagation: boolean) {
-        const listener = function (e: Event) {
-            const args = Array.from(spec, x => serializeParameter(e, x));
-            dotNetRef.invokeMethodAsync(callback, ...args);
-            if (stopPropagation) {
-                e.stopPropagation();
-            }
-        };
-        element.addEventListener(event, listener);
-        this.eventListeners[++this.listenerId] = listener;
-        return this.listenerId;
-    }
-    
-    changeCssClassName(element: Element, className: string) {
-        if (element) {
-            element.className = className;
-        }
-    }
-
-    changeCssVariable(element: HTMLElement, name: string, newValue: string) {
-        if (element) {
-            element.style.setProperty(name, newValue);
-        }
-    }
-
-    focusFirst(element: HTMLElement, skip = 0, min = 0) {
-        if (element) {
-            const tabbables = getTabbableElements(element);
-            if (tabbables.length <= min) {
-                element.focus();
-            } else {
-                const tabbable = tabbables[skip];
-                if (tabbable instanceof HTMLElement) {
-                    tabbable.focus();
-                }
-            }
-        }
-    }
-
-    focusLast(element: HTMLElement, skip = 0, min = 0) {
-        if (element) {
-            const tabbables = getTabbableElements(element);
-            if (tabbables.length <= min) {
-                element.focus();
-            } else {
-                const tabbable = tabbables[tabbables.length - skip - 1];
-                if (tabbable instanceof HTMLElement) {
-                    tabbable.focus();
-                }
-            }
-        }
-    }
-
-    getBoundingClientRect(element: HTMLElement) {
-        if (!element) {
-            return;
-        }
-
-        const rect: IBoundingClientRect = JSON.parse(JSON.stringify(element.getBoundingClientRect()));
-
-        rect.scrollY = window.scrollY || document.documentElement.scrollTop;
-        rect.scrollX = window.scrollX || document.documentElement.scrollLeft;
-
-        rect.windowHeight = window.innerHeight;
-        rect.windowWidth = window.innerWidth;
-        return rect;
-    }
-
-    getClientRectFromFirstChild(element: HTMLElement) {
-        if (!element) {
-            return;
-        }
-        const child = element.children && element.children[0];
-        if (!child || !(child instanceof HTMLElement)) {
-            return;
-        }
-        return this.getBoundingClientRect(child);
-    }
-
-    getClientRectFromParent(element: HTMLElement) {
-        if (!element) {
-            return;
-        }
-        const parent = element.parentElement;
-        if (!parent) {
-            return;
-        }
-        return this.getBoundingClientRect(parent);
-    }
-
-    getTextContent(element: HTMLElement) {
-        if (!element) {
-            return '';
-        }
-        return element.textContent;
-    }
-
-    hasFixedAncestors(element: Node | null) {
-        for (; element && element instanceof Element; element = element.parentNode) {
-            if (window.getComputedStyle(element).getPropertyValue("position") === "fixed") {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    removeEventListener(element: Element, event: string, eventId: number) {
-        if (!element) {
-            return;
-        }
-        element.removeEventListener(event, this.eventListeners[eventId]);
-        delete this.eventListeners[eventId];
-    }
-
-    removeEventListenerById(elementId: string, event: string, eventId: number) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            this.removeEventListener(element, event, eventId);
-        }
-    }
-
-    restoreFocus(element: IFocusableElement) {
-        if (element) {
-            let previous = element.savedFocus;
-            delete element.savedFocus;
-            if (previous) {
-                previous.focus();
-            }
-        }
-    }
-
-    saveFocus(element: IFocusableElement) {
-        if (element && document.activeElement instanceof HTMLElement) {
-            element.savedFocus = document.activeElement;
-        }
-    }
-
-    select(element: HTMLInputElement) {
-        if (element) {
-            element.select();
-        }
-    }
-
-    selectRange(element: HTMLInputElement, start: number, end: number | null) {
-        if (element) {
-            if (element.setSelectionRange) {
-                element.setSelectionRange(start, end);
-            } else if (element.selectionStart) {
-                element.selectionStart = start;
-                element.selectionEnd = end;
-            }
-            element.focus();
-        }
-    }
-}
-const elementReference = new ElementReference();
+let listenerId = 0;
 
 export function addEventListener(
     element: Element,
@@ -194,21 +26,28 @@ export function addEventListener(
     callback: string,
     spec: Record<string, any>[],
     stopPropagation: boolean) {
-    return elementReference.addEventListener(
-        element,
-        dotNetRef,
-        event,
-        callback,
-        spec,
-        stopPropagation);
+    const listener = function (e: Event) {
+        const args = Array.from(spec, x => serializeParameter(e, x));
+        dotNetRef.invokeMethodAsync(callback, ...args);
+        if (stopPropagation) {
+            e.stopPropagation();
+        }
+    };
+    element.addEventListener(event, listener);
+    eventListeners[++listenerId] = listener;
+    return listenerId;
 }
 
 export function changeCssClassName(element: Element, className: string) {
-    elementReference.changeCssClassName(element, className);
+    if (element) {
+        element.className = className;
+    }
 }
 
 export function changeCssVariable(element: HTMLElement, name: string, newValue: string) {
-    elementReference.changeCssVariable(element, name, newValue);
+    if (element) {
+        element.style.setProperty(name, newValue);
+    }
 }
 
 export async function downloadStream(fileName: string, fileType: string, streamReference: DotNetStreamReference) {
@@ -230,32 +69,85 @@ export function downloadUrl(fileName: string, url: string, open?: boolean) {
     anchor.remove();
 }
 
+export function elementHasFixedAncestors(element: Node | null) {
+    for (; element && element instanceof Element; element = element.parentNode) {
+        if (window.getComputedStyle(element).getPropertyValue("position") === "fixed") {
+            return true;
+        }
+    }
+    return false;
+}
+
 export function focusFirstElement(element: HTMLElement, skip = 0, min = 0) {
-    elementReference.focusFirst(element, skip, min);
+    if (element) {
+        const tabbables = getTabbableElements(element);
+        if (tabbables.length <= min) {
+            element.focus();
+        } else {
+            const tabbable = tabbables[skip];
+            if (tabbable instanceof HTMLElement) {
+                tabbable.focus();
+            }
+        }
+    }
 }
 
 export function focusLastElement(element: HTMLElement, skip = 0, min = 0) {
-    elementReference.focusLast(element, skip, min);
+    if (element) {
+        const tabbables = getTabbableElements(element);
+        if (tabbables.length <= min) {
+            element.focus();
+        } else {
+            const tabbable = tabbables[tabbables.length - skip - 1];
+            if (tabbable instanceof HTMLElement) {
+                tabbable.focus();
+            }
+        }
+    }
 }
 
 export function getBoundingClientRect(element: HTMLElement) {
-    return elementReference.getBoundingClientRect(element);
+    if (!element) {
+        return;
+    }
+
+    const rect: IBoundingClientRect = JSON.parse(JSON.stringify(element.getBoundingClientRect()));
+
+    rect.scrollY = window.scrollY || document.documentElement.scrollTop;
+    rect.scrollX = window.scrollX || document.documentElement.scrollLeft;
+
+    rect.windowHeight = window.innerHeight;
+    rect.windowWidth = window.innerWidth;
+    return rect;
 }
 
 export function getClientRectFromFirstChild(element: HTMLElement) {
-    return elementReference.getClientRectFromFirstChild(element);
+    if (!element) {
+        return;
+    }
+    const child = element.children && element.children[0];
+    if (!child || !(child instanceof HTMLElement)) {
+        return;
+    }
+    return getBoundingClientRect(child);
 }
 
 export function getClientRectFromParent(element: HTMLElement) {
-    return elementReference.getClientRectFromParent(element);
+    if (!element) {
+        return;
+    }
+    const parent = element.parentElement;
+    if (!parent) {
+        return;
+    }
+    return getBoundingClientRect(parent);
 }
 
 export function getTextContent(element: HTMLElement) {
-    return elementReference.getTextContent(element);
-}
-
-export function elementHasFixedAncestors(element: Node | null) {
-    return elementReference.hasFixedAncestors(element);
+    if (!element) {
+        return '';
+    }
+    return element.textContent;
 }
 
 export function open(url?: string, target?: string, features?: string) {
@@ -706,15 +598,28 @@ export function registerComponents() {
 }
 
 export function removeEventListener(element: Element, event: string, eventId: number) {
-    elementReference.removeEventListener(element, event, eventId);
+    if (!element) {
+        return;
+    }
+    element.removeEventListener(event, eventListeners[eventId]);
+    delete eventListeners[eventId];
 }
 
 export function removeEventListenerById(elementId: string, event: string, eventId: number) {
-    elementReference.removeEventListenerById(elementId, event, eventId);
+    const element = document.getElementById(elementId);
+    if (element) {
+        removeEventListener(element, event, eventId);
+    }
 }
 
 export function restoreElementFocus(element: IFocusableElement) {
-    elementReference.restoreFocus(element);
+    if (element) {
+        const previous = element.savedFocus;
+        delete element.savedFocus;
+        if (previous) {
+            previous.focus();
+        }
+    }
 }
 
 export function revokeURL(url: string) {
@@ -722,15 +627,27 @@ export function revokeURL(url: string) {
 }
 
 export function saveElementFocus(element: IFocusableElement) {
-    elementReference.saveFocus(element);
+    if (element && document.activeElement instanceof HTMLElement) {
+        element.savedFocus = document.activeElement;
+    }
 }
 
 export function select(element: HTMLInputElement) {
-    elementReference.select(element);
+    if (element) {
+        element.select();
+    }
 }
 
 export function selectRange(element: HTMLInputElement, start: number, end: number | null) {
-    elementReference.selectRange(element, start, end);
+    if (element) {
+        if (element.setSelectionRange) {
+            element.setSelectionRange(start, end);
+        } else if (element.selectionStart) {
+            element.selectionStart = start;
+            element.selectionEnd = end;
+        }
+        element.focus();
+    }
 }
 
 export function shake(elementId: string | null) {
