@@ -40,15 +40,23 @@
         border-top-left-radius: var(--tavenem-border-radius);
         border-top-right-radius: var(--tavenem-border-radius);
         border-width: 1px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: .5rem;
         margin-top: .5rem;
-        padding: .5rem 1rem;
         position: relative;
 
         .field > .input {
             margin-top: 0;
+        }
+
+        > div {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            padding: .5rem 1rem;
+
+            &:first-child {
+                border-top-left-radius: var(--tavenem-border-radius);
+                border-top-right-radius: var(--tavenem-border-radius);
+            }
         }
     }
 

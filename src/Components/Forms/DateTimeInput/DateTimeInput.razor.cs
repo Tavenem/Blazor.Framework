@@ -99,17 +99,13 @@ public partial class DateTimeInput<TValue>
 
     /// <summary>
     /// <para>
-    /// Whether to display this picker as an inline component.
+    /// The way a picker's activator should be displayed.
     /// </para>
     /// <para>
-    /// If not, an input field is displayed inline instead, and the picker is displayed in a popup
-    /// when the field has focus.
-    /// </para>
-    /// <para>
-    /// Default is <see langword="false"/>.
+    /// Defaults to <see cref="PickerDisplayType.Field"/>.
     /// </para>
     /// </summary>
-    [Parameter] public bool Inline { get; set; }
+    [Parameter] public PickerDisplayType DisplayType { get; set; }
 
     /// <summary>
     /// <para>
@@ -248,7 +244,7 @@ public partial class DateTimeInput<TValue>
         }
     }
 
-    private protected override bool ShrinkWhen => Inline
+    private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline
         || CurrentValue is not null;
 
     private string? AMClass => new CssBuilder("btn btn-text current")
@@ -257,6 +253,23 @@ public partial class DateTimeInput<TValue>
         .ToString();
 
     private string AMString => Culture.DateTimeFormat.AMDesignator;
+
+    private string? ButtonClass => new CssBuilder(InputClass)
+        .AddClassFromDictionary(InputAttributes)
+        .Add("picker-btn btn btn-icon")
+        .ToString();
+
+    private string? ButtonContainerClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("form-field picker")
+        .Add("modified", IsTouched)
+        .Add("valid", IsValid)
+        .Add("invalid", !IsValid)
+        .ToString();
+
+    private string? ButtonContainerStyle => new CssBuilder(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
+        .ToString();
 
     private Calendar Calendar => Culture.DateTimeFormat.Calendar;
 
@@ -794,7 +807,7 @@ public partial class DateTimeInput<TValue>
     /// </summary>
     public override async Task FocusAsync()
     {
-        if (Inline
+        if (DisplayType == PickerDisplayType.Inline
             && !OnlyTime
             && (OnlyDate
             || !ShowTime
@@ -1290,7 +1303,8 @@ public partial class DateTimeInput<TValue>
             SetValue();
         }
         SetDate = true;
-        if (!Inline && (!HasTime || SetTime))
+        if (DisplayType != PickerDisplayType.Inline
+            && (!HasTime || SetTime))
         {
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
@@ -1357,7 +1371,8 @@ public partial class DateTimeInput<TValue>
         {
             SettingSeconds = true;
         }
-        else if (!Inline && (!HasDate || SetDate))
+        else if (DisplayType != PickerDisplayType.Inline
+            && (!HasDate || SetDate))
         {
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
@@ -1383,7 +1398,7 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Second,
                 DateTimeOffset.Offset);
             SetValue();
-            if (!Inline)
+            if (DisplayType != PickerDisplayType.Inline)
             {
                 await Task.Delay(CloseDelay);
                 await ClosePopoverAsync();
@@ -1418,7 +1433,8 @@ public partial class DateTimeInput<TValue>
             DateTimeOffset.Offset);
         SetValue();
         SetTime = true;
-        if (!Inline && (!HasDate || SetDate))
+        if (DisplayType != PickerDisplayType.Inline
+            && (!HasDate || SetDate))
         {
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
@@ -1468,7 +1484,8 @@ public partial class DateTimeInput<TValue>
         SetValue();
         SettingSeconds = false;
         SetTime = true;
-        if (!Inline && (!HasDate || SetDate))
+        if (DisplayType != PickerDisplayType.Inline
+            && (!HasDate || SetDate))
         {
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
@@ -1500,7 +1517,8 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Offset);
             SetValue();
             SetDate = true;
-            if (!Inline && (!HasTime || SetTime))
+            if (DisplayType != PickerDisplayType.Inline
+                && (!HasTime || SetTime))
             {
                 await Task.Delay(CloseDelay);
                 await ClosePopoverAsync();
@@ -1535,7 +1553,7 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Second,
                 DateTimeOffset.Offset);
             SetValue();
-            if (!Inline)
+            if (DisplayType != PickerDisplayType.Inline)
             {
                 await Task.Delay(CloseDelay);
                 await ClosePopoverAsync();

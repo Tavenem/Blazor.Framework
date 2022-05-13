@@ -193,6 +193,12 @@ public class UtilityService : IAsyncDisposable
         await module.InvokeVoidAsync("cancelOutsideEvent");
     }
 
+    internal async ValueTask<string[]> GetFontsAsync()
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        return await module.InvokeAsync<string[]>("getFonts");
+    }
+
     internal async ValueTask RegisterComponents()
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);

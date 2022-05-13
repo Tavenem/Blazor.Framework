@@ -217,15 +217,15 @@
         @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => _isVisible = true)"">Open</button>
 
 <Dialog @bind-IsVisible=""_isVisible"">
-	<TitleContent>
-		<h6>Title</h6>
-	</TitleContent>
-	<ChildContent>
-		<p>This is an inlined dialog.</p>
-	</ChildContent>
-	<FooterContent>
-		<button class=""btn btn-text"" @onclick=""@(_ => _isVisible = false)"">Close</button>
-	</FooterContent>
+    <TitleContent>
+        <h6>Title</h6>
+    </TitleContent>
+    <ChildContent>
+        <p>This is an inlined dialog.</p>
+    </ChildContent>
+    <FooterContent>
+        <button class=""btn btn-text"" @onclick=""@(_ => _isVisible = false)"">Close</button>
+    </FooterContent>
 </Dialog>
 
 @code {

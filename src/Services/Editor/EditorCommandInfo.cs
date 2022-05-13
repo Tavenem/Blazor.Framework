@@ -2,7 +2,6 @@
 
 internal struct EditorCommandInfo
 {
-    public bool? Active { get; set; }
-    public bool? Enabled { get; set; }
-    public EditorCommandType Type { get; set; }
+    public bool Active { get; set; }
+    public bool Enabled { get; set; }
 }

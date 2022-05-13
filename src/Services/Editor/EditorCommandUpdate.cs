@@ -2,5 +2,5 @@
 
 internal struct EditorCommandUpdate
 {
-    public EditorCommandInfo[]? Commands { get; set; }
+    public Dictionary<EditorCommandType, EditorCommandInfo>? Commands { get; set; }
 }

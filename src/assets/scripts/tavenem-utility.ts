@@ -16,6 +16,19 @@ interface DotNetStreamReference {
 }
 
 const eventListeners: Record<number, EventListener> = {};
+const fonts = [
+    'Arial',
+    'Arial Black',
+    'Comic Sans MS',
+    'Courier New',
+    'Georgia',
+    'Impact',
+    'Microsoft Sans Serif',
+    'Tahoma',
+    'Times New Roman',
+    'Trebuchet MS',
+    'Verdana',
+];
 
 let listenerId = 0;
 
@@ -141,6 +154,16 @@ export function getClientRectFromParent(element: HTMLElement) {
         return;
     }
     return getBoundingClientRect(parent);
+}
+
+export function getFonts() {
+    const validFonts: string[] = [];
+    for (const font of fonts) {
+        if (document.fonts.check(font)) {
+            validFonts.push(font);
+        }
+    }
+    return validFonts;
 }
 
 export function getTextContent(element: HTMLElement) {

@@ -141,7 +141,15 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// The final value assigned to the input element's class attribute, including component values.
     /// </summary>
     protected string? InputCssClass => new CssBuilder(InputClass)
+        .AddClassFromDictionary(InputAttributes)
         .Add("input-core")
+        .ToString();
+
+    /// <summary>
+    /// The final value assigned to the input element's style attribute.
+    /// </summary>
+    protected string? InputCssStyle => new CssBuilder(InputStyle)
+        .AddStyleFromDictionary(InputAttributes)
         .ToString();
 
     /// <summary>

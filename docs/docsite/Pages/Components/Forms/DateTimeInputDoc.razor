@@ -161,21 +161,52 @@
     <code>getter</code> is not used for date-time pickers.
 </p>
 
-<Heading Level="HeadingLevel.H2">Inline</Heading>
+<Heading Level="HeadingLevel.H2">Button</Heading>
 
 <p>
-    If you set the <code>Inline</code> property to <code>true</code> the full picker is displayed in
-    the document flow, instead of a field which triggers a popover containing the picker.
+    If you set the <code>DisplayType</code> property to <code>PickerDisplayType.Button</code> a
+    simple button is displayed instead of a full field.
 </p>
 
 <Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DateTimeInput TValue="string" Label="Inline" Inline="true" />
+            <DateTimeInput TValue="string" DisplayType="PickerDisplayType.Button" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DateTimeInput TValue=""string"" Label=""Inline"" Inline=""true"" />")
+        @CodeFormatter.CodeToMarkup(@"<DateTimeInput TValue=""string"" DisplayType=""PickerDisplayType.Button"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The label and any help text or validation messages are not displayed in this style, but the
+    button does get a special border color when the input is invalid.
+</p>
+
+<p>
+    This display style is intended for integration within a toolbar, or a similar compact layout,
+    where a full field would not be appropriate. It will usually be good practice to label the
+    button in some manner (e.g. with a <a href="./components/tooltip">tooltip</a>), and display any
+    help text or validation messages manually in an appropriate place. Otherwise the purpose of the
+    button may not be clear to a user, particularly when the selected color is transparent.
+</p>
+
+<Heading Level="HeadingLevel.H2">Inline</Heading>
+
+<p>
+    If you set the <code>DisplayType</code> property to <code>PickerDisplayType.Inline</code> the
+    full picker is displayed in the document flow.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <DateTimeInput TValue="string" Label="Inline" DisplayType="PickerDisplayType.Inline" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DateTimeInput TValue=""string"" Label=""Inline"" DisplayType=""PickerDisplayType.Inline"" />")
     </ChildContent>
 </Collapse>
 

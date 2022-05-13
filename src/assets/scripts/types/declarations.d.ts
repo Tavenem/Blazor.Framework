@@ -25,6 +25,8 @@ declare module 'prosemirror-example-setup' {
     export function buildKeymap(schema: Schema): any;
 }
 
+declare module 'prosemirror-model' { }
+
 declare module 'prosemirror-markdown' { }
 
 declare module 'prosemirror-tables/dist' {

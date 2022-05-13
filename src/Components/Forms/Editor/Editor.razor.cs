@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -12,6 +13,10 @@ public partial class Editor : IDisposable
 {
     private bool _disposedValue;
     private bool _initialized;
+    private bool _isFontSizeDialogVisible;
+    private bool _isLineHeightDialogVisible;
+    private bool _isLinkDialogVisible;
+    private bool _isImgDialogVisible;
 
     /// <summary>
     /// Whether this editor should receive focus on page load.
@@ -167,12 +172,26 @@ public partial class Editor : IDisposable
         .Add("required", Required)
         .ToString();
 
+    private ColorInput<string>? BackgroundPicker { get; set; }
+
+    private string? CurrentBackground { get; set; } = "transparent";
+
+    private string? CurrentFontFamily { get; set; } = "sans-serif";
+
+    private string? CurrentFontSize { get; set; } = "1em";
+
+    private string? CurrentForeground { get; set; } = "black";
+
     private int CurrentLength { get; set; }
 
-    private bool DisplayToolbar => !LockSyntax
-        || IsWysiwyg
-        || (Syntax is EditorSyntax.HTML or EditorSyntax.Markdown
-        && !LockEditMode);
+    private string? CurrentLineHeight { get; set; } = "normal";
+
+    private bool DisplayCommands => IsWysiwyg
+        || Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
+
+    private bool DisplayToolbar => DisplayCommands
+        || !LockSyntax
+        || (!LockEditMode && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown);
 
     private string? EditorClass => new CssBuilder("editor")
         .Add("set-height", !string.IsNullOrEmpty(Height))
@@ -189,10 +208,42 @@ public partial class Editor : IDisposable
 
     [Inject] private EditorService EditorService { get; set; } = default!;
 
+    private List<string> Fonts { get; } = new() { "sans-serif", "serif", "monospace", "cursive" };
+
+    private TextInput? FontSizeInput { get; set; }
+
+    private List<string> FontSizes { get; } = new() { ".75em", ".875em", "1em", "1.25em", "1.5em", "1.75em", "2em", "2.5em", "3em" };
+
+    private ColorInput<string>? ForegroundPicker { get; set; }
+
+    private ImgInfo Img { get; set; } = new();
+
+    private Form? ImgForm { get; set; }
+
     private bool IsWysiwyg => EditMode == EditorMode.WYSIWYG
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
 
+    private TextInput? LineHeightInput { get; set; }
+
+    private List<string> LineHeights { get; } = new() { "normal", "1", "1.2", "1.5", "2" };
+
+    private LinkInfo Link { get; set; } = new();
+
+    private Form? LinkForm { get; set; }
+
+    private bool ShowAdvanced { get; set; }
+
+    private string? ShowAdvancedClass => new CssBuilder("btn btn-icon small")
+        .Add("filled", ShowAdvanced)
+        .ToString();
+
     private string? SpellcheckValue => Spellcheck == true ? "true" : "false";
+
+    [Inject] private UtilityService UtilityService { get; set; } = default!;
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+        => Fonts.AddRange(await UtilityService.GetFontsAsync());
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -344,6 +395,92 @@ public partial class Editor : IDisposable
         }
     }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    private static async IAsyncEnumerable<string> ValidateFontSizeAsync(string? value, object? _)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            yield break;
+        }
+
+        if (double.TryParse(value, out var _))
+        {
+            yield break;
+        }
+
+        if (!Regex.IsMatch(value, @"^(0?\.?[\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$"))
+        {
+            yield return "Invalid font size";
+        }
+    }
+
+    private static async IAsyncEnumerable<string> ValidateLineHeightAsync(string? value, object? _)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            yield break;
+        }
+
+        if (double.TryParse(value, out var _))
+        {
+            yield break;
+        }
+
+        if (!Regex.IsMatch(value, @"^(0?\.?[\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|(normal|inherit|initial|revert|revert-layer|unset)$"))
+        {
+            yield return "Invalid font size";
+        }
+    }
+
+    private static async IAsyncEnumerable<string> ValidateUri(string? value, object? _)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            yield break;
+        }
+
+        if (value.StartsWith('#'))
+        {
+            yield break;
+        }
+
+        if (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out var _))
+        {
+            yield break;
+        }
+
+        yield return "Must be a valid URL";
+    }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
+    private string ActiveButtonClass(EditorCommandType type) => EditorService
+        .CommandsActive
+        .TryGetValue(type, out var v)
+        && v
+        ? "btn btn-icon small filled"
+        : "btn btn-icon small";
+
+    private string ActiveButtonGroupClass(EditorCommandType type) => EditorService
+        .CommandsActive
+        .TryGetValue(type, out var v)
+        && v
+        ? "btn btn-icon filled"
+        : "btn btn-icon";
+
+    private async Task CommandAsync(EditorCommandType type, params object?[] parameters)
+        => await EditorService.ActivateCommandAsync(type, parameters);
+
+    private bool IsActive(EditorCommandType type) => EditorService
+        .CommandsActive
+        .TryGetValue(type, out var v)
+        && v;
+
+    private bool IsDisabled(EditorCommandType type) => ReadOnly
+        || (EditorService
+            .CommandsEnabled
+            .TryGetValue(type, out var v)
+        && !v);
+
     private void OnInput(object? sender, string? value)
     {
         CurrentLength = value?.Length ?? 0;
@@ -352,6 +489,71 @@ public partial class Editor : IDisposable
         {
             CurrentValueAsString = value;
         }
+    }
+
+    private Task SetBackgroundAsync(string? value)
+    {
+        CurrentBackground = value;
+        return CommandAsync(EditorCommandType.BackgroundColor, value);
+    }
+
+    private Task SetFontFamilyAsync(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return Task.CompletedTask;
+        }
+
+        CurrentFontFamily = value;
+        return CommandAsync(EditorCommandType.SetFontFamily, value);
+    }
+
+    private async Task SetFontSizeAsync()
+    {
+        if (string.IsNullOrEmpty(CurrentFontSize))
+        {
+            return;
+        }
+
+        if (FontSizeInput is not null)
+        {
+            await FontSizeInput.ValidateAsync();
+            if (!FontSizeInput.IsValid)
+            {
+                return;
+            }
+        }
+
+        if (double.TryParse(CurrentFontSize, out var _))
+        {
+            CurrentFontSize = $"{CurrentFontSize}em";
+        }
+        await CommandAsync(EditorCommandType.SetFontSize, CurrentFontSize);
+    }
+
+    private Task SetForegroundAsync(string? value)
+    {
+        CurrentForeground = value;
+        return CommandAsync(EditorCommandType.ForegroundColor, value);
+    }
+
+    private async Task SetLineHeightAsync()
+    {
+        if (string.IsNullOrEmpty(CurrentLineHeight))
+        {
+            return;
+        }
+
+        if (LineHeightInput is not null)
+        {
+            await LineHeightInput.ValidateAsync();
+            if (!LineHeightInput.IsValid)
+            {
+                return;
+            }
+        }
+
+        await CommandAsync(EditorCommandType.SetLineHeight, CurrentLineHeight);
     }
 
     private async Task SetModeAsync(EditorMode value)
@@ -391,6 +593,86 @@ public partial class Editor : IDisposable
         }
     }
 
+    private void ShowImgDialog()
+    {
+        Img.Alt = null;
+        Img.Src = null;
+        Img.Title = null;
+        _isImgDialogVisible = true;
+    }
+
+    private void ShowFontSizeDialog()
+    {
+        CurrentFontSize = "1em";
+        _isFontSizeDialogVisible = true;
+    }
+
+    private void ShowLineHeightDialog()
+    {
+        CurrentLineHeight = "normal";
+        _isLineHeightDialogVisible = true;
+    }
+
+    private async Task ShowLinkDialogAsync()
+    {
+        if (IsActive(EditorCommandType.InsertLink))
+        {
+            await CommandAsync(EditorCommandType.InsertLink);
+            return;
+        }
+
+        Link.Title = null;
+        Link.Url = null;
+        _isLinkDialogVisible = true;
+    }
+
+    private async Task SubmitImgDialogAsync()
+    {
+        if (ImgForm is null
+            || string.IsNullOrEmpty(Img.Src))
+        {
+            return;
+        }
+
+        var valid = await ImgForm.ValidateAsync();
+        if (!valid)
+        {
+            return;
+        }
+
+        var src = System.Text.Encodings.Web.UrlEncoder.Default.Encode(Img.Src);
+        var title = string.IsNullOrEmpty(Img.Title)
+            ? null
+            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Img.Title);
+        var alt = string.IsNullOrEmpty(Img.Alt)
+            ? null
+            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Img.Alt);
+        await CommandAsync(EditorCommandType.InsertImage, src, title, alt);
+        _isImgDialogVisible = false;
+    }
+
+    private async Task SubmitLinkDialogAsync()
+    {
+        if (LinkForm is null
+            || string.IsNullOrEmpty(Link.Url))
+        {
+            return;
+        }
+
+        var valid = await LinkForm.ValidateAsync();
+        if (!valid)
+        {
+            return;
+        }
+
+        var url = System.Text.Encodings.Web.UrlEncoder.Default.Encode(Link.Url);
+        var title = string.IsNullOrEmpty(Link.Title)
+            ? null
+            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Link.Title);
+        await CommandAsync(EditorCommandType.InsertLink, url, title);
+        _isLinkDialogVisible = false;
+    }
+
     private async Task ToggleModeAsync()
     {
         EditMode = EditMode == EditorMode.WYSIWYG
@@ -401,5 +683,18 @@ public partial class Editor : IDisposable
         {
             await EditorService.SetEditorMode(EditMode);
         }
+    }
+
+    private class ImgInfo
+    {
+        public string? Alt { get; set; }
+        public string? Src { get; set; }
+        public string? Title { get; set; }
+    }
+
+    private class LinkInfo
+    {
+        public string? Title { get; set; }
+        public string? Url { get; set; }
     }
 }

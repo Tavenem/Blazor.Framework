@@ -92,9 +92,39 @@
 </Collapse>
 
 <p>
+    When using <code>MouseEvent.MouseOver</code> you can also specify the <code>Delay</code>
+    property to a number of milliseconds by which to delay the dropdown opening.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Dropdown Text="Hover and wait" ActivationType="MouseEvent.MouseOver" DelayMilliseconds="750">
+                <span>First choice</span>
+                <span>Second choice</span>
+                <span>Third choice</span>
+            </Dropdown>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Hover and wait"" ActivationType=""MouseEvent.MouseOver"" DelayMilliseconds=""750"">
+    <span>First choice</span>
+    <span>Second choice</span>
+    <span>Third choice</span>
+</Dropdown>")
+    </ChildContent>
+</Collapse>
+
+<p>
     You can set the <code>IsDisabled</code> property to <code>true</code> to disable the menu, which
     closes the popover if it was already open, disables the trigger button, and prevents the menu
     from opening.
+</p>
+
+<p>
+    When <code>ActivationType</code> does not include <code>MouseEvent.LeftCLick</code> (the
+    default), the <code>Click</code> callback is invoked when a left-click (or tap) occurs on the
+    activation target.
 </p>
 
 <Heading Level="HeadingLevel.H3">Custom activation</Heading>

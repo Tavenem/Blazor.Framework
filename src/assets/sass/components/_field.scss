@@ -567,6 +567,31 @@
     }
 }
 
+.picker {
+    --field-active-label-color: var(--tavenem-color-primary);
+
+    .picker-btn {
+        --button-padding-x: var(--button-padding-y);
+        min-width: 0;
+    }
+
+    &.invalid {
+        --field-active-label-color: var(--tavenem-color-error);
+
+        > .picker-btn {
+            border-color: var(--tavenem-color-error) !important;
+        }
+    }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            &:not(.invalid, .disabled) {
+                --field-active-label-color: var(--tavenem-theme-color);
+            }
+        }
+    }
+}
+
 .select.open > .input > .expand {
     transform: rotate(-180deg);
 }

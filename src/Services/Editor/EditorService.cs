@@ -64,9 +64,15 @@ internal class EditorService : IAsyncDisposable
         _themeService.OnThemeChange += SetCodeEditorTheme;
     }
 
-    public async ValueTask ActivateCommandAsync(EditorCommandType type)
+    public async ValueTask ActivateCommandAsync(EditorCommandType type, params object?[] parameters)
     {
         if (string.IsNullOrEmpty(ElementId))
+        {
+            return;
+        }
+
+        if (_commandsEnabled.TryGetValue(type, out var enabled)
+            && !enabled)
         {
             return;
         }
@@ -75,7 +81,8 @@ internal class EditorService : IAsyncDisposable
         await module.InvokeVoidAsync(
             "activateCommand",
             ElementId,
-            type).ConfigureAwait(false);
+            type,
+            parameters).ConfigureAwait(false);
     }
 
     public async ValueTask DisposeAsync()
@@ -171,10 +178,10 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
-        foreach (var command in update.Commands)
+        foreach (var (type, command) in update.Commands)
         {
-            _commandsActive[command.Type] = command.Active ?? false;
-            _commandsEnabled[command.Type] = command.Enabled ?? false;
+            _commandsActive[type] = command.Active;
+            _commandsEnabled[type] = command.Enabled;
         }
     }
 

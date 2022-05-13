@@ -9,6 +9,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Dropdown : IAsyncDisposable
 {
+    private readonly AsyncAdjustableTimer _delay;
     private readonly AdjustableTimer _timer;
 
     private MouseEvent _activation;
@@ -52,6 +53,23 @@ public partial class Dropdown : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public Origin? AnchorOrigin { get; set; }
+
+    /// <summary>
+    /// When <see cref="ActivationType"/> does not include <see cref="MouseEvent.LeftClick"/>, this
+    /// event callback is invoked when the activator <em>is</em> targeted with a left click or tap.
+    /// </summary>
+    [Parameter] public EventCallback Click { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// When <see cref="ActivationType"/> includes <see cref="MouseEvent.MouseOver"/>, this is the
+    /// delay in milliseconds between the mouseover and the dropdown opening.
+    /// </para>
+    /// <para>
+    /// Default is zero.
+    /// </para>
+    /// </summary>
+    [Parameter] public int Delay { get; set; }
 
     /// <summary>
     /// Whether the popover list should use dense padding.
@@ -203,7 +221,11 @@ public partial class Dropdown : IAsyncDisposable
     /// <summary>
     /// Constructs a new instance of <see cref="Dropdown"/>.
     /// </summary>
-    public Dropdown() => _timer = new(Close, 100);
+    public Dropdown()
+    {
+        _delay = new(OpenDelayedAsync, 0);
+        _timer = new(Close, 100);
+    }
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
@@ -266,6 +288,7 @@ public partial class Dropdown : IAsyncDisposable
     public void Close()
     {
         _timer.Cancel();
+        _delay.Cancel();
         _isMouseOver = false;
         _activation = MouseEvent.None;
         _isOpen = false;
@@ -283,7 +306,14 @@ public partial class Dropdown : IAsyncDisposable
         if (!_isOpen
             && ActivationType.HasFlag(MouseEvent.MouseOver))
         {
-            await OpenAsync(e);
+            if (Delay <= 0)
+            {
+                await OpenAsync(e);
+            }
+            else
+            {
+                OpenDelayed(e);
+            }
         }
     }
 
@@ -293,6 +323,7 @@ public partial class Dropdown : IAsyncDisposable
     [JSInvokable]
     public async Task OnButtonMouseLeaveAsync()
     {
+        _delay.Cancel();
         if (!_isOpen)
         {
             return;
@@ -337,6 +368,7 @@ public partial class Dropdown : IAsyncDisposable
     /// <param name="e">An instance of <see cref="MouseEventArgs"/>.</param>
     public async Task OpenAsync(MouseEventArgs? e)
     {
+        _delay.Cancel();
         _timer.Cancel();
         if (Disabled)
         {
@@ -379,7 +411,6 @@ public partial class Dropdown : IAsyncDisposable
     /// <param name="e">An instance of <see cref="MouseEventArgs"/>.</param>
     public async Task ToggleAsync(MouseEventArgs? e)
     {
-        Console.WriteLine("here");
         var correctButton = ActivationType.HasFlag(GetMouseButton(e));
 
         if (_isOpen)
@@ -395,6 +426,12 @@ public partial class Dropdown : IAsyncDisposable
         {
             await OpenAsync(e);
         }
+
+        if (!correctButton
+            && GetMouseButton(e) == MouseEvent.LeftClick)
+        {
+            await Click.InvokeAsync();
+        }
     }
 
     /// <summary>
@@ -409,6 +446,7 @@ public partial class Dropdown : IAsyncDisposable
             {
                 _dotNetRef?.Dispose();
                 _timer.Dispose();
+                _delay.Dispose();
 
                 IJSObjectReference? module = null;
                 try
@@ -466,6 +504,42 @@ public partial class Dropdown : IAsyncDisposable
         };
 
     private void OnMouseDown() => _timer.Cancel();
+
+    private void OpenDelayed(MouseEventArgs e)
+    {
+        if (Disabled)
+        {
+            _delay.Cancel();
+            return;
+        }
+
+        if (OpenAtPointer)
+        {
+            PopoverOffsetX = e?.ClientX;
+            PopoverOffsetY = e?.ClientY;
+        }
+
+        _delay.Change(Delay);
+    }
+
+    private async Task OpenDelayedAsync()
+    {
+        _delay.Cancel();
+        _timer.Cancel();
+        if (Disabled)
+        {
+            return;
+        }
+
+        _activation = MouseEvent.MouseOver;
+
+        _isOpen = true;
+        if (Popover is not null)
+        {
+            await Popover.ElementReference.FocusAsync();
+        }
+        StateHasChanged();
+    }
 
     private void StartClosing() => _timer.Start();
 }

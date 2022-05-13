@@ -47,7 +47,7 @@ import { typescript } from '@codemirror/legacy-modes/mode/javascript';
 
 import { EditorState as PMEditorState, Plugin, Selection, TextSelection, Transaction } from 'prosemirror-state';
 import { EditorView as PMEditorView } from 'prosemirror-view';
-import { DOMParser, DOMSerializer, PMNode } from 'prosemirror-model';
+import { DOMParser, DOMSerializer, ProsemirrorNode } from 'prosemirror-model';
 import {
     baseKeymap,
     chainCommands,
@@ -76,16 +76,16 @@ import {
 
 import {
     CommandInfo,
+    CommandSet,
     CommandType,
     commonCommands,
-    htmlCommands,
-    htmlPMCommands,
     htmlSchema,
-    markdownCommands,
     markdownSchema,
-    tavenemMarkdownParser,
-    tavenemMarkdownSerializer
-} from './tavenem-schemas';
+    ParamStateCommand
+} from './_schemas';
+
+import { htmlCommands } from './_html';
+import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from './_markdown';
 
 enum ThemePreference {
     Auto = 0,
@@ -123,7 +123,7 @@ interface CodeEditorInfo extends EditorInfo {
 }
 
 interface WysiwygEditorInfo extends EditorInfo {
-    commands: CommandInfo[];
+    commands: CommandSet;
     view: PMEditorView;
 }
 
@@ -502,13 +502,13 @@ class TavenemCodeEditor {
 const tavenemCodeEditor = new TavenemCodeEditor();
 
 class MenuView {
-    _commands: CommandInfo[] = [];
+    _commands: CommandSet;
     _editorView: PMEditorView;
     _ref: DotNet.DotNetObject;
 
     constructor(
         dotNetRef: DotNet.DotNetObject,
-        commands: CommandInfo[],
+        commands: CommandSet,
         editorView: PMEditorView) {
         this._commands = commands;
         this._editorView = editorView;
@@ -517,13 +517,28 @@ class MenuView {
     }
 
     update() {
-        this._commands.forEach(command => {
-            if (command.isActive && command.markType) {
-                command.active = command.isActive(this._editorView.state, command.markType);
+        const commandUpdate: {
+            [type in CommandType]?: {
+                active: boolean,
+                enabled: boolean,
             }
-            command.enabled = command.command(this._editorView.state, undefined, this._editorView);
-        });
-        this._ref.invokeMethodAsync("UpdateCommands", { commands: this._commands });
+        } = {};
+        for (const type in this._commands) {
+            const commandType = type as unknown as CommandType;
+            const command = this._commands[commandType];
+            if (command) {
+                const update = {
+                    active: false,
+                    enabled: false,
+                };
+                if (command.isActive && command.markType) {
+                    update.active = command.isActive(this._editorView.state, command.markType);
+                }
+                update.enabled = command.command(this._editorView.state, undefined, this._editorView);
+                commandUpdate[commandType] = update;
+            }
+        }
+        this._ref.invokeMethodAsync("UpdateCommands", commandUpdate);
     }
 }
 
@@ -531,12 +546,12 @@ class CodeBlockView {
     _cm: EditorView;
     _getPos: () => number;
     _languageCompartment = new Compartment;
-    _node: PMNode;
+    _node: ProsemirrorNode;
     _syntax: string | null;
     _updating = false;
     _view: PMEditorView;
 
-    constructor(node: PMNode, view: PMEditorView, getPos: () => number) {
+    constructor(node: ProsemirrorNode, view: PMEditorView, getPos: () => number) {
         this._node = node;
         this._view = view;
         this._getPos = getPos;
@@ -591,7 +606,7 @@ class CodeBlockView {
         
     }
 
-    asProseMirrorSelection(view: EditorView, doc: PMNode) {
+    asProseMirrorSelection(view: EditorView, doc: ProsemirrorNode) {
         const offset = this._getPos() + 1;
         const anchor = view.state.selection.main.anchor + offset;
         const head = view.state.selection.main.head + offset;
@@ -676,7 +691,7 @@ class CodeBlockView {
 
     stopEvent() { return true }
 
-    update(node: PMNode) {
+    update(node: ProsemirrorNode) {
         if (node.type != this._node.type) {
             return false;
         }
@@ -783,7 +798,7 @@ class TavenemWysiwygEditor {
             ? markdownSchema
             : htmlSchema;
 
-        let doc: PMNode;
+        let doc: ProsemirrorNode;
         if (options.syntax == 'markdown') {
             doc = tavenemMarkdownParser.parse(options.initialValue || '');
         } else {
@@ -799,18 +814,7 @@ class TavenemWysiwygEditor {
         const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, editorSchema.nodes.math_inline);
         const blockMathInputRule = makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, editorSchema.nodes.math_display);
 
-        const commands: CommandInfo[] = [];
-        for (const type in commonCommands(editorSchema)) {
-            commands.push(commands[type as unknown as CommandType]);
-        }
-        if (options.syntax != 'markdown') {
-            for (const type in htmlPMCommands) {
-                const command = htmlPMCommands[type as unknown as CommandType];
-                if (command) {
-                    commands.push(command);
-                }
-            }
-        }
+        const commands = commonCommands(editorSchema);
         const menu = new Plugin({
             view(editorView) {
                 return new MenuView(dotNetRef, commands, editorView);
@@ -939,9 +943,22 @@ class TavenemWysiwygEditor {
 }
 const tavenemWysiwygEditor = new TavenemWysiwygEditor();
 
-export function activateCommand(elementId: string, type: CommandType) {
+export function activateCommand(elementId: string, type: CommandType, params?: any[]) {
     const codeEditor = tavenemCodeEditor._editors[elementId];
     if (codeEditor) {
+        let command: ParamStateCommand | undefined;
+        if (codeEditor.options.syntax == 'html') {
+            command = htmlCommands[type];
+        } else if (codeEditor.options.syntax == 'markdown') {
+            command = markdownCommands[type];
+        }
+        if (command) {
+            command(params)({
+                state: codeEditor.view.state,
+                dispatch: codeEditor.view.dispatch
+            });
+            codeEditor.view.focus();
+        }
         return;
     }
 
@@ -950,7 +967,7 @@ export function activateCommand(elementId: string, type: CommandType) {
         return;
     }
 
-    let command = wysiwygEditor.commands[type];
+    const command = wysiwygEditor.commands[type];
     if (command) {
         command.command(wysiwygEditor.view.state, wysiwygEditor.view.dispatch, wysiwygEditor.view);
         wysiwygEditor.view.focus();

@@ -102,6 +102,16 @@ public partial class ColorInput<TValue>
     [Parameter] public InputValueConverter<TValue>? Converter { get; set; }
 
     /// <summary>
+    /// <para>
+    /// The way a picker's activator should be displayed.
+    /// </para>
+    /// <para>
+    /// Defaults to <see cref="PickerDisplayType.Field"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public PickerDisplayType DisplayType { get; set; }
+
+    /// <summary>
     /// The green component of the currently selected color.
     /// </summary>
     public byte Green { get; private set; }
@@ -117,18 +127,10 @@ public partial class ColorInput<TValue>
     public ushort Hue { get; private set; }
 
     /// <summary>
-    /// <para>
-    /// Whether to display this picker as an inline component.
-    /// </para>
-    /// <para>
-    /// If not, an input field is displayed inline instead, and the picker is displayed in a popup
-    /// when the field has focus.
-    /// </para>
-    /// <para>
-    /// Default is <see langword="false"/>.
-    /// </para>
+    /// When <see cref="DisplayType"/> is <see cref="PickerDisplayType.Button"/> and this is <see
+    /// langword="true"/>, the button displays an icon rather than the current selected color.
     /// </summary>
-    [Parameter] public bool Inline { get; set; }
+    [Parameter] public bool IconButton { get; set; }
 
     /// <summary>
     /// The lightness of the currently selected color, as a percentage in the range [0-100].
@@ -162,13 +164,31 @@ public partial class ColorInput<TValue>
         ? null
         : (Color.Keyword ?? Color.Css);
 
-    private protected override bool ShrinkWhen => Inline
+    private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline
         || CurrentValue is not null;
 
     private string AlphaSliderStyle => new StringBuilder("--alpha-background:linear-gradient(to right, transparent, ")
         .Append("hsl(")
         .Append(Hue)
         .Append(",100%,50%))")
+        .ToString();
+
+    private string? ButtonClass => new CssBuilder(InputClass)
+        .AddClassFromDictionary(InputAttributes)
+        .Add("picker-btn btn")
+        .Add("btn-icon", IconButton)
+        .ToString();
+
+    private string? ButtonContainerClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("form-field picker")
+        .Add("modified", IsTouched)
+        .Add("valid", IsValid)
+        .Add("invalid", !IsValid)
+        .ToString();
+
+    private string? ButtonSwatchStyle => new CssBuilder("width:1.5em")
+        .AddStyle(SwatchStyle)
         .ToString();
 
     private ColorFormatConverter Color { get; set; }
@@ -301,7 +321,7 @@ public partial class ColorInput<TValue>
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if ((firstRender && Inline)
+        if ((firstRender && DisplayType == PickerDisplayType.Inline)
             || _addMouseOverEvent)
         {
             await AddMouseOverEventAsync();
@@ -378,7 +398,8 @@ public partial class ColorInput<TValue>
     /// </summary>
     public override async Task FocusAsync()
     {
-        if (Inline && HueSlider is not null)
+        if (DisplayType == PickerDisplayType.Inline
+            && HueSlider is not null)
         {
             await HueSlider.FocusAsync();
         }
