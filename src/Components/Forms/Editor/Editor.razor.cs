@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Tavenem.Blazor.Framework.Services;
@@ -17,6 +18,7 @@ public partial class Editor : IDisposable
     private bool _isLineHeightDialogVisible;
     private bool _isLinkDialogVisible;
     private bool _isImgDialogVisible;
+    private bool _isSyntaxDialogVisible;
 
     /// <summary>
     /// Whether this editor should receive focus on page load.
@@ -29,7 +31,7 @@ public partial class Editor : IDisposable
     /// <remarks>
     /// Note: this property is only referenced during initialization. Subsequent changes will be ignored.
     /// </remarks>
-    [Parameter] public List<MarkdownEditorButton>? CustomToolbarButtons { get; set; }
+    [Parameter] public List<EditorButton>? CustomToolbarButtons { get; set; }
 
     /// <summary>
     /// <para>
@@ -45,7 +47,7 @@ public partial class Editor : IDisposable
     /// cref="Syntax"/> does not have a supported value.
     /// </para>
     /// </summary>
-    [Parameter] public EditorMode EditMode { get; set; } = EditorMode.WYSIWYG;
+    [Parameter] public EditorMode EditorMode { get; set; } = EditorMode.WYSIWYG;
 
     /// <summary>
     /// <para>
@@ -59,10 +61,6 @@ public partial class Editor : IDisposable
     /// of the content.
     /// </para>
     /// </summary>
-    /// <remarks>
-    /// Note: this property is only referenced during initialization. Subsequent changes will be
-    /// ignored.
-    /// </remarks>
     [Parameter] public string? Height { get; set; }
 
     /// <summary>
@@ -74,7 +72,7 @@ public partial class Editor : IDisposable
     /// splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// A label which describes the field.
@@ -82,7 +80,7 @@ public partial class Editor : IDisposable
     [Parameter] public string? Label { get; set; }
 
     /// <summary>
-    /// Whether <see cref="EditMode"/> can be changed by the user.
+    /// Whether <see cref="EditorMode"/> can be changed by the user.
     /// </summary>
     /// <remarks>
     /// Note: this property is only referenced during initialization. Subsequent changes will be
@@ -103,6 +101,16 @@ public partial class Editor : IDisposable
     /// ignored.
     /// </remarks>
     [Parameter] public bool LockSyntax { get; set; } = true;
+
+    /// <summary>
+    /// <para>
+    /// Sets the maximum height of the editor.
+    /// </para>
+    /// <para>
+    /// Should include a unit, such as "200px" or "10rem."
+    /// </para>
+    /// </summary>
+    [Parameter] public string? MaxHeight { get; set; }
 
     /// <summary>
     /// The placeholder value.
@@ -172,38 +180,48 @@ public partial class Editor : IDisposable
         .Add("required", Required)
         .ToString();
 
+    private string? AdditionalMarksClass => new CssBuilder("small")
+        .Add("button-group", IsActive(EditorCommandType.Underline))
+        .Add("button-group-text", !IsActive(EditorCommandType.Underline))
+        .Add(
+            "outlined",
+            IsActive(EditorCommandType.Strikethrough)
+            || IsActive(EditorCommandType.Subscript)
+            || IsActive(EditorCommandType.Superscript)
+            || IsActive(EditorCommandType.CodeInline)
+            || IsActive(EditorCommandType.Small)
+            || IsActive(EditorCommandType.Inserted))
+        .ToString();
+
+    private string AdditionalMarksGroupId { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    private Dropdown? BackgroundContext { get; set; }
+
     private ColorInput<string>? BackgroundPicker { get; set; }
 
-    private string? CurrentBackground { get; set; } = "transparent";
-
-    private string? CurrentFontFamily { get; set; } = "sans-serif";
-
-    private string? CurrentFontSize { get; set; } = "1em";
-
-    private string? CurrentForeground { get; set; } = "black";
+    private string? BoldClass => new CssBuilder("rounded small")
+        .Add("filled", IsActive(EditorCommandType.Strong))
+        .Add("outlined", IsActive(EditorCommandType.Bold))
+        .ToString();
 
     private int CurrentLength { get; set; }
-
-    private string? CurrentLineHeight { get; set; } = "normal";
 
     private bool DisplayCommands => IsWysiwyg
         || Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
 
-    private bool DisplayToolbar => DisplayCommands
+    private bool DisplayShowAll => DisplayCommands
         || !LockSyntax
-        || (!LockEditMode && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown);
+        || (!LockEditMode && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown)
+        || CustomToolbarButtons is not null;
 
     private string? EditorClass => new CssBuilder("editor")
-        .Add("set-height", !string.IsNullOrEmpty(Height))
-        .Add(
-            "no-toolbar",
-            (EditMode != EditorMode.WYSIWYG
-            || Syntax is not EditorSyntax.HTML and not EditorSyntax.Markdown)
-            && LockSyntax)
+        .Add("set-height", !string.IsNullOrEmpty(Height) || !string.IsNullOrEmpty(MaxHeight))
+        .Add("no-statusbar", !IsWysiwyg)
         .ToString();
 
     private string? EditorStyle => new CssBuilder()
         .AddStyle("height", Height)
+        .AddStyle("max-height", MaxHeight)
         .ToString();
 
     [Inject] private EditorService EditorService { get; set; } = default!;
@@ -212,7 +230,9 @@ public partial class Editor : IDisposable
 
     private TextInput? FontSizeInput { get; set; }
 
-    private List<string> FontSizes { get; } = new() { ".75em", ".875em", "1em", "1.25em", "1.5em", "1.75em", "2em", "2.5em", "3em" };
+    private List<string> FontSizes { get; } = new() { "Reset", ".75em", ".875em", "1em", "1.25em", "1.5em", "1.75em", "2em", "2.5em", "3em" };
+
+    private Dropdown? ForegroundContext { get; set; }
 
     private ColorInput<string>? ForegroundPicker { get; set; }
 
@@ -220,24 +240,68 @@ public partial class Editor : IDisposable
 
     private Form? ImgForm { get; set; }
 
-    private bool IsWysiwyg => EditMode == EditorMode.WYSIWYG
+    private bool IsWysiwyg => EditorMode == EditorMode.WYSIWYG
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
+
+    private string? ItalicClass => new CssBuilder("rounded small")
+        .Add("filled", IsActive(EditorCommandType.Italic))
+        .Add("outlined", IsActive(EditorCommandType.Italic))
+        .ToString();
 
     private TextInput? LineHeightInput { get; set; }
 
-    private List<string> LineHeights { get; } = new() { "normal", "1", "1.2", "1.5", "2" };
+    private List<string> LineHeights { get; } = new() { "Reset", "normal", "1", "1.2", "1.5", "2" };
 
     private LinkInfo Link { get; set; } = new();
 
     private Form? LinkForm { get; set; }
 
-    private bool ShowAdvanced { get; set; }
-
-    private string? ShowAdvancedClass => new CssBuilder("btn btn-icon small")
-        .Add("filled", ShowAdvanced)
+    private string? ListGroupClass => new CssBuilder("small")
+        .Add("button-group", IsActive(EditorCommandType.ListBullet))
+        .Add("button-group-text", !IsActive(EditorCommandType.ListBullet))
+        .Add(
+            "outlined",
+            IsActive(EditorCommandType.ListNumber)
+            || IsActive(EditorCommandType.ListCheck))
         .ToString();
 
-    private string? SpellcheckValue => Spellcheck == true ? "true" : "false";
+    private string ListsGroupId { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    private string? NewBackground { get; set; } = "transparent";
+
+    private string? NewFontFamily { get; set; } = "sans-serif";
+
+    private string? NewFontSize { get; set; } = "1em";
+
+    private string? NewForeground { get; set; } = "black";
+
+    private string? NewLineHeight { get; set; } = "normal";
+
+    private EditorSyntax NewCodeSyntax { get; set; }
+
+    private bool ShowAll { get; set; }
+
+    private string? ShowAllClass => new CssBuilder("btn btn-icon rounded small")
+        .Add("filled", ShowAll)
+        .ToString();
+
+    private string? SpellcheckValue
+    {
+        get
+        {
+            if (Spellcheck.HasValue)
+            {
+                return Spellcheck.Value ? "true" : "false";
+            }
+            return IsWysiwyg ? "true" : "false";
+        }
+    }
+
+    private string TableGroupId { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    private string? ToolbarClass => new CssBuilder("editor-toolbar")
+        .Add("editor-toolbar-extended", ShowAll)
+        .ToString();
 
     [Inject] private UtilityService UtilityService { get; set; } = default!;
 
@@ -262,8 +326,8 @@ public partial class Editor : IDisposable
 
         if (_initialized)
         {
-            if (parameters.TryGetValue(nameof(EditMode), out newMode)
-                && newMode != EditMode)
+            if (parameters.TryGetValue(nameof(EditorMode), out newMode)
+                && newMode != EditorMode)
             {
                 pendingMode = true;
             }
@@ -319,7 +383,7 @@ public partial class Editor : IDisposable
         }
 
         EditorService.AutoFocus = AutoFocus;
-        EditorService.EditMode = EditMode;
+        EditorService.EditMode = EditorMode;
         EditorService.ElementId = Id;
         EditorService.InitialValue = Value;
         EditorService.Placeholder = Placeholder;
@@ -327,6 +391,7 @@ public partial class Editor : IDisposable
         EditorService.Syntax = Syntax;
         EditorService.UpdateOnInput = UpdateOnInput;
         EditorService.OnInput += OnInput;
+        EditorService.CommandsUpdated += CommandsUpdated;
         _initialized = true;
     }
 
@@ -386,6 +451,7 @@ public partial class Editor : IDisposable
         {
             if (disposing)
             {
+                EditorService.CommandsUpdated -= CommandsUpdated;
                 EditorService.OnInput -= OnInput;
             }
 
@@ -398,7 +464,8 @@ public partial class Editor : IDisposable
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private static async IAsyncEnumerable<string> ValidateFontSizeAsync(string? value, object? _)
     {
-        if (string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(value)
+            || value == "Reset")
         {
             yield break;
         }
@@ -416,7 +483,8 @@ public partial class Editor : IDisposable
 
     private static async IAsyncEnumerable<string> ValidateLineHeightAsync(string? value, object? _)
     {
-        if (string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(value)
+            || value == "Reset")
         {
             yield break;
         }
@@ -457,18 +525,24 @@ public partial class Editor : IDisposable
         .CommandsActive
         .TryGetValue(type, out var v)
         && v
-        ? "btn btn-icon small filled"
-        : "btn btn-icon small";
+        ? "btn btn-icon rounded small filled"
+        : "btn btn-icon rounded small";
 
     private string ActiveButtonGroupClass(EditorCommandType type) => EditorService
         .CommandsActive
         .TryGetValue(type, out var v)
         && v
-        ? "btn btn-icon filled"
-        : "btn btn-icon";
+        ? "btn btn-icon rounded-left filled"
+        : "btn btn-icon rounded-left";
+
+    private string? ActiveThemeClass(EditorCommandType type) => IsActive(type)
+        ? (ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS()
+        : null;
 
     private async Task CommandAsync(EditorCommandType type, params object?[] parameters)
         => await EditorService.ActivateCommandAsync(type, parameters);
+
+    private void CommandsUpdated(object? _, EventArgs e) => StateHasChanged();
 
     private bool IsActive(EditorCommandType type) => EditorService
         .CommandsActive
@@ -476,10 +550,122 @@ public partial class Editor : IDisposable
         && v;
 
     private bool IsDisabled(EditorCommandType type) => ReadOnly
-        || (EditorService
+        || !EditorService
             .CommandsEnabled
             .TryGetValue(type, out var v)
-        && !v);
+        || !v;
+
+    private bool IsAdvMarkDisabled() => ReadOnly
+        || ((!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Strikethrough, out var st)
+        || !st)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Subscript, out var sb)
+        || !sb)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Superscript, out var sp)
+        || !sp)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.CodeInline, out var c)
+        || !c)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Small, out var sm)
+        || !sm)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Inserted, out var i)
+        || !i));
+
+    private bool IsBlockDisabled() => ReadOnly
+        || ((!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Heading, out var h)
+        || !h)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.Paragraph, out var p)
+        || !p)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.BlockQuote, out var b)
+        || !b)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.CodeBlock, out var c)
+        || !c));
+
+    private bool IsTableDisabled() => ReadOnly
+        || ((!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableInsertColumnBefore, out var t1)
+        || !t1)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableInsertColumnAfter, out var t2)
+        || !t2)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableDeleteColumn, out var t3)
+        || !t3)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableInsertRowBefore, out var t4)
+        || !t4)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableInsertRowAfter, out var t5)
+        || !t5)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableDeleteRow, out var t6)
+        || !t6)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableDelete, out var t7)
+        || !t7)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableMergeCells, out var t8)
+        || !t8)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableSplitCell, out var t9)
+        || !t9)
+        && (!EditorService
+            .CommandsEnabled
+            .TryGetValue(EditorCommandType.TableToggleHeaderRow, out var t10)
+        || !t10));
+
+    private void OnBackgroundContext(MouseEventArgs e) => BackgroundContext?.Open(e);
+
+    private async Task OnCustomButtonAsync(EditorButton button)
+    {
+        if (button.Action is null
+            && button.AsyncAction is null)
+        {
+            return;
+        }
+
+        var value = await EditorService.GetSelectedText();
+        if (button.Action is not null)
+        {
+            value = button.Action.Invoke(value);
+        }
+
+        if (button.AsyncAction is not null)
+        {
+            value = await button.AsyncAction.Invoke(value);
+        }
+
+        await EditorService.UpdateSelectedText(value);
+    }
+
+    private void OnForegroundContext(MouseEventArgs e) => ForegroundContext?.Open(e);
 
     private void OnInput(object? sender, string? value)
     {
@@ -493,26 +679,27 @@ public partial class Editor : IDisposable
 
     private Task SetBackgroundAsync(string? value)
     {
-        CurrentBackground = value;
+        NewBackground = value;
         return CommandAsync(EditorCommandType.BackgroundColor, value);
+    }
+
+    private Task SetCodeSyntaxAsync(EditorSyntax value)
+    {
+        NewCodeSyntax = value;
+        return CommandAsync(EditorCommandType.SetCodeSyntax, value.ToString());
     }
 
     private Task SetFontFamilyAsync(string? value)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            return Task.CompletedTask;
-        }
-
-        CurrentFontFamily = value;
+        NewFontFamily = value;
         return CommandAsync(EditorCommandType.SetFontFamily, value);
     }
 
     private async Task SetFontSizeAsync()
     {
-        if (string.IsNullOrEmpty(CurrentFontSize))
+        if (NewFontSize == "Reset")
         {
-            return;
+            NewFontSize = null;
         }
 
         if (FontSizeInput is not null)
@@ -524,24 +711,26 @@ public partial class Editor : IDisposable
             }
         }
 
-        if (double.TryParse(CurrentFontSize, out var _))
+        if (!string.IsNullOrEmpty(NewFontSize)
+            && double.TryParse(NewFontSize, out var _))
         {
-            CurrentFontSize = $"{CurrentFontSize}em";
+            NewFontSize = $"{NewFontSize}em";
         }
-        await CommandAsync(EditorCommandType.SetFontSize, CurrentFontSize);
+        await CommandAsync(EditorCommandType.SetFontSize, NewFontSize);
+        _isFontSizeDialogVisible = false;
     }
 
     private Task SetForegroundAsync(string? value)
     {
-        CurrentForeground = value;
+        NewForeground = value;
         return CommandAsync(EditorCommandType.ForegroundColor, value);
     }
 
     private async Task SetLineHeightAsync()
     {
-        if (string.IsNullOrEmpty(CurrentLineHeight))
+        if (NewLineHeight == "Reset")
         {
-            return;
+            NewLineHeight = null;
         }
 
         if (LineHeightInput is not null)
@@ -553,12 +742,13 @@ public partial class Editor : IDisposable
             }
         }
 
-        await CommandAsync(EditorCommandType.SetLineHeight, CurrentLineHeight);
+        await CommandAsync(EditorCommandType.SetLineHeight, NewLineHeight);
+        _isLineHeightDialogVisible = false;
     }
 
     private async Task SetModeAsync(EditorMode value)
     {
-        EditMode = value;
+        EditorMode = value;
         EditorService.EditMode = value;
         if (_initialized)
         {
@@ -577,11 +767,20 @@ public partial class Editor : IDisposable
 
     private async Task SetSyntax(EditorSyntax value)
     {
+        var oldSyntax = Syntax;
         Syntax = value;
         EditorService.Syntax = value;
         if (_initialized)
         {
             await EditorService.SetSyntax(value);
+            if (value is EditorSyntax.HTML
+                or EditorSyntax.Markdown
+                && oldSyntax is not EditorSyntax.HTML
+                and not EditorSyntax.Markdown
+                && EditorMode == EditorMode.WYSIWYG)
+            {
+                await EditorService.SetEditorMode(EditorMode);
+            }
         }
     }
 
@@ -591,6 +790,12 @@ public partial class Editor : IDisposable
         {
             await EditorService.SetValue(value);
         }
+    }
+
+    private void ShowCodeSyntaxDialog()
+    {
+        NewCodeSyntax = EditorSyntax.None;
+        _isSyntaxDialogVisible = true;
     }
 
     private void ShowImgDialog()
@@ -603,13 +808,13 @@ public partial class Editor : IDisposable
 
     private void ShowFontSizeDialog()
     {
-        CurrentFontSize = "1em";
+        NewFontSize = "1em";
         _isFontSizeDialogVisible = true;
     }
 
     private void ShowLineHeightDialog()
     {
-        CurrentLineHeight = "normal";
+        NewLineHeight = "normal";
         _isLineHeightDialogVisible = true;
     }
 
@@ -640,14 +845,23 @@ public partial class Editor : IDisposable
             return;
         }
 
-        var src = System.Text.Encodings.Web.UrlEncoder.Default.Encode(Img.Src);
+        if (!Uri.TryCreate(Img.Src, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return;
+        }
+        if (!uri.IsAbsoluteUri
+            && Uri.TryCreate("http://" + Img.Src, UriKind.Absolute, out var uri2))
+        {
+            uri = uri2;
+        }
+
         var title = string.IsNullOrEmpty(Img.Title)
             ? null
             : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Img.Title);
         var alt = string.IsNullOrEmpty(Img.Alt)
             ? null
             : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Img.Alt);
-        await CommandAsync(EditorCommandType.InsertImage, src, title, alt);
+        await CommandAsync(EditorCommandType.InsertImage, uri, title, alt);
         _isImgDialogVisible = false;
     }
 
@@ -665,23 +879,32 @@ public partial class Editor : IDisposable
             return;
         }
 
-        var url = System.Text.Encodings.Web.UrlEncoder.Default.Encode(Link.Url);
+        if (!Uri.TryCreate(Link.Url, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return;
+        }
+        if (!uri.IsAbsoluteUri
+            && Uri.TryCreate("http://" + Link.Url, UriKind.Absolute, out var uri2))
+        {
+            uri = uri2;
+        }
+
         var title = string.IsNullOrEmpty(Link.Title)
             ? null
             : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Link.Title);
-        await CommandAsync(EditorCommandType.InsertLink, url, title);
+        await CommandAsync(EditorCommandType.InsertLink, uri.ToString(), title);
         _isLinkDialogVisible = false;
     }
 
     private async Task ToggleModeAsync()
     {
-        EditMode = EditMode == EditorMode.WYSIWYG
+        EditorMode = EditorMode == EditorMode.WYSIWYG
             ? EditorMode.Text
             : EditorMode.WYSIWYG;
-        EditorService.EditMode = EditMode;
+        EditorService.EditMode = EditorMode;
         if (_initialized)
         {
-            await EditorService.SetEditorMode(EditMode);
+            await EditorService.SetEditorMode(EditorMode);
         }
     }
 

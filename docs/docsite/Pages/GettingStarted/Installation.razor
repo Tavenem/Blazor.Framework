@@ -8,24 +8,24 @@
 
 <Heading Level="HeadingLevel.H2" Title="Install">1. Install</Heading>
 <p>The <code>Tavenem.Blazor.Framework</code> NuGet package is available through the package manager, or the CLI:</p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     <pre class="user-select-all">dotnet add package Tavenem.Blazor.Framework</pre>
-</div>
+</pre>
 
 <Heading Level="HeadingLevel.H2" Title="Import Namespace">2. Import Namespace</Heading>
 <p>Add the package namespace to your <code>_Imports.razor</code> file.</p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     <pre class="user-select-all">
         <span class="pre-directive">&#64;using</span><span> Tavenem</span><span class="pre-operator">.</span><span>Blazor</span><span class="pre-operator">.</span><span>Framework</span>
     </pre>
-</div>
+</pre>
 
 <Heading Level="HeadingLevel.H2" Title="Add Font links">3. Add Font links</Heading>
 <p>Add the following links to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap"" rel=""stylesheet"">
 <link href=""https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined"" rel=""stylesheet"">", true)
-</div>
+</pre>
 <p>
     You may use different fonts if you prefer, but a <a
     href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide">variable
@@ -51,9 +51,9 @@
 
 <Heading Level="HeadingLevel.H2" Title="Add CSS Link">4. Add CSS Link</Heading>
 <p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<link href=""_content/Tavenem.Blazor.Framework/framework.css"" rel=""stylesheet"">", true)
-</div>
+</pre>
 <p>
     If you started your project with the default Blazor template, delete the
     references to Bootstrap, and all the pregenerated content in the
@@ -68,17 +68,16 @@
     If you ordinarily use <a href="https://getbootstrap.com/">Bootstrap</a>, be aware that the
     Tavenem Blazor Framework includes most of the same (or similar) utility classes, and most of the
     same (or similar) components. Consider carefully before keeping references to Bootstrap's CSS in
-    your project, as there are likely to be conflicts leading to difficult-to-diagnose styling
-    issues.
+    your project, as there are likely to be conflicts leading to difficult styling issues.
 </p>
 
-<Heading Level="HeadingLevel.H2" Title="Register Service with Dependency Injection">5. Register Service with Dependency Injection</Heading>
+<Heading Level="HeadingLevel.H2" Title="Register Services with Dependency Injection">5. Register Services with Dependency Injection</Heading>
 <p>Add the following to your <code>Program.cs</code>:</p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     <pre class="user-select-all">
         <span class="pre-attribute">builder</span><span class="pre-operator">.</span><span>Services</span><span class="pre-operator">.</span><span class="pre-method">AddTavenemFramework</span><span>();</span>
     </pre>
-</div>
+</pre>
 
 <Heading Level="HeadingLevel.H2" Title="Set up the Framework">6. Set up the Framework</Heading>
 <p>Add a <code class="primary">FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>

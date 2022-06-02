@@ -89,10 +89,10 @@ internal class PopoverService : IAsyncDisposable
         }
     }
 
-    internal async Task<PopoverHandler> RegisterPopoverAsync(string? anchorId = null)
+    internal async Task<PopoverHandler> RegisterPopoverAsync(string? anchorId = null, string? focusId = null)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
-        var handler = new PopoverHandler(module, anchorId);
+        var handler = new PopoverHandler(module, anchorId, focusId);
         _popoverHandlers.Add(handler);
         return handler;
     }

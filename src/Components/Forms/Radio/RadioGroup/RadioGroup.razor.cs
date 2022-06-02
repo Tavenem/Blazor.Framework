@@ -10,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
 {
-    private readonly string _defaultGroupName = Guid.NewGuid().ToString("N");
+    private readonly string _defaultGroupName = Guid.NewGuid().ToHtmlId();
 
     private RadioContext<TValue>? _context;
 

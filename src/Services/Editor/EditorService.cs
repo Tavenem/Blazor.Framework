@@ -20,6 +20,8 @@ internal class EditorService : IAsyncDisposable
 
     public IReadOnlyDictionary<EditorCommandType, bool> CommandsEnabled { get; }
 
+    public string? CurrentNode { get; private set; }
+
     public EditorMode EditMode { get; set; }
 
     /// <summary>
@@ -45,6 +47,8 @@ internal class EditorService : IAsyncDisposable
         add => SubscribeInput(value);
         remove => UnsubscribeInput(value);
     }
+
+    public event EventHandler? CommandsUpdated;
 
     /// <summary>
     /// Initializes a new instance of <see cref="EditorService"/>.
@@ -102,6 +106,14 @@ internal class EditorService : IAsyncDisposable
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
             "focusEditor",
+            ElementId).ConfigureAwait(false);
+    }
+
+    public async ValueTask<string?> GetSelectedText()
+    {
+        var module = await _moduleTask.Value.ConfigureAwait(false);
+        return await module.InvokeAsync<string?>(
+            "getSelectedText",
             ElementId).ConfigureAwait(false);
     }
 
@@ -173,6 +185,8 @@ internal class EditorService : IAsyncDisposable
     [JSInvokable]
     public void UpdateCommands(EditorCommandUpdate update)
     {
+        CurrentNode = update.CurrentNode;
+
         if (update.Commands is null)
         {
             return;
@@ -183,13 +197,15 @@ internal class EditorService : IAsyncDisposable
             _commandsActive[type] = command.Active;
             _commandsEnabled[type] = command.Enabled;
         }
+
+        CommandsUpdated?.Invoke(this, EventArgs.Empty);
     }
 
-    public async Task UpdateWysiwygEditorSelectedText(string? value)
+    public async ValueTask UpdateSelectedText(string? value)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module.InvokeVoidAsync(
-            "updateWysiwygEditorSelectedText",
+            "updateSelectedText",
             ElementId,
             value).ConfigureAwait(false);
     }

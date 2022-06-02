@@ -350,39 +350,46 @@
                     border-top: 1px solid var(--tavenem-color-border-table);
                 }
 
-                tr {
-                    display: initial;
 
-                    > td {
-                        align-items: center;
-                        border: none;
-                        display: flex;
-                        justify-content: space-between;
-                        padding: .875em 1em;
-                        text-align: start !important;
+                thead, tbody, tfoot {
+                    > tr {
+                        display: initial;
 
-                        &:last-child {
-                            border-bottom: 1px solid var(--tavenem-color-border-table);
-                        }
+                        > td {
+                            align-items: center;
+                            border: none;
+                            display: flex;
+                            justify-content: space-between;
+                            padding: .875em 1em;
+                            text-align: start !important;
 
-                        &:before {
-                            content: attr(data-label);
-                            font-weight: var(--tavenem-font-weight-bold);
-                            padding-inline-end: 1em;
-                        }
+                            &:last-child {
+                                border-bottom: 1px solid var(--tavenem-color-border-table);
+                            }
 
-                        &.hide-xs {
-                            height: 0;
-                            margin: 0;
-                            padding: 0;
-                            visibility: collapse;
+                            &:before {
+                                content: attr(data-label);
+                                font-weight: var(--tavenem-font-weight-bold);
+                                padding-inline-end: 1em;
+                            }
+
+                            &.hide-xs {
+                                height: 0;
+                                margin: 0;
+                                padding: 0;
+                                visibility: collapse;
+                            }
                         }
                     }
                 }
             }
 
-            &.dense > tr > td {
-                padding: 6px 1em;
+            &.dense > {
+                thead, tbody, tfoot {
+                    > tr > td {
+                        padding: 6px 1em;
+                    }
+                }
             }
         }
     }
@@ -405,6 +412,7 @@
 
     > div:last-child {
         flex-grow: 1;
+        justify-content: end;
 
         .field {
             margin: 0;
@@ -432,6 +440,14 @@
         padding-left: 1em;
         padding-right: 1em;
         padding-top: 6px;
+    }
+
+    > form {
+        scrollbar-color: inherit var(--tavenem-color-bg-alt);
+
+        &::-webkit-scrollbar {
+            background-color: var(--tavenem-color-bg-alt);
+        }
     }
 
     .expand-row {

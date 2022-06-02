@@ -58,7 +58,6 @@ public partial class ColorInput<TValue>
     private const int HalfSelectorSize = 13;
     private readonly Type _baseType;
     private readonly Type? _nullableType;
-    private readonly Guid _overlayId = Guid.NewGuid();
     private readonly string _overlayIdString;
 
     private bool _addMouseOverEvent;
@@ -127,6 +126,11 @@ public partial class ColorInput<TValue>
     public ushort Hue { get; private set; }
 
     /// <summary>
+    /// This can be used to override the default icon.
+    /// </summary>
+    [Parameter] public string? Icon { get; set; }
+
+    /// <summary>
     /// When <see cref="DisplayType"/> is <see cref="PickerDisplayType.Button"/> and this is <see
     /// langword="true"/>, the button displays an icon rather than the current selected color.
     /// </summary>
@@ -187,6 +191,8 @@ public partial class ColorInput<TValue>
         .Add("invalid", !IsValid)
         .ToString();
 
+    private string ButtonIcon => Icon ?? DefaultIcons.ColorSelect;
+
     private string? ButtonSwatchStyle => new CssBuilder("width:1.5em")
         .AddStyle(SwatchStyle)
         .ToString();
@@ -226,7 +232,7 @@ public partial class ColorInput<TValue>
             throw new InvalidOperationException($"Type {_baseType.Name} is not supported. Only string and System.Drawing.Color are supported.");
         }
 
-        _overlayIdString = _overlayId.ToString("N");
+        _overlayIdString = Guid.NewGuid().ToHtmlId();
 
         Clearable = _nullableType is not null
             || _baseType == typeof(string);
@@ -241,7 +247,7 @@ public partial class ColorInput<TValue>
         }
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
-        HexInput = Color.HexCompact;
+        HexInput = HexColor;
     }
 
     /// <inheritdoc/>
@@ -294,7 +300,7 @@ public partial class ColorInput<TValue>
             Lightness = Color.Lightness;
             Alpha = Color.AlphaFloat;
             HexColor = Color.HexCompact;
-            HexInput = Color.HexCompact;
+            HexInput = HexColor;
             _selectorX = Saturation / 100.0 * OverlayWidth;
             _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
         }
@@ -439,8 +445,14 @@ public partial class ColorInput<TValue>
         }
     }
 
-    private protected override Task OnClosePopoverAsync()
-        => RemoveMouseOverEventAsync();
+    private protected override async Task OnClosePopoverAsync()
+    {
+        await RemoveMouseOverEventAsync();
+        if (DisplayType == PickerDisplayType.Button)
+        {
+            SetValue();
+        }
+    }
 
     private protected override void OnOpenPopover()
     {
@@ -548,10 +560,13 @@ public partial class ColorInput<TValue>
             Green = Color.Green;
             Blue = Color.Blue;
             HexColor = Color.HexCompact;
-            HexInput = Color.HexCompact;
+            HexInput = HexColor;
             _selectorX = Saturation / 100.0 * OverlayWidth;
             _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
         }
         catch { }
     }
@@ -577,7 +592,10 @@ public partial class ColorInput<TValue>
             HexColor = Color.HexCompact;
             _selectorX = Saturation / 100.0 * OverlayWidth;
             _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
         }
         catch { }
     }
@@ -609,10 +627,13 @@ public partial class ColorInput<TValue>
             Saturation = Color.Saturation;
             Lightness = Color.Lightness;
             HexColor = Color.HexCompact;
-            HexInput = Color.HexCompact;
+            HexInput = HexColor;
             _selectorX = Saturation / 100.0 * OverlayWidth;
             _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
         }
         catch { }
     }
@@ -689,7 +710,11 @@ public partial class ColorInput<TValue>
         Lightness = Color.Lightness;
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
+        HexInput = HexColor;
 
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
     }
 }

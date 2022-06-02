@@ -3,7 +3,7 @@
 @inherits InputComponentBase<string>
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
-    <div class="input">
+    <div id="@InputId" class="input">
         @if (PrefixContent is not null)
         {
             @PrefixContent(Value)
@@ -53,7 +53,7 @@
                @onfocusout="OnFocusOut" />
         @if (CanClear)
         {
-            <button class="btn btn-icon small" @onclick="Clear">
+            <button class="btn btn-icon small" tabindex="-1" @onclick="Clear">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
@@ -106,11 +106,13 @@
         </div>
     }
     <Popover Class="filled"
-             AnchorId="@Id"
+             AnchorId="@InputId"
+             AnchorOrigin="Origin.Bottom_Left"
+             PopoverOrigin="Origin.Top_Left"
              IsOpen="ShowSuggestions"
              MatchWidth="true">
-        <ul class="@SuggestionListCssClass"
-            @onclick:stopPropagation="true">
+        <menu class="@SuggestionListCssClass"
+              @onclick:stopPropagation="true">
             @foreach (var suggestion in FilteredSuggestions)
             {
                 <li @key="suggestion" @onclick="@(_ => SuggestionSelectedAsync(suggestion))">@suggestion</li>
@@ -135,6 +137,6 @@
             {
                 <tf-progress-circle></tf-progress-circle>
             }
-        </ul>
+        </menu>
     </Popover>
 </div>

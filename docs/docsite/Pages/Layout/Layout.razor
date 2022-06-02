@@ -11,16 +11,16 @@
     In its most basic form, you use it in your MainLayout.razor (and any other layout files)
     like this:
 </p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<FrameworkLayout>
     @Body
 </FrameworkLayout>")
-</div>
+</pre>
 
 <p>
     A more complete example, however, will look something like this:
 </p>
-<div class="codeblock pre-razor-code">
+<pre class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<FrameworkLayout ThemeColor=""ThemeColor.Primary"">
     <FrameworkContent>
         <AppBar Side=""VerticalSide.Top"" ControlsDrawerSide=""Side.Left"">
@@ -39,7 +39,7 @@
         @Body
     </ChildContent>
 </FrameworkLayout>")
-</div>
+</pre>
 
 <p>
     The example above includes an <a href="./components/appbar">AppBar</a> at the top of the page,

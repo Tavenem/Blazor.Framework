@@ -1,4 +1,5 @@
-﻿import {
+﻿import { html_beautify } from 'js-beautify';
+import {
     EditorView,
     keymap,
     highlightSpecialChars,
@@ -11,6 +12,7 @@
     highlightActiveLineGutter,
     placeholder,
     Command,
+    ViewUpdate,
 } from '@codemirror/view';
 import { Extension, EditorState, Compartment, TransactionSpec } from '@codemirror/state';
 import {
@@ -25,7 +27,7 @@ import {
     foldKeymap,
     codeFolding,
 } from '@codemirror/language';
-import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import { defaultKeymap, history, historyKeymap, indentWithTab, redo as codeRedo, undo as codeUndo } from '@codemirror/commands';
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
 import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { lintKeymap } from '@codemirror/lint';
@@ -45,16 +47,30 @@ import { sql } from '@codemirror/lang-sql';
 import { stex } from '@codemirror/legacy-modes/mode/stex';
 import { typescript } from '@codemirror/legacy-modes/mode/javascript';
 
-import { EditorState as PMEditorState, Plugin, Selection, TextSelection, Transaction } from 'prosemirror-state';
-import { EditorView as PMEditorView } from 'prosemirror-view';
-import { DOMParser, DOMSerializer, ProsemirrorNode } from 'prosemirror-model';
+import {
+    Command as PMCommand,
+    EditorState as PMEditorState,
+    Plugin,
+    Selection,
+    TextSelection,
+    Transaction
+} from 'prosemirror-state';
+import { Decoration, DecorationSet, EditorView as PMEditorView } from 'prosemirror-view';
+import {
+    ContentMatch,
+    DOMParser as PMDOMParser,
+    DOMSerializer,
+    Fragment,
+    Node as ProsemirrorNode,
+    Schema
+} from 'prosemirror-model';
 import {
     baseKeymap,
     chainCommands,
     deleteSelection,
     exitCode,
-    selectNodeBackward,
-    joinBackward
+    joinBackward,
+    selectNodeBackward
 } from 'prosemirror-commands';
 import { keymap as pmKeymap } from 'prosemirror-keymap';
 import { inputRules } from 'prosemirror-inputrules';
@@ -62,7 +78,6 @@ import { history as pmHistory, undo, redo } from 'prosemirror-history';
 import { dropCursor as pmDropCursor } from 'prosemirror-dropcursor';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { buildKeymap, buildInputRules } from 'prosemirror-example-setup';
-import { columnResizing, fixTables, goToNextCell, tableEditing } from 'prosemirror-tables';
 import {
     makeBlockMathInputRule,
     makeInlineMathInputRule,
@@ -75,17 +90,16 @@ import {
 } from "@benrbray/prosemirror-math";
 
 import {
-    CommandInfo,
     CommandSet,
     CommandType,
     commonCommands,
-    htmlSchema,
-    markdownSchema,
-    ParamStateCommand
+    schema,
+    ParamStateCommand,
+    exitDiv
 } from './_schemas';
-
 import { htmlCommands } from './_html';
 import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from './_markdown';
+import { cellMinWidth, columnResizing, fixTables, goToNextCell, tableEditing, TableView } from './_tables';
 
 enum ThemePreference {
     Auto = 0,
@@ -124,7 +138,18 @@ interface CodeEditorInfo extends EditorInfo {
 
 interface WysiwygEditorInfo extends EditorInfo {
     commands: CommandSet;
+    isMarkdown: boolean;
     view: PMEditorView;
+}
+
+interface UpdateInfo {
+    commands: {
+        [type in CommandType]?: {
+            active: boolean,
+            enabled: boolean,
+        }
+    };
+    currentNode: string | null;
 }
 
 const codeEditorLanguageMap: Record<string, LanguageSupport | StreamLanguage<unknown>> = {
@@ -149,7 +174,8 @@ const codeEditorPlainText: Extension = [];
 
 const codeEditorBaseTheme = EditorView.baseTheme({
     "&": {
-        flexGrow: "1"
+        flexGrow: "1",
+        overflowX: "auto"
     },
 
     "&, .cm-scroller": {
@@ -349,9 +375,6 @@ const codeEditorDarkHighlightStyle = HighlightStyle.define([
 const codeEditorDarkExtension: Extension = [codeEditorDarkTheme, syntaxHighlighting(codeEditorDarkHighlightStyle)];
 const codeEditorThemeCompartment = new Compartment;
 
-let codeEditorThemeExtension: Extension | undefined;
-let themePreference = ThemePreference.Auto;
-
 const defaultCodeExtensions: Extension[] = [
     lineNumbers(),
     highlightActiveLineGutter(),
@@ -378,10 +401,33 @@ const defaultCodeExtensions: Extension[] = [
         ...historyKeymap,
         ...foldKeymap,
         ...completionKeymap,
-        ...lintKeymap
+        ...lintKeymap,
+        indentWithTab,
     ]),
     codeEditorBaseTheme,
 ];
+
+const exitCodeUp: PMCommand = (state, dispatch) => {
+    const { $head, $anchor } = state.selection;
+    if (!$head.parent.type.spec.code
+        || !$head.sameParent($anchor)) {
+        return false;
+    }
+    const above = $head.node(-1), before = $head.index(-1), type = defaultBlockAt(above.contentMatchAt(before));
+    if (!type || !above.canReplaceWith(before, before, type)) {
+        return false;
+    }
+    if (dispatch) {
+        const pos = $head.before(), tr = state.tr.replaceWith(pos, pos, type.createAndFill()!);
+        tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
+        dispatch(tr.scrollIntoView());
+    }
+    return true;
+}
+
+let codeEditorThemeExtension: Extension | undefined;
+let themePreference = ThemePreference.Auto;
+
 class TavenemCodeEditor {
     _editors: Record<string, CodeEditorInfo> = {};
 
@@ -437,8 +483,7 @@ class TavenemCodeEditor {
                 }
 
                 const editor = tavenemCodeEditor._editors[div.id];
-                if (!editor
-                    || !editor.options.updateOnInput) {
+                if (!editor) {
                     return;
                 }
 
@@ -490,12 +535,53 @@ class TavenemCodeEditor {
         if (options.autoFocus) {
             view.focus();
         }
+
+        return this._editors[elementId];
+    }
+
+    updateSelectedText(elementId: string, value?: string) {
+        const editor = this._editors[elementId];
+        if (!editor) {
+            return;
+        }
+
+        if (!value || !value.length) {
+            editor.view.dispatch(editor.view.state.replaceSelection(''));
+        } else {
+            editor.view.dispatch(editor.view.state.replaceSelection(value));
+        }
+
+        editor.ref.invokeMethodAsync(
+            "OnChangeInvoked",
+            editor.view.state.doc.toString());
     }
 
     private onInput(elementId: string) {
         const editor = this._editors[elementId];
         if (editor) {
-            editor.ref.invokeMethodAsync("OnChangeInvoked", editor.view.state.doc.toString());
+            const updateInfo: UpdateInfo = {
+                commands: {},
+                currentNode: null,
+            };
+            updateInfo.commands[CommandType.Undo] = {
+                active: false,
+                enabled: codeUndo({
+                    state: editor.view.state,
+                    dispatch: _ => {},
+                }),
+            };
+            updateInfo.commands[CommandType.Redo] = {
+                active: false,
+                enabled: codeRedo({
+                    state: editor.view.state,
+                    dispatch: _ => { },
+                }),
+            };
+            editor.ref.invokeMethodAsync("UpdateCommands", updateInfo);
+
+            if (editor.options.updateOnInput) {
+                editor.ref.invokeMethodAsync("OnChangeInvoked", editor.view.state.doc.toString());
+            }
         }
     }
 }
@@ -517,12 +603,29 @@ class MenuView {
     }
 
     update() {
-        const commandUpdate: {
-            [type in CommandType]?: {
-                active: boolean,
-                enabled: boolean,
+        const updateInfo: UpdateInfo = {
+            commands: {},
+            currentNode: null,
+        };
+
+        const head = this._editorView.state.selection.$head;
+        const depth = head.sharedDepth(this._editorView.state.selection.anchor);
+        if (depth == 0) {
+            updateInfo.currentNode = 'document';
+        } else {
+            let path = '';
+            for (let i = 1; i <= depth; i++) {
+                if (path.length) {
+                    path += ' > ';
+                }
+                path += this.nodeName(head.node(i));
             }
-        } = {};
+            if (path.length == 0) {
+                path = this.nodeName(this._editorView.state.selection.$head.parent);
+            }
+            updateInfo.currentNode = path;
+        }
+
         for (const type in this._commands) {
             const commandType = type as unknown as CommandType;
             const command = this._commands[commandType];
@@ -531,31 +634,38 @@ class MenuView {
                     active: false,
                     enabled: false,
                 };
-                if (command.isActive && command.markType) {
+                if (command.isActive) {
                     update.active = command.isActive(this._editorView.state, command.markType);
                 }
-                update.enabled = command.command(this._editorView.state, undefined, this._editorView);
-                commandUpdate[commandType] = update;
+                update.enabled = command.isEnabled
+                    ? command.isEnabled(this._editorView.state)
+                    : command.command(this._editorView.state, undefined, this._editorView);
+                updateInfo.commands[commandType] = update;
             }
         }
-        this._ref.invokeMethodAsync("UpdateCommands", commandUpdate);
+        this._ref.invokeMethodAsync("UpdateCommands", updateInfo);
+    }
+
+    private nodeName(node: ProsemirrorNode) {
+        let name = node.type.name.replace('_', ' ');
+        if (node.type == this._editorView.state.schema.nodes.heading) {
+            name += ' ' + node.attrs.level;
+        }
+        return name;
     }
 }
 
 class CodeBlockView {
+    dom: Node;
     _cm: EditorView;
-    _getPos: () => number;
     _languageCompartment = new Compartment;
-    _node: ProsemirrorNode;
     _syntax: string | null;
     _updating = false;
-    _view: PMEditorView;
 
-    constructor(node: ProsemirrorNode, view: PMEditorView, getPos: () => number) {
-        this._node = node;
-        this._view = view;
-        this._getPos = getPos;
-
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number) {
         if (!codeEditorThemeExtension) {
             codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
                 ? codeEditorDarkExtension
@@ -572,42 +682,32 @@ class CodeBlockView {
             .concat([
                 codeEditorThemeExtension,
                 this._languageCompartment.of(languageExtension),
-                EditorView.updateListener.of(update => {
-                    if (update.docChanged && !this._updating) {
-                        this.valueChanged(update.view);
-                        this.forwardSelection(update.view);
-                        return;
-                    }
-
-                    if (update.selectionSet && !this._updating) {
-                        this.forwardSelection(update.view);
-                    }
-                }),
+                EditorView.updateListener.of(update => this.listen.call(this, update)),
                 EditorView.domEventHandlers({
-                    'focus': function (_, view) {
-                        this.forwardSelection(view);
-                    }
+                    'focus': (_, view) => this.forwardSelection(view)
                 }),
                 EditorView.editorAttributes.of(_ => {
                     if (this._syntax && this._syntax.length) {
-                        return {
-                            dataLanguage: this._syntax
-                        };
+                        const attrs: { [name: string]: string } = {};
+                        attrs['data-language'] = this._syntax;
+                        return attrs;
                     }
                     return null;
                 }),
             ]);
         this._cm = new EditorView({
             state: EditorState.create({
-                doc: this._node.textContent,
+                doc: this.node.textContent,
                 extensions: extensions,
             }),
         });
-        
+        const div = document.createElement('div');
+        div.appendChild(this._cm.dom);
+        this.dom = div;
     }
 
     asProseMirrorSelection(view: EditorView, doc: ProsemirrorNode) {
-        const offset = this._getPos() + 1;
+        const offset = this.getPos() + 1;
         const anchor = view.state.selection.main.anchor + offset;
         const head = view.state.selection.main.head + offset;
         return TextSelection.create(doc, anchor, head);
@@ -620,10 +720,20 @@ class CodeBlockView {
             { key: "ArrowUp", run: this.maybeEscape("line", -1), preventDefault: true, },
             { key: "ArrowDown", run: this.maybeEscape("line", 1), preventDefault: true, },
             {
+                key: "Shift-Ctrl-Enter",
+                run: () => {
+                    if (exitCodeUp(this.view.state, this.view.dispatch)) {
+                        this.view.focus();
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
                 key: "Ctrl-Enter",
                 run: () => {
-                    if (exitCode(this._view.state, this._view.dispatch)) {
-                        this._view.focus();
+                    if (exitCode(this.view.state, this.view.dispatch)) {
+                        this.view.focus();
                         return true;
                     }
                     return false;
@@ -632,7 +742,7 @@ class CodeBlockView {
             {
                 key: "Mod-z",
                 run: () => {
-                    undo(this._view.state, this._view.dispatch);
+                    undo(this.view.state, this.view.dispatch);
                     return true;
                 }
             },
@@ -640,7 +750,7 @@ class CodeBlockView {
                 key: "Mod-y",
                 mac: "Mod-Shift-z",
                 run: () => {
-                    redo(this._view.state, this._view.dispatch);
+                    redo(this.view.state, this.view.dispatch);
                     return true;
                 }
             },
@@ -653,9 +763,21 @@ class CodeBlockView {
         if (!view.hasFocus) {
             return;
         }
-        const selection = this.asProseMirrorSelection(view, this._view.state.doc);
-        if (!selection.eq(this._view.state.selection)) {
-            this._view.dispatch(this._view.state.tr.setSelection(selection));
+        const selection = this.asProseMirrorSelection(view, this.view.state.doc);
+        if (!selection.eq(this.view.state.selection)) {
+            this.view.dispatch(this.view.state.tr.setSelection(selection));
+        }
+    }
+
+    listen(update: ViewUpdate) {
+        if (update.docChanged && !this._updating) {
+            this.valueChanged(update.view);
+            this.forwardSelection(update.view);
+            return;
+        }
+
+        if (update.selectionSet && !this._updating) {
+            this.forwardSelection(update.view);
         }
     }
 
@@ -671,11 +793,11 @@ class CodeBlockView {
                     && pos.head != (dir < 0 ? line.from : line.to))) {
                 return false;
             }
-            this._view.focus();
-            const targetPos = this._getPos() + (dir < 0 ? 0 : this._node.nodeSize);
-            const selection = Selection.near(this._view.state.doc.resolve(targetPos), dir);
-            this._view.dispatch(this._view.state.tr.setSelection(selection).scrollIntoView());
-            this._view.focus();
+            this.view.focus();
+            const targetPos = this.getPos() + (dir < 0 ? 0 : this.node.nodeSize);
+            const selection = Selection.near(this.view.state.doc.resolve(targetPos), dir);
+            this.view.dispatch(this.view.state.tr.setSelection(selection).scrollIntoView());
+            this.view.focus();
             return true;
         };
     }
@@ -692,10 +814,10 @@ class CodeBlockView {
     stopEvent() { return true }
 
     update(node: ProsemirrorNode) {
-        if (node.type != this._node.type) {
+        if (node.type != this.node.type) {
             return false;
         }
-        this._node = node;
+        this.node = node;
 
         const spec: TransactionSpec = {};
         const change = computeChange(this._cm.state.doc.toString(), node.textContent);
@@ -727,16 +849,88 @@ class CodeBlockView {
     }
 
     valueChanged(view: EditorView) {
-        const change = computeChange(this._node.textContent, view.state.doc.toString())
+        const change = computeChange(this.node.textContent, view.state.doc.toString());
         if (change) {
-            const start = this._getPos() + 1;
-            this._view.dispatch(this._view.state.tr.replaceWith(
+            const start = this.getPos() + 1;
+            this.view.dispatch(this.view.state.tr.replaceWith(
                 start + change.from,
                 start + change.to,
                 change.text
-                    ? this._view.state.schema.text(change.text)
-                    : null));
+                    ? this.view.state.schema.text(change.text)
+                    : Fragment.empty));
         }
+    }
+}
+
+class HeadView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true }
+
+    update(node: ProsemirrorNode) {
+        if (node.type != this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const head = document.createElement('head');
+        head.appendChild(DOMSerializer
+            .fromSchema(node.type.schema)
+            .serializeFragment(node.content));
+        const value = html_beautify(head.innerHTML, {
+            extra_liners: [],
+            indent_size: 2,
+            wrap_line_length: 0,
+        });
+        const dom = document.createElement('head');
+        dom.appendChild(document.createComment(value));
+        return dom;
+    }
+}
+
+class ForbiddenView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true }
+
+    update(node: ProsemirrorNode) {
+        if (node.type != this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const div = document.createElement('div');
+        div.appendChild(DOMSerializer
+            .fromSchema(node.type.schema)
+            .serializeNode(node));
+        const value = html_beautify(div.innerHTML, {
+            extra_liners: [],
+            indent_size: 2,
+            wrap_line_length: 0,
+        });
+        const dom = document.createElement('div');
+        dom.appendChild(document.createComment(value));
+        return dom;
     }
 }
 
@@ -758,16 +952,21 @@ class TavenemWysiwygEditor {
         delete this._editors[elementId];
     }
 
-    getContent(editor: PMEditorView) {
+    getContent(editor: WysiwygEditorInfo) {
         let value;
-        if (editor.state.schema == markdownSchema) {
-            value = tavenemMarkdownSerializer.serialize(editor.state.doc);
+        if (editor.isMarkdown) {
+            value = tavenemMarkdownSerializer.serialize(editor.view.state.doc);
         } else {
             const div = document.createElement('div');
             div.appendChild(DOMSerializer
-                .fromSchema(editor.state.schema)
-                .serializeFragment(editor.state.doc.content));
+                .fromSchema(editor.view.state.schema)
+                .serializeFragment(editor.view.state.doc.content));
             value = div.innerHTML;
+            value = html_beautify(value, {
+                extra_liners: [],
+                indent_size: 2,
+                wrap_line_length: 0,
+            });
         }
         return value;
     }
@@ -794,74 +993,106 @@ class TavenemWysiwygEditor {
                 : codeEditorLightTheme);
         }
 
-        const editorSchema = options.syntax == 'markdown'
-            ? markdownSchema
-            : htmlSchema;
+        const isMarkdown = options.syntax == 'Markdown';
 
         let doc: ProsemirrorNode;
-        if (options.syntax == 'markdown') {
+        if (isMarkdown) {
             doc = tavenemMarkdownParser.parse(options.initialValue || '');
         } else {
             const div = document.createElement('div');
             if (options.initialValue) {
-                div.innerHTML = options.initialValue;
+                if (options.initialValue.trimStart().startsWith('<html')) {
+                    div.appendChild(new DOMParser()
+                        .parseFromString(options.initialValue, 'text/html')
+                        .documentElement);
+                } else {
+                    div.innerHTML = options.initialValue;
+                }
             }
-            doc = DOMParser
-                .fromSchema(editorSchema)
+            doc = PMDOMParser
+                .fromSchema(schema)
                 .parse(div);
         }
 
-        const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, editorSchema.nodes.math_inline);
-        const blockMathInputRule = makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, editorSchema.nodes.math_display);
+        const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline);
+        const blockMathInputRule = makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, schema.nodes.math_display);
 
-        const commands = commonCommands(editorSchema);
+        const commands = commonCommands(schema);
         const menu = new Plugin({
             view(editorView) {
                 return new MenuView(dotNetRef, commands, editorView);
             }
-        });;
-
-        let state = PMEditorState.create({
-            doc,
-            plugins: [
-                mathPlugin,
-                arrowHandlers,
-                inputRules({ rules: [inlineMathInputRule, blockMathInputRule] }),
-                buildInputRules(editorSchema),
-                pmKeymap({
-                    "Mod-Space": insertMathCmd(editorSchema.nodes.math_inline),
-                    "Backspace": chainCommands(deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
-                    "Tab": goToNextCell(1),
-                    "Shift-Tab": goToNextCell(-1),
-                }),
-                pmKeymap(buildKeymap(editorSchema)),
-                pmKeymap(baseKeymap),
-                pmDropCursor(),
-                gapCursor(),
-                pmHistory(),
-                columnResizing({}),
-                tableEditing()
-            ]
         });
+
+        const placeholder = (text: string) => new Plugin({
+            props: {
+                decorations(state) {
+                    const doc = state.doc;
+                    if (doc.childCount > 1
+                        || (doc.firstChild
+                            && (!doc.firstChild.isTextblock
+                                || doc.firstChild.content.size > 0))) {
+                        return null;
+                    }
+                    const div = document.createElement('div');
+                    div.classList.add('editor-placeholder');
+                    div.textContent = text;
+                    return DecorationSet.create(doc, [Decoration.widget(1, div)]);
+                }
+            }
+        });
+
+        const plugins = [
+            mathPlugin,
+            arrowHandlers,
+            inputRules({ rules: [inlineMathInputRule, blockMathInputRule] }),
+            buildInputRules(schema),
+            pmKeymap({
+                "Mod-Space": insertMathCmd(schema.nodes.math_inline),
+                "Backspace": chainCommands(deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
+                "Tab": goToNextCell(1),
+                "Shift-Tab": goToNextCell(-1),
+                "Ctrl-Enter": exitDiv,
+            }),
+            pmKeymap(buildKeymap(schema)),
+            pmKeymap(baseKeymap),
+            pmDropCursor(),
+            gapCursor(),
+            pmHistory(),
+            columnResizing,
+            tableEditing,
+        ];
+        if (options.placeholder) {
+            plugins.push(placeholder(options.placeholder));
+        }
+
+        let state = PMEditorState.create({ doc, plugins });
         const fixed = fixTables(state);
         if (fixed) {
             state = state.apply(fixed.setMeta("addToHistory", false));
         }
+
         const view = new PMEditorView(element, {
             state: state,
             plugins: [menu],
             clipboardTextSerializer: slice => { return mathSerializer.serializeSlice(slice) },
             nodeViews: {
-                code_block: (node, view, getPos, _) => new CodeBlockView(node, view, getPos)
+                code_block: (node, view, getPos, _) => new CodeBlockView(node, view, getPos),
+                table: (node, view, getPos, _) => new TableView(node, cellMinWidth),
+                head: (node, view, getPos, _) => new HeadView(node, view, getPos),
+                iframe: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                noscript: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                object: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                script: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
             },
             dispatchTransaction(tr) {
-                this.updateState(this.state.apply(tr));
+                (this as unknown as PMEditorView).updateState(this.state.apply(tr));
 
                 if (!tr.docChanged) {
                     return;
                 }
 
-                const div = this.dom.parentElement;
+                const div = (this as unknown as PMEditorView).dom.parentElement;
                 if (!div) {
                     return;
                 }
@@ -880,7 +1111,7 @@ class TavenemWysiwygEditor {
                     500);
             },
             handleDOMEvents: {
-                'blur': function (view, e) {
+                'blur': function (view, _) {
                     const div = view.dom.parentElement;
                     if (!div) {
                         return true;
@@ -891,13 +1122,14 @@ class TavenemWysiwygEditor {
                     }
                     editor.ref.invokeMethodAsync(
                         "OnChangeInvoked",
-                        tavenemWysiwygEditor.getContent(view));
+                        tavenemWysiwygEditor.getContent(editor));
                     return true;
                 }
             }
         });
         this._editors[elementId] = {
             commands: commands,
+            isMarkdown,
             view,
             options,
             ref: dotNetRef,
@@ -905,6 +1137,8 @@ class TavenemWysiwygEditor {
         if (options.readOnly) {
             this.setReadOnly(view, options.readOnly);
         }
+
+        return this._editors[elementId];
     }
 
     setReadOnly(editor: PMEditorView | undefined, value: boolean) {
@@ -921,15 +1155,15 @@ class TavenemWysiwygEditor {
 
         if (!value || !value.length) {
             deleteSelection(editor.view.state, editor.view.dispatch);
+        } else {
+            const node = editor.view.state.schema.text(value);
+            editor.view.state.applyTransaction(
+                editor.view.state.tr.replaceSelectionWith(node));
         }
-
-        const node = editor.view.state.schema.text(value);
-        editor.view.state.applyTransaction(
-            editor.view.state.tr.replaceSelectionWith(node));
 
         editor.ref.invokeMethodAsync(
             "OnChangeInvoked",
-            this.getContent(editor.view));
+            this.getContent(editor));
     }
 
     private onInput(elementId: string) {
@@ -937,7 +1171,7 @@ class TavenemWysiwygEditor {
         if (editor) {
             editor.ref.invokeMethodAsync(
                 "OnChangeInvoked",
-                this.getContent(editor.view));
+                this.getContent(editor));
         }
     }
 }
@@ -947,10 +1181,14 @@ export function activateCommand(elementId: string, type: CommandType, params?: a
     const codeEditor = tavenemCodeEditor._editors[elementId];
     if (codeEditor) {
         let command: ParamStateCommand | undefined;
-        if (codeEditor.options.syntax == 'html') {
+        if (codeEditor.options.syntax == 'HTML') {
             command = htmlCommands[type];
-        } else if (codeEditor.options.syntax == 'markdown') {
+        } else if (codeEditor.options.syntax == 'Markdown') {
             command = markdownCommands[type];
+        } else if (type == CommandType.Undo) {
+            command = _ => codeUndo;
+        } else if (type == CommandType.Redo) {
+            command = _ => codeRedo;
         }
         if (command) {
             command(params)({
@@ -969,7 +1207,7 @@ export function activateCommand(elementId: string, type: CommandType, params?: a
 
     const command = wysiwygEditor.commands[type];
     if (command) {
-        command.command(wysiwygEditor.view.state, wysiwygEditor.view.dispatch, wysiwygEditor.view);
+        command.command(wysiwygEditor.view.state, wysiwygEditor.view.dispatch, wysiwygEditor.view, params);
         wysiwygEditor.view.focus();
     }
 }
@@ -1050,6 +1288,7 @@ export function setEditorMode(elementId: string, value: EditorMode) {
         }
 
         const options = editor.options;
+        options.autoFocus = true;
         options.initialValue = editor.view.state.doc.toString();
         options.mode = value;
 
@@ -1059,6 +1298,7 @@ export function setEditorMode(elementId: string, value: EditorMode) {
             elementId,
             editor.ref,
             options);
+
     } else {
         const existingEditor = tavenemCodeEditor._editors[elementId];
         if (existingEditor) {
@@ -1071,7 +1311,8 @@ export function setEditorMode(elementId: string, value: EditorMode) {
         }
 
         const options = editor.options;
-        options.initialValue = tavenemWysiwygEditor.getContent(editor.view);
+        options.autoFocus = true;
+        options.initialValue = tavenemWysiwygEditor.getContent(editor);
         options.mode = value;
         options.theme = themePreference;
 
@@ -1122,14 +1363,14 @@ export async function setSyntax(elementId: string, value: string) {
             if (codeEditor.options.syntax == 'HTML'
                 && value == 'Markdown') {
                 div.innerHTML = codeEditor.view.state.doc.toString();
-                const node = DOMParser
-                    .fromSchema(htmlSchema)
+                const node = PMDOMParser
+                    .fromSchema(schema)
                     .parse(div);
                 text = tavenemMarkdownSerializer.serialize(node);
             } else {
                 const node = tavenemMarkdownParser.parse(codeEditor.view.state.doc.toString());
                 div.appendChild(DOMSerializer
-                    .fromSchema(htmlSchema)
+                    .fromSchema(schema)
                     .serializeFragment(node.content));
                 text = div.innerHTML;
             }
@@ -1172,7 +1413,7 @@ export async function setSyntax(elementId: string, value: string) {
             .serializeFragment(wysiwygEditor.view.state.doc.content));
         text = div.innerHTML;
     } else {
-        text = tavenemWysiwygEditor.getContent(wysiwygEditor.view);
+        text = tavenemWysiwygEditor.getContent(wysiwygEditor);
     }
 
     options.initialValue = text;
@@ -1216,12 +1457,12 @@ export function setValue(elementId: string, value?: string) {
     }
     if (value) {
         let content;
-        if (wysiwygEditor.view.state.schema == markdownSchema) {
+        if (wysiwygEditor.isMarkdown) {
             content = tavenemMarkdownParser.parse(value);
         } else {
             const div = document.createElement('div');
             div.innerHTML = value;
-            content = DOMParser
+            content = PMDOMParser
                 .fromSchema(wysiwygEditor.view.state.schema)
                 .parse(div);
         }
@@ -1240,7 +1481,12 @@ export function setValue(elementId: string, value?: string) {
     }
 }
 
-export function updateWysiwygEditorSelectedText(elementId: string, value?: string) {
+export function updateSelectedText(elementId: string, value?: string) {
+    const codeEditor = tavenemCodeEditor._editors[elementId];
+    if (codeEditor) {
+        tavenemCodeEditor.updateSelectedText(elementId, value);
+    }
+
     tavenemWysiwygEditor.updateSelectedText(elementId, value);
 }
 
@@ -1285,4 +1531,14 @@ function computeChange(oldVal: string, newVal: string) {
         to: oldEnd,
         text: newVal.slice(start, newEnd),
     };
+}
+
+function defaultBlockAt(match: ContentMatch) {
+    for (let i = 0; i < match.edgeCount; i++) {
+        const { type } = match.edge(i);
+        if (type.isTextblock && !type.hasRequiredAttrs()) {
+            return type;
+        }
+    }
+    return null;
 }

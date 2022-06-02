@@ -9,39 +9,46 @@ internal static class ElementReferenceExtensions
     private static readonly PropertyInfo? _jsRuntimeProperty =
             typeof(WebElementReferenceContext).GetProperty("JSRuntime", BindingFlags.Instance | BindingFlags.NonPublic);
 
-    public static ValueTask<int> AddEventListenerAsync<T>(
+    public static async ValueTask<int> AddEventListenerAsync<T>(
         this ElementReference elementReference,
         DotNetObjectReference<T> dotNetRef,
         string @event,
         string callback,
         bool stopPropagation = false) where T : class
     {
-        var parameters = dotNetRef
-            .Value
-            .GetType()
-            .GetMethods()
-            .FirstOrDefault(x => x.Name == callback)?
-            .GetParameters()
-            .Select(x => x.ParameterType)
-            .ToList();
-        if (parameters is null)
+        try
         {
-            return ValueTask.FromResult(0);
-        }
+            var parameters = dotNetRef
+                .Value
+                .GetType()
+                .GetMethods()
+                .FirstOrDefault(x => x.Name == callback)?
+                .GetParameters()
+                .Select(x => x.ParameterType)
+                .ToList();
+            if (parameters is null)
+            {
+                return 0;
+            }
 
-        var parameterSpecs = new Dictionary<string, object>[parameters.Count];
-        for (var i = 0; i < parameters.Count; ++i)
+            var parameterSpecs = new Dictionary<string, object>[parameters.Count];
+            for (var i = 0; i < parameters.Count; ++i)
+            {
+                parameterSpecs[i] = GetSerializationSpec(parameters[i]);
+            }
+
+            return await elementReference.InvokeAsync<int>(
+                "addEventListener",
+                dotNetRef,
+                @event,
+                callback,
+                parameterSpecs,
+                stopPropagation);
+        }
+        catch (ObjectDisposedException)
         {
-            parameterSpecs[i] = GetSerializationSpec(parameters[i]);
+            return 0;
         }
-
-        return elementReference.InvokeAsync<int>(
-            "addEventListener",
-            dotNetRef,
-            @event,
-            callback,
-            parameterSpecs,
-            stopPropagation);
     }
 
     public static ValueTask ChangeCssClassNameAsync(this ElementReference elementReference, string className)
@@ -166,6 +173,10 @@ internal static class ElementReferenceExtensions
                 finalArgs.AddRange(args);
             }
             return await module.InvokeAsync<TValue>(identifier, finalArgs.ToArray());
+        }
+        catch (ObjectDisposedException)
+        {
+            return default;
         }
         finally
         {

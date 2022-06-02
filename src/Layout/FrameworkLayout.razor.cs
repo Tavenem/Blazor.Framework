@@ -331,10 +331,12 @@ public partial class FrameworkLayout : IDisposable
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (uri.Fragment.Length == 0)
         {
-            return;
+            await ScrollService.ScrollToTop("#main-container");
         }
-
-        await ScrollService.ScrollToId(uri.Fragment[1..]);
+        else
+        {
+            await ScrollService.ScrollToId(uri.Fragment[1..]);
+        }
     }
 
     private void OnSnackbarsUpdated() => InvokeAsync(StateHasChanged);

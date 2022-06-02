@@ -11,6 +11,9 @@ interface IPopoverScroller extends HTMLElement {
 
 interface IPopoverElement extends HTMLElement {
     anchorId?: string | null;
+    clientX?: number;
+    clientY?: number;
+    focusId?: string | null;
     offsetX?: number;
     offsetY?: number;
     parent?: HTMLElement | null;
@@ -20,6 +23,8 @@ interface IPopoverElement extends HTMLElement {
 
 interface IPopoverMapItem {
     anchorId: string | null;
+    dotNetRef?: DotNet.DotNetObject;
+    focusTimer?: number;
     mutationObserver: MutationObserver;
     parentResizeObserver: ResizeObserver;
     resizeObserver: ResizeObserver;
@@ -67,13 +72,19 @@ const map: Record<string, IPopoverMapItem> = {};
 
 let contentObserver: ResizeObserver | null = null;
 
-export function popoverConnect(id: string, anchorId: string | null) {
+export function popoverConnect(id: string, dotNetRef: DotNet.DotNetObject, anchorId: string | null, focusId: string | null) {
     popoverInitialize();
 
     const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
     if (!popoverNode) {
         return;
     }
+
+    popoverNode.addEventListener('click', cancelFocusLoss);
+    popoverNode.addEventListener('touchstart', cancelFocusLoss);
+    popoverNode.addEventListener('contextmenu', cancelFocusLoss);
+
+    popoverNode.focusId = focusId;
 
     popoverNode.anchorId = anchorId;
     const anchor = anchorId ? document.getElementById(anchorId) : null;
@@ -146,7 +157,8 @@ export function popoverConnect(id: string, anchorId: string | null) {
     }
 
     map[id] = {
-        anchorId: anchorId,
+        anchorId,
+        dotNetRef,
         mutationObserver: observer,
         parentResizeObserver: parentResizeObserver,
         resizeObserver: resizeObserver,
@@ -156,6 +168,12 @@ export function popoverConnect(id: string, anchorId: string | null) {
 export function popoverDisconnect(id: string) {
     const item = map[id];
     if (item) {
+        const popoverNode = document.getElementById(`popover-${id}`);
+        if (popoverNode) {
+            popoverNode.removeEventListener('click', cancelFocusLoss);
+            popoverNode.removeEventListener('touchstart', cancelFocusLoss);
+            popoverNode.removeEventListener('contextmenu', cancelFocusLoss);
+        }
         item.resizeObserver.disconnect();
         item.mutationObserver.disconnect();
         item.parentResizeObserver.disconnect();
@@ -197,11 +215,9 @@ export function popoverInitialize() {
 
 export function setPopoverOffset(id: string, offsetX: number | null, offsetY: number | null) {
     const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
-    if (!popoverNode
-        || !popoverNode.parent) {
+    if (!popoverNode) {
         return;
     }
-    const boundingRect = popoverNode.parent.getBoundingClientRect();
 
     const prevX = popoverNode.offsetX;
     const prevY = popoverNode.offsetY;
@@ -214,11 +230,11 @@ export function setPopoverOffset(id: string, offsetX: number | null, offsetY: nu
         if (popoverNode.style.left) {
             left = Number.parseFloat(popoverNode.style.left.substr(0, popoverNode.style.left.length - 2));
         }
-        if (prevX || prevX === 0) {
-            left -= prevX - boundingRect.left;
+        if (prevX) {
+            left -= prevX;
         }
-        if (popoverNode.offsetX || popoverNode.offsetX === 0) {
-            left += popoverNode.offsetX - boundingRect.left;
+        if (popoverNode.offsetX) {
+            left += popoverNode.offsetX;
         }
         popoverNode.style.left = +left.toFixed(2) + 'px';
     }
@@ -228,51 +244,67 @@ export function setPopoverOffset(id: string, offsetX: number | null, offsetY: nu
         if (popoverNode.style.top) {
             top = Number.parseFloat(popoverNode.style.top.substr(0, popoverNode.style.top.length - 2));
         }
-        if (prevY || prevY === 0) {
-            top -= prevY - boundingRect.top;
+        if (prevY) {
+            top -= prevY;
         }
-        if (popoverNode.offsetY || popoverNode.offsetY === 0) {
-            top += popoverNode.offsetY - boundingRect.top;
+        if (popoverNode.offsetY) {
+            top += popoverNode.offsetY;
         }
         popoverNode.style.top = +top.toFixed(2) + 'px';
+    }
+}
+
+export function setPopoverPosition(id: string, clientX: number | null, clientY: number | null) {
+    const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
+    if (!popoverNode) {
+        return;
+    }
+
+    popoverNode.clientX = clientX ? clientX : undefined;
+    popoverNode.clientY = clientY ? clientY : undefined;
+
+    if (popoverNode.clientX) {
+        popoverNode.style.left = popoverNode.clientX.toFixed(2) + 'px';
+    }
+
+    if (popoverNode.clientY) {
+        popoverNode.style.top = popoverNode.clientY.toFixed(2) + 'px';
     }
 }
 
 function calculatePopoverPosition(
     list: string[],
     boundingRect: DOMRect,
-    anchorOffsetLeft: number,
-    anchorOffsetTop: number,
     selfRect: DOMRect): IPopoverPosition {
-    let top = anchorOffsetLeft;
-    let left = anchorOffsetTop;
+    let top = 0;
+    let left = 0;
     if (list.indexOf('anchor-top-left') >= 0) {
-        left = anchorOffsetLeft;
-        top = anchorOffsetTop;
+        left = 0;
+        top = 0;
     } else if (list.indexOf('anchor-top-center') >= 0) {
-        left = anchorOffsetLeft + boundingRect.width / 2;
-        top = anchorOffsetTop;
+        left = 0 + boundingRect.width / 2;
+        top = 0;
     } else if (list.indexOf('anchor-top-right') >= 0) {
-        left = anchorOffsetLeft + boundingRect.width;
-        top = anchorOffsetTop;
+        left = 0 + boundingRect.width;
+        top = 0;
     } else if (list.indexOf('anchor-center-left') >= 0) {
-        left = anchorOffsetLeft;
-        top = anchorOffsetTop + boundingRect.height / 2;
+        left = 0;
+        top = 0 + boundingRect.height / 2;
     } else if (list.indexOf('anchor-center-center') >= 0) {
-        left = anchorOffsetLeft + boundingRect.width / 2;
-        top = anchorOffsetTop + boundingRect.height / 2;
+        left = 0 + boundingRect.width / 2;
+        top = 0 + boundingRect.height / 2;
     } else if (list.indexOf('anchor-center-right') >= 0) {
-        left = anchorOffsetLeft + boundingRect.width;
-        top = anchorOffsetTop + boundingRect.height / 2;
+        left = 0 + boundingRect.width;
+        top = 0 + boundingRect.height / 2;
     } else if (list.indexOf('anchor-bottom-left') >= 0) {
-        left = anchorOffsetLeft;
-        top = anchorOffsetTop + boundingRect.height;
+        left = 0;
+        top = 0 + boundingRect.height;
     } else if (list.indexOf('anchor-bottom-center') >= 0) {
-        left = anchorOffsetLeft + boundingRect.width / 2;
-        top = anchorOffsetTop + boundingRect.height;
+        left = 0 + boundingRect.width / 2;
+        top = 0 + boundingRect.height;
     } else if (list.indexOf('anchor-bottom-right') >= 0) {
-        left = anchorOffsetLeft + boundingRect.width;
-        top = anchorOffsetTop + boundingRect.height;
+        left = 0 + boundingRect.width;
+        top = 0 + boundingRect.height;
     }
 
     let offsetX = 0;
@@ -327,6 +359,88 @@ function callback(mutationsList: MutationRecord[]): void {
     }
 }
 
+function cancelFocusLoss(e: Event) {
+    const popoverIds: string[] = [];
+    if (e.target instanceof Element) {
+        let popover: Element | null | undefined = e.target.closest('.popover');
+        while (popover) {
+            popoverIds.push(popover.id);
+            popover = popover.parentElement?.closest('.popover');
+        }
+    }
+    if (!popoverIds.length) {
+        return;
+    }
+
+    for (const popoverId of popoverIds) {
+        const id = popoverId.substr(8);
+        const { focusTimer } = map[id];
+        if (focusTimer) {
+            clearTimeout(focusTimer);
+            delete map[id].focusTimer;
+        }
+    }
+}
+
+function focusPopovers(isIn: boolean, e: FocusEvent) {
+    const popoverIds: string[] = [];
+    if (e.target instanceof Element) {
+        let popover: Element | null | undefined = e.target.closest('.popover');
+        if (!popover && isIn) {
+            for (var id in map) {
+                const popoverId = `popover-${id}`;
+                const popover = document.getElementById(popoverId) as IPopoverElement;
+                if (popover && popover.focusId) {
+                    const focusElement = e.target.closest(`#${popover.focusId}`);
+                    if (focusElement) {
+                        popoverIds.unshift(popoverId);
+                    }
+                }
+            }
+        } else {
+            while (popover) {
+                popoverIds.unshift(popover.id);
+                popover = popover.parentElement?.closest('.popover');
+            }
+        }
+    }
+
+    for (var id in map) {
+        const popoverId = `popover-${id}`;
+        const popover = document.getElementById(popoverId) as IPopoverElement;
+        if (!popover || !popover.classList.contains('open')) {
+            continue;
+        }
+
+        const { dotNetRef, focusTimer } = map[id];
+
+        const withinPopover = popoverIds.indexOf(popoverId) != -1;
+        if (isIn) {
+            if (withinPopover) {
+                if (focusTimer) {
+                    clearTimeout(focusTimer);
+                    delete map[id].focusTimer;
+                }
+                continue;
+            }
+        } else if (withinPopover && e.relatedTarget instanceof Element) {
+            const focusedPopover = e.relatedTarget.closest('.popover');
+            if (focusedPopover
+                && focusedPopover.id == popoverId) {
+                continue;
+            }
+        }
+
+        if (!dotNetRef) {
+            continue;
+        }
+
+        map[id].focusTimer = setTimeout((ref: DotNet.DotNetObject) => {
+            ref.invokeMethodAsync('OnFocusLeft');
+        }, 150, dotNetRef);
+    }
+}
+
 function getAllObservedContainers(): string[] {
     const result = [];
     for (const i in map) {
@@ -335,12 +449,41 @@ function getAllObservedContainers(): string[] {
     return result;
 }
 
+function getOffsetParent(element: Element) {
+    if (!element) {
+        return document.documentElement;
+    }
+
+    let offsetParent: Element | null = null;
+    while (offsetParent === null) {
+        if (element.parentElement) {
+            element = element.parentElement;
+        } else {
+            break;
+        }
+        if (element.nodeName == 'HTML') {
+            return element;
+        }
+        const style = window.getComputedStyle(element);
+        if (style.transform != 'none'
+            || style.perspective != 'none'
+            || style.willChange == 'transform'
+            || style.willChange == 'perspective'
+            || style.willChange == 'filter'
+            || style.filter != 'none'
+            || style.contain == 'paint'
+            || style.getPropertyValue('backdrop-filter') != 'none') {
+            return element;
+        }
+    }
+
+    return offsetParent || document.documentElement;
+}
+
 function getPositionForFlippedPopver(
     inputArray: string[],
     selector: string,
     boundingRect: DOMRect,
-    anchorOffsetLeft: number,
-    anchorOffsetTop: number,
     selfRect: DOMRect): IPopoverPosition {
     const classList = [];
     for (let i = 0; i < inputArray.length; i++) {
@@ -357,42 +500,37 @@ function getPositionForFlippedPopver(
     return calculatePopoverPosition(
         classList,
         boundingRect,
-        anchorOffsetLeft,
-        anchorOffsetTop,
         selfRect);
 }
 
 function placePopover(popoverNode: IPopoverElement): void {
     if (!popoverNode
-        || !popoverNode.classList.contains('open')
-        || !popoverNode.parent) {
+        || !popoverNode.classList.contains('open')) {
         return;
     }
 
-    const anchorElementId = popoverNode.anchorId;
-    let anchorElement = anchorElementId ? document.getElementById(anchorElementId) : null;
-    let anchorOffsetLeft = 0;
-    let anchorOffsetTop = 0;
-    if (anchorElement) {
-        if (anchorElement.offsetParent != popoverNode.parent) {
-            anchorElement = null;
-        } else {
-            anchorOffsetLeft = anchorElement.offsetLeft;
-            anchorOffsetTop = anchorElement.offsetTop;
-        }
-    }
+    const offsetParent = getOffsetParent(popoverNode);
+    const offsetBoundingRect = offsetParent.getBoundingClientRect();
 
-    const boundingRect = popoverNode.parent.getBoundingClientRect();
+    const anchorElementId = popoverNode.anchorId;
+    const anchorElement = anchorElementId
+        ? document.getElementById(anchorElementId)
+        : null;
     const anchorBoundingRect = anchorElement
         ? anchorElement.getBoundingClientRect()
-        : boundingRect;
+        : null;
+
+    const boundingRect = anchorElement
+        ? anchorBoundingRect!
+        : popoverNode.parent
+            ? popoverNode.parent.getBoundingClientRect()
+            : offsetBoundingRect;
 
     if (popoverNode.classList.contains('match-width')) {
-        popoverNode.style.width = anchorBoundingRect.width + 'px';
-        popoverNode.style.minWidth = anchorBoundingRect.width + 'px';
-        popoverNode.style.maxWidth = anchorBoundingRect.width + 'px';
-    } else if (popoverNode.classList.contains('limit-width')) {
-        popoverNode.style.maxWidth = anchorBoundingRect.width + 'px';
+        popoverNode.style.minWidth = boundingRect.width + 'px';
+    }
+    if (popoverNode.classList.contains('limit-width')) {
+        popoverNode.style.maxWidth = boundingRect.width + 'px';
     }
 
     const selfRect = popoverNode.getBoundingClientRect();
@@ -401,9 +539,7 @@ function placePopover(popoverNode: IPopoverElement): void {
 
     const postion = calculatePopoverPosition(
         classListArray,
-        anchorBoundingRect,
-        anchorOffsetLeft,
-        anchorOffsetTop,
+        boundingRect,
         selfRect);
     let left = postion.left;
     let top = postion.top;
@@ -412,28 +548,30 @@ function placePopover(popoverNode: IPopoverElement): void {
 
     if (classList.contains('flip-onopen')
         || classList.contains('flip-always')) {
-        const appBarElements = document.getElementsByClassName('appbar');
-        const appBarArray = Array.from(appBarElements);
-
-        const topAppBar = appBarArray.find((v) => { v.classList.contains('top') });
-        let topAppBarOffset = 0;
-        if (topAppBar) {
-            topAppBarOffset = topAppBar.getBoundingClientRect().height;
+        let absLeft = boundingRect.left + left;
+        let absTop = boundingRect.top + top;
+        if (popoverNode.clientX
+            && popoverNode.clientY) {
+            absLeft = popoverNode.clientX + left;
+            absTop = popoverNode.clientY + top;
+        } else if (anchorElement) {
+            const anchorOffsetParent = getOffsetParent(anchorElement);
+            if (anchorOffsetParent != anchorElement.parentElement) {
+                const anchorOffsetBoundingRect = anchorOffsetParent.getBoundingClientRect();
+                absLeft += anchorOffsetBoundingRect.left;
+                absTop += anchorOffsetBoundingRect.top;
+            }
+        } else if (popoverNode.parent
+            && offsetParent != popoverNode.parent) {
+            absLeft += offsetBoundingRect.left;
+            absTop += offsetBoundingRect.top;
         }
 
-        const bottomAppBar = appBarArray.find((v) => { v.classList.contains('bottom') });
-        let bottomAppBarOffset = 0;
-        if (bottomAppBar) {
-            bottomAppBarOffset = bottomAppBar.getBoundingClientRect().height;
-        }
-
-        const absLeft = boundingRect.left + left;
-        const absTop = boundingRect.top + top;
         const deltaToLeft = absLeft + offsetX;
         const deltaToRight = window.innerWidth - absLeft - selfRect.width;
-        const deltaTop = absTop - selfRect.height - topAppBarOffset;
-        const spaceToTop = absTop - topAppBarOffset;
-        const deltaBottom = window.innerHeight - bottomAppBarOffset - absTop - selfRect.height;
+        const deltaTop = absTop - selfRect.height;
+        const spaceToTop = absTop;
+        const deltaBottom = window.innerHeight - absTop - selfRect.height;
 
         let selector = popoverNode.popoverFlipped as string;
 
@@ -493,9 +631,7 @@ function placePopover(popoverNode: IPopoverElement): void {
             const newPosition = getPositionForFlippedPopver(
                 classListArray,
                 selector,
-                anchorBoundingRect,
-                anchorOffsetLeft,
-                anchorOffsetTop,
+                boundingRect,
                 selfRect);
             left = newPosition.left;
             top = newPosition.top;
@@ -512,15 +648,22 @@ function placePopover(popoverNode: IPopoverElement): void {
         }
     }
 
-    offsetX += boundingRect.left;
-    offsetY += boundingRect.top;
+    if (popoverNode.clientX
+        && popoverNode.clientY) {
+        offsetX += popoverNode.clientX;
+        offsetY += popoverNode.clientY;
+    } else {
+        offsetX += boundingRect.left - offsetBoundingRect.left;
+        offsetY += boundingRect.top - offsetBoundingRect.top;
+    }
 
     if (popoverNode.offsetX) {
-        offsetX += popoverNode.offsetX - boundingRect.left;
+        offsetX += popoverNode.offsetX;
     }
     if (popoverNode.offsetY) {
-        offsetY += popoverNode.offsetY - boundingRect.top;
+        offsetY += popoverNode.offsetY;
     }
+
     popoverNode.style.left = (left + offsetX) + 'px';
     popoverNode.style.top = (top + offsetY) + 'px';
 }
@@ -536,6 +679,8 @@ function placePopovers(): void {
     }
 }
 
+document.addEventListener('focusin', focusPopovers.bind(this, true));
+document.addEventListener('focusout', focusPopovers.bind(this, false));
 window.addEventListener('resize', () => {
     placePopovers();
 });

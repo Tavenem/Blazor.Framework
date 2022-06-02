@@ -6,6 +6,10 @@
     right: 1rem;
     z-index: var(--tavenem-zindex-scroll-to-top);
 
+    @media print {
+        display: none;
+    }
+
     &:not(.hidden) {
         transition: transform 0.5s;
     }

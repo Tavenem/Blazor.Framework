@@ -2,7 +2,6 @@
 import { undo, redo } from '@codemirror/commands';
 import {
     CodeCommandSet,
-    CommandSet,
     CommandType,
     htmlWrapCommand,
     ParamStateCommand,
@@ -12,9 +11,30 @@ import {
 export const htmlCommands: CodeCommandSet = {};
 htmlCommands[CommandType.Undo] = _ => undo;
 htmlCommands[CommandType.Redo] = _ => redo;
-for (let i = 0; i < 6; i++) {
-    htmlCommands[(CommandType.Heading1 - i) as CommandType] = wrapCommand(`<h${i}>`, `</h${i}>`);
-}
+htmlCommands[CommandType.Heading] = params => {
+    let level = 1;
+    if (params && params.length) {
+        const i = Number.parseInt(params[0]);
+        if (i >= 1) {
+            level = i;
+        }
+    }
+    const tag = `<h${level}>`;
+    const closeTag = `</h${level}>`;
+    return (target: {
+        state: EditorState;
+        dispatch: (transaction: Transaction) => void;
+    }) => {
+        target.dispatch(target.state.update(target.state.changeByRange(range => ({
+            range: EditorSelection.range(range.from + tag.length, range.to + tag.length),
+            changes: [
+                { from: range.from, insert: tag },
+                { from: range.to, insert: closeTag },
+            ],
+        }))));
+        return true;
+    }
+};
 htmlCommands[CommandType.Paragraph] = wrapCommand("\n<p>\n", "\n</p>\n");
 htmlCommands[CommandType.BlockQuote] = wrapCommand("\n<blockquote>\n", "\n</blockquote>\n");
 htmlCommands[CommandType.CodeBlock] = wrapCommand("\n<pre>\n<code>", "</code>\n</pre>\n");

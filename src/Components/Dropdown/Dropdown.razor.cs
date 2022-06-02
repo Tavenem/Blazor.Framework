@@ -9,7 +9,9 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Dropdown : IAsyncDisposable
 {
-    private readonly AsyncAdjustableTimer _delay;
+    private const Origin _defaultPopoverOrigin = Origin.Top_Left;
+
+    private readonly AdjustableTimer _delay;
     private readonly AdjustableTimer _timer;
 
     private MouseEvent _activation;
@@ -101,7 +103,7 @@ public partial class Dropdown : IAsyncDisposable
     /// splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// Invoked when the dropdown opens or closes.
@@ -202,19 +204,17 @@ public partial class Dropdown : IAsyncDisposable
 
     private Origin AnchorOriginValue => AnchorOriginOverride ?? AnchorOrigin ?? DefaultAnchorOrigin;
 
-    private Origin DefaultAnchorOrigin => HideButton ? Origin.Top_Left : Origin.Bottom_Center;
-
-    private Origin DefaultPopoverOrigin => HideButton ? Origin.Top_Left : Origin.Top_Center;
+    private Origin DefaultAnchorOrigin => HideButton ? Origin.Top_Left : Origin.Bottom_Left;
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
-    private double? PopoverOffsetX { get; set; }
+    private double? PopoverPositionX { get; set; }
 
-    private double? PopoverOffsetY { get; set; }
+    private double? PopoverPositionY { get; set; }
 
-    private Origin PopoverOriginValue => PopoverOrigin ?? DefaultPopoverOrigin;
+    private Origin PopoverOriginValue => PopoverOrigin ?? _defaultPopoverOrigin;
 
     [Inject] private UtilityService UtilityService { get; set; } = default!;
 
@@ -223,7 +223,7 @@ public partial class Dropdown : IAsyncDisposable
     /// </summary>
     public Dropdown()
     {
-        _delay = new(OpenDelayedAsync, 0);
+        _delay = new(OpenDelayed, 0);
         _timer = new(Close, 100);
     }
 
@@ -254,7 +254,7 @@ public partial class Dropdown : IAsyncDisposable
                 _buttonMouseEnterListenerId = await Button.AddEventListenerAsync(
                     _dotNetRef,
                     "mouseenter",
-                    nameof(OnButtonMouseEnterAsync));
+                    nameof(OnButtonMouseEnter));
                 _buttonMouseLeaveListenerId = await Button.AddEventListenerAsync(
                     _dotNetRef,
                     "mouseleave",
@@ -292,8 +292,8 @@ public partial class Dropdown : IAsyncDisposable
         _isMouseOver = false;
         _activation = MouseEvent.None;
         _isOpen = false;
-        PopoverOffsetX = null;
-        PopoverOffsetY = null;
+        PopoverPositionX = null;
+        PopoverPositionY = null;
         StateHasChanged();
     }
 
@@ -301,14 +301,14 @@ public partial class Dropdown : IAsyncDisposable
     /// Invoked by javascript internally.
     /// </summary>
     [JSInvokable]
-    public async Task OnButtonMouseEnterAsync(MouseEventArgs e)
+    public void OnButtonMouseEnter(MouseEventArgs e)
     {
         if (!_isOpen
             && ActivationType.HasFlag(MouseEvent.MouseOver))
         {
             if (Delay <= 0)
             {
-                await OpenAsync(e);
+                Open(e);
             }
             else
             {
@@ -366,7 +366,7 @@ public partial class Dropdown : IAsyncDisposable
     /// </para>
     /// </summary>
     /// <param name="e">An instance of <see cref="MouseEventArgs"/>.</param>
-    public async Task OpenAsync(MouseEventArgs? e)
+    public void Open(MouseEventArgs? e)
     {
         _delay.Cancel();
         _timer.Cancel();
@@ -377,8 +377,8 @@ public partial class Dropdown : IAsyncDisposable
 
         if (OpenAtPointer)
         {
-            PopoverOffsetX = e?.ClientX;
-            PopoverOffsetY = e?.ClientY;
+            PopoverPositionX = e?.ClientX;
+            PopoverPositionY = e?.ClientY;
         }
 
         if (e?.Type == "mouseenter")
@@ -391,10 +391,6 @@ public partial class Dropdown : IAsyncDisposable
         }
 
         _isOpen = true;
-        if (Popover is not null)
-        {
-            await Popover.ElementReference.FocusAsync();
-        }
         StateHasChanged();
     }
 
@@ -419,12 +415,12 @@ public partial class Dropdown : IAsyncDisposable
             if (correctButton
                 && OpenAtPointer)
             {
-                await OpenAsync(e);
+                Open(e);
             }
         }
         else if (!Disabled && correctButton)
         {
-            await OpenAsync(e);
+            Open(e);
         }
 
         if (!correctButton
@@ -503,6 +499,8 @@ public partial class Dropdown : IAsyncDisposable
             _ => MouseEvent.None,
         };
 
+    private static void OnContext() { }
+
     private void OnMouseDown() => _timer.Cancel();
 
     private void OpenDelayed(MouseEventArgs e)
@@ -515,14 +513,14 @@ public partial class Dropdown : IAsyncDisposable
 
         if (OpenAtPointer)
         {
-            PopoverOffsetX = e?.ClientX;
-            PopoverOffsetY = e?.ClientY;
+            PopoverPositionX = e?.ClientX;
+            PopoverPositionY = e?.ClientY;
         }
 
         _delay.Change(Delay);
     }
 
-    private async Task OpenDelayedAsync()
+    private void OpenDelayed()
     {
         _delay.Cancel();
         _timer.Cancel();
@@ -534,10 +532,6 @@ public partial class Dropdown : IAsyncDisposable
         _activation = MouseEvent.MouseOver;
 
         _isOpen = true;
-        if (Popover is not null)
-        {
-            await Popover.ElementReference.FocusAsync();
-        }
         StateHasChanged();
     }
 

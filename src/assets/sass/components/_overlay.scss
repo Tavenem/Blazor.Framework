@@ -25,6 +25,10 @@
     width: 100%;
     z-index: var(--tavenem-zindex-overlay);
 
+    @media print {
+        display: none;
+    }
+
     &.local {
         padding: 1rem;
         position: absolute;

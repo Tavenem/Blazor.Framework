@@ -112,8 +112,9 @@
 
 .date-picker-controls {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 310px;
 
     .active {
         --button-inherited-border-color: var(--date-picker-active-color);
@@ -127,20 +128,6 @@
     @media (max-width: 700px) {
         flex-direction: column;
     }
-}
-
-.date-picker-date-controls,
-.date-picker-time-controls {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-width: 310px;
-    max-width: 350px;
-}
-
-.date-picker-time-controls {
-    align-items: center;
-    justify-content: center;
 }
 
 .date-picker-selection {
@@ -191,6 +178,7 @@
 }
 
 .date-picker-clock {
+    align-self: center;
     background-color: rgba(0,0,0,.07);
     border-radius: 50%;
     height: 260px;

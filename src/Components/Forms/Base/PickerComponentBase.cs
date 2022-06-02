@@ -8,10 +8,6 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// </summary>
 public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 {
-    private readonly AsyncAdjustableTimer _timer;
-
-    private bool _disposedValue;
-
     /// <summary>
     /// <para>
     /// Whether to allow the user to clear the current value.
@@ -79,7 +75,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// Set to a random GUID if not provided.
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// Custom HTML attributes for the select element.
@@ -166,6 +162,10 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected bool Clearable { get; set; }
 
+    private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    private protected string InputId { get; set; } = Guid.NewGuid().ToHtmlId();
+
     private protected bool PopoverOpen { get; set; }
 
     private protected bool ShowPicker => PopoverOpen
@@ -175,10 +175,17 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     private protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString)
         || !string.IsNullOrEmpty(Placeholder);
 
-    /// <summary>
-    /// Constructs a new instance of <see cref="PickerComponentBase{TValue}"/>.
-    /// </summary>
-    protected PickerComponentBase() => _timer = new(ClosePopoverAsync, 100);
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes is not null
+            && AdditionalAttributes.TryGetValue("id", out var id)
+            && id is string idString
+            && !string.IsNullOrEmpty(idString))
+        {
+            ContainerId = idString;
+        }
+    }
 
     /// <summary>
     /// <para>
@@ -202,31 +209,8 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     public virtual async Task FocusAsync() => await ElementReference.FocusAsync();
 
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _timer.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        base.Dispose(disposing);
-    }
-
-    private protected void CancelClose()
-    {
-        Popover?.CancelFocusOut();
-        _timer.Cancel();
-    }
-
     private protected async Task ClosePopoverAsync()
     {
-        _timer.Cancel();
         if (PopoverOpen)
         {
             PopoverOpen = false;
@@ -245,10 +229,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         PopoverOpen = !PopoverOpen;
         if (PopoverOpen)
         {
-            if (Popover is not null)
-            {
-                await Popover.ElementReference.FocusAsync();
-            }
             OnOpenPopover();
         }
         else
@@ -285,6 +265,12 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
                     return TogglePopoverAsync();
                 }
                 break;
+            case "delete":
+                if (CanClear)
+                {
+                    return ClearAsync();
+                }
+                break;
             case " ":
             case "enter":
                 return TogglePopoverAsync();
@@ -294,6 +280,4 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     }
 
     private protected virtual void OnOpenPopover() { }
-
-    private protected void StartClosing() => _timer.Start();
 }

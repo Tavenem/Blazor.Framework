@@ -11,7 +11,7 @@ public partial class ListItemCollapse<TListItem>
     /// <summary>
     /// The id of the header element.
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     [Inject] private DragDropListener DragDropListener { get; set; } = default!;
 

@@ -82,7 +82,10 @@
 </p>
 <p>
 	There are light and dark mode variations of each theme color's hue, saturation, and lightness,
-	as well as the color of text which will show up best against a background of that color. Each color has been selected to meet WCAG 2.0 level AA contrast guidelines when set against the default background color for its color scheme, or when used as a background color with text of the default color.
+	as well as the color of text which will show up best against a background of that color. Each
+	color has been selected to meet WCAG 2.0 level AA contrast guidelines when set against the
+	default background color for its color scheme, or when used as a background color with text of
+	the default color.
 </p>
 <p>
 	Each theme color has two lighter and darker varieties, which can change the lightness value by
@@ -109,12 +112,19 @@
 </p>
 <p>
 	The theme classes are:
-	<ul>
-		@foreach (var color in Enum.GetValues<ThemeColor>().Where(x => x != ThemeColor.None))
-		{
-			<li><code>@color.ToString().ToLowerInvariant()</code></li>
-		}
-	</ul>
+</p>
+<ul>
+	@foreach (var color in Enum.GetValues<ThemeColor>().Where(x => x != ThemeColor.None))
+	{
+		<li><code>@color.ToString().ToLowerInvariant()</code></li>
+	}
+</ul>
+<p>
+	You may note that unlike some other style frameworks, the "success" theme color is a shade of
+	blue, rather than green. This choice was made to provide better support for colorblind users,
+	for whom the contrast between a red "danger" (often used to indicate a failure or error state),
+	and a green "success" may be difficult to determine. Green is used instead for the "info" theme
+	color, as it is generally less critical to visually distinguish "info" and "danger" states.
 </p>
 
 <Heading Level="HeadingLevel.H2" Id="list">Property List</Heading>
@@ -515,7 +525,7 @@
 	<dd>100%<span class="text-muted ms-2">In light mode, the saturation of the warning theme color</span></dd>
 
 	<dt>--tavenem-light-color-warning-lightness</dt>
-	<dd>50%<span class="text-muted ms-2">In light mode, the lightness of the warning theme color</span></dd>
+	<dd>33%<span class="text-muted ms-2">In light mode, the lightness of the warning theme color</span></dd>
 
 	<dt>--tavenem-light-color-warning-text</dt>
 	<dd>var(--tavenem-dark-color-text)<span class="text-muted ms-2">In light mode, the color used for text set against a background with the warning theme color</span></dd>

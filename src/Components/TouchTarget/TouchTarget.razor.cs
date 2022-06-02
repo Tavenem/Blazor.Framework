@@ -46,6 +46,12 @@ public partial class TouchTarget
     /// </remarks>
     [Parameter] public EventCallback<SwipeEventArgs> OnSwipe { get; set; }
 
+    /// <inheritdoc />
+    protected override string? CssStyle => new CssBuilder("touch-action:none")
+        .AddStyle(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
+        .ToString();
+
     private void OnTouchCancel(TouchEventArgs e) => Reset();
 
     private async Task OnTouchEndAsync(TouchEventArgs e)
@@ -64,41 +70,49 @@ public partial class TouchTarget
             return;
         }
 
-        var xEnd = e.Touches.Max(x => x.ClientX);
-        var deltaX = _xDownMin.Value - xEnd;
+        double xEnd, deltaX, yEnd, deltaY;
+        if (e.Touches.Length == 0)
+        {
+            xEnd = _xMaxLast ?? _xDownMax.Value;
+            yEnd = _yMaxLast ?? _yDownMax.Value;
+        }
+        else
+        {
+            xEnd = e.Touches.Max(x => x.ClientX);
+            yEnd = e.Touches.Max(x => x.ClientY);
+        }
+        deltaX = xEnd - _xDownMin.Value;
+        deltaY = yEnd - _yDownMin.Value;
 
-        var yEnd = e.Touches.Max(x => x.ClientY);
-        var deltaY = _yDownMin.Value - yEnd;
-
-        if (Math.Abs(deltaX) < 100
-            && Math.Abs(deltaY) < 100)
+        if (Math.Abs(deltaX) < 10
+            && Math.Abs(deltaY) < 10)
         {
             Reset();
             return;
         }
 
         var leftRightDirection = SwipeDirection.None;
-        if (deltaX > 0)
+        if (deltaX > 10)
         {
             if (_xMax - xEnd < 100)
             {
                 leftRightDirection = SwipeDirection.Right;
             }
         }
-        else if (xEnd - _xMin < 100)
+        else if (deltaX < -10 && xEnd - _xMin < 10)
         {
             leftRightDirection = SwipeDirection.Left;
         }
 
         var upDownDirection = SwipeDirection.None;
-        if (deltaY > 0)
+        if (deltaY > 10)
         {
-            if (_yMax - yEnd < 100)
+            if (_yMax - yEnd < 10)
             {
                 upDownDirection = SwipeDirection.Down;
             }
         }
-        else if (yEnd - _yMin < 100)
+        else if (deltaY < -10 && yEnd - _yMin < 10)
         {
             upDownDirection = SwipeDirection.Up;
         }
@@ -122,6 +136,11 @@ public partial class TouchTarget
     private async Task OnTouchMoveAsync(TouchEventArgs e)
     {
         var currentTouches = e.Touches.Length;
+        if (currentTouches == 0)
+        {
+            return;
+        }
+
         _minTouches = Math.Min(_minTouches ?? 0, currentTouches);
         _maxTouches = Math.Max(_maxTouches ?? 0, currentTouches);
 

@@ -359,7 +359,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         .Add(NoDropClass, DragDropListener.DropValid == false)
         .ToString();
 
-    private string ToolbarId { get; } = Guid.NewGuid().ToString("N");
+    private string ToolbarId { get; } = Guid.NewGuid().ToHtmlId();
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)

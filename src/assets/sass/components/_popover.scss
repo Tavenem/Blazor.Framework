@@ -20,6 +20,10 @@
     width: max-content;
     z-index: var(--tavenem-zindex-tooltip);
 
+    @media print {
+        display: none;
+    }
+
     &.fixed {
         z-index: var(--tavenem-zindex-tooltip);
     }
@@ -34,6 +38,7 @@
         pointer-events: none;
         transition-duration: 0ms;
         transition-delay: 0ms !important;
+        visibility: hidden;
     }
 
     .list {

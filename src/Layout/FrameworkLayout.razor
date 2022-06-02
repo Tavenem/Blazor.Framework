@@ -45,15 +45,13 @@
 <div class="@CssClass" style="@Style">
     <CascadingValue Value="this" IsFixed="true">
         @FrameworkContent
-        <div class="d-flex" style="overflow-y: auto">
-            <main id="main-container" class="container mt-3">
-                @ChildContent
-            </main>
-            @if (ContentsBreakpoint != Breakpoint.None)
-            {
-                <Contents ThemeColor="ThemeColor" Breakpoint="ContentsBreakpoint" />
-            }
-        </div>
+        <main id="main-container" class="container mt-3">
+            @ChildContent
+        </main>
+        @if (ContentsBreakpoint != Breakpoint.None)
+        {
+            <Contents ThemeColor="ThemeColor" Breakpoint="ContentsBreakpoint" Class="d-print-none" Style="grid-area:contents" />
+        }
         @foreach (var dialogReference in _dialogs)
         {
             @dialogReference.RenderFragment

@@ -76,6 +76,11 @@ public static class DefaultIcons
     public static string ColorSelect { get; set; } = "palette";
 
     /// <summary>
+    /// An icon for background color selection.
+    /// </summary>
+    public static string ColorBackgroundSelect { get; set; } = "format_color_fill";
+
+    /// <summary>
     /// Indicates dark mode.
     /// </summary>
     public static string DarkMode { get; set; } = "dark_mode";
@@ -155,6 +160,12 @@ public static class DefaultIcons
     /// </para>
     /// </summary>
     public static string Forward { get; set; } = "chevron_right";
+
+    /// <summary>A help icon.</summary>
+    public static string Help { get; set; } = "help";
+
+    /// <summary>An icon to indicate highlighting.</summary>
+    public static string Highlight { get; set; } = "highlight";
 
     /// <summary>An icon to indicate a horizontal rule.</summary>
     public static string HorizontalRule { get; set; } = "horizontal_rule";
@@ -348,7 +359,10 @@ public static class DefaultIcons
     public static string Superscript { get; set; } = "superscript";
 
     /// <summary>An icon to indicate text style.</summary>
-    public static string Style { get; set; } = "line_weight";
+    public static string Style { get; set; } = "title";
+
+    /// <summary>An icon to indicate a table.</summary>
+    public static string Table { get; set; } = "window";
 
     /// <summary>
     /// An icon for time-only selection.

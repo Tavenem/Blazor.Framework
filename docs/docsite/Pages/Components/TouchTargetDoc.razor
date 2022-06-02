@@ -77,7 +77,7 @@
                 <TouchTarget OnPinch="@OnPinch" OnSwipe="OnSwipe" Style="height:100%;width:100%">
                     @foreach (var msg in _messages)
                     {
-                        <span>@msg</span>
+                        <span>@msg</span><br>
                     }
                 </TouchTarget>
             </div>
@@ -88,7 +88,7 @@
     <TouchTarget OnPinch=""@OnPinch"" OnSwipe=""OnSwipe"" Style=""height:100%;width:100%"">
         @foreach (var msg in _messages)
         {
-            <span>@msg</span>
+            <span>@msg</span><br>
         }
     </TouchTarget>
 </div>
@@ -98,7 +98,7 @@
 
     private void OnPinch(PinchEventArgs e)
     {
-        if (_messages.Count > 5)
+        if (_messages.Count > 2)
         {
             _messages.Dequeue();
         }
@@ -107,7 +107,7 @@
 
     private void OnSwipe(SwipeEventArgs e)
     {
-        if (_messages.Count > 5)
+        if (_messages.Count > 2)
         {
             _messages.Dequeue();
         }
@@ -122,7 +122,7 @@
 
     private void OnPinch(PinchEventArgs e)
     {
-        if (_messages.Count > 5)
+        if (_messages.Count > 2)
         {
             _messages.Dequeue();
         }
@@ -131,7 +131,7 @@
 
     private void OnSwipe(SwipeEventArgs e)
     {
-        if (_messages.Count > 5)
+        if (_messages.Count > 2)
         {
             _messages.Dequeue();
         }

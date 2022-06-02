@@ -671,7 +671,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
 
         var selectedItemsChanged = !selectedItemChanged
-            && newSelectedItems?.SequenceEqual(SelectedItems) != true;
+            && newSelectedItems?.SequenceEqual(SelectedItems) == false;
 
         var reload = false;
         var newRowsPerPage = false;

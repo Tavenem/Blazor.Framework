@@ -4,26 +4,28 @@
 
 <div @attributes="AdditionalAttributes" id="@_elementId" class="@ContainerCssClass">
     <div class="overlay" @onclick="OnOverlayClick" @onclick:stopPropagation="true"></div>
-    <div id="_@Id.ToString("N")" role="dialog" class="@CssClass" style="@CssStyle">
-        @if (!Options.HideHeader)
-        {
-            <div class="header">
-                @if (TitleContent is not null)
-                {
-                    @TitleContent
-                }
-                else if (!string.IsNullOrEmpty(Title))
-                {
-                    <h6>Title</h6>
-                }
-                @if (!Options.HideCloseButton)
-                {
-                    <tf-close @onclick="Cancel" />
-                }
-            </div>
+    <dialog id="_@Id.ToString("N")" open="true" class="@CssClass" style="@CssStyle">
+        <FocusTrap Style="border-radius:inherit">
+            @if (!Options.HideHeader)
+            {
+                <div class="header">
+                    @if (TitleContent is not null)
+                    {
+                        @TitleContent
+                    }
+                    else if (!string.IsNullOrEmpty(Title))
+                    {
+                        <h6>Title</h6>
+                    }
+                    @if (!Options.HideCloseButton)
+                    {
+                        <tf-close @onclick="Cancel" />
+                    }
+                </div>
+            }
             <CascadingValue Value="this" IsFixed="true">
                 @ChildContent
             </CascadingValue>
-        }
-    </div>
+        </FocusTrap>
+    </dialog>
 </div>

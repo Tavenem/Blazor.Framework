@@ -136,8 +136,9 @@
 <Heading Level="HeadingLevel.H2">Style</Heading>
 
 <p>
-    When using the (default) Recursive font, text can be given a "casual" appearance. This value
-    ranges from 0&ndash;1, with 0 being normal and 1 being casual.
+    When using the (default) <a href="https://www.recursive.design/">Recursive</a> font, text can be
+    given a "casual" appearance. This value ranges from 0&ndash;1, with 0 being normal and 1 being
+    casual.
 </p>
 
 <CodeExample Code="@(@"<div>
@@ -219,10 +220,10 @@
     You can display a block quote, and optional footer, with special formatting:
 </p>
 
-<CodeExample Code="@(@"<div>
-    <p class=""blockquote"">""This is a famous quote.""</p>
-    <p class=""blockquote-footer"">by Somebody</p>
-</div>")" />
+<CodeExample Code="@(@"<figure>
+    <blockquote class=""blockquote"">""This is a famous quote.""</blockquote>
+    <figcaption class=""blockquote-footer"">by Somebody</figcaption>
+</figure>")" />
 
 <Heading Level="HeadingLevel.H2">Code</Heading>
 
@@ -231,6 +232,6 @@
     improved visibility, and automatic overflow scrollbar:
 </p>
 
-<CodeExample Code="@(@"<div class=""codeblock"">
-    <code>Sample code</code>
-</div>")" />
+<CodeExample Code="@(@"<pre class=""codeblock"">
+<code>Sample code</code>
+</pre>")" />

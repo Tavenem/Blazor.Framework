@@ -9,6 +9,9 @@
      @onfocusout="OnMouseOut"
      @onmouseover="OnMouseOver"
      @onmouseout="OnMouseOut">
+    <button class="btn btn-icon info tooltip-trigger" tabindex="-1">
+        <tf-icon>@DefaultIcons.Help</tf-icon>
+    </button>
     @ChildContent
     @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
     {

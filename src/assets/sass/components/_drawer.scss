@@ -23,6 +23,10 @@
     transition: transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
     z-index: var(--tavenem-zindex-drawer);
 
+    @media print {
+        display: none;
+    }
+
     &.filled {
         background-color: var(--tavenem-color-bg-surface);
     }
@@ -342,6 +346,10 @@
     &.drawer-open {
         .overlay.drawer-overlay {
             display: flex;
+
+            @media print {
+                display: none;
+            }
         }
     }
 }

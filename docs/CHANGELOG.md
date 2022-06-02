@@ -1,5 +1,5 @@
 # Changelog
 
-## 1.0.0
+## 0.1.0-preview
 ### Added
-- Initial release
+- Initial preview release

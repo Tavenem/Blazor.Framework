@@ -111,7 +111,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     /// splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// <para>

@@ -99,7 +99,7 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Dropdown Text="Hover and wait" ActivationType="MouseEvent.MouseOver" DelayMilliseconds="750">
+            <Dropdown Text="Hover and wait" ActivationType="MouseEvent.MouseOver" Delay="750">
                 <span>First choice</span>
                 <span>Second choice</span>
                 <span>Third choice</span>
@@ -107,7 +107,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Hover and wait"" ActivationType=""MouseEvent.MouseOver"" DelayMilliseconds=""750"">
+        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Hover and wait"" ActivationType=""MouseEvent.MouseOver"" Delay=""750"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
@@ -163,11 +163,11 @@
 @code {
     private Dropdown? _dropdown;
 
-    private void Toggle(MouseEventArgs e)
+    private async Task Toggle(MouseEventArgs e)
     {
         if (_dropdown is not null)
         {
-            _dropdown.Toggle(e);
+            await _dropdown.ToggleAsync(e);
         }
     }
 }")
@@ -251,11 +251,11 @@
 @code {
     private Dropdown? _dropdown, _dropdown2;
 
-    private async Task Open(MouseEventArgs e)
+    private void Open(MouseEventArgs e)
     {
         if (_dropdown2 is not null)
         {
-            await _dropdown2.OpenAsync(e);
+            _dropdown2.Open(e);
         }
     }
 

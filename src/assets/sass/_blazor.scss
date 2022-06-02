@@ -21,6 +21,10 @@
     width: 100%;
     z-index: 9999;
 
+    @media print {
+        display: none;
+    }
+
     .dismiss {
         cursor: pointer;
         position: absolute;

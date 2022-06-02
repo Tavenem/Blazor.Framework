@@ -12,7 +12,8 @@
             disabled="@Disabled"
             @onmousedown="OnMouseDown"
             @onmouseup="ToggleAsync"
-            @oncontextmenu:preventDefault="@(ActivationType.HasFlag(MouseEvent.RightClick))">
+            @oncontextmenu="OnContext"
+            @oncontextmenu:preventDefault="@ActivationType.HasFlag(MouseEvent.RightClick)">
         @if (!string.IsNullOrEmpty(Icon))
         {
             <tf-icon>@Icon</tf-icon>
@@ -28,13 +29,12 @@
          IsOpen="_isOpen"
          MatchWidth="@(!OpenAtPointer && !HideButton)"
          MaxHeight="@MaxHeight"
-         OffsetX="PopoverOffsetX"
-         OffsetY="PopoverOffsetY"
+         PositionX="PopoverPositionX"
+         PositionY="PopoverPositionY"
          PopoverOrigin="PopoverOriginValue"
          Style="@PopoverStyle"
          ThemeColor="ThemeColor"
-         oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)"
-         tabindex="-1">
+         oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)">
     <div class="@ListCssClass"
          @onclick="Close"
          @onclick:stopPropagation="true">

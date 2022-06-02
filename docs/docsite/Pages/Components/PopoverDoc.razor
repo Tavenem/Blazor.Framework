@@ -86,23 +86,22 @@
 
 <p>
     You can specify a particular element to which the popover should be anchored with the
-    <code>AnchorId</code> property. The anchoring element's offset parent must be the popover's
-    nearest positioned ancestor element in the containment hierarchy. When an anchor is specified,
-    the <code>AnchorOrigin</code> refers to the anchoring element. When it is unspecified,
-    <code>AnchorOrigin</code> refers to the containing positioned parent.
+    <code>AnchorId</code> property. When an anchor is specified, the <code>AnchorOrigin</code>
+    refers to the anchoring element. When it is unspecified, <code>AnchorOrigin</code> refers to the
+    containing positioned parent.
 </p>
 
 <p>
-    You can set the <code>MatchWidth</code> property to <code>true</code> to force the popover to
-    have the same width as its anchoring element (whether a named element, or its positioned
-    parent).
+    You can set the <code>MatchWidth</code> property to <code>true</code> to set the popover's
+    <code>min-width</code> style attribute to the width of its anchoring element (whether a named
+    element, or its positioned parent). This allows the popover to stretch to fit its content, but
+    ensures that it's at least as wide as its anchor.
 </p>
 
 <p>
-    Alternatively, you can set the <code>LimitWidth</code> property to <code>true</code> to set the
-    popover's <code>max-width</code> style attribute to the width of its anchoring element (whether
-    a named element, or its positioned parent). This allows the popover to be smaller than its
-    anchor, but prevents it from being larger.
+    You can also set the <code>LimitWidth</code> property to <code>true</code> to set the popover's
+    <code>max-width</code> to the width of its anchoring element. When combined with
+    <code>MatchWidth</code> this ensures that a popover is always exactly as wide as its anchor.
 </p>
 
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -110,7 +109,7 @@
         <div class="row align-items-center justify-content-center">
             <div class="d-flex rounded outlined center-items p-4">
                 <div id="popover-anchor-demo" class="primary filled px-3 py-2">Anchored to this</div>
-                <Popover AnchorId="popover-anchor-demo" MatchWidth="true" AnchorOrigin="Origin.Bottom_Center" PopoverOrigin="Origin.Top_Center" IsOpen="true">
+                <Popover AnchorId="popover-anchor-demo" LimitWidth="true" MatchWidth="true" AnchorOrigin="Origin.Bottom_Center" PopoverOrigin="Origin.Top_Center" IsOpen="true">
                     <div class="p-2">I am anchored to an element.</div>
                 </Popover>
             </div>
@@ -119,7 +118,8 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""d-flex rounded outlined center-items p-4"">
     <div id=""popover-anchor-demo"" class=""primary filled px-3 py-2"">Anchored to this</div>
-    <Popover AnchorId=""popover-anchor-demo"" MatchWidth=""true"" AnchorOrigin=""Origin.Bottom_Center"" PopoverOrigin=""Origin.Top_Center"" IsOpen=""true"">
+    <Popover AnchorId=""popover-anchor-demo"" LimitWidth=""true"" MatchWidth=""true""
+    AnchorOrigin=""Origin.Bottom_Center"" PopoverOrigin=""Origin.Top_Center"" IsOpen=""true"">
         <div class=""p-2"">I am anchored to an element.</div>
     </Popover>
 </div>")

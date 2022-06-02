@@ -81,7 +81,7 @@ public partial class Rating
     /// Defaults to a random <see cref="Guid"/>.
     /// </para>
     /// </summary>
-    [Parameter] public override string? Name { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public override string? Name { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// Custom CSS class(es) for the rating item controls.

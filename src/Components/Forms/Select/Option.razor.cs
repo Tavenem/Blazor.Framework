@@ -54,7 +54,7 @@ public partial class Option<TValue> : IDisposable
     /// </para>
     /// </summary>
     [Parameter]
-    public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// <para>

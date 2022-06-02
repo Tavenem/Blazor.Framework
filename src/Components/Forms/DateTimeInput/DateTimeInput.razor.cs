@@ -54,7 +54,8 @@ namespace Tavenem.Blazor.Framework;
 /// </typeparam>
 public partial class DateTimeInput<TValue>
 {
-    private const int CloseDelay = 200;
+    private const int CloseDelay = 500;
+    private const int ViewSwitchDelay = 200;
 
     private readonly Type _baseType;
     private readonly Type? _nullableType;
@@ -106,6 +107,11 @@ public partial class DateTimeInput<TValue>
     /// </para>
     /// </summary>
     [Parameter] public PickerDisplayType DisplayType { get; set; }
+
+    /// <summary>
+    /// This can be used to override the default icon.
+    /// </summary>
+    [Parameter] public string? Icon { get; set; }
 
     /// <summary>
     /// <para>
@@ -259,6 +265,13 @@ public partial class DateTimeInput<TValue>
         .Add("picker-btn btn btn-icon")
         .ToString();
 
+    private string ButtonIcon => Icon ?? (OnlyTime
+        || (!OnlyDate
+        && DateType == DateType.None
+        && ShowTime)
+        ? DefaultIcons.TimeSelect
+        : DefaultIcons.DateTimeSelect);
+
     private string? ButtonContainerClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("form-field picker")
@@ -377,13 +390,6 @@ public partial class DateTimeInput<TValue>
         .ToString();
 
     private string HourTitle => DisplayedTime.ToString(ShowAMPM ? "%h" : "HH", Culture);
-
-    private string Icon => OnlyTime
-        || (!OnlyDate
-        && DateType == DateType.None
-        && ShowTime)
-        ? DefaultIcons.TimeSelect
-        : DefaultIcons.DateTimeSelect;
 
     private string InputType
     {
@@ -607,7 +613,7 @@ public partial class DateTimeInput<TValue>
         Culture = CultureInfo.CurrentCulture;
         SetCulture();
 
-        if (!Clearable)
+        if (!Clearable && DisplayType != PickerDisplayType.Button)
         {
             SetValue();
         }
@@ -898,6 +904,10 @@ public partial class DateTimeInput<TValue>
     {
         SetDate = false;
         SetTime = false;
+        if (DisplayType == PickerDisplayType.Button)
+        {
+            SetValue();
+        }
         return Task.CompletedTask;
     }
 
@@ -1067,7 +1077,7 @@ public partial class DateTimeInput<TValue>
             }
             else if (Hour != DateTimeOffset.Hour)
             {
-                OnSelectHour(Hour);
+                await OnSelectHourAsync(Hour);
             }
 
             _clockMouseDown = false;
@@ -1247,22 +1257,17 @@ public partial class DateTimeInput<TValue>
             DateTimeOffset.Minute,
             DateTimeOffset.Second,
             DateTimeOffset.Offset);
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
     }
 
     private async Task OnSelectCenturyAsync(int century)
     {
         Century = century;
         SetCenturyDecadeValues();
-        View = DatePickerView.Decade;
-        if (Popover is not null)
-        {
-            await Popover.ElementReference.FocusAsync();
-        }
-        await ScrollService.ScrollToId(
-            $"date-picker-decade-{Decade}",
-            ScrollLogicalPosition.Nearest,
-            false);
+        await SetViewAsync(DatePickerView.Decade);
     }
 
     private async Task OnSelectCurentAsync()
@@ -1275,11 +1280,7 @@ public partial class DateTimeInput<TValue>
             && (!ShowTime
             || OnlyDate)))
         {
-            View = DatePickerView.Date;
-            if (Popover is not null)
-            {
-                await Popover.ElementReference.FocusAsync();
-            }
+            await SetViewAsync(DatePickerView.Date);
         }
     }
 
@@ -1300,7 +1301,10 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Offset);
             Year = DateTimeOffset.Year;
             Month = (byte)DateTimeOffset.Month;
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
         }
         SetDate = true;
         if (DisplayType != PickerDisplayType.Inline
@@ -1309,24 +1313,21 @@ public partial class DateTimeInput<TValue>
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
         }
+        else if (HasTime)
+        {
+            await Task.Delay(ViewSwitchDelay);
+            await SetViewAsync(DatePickerView.Time);
+        }
     }
 
     private async Task OnSelectDecadeAsync(byte value)
     {
         Decade = value;
         SetCenturyDecadeValues();
-        View = DatePickerView.Year;
-        if (Popover is not null)
-        {
-            await Popover.ElementReference.FocusAsync();
-        }
-        await ScrollService.ScrollToId(
-            $"date-picker-year-{Year}",
-            ScrollLogicalPosition.Nearest,
-            false);
+        await SetViewAsync(DatePickerView.Year);
     }
 
-    private void OnSelectHour(byte value)
+    private async Task OnSelectHourAsync(byte value)
     {
         Hour = value;
         DisplayedTime = new DateTime(1, 1, 1, value, Minute, Second);
@@ -1343,8 +1344,15 @@ public partial class DateTimeInput<TValue>
             DateTimeOffset.Minute,
             DateTimeOffset.Second,
             DateTimeOffset.Offset);
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
         SettingMinutes = true;
+        if (Popover is not null)
+        {
+            await Popover.ElementReference.FocusAsync();
+        }
     }
 
     private async Task OnSelectMinuteAsync(byte value)
@@ -1364,9 +1372,16 @@ public partial class DateTimeInput<TValue>
             value,
             DateTimeOffset.Second,
             DateTimeOffset.Offset);
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
         SettingMinutes = false;
         SetTime = !ShowSeconds;
+        if (Popover is not null)
+        {
+            await Popover.ElementReference.FocusAsync();
+        }
         if (ShowSeconds)
         {
             SettingSeconds = true;
@@ -1376,6 +1391,11 @@ public partial class DateTimeInput<TValue>
         {
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
+        }
+        else if (HasDate)
+        {
+            await Task.Delay(ViewSwitchDelay);
+            await SetViewAsync(DatePickerView.Date);
         }
     }
 
@@ -1397,7 +1417,10 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Minute,
                 DateTimeOffset.Second,
                 DateTimeOffset.Offset);
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
             if (DisplayType != PickerDisplayType.Inline)
             {
                 await Task.Delay(CloseDelay);
@@ -1406,11 +1429,7 @@ public partial class DateTimeInput<TValue>
         }
         else if (View == DatePickerView.Month)
         {
-            View = DatePickerView.Date;
-            if (Popover is not null)
-            {
-                await Popover.ElementReference.FocusAsync();
-            }
+            await SetViewAsync(DatePickerView.Date);
         }
     }
 
@@ -1431,7 +1450,10 @@ public partial class DateTimeInput<TValue>
             Minute,
             Second,
             DateTimeOffset.Offset);
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
         SetTime = true;
         if (DisplayType != PickerDisplayType.Inline
             && (!HasDate || SetDate))
@@ -1461,7 +1483,10 @@ public partial class DateTimeInput<TValue>
             DateTimeOffset.Minute,
             DateTimeOffset.Second,
             DateTimeOffset.Offset);
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
     }
 
     private async Task OnSelectSecondAsync(byte value)
@@ -1481,7 +1506,10 @@ public partial class DateTimeInput<TValue>
             DateTimeOffset.Minute,
             value,
             DateTimeOffset.Offset);
-        SetValue();
+        if (DisplayType != PickerDisplayType.Button)
+        {
+            SetValue();
+        }
         SettingSeconds = false;
         SetTime = true;
         if (DisplayType != PickerDisplayType.Inline
@@ -1489,6 +1517,11 @@ public partial class DateTimeInput<TValue>
         {
             await Task.Delay(CloseDelay);
             await ClosePopoverAsync();
+        }
+        else if (HasDate)
+        {
+            await Task.Delay(ViewSwitchDelay);
+            await SetViewAsync(DatePickerView.Date);
         }
     }
 
@@ -1515,7 +1548,10 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Minute,
                 DateTimeOffset.Second,
                 DateTimeOffset.Offset);
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
             SetDate = true;
             if (DisplayType != PickerDisplayType.Inline
                 && (!HasTime || SetTime))
@@ -1526,11 +1562,7 @@ public partial class DateTimeInput<TValue>
         }
         else if ((int)DateType >= (int)DateType.Week)
         {
-            View = DatePickerView.Date;
-            if (Popover is not null)
-            {
-                await Popover.ElementReference.FocusAsync();
-            }
+            await SetViewAsync(DatePickerView.Date);
         }
     }
 
@@ -1552,7 +1584,10 @@ public partial class DateTimeInput<TValue>
                 DateTimeOffset.Minute,
                 DateTimeOffset.Second,
                 DateTimeOffset.Offset);
-            SetValue();
+            if (DisplayType != PickerDisplayType.Button)
+            {
+                SetValue();
+            }
             if (DisplayType != PickerDisplayType.Inline)
             {
                 await Task.Delay(CloseDelay);
@@ -1561,11 +1596,7 @@ public partial class DateTimeInput<TValue>
         }
         else if (View == DatePickerView.Year)
         {
-            View = DatePickerView.Month;
-            if (Popover is not null)
-            {
-                await Popover.ElementReference.FocusAsync();
-            }
+            await SetViewAsync(DatePickerView.Month);
         }
     }
 
@@ -1797,7 +1828,7 @@ public partial class DateTimeInput<TValue>
     {
         TimeZone = timeZone;
         DateTimeOffset = DateTimeOffset.ToOffset(timeZone.GetUtcOffset(DateTimeOffset));
-        if (_baseType == typeof(DateTimeOffset))
+        if (_baseType == typeof(DateTimeOffset) && DisplayType != PickerDisplayType.Button)
         {
             SetValue();
         }

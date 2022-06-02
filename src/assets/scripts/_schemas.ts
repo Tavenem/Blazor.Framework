@@ -1,11 +1,30 @@
-﻿import OrderedMap from 'orderedmap';
-
-import { EditorState, NodeSelection, Transaction } from 'prosemirror-state';
+﻿import { Command, EditorState, NodeSelection, Selection, SelectionRange, TextSelection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import { Schema, ProsemirrorNode, MarkType, MarkSpec, NodeSpec, Mark, NodeType, AttributeSpec, DOMOutputSpec } from 'prosemirror-model';
-import { chainCommands, Command, lift, liftEmptyBlock, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
+import {
+    AttributeSpec,
+    Attrs,
+    ContentMatch,
+    DOMOutputSpec,
+    Mark,
+    MarkSpec,
+    MarkType,
+    Node as ProsemirrorNode,
+    NodeSpec,
+    NodeType,
+    ResolvedPos,
+    Schema,
+} from 'prosemirror-model';
+import { findWrapping, RemoveMarkStep } from 'prosemirror-transform';
+import { chainCommands, lift, liftEmptyBlock, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
 import { redo, undo } from 'prosemirror-history';
 import { liftListItem, sinkListItem, wrapInList } from 'prosemirror-schema-list';
+
+import {
+    EditorSelection,
+    EditorState as CodeEditorState,
+    Transaction as CodeTransaction,
+    StateCommand
+} from '@codemirror/state';
 import {
     addColumnAfter,
     addColumnBefore,
@@ -15,80 +34,70 @@ import {
     deleteColumn,
     deleteRow,
     deleteTable,
-    isInTable,
     mergeCells,
-    selectionCell,
+    setColumnAlign,
+    setNodeAttrs,
     splitCell,
-    tableNodes,
-    toggleHeaderRow
-} from 'prosemirror-tables';
-import { setAttr } from 'prosemirror-tables/dist';
-
-import {
-    EditorSelection,
-    EditorState as CodeEditorState,
-    Transaction as CodeTransaction,
-    StateCommand
-} from '@codemirror/state';
+    toggleFullWidth,
+    toggleHeaderColumn,
+    toggleHeaderRow,
+} from './_tables';
 
 export enum CommandType {
     None = 0,
     Undo = 1,
     Redo = 2,
-    Heading1 = 3,
-    Heading2 = 4,
-    Heading3 = 5,
-    Heading4 = 6,
-    Heading5 = 7,
-    Heading6 = 8,
-    Paragraph = 9,
-    BlockQuote = 10,
-    CodeBlock = 11,
-    Strong = 12,
-    Bold = 13,
-    Emphasis = 14,
-    Italic = 15,
-    Underline = 16,
-    Strikethrough = 17,
-    Small = 18,
-    Subscript = 19,
-    Superscript = 20,
-    Inserted = 21,
-    Marked = 22,
-    CodeInline = 23,
-    ForegroundColor = 24,
-    BackgroundColor = 25,
-    InsertLink = 26,
-    InsertImage = 27,
-    ListBullet = 28,
-    ListNumber = 29,
-    ListCheck = 30,
-    UpLevel = 31,
-    DownLevel = 32,
-    InsertTable = 33,
-    TableInsertColumnBefore = 34,
-    TableInsertColumnAfter = 35,
-    TableDeleteColumn = 36,
-    TableInsertRowBefore = 37,
-    TableInsertRowAfter = 38,
-    TableDeleteRow = 39,
-    TableDelete = 40,
-    TableMergeCells = 41,
-    TableSplitCell = 42,
-    TableToggleHeaderRow = 43,
-    HorizontalRule = 44,
-    SetCodeSyntax = 45,
-    SetFontFamily = 46,
-    SetFontSize = 47,
-    SetLineHeight = 48,
-    AlignLeft = 49,
-    AlignCenter = 50,
-    AlignRight = 51,
-    PageBreak = 52,
+    Heading = 3,
+    Paragraph = 4,
+    BlockQuote = 5,
+    CodeBlock = 6,
+    Strong = 7,
+    Bold = 8,
+    Emphasis = 9,
+    Italic = 10,
+    Underline = 11,
+    Strikethrough = 12,
+    Small = 13,
+    Subscript = 14,
+    Superscript = 15,
+    Inserted = 16,
+    Marked = 17,
+    CodeInline = 18,
+    ForegroundColor = 19,
+    BackgroundColor = 20,
+    InsertLink = 21,
+    InsertImage = 22,
+    ListBullet = 23,
+    ListNumber = 24,
+    ListCheck = 25,
+    UpLevel = 26,
+    DownLevel = 27,
+    InsertTable = 28,
+    TableInsertColumnBefore = 29,
+    TableInsertColumnAfter = 30,
+    TableDeleteColumn = 31,
+    TableInsertRowBefore = 32,
+    TableInsertRowAfter = 33,
+    TableDeleteRow = 34,
+    TableDelete = 35,
+    TableMergeCells = 36,
+    TableSplitCell = 37,
+    TableToggleHeaderColumn = 38,
+    TableToggleHeaderRow = 39,
+    TableFullWidth = 40,
+    HorizontalRule = 41,
+    SetCodeSyntax = 42,
+    SetFontFamily = 43,
+    SetFontSize = 44,
+    SetLineHeight = 45,
+    AlignLeft = 46,
+    AlignCenter = 47,
+    AlignRight = 48,
+    PageBreak = 49,
 }
 
-interface ParamCommand<S extends Schema = any> {
-    (state: EditorState<S>, dispatch?: (tr: Transaction<S>) => void, view?: EditorView<S>, params?: any[]): boolean;
+interface ParamCommand {
+    (state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView, params?: any[]): boolean;
 }
 
 export interface ParamStateCommand {
@@ -109,55 +118,297 @@ export type CommandSet = { [type in CommandType]?: CommandInfo };
 const commonAttrs: { [name: string]: AttributeSpec } = {
     id: { default: null },
     className: { default: null },
+    dir: { default: null },
+    itemid: { default: null },
+    itemprop: { default: null },
+    itemref: { default: null },
+    itemscope: { default: null },
+    itemtype: { default: null },
+    lang: { default: null },
+    role: { default: null },
     style: { default: null },
+    title: { default: null },
 };
-const getCommonAttrs = (node: Node | string, attrs?: { [key: string]: any }) => {
-    attrs = attrs || {};
+const getCommonAttrs = (
+    node: Node | string,
+    attrs?: { [key: string]: any },
+    filterClass?: (x: string) => boolean) => {
     if (node instanceof HTMLElement) {
+        attrs = attrs || {};
         attrs.id = node.id;
-        attrs.className = node.className;
+
+        if (filterClass) {
+            const classes = node.className.split(" ");
+            attrs.className = classes.filter(x => filterClass(x)).join(" ");
+        } else {
+            attrs.className = node.className; 
+        }
+
+        attrs.dir = node.dir;
+        attrs.itemid = node.getAttribute('itemid');
+        attrs.itemprop = node.getAttribute('itemprop');
+        attrs.itemref = node.getAttribute('itemref');
+        attrs.itemscope = node.getAttribute('itemscope');
+        attrs.itemtype = node.getAttribute('itemtype');
+        attrs.lang = node.lang;
+        attrs.role = node.getAttribute('role');
         attrs.style = node.style.cssText;
+        attrs.title = node.title;
     }
-    return attrs;
+    return attrs as Attrs;
 };
-const nodeToDomWithCommonAttrs: (node: ProsemirrorNode, tag: string) => DOMOutputSpec = (node: ProsemirrorNode, tag: string) => {
-    const { id, className, style } = node.attrs;
-    return [tag, { id, class: className, style }, 0];
+const nodeToDomWithCommonAttrs: (node: ProsemirrorNode, tag: string, extraClass?: string, children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, extraClass, children) => {
+    const {
+        id,
+        className,
+        dir,
+        itemid,
+        itemprop,
+        itemref,
+        itemscope,
+        itemtype,
+        lang,
+        role,
+        style,
+        title
+    } = node.attrs;
+    const attrs: { [key: string]: any } = {};
+    if (id && id.length) {
+        attrs.id = id;
+    }
+
+    if (className && className.length) {
+        attrs.class = className;
+    }
+    if (extraClass) {
+        attrs.class = attrs.class || "";
+        if (attrs.class.length) {
+            attrs.class += " ";
+        }
+        attrs.class += extraClass;
+    }
+
+    if (dir && dir.length) {
+        attrs.dir = dir;
+    }
+    if (itemid && itemid.length) {
+        attrs.itemid = itemid;
+    }
+    if (itemprop && itemprop.length) {
+        attrs.itemprop = itemprop;
+    }
+    if (itemref && itemref.length) {
+        attrs.itemref = itemref;
+    }
+    if (itemscope && itemscope.length) {
+        attrs.itemscope = itemscope;
+    }
+    if (itemtype && itemtype.length) {
+        attrs.itemtype = itemtype;
+    }
+    if (lang && lang.length) {
+        attrs.lang = lang;
+    }
+    if (role && role.length) {
+        attrs.role = role;
+    }
+    if (style && style.length) {
+        attrs.style = style;
+    }
+    if (title && title.length) {
+        attrs.title = title;
+    }
+
+    if (children) {
+        return [tag, attrs, ...children];
+    } else {
+        return [tag, attrs, 0];
+    }
+};
+const nodeToDomWithAttrs: (node: ProsemirrorNode, tag: string, attrs: { [key: string]: any }, extraClass?: string, children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, attrs, extraClass, children) => {
+    const {
+        id,
+        className,
+        dir,
+        itemid,
+        itemprop,
+        itemref,
+        itemscope,
+        itemtype,
+        lang,
+        role,
+        style,
+        title
+    } = node.attrs;
+
+    const domAttrs: { [key: string]: any } = {};
+    for (const attr in attrs) {
+        if (attrs[attr]) {
+            domAttrs[attr] = attrs[attr];
+        }
+    }
+
+    if (id && id.length) {
+        domAttrs.id = id;
+    }
+
+    if (className && className.length) {
+        if (domAttrs.class) {
+            domAttrs.class += ' ' + className;
+        } else {
+            domAttrs.class = className;
+        }
+    }
+    if (extraClass) {
+        domAttrs.class = domAttrs.class || "";
+        if (domAttrs.class.length) {
+            domAttrs.class += " ";
+        }
+        domAttrs.class += extraClass;
+    }
+
+
+    if (dir && dir.length) {
+        domAttrs.dir = dir;
+    }
+    if (itemid && itemid.length) {
+        domAttrs.itemid = itemid;
+    }
+    if (itemprop && itemprop.length) {
+        domAttrs.itemprop = itemprop;
+    }
+    if (itemref && itemref.length) {
+        domAttrs.itemref = itemref;
+    }
+    if (itemscope && itemscope.length) {
+        domAttrs.itemscope = itemscope;
+    }
+    if (itemtype && itemtype.length) {
+        domAttrs.itemtype = itemtype;
+    }
+    if (lang && lang.length) {
+        domAttrs.lang = lang;
+    }
+    if (role && role.length) {
+        domAttrs.role = role;
+    }
+    if (style && style.length) {
+        domAttrs.style = style;
+    }
+    if (title && title.length) {
+        domAttrs.title = title;
+    }
+
+    if (children) {
+        return [tag, domAttrs, ...children];
+    } else {
+        return [tag, domAttrs, 0];
+    }
+};
+const contentlessToDomWithCommonAttrs: (node: ProsemirrorNode, tag: string, attrs?: { [key: string]: any }) => DOMOutputSpec = (node, tag, attrs) => {
+    const {
+        id,
+        className,
+        dir,
+        itemid,
+        itemprop,
+        itemref,
+        itemscope,
+        itemtype,
+        lang,
+        role,
+        style,
+        title
+    } = node.attrs;
+
+    const domAttrs: { [key: string]: any } = {};
+    if (attrs) {
+        for (const attr in attrs) {
+            if (attrs[attr]) {
+                domAttrs[attr] = attrs[attr];
+            }
+        }
+    }
+
+    if (id && id.length) {
+        domAttrs.id = id;
+    }
+    if (className && className.length) {
+        domAttrs.class = className;
+    }
+    if (dir && dir.length) {
+        domAttrs.dir = dir;
+    }
+    if (itemid && itemid.length) {
+        domAttrs.itemid = itemid;
+    }
+    if (itemprop && itemprop.length) {
+        domAttrs.itemprop = itemprop;
+    }
+    if (itemref && itemref.length) {
+        domAttrs.itemref = itemref;
+    }
+    if (itemscope && itemscope.length) {
+        domAttrs.itemscope = itemscope;
+    }
+    if (itemtype && itemtype.length) {
+        domAttrs.itemtype = itemtype;
+    }
+    if (lang && lang.length) {
+        domAttrs.lang = lang;
+    }
+    if (role && role.length) {
+        domAttrs.role = role;
+    }
+    if (style && style.length) {
+        domAttrs.style = style;
+    }
+    if (title && title.length) {
+        domAttrs.title = title;
+    }
+    return [tag, domAttrs];
 };
 const commonNodes: { [name in string]: NodeSpec } = {
-    doc: { content: "block+" },
+    doc: { content: "(flow | address | headerfooter | heading | main | sectioning)+ | html" },
     paragraph: {
         attrs: commonAttrs,
-        content: "inline*",
-        group: "block",
+        content: "(phrasing | image)*",
+        group: "flow",
         parseDOM: [{ tag: "p", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "p") }
     },
     blockquote: {
-        content: "block+",
-        group: "block",
+        attrs: plusCommonAttributes({
+            cite: { default: null }
+        }),
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        group: "flow",
         defining: true,
-        parseDOM: [{ tag: "blockquote" }],
-        toDOM() { return ["blockquote", 0] }
+        parseDOM: [{
+            tag: "blockquote",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLQuoteElement) {
+                    attrs = { cite: node.cite };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { cite } = node.attrs;
+            return nodeToDomWithAttrs(node, "blockquote", { cite });
+        }
     },
     horizontal_rule: {
         attrs: commonAttrs,
-        group: "block",
+        group: "flow",
         parseDOM: [{ tag: "hr", getAttrs: getCommonAttrs }],
-        toDOM(node) {
-            const { id, className, style } = node.attrs;
-            return ["hr", { id, class: className, style }];
-        }
+        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "hr") }
     },
     heading: {
-        attrs: {
-            level: { default: 1 },
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
-        content: "inline*",
-        group: "block",
+        attrs: plusCommonAttributes({ level: { default: 1 } }),
+        content: "(phrasing | image)*",
+        group: "heading",
         defining: true,
         parseDOM: [
             { tag: "h1", getAttrs(p) { return getCommonAttrs(p, { level: 1 }) } },
@@ -167,21 +418,13 @@ const commonNodes: { [name in string]: NodeSpec } = {
             { tag: "h5", getAttrs(p) { return getCommonAttrs(p, { level: 5 }) } },
             { tag: "h6", getAttrs(p) { return getCommonAttrs(p, { level: 6 }) } }
         ],
-        toDOM(node) {
-            const { id, className, style } = node.attrs;
-            return ["h" + node.attrs.level, { id, class: className, style }, 0];
-        }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "h" + node.attrs.level) }
     },
     code_block: {
-        attrs: {
-            syntax: { default: null },
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
+        attrs: plusCommonAttributes({ syntax: { default: null } }),
         content: "text*",
         marks: "",
-        group: "block",
+        group: "flow",
         code: true,
         defining: true,
         parseDOM: [{
@@ -193,154 +436,278 @@ const commonNodes: { [name in string]: NodeSpec } = {
                     const classes = node.className.split(" ");
                     if (classes && classes.length) {
                         syntax = classes.find(x => x.startsWith("language-")) || null;
+                        if (syntax) {
+                            syntax = syntax.substring(9);
+                        }
                     }
-                    return {
-                        syntax,
-                        id: node.id,
-                        className: classes.filter(x => !x.startsWith("language-")).join(" "),
-                        style: node.style.cssText,
-                    }
+                    return getCommonAttrs(node, { syntax }, x => !x.startsWith("language-"));
                 }
                 return null;
             }
         }],
         toDOM(node) {
-            let { syntax, id, className, style } = node.attrs;
-            if (syntax) {
-                className = className || "";
-                if (className.length) {
-                    className += " ";
-                }
-                className += `language-${syntax}`;
-            }
-            return ["pre", { id, class: className, style }, ["code", 0]];
+            const { syntax } = node.attrs;
+            return nodeToDomWithCommonAttrs(node, "pre", syntax ? `language-${syntax}` : undefined, [["code", 0]]);
         }
     },
-    text: { group: "inline" },
+    text: { group: "phrasing" },
     image: {
-        inline: true,
-        attrs: {
+        attrs: plusCommonAttributes({
             src: {},
+            srcset: { default: null },
             alt: { default: null },
-            title: { default: null },
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
-        group: "inline",
+            height: { default: null },
+            sizes: { default: null },
+            width: { default: null },
+        }),
         draggable: true,
+        inline: true,
         parseDOM: [{
             tag: "img[src]",
             getAttrs(node) {
-                if (node instanceof HTMLElement) {
-                    return {
-                        src: node.getAttribute("src"),
-                        title: node.getAttribute("title"),
-                        alt: node.getAttribute("alt"),
-                        id: node.id,
-                        className: node.className,
-                        style: node.style.cssText,
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLImageElement) {
+                    attrs = {
+                        src: node.src,
+                        srcset: node.srcset,
+                        alt: node.alt,
+                        height: node.height,
+                        sizes: node.sizes,
+                        width: node.width,
                     };
-                } else {
-                    return null;
                 }
+                return getCommonAttrs(node, attrs);
             }
         }],
         toDOM(node) {
-            const { src, alt, title, id, className, style } = node.attrs;
-            return ["img", { src, alt, title, id, class: className, style }];
+            const { src, srcset, alt, height, sizes, width } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "img", { src, srcset, alt, height, sizes, width });
         }
     },
     hard_break: {
+        attrs: commonAttrs,
         inline: true,
-        group: "inline",
+        group: "phrasing",
         selectable: false,
-        parseDOM: [{ tag: "br" }],
-        toDOM() { return ["br"] }
+        parseDOM: [{ tag: "br", getAttrs: getCommonAttrs }],
+        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "br") }
     },
-    orderedList: {
-        attrs: {
-            order: { default: 1 },
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
+    ordered_list: {
+        attrs: plusCommonAttributes({ order: { default: 1 } }),
         content: "list_item+",
-        group: "block",
+        group: "flow",
         parseDOM: [{
             tag: "ol",
             getAttrs(node) {
+                let attrs: { [key: string]: any };
                 if (node instanceof HTMLElement) {
-                    return {
-                        order: node.hasAttribute("start") ? +(node.getAttribute("start") || 1) : 1,
-                        id: node.id,
-                        className: node.className,
-                        style: node.style.cssText,
-                    };
+                    attrs = { order: node.hasAttribute("start") ? +(node.getAttribute("start") || 1) : 1 };
                 } else {
-                    return { order: 1 };
+                    attrs = { order: 1 };
                 }
+                return getCommonAttrs(node, attrs);
             }
         }],
         toDOM(node) {
-            const { order, id, className, style } = node.attrs;
+            const { order } = node.attrs;
             return order == 1
-                ? ["ol", { id, className, style }, 0]
-                : ["ol", { start: order, id, class: className, style }, 0];
+                ? nodeToDomWithCommonAttrs(node, "ol")
+                : nodeToDomWithAttrs(node, "ol", { start: order });
         }
     },
     task_list: {
         attrs: commonAttrs,
         content: "(task_list_item | list_item)+",
-        group: "block",
+        group: "flow",
         parseDOM: [{ tag: "ul", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "ul") }
     },
-    bulletList: {
+    bullet_list: {
         attrs: commonAttrs,
         content: "list_item+",
-        group: "block",
+        group: "flow",
         parseDOM: [{ tag: "ul", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "ul") }
     },
+    menu: {
+        attrs: commonAttrs,
+        content: "list_item+",
+        group: "flow",
+        parseDOM: [{ tag: "menu", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "menu") }
+    },
+    definition_list: {
+        attrs: commonAttrs,
+        content: "(term | definition)+",
+        group: "flow",
+        parseDOM: [{ tag: "dl", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "dl") }
+    },
     task_list_item: {
-        attrs: {
-            complete: { default: false },
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
-        content: "paragraph block*",
+        attrs: plusCommonAttributes({ complete: { default: false } }),
+        content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
+        defining: true,
         parseDOM: [{
             tag: "li",
             getAttrs: node => {
-                if (!(node instanceof HTMLLIElement)) {
-                    return false;
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLLIElement) {
+                    const child = node.firstChild;
+                    if (child instanceof HTMLInputElement
+                        && child.type == 'checkbox') {
+                        attrs = { complete: child.checked };
+                    }
                 }
-                const child = node.firstChild;
-                if (!(child instanceof HTMLInputElement)
-                    || child.type != 'checkbox') {
-                    return false;
-                }
-                return {
-                    complete: child.checked,
-                    id: node.id,
-                    className: node.className,
-                    style: node.style.cssText,
-                };
+                return getCommonAttrs(node, attrs);
             }
         }],
         toDOM(node) {
-            const { complete, id, className, style } = node.attrs;
-            return ["li", { id, class: className, style }, ["input", { type: "checkbox", checked: complete }], 0];
+            const { complete } = node.attrs;
+            return nodeToDomWithAttrs(node, "li", { class: "task-list-item" }, undefined, [["input", { type: 'checkbox', checked: complete }], ["div", 0]]);
         }
     },
-    listItem: {
+    term: {
         attrs: commonAttrs,
-        content: "paragraph block*",
+        content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
+        defining: true,
+        parseDOM: [{ tag: "dt", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "dt") }
+    },
+    definition: {
+        attrs: commonAttrs,
+        content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
+        defining: true,
+        parseDOM: [{ tag: "dd", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "dd") }
+    },
+    list_item: {
+        attrs: commonAttrs,
+        content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
         defining: true,
         parseDOM: [{ tag: "li", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "li") }
+    },
+    table: {
+        content: "caption? colgroup* thead? tbody tfoot?",
+        attrs: commonAttrs,
+        group: "flow",
+        tableRole: "table",
+        isolating: true,
+        parseDOM: [{ tag: "table", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "table", undefined) }
+    },
+    table_row: {
+        content: "(table_cell | table_header)*",
+        attrs: commonAttrs,
+        tableRole: "row",
+        parseDOM: [{ tag: "tr", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tr") }
+    },
+    table_cell: {
+        content: "(phrasing | image)*",
+        attrs: plusCommonAttributes({
+            align: { default: null },
+            colspan: { default: 1 },
+            colwidth: { default: null },
+            rowspan: { default: 1 }
+        }),
+        tableRole: "cell",
+        isolating: true,
+        parseDOM: [{
+            tag: "td",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLTableCellElement) {
+                    attrs = {
+                        align: node.style.textAlign,
+                        colspan: node.colSpan || 1,
+                        rowspan: node.rowSpan || 1
+                    };
+
+                    const widthAttr = node.getAttribute("data-colwidth");
+                    const widths = widthAttr
+                        && /^\d+(,\d+)*$/.test(widthAttr)
+                        ? widthAttr.split(",").map(s => Number(s))
+                        : null;
+                    attrs.colwidth = widths && widths.length == attrs.colspan
+                        ? widths
+                        : null;
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { align, colspan, colwidth, rowspan } = node.attrs;
+            const attrs: { [key: string]: any } = {};
+            if (colspan != 1) {
+                attrs.colspan = colspan;
+            }
+            if (rowspan != 1) {
+                attrs.rowspan = rowspan;
+            }
+            if (colwidth) {
+                attrs["data-colwidth"] = colwidth;
+            }
+            if (align) {
+                attrs.style = `text-align: ${align};`;
+            }
+            return nodeToDomWithAttrs(node, "td", attrs);
+        }
+    },
+    table_header: {
+        content: "(phrasing | image)*",
+        attrs: plusCommonAttributes({
+            abbr: { default: null },
+            align: { default: null },
+            colspan: { default: 1 },
+            colwidth: { default: null },
+            rowspan: { default: 1 },
+            scope: { default: null }
+        }),
+        tableRole: "header_cell",
+        isolating: true,
+        parseDOM: [{
+            tag: "th",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLTableCellElement) {
+                    attrs = {
+                        abbr: node.abbr,
+                        align: node.style.textAlign,
+                        colspan: node.colSpan || 1,
+                        rowspan: node.rowSpan || 1,
+                        scope: node.scope,
+                    };
+
+                    const widthAttr = node.getAttribute("data-colwidth");
+                    const widths = widthAttr
+                        && /^\d+(,\d+)*$/.test(widthAttr)
+                        ? widthAttr.split(",").map(s => Number(s))
+                        : null;
+                    attrs.colwidth = widths && widths.length == attrs.colspan
+                        ? widths
+                        : null;
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { align, colspan, colwidth, rowspan } = node.attrs;
+            const attrs: { [key: string]: any } = {};
+            if (colspan != 1) {
+                attrs.colspan = colspan;
+            }
+            if (rowspan != 1) {
+                attrs.rowspan = rowspan;
+            }
+            if (colwidth) {
+                attrs["data-colwidth"] = colwidth;
+            }
+            if (align) {
+                attrs.style = `text-align: ${align};`;
+            }
+            return nodeToDomWithAttrs(node, "th", attrs);
+        }
     },
     math_inline: {
         attrs: commonAttrs,
@@ -350,29 +717,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
         atom: true,
         parseDOM: [{
             tag: "math-inline",
-            getAttrs(node) {
-                if (!(node instanceof HTMLDivElement)) {
-                    return false;
-                }
-                return {
-                    id: node.id,
-                    className: node.className.split(" ").filter(x => x != "math-node").join(" "),
-                    style: node.style.cssText,
-                };
-            }
+            getAttrs(node) { return getCommonAttrs(node, undefined, x => x != "math-node") }
         }],
-        toDOM(node) {
-            const { id, className, style } = node.attrs;
-            return [
-                "math-inline",
-                {
-                    id,
-                    class: className + (className && className.length ? " math-node" : "math-node"),
-                    style
-                },
-                0
-            ];
-        }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "math-inline", "math-node") }
     },
     math_display: {
         attrs: commonAttrs,
@@ -382,76 +729,1145 @@ const commonNodes: { [name in string]: NodeSpec } = {
         code: true,
         parseDOM: [{
             tag: "math-display",
-            getAttrs(node) {
-                if (!(node instanceof HTMLDivElement)) {
-                    return false;
-                }
-                return {
-                    id: node.id,
-                    className: node.className.split(" ").filter(x => x != "math-node").join(" "),
-                    style: node.style.cssText,
-                };
-            }
+            getAttrs(node) { return getCommonAttrs(node, undefined, x => x != "math-node") }
         }],
-        toDOM(node) {
-            const { id, className, style } = node.attrs;
-            return [
-                "math-display",
-                {
-                    id,
-                    class: className + (className && className.length ? " math-node" : "math-node"),
-                    style
-                },
-                0
-            ];
-        }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "math-display", "math-node") }
     },
-    container: {
+    div: {
         attrs: commonAttrs,
-        content: "block+",
-        group: "block",
+        content: "(flow | address | headerfooter | heading | main | sectioning)+",
+        group: "flow",
         parseDOM: [{ tag: "div", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "div") }
     },
-};
-
-const tableSchemaNodes = tableNodes({
-    tableGroup: "block",
-    cellContent: "block+",
-    cellAttributes: {
-        align: {
-            default: null,
-            getFromDOM(dom) { return dom instanceof HTMLElement ? dom.style.textAlign : null },
-            setDOMAttr(value, attrs) {
-                if (value) {
-                    attrs.style = (attrs.style || "") + `text-align: ${value};`;
+    address: {
+        attrs: commonAttrs,
+        content: "(phrasing | image)*",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "address", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "address") }
+    },
+    area: {
+        attrs: plusCommonAttributes({
+            href: {},
+            shape: {},
+            alt: { default: null },
+            coords: { default: null },
+            download: { default: null },
+            rel: { default: null },
+            target: { default: null },
+        }),
+        defining: true,
+        inline: true,
+        selectable: false,
+        parseDOM: [{
+            tag: "area[href][shape]",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLAreaElement) {
+                    attrs = {
+                        href: node.href,
+                        shape: node.shape,
+                        alt: node.alt,
+                        coords: node.coords,
+                        download: node.download,
+                        rel: node.rel,
+                        target: node.target,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { href, shape, alt, coords, download, rel, target } = node.attrs;
+            return nodeToDomWithAttrs(node, "area", { href, shape, alt, coords, download, rel, target });
+        }
+    },
+    article: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        group: "sectioning",
+        parseDOM: [{ tag: "article", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "article") }
+    },
+    aside: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        group: "sectioning",
+        parseDOM: [{ tag: "aside", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "aside") }
+    },
+    audio: {
+        attrs: plusCommonAttributes({
+            controls: { default: null },
+            loop: { default: null },
+            muted: { default: null },
+            preload: { default: null },
+            src: { default: null },
+        }),
+        content: "(image | phrasing)*",
+        defining: true,
+        draggable: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "audio",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLAudioElement) {
+                    attrs = {
+                        controls: node.controls,
+                        loop: node.loop,
+                        muted: node.muted,
+                        preload: node.preload,
+                        src: node.src,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { controls, loop, muted, preload, src } = node.attrs;
+            return nodeToDomWithAttrs(node, "audio", { controls, loop, muted, preload, src });
+        }
+    },
+    base: {
+        attrs: plusCommonAttributes({
+            href: {},
+            target: { default: null },
+        }),
+        parseDOM: [{
+            tag: "base",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLBaseElement) {
+                    attrs = {
+                        href: node.href,
+                        target: node.target,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { href, target } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "base", { href, target });
+        }
+    },
+    body: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | main | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "body", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "body") }
+    },
+    caption: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "caption", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "caption") }
+    },
+    col: {
+        attrs: plusCommonAttributes({ span: { default: null } }),
+        defining: true,
+        parseDOM: [{
+            tag: "col",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLTableColElement) {
+                    attrs = { span: node.span };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { span } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "col", { span });
+        }
+    },
+    colgroup: {
+        attrs: plusCommonAttributes({ span: { default: null } }),
+        content: "col*",
+        defining: true,
+        parseDOM: [{
+            tag: "colgroup",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLTableColElement) {
+                    attrs = { span: node.span };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { span } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "colgroup", { span });
+        }
+    },
+    details: {
+        attrs: plusCommonAttributes({ open: { default: null } }),
+        content: "summary? (phrasing | image)+",
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "progress",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLDetailsElement) {
+                    attrs = { open: node.open };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { open } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "progress", { open });
+        }
+    },
+    figcaption: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "figcaption", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "figcaption") }
+    },
+    figure: {
+        attrs: commonAttrs,
+        content: "(flow | address | figcaption | headerfooter | heading | sectioning)+",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "figure", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "figure") }
+    },
+    footer: {
+        attrs: commonAttrs,
+        content: "(flow | address | heading | sectioning)+",
+        defining: true,
+        group: "headerfooter",
+        parseDOM: [{ tag: "footer", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "footer") }
+    },
+    head: {
+        attrs: commonAttrs,
+        content: "(meta | link | style)* title (meta | link | style)*",
+        defining: true,
+        parseDOM: [{ tag: "head", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "head") }
+    },
+    header: {
+        attrs: commonAttrs,
+        content: "(flow | address | heading | sectioning)+",
+        defining: true,
+        group: "headerfooter",
+        parseDOM: [{ tag: "header", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "header") }
+    },
+    html: {
+        attrs: plusCommonAttributes({ xmlns: { default: null } }),
+        content: "head body",
+        defining: true,
+        parseDOM: [{
+            tag: "html",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLHtmlElement) {
+                    attrs = { xmlns: node.getAttribute('xmlns') };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { xmlns } = node.attrs;
+            return nodeToDomWithAttrs(node, "html", { xmlns });
+        }
+    },
+    iframe: {
+        attrs: plusCommonAttributes({
+            allow: { default: null },
+            allowfullscreen: { default: null },
+            allowpaymentrequest: { default: null },
+            csp: { default: null },
+            fetchpriority: { default: null },
+            height: { default: null },
+            loading: { default: null },
+            name: { default: null },
+            referrerpolicy: { default: null },
+            sandbox: { default: null },
+            src: { default: null },
+            srcdoc: { default: null },
+            width: { default: null },
+        }),
+        group: "flow",
+        parseDOM: [{
+            tag: "iframe",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLIFrameElement) {
+                    attrs = {
+                        content: node.outerHTML,
+                        allow: node.allow,
+                        allowfullscreen: node.allowFullscreen,
+                        allowpaymentrequest: node.getAttribute('allowpaymentrequest'),
+                        csp: node.getAttribute('csp'),
+                        fetchpriority: node.getAttribute('fetchpriority'),
+                        height: node.height,
+                        loading: node.getAttribute('loading'),
+                        name: node.name,
+                        referrerpolicy: node.referrerPolicy,
+                        sandbox: node.sandbox,
+                        src: node.src,
+                        srcdoc: node.srcdoc,
+                        width: node.width,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const {
+                allow,
+                allowfullscreen,
+                allowpaymentrequest,
+                csp,
+                fetchpriority,
+                height,
+                loading,
+                name,
+                referrerpolicy,
+                sandbox,
+                src,
+                srcdoc,
+                width,
+            } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "iframe", {
+                allow,
+                allowfullscreen,
+                allowpaymentrequest,
+                csp,
+                fetchpriority,
+                height,
+                loading,
+                name,
+                referrerpolicy,
+                sandbox,
+                src,
+                srcdoc,
+                width,
+            });
+        }
+    },
+    label: {
+        attrs: plusCommonAttributes({ for: { default: null } }),
+        content: "(phrasing | image)*",
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "label",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLLabelElement) {
+                    attrs = { htmlFor: node.htmlFor };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { htmlFor } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "label", { for: htmlFor });
+        }
+    },
+    link: {
+        attrs: plusCommonAttributes({
+            as: { default: null },
+            crossorigin: { default: null },
+            disabled: { default: null },
+            fetchpriority: { default: null },
+            href: { default: null },
+            hreflang: { default: null },
+            imagesizes: { default: null },
+            imagesrcset: { default: null },
+            media: { default: null },
+            prefetch: { default: null },
+            referrerpolicy: { default: null },
+            rel: { default: null },
+            sizes: { default: null },
+            type: { default: null },
+        }),
+        parseDOM: [{
+            tag: "link",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLLinkElement) {
+                    attrs = {
+                        as: node.as,
+                        crossorigin: node.getAttribute('crossorigin'),
+                        disabled: node.disabled,
+                        fetchpriority: node.getAttribute('fetchpriority'),
+                        href: node.href,
+                        hreflang: node.hreflang,
+                        imagesizes: node.getAttribute('imagesizes'),
+                        imagesrcset: node.getAttribute('imagesrcset'),
+                        media: node.media,
+                        prefetch: node.getAttribute('prefetch'),
+                        referrerpolicy: node.getAttribute('referrerpolicy'),
+                        rel: node.rel,
+                        sizes: node.sizes,
+                        type: node.type,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const {
+                as,
+                crossorigin,
+                disabled,
+                fetchpriority,
+                href,
+                hreflang,
+                imagesizes,
+                imagesrcset,
+                media,
+                prefetch,
+                referrerpolicy,
+                rel,
+                sizes,
+                type,
+            } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "link", {
+                as,
+                crossorigin,
+                disabled,
+                fetchpriority,
+                href,
+                hreflang,
+                imagesizes,
+                imagesrcset,
+                media,
+                prefetch,
+                referrerpolicy,
+                rel,
+                sizes,
+                type,
+            });
+        }
+    },
+    main: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "main", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "main") }
+    },
+    map: {
+        attrs: plusCommonAttributes({ name: {} }),
+        content: "area*",
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "map[name]",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLMapElement) {
+                    attrs = { name: node.name };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { name } = node.attrs;
+            return nodeToDomWithAttrs(node, "map", { name });
+        }
+    },
+    meta: {
+        attrs: plusCommonAttributes({
+            charset: { default: null },
+            content: { default: null },
+            httpEquiv: { default: null },
+            name: { default: null },
+        }),
+        parseDOM: [{
+            tag: "meta",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLMetaElement) {
+                    attrs = {
+                        charset: node.getAttribute('charset'),
+                        content: node.content,
+                        httpEquiv: node.httpEquiv,
+                        name: node.name,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const {
+                charset,
+                content,
+                httpEquiv,
+                name,
+            } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "meta", {
+                charset,
+                content,
+                'http-equiv': httpEquiv,
+                name,
+            });
+        }
+    },
+    meter: {
+        attrs: plusCommonAttributes({
+            high: { default: null },
+            low: { default: null },
+            min: { default: null },
+            max: { default: null },
+            optimum: { default: null },
+            value: { default: null },
+        }),
+        content: "(phrasing | image)*",
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "meter",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLMeterElement) {
+                    attrs = {
+                        high: node.high,
+                        low: node.low,
+                        min: node.min,
+                        max: node.max,
+                        optimum: node.optimum,
+                        value: node.value,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { high, low, min, max, optimum, value } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "meter", { high, low, min, max, optimum, value });
+        }
+    },
+    nav: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        group: "sectioning",
+        parseDOM: [{ tag: "nav", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "nav") }
+    },
+    noscript: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | main | sectioning | link | meta | style)+",
+        group: "flow",
+        parseDOM: [{ tag: "noscript", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "noscript") }
+    },
+    object: {
+        attrs: plusCommonAttributes({
+            data: { default: null },
+            form: { default: null },
+            height: { default: null },
+            name: { default: null },
+            type: { default: null },
+            usemap: { default: null },
+            width: { default: null },
+        }),
+        group: "flow",
+        parseDOM: [{
+            tag: "object",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLObjectElement) {
+                    attrs = {
+                        data: node.data,
+                        form: node.form,
+                        height: node.height,
+                        name: node.name,
+                        type: node.type,
+                        usemap: node.useMap,
+                        width: node.width,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const {
+                data,
+                form,
+                height,
+                name,
+                type,
+                usemap,
+                width,
+            } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "object", {
+                data,
+                form,
+                height,
+                name,
+                type,
+                usemap,
+                width,
+            });
+        }
+    },
+    output: {
+        attrs: plusCommonAttributes({ for: { default: null } }),
+        content: "(phrasing | image)*",
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "output",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLLabelElement) {
+                    attrs = { htmlFor: node.htmlFor };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { htmlFor } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "output", { for: htmlFor });
+        }
+    },
+    picture: {
+        attrs: commonAttrs,
+        content: "(source)* image?",
+        draggable: true,
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{ tag: "picture", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "picture") }
+    },
+    progress: {
+        attrs: plusCommonAttributes({
+            max: { default: null },
+            value: { default: null },
+        }),
+        content: "(phrasing | image)*",
+        defining: true,
+        draggable: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "progress",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLProgressElement) {
+                    attrs = {
+                        max: node.max,
+                        value: node.value,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { max, value } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "progress", { max, value });
+        }
+    },
+    rp: {
+        attrs: commonAttrs,
+        content: "text*",
+        defining: true,
+        inline: true,
+        parseDOM: [{ tag: "rp", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "rp") }
+    },
+    rt: {
+        attrs: commonAttrs,
+        content: "(phrasing | image)+",
+        defining: true,
+        inline: true,
+        parseDOM: [{ tag: "rt", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "rt") }
+    },
+    ruby: {
+        attrs: commonAttrs,
+        content: "(phrasing | image | rp | rt)+",
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{ tag: "ruby", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "ruby") }
+    },
+    script: {
+        attrs: plusCommonAttributes({
+            async: { default: null },
+            crossorigin: { default: null },
+            defer: { default: null },
+            fetchpriority: { default: null },
+            integrity: { default: null },
+            nomodule: { default: null },
+            nonce: { default: null },
+            referrerpolicy: { default: null },
+            src: { default: null },
+            type: { default: null },
+        }),
+        content: "text*",
+        marks: "",
+        group: "flow",
+        code: true,
+        defining: true,
+        parseDOM: [{
+            tag: "script",
+            preserveWhitespace: "full",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLScriptElement) {
+                    attrs = {
+                        async: node.async,
+                        crossorigin: node.crossOrigin,
+                        defer: node.defer,
+                        fetchpriority: node.getAttribute('fetchpriority'),
+                        integrity: node.integrity,
+                        nomodule: node.noModule,
+                        nonce: node.nonce,
+                        referrerpolicy: node.referrerPolicy,
+                        src: node.src,
+                        type: node.type,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const {
+                async,
+                crossorigin,
+                defer,
+                fetchpriority,
+                integrity,
+                nomodule,
+                nonce,
+                referrerpolicy,
+                src,
+                type,
+            } = node.attrs;
+            return nodeToDomWithAttrs(node, "script", {
+                async,
+                crossorigin,
+                defer,
+                fetchpriority,
+                integrity,
+                nomodule,
+                nonce,
+                referrerpolicy,
+                src,
+                type,
+            });
+        }
+    },
+    section: {
+        attrs: commonAttrs,
+        content: "(flow | address | headerfooter | heading | sectioning)+",
+        defining: true,
+        group: "sectioning",
+        parseDOM: [{ tag: "section", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "section") }
+    },
+    source: {
+        attrs: plusCommonAttributes({
+            src: {},
+            srcset: { default: null },
+            height: { default: null },
+            media: { default: null },
+            sizes: { default: null },
+            type: { default: null },
+            width: { default: null },
+        }),
+        inline: true,
+        parseDOM: [{
+            tag: "source[src]",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLSourceElement) {
+                    attrs = {
+                        src: node.src,
+                        srcset: node.srcset,
+                        height: node.height,
+                        media: node.media,
+                        sizes: node.sizes,
+                        type: node.type,
+                        width: node.width,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { src, srcset, height, media, sizes, type, width } = node.attrs;
+            return contentlessToDomWithCommonAttrs(node, "source", { src, srcset, height, media, sizes, type, width });
+        }
+    },
+    style: {
+        attrs: plusCommonAttributes({
+            media: { default: null },
+            nonce: { default: null },
+        }),
+        content: "text*",
+        marks: "",
+        code: true,
+        defining: true,
+        parseDOM: [{
+            tag: "style",
+            preserveWhitespace: "full",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLStyleElement) {
+                    attrs = {
+                        media: node.media,
+                        nonce: node.nonce,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { media, nonce } = node.attrs;
+            return nodeToDomWithAttrs(node, "style", { media, nonce });
+        }
+    },
+    summary: {
+        attrs: commonAttrs,
+        content: "(phrasing | image)+",
+        defining: true,
+        inline: true,
+        parseDOM: [{ tag: "summary", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "summary") }
+    },
+    svg: {
+        attrs: plusCommonAttributes({
+            height: { default: null },
+            preserveAspectRatio: { default: null },
+            viewBox: { default: null },
+            width: { default: null },
+        }),
+        draggable: true,
+        inline: true,
+        parseDOM: [{
+            tag: "svg",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLElement) {
+                    attrs = {
+                        height: node.getAttribute("height"),
+                        preserveAspectRatio: node.getAttribute("preserveAspectRatio"),
+                        viewBox: node.getAttribute("viewBox"),
+                        width: node.getAttribute("width"),
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { height, preserveAspectRatio, viewBox, width } = node.attrs;
+            return nodeToDomWithAttrs(node, "svg", { height, preserveAspectRatio, viewBox, width });
+        }
+    },
+    tbody: {
+        content: "table_row+",
+        attrs: commonAttrs,
+        isolating: true,
+        parseDOM: [{ tag: "tbody", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tbody") }
+    },
+    tfoot: {
+        content: "table_row*",
+        attrs: commonAttrs,
+        isolating: true,
+        parseDOM: [{ tag: "tfoot", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tfoot") }
+    },
+    thead: {
+        content: "table_row*",
+        attrs: commonAttrs,
+        isolating: true,
+        parseDOM: [{ tag: "thead", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "thead") }
+    },
+    title: {
+        attrs: commonAttrs,
+        content: "text*",
+        defining: true,
+        marks: "",
+        parseDOM: [{ tag: "title", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "title") }
+    },
+    track: {
+        attrs: plusCommonAttributes({
+            src: {},
+            isDefault: { default: null },
+            kind: { default: null },
+            label: { default: null },
+            srclang: { default: null },
+        }),
+        inline: true,
+        selectable: false,
+        parseDOM: [{
+            tag: "track[src]",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLTrackElement) {
+                    attrs = {
+                        src: node.src,
+                        isDefault: node.default,
+                        kind: node.kind,
+                        label: node.label,
+                        srclang: node.srclang,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { src, isDefault, kind, label, srclang } = node.attrs;
+            return nodeToDomWithAttrs(node, "track", { src, isDefault, kind, label, srclang });
+        }
+    },
+    video: {
+        attrs: plusCommonAttributes({
+            controls: { default: null },
+            height: { default: null },
+            loop: { default: null },
+            muted: { default: null },
+            poster: { default: null },
+            preload: { default: null },
+            src: { default: null },
+            width: { default: null },
+        }),
+        content: "(image | phrasing)*",
+        defining: true,
+        draggable: true,
+        inline: true,
+        group: "phrasing",
+        parseDOM: [{
+            tag: "video",
+            getAttrs(node) {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLVideoElement) {
+                    attrs = {
+                        controls: node.controls,
+                        height: node.height,
+                        loop: node.loop,
+                        muted: node.muted,
+                        poster: node.poster,
+                        preload: node.preload,
+                        src: node.src,
+                        width: node.width,
+                    };
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { controls, height, loop, muted, poster, preload, src, width } = node.attrs;
+            return nodeToDomWithAttrs(node, "video", { controls, height, loop, muted, poster, preload, src, width });
+        }
+    },
+    wbr: {
+        attrs: commonAttrs,
+        defining: true,
+        inline: true,
+        group: "phrasing",
+        selectable: false,
+        parseDOM: [{ tag: "wbr", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "wbr") }
+    },
+    other: {
+        atom: true,
+        attrs: { content: { default: null } },
+        code: true,
+        content: "text*",
+        group: "flow",
+        parseDOM: [{
+            tag: "*",
+            getAttrs(node) {
+                let attrs: Attrs | null = null;
+                if (node instanceof Element) {
+                    attrs = { content: node.outerHTML };
+                }
+                return attrs;
+            }
+        }],
+        toDOM(node) {
+            const { content } = node.attrs;
+            if (content) {
+                const div = document.createElement('div');
+                div.innerHTML = content;
+                const element = div.firstChild;
+                if (element instanceof Element) {
+                    const tag = element.tagName.toLowerCase();
+                    const attrs: { [key: string]: any } = {};
+                    const attrNames = element.getAttributeNames();
+                    for (let i = 0; i < attrNames.length; i++) {
+                        attrs[attrNames[i]] = element.getAttribute(attrNames[i]);
+                    }
+                    return [tag, attrs, 0];
                 }
             }
+            return ["PARSE_ERROR", 0];
         }
     }
-}) as unknown as Record<string, NodeSpec>;
+};
 
 const markToDomWithCommonAttrs: (mark: Mark, tag: string) => DOMOutputSpec = (mark: Mark, tag: string) => {
-    const { id, className, style } = mark.attrs;
-    return [tag, { id, class: className, style }, 0];
+    const {
+        id,
+        className,
+        dir,
+        itemid,
+        itemprop,
+        itemref,
+        itemscope,
+        itemtype,
+        lang,
+        role,
+        style,
+        title
+    } = mark.attrs;
+    const attrs: { [key: string]: any } = {};
+    if (id && id.length) {
+        attrs.id = id;
+    }
+    if (className && className.length) {
+        attrs.class = className;
+    }
+    if (dir && dir.length) {
+        attrs.dir = dir;
+    }
+    if (itemid && itemid.length) {
+        attrs.itemid = itemid;
+    }
+    if (itemprop && itemprop.length) {
+        attrs.itemprop = itemprop;
+    }
+    if (itemref && itemref.length) {
+        attrs.itemref = itemref;
+    }
+    if (itemscope && itemscope.length) {
+        attrs.itemscope = itemscope;
+    }
+    if (itemtype && itemtype.length) {
+        attrs.itemtype = itemtype;
+    }
+    if (lang && lang.length) {
+        attrs.lang = lang;
+    }
+    if (role && role.length) {
+        attrs.role = role;
+    }
+    if (style && style.length) {
+        attrs.style = style;
+    }
+    if (title && title.length) {
+        attrs.title = title;
+    }
+
+    return [tag, attrs, 0];
+};
+const markToDomWithAttrs: (mark: Mark, tag: string, attrs: { [key: string]: any }) => DOMOutputSpec = (mark, tag, attrs) => {
+    const {
+        id,
+        className,
+        dir,
+        itemid,
+        itemprop,
+        itemref,
+        itemscope,
+        itemtype,
+        lang,
+        role,
+        style,
+        title
+    } = mark.attrs;
+
+    const domAttrs: { [key: string]: any } = {};
+    for (const attr in attrs) {
+        if (attrs[attr]) {
+            domAttrs[attr] = attrs[attr];
+        }
+    }
+
+    if (id && id.length) {
+        domAttrs.id = id;
+    }
+    if (className && className.length) {
+        if (domAttrs.class) {
+            domAttrs.class += ' ' + className;
+        } else {
+            domAttrs.class = className;
+        }
+    }
+    if (dir && dir.length) {
+        domAttrs.dir = dir;
+    }
+    if (itemid && itemid.length) {
+        domAttrs.itemid = itemid;
+    }
+    if (itemprop && itemprop.length) {
+        domAttrs.itemprop = itemprop;
+    }
+    if (itemref && itemref.length) {
+        domAttrs.itemref = itemref;
+    }
+    if (itemscope && itemscope.length) {
+        domAttrs.itemscope = itemscope;
+    }
+    if (itemtype && itemtype.length) {
+        domAttrs.itemtype = itemtype;
+    }
+    if (lang && lang.length) {
+        domAttrs.lang = lang;
+    }
+    if (role && role.length) {
+        domAttrs.role = role;
+    }
+    if (style && style.length) {
+        domAttrs.style = style;
+    }
+    if (title && title.length) {
+        domAttrs.title = title;
+    }
+
+    return [tag, domAttrs, 0];
 };
 const commonMarks: { [name in string]: MarkSpec } = {
-    link: {
-        attrs: {
+    anchor: {
+        attrs: plusCommonAttributes({
             href: {},
-            title: { default: null },
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
+            download: { default: null },
+            rel: { default: null },
+            target: { default: null },
+        }),
         inclusive: false,
         parseDOM: [{
             tag: "a[href]",
             getAttrs(node) {
-                if (node instanceof HTMLElement) {
+                if (node instanceof HTMLAnchorElement) {
                     return {
-                        href: node.getAttribute("href"),
-                        title: node.getAttribute("title"),
+                        href: node.href,
+                        download: node.download,
+                        rel: node.rel,
+                        target: node.target,
+                        title: node.title,
                         id: node.id,
                         className: node.className,
                         style: node.style.cssText,
@@ -460,9 +1876,9 @@ const commonMarks: { [name in string]: MarkSpec } = {
                 return null;
             }
         }],
-        toDOM(node) {
-            const { href, title, id, className, style } = node.attrs;
-            return ["a", { href, title, id, class: className, style }, 0];
+        toDOM(mark) {
+            const { href, download, rel, target } = mark.attrs;
+            return markToDomWithAttrs(mark, "a", { href, download, rel, target });
         }
     },
     em: {
@@ -479,10 +1895,12 @@ const commonMarks: { [name in string]: MarkSpec } = {
         toDOM(mark) { return markToDomWithCommonAttrs(mark, "i") }
     },
     strong: {
+        attrs: commonAttrs,
         parseDOM: [{ tag: "strong", getAttrs: getCommonAttrs }],
         toDOM(mark) { return markToDomWithCommonAttrs(mark, "strong") }
     },
     bold: {
+        attrs: commonAttrs,
         parseDOM: [
             {
                 tag: "b",
@@ -510,6 +1928,7 @@ const commonMarks: { [name in string]: MarkSpec } = {
         toDOM(mark) { return markToDomWithCommonAttrs(mark, "b") }
     },
     underline: {
+        attrs: commonAttrs,
         parseDOM: [
             { tag: "u" },
             { style: "text-decoration-line=underline" },
@@ -559,6 +1978,148 @@ const commonMarks: { [name in string]: MarkSpec } = {
         parseDOM: [{ tag: "sup", getAttrs: getCommonAttrs }, { style: "vertical-align=super" }],
         toDOM(mark) { return markToDomWithCommonAttrs(mark, "sup") }
     },
+    abbr: {
+        attrs: {
+            title: {},
+            id: { default: null },
+            className: { default: null },
+            style: { default: null },
+        },
+        parseDOM: [{
+            tag: "abbr[title]",
+            getAttrs(node) {
+                if (node instanceof HTMLElement) {
+                    return {
+                        title: node.title,
+                        id: node.id,
+                        className: node.className,
+                        style: node.style.cssText,
+                    }
+                }
+                return null;
+            }
+        }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "abbr") }
+    },
+    bdi: {
+        attrs: commonAttrs,
+        parseDOM: [{ tag: "bdi", getAttrs: getCommonAttrs }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "bdi") }
+    },
+    bdo: {
+        attrs: {
+            dir: {},
+            id: { default: null },
+            className: { default: null },
+            style: { default: null },
+        },
+        parseDOM: [{
+            tag: "bdo",
+            getAttrs(node) {
+                if (node instanceof HTMLElement) {
+                    return {
+                        dir: node.dir,
+                        id: node.id,
+                        className: node.className,
+                        style: node.style.cssText,
+                    }
+                }
+                return null;
+            }
+        }],
+        toDOM(mark) {
+            const { dir } = mark.attrs;
+            return markToDomWithAttrs(mark, "bdo", { dir });
+        }
+    },
+    cite: {
+        attrs: commonAttrs,
+        parseDOM: [{ tag: "cite", getAttrs: getCommonAttrs }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "cite") }
+    },
+    data: {
+        attrs: plusCommonAttributes({ value: {} }),
+        parseDOM: [{
+            tag: "data[value]",
+            getAttrs(node) {
+                if (node instanceof HTMLDataElement) {
+                    return {
+                        value: node.value,
+                        id: node.id,
+                        className: node.className,
+                        style: node.style.cssText,
+                    }
+                }
+                return null;
+            }
+        }],
+        toDOM(mark) {
+            const { value } = mark.attrs;
+            return markToDomWithAttrs(mark, "data", { value });
+        }
+    },
+    dfn: {
+        attrs: commonAttrs,
+        parseDOM: [{ tag: "dfn", getAttrs: getCommonAttrs }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "dfn") }
+    },
+    kbd: {
+        attrs: commonAttrs,
+        parseDOM: [{ tag: "kbd", getAttrs: getCommonAttrs }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "kbd") }
+    },
+    quote: {
+        attrs: plusCommonAttributes({ cite: { default: null } }),
+        parseDOM: [{
+            tag: "q",
+            getAttrs(node) {
+                if (node instanceof HTMLQuoteElement) {
+                    return {
+                        cite: node.cite,
+                        id: node.id,
+                        className: node.className,
+                        style: node.style.cssText,
+                    }
+                }
+                return null;
+            }
+        }],
+        toDOM(mark) {
+            const { cite } = mark.attrs;
+            return markToDomWithAttrs(mark, "q", { cite });
+        }
+    },
+    samp: {
+        attrs: commonAttrs,
+        parseDOM: [{ tag: "samp", getAttrs: getCommonAttrs }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "samp") }
+    },
+    time: {
+        attrs: plusCommonAttributes({ datetime: {} }),
+        parseDOM: [{
+            tag: "time[datetime]",
+            getAttrs(node) {
+                if (node instanceof HTMLTimeElement) {
+                    return {
+                        datetime: node.dateTime,
+                        id: node.id,
+                        className: node.className,
+                        style: node.style.cssText,
+                    }
+                }
+                return null;
+            }
+        }],
+        toDOM(mark) {
+            const { datetime } = mark.attrs;
+            return markToDomWithAttrs(mark, "time", { datetime });
+        }
+    },
+    variable: {
+        attrs: commonAttrs,
+        parseDOM: [{ tag: "var", getAttrs: getCommonAttrs }],
+        toDOM(mark) { return markToDomWithCommonAttrs(mark, "var") }
+    },
     span: {
         attrs: commonAttrs,
         excludes: '',
@@ -567,15 +2128,8 @@ const commonMarks: { [name in string]: MarkSpec } = {
     },
 };
 
-export const htmlSchema = new Schema({
-    nodes: OrderedMap.from(commonNodes)
-        .append(tableSchemaNodes),
-    marks: commonMarks
-});
-
-export const markdownSchema = new Schema({
-    nodes: OrderedMap.from(commonNodes)
-        .append(tableSchemaNodes),
+export const schema = new Schema({
+    nodes: commonNodes,
     marks: commonMarks
 });
 
@@ -583,11 +2137,31 @@ export function commonCommands(schema: Schema) {
     const commands: CommandSet = {};
     commands[CommandType.Undo] = { command: undo };
     commands[CommandType.Redo] = { command: redo };
-    for (let i = 0; i < 6; i++) {
-        commands[(CommandType.Heading1 - i) as CommandType] = blockTypeMenuItem(schema.nodes.heading, { level: i });
-    }
+    commands[CommandType.Heading] = {
+        command(state, dispatch, _, params) {
+            let level = 1;
+            if (params && params.length) {
+                const i = Number.parseInt(params[0]);
+                if (i >= 1) {
+                    level = i;
+                }
+            }
+            return setBlockType(schema.nodes.heading, { level })(state, dispatch);
+        }
+    };
     commands[CommandType.Paragraph] = blockTypeMenuItem(schema.nodes.paragraph);
-    commands[CommandType.BlockQuote] = blockTypeMenuItem(schema.nodes.blockquote);
+    commands[CommandType.BlockQuote] = {
+        command: wrapIn(schema.nodes.blockquote),
+        isActive(state) {
+            if (state.selection instanceof NodeSelection
+                && state.selection.node) {
+                return state.selection.node.type.name == schema.nodes.blockquote.name;
+            }
+            const { $from, to } = state.selection;
+            return to <= $from.end()
+                && $from.parent.type.name == schema.nodes.blockquote.name;
+        }
+    };
     commands[CommandType.CodeBlock] = blockTypeMenuItem(schema.nodes.code_block);
     commands[CommandType.Strong] = markMenuItem(schema.marks.strong);
     commands[CommandType.Bold] = markMenuItem(schema.marks.bold);
@@ -601,136 +2175,8 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Inserted] = markMenuItem(schema.marks.ins);
     commands[CommandType.Marked] = markMenuItem(schema.marks.mark);
     commands[CommandType.CodeInline] = markMenuItem(schema.marks.code);
-    commands[CommandType.ForegroundColor] = {
-        command(state, dispatch, _, params) {
-            const { from, $from, to, $to } = state.selection;
-            const marks = $from.marksAcross($to);
-
-            if (!params || !params.length) {
-                const parentColor = to <= $from.end()
-                    && $from.parent.attrs.style
-                    && $from.parent.attrs.style.contains('color:');
-                let anyColor = parentColor;
-
-                if (marks && marks.length) {
-                    marks.forEach(m => anyColor = anyColor || m.attrs.style?.contains('color:'));
-                }
-
-                if (!anyColor) {
-                    return false;
-                }
-
-                if (dispatch) {
-                    if (parentColor) {
-                        const attrs = $from.parent.attrs;
-                        attrs.style = ((attrs.style || '') as string)
-                            .split(';')
-                            .filter(x => !x.trimStart().startsWith('color:'))
-                            .join(';');
-                            
-                        dispatch(state.tr.setNodeMarkup(from, undefined, attrs));
-                    }
-                    if (marks && marks.length) {
-                        marks.forEach(m => {
-                            if (m.attrs.style?.contains('color:')) {
-                                dispatch(state.tr.removeMark(from, to, m));
-                            }
-                        });
-                    }
-                }
-                return true;
-            }
-
-            const styleValue = `$color:${params[0]}`;
-
-            if (state.selection instanceof NodeSelection
-                && state.selection.node
-                && state.selection.node.attrs.style?.contains(styleValue)) {
-                return false;
-            }
-            if (to <= $from.end()
-                && $from.parent.attrs.style?.contains(styleValue)) {
-                return false;
-            }
-            if (marks && marks.length) {
-                let allMarks = true;
-                marks.forEach(m => allMarks = allMarks && m.attrs.style?.contains(styleValue));
-                if (allMarks) {
-                    return false;
-                }
-            }
-
-            return toggleMark(state.schema.marks.span, { style: styleValue })(state, dispatch);
-        },
-        isEnabled(state) {
-            return toggleMark(state.schema.marks.span, { style: 'color:placeholder' })(state);
-        }
-    };
-    commands[CommandType.BackgroundColor] = {
-        command(state, dispatch, _, params) {
-            const { from, $from, to, $to } = state.selection;
-            const marks = $from.marksAcross($to);
-
-            if (!params || !params.length) {
-                const parentColor = to <= $from.end()
-                    && $from.parent.attrs.style
-                    && $from.parent.attrs.style.contains('background-color:');
-                let anyColor = parentColor;
-
-                if (marks && marks.length) {
-                    marks.forEach(m => anyColor = anyColor || m.attrs.style?.contains('background-color:'));
-                }
-
-                if (!anyColor) {
-                    return false;
-                }
-
-                if (dispatch) {
-                    if (parentColor) {
-                        const attrs = $from.parent.attrs;
-                        attrs.style = ((attrs.style || '') as string)
-                            .split(';')
-                            .filter(x => !x.trimStart().startsWith('background-color:'))
-                            .join(';');
-
-                        dispatch(state.tr.setNodeMarkup(from, undefined, attrs));
-                    }
-                    if (marks && marks.length) {
-                        marks.forEach(m => {
-                            if (m.attrs.style?.contains('background-color:')) {
-                                dispatch(state.tr.removeMark(from, to, m));
-                            }
-                        });
-                    }
-                }
-                return true;
-            }
-
-            const styleValue = `background-color:${params[0]}`;
-
-            if (state.selection instanceof NodeSelection
-                && state.selection.node
-                && state.selection.node.attrs.style?.contains(styleValue)) {
-                return false;
-            }
-            if (to <= $from.end()
-                && $from.parent.attrs.style?.contains(styleValue)) {
-                return false;
-            }
-            if (marks && marks.length) {
-                let allMarks = true;
-                marks.forEach(m => allMarks = allMarks && m.attrs.style?.contains(styleValue));
-                if (allMarks) {
-                    return false;
-                }
-            }
-
-            return toggleMark(state.schema.marks.span, { style: styleValue })(state, dispatch);
-        },
-        isEnabled(state) {
-            return toggleMark(state.schema.marks.span, { style: 'background-color:placeholder' })(state);
-        }
-    };
+    commands[CommandType.ForegroundColor] = toggleInlineStyleMenuItem('color');
+    commands[CommandType.BackgroundColor] = toggleInlineStyleMenuItem('background-color');
     commands[CommandType.InsertImage] = {
         command(state, dispatch, _, params) {
             if (!canInsert(state, schema.nodes.image)) {
@@ -742,8 +2188,8 @@ export function commonCommands(schema: Schema) {
                 }
                 let attrs: { [key: string]: any } | null = null;
                 if (state.selection instanceof NodeSelection
-                    && state.selection.node.type == schema.nodes.image) {
-                    attrs = state.selection.node.attrs;
+                    && state.selection.node.type.name == schema.nodes.image.name) {
+                    attrs = { ...state.selection.node.attrs };
                 }
                 attrs = attrs || {};
                 attrs.src = params[0];
@@ -758,14 +2204,20 @@ export function commonCommands(schema: Schema) {
             return true;
         },
         isActive(state, type) { return isMarkActive(state, type) },
-        markType: schema.marks.image
+        markType: schema.marks.image as MarkType
     };
     commands[CommandType.InsertLink] = {
         command(state, dispatch, _, params) {
-            const isActive = isMarkActive(state, schema.marks.link);
-            if (isActive) {
-                return toggleMark(schema.marks.link)(state, dispatch);
+            const node = state.selection.$head.parent;
+            if (node && node.type == schema.nodes.code_block) {
+                return false;
             }
+
+            const isActive = isMarkActive(state, schema.marks.anchor);
+            if (isActive) {
+                return toggleMark(schema.marks.anchor)(state, dispatch);
+            }
+
             if (dispatch) {
                 if (!params || !params.length) {
                     return true;
@@ -775,12 +2227,12 @@ export function commonCommands(schema: Schema) {
                 if (params.length > 1) {
                     attrs.title = params[1];
                 }
-                return toggleMark(schema.marks.link, attrs)(state, dispatch);
+                return toggleMark(schema.marks.anchor, attrs)(state, dispatch);
             }
             return true;
         },
         isActive(state, type) { return isMarkActive(state, type) },
-        markType: schema.marks.link
+        markType: schema.marks.anchor as MarkType
     };
     commands[CommandType.ListBullet] = { command: wrapInList(schema.nodes.bullet_list) };
     commands[CommandType.ListNumber] = { command: wrapInList(schema.nodes.ordered_list) };
@@ -803,23 +2255,32 @@ export function commonCommands(schema: Schema) {
                 || this.isActive!(state)) {
                 return false;
             }
+            const node = state.selection.$head.parent;
+            if (node && node.type == schema.nodes.code_block) {
+                return false;
+            }
             if (dispatch) {
-                const rows = params && params.length ? params[0] : 2;
-                const columns = params && params.length > 1 ? params[1] : 2;
+                let rows = Math.max(2, params && params.length ? params[0] : 2);
+                let columns = Math.max(1, params && params.length > 1 ? params[1] : 2);
+
+                const headerRowNodes: ProsemirrorNode[] = [];
+                const cells: ProsemirrorNode[] = [];
+                for (let j = 0; j < columns; j++) {
+                    cells.push(schema.nodes.table_header.create());
+                }
+                headerRowNodes.push(schema.nodes.table_row.create(null, cells));
+                const head = schema.nodes.thead.create(null, headerRowNodes);
 
                 const rowNodes: ProsemirrorNode[] = [];
-                for (let i = 0; i < rows; i++) {
+                for (let i = 1; i < rows; i++) {
                     const cells: ProsemirrorNode[] = [];
                     for (let j = 0; j < columns; j++) {
-                        if (i == 0) {
-                            cells.push(schema.nodes.table_header.create());
-                        } else {
-                            cells.push(schema.nodes.table_cell.create());
-                        }
+                        cells.push(schema.nodes.table_cell.create());
                     }
                     rowNodes.push(schema.nodes.table_row.create(null, cells));
                 }
-                dispatch(state.tr.replaceSelectionWith(schema.nodes.table.create(null, rowNodes)!));
+                const body = schema.nodes.tbody.create(null, rowNodes);
+                dispatch(state.tr.replaceSelectionWith(schema.nodes.table.create(null, [head, body])!));
             }
             return true;
         },
@@ -830,7 +2291,7 @@ export function commonCommands(schema: Schema) {
             }
             const { $from, to } = state.selection;
             return to <= $from.end()
-                && $from.parent.hasMarkup(schema.nodes.table);
+                && $from.parent.hasMarkup(schema.nodes.table as NodeType);
         }
     };
     commands[CommandType.TableInsertColumnBefore] = { command: addColumnBefore };
@@ -842,7 +2303,28 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.TableDelete] = { command: deleteTable };
     commands[CommandType.TableMergeCells] = { command: mergeCells };
     commands[CommandType.TableSplitCell] = { command: splitCell };
+    commands[CommandType.TableToggleHeaderColumn] = { command: toggleHeaderColumn };
     commands[CommandType.TableToggleHeaderRow] = { command: toggleHeaderRow };
+    commands[CommandType.TableFullWidth] = {
+        command: toggleFullWidth,
+        isActive(state) {
+            const style = 'width:100%';
+            const { $from, to } = state.selection;
+            if (to > $from.end()) {
+                return false;
+            }
+            const depth = $from.sharedDepth(to);
+            for (let i = depth; i >= 0; i--) {
+                const node = $from.node(i);
+                if (node
+                    && node.type == state.schema.nodes.table) {
+                    return !!node.attrs.style
+                        && node.attrs.style.indexOf(style) != -1;
+                }
+            }
+            return false;
+        }
+    };
     commands[CommandType.HorizontalRule] = {
         command(state, dispatch) {
             if (!canInsert(state, schema.nodes.horizontal_rule)) {
@@ -856,36 +2338,137 @@ export function commonCommands(schema: Schema) {
     };
     commands[CommandType.SetCodeSyntax] = {
         command(state, dispatch, _, params) {
-            const node = state.selection.$head.nodeAfter;
+            const node = state.selection.$head.parent;
             if (!node || node.type != schema.nodes.code_block) {
                 return false;
             }
             if (dispatch) {
-                if (!params || !params.length) {
-                    return true;
+                const attrs = { ...node.attrs };
+                if (!params
+                    || !params.length
+                    || !params[0]
+                    || params[0] == "None") {
+                    delete attrs.syntax;
+                } else {
+                    attrs.syntax = params[0];
                 }
-                const attrs = node.attrs;
-                attrs.syntax = params[0] as string | null;
-                dispatch(state.tr.setNodeMarkup(
-                    state.selection.head,
-                    undefined,
-                    attrs));
+                const tr = state.tr;
+                setNodeAttrs(tr, state.selection.head, state.selection.$head.depth, state.schema.nodes.code_block, attrs);
+                dispatch(tr);
             }
             return true;
         }
     };
-    commands[CommandType.SetFontFamily] = setInlineStyleMenuItem('font-family');
-    commands[CommandType.SetFontSize] = setInlineStyleMenuItem('font-size');
-    commands[CommandType.SetLineHeight] = setInlineStyleMenuItem('line-height');
+    commands[CommandType.SetFontFamily] = toggleInlineStyleMenuItem('font-family');
+    commands[CommandType.SetFontSize] = toggleInlineStyleMenuItem('font-size');
+    commands[CommandType.SetLineHeight] = toggleInlineStyleMenuItem('line-height');
     commands[CommandType.AlignLeft] = alignMenuItem('left');
     commands[CommandType.AlignCenter] = alignMenuItem('center');
     commands[CommandType.AlignRight] = alignMenuItem('right');
-    commands[CommandType.PageBreak] = setStyleMenuItem('page-break-after', 'always');
+    commands[CommandType.PageBreak] = {
+        command(state, dispatch, view, params) {
+            const styleAttr = 'page-break-after:';
+            const style = 'page-break-after:always';
+
+            if (dispatch) {
+                const { from, $from, to } = state.selection;
+                if (to > $from.end()) {
+                    return wrapIn(state.schema.nodes.div, { style })(state, dispatch);
+                }
+
+                let parentDiv: ProsemirrorNode | undefined;
+                const depth = $from.sharedDepth(to);
+                let parentDepth = depth;
+                for (let i = depth; i >= 0; i--) {
+                    const node = $from.node(i);
+                    if (node && node.type.name == state.schema.nodes.div.name) {
+                        parentDiv = node;
+                        parentDepth = i;
+                        break;
+                    }
+                }
+                if (!parentDiv) {
+                    return wrapAndExitDiv(state.schema.nodes.div, { style })(state, dispatch);
+                }
+                const parentStyled = parentDiv.attrs.style
+                    && parentDiv.attrs.style.indexOf(styleAttr) != -1;
+
+                if (parentStyled) {
+                    const tr = state.tr;
+                    const attrs = { ...parentDiv.attrs };
+                    attrs.style = ((attrs.style || '') as string)
+                        .split(';')
+                        .filter(x => !x.trimStart().startsWith(styleAttr))
+                        .join(';') + style;
+                    setNodeAttrs(tr, from, parentDepth, state.schema.nodes.div, attrs);
+                    dispatch(tr.scrollIntoView());
+                } else {
+                    return wrapAndExitDiv(state.schema.nodes.div, { style })(state, dispatch);
+                }
+            }
+            return true;
+        },
+        isActive(state) {
+            const { $from, to } = state.selection;
+            if (to > $from.end()) {
+                return false;
+            }
+            const depth = $from.sharedDepth(to);
+            for (let i = depth; i >= 0; i--) {
+                const node = $from.node(i);
+                if (node
+                    && node.type.name == state.schema.nodes.div.name
+                    && node.attrs.style
+                    && node.attrs.style.indexOf('page-break-after:') != -1) {
+                    return node.attrs.style.indexOf('page-break-after:always') != -1;
+                }
+            }
+            return false;
+        }
+    };
     return commands;
+}
+
+export const exitDiv: Command = (state, dispatch) => {
+    const { $head, $anchor } = state.selection;
+    if (!$head.sameParent($anchor)) {
+        return false;
+    }
+    let div: ProsemirrorNode | null = null;
+    let depth = $head.depth;
+    for (; depth >= 0; depth--) {
+        const node = $head.node(depth);
+        if (node.type.name == "div") {
+            div = node;
+            break;
+        }
+    }
+    if (!div) {
+        return false;
+    }
+    const above = $head.node(depth - 1), after = $head.indexAfter(depth - 1), type = defaultBlockAt(above.contentMatchAt(after));
+    if (!type || !above.canReplaceWith(after, after, type)) {
+        return false;
+    }
+    if (dispatch) {
+        const pos = $head.after(depth), tr = state.tr.replaceWith(pos, pos, type.createAndFill()!);
+        tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
+        dispatch(tr.scrollIntoView());
+    }
+    return true;
 }
 
 export function htmlWrapCommand(tag: string) {
     return wrapCommand(`<${tag}>`, `</${tag}>`);
+}
+
+export function setAttr(attrs: { [key: string]: any }, name: string, value: any) {
+    const result: { [key: string]: any } = {};
+    for (const prop in attrs) {
+        result[prop] = attrs[prop];
+    }
+    result[name] = value;
+    return result;
 }
 
 export function wrapCommand(tag: string, closeTag: string) {
@@ -905,17 +2488,63 @@ export function wrapCommand(tag: string, closeTag: string) {
 }
 
 function alignMenuItem(value: string): CommandInfo {
+    const styleAttr = 'text-align:';
     const style = `text-align:${value}`;
     return {
         command(state, dispatch, view) {
-            if (this.isActive!(state)) {
-                return true;
-            }
             const handled = setColumnAlign(value)(state, dispatch, view);
             if (handled) {
                 return true;
             }
-            return setBlockType(state.schema.nodes.container, { style })(state, dispatch);
+
+            if (dispatch) {
+                const { from, $from, to } = state.selection;
+                if (to > $from.end()) {
+                    return wrapIn(state.schema.nodes.div, { style })(state, dispatch);
+                }
+
+                let parentDiv: ProsemirrorNode | undefined;
+                const depth = $from.sharedDepth(to);
+                let parentDepth = depth;
+                for (let i = depth; i >= 0; i--) {
+                    const node = $from.node(i);
+                    if (node && node.type.name == state.schema.nodes.div.name) {
+                        parentDiv = node;
+                        parentDepth = i;
+                        break;
+                    }
+                }
+                if (!parentDiv) {
+                    return wrapIn(state.schema.nodes.div, { style })(state, dispatch);
+                }
+                const parentAligned = parentDiv.attrs.style
+                    && parentDiv.attrs.style.indexOf(styleAttr) != -1;
+
+                if (parentAligned) {
+                    const tr = state.tr;
+                    const attrs = { ...parentDiv.attrs };
+                    if (!attrs.style || attrs.style.indexOf(style) == -1) {
+                        attrs.style = ((attrs.style || '') as string)
+                            .split(';')
+                            .filter(x => !x.trimStart().startsWith(styleAttr))
+                            .join(';') + style;
+                    } else {
+                        attrs.style = ((attrs.style || '') as string)
+                            .split(';')
+                            .filter(x => !x.trimStart().startsWith(styleAttr))
+                            .join(';');
+                        if (attrs.style.length == 0
+                            && parentDepth == depth - 1) {
+                            return chainCommands(lift, liftEmptyBlock)(state, dispatch, view);
+                        }
+                    }
+                    setNodeAttrs(tr, from, parentDepth, state.schema.nodes.div, attrs);
+                    dispatch(tr.scrollIntoView());
+                } else {
+                    return wrapIn(state.schema.nodes.div, { style })(state, dispatch);
+                }
+            }
+            return true;
         },
         isActive(state) {
             if (state.selection instanceof CellSelection) {
@@ -929,18 +2558,28 @@ function alignMenuItem(value: string): CommandInfo {
                 colSelection.forEachCell(x => allCells = allCells && ((x.attrs?.align == value) || false));
                 return allCells;
             }
-            if (state.selection instanceof NodeSelection
-                && state.selection.node) {
-                return state.selection.node.attrs?.style?.contains(style) || false;
-            }
             const { $from, to } = state.selection;
-            return to <= $from.end()
-                && $from.parent.attrs?.style?.contains(style) || false;
+            if (to > $from.end()) {
+                return false;
+            }
+            const depth = $from.sharedDepth(to);
+            for (let i = depth; i >= 0; i--) {
+                const node = $from.node(i);
+                if (node
+                    && node.type.name == state.schema.nodes.div.name
+                    && node.attrs.style
+                    && node.attrs.style.indexOf(styleAttr) != -1) {
+                    return node.attrs.style.indexOf(style) != -1;
+                }
+            }
+            return false;
         }
     };
 }
 
-function blockTypeMenuItem(nodeType: NodeType, attrs?: { [key: string]: any }): CommandInfo {
+function blockTypeMenuItem(
+    nodeType: NodeType,
+    attrs?: { [key: string]: any }): CommandInfo {
     return {
         command: setBlockType(nodeType),
         isActive(state) {
@@ -955,7 +2594,9 @@ function blockTypeMenuItem(nodeType: NodeType, attrs?: { [key: string]: any }): 
     };
 }
 
-function canInsert(state: EditorState, nodeType: NodeType) {
+function canInsert(
+    state: EditorState,
+    nodeType: NodeType) {
     const $from = state.selection.$from;
     for (let d = $from.depth; d >= 0; d--) {
         const index = $from.index(d);
@@ -966,7 +2607,19 @@ function canInsert(state: EditorState, nodeType: NodeType) {
     return false;
 }
 
-function isMarkActive(state: EditorState, type?: MarkType) {
+function defaultBlockAt(match: ContentMatch) {
+    for (let i = 0; i < match.edgeCount; i++) {
+        const { type } = match.edge(i);
+        if (type.isTextblock && !type.hasRequiredAttrs()) {
+            return type;
+        }
+    }
+    return null;
+}
+
+function isMarkActive(
+    state: EditorState,
+    type?: MarkType) {
     if (!type) {
         return false;
     }
@@ -978,6 +2631,29 @@ function isMarkActive(state: EditorState, type?: MarkType) {
     }
 }
 
+function markApplies(
+    doc: ProsemirrorNode,
+    ranges: readonly SelectionRange[],
+    type: MarkType) {
+    for (let i = 0; i < ranges.length; i++) {
+        const { $from, $to } = ranges[i];
+        let can = $from.depth == 0
+            ? doc.type.allowsMarkType(type)
+            : false;
+        doc.nodesBetween($from.pos, $to.pos, node => {
+            if (can) {
+                return false;
+            }
+            can = node.inlineContent
+                && node.type.allowsMarkType(type);
+        })
+        if (can) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function markMenuItem(type: MarkType): CommandInfo {
     return {
         command: toggleMark(type),
@@ -986,105 +2662,184 @@ function markMenuItem(type: MarkType): CommandInfo {
     }
 }
 
-function setInlineStyleMenuItem(style: string): CommandInfo {
+function plusCommonAttributes(attrs: { [key: string]: any }) {
+    for (const prop in commonAttrs) {
+        attrs[prop] = { default: commonAttrs[prop].default };
+    }
+    return attrs;
+}
+
+function removeMarkStyle(
+    tr: Transaction,
+    styleAttr: string,
+    from: number,
+    to: number) {
+    const set = tr.storedMarks || tr.selection.$head.marks();
+    const newSet: Mark[] = [];
+    for (let i = 0; i < set.length; i++) {
+        if (!set[i].attrs.style
+            || set[i].attrs.style.indexOf(styleAttr) == -1) {
+            newSet.push(set[i]);
+        }
+    }
+
+    const matched: { style: Mark, from: number, to: number, step: number }[] = [];
+    let step = 0;
+    tr.doc.nodesBetween(from, to, (node, pos) => {
+        if (!node.isInline) {
+            return;
+        }
+        step++;
+        const toRemove: Mark[] = [];
+        const set = node.marks;
+        for (let i = 0; i < set.length; i++) {
+            if (set[i].attrs.style
+                && set[i].attrs.style.indexOf(styleAttr) != -1) {
+                toRemove.push(set[i]);
+            }
+        }
+        if (toRemove.length) {
+            const end = Math.min(pos + node.nodeSize, to);
+            for (let i = 0; i < toRemove.length; i++) {
+                const style = toRemove[i];
+                let found;
+                for (let j = 0; j < matched.length; j++) {
+                    const m = matched[j];
+                    if (m.step == step - 1
+                        && style.eq(matched[j].style)) {
+                        found = m;
+                    }
+                }
+                if (found) {
+                    found.to = end;
+                    found.step = step;
+                } else {
+                    matched.push({ style, from: Math.max(pos, from), to: end, step });
+                }
+            }
+        }
+    })
+    matched.forEach(m => tr.step(new RemoveMarkStep(m.from, m.to, m.style)));
+
+    return tr.ensureMarks(newSet);
+}
+
+function toggleInlineStyleMenuItem(style: string): CommandInfo {
+    const styleAttr = style + ':';
     return {
         command(state, dispatch, _, params) {
-            if (!params || !params.length) {
-                return false;
+            const { from, $from, to, $to } = state.selection;
+            const marks = $from.marksAcross($to);
+
+            if (!params || !params.length || !params[0]) {
+                let anyStyleSet = false;
+
+                if (marks && marks.length) {
+                    marks.forEach(m => anyStyleSet = anyStyleSet
+                        || (m.attrs.style
+                        && m.attrs.style.indexOf(styleAttr) != -1));
+                }
+
+                if (!anyStyleSet) {
+                    return false;
+                }
+
+                if (dispatch) {
+                    const tr = state.tr;
+                    removeMarkStyle(tr, styleAttr, from, to);
+                    dispatch(tr.scrollIntoView());
+                }
+                return true;
             }
 
             const styleValue = `${style}:${params[0]}`;
 
-            if (state.selection instanceof NodeSelection
-                && state.selection.node
-                && state.selection.node.attrs.style?.contains(styleValue)) {
+            const attrs = { style: styleValue };
+            const { empty, ranges } = state.selection;
+            let $cursor: ResolvedPos | null | undefined;
+            if (state.selection instanceof TextSelection) {
+                $cursor = (state.selection as TextSelection).$cursor;
+            }
+            if (empty && !$cursor) {
                 return false;
             }
-            const { $from, to, $to } = state.selection;
-            if (to <= $from.end()
-                && $from.parent.attrs.style?.contains(styleValue)) {
+            if (!markApplies(state.doc, ranges, state.schema.marks.span)) {
                 return false;
             }
-            const marks = $from.marksAcross($to);
-            if (marks && marks.length) {
-                let allMarks = true;
-                marks.forEach(m => allMarks = allMarks && m.attrs.style?.contains(styleValue));
-                if (allMarks) {
-                    return false;
+            if (dispatch) {
+                const tr = state.tr;
+                removeMarkStyle(tr, styleAttr, from, to);
+                const mark = state.schema.marks.span.create(attrs);
+                if ($cursor) {
+                    dispatch(state.tr.addStoredMark(mark));
+                } else {
+                    for (let i = 0; i < ranges.length; i++) {
+                        const { $from, $to } = ranges[i];
+                        let from = $from.pos,
+                            to = $to.pos;
+                        const start = $from.nodeAfter,
+                            end = $to.nodeBefore;
+                        const spaceStart = start && start.isText
+                            ? (/^\s*/.exec(start.text!))![0].length
+                            : 0;
+                        const spaceEnd = end && end.isText
+                            ? (/\s*$/.exec(end.text!))![0].length
+                            : 0;
+                        if (from + spaceStart < to) {
+                            from += spaceStart;
+                            to -= spaceEnd;
+                        }
+                        tr.addMark(from, to, mark);
+                    }
+                    dispatch(tr.scrollIntoView());
                 }
             }
-
-            return toggleMark(state.schema.marks.span, { style: styleValue })(state, dispatch);
+            return true;
+        },
+        isEnabled(state) {
+            return toggleMark(state.schema.marks.span, { style: `${style}:placeholder` })(state);
         }
     };
 }
 
-function setStyleMenuItem(style: string, value?: string): CommandInfo {
-    return {
-        command(state, dispatch, _, params) {
-            if (!value && (!params || !params.length)) {
-                return false;
-            }
-
-            value = value || params![0];
-
-            const styleValue = `${style}:${value}`;
-
-            if (state.selection instanceof NodeSelection
-                && state.selection.node
-                && state.selection.node.attrs.style?.contains(styleValue)) {
-                return false;
-            }
-            const { $from, to, $to } = state.selection;
-            if (to <= $from.end()
-                && $from.parent.attrs.style?.contains(styleValue)) {
-                return false;
-            }
-            const marks = $from.marksAcross($to);
-            if (marks && marks.length) {
-                let allMarks = true;
-                marks.forEach(m => allMarks = allMarks && m.attrs.style?.contains(styleValue));
-                if (allMarks) {
-                    return false;
-                }
-            }
-
-            return wrapIn(state.schema.nodes.container, { style: styleValue })(state, dispatch);
-        }
-    };
-}
-
-function setColumnAlign<S extends Schema = any>(value: string): Command<S> {
-    return function (state: EditorState<S>, dispatch?: (tr: Transaction<S>) => void) {
-        if (!isInTable(state)) {
-            return false;
-        }
-        const $cell = selectionCell(state);
-        if (!$cell || !$cell.nodeAfter) {
-            return false;
-        }
-        if ($cell.nodeAfter.attrs.align === value) {
+function wrapAndExitDiv(
+    nodeType: NodeType,
+    attrs?: Attrs): Command {
+    return function (state, dispatch) {
+        const { $from, $to } = state.selection;
+        const range = $from.blockRange($to), wrapping = range && findWrapping(range, nodeType, attrs);
+        if (!wrapping) {
             return false;
         }
         if (dispatch) {
             const tr = state.tr;
-            if (state.selection instanceof CellSelection) {
-                let colSelection;
-                if (state.selection.isColSelection()) {
-                    colSelection = state.selection;
-                } else {
-                    colSelection = CellSelection.colSelection(state.selection.$anchorCell, state.selection.$headCell);
-                }
-                colSelection.forEachCell((node, pos) => {
-                    if (node.attrs.align !== value) {
-                        tr.setNodeMarkup(pos, undefined, setAttr(node.attrs, 'align', value));
+            tr.wrap(range!, wrapping);
+
+            const { $head, $anchor } = tr.selection;
+            if ($head.sameParent($anchor)) {
+                let div: ProsemirrorNode | null = null;
+                let depth = $head.depth;
+                for (; depth >= 0; depth--) {
+                    const node = $head.node(depth);
+                    if (node.type.name == "div") {
+                        div = node;
+                        break;
                     }
-                });
-            } else {
-                tr.setNodeMarkup($cell.pos, undefined, setAttr($cell.nodeAfter.attrs, 'align', value));
+                }
+                if (div) {
+                    const above = $head.node(depth - 1), after = $head.indexAfter(depth - 1), type = defaultBlockAt(above.contentMatchAt(after));
+                    if (type && above.canReplaceWith(after, after, type)) {
+                        const pos = $head.after(depth);
+                        tr.replaceWith(pos, pos, type.createAndFill()!);
+                        tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
+                    }
+                }
             }
-            dispatch(tr);
+
+            dispatch(tr.scrollIntoView());
         }
         return true;
-    };
+
+        return exitDiv(state, dispatch);
+    }
 }

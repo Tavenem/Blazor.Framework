@@ -33,7 +33,7 @@ public partial class Meter<TValue>
     /// Set to a random GUID if not provided.
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// A label which describes the meter.

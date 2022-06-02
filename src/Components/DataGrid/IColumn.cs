@@ -242,7 +242,8 @@ public interface IColumn<TDataItem> : IDisposable where TDataItem : notnull
     /// </para>
     /// <para>
     /// Note: this is still used even if <see cref="LabelContent"/> is set, to set the label for the
-    /// column filter dialog, and for input components in automatic edit dialogs.
+    /// column filter dialog, for input components in automatic edit dialogs, and for data labels in
+    /// single-column layout.
     /// </para>
     /// </summary>
     public string? Label { get; set; }

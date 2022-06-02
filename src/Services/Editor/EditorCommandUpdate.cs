@@ -3,4 +3,5 @@
 internal struct EditorCommandUpdate
 {
     public Dictionary<EditorCommandType, EditorCommandInfo>? Commands { get; set; }
+    public string? CurrentNode { get; set; }
 }

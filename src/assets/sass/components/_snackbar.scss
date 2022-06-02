@@ -5,6 +5,10 @@
     position: fixed;
     z-index: var(--tavenem-zindex-snackbar);
 
+    @media print {
+        display: none;
+    }
+
     &.top-left {
         left: 1.5rem;
         top: 1.5rem;

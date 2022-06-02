@@ -7,9 +7,12 @@ namespace Tavenem.Blazor.Framework;
 
 internal static class Extensions
 {
+    private const string Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private const string NextBoundaryRegex = ".*\\b";
     private const string PreviousBoundaryRegex = "\\b[\\w]*";
     private const string WholeWordRegex = "\\b";
+
+    private static readonly Random _Random = new();
 
     public static IEnumerable<HighlightingChunk> GetHighlightingChunks(
         this string? text,
@@ -68,6 +71,16 @@ internal static class Extensions
                         : RegexOptions.IgnoreCase),
                 Text = x,
             });
+    }
+
+    public static string ToHtmlId(this Guid guid)
+    {
+        var str = guid.ToString("N");
+        if (char.IsDigit(str, 0))
+        {
+            return Letters[_Random.Next(Letters.Length)] + str;
+        }
+        return str;
     }
 
     public static IEnumerable<string> ReadLines(this string value)

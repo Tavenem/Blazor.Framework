@@ -110,105 +110,108 @@ public static class CodeFormatter
                         break;
                     case CodeType.String:
                         var value = code.Slice(index + 1, length - 2);
-                        if (value[0] == '@')
+                        if (value.Length > 0)
                         {
-                            sb.Append(code[index]);
-                            index++;
-
-                            var directive = 1;
-                            if (value.Length > 1
-                                && value[1] == '(')
-                            {
-                                directive++;
-                            }
-                            sb.Append("<span class=\"pre-directive\">")
-                                .Append(value[..directive])
-                                .Append("</span>");
-                            if (value.Length > 1
-                                && value[1] == '(')
-                            {
-                                index++;
-                            }
-
-                            if (value.Contains('('))
-                            {
-                                MarkupCodeBlock(sb, code, ref index);
-                            }
-                            else
-                            {
-                                var isMethod = value.Length > 1
-                                    && char.IsUpper(value[1]);
-                                if (isMethod)
-                                {
-                                    sb.Append("<span class=\"pre-method\">");
-                                }
-                                sb.Append(Sanitized(value[1..]));
-                                if (isMethod)
-                                {
-                                    sb.Append("</span>");
-                                }
-                                index += value.Length;
-                            }
-
-                            sb.Append(code[index]);
-                            length = 1;
-                        }
-                        else if (isHref)
-                        {
-                            sb.Append(code[index]);
-                            if (value.StartsWith("http"))
-                            {
-                                sb.Append("<u class=\"pre-element\">")
-                                    .Append(Sanitized(value))
-                                    .Append("</u>");
-                            }
-                            else
-                            {
-                                sb.Append(Sanitized(value));
-                            }
-                            sb.Append(code[index + length - 1]);
-                        }
-                        else
-                        {
-                            var dotIndex = value.IndexOf('.');
-                            if (dotIndex == -1)
+                            if (value[0] == '@')
                             {
                                 sb.Append(code[index]);
-                                var isMethod = char.IsUpper(value[0]);
-                                var isBool = !isMethod
-                                    && (value.Equals("true", StringComparison.Ordinal)
-                                    || value.Equals("false", StringComparison.Ordinal));
-                                var isNumber = !isMethod
-                                    && !isBool
-                                    && double.TryParse(value, out _);
-                                if (isMethod)
+                                index++;
+
+                                var directive = 1;
+                                if (value.Length > 1
+                                    && value[1] == '(')
                                 {
-                                    sb.Append("<span class=\"pre-method\">");
+                                    directive++;
                                 }
-                                else if (isBool)
+                                sb.Append("<span class=\"pre-directive\">")
+                                    .Append(value[..directive])
+                                    .Append("</span>");
+                                if (value.Length > 1
+                                    && value[1] == '(')
                                 {
-                                    sb.Append("<span class=\"pre-element\">");
+                                    index++;
                                 }
-                                else if (isNumber)
+
+                                if (value.Contains('('))
                                 {
-                                    sb.Append("<span class=\"pre-enum\">");
+                                    MarkupCodeBlock(sb, code, ref index);
                                 }
-                                sb.Append(Sanitized(value));
-                                if (isMethod || isBool || isNumber)
+                                else
                                 {
-                                    sb.Append("</span>");
+                                    var isMethod = value.Length > 1
+                                        && char.IsUpper(value[1]);
+                                    if (isMethod)
+                                    {
+                                        sb.Append("<span class=\"pre-method\">");
+                                    }
+                                    sb.Append(Sanitized(value[1..]));
+                                    if (isMethod)
+                                    {
+                                        sb.Append("</span>");
+                                    }
+                                    index += value.Length;
+                                }
+
+                                sb.Append(code[index]);
+                                length = 1;
+                            }
+                            else if (isHref)
+                            {
+                                sb.Append(code[index]);
+                                if (value.StartsWith("http"))
+                                {
+                                    sb.Append("<u class=\"pre-element\">")
+                                        .Append(Sanitized(value))
+                                        .Append("</u>");
+                                }
+                                else
+                                {
+                                    sb.Append(Sanitized(value));
                                 }
                                 sb.Append(code[index + length - 1]);
                             }
                             else
                             {
-                                sb.Append(code[index])
-                                    .Append("<span class=\"pre-enum\">")
-                                    .Append(Sanitized(value[..dotIndex]))
-                                    .Append("</span><span class=\"pre-operator\">.</span><span class=\"pre-value\">")
-                                    .Append(Sanitized(value[(dotIndex + 1)..]))
-                                    .Append("</span>")
-                                    .Append(code[index + length - 1]);
+                                var dotIndex = value.IndexOf('.');
+                                if (dotIndex == -1)
+                                {
+                                    sb.Append(code[index]);
+                                    var isMethod = char.IsUpper(value[0]);
+                                    var isBool = !isMethod
+                                        && (value.Equals("true", StringComparison.Ordinal)
+                                        || value.Equals("false", StringComparison.Ordinal));
+                                    var isNumber = !isMethod
+                                        && !isBool
+                                        && double.TryParse(value, out _);
+                                    if (isMethod)
+                                    {
+                                        sb.Append("<span class=\"pre-method\">");
+                                    }
+                                    else if (isBool)
+                                    {
+                                        sb.Append("<span class=\"pre-element\">");
+                                    }
+                                    else if (isNumber)
+                                    {
+                                        sb.Append("<span class=\"pre-enum\">");
+                                    }
+                                    sb.Append(Sanitized(value));
+                                    if (isMethod || isBool || isNumber)
+                                    {
+                                        sb.Append("</span>");
+                                    }
+                                    sb.Append(code[index + length - 1]);
+                                }
+                                else
+                                {
+                                    sb.Append(code[index])
+                                        .Append("<span class=\"pre-enum\">")
+                                        .Append(Sanitized(value[..dotIndex]))
+                                        .Append("</span><span class=\"pre-operator\">.</span><span class=\"pre-value\">")
+                                        .Append(Sanitized(value[(dotIndex + 1)..]))
+                                        .Append("</span>")
+                                        .Append(code[index + length - 1]);
+                                }
                             }
                         }
                         isDirective = false;

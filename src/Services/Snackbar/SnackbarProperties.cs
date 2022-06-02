@@ -93,7 +93,7 @@ internal class SnackbarProperties
 
     public SnackbarProperties(SnackbarOptions options)
     {
-        Id = $"snackbar-{Guid.NewGuid()}";
+        Id = $"snackbar-{Guid.NewGuid():N}";
         Options = options;
         State = SnackbarState.Initializing;
     }

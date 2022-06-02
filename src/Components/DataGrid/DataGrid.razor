@@ -450,7 +450,7 @@
             && _isEditDialogVisible
             && EditDialog is null)
         {
-            <Form @ref="DialogEditForm" Class="d-flex flex-column mx-3" Style="max-height:300px;min-height:47rem;min-width:310px;overflow:auto">
+            <Form @ref="DialogEditForm" Class="d-flex flex-column mx-3">
                 @foreach (var column in _columns)
                 {
                     @if (column.GetCanEdit())

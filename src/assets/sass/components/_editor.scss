@@ -43,28 +43,86 @@
         margin-top: .5rem;
         position: relative;
 
-        .field > .input {
-            margin-top: 0;
+        > .editor-toolbar-show-all-btn {
+            position: absolute;
+            right: 1rem;
+            top: .5rem;
         }
 
-        > div {
+        > div:first-child {
+            border-top-left-radius: var(--tavenem-border-radius);
+            border-top-right-radius: var(--tavenem-border-radius);
+            column-gap: .5rem;
             display: flex;
             flex-wrap: wrap;
-            gap: .5rem;
-            padding: .5rem 1rem;
+            height: calc(2.25rem + 12px);
+            padding: .5rem calc(2.75rem + 10px) .5rem 1rem;
+            row-gap: .75rem;
 
-            &:first-child {
-                border-top-left-radius: var(--tavenem-border-radius);
-                border-top-right-radius: var(--tavenem-border-radius);
+            > .btn:not(:disabled),
+            > .tooltip-root > .btn:not(:disabled),
+            > .button-group,
+            > .button-group-text {
+                border: 1px solid transparent;
+            }
+
+            > .button-group,
+            > .button-group-text {
+                > .tooltip-root {
+                    align-self: stretch;
+                    height: auto;
+
+                    > .btn {
+                        align-self: stretch;
+                    }
+                }
+            }
+        }
+
+        &.editor-toolbar-extended > div:first-child {
+            height: auto;
+        }
+
+        .tooltip-root {
+            align-items: baseline;
+            align-self: center;
+            display: inline-flex;
+            height: fit-content;
+        }
+
+        .field {
+            flex-grow: 0;
+
+            > .input {
+                margin-top: 0;
+                padding-bottom: 5px;
+            }
+        }
+
+        .select {
+            margin-bottom: 0;
+            margin-top: 0;
+
+            .input-core {
+                width: 8em;
             }
         }
     }
 
-    > .editor {
-        background-color: var(--tavenem-color-bg-input);
+    > .editor-statusbar {
+        background-color: var(--tavenem-color-bg-surface);
         border-bottom-left-radius: var(--tavenem-border-radius);
         border-bottom-right-radius: var(--tavenem-border-radius);
-        border-bottom-width: 1px;
+        border-color: var(--field-border-color);
+        border-style: solid;
+        border-width: 1px;
+        position: relative;
+        padding: .25rem 1rem;
+    }
+
+    > .editor {
+        background-color: var(--tavenem-color-bg-input);
+        border-bottom-width: 0;
         border-color: var(--field-border-color);
         border-left-width: 1px;
         border-right-width: 1px;
@@ -76,25 +134,10 @@
         position: relative;
         transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
-        &[data-language]:after {
-            background-color: var(--tavenem-color-bg);
+        &.no-statusbar {
             border-bottom-left-radius: var(--tavenem-border-radius);
             border-bottom-right-radius: var(--tavenem-border-radius);
-            color: var(--tavenem-color-text);
-            content: attr(data-language);
-            font-size: .5em;
-            line-height: 1;
-            padding: 2px;
-            position: absolute;
-            right: 4px;
-            top: 0;
-        }
-
-        &.no-toolbar {
-            border-top-left-radius: var(--tavenem-border-radius);
-            border-top-right-radius: var(--tavenem-border-radius);
-            border-top-width: 1px;
-            margin-top: .5rem;
+            border-bottom-width: 1px;
         }
 
         .cm-panel input[type=checkbox]:not(:checked):before {
@@ -108,12 +151,114 @@
         }
 
         .ProseMirror {
+            flex-grow: 1;
             line-height: 1.2;
             outline: none;
             padding: .25rem .5rem .25rem 1rem;
             position: relative;
             white-space: break-spaces;
             word-wrap: break-word;
+
+            ::selection {
+                background-color: var(--tavenem-color-bg);
+            }
+
+            &:focus-within, &[contenteditable="false"] {
+                ::selection {
+                    background-color: var(--tavenem-color-bg-highlight);
+                }
+            }
+
+            &.resize-cursor {
+                cursor: col-resize;
+            }
+
+            .editor-placeholder {
+                color: var(--tavenem-color-text-secondary);
+                height: 0;
+                pointer-events: none;
+            }
+
+            &:focus .editor-placeholder {
+                display: none;
+            }
+
+            .task-list-item {
+                align-items: baseline;
+                display: flex;
+
+                > input:first-child {
+                    flex: 0 0 auto;
+                    margin-right: .5rem;
+                }
+
+                > *:not(:first-child) {
+                    flex: 1 1 auto;
+                }
+            }
+
+            .tableWrapper {
+                margin: 1em 0;
+                overflow-x: auto;
+
+                table {
+                    overflow: hidden;
+                    table-layout: fixed;
+                }
+
+                table, th, td {
+                    border-style: solid;
+                    border-width: 1px;
+                    padding: 3px 5px;
+                }
+
+                th, td {
+                    min-width: 25px;
+                    position: relative;
+                    vertical-align: top;
+                }
+
+                th {
+                    font-weight: bolder;
+                }
+            }
+
+            .column-resize-handle {
+                background-color: #adf;
+                bottom: 0;
+                pointer-events: none;
+                position: absolute;
+                right: -2px;
+                top: 0;
+                width: 4px;
+                z-index: 20;
+            }
+
+            .selectedCell:after {
+                background: rgba(200, 200, 255, 0.4);
+                bottom: 0;
+                content: "";
+                left: 0;
+                right: 0;
+                top: 0;
+                pointer-events: none;
+                position: absolute;
+                z-index: 2;
+            }
+
+            .cm-editor[data-language]:after {
+                background-color: rgba(0,128,255,.2);
+                border-bottom-left-radius: var(--tavenem-border-radius);
+                border-bottom-right-radius: var(--tavenem-border-radius);
+                color: var(--tavenem-color-text);
+                content: attr(data-language);
+                font-size: .75em;
+                line-height: 1;
+                padding: 2px 4px;
+                position: absolute;
+                right: .5rem;
+                top: 1px;
+            }
         }
 
         &.set-height .ProseMirror {
@@ -151,9 +296,6 @@
                 --field-active-border-color: var(--tavenem-theme-color);
                 --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
                 --field-active-label-color: var(--tavenem-theme-color);
-                --field-border-color: var(--tavenem-theme-color);
-                --field-border-hover-color: var(--tavenem-theme-color-lighten);
-                --field-label-color: var(--tavenem-theme-color);
             }
 
             &.filled {

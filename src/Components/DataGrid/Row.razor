@@ -23,24 +23,32 @@
             <span class="d-inline-flex gap-1 align-items-center justify-content-space-around">
                 @if (IsEditing)
                 {
-                    <button class="btn btn-icon small" @onclick="CancelEditAsync">
-                        <tf-icon>@DefaultIcons.Cancel</tf-icon>
-                    </button>
-                    <button class="@ThemeButtonClass" @onclick="OnSaveAsync">
-                        <tf-icon>@DefaultIcons.Save</tf-icon>
-                    </button>
+                    <Tooltip TooltipText="Cancel" Delay="750">
+                        <button class="btn btn-icon small" @onclick="CancelEditAsync">
+                            <tf-icon>@DefaultIcons.Cancel</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="Save" Delay="750">
+                        <button class="@ThemeButtonClass" @onclick="OnSaveAsync">
+                            <tf-icon>@DefaultIcons.Save</tf-icon>
+                        </button>
+                    </Tooltip>
                 }
                 else
                 {
-                    <button class="btn btn-icon small" @onclick="OnEditAsync" @onclick:stopPropagation="true">
-                        <tf-icon>@DefaultIcons.Edit</tf-icon>
-                    </button>
+                    <Tooltip TooltipText="Edit" Delay="750">
+                        <button class="btn btn-icon small" @onclick="OnEditAsync" @onclick:stopPropagation="true">
+                            <tf-icon>@DefaultIcons.Edit</tf-icon>
+                        </button>
+                    </Tooltip>
                 }
                 @if (DataGrid.AllowDelete)
                 {
-                    <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
-                        <tf-icon>@DefaultIcons.Delete</tf-icon>
-                    </button>
+                    <Tooltip TooltipText="Delete" Delay="750">
+                        <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
+                            <tf-icon>@DefaultIcons.Delete</tf-icon>
+                        </button>
+                    </Tooltip>
                 }
             </span>
         </td>
@@ -48,9 +56,11 @@
     else if (DataGrid.AllowDelete)
     {
         <td>
-            <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
-                <tf-icon>@DefaultIcons.Delete</tf-icon>
-            </button>
+            <Tooltip TooltipText="Delete" Delay="750">
+                <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
+                    <tf-icon>@DefaultIcons.Delete</tf-icon>
+                </button>
+            </Tooltip>
         </td>
     }
     @if (HasRowExpansion)
@@ -66,7 +76,7 @@
     }
     @foreach (var column in DataGrid.Columns.Where(x => x.GetIsShown()))
     {
-        <td class="@column.GetCellClass(Item)">
+        <td class="@column.GetCellClass(Item)" data-label="@column.Label">
             @if (IsEditing
                 && column.GetCanEdit())
             {

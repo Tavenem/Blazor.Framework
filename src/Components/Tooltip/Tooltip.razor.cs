@@ -5,8 +5,11 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Wraps content with a <see cref="Popover"/> displayed on hover.
 /// </summary>
-public partial class Tooltip
+public partial class Tooltip : IDisposable
 {
+    private readonly AdjustableTimer _timer;
+
+    private bool _disposedValue;
     private bool _visible;
 
     /// <summary>
@@ -127,7 +130,62 @@ public partial class Tooltip
         _ => Origin.Center_Center,
     };
 
-    private void OnMouseOver() => _visible = true;
+    /// <summary>
+    /// Contructs a new instance of <see cref="Tooltip"/>.
+    /// </summary>
+    public Tooltip() => _timer = new(Hide, 200);
 
-    private void OnMouseOut() => _visible = false;
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Toggles the visibility of this tooltip.
+    /// </summary>
+    public void Toggle() => _visible = !_visible;
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting
+    /// unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                _timer.Dispose();
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    private void Hide()
+    {
+        _visible = false;
+        StateHasChanged();
+    }
+
+    private void OnMouseOver()
+    {
+        if (_disposedValue)
+        {
+            return;
+        }
+        _timer.Cancel();
+        _visible = true;
+    }
+
+    private void OnMouseOut()
+    {
+        if (!_disposedValue)
+        {
+            _timer.Start();
+        }
+    }
 }

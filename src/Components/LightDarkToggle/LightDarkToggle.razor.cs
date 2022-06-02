@@ -37,7 +37,7 @@ public partial class LightDarkToggle
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("btn")
+    protected override string? CssClass => new CssBuilder("btn d-print-none")
         .Add("btn-icon", string.IsNullOrWhiteSpace(Text))
         .Add(ThemeColor.ToCSS())
         .Add(Class)

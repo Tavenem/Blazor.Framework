@@ -69,7 +69,7 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// Set to a random GUID if not provided.
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToString("N");
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// Custom HTML attributes for the input element.
@@ -147,6 +147,8 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     private protected string? HelpersClass => new CssBuilder("field-helpers")
         .Add("onfocus", DisplayHelpTextOnFocus)
         .ToString();
+
+    private protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
 
     private protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString);
 

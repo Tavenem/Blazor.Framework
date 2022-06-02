@@ -24,14 +24,17 @@
     }
 
     &:not(.vertical) > {
-        .btn {
+        .btn, .tooltip-root, .tooltip-root > .btn:not(.tooltip-trigger) {
             border-bottom-left-radius: inherit;
             border-top-left-radius: inherit;
 
-            + .btn {
+            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
                 border-bottom-left-radius: 0;
-                border-left-style: solid;
                 border-top-left-radius: 0;
+            }
+
+            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
+                border-left-style: solid;
                 margin-left: -1px;
             }
 
@@ -50,14 +53,17 @@
     &.vertical {
         flex-direction: column;
 
-        > .btn {
+        > .btn, > .tooltip-root, > .tooltip-root > .btn:not(.tooltip-trigger) {
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
             width: 100%;
 
-            + .btn {
+            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
+            }
+
+            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
                 border-top-style: solid;
                 margin-top: -1px;
             }
@@ -169,29 +175,37 @@
     --button-inherited-padding-y-icon: 7px;
     --button-inherited-shadow: none;
 
-    &:not(.vertical) > .btn {
-        + .btn {
-            border-bottom-left-radius: 0;
-            border-left-style: solid;
-            border-top-left-radius: 0;
-            margin-left: -1px;
-        }
+    &:not(.vertical) > {
+        .btn, .tooltip-root, .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
+                border-bottom-left-radius: 0;
+                border-top-left-radius: 0;
+            }
 
-        &:not(:last-child) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
+            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
+                border-left-style: solid;
+                margin-left: -1px;
+            }
+
+            &:not(:last-child) {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
         }
     }
 
     &.vertical {
         flex-direction: column;
 
-        > .btn {
+        > .btn, > .tooltip-root, > .tooltip-root > .btn:not(.tooltip-trigger) {
             width: 100%;
 
-            + .btn {
+            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
+            }
+
+            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
                 border-top-style: solid;
                 margin-top: -1px;
             }

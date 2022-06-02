@@ -98,10 +98,6 @@ h6, .h6 {
 p {
     margin-bottom: 1rem;
     margin-top: 0;
-
-    &:last-child {
-        margin-bottom: .25rem;
-    }
 }
 
 abbr[title] {
@@ -116,20 +112,20 @@ address {
     margin-bottom: 1rem;
 }
 
-ol, ul {
+ol, ul, menu {
     padding-left: 2rem;
 }
 
-ol, ul, dl {
+ol, ul, menu, dl {
     margin-bottom: 1rem;
     margin-top: 0;
 }
 
-:is(ul, ol) :is(ul, ol) {
+:is(ul, menu, ol) :is(ul, menu, ol) {
     margin-bottom: 0;
 }
 
-ul {
+ul, menu {
     list-style: none;
 }
 
@@ -143,7 +139,7 @@ dd {
 }
 
 blockquote {
-    margin: 0 0 1rem;
+    margin: 1rem 2.5rem;
 }
 
 b, strong {

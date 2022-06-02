@@ -13,12 +13,13 @@
     </CascadingValue>
 </div>
 <div @attributes="AdditionalAttributes"
+     id="@ContainerId"
      class="@CssClass"
      style="@CssStyle"
+     tabindex="-1"
      @onclick="OnClickContainerAsync"
-     @onkeydown="OnKeyDownAsync"
-     @onmousedown="CancelClose">
-    <div class="input">
+     @onkeydown="OnKeyDownAsync">
+    <div id="@InputId" class="input">
         <input disabled="@Disabled"
                name="@Name"
                hidden
@@ -41,7 +42,7 @@
                @onclick:stopPropagation="true" />
         @if (CanClear)
         {
-            <button class="btn btn-icon small" @onclick="ClearAsync">
+            <button class="btn btn-icon small" tabindex="-1" @onclick="ClearAsync">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
@@ -72,11 +73,11 @@
     }
     <Popover @ref="Popover"
              Class="filled"
-             AnchorId="@Id"
-             FocusOut="StartClosing"
+             AnchorId="@InputId"
+             FocusId="@ContainerId"
+             FocusOut="ClosePopoverAsync"
              IsOpen="ShowPicker"
-             MatchWidth="true"
-             tabindex="-1">
+             MatchWidth="true">
         <div @onclick:stopPropagation="true">
             <DataGrid @ref="DataGrid"
                       TDataItem="TDataItem"

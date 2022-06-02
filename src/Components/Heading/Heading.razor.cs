@@ -76,7 +76,7 @@ public partial class Heading : IDisposable
     /// initial parameters from its parent in the render tree.
     /// </summary>
     protected override void OnInitialized() => CalculatedId = FrameworkLayout is null
-        ? Guid.NewGuid().ToString("N")
+        ? Guid.NewGuid().ToHtmlId()
         : FrameworkLayout.Add(this);
 
     /// <summary>

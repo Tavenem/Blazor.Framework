@@ -160,6 +160,12 @@ a.btn:not(.disabled, :disabled) {
     &:focus {
         color: var(--button-hover-color);
     }
+
+    @each $theme in $theme-colors {
+        &.#{$theme} {
+            color: var(--button-color);
+        }
+    }
 }
 
 .btn-text {

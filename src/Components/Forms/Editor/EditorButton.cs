@@ -1,9 +1,11 @@
-﻿namespace Tavenem.Blazor.Framework;
+﻿using Microsoft.AspNetCore.Components;
+
+namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// A custom button to display on the markdown editor toolbar.
+/// A custom button to display on the editor toolbar.
 /// </summary>
-public class MarkdownEditorButton
+public class EditorButton
 {
     /// <summary>
     /// <para>
@@ -21,10 +23,6 @@ public class MarkdownEditorButton
     /// cref="Action"/> as its input, and the result will be used to update the
     /// editor.
     /// </remarks>
-    /// <example>
-    /// If the function receives "some text" as a parameter, you could return
-    /// "*some text*" to add italic formatting.
-    /// </example>
     public Func<string?, string?>? Action { get; set; }
 
     /// <summary>
@@ -43,25 +41,22 @@ public class MarkdownEditorButton
     /// cref="Action"/> as its input, and the result will be used to update the
     /// editor.
     /// </remarks>
-    /// <example>
-    /// If the function receives "some text" as a parameter, you could return
-    /// "*some text*" to add italic formatting.
-    /// </example>
     public Func<string?, Task<string?>>? AsyncAction { get; set; }
 
     /// <summary>
     /// <para>
-    /// The id of the host HTML element.
+    /// The editor mode in which this button appears.
     /// </para>
     /// <para>
-    /// Will be set to a random GUID if left unset.
+    /// When set to <see cref="EditorMode.None"/> (the default) the button is displayed in any mode.
     /// </para>
     /// </summary>
-    /// <remarks>
-    /// In most situations this can be left unset. It can be manually configured
-    /// when you intend to provide custom CSS for this specific button instance.
-    /// </remarks>
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public EditorMode EditMode { get; set; }
+
+    /// <summary>
+    /// The name of an icon to display on the button.
+    /// </summary>
+    public string? Icon { get; set; }
 
     /// <summary>
     /// The text to display on the button.

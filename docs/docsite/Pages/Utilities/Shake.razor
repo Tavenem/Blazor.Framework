@@ -28,16 +28,14 @@
     <code>UtilityService</code> in a component, and call the <code>Shake</code> method with the
     <code>id</code> of an element as a parameter to cause that element to shake on command.
 </p>
-<div class="codeblock pre-razor-code">
-    <pre>
-        <span class="pre-operator">[</span><span class="pre-class">Inject</span><span class="pre-operator">]</span> <span class="pre-class">UtilityService</span> service<span class="pre-operator">;</span>
+<pre class="codeblock pre-razor-code">
+    <span class="pre-operator">[</span><span class="pre-class">Inject</span><span class="pre-operator">]</span> <span class="pre-class">UtilityService</span> service<span class="pre-operator">;</span>
 
 <span class="pre-method">SomeMethod</span><span class="pre-operator">()</span>
 <span class="pre-operator">{</span>
-    service<span class="pre-operator">.</span><span class="pre-method">Shake</span><span class="pre-operator">(</span><span class="pre-string">"myElement"</span><span class="pre-operator">);</span>
+service<span class="pre-operator">.</span><span class="pre-method">Shake</span><span class="pre-operator">(</span><span class="pre-string">"myElement"</span><span class="pre-operator">);</span>
 <span class="pre-operator">}</span>
-    </pre>
-</div>
+</pre>
 
 <p>
     The <code>Shake</code> method can be called repeatedly, but if it's called with the same element

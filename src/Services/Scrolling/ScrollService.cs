@@ -57,7 +57,7 @@ public class ScrollService : IAsyncDisposable
     /// Scroll to the top of the element which matches the given CSS selector.
     /// </summary>
     /// <param name="selector">A CSS selector.</param>
-    public async ValueTask ScrollToTop(string? selector)
+    public async ValueTask ScrollToTop(string? selector = null)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module

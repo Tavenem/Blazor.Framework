@@ -58,11 +58,12 @@ public partial class AppBar
     /// The final value assigned to the drawer toggle's class attribute,
     /// including component values.
     /// </summary>
-    protected string DrawerToggleClassName => BreakpointValue switch
-    {
-        Framework.Breakpoint.None => "me-2",
-        _ => $"me-2 drawer-toggle-{BreakpointValue.ToCSS()}",
-    };
+    protected string? DrawerToggleClassName => new CssBuilder("me-2 d-print-none")
+        .Add(BreakpointValue switch
+        {
+            Framework.Breakpoint.None => null,
+            _ => $"drawer-toggle-{BreakpointValue.ToCSS()}",
+        }).ToString();
 
     /// <summary>
     /// The final value assigned to the toolbar's class attribute, including

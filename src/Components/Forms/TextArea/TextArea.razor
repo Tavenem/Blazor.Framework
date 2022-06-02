@@ -3,7 +3,7 @@
 @inherits InputComponentBase<string>
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
-    <div class="input">
+    <div id="@InputId" class="input">
         <textarea @ref="ElementReference"
                   class="@InputCssClass"
                   style="@InputCssStyle"

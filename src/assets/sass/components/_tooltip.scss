@@ -5,6 +5,25 @@
     &.inline {
         align-items: baseline;
         display: inline-flex;
+        height: fit-content;
+    }
+
+    > .tooltip-trigger {
+        --button-inherited-font-size-icon: 1rem;
+        --button-inherited-padding-y-icon: 3px;
+        display: none;
+        left: calc(100% - .375em);
+        line-height: 0;
+        min-width: 0;
+        padding: 0;
+        position: absolute;
+        top: -.25em;
+    }
+
+    @media (hover: none) {
+        &:not(.no-help) > .tooltip-trigger {
+            display: unset;
+        }
     }
 }
 

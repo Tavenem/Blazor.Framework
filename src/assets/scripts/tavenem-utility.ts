@@ -159,7 +159,7 @@ export function getClientRectFromParent(element: HTMLElement) {
 export function getFonts() {
     const validFonts: string[] = [];
     for (const font of fonts) {
-        if (document.fonts.check(font)) {
+        if (document.fonts.check('1em ' + font)) {
             validFonts.push(font);
         }
     }

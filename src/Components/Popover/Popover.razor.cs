@@ -9,25 +9,22 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Popover : IAsyncDisposable
 {
-    private readonly AsyncAdjustableTimer _timer;
-
     private bool _disposedValue;
     private PopoverHandler? _handler;
     private bool _initialized;
 
     /// <summary>
     /// <para>
-    /// The id of an element which should be used as the anchor for this popover
-    /// (optional).
+    /// The id of an HTML element which should be used as the anchor for this popover (optional).
     /// </para>
     /// <para>
-    /// If no anchor element is set, the popover's nearest containing parent
-    /// with relative position is used as its anchor, as well as its container.
+    /// If no anchor element is set, the popover's nearest containing parent with relative position
+    /// is used as its anchor, as well as its container.
     /// </para>
     /// </summary>
     /// <remarks>
-    /// The anchor element must have the same offset parent as the popover
-    /// (nearest positioned ancestor element in the containment hierarchy).
+    /// The anchor element must have the same offset parent as the popover (nearest positioned
+    /// ancestor element in the containment hierarchy).
     /// </remarks>
     [Parameter] public string? AnchorId { get; set; }
 
@@ -60,6 +57,17 @@ public partial class Popover : IAsyncDisposable
     [Parameter] public FlipBehavior FlipBehavior { get; set; } = FlipBehavior.Flip_OnOpen;
 
     /// <summary>
+    /// <para>
+    /// The id of an HTML element which should be ignored for the purpose of determining when the
+    /// popover's focus state changes.
+    /// </para>
+    /// <para>
+    /// The may be the same as <see cref="AnchorId"/>, but does not need to be.
+    /// </para>
+    /// </summary>
+    [Parameter] public string? FocusId { get; set; }
+
+    /// <summary>
     /// Raised when the popover loses focus.
     /// </summary>
     [Parameter] public EventCallback FocusOut { get; set; }
@@ -75,22 +83,12 @@ public partial class Popover : IAsyncDisposable
     [Parameter] public bool IsOpen { get; set; }
 
     /// <summary>
-    /// <para>
     /// Whether the popover should have its max-width set to the width of its anchor element.
-    /// </para>
-    /// <para>
-    /// Always <see langword="true"/> when <see cref="MatchWidth"/> is <see langword="true"/>.
-    /// </para>
     /// </summary>
     [Parameter] public bool LimitWidth { get; set; }
 
     /// <summary>
-    /// <para>
-    /// Whether the popover should have the same width at its anchor element.
-    /// </para>
-    /// <para>
-    /// Implies <see cref="LimitWidth"/>.
-    /// </para>
+    /// Whether the popover should have its min-width set to the width of its anchor element.
     /// </summary>
     [Parameter] public bool MatchWidth { get; set; }
 
@@ -113,6 +111,28 @@ public partial class Popover : IAsyncDisposable
     /// A number of pixels this popover is offset from the top edge of its anchor.
     /// </summary>
     [Parameter] public double? OffsetY { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Set to enable absolute positioning. The popover will be placed this number of pixels from
+    /// the left edge of the viewport.
+    /// </para>
+    /// <para>
+    /// Note: both this and <see cref="PositionY"/> must be set, or the value will be ignored.
+    /// </para>
+    /// </summary>
+    [Parameter] public double? PositionX { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Set to enable absolute positioning. The popover will be placed this number of pixels from
+    /// the top edge of the viewport.
+    /// </para>
+    /// <para>
+    /// Note: both this and <see cref="PositionX"/> must be set, or the value will be ignored.
+    /// </para>
+    /// </summary>
+    [Parameter] public double? PositionY { get; set; }
 
     /// <summary>
     /// <para>
@@ -145,8 +165,8 @@ public partial class Popover : IAsyncDisposable
         .Add(FlipBehavior.ToCSS())
         .Add(ThemeColor.ToCSS())
         .Add("open", IsOpen)
+        .Add("limit-width", LimitWidth)
         .Add("match-width", MatchWidth)
-        .Add("limit-width", !MatchWidth && LimitWidth)
         .ToString();
 
     /// <summary>
@@ -162,11 +182,6 @@ public partial class Popover : IAsyncDisposable
         .ToString();
 
     [Inject] private PopoverService PopoverService { get; set; } = default!;
-
-    /// <summary>
-    /// Constructs a new instance of <see cref="Popover"/>.
-    /// </summary>
-    public Popover() => _timer = new(FocusOutAsync, 100);
 
     /// <summary>
     /// Sets parameters supplied by the component's parent in the render tree.
@@ -193,15 +208,24 @@ public partial class Popover : IAsyncDisposable
     {
         var initialOffsetX = OffsetX;
         var initialOffsetY = OffsetY;
+        var initialPositionX = PositionX;
+        var initialPositionY = PositionY;
 
         await base.SetParametersAsync(parameters);
 
         if (_handler is not null
-            && _initialized
-            && (OffsetX != initialOffsetX
-            || OffsetY != initialOffsetY))
+            && _initialized)
         {
-            await _handler.SetOffsetAsync(OffsetX, OffsetY);
+            if (OffsetX != initialOffsetX
+                || OffsetY != initialOffsetY)
+            {
+                await _handler.SetOffsetAsync(OffsetX, OffsetY);
+            }
+            if (PositionX != initialPositionX
+                || PositionY != initialPositionY)
+            {
+                await _handler.SetPositionAsync(PositionX, PositionY);
+            }
         }
     }
 
@@ -231,12 +255,13 @@ public partial class Popover : IAsyncDisposable
         if (firstRender)
         {
             await PopoverService.InitializePopoversAsync();
-            _handler = await PopoverService.RegisterPopoverAsync(AnchorId);
+            _handler = await PopoverService.RegisterPopoverAsync(AnchorId, FocusId);
             StateHasChanged();
         }
         else if (!_initialized && _handler is not null)
         {
             await _handler.Initialize();
+            _handler.FocusLeft += OnFocusOut;
             _initialized = true;
         }
     }
@@ -255,8 +280,6 @@ public partial class Popover : IAsyncDisposable
         GC.SuppressFinalize(this);
     }
 
-    internal void CancelFocusOut() => _timer.Cancel();
-
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
     /// or resetting unmanaged resources asynchronously.
@@ -268,26 +291,20 @@ public partial class Popover : IAsyncDisposable
     {
         if (!_disposedValue)
         {
-            if (disposing)
+            if (disposing && _handler is not null)
             {
-                _timer.Dispose();
-
-                if (_handler is not null)
+                _handler.FocusLeft -= OnFocusOut;
+                try
                 {
-                    try
-                    {
-                        await PopoverService.UnregisterPopoverHandler(_handler);
-                    }
-                    catch (JSDisconnectedException) { }
-                    catch (TaskCanceledException) { }
+                    await PopoverService.UnregisterPopoverHandler(_handler);
                 }
+                catch (JSDisconnectedException) { }
+                catch (TaskCanceledException) { }
             }
 
             _disposedValue = true;
         }
     }
 
-    private Task FocusOutAsync() => FocusOut.InvokeAsync();
-
-    private void OnFocusOut() => _timer.Start();
+    private async void OnFocusOut(object? sender, EventArgs e) => await FocusOut.InvokeAsync();
 }

@@ -2,17 +2,21 @@
     display: grid;
     flex: 1 0;
     grid-template-areas:
-        "header header header"
-        "topdrawer topdrawer topdrawer"
-        "leftdrawer main rightdrawer"
-        "bottomdrawer bottomdrawer bottomdrawer"
-        "footer footer footer";
-    grid-template-columns: max-content 1fr max-content;
+        "header header header header"
+        "topdrawer topdrawer topdrawer topdrawer"
+        "leftdrawer main contents rightdrawer"
+        "bottomdrawer bottomdrawer bottomdrawer bottomdrawer"
+        "footer footer footer footer";
+    grid-template-columns: max-content 1fr max-content max-content;
     grid-template-rows: max-content max-content 1fr max-content max-content;
     height: 100%;
     overflow: hidden;
     position: relative;
     width: 100%;
+
+    @media print {
+        overflow: visible;
+    }
 
     > * {
         grid-area: main;
@@ -38,6 +42,10 @@
 
 #main-container {
     padding-bottom: 6rem;
+
+    @media print {
+        overflow: visible;
+    }
 }
 
 @each $breakpoint, $min-width in $breakpoints {
