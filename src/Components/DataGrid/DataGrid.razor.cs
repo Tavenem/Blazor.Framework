@@ -185,6 +185,19 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     [Parameter] public Type? EditDialog { get; set; }
 
     /// <summary>
+    /// <para>
+    /// If provided, this callback is used to fetch the parameters used for the <see
+    /// cref="EditDialog"/>.
+    /// </para>
+    /// <para>
+    /// The dialog also receives a parameter named "Item" which contains the edited item, unless the
+    /// dialog is being used to create a new item. This parameter is added to the result of this
+    /// callback, if it exists, or to a new <see cref="DialogParameters"/> instance if not.
+    /// </para>
+    /// </summary>
+    [Parameter] public Func<DialogParameters>? EditDialogParameters { get; set; }
+
+    /// <summary>
     /// This optional content is displayed when a row is expanded.
     /// </summary>
     [Parameter] public RenderFragment<TDataItem>? ExpandedContent { get; set; }
@@ -1010,13 +1023,12 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
         if (EditDialog is not null)
         {
+            var parameters = EditDialogParameters?.Invoke() ?? new();
+            parameters.Add(nameof(Row<TDataItem>.Item), row.Item);
             DialogService.Show(
                 EditDialog,
                 "Edit",
-                new DialogParameters
-                {
-                    { nameof(Row<TDataItem>.Item), row.Item }
-                });
+                parameters);
         }
         else if (UseEditDialog)
         {
@@ -1594,9 +1606,11 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
         if (EditDialog is not null)
         {
+            var parameters = EditDialogParameters?.Invoke();
             DialogService.Show(
                 EditDialog,
-                "Add");
+                "Add",
+                parameters);
         }
         else
         {

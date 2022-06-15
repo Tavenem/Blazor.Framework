@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0-preview
+### Added
+- Allow passing parameters to the edit dialog for DataGrid 
+
 ## 0.1.1-preview
 ### Changed
 - Update to .NET 7 preview 5

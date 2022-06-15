@@ -793,8 +793,14 @@
 <p>
     You can also take complete control over the editing process by assigning a
     <code>Component</code> type to the <code>EditDialog</code> property. If this is set, your own
-    component will be displayed as a dialog when the user edits a row, rather than the
+    component will be displayed as a dialog when the user adds or edits a row, rather than the
     auto-generated edit dialog.
+</p>
+
+<p>
+    You can supply parameters for your custom edit dialog via the <code>EditDialogParameters</code>
+    function parameter. Whether or not you provide a callback for this parameter, the currently
+    edited item will also be provided as a parameter with the name "Item" to your dialog.
 </p>
 
 <p>
