@@ -143,7 +143,7 @@ public partial class DialogInstance
     /// Close this dialog with an Ok result that contains the given data.
     /// </summary>
     /// <param name="data">The data to return.</param>
-    public void Close(object data)
+    public void Close(object? data)
         => Parent?.DismissDialogInstance(Id, DialogResult.Ok(data));
 
     /// <summary>
