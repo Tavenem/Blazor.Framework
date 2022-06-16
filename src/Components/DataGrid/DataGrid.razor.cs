@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Reflection;
@@ -195,7 +196,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     /// callback, if it exists, or to a new <see cref="DialogParameters"/> instance if not.
     /// </para>
     /// </summary>
-    [Parameter] public Func<DialogParameters>? EditDialogParameters { get; set; }
+    [Parameter] public Func<TDataItem?, Task<DialogParameters>>? EditDialogParameters { get; set; }
 
     /// <summary>
     /// This optional content is displayed when a row is expanded.
@@ -1023,8 +1024,12 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
         if (EditDialog is not null)
         {
-            var parameters = EditDialogParameters?.Invoke() ?? new();
-            parameters.Add(nameof(Row<TDataItem>.Item), row.Item);
+            DialogParameters? parameters = null;
+            if (EditDialogParameters is not null)
+            {
+                parameters = await EditDialogParameters.Invoke(row.Item);
+            }
+            (parameters ??= new()).Add(nameof(Row<TDataItem>.Item), row.Item);
             DialogService.Show(
                 EditDialog,
                 "Edit",
@@ -1606,7 +1611,12 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
         if (EditDialog is not null)
         {
-            var parameters = EditDialogParameters?.Invoke();
+            DialogParameters? parameters = null;
+            if (EditDialogParameters is not null)
+            {
+                parameters = await EditDialogParameters.Invoke(default);
+            }
+            parameters ??= new();
             DialogService.Show(
                 EditDialog,
                 "Add",

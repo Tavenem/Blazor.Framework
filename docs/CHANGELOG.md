@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.3.0-preview
+### Changed
+- DataGrid.EditDialogParameters is now asynchronous, and receives the edited item
+
 ## 0.2.0-preview
 ### Added
-- Allow passing parameters to the edit dialog for DataGrid 
+- Allow passing parameters to the edit dialog for DataGrid
 
 ## 0.1.1-preview
 ### Changed
