@@ -2462,15 +2462,6 @@ export function htmlWrapCommand(tag: string) {
     return wrapCommand(`<${tag}>`, `</${tag}>`);
 }
 
-export function setAttr(attrs: { [key: string]: any }, name: string, value: any) {
-    const result: { [key: string]: any } = {};
-    for (const prop in attrs) {
-        result[prop] = attrs[prop];
-    }
-    result[name] = value;
-    return result;
-}
-
 export function wrapCommand(tag: string, closeTag: string) {
     return (_params?: any[]) => (target: {
         state: CodeEditorState;

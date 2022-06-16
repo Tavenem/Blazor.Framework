@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2-preview
+### Fixed
+- Removed circular TypeScript import.
+
 ## 0.3.1-preview
 ### Changed
 - Ensure ItemAded and ItemSaved and invoked when DataGrid.EditDialog is defined, and provide automatic item add and update on success.

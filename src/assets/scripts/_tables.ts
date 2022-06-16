@@ -9,13 +9,11 @@ import {
     PluginKey,
     Selection,
     SelectionBookmark,
-    SelectionRange,
     TextSelection,
     Transaction,
 } from "prosemirror-state";
 import { Mappable, Mapping, ReplaceAroundStep, Transform } from "prosemirror-transform";
 import { Decoration, DecorationSet, EditorView, NodeView } from "prosemirror-view";
-import { setAttr } from "./_schemas";
 
 export const cellMinWidth = 25;
 
@@ -816,6 +814,15 @@ export function mergeCells(
         dispatch(tr);
     }
     return true;
+}
+
+export function setAttr(attrs: { [key: string]: any }, name: string, value: any) {
+    const result: { [key: string]: any } = {};
+    for (const prop in attrs) {
+        result[prop] = attrs[prop];
+    }
+    result[name] = value;
+    return result;
 }
 
 export function setColumnAlign(value: string): Command {
