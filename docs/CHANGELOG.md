@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1-preview
+### Changed
+- Ensure ItemAded and ItemSaved and invoked when DataGrid.EditDialog is defined, and provide automatic item add and update on success.
+
 ## 0.3.0-preview
 ### Changed
 - DataGrid.EditDialogParameters is now asynchronous, and receives the edited item

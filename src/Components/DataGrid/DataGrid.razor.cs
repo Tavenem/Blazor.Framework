@@ -1030,10 +1030,36 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                 parameters = await EditDialogParameters.Invoke(row.Item);
             }
             (parameters ??= new()).Add(nameof(Row<TDataItem>.Item), row.Item);
-            DialogService.Show(
+            var result = await DialogService.Show(
                 EditDialog,
                 "Edit",
-                parameters);
+                parameters).Result;
+            if (result.Choice == DialogChoice.Ok
+                && result.Data is TDataItem item)
+            {
+                var success = true;
+                if (ItemSaved is not null)
+                {
+                    success = await ItemSaved.Invoke(item);
+                }
+                if (success)
+                {
+                    if (LoadItems is null)
+                    {
+                        Items.Remove(row.Item);
+                        Items.Add(item);
+                    }
+                    else if (CurrentDataPage is null)
+                    {
+                        await LoadItemsAsync();
+                    }
+                    else if (CurrentDataPage.Items.Contains(row.Item))
+                    {
+                        CurrentDataPage.Items.Remove(row.Item);
+                        CurrentDataPage.Items.Add(item);
+                    }
+                }
+            }
         }
         else if (UseEditDialog)
         {
@@ -1617,10 +1643,34 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                 parameters = await EditDialogParameters.Invoke(default);
             }
             parameters ??= new();
-            DialogService.Show(
+            var result = await DialogService.Show(
                 EditDialog,
                 "Add",
-                parameters);
+                parameters).Result;
+            if (result.Choice == DialogChoice.Ok
+                && result.Data is TDataItem item)
+            {
+                var success = true;
+                if (ItemAdded is not null)
+                {
+                    success = await ItemAdded.Invoke(item);
+                }
+                if (success)
+                {
+                    if (LoadItems is null)
+                    {
+                        Items.Add(item);
+                    }
+                    else if (CurrentDataPage is null)
+                    {
+                        await LoadItemsAsync();
+                    }
+                    else
+                    {
+                        CurrentDataPage.Items.Add(item);
+                    }
+                }
+            }
         }
         else
         {
