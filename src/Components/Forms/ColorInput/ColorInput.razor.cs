@@ -327,6 +327,7 @@ public partial class ColorInput<TValue>
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
         if ((firstRender && DisplayType == PickerDisplayType.Inline)
             || _addMouseOverEvent)
         {

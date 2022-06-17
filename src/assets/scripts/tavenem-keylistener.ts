@@ -11,7 +11,6 @@
 
 interface IKeyListenerOptions {
     keys: IKeyOptions[];
-    class: string | undefined | null;
 }
 
 interface IKeyListenerObserver extends MutationObserver {
@@ -40,8 +39,7 @@ class KeyListener {
     _dotNetRef: DotNet.DotNetObject;
     _element: IKeyListenerElement | undefined;
     _keyOptions: Record<string, IKeyOptions> = {};
-    _observedChildren: Element[] = [];
-    _observer: IKeyListenerObserver | undefined | null;
+    _observedChildren: IKeyListenerElement[] = [];
     _options: IKeyListenerOptions;
     _regexOptions: IKeyOptions[] = [];
 
@@ -57,17 +55,7 @@ class KeyListener {
         if (!this._options.keys) {
             throw "_options.keys: array of IKeyOptions expected";
         }
-        if (!this._options.class) {
-            throw "_options.class: CSS class name expected";
-        }
-        if (this._observer) {
-            return;
-        }
         this._element = element;
-        this._observer = (new MutationObserver(this.onDomChanged)) as IKeyListenerObserver;
-        this._observer.keyListener = this;
-        this._observer.observe(this._element, { attributes: false, childList: true, subtree: true });
-        this._observedChildren = [];
         // transform key options into a key lookup
         this._keyOptions = {};
         this._regexOptions = [];
@@ -78,22 +66,14 @@ class KeyListener {
             this.setKeyOption(keyOption);
         }
         // register handlers
-        for (const child of this._element.getElementsByClassName(this._options.class)) {
-            this.attachHandlers(child as IKeyListenerElement);
-        }
+        this.attachHandlers(this._element as IKeyListenerElement);
     }
 
     disconnect() {
-        if (!this._observer) {
+        if (!this._element) {
             return;
         }
-        this._observer.disconnect();
-        this._observer = null;
-        if (this._observedChildren) {
-            for (const child of this._observedChildren) {
-                this.detachHandlers(child);
-            }
-        }
+        this.detachHandlers(this._element);
     }
 
     setKeyOption(keyOption: IKeyOptions) {
@@ -151,33 +131,6 @@ class KeyListener {
         return option.includes(`key${shift ? "+shift" : ""}${ctrl ? "+ctrl" : ""}${alt ? "+alt" : ""}${meta ? "+meta" : ""}`);
     }
 
-    private onDomChanged(this: IKeyListenerObserver, mutationsList: MutationRecord[]) {
-        var self = this.keyListener;
-        if (!self) {
-            return;
-        }
-        const targetClass = self._options.class;
-        if (!targetClass) {
-            return;
-        }
-        for (const mutation of mutationsList) {
-            for (const element of mutation.addedNodes) {
-                if (element instanceof Element
-                    && element.classList
-                    && element.classList.contains(targetClass)) {
-                    self.attachHandlers(element as IKeyListenerElement);
-                }
-            }
-            for (const element of mutation.removedNodes) {
-                if (element instanceof Element
-                    && element.classList
-                    && element.classList.contains(targetClass)) {
-                    self.detachHandlers(element);
-                }
-            }
-        }
-    }
-
     private onKeyDown(this: IKeyListenerElement, args: Event) {
         var self = this.keyListener; // func is invoked with this == child
         if (!self) {
@@ -196,7 +149,7 @@ class KeyListener {
             }
         }
         for (const keyOptions of self._regexOptions) {
-            if (keyOptions.regex && keyOptions.regex.test(key)) {
+            if (keyOptions.regex && keyOptions.regex.test(args.key)) {
                 self.processKeyDown(args, keyOptions);
                 if (keyOptions.subscribeDown) {
                     invoke = true;
@@ -276,11 +229,11 @@ class KeyListener {
 
 export function listenForKeyEvent(dotNetRef: DotNet.DotNetObject, elementId: string, options: IKeyListenerOptions) {
     if (!elementId) {
-        throw "elementId: expected element id!";
+        return;
     }
     const element = document.getElementById(elementId) as IKeyListenerElement;
     if (!element) {
-        throw "no element found for id: " + elementId;
+        return;
     }
     if (!element.keyListener) {
         element.keyListener = new KeyListener(dotNetRef, options);

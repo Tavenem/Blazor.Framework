@@ -2,6 +2,10 @@
 
 ## 0.3.2-preview
 ### Fixed
+- Improve Select keyboard behavior.
+
+## 0.3.2-preview
+### Fixed
 - Removed circular TypeScript import.
 
 ## 0.3.1-preview

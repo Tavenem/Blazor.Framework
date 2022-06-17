@@ -117,6 +117,21 @@ public abstract class DataGridSelectBase<TDataItem, TValue>
 
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
 
+    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/Escape|ArowDown|ArrowUp|Delete| |Enter/",
+            SubscribeDown = true,
+            PreventDown = "key+none|key+ctrl",
+        },
+        new()
+        {
+            Key = "Tab",
+            SubscribeDown = true,
+        }
+    };
+
     /// <summary>
     /// Constructs a new instance of <see cref="DataGridSelectBase{TDataItem, TValue}"/>.
     /// </summary>
@@ -159,6 +174,7 @@ public abstract class DataGridSelectBase<TDataItem, TValue>
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
         if (DataGrid is not null)
         {
             foreach (var column in DataGrid.Columns.Except(_columns).ToList())
@@ -261,30 +277,36 @@ public abstract class DataGridSelectBase<TDataItem, TValue>
         }
     }
 
-    private protected override async Task OnKeyDownAsync(KeyboardEventArgs e)
+    private protected override async void OnKeyDownAsync(KeyboardEventArgs e)
     {
         if (Disabled || ReadOnly)
         {
             return;
         }
 
-        switch (e.Key.ToLowerInvariant())
+        switch (e.Key)
         {
-            case "escape":
-            case "tab":
+            case "Escape":
+            case "Tab":
                 if (PopoverOpen)
                 {
                     await TogglePopoverAsync();
                 }
                 break;
-            case "arrowdown":
+            case "Delete":
+                if (CanClear)
+                {
+                    await ClearAsync();
+                }
+                break;
+            case "ArrowDown":
                 await OnArrowDownAsync();
                 break;
-            case "arrowup":
+            case "ArrowUp":
                 await OnArrowUpAsync();
                 break;
             case " ":
-            case "enter":
+            case "Enter":
                 await TogglePopoverAsync();
                 break;
             case "a":

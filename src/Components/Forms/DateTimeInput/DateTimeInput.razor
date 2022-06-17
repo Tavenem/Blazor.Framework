@@ -382,6 +382,7 @@
 @if (DisplayType == PickerDisplayType.Button)
 {
     <span @attributes="AdditionalAttributes"
+          id="@ContainerId"
           class="@ButtonContainerClass"
           style="@ButtonContainerStyle">
         <button @ref="ElementReference"
@@ -420,8 +421,7 @@ else
          class="@CssClass"
          style="@CssStyle"
          tabindex="-1"
-         @onclick="OnClickContainerAsync"
-         @onkeydown="OnKeyDownAsync">
+         @onclick="OnClickContainerAsync">
         <div id="@InputId"
              class="input"
              style="@(DisplayType == PickerDisplayType.Inline ? "display:none" : null)">

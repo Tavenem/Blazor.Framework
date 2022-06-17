@@ -166,6 +166,23 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected string InputId { get; set; } = Guid.NewGuid().ToHtmlId();
 
+    [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
+
+    private protected virtual List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/Escape|Delete| |Enter/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+        },
+        new()
+        {
+            Key = "Tab",
+            SubscribeDown = true,
+        }
+    };
+
     private protected bool PopoverOpen { get; set; }
 
     private protected bool ShowPicker => PopoverOpen
@@ -184,6 +201,19 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
             && !string.IsNullOrEmpty(idString))
         {
             ContainerId = idString;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await KeyListener.ConnectAsync(ContainerId, new()
+            {
+                Keys = KeyOptions,
+            });
+            KeyListener.KeyDown += OnKeyDownAsync;
         }
     }
 
@@ -249,34 +279,33 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected virtual Task OnClosePopoverAsync() => Task.CompletedTask;
 
-    private protected virtual Task OnKeyDownAsync(KeyboardEventArgs e)
+    private protected virtual async void OnKeyDownAsync(KeyboardEventArgs e)
     {
         if (Disabled || ReadOnly)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         switch (e.Key)
         {
-            case "escape":
-            case "tab":
+            case "Escape":
+            case "Tab":
                 if (PopoverOpen)
                 {
-                    return TogglePopoverAsync();
+                    await TogglePopoverAsync();
                 }
                 break;
-            case "delete":
+            case "Delete":
                 if (CanClear)
                 {
-                    return ClearAsync();
+                    await ClearAsync();
                 }
                 break;
             case " ":
-            case "enter":
-                return TogglePopoverAsync();
+            case "Enter":
+                await TogglePopoverAsync();
+                break;
         }
-
-        return Task.CompletedTask;
     }
 
     private protected virtual void OnOpenPopover() { }

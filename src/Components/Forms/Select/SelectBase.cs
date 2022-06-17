@@ -177,6 +177,21 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
 
     private protected string? TypedValue { get; set; }
 
+    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/^(?!Tab$)/",
+            SubscribeDown = true,
+            PreventDown = "any",
+        },
+        new()
+        {
+            Key = "Tab",
+            SubscribeDown = true,
+        }
+    };
+
     /// <summary>
     /// Constructs a new instance of <see cref="SelectBase{TValue, TOption}"/>.
     /// </summary>
@@ -284,27 +299,8 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     /// Toggle the given option's selected state.
     /// </summary>
     /// <param name="option">The option to toggle.</param>
-    public async Task ToggleValueAsync(Option<TOption> option)
-    {
-        if (PopoverOpen)
-        {
-            await TogglePopoverAsync();
-        }
-        SelectedIndex = _options.IndexOf(option);
-        if (IsSelected(option.Value))
-        {
-            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
-        }
-        else
-        {
-            if (!IsMultiselect)
-            {
-                _selectedOptions.Clear();
-            }
-            _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
-        }
-        UpdateCurrentValue();
-    }
+    public Task ToggleValueAsync(Option<TOption> option)
+        => ToggleValueAsync(option, true);
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
@@ -326,31 +322,36 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
 
     private protected Task OnArrowUpAsync(KeyboardEventArgs e) => SelectIndexAsync(e, SelectedIndex - 1);
 
-    private protected override async Task OnKeyDownAsync(KeyboardEventArgs e)
+    private protected override async void OnKeyDownAsync(KeyboardEventArgs e)
     {
         if (Disabled || ReadOnly)
         {
             return;
         }
 
-        var key = e.Key.ToLowerInvariant();
-        switch (key)
+        switch (e.Key)
         {
-            case "escape":
-            case "tab":
+            case "Escape":
+            case "Tab":
                 if (PopoverOpen)
                 {
                     await TogglePopoverAsync();
                 }
                 break;
-            case "arrowdown":
+            case "Delete":
+                if (CanClear)
+                {
+                    await ClearAsync();
+                }
+                break;
+            case "ArrowDown":
                 await OnArrowDownAsync(e);
                 break;
-            case "arrowup":
+            case "ArrowUp":
                 await OnArrowUpAsync(e);
                 break;
             case " ":
-            case "enter":
+            case "Enter":
                 await TogglePopoverAsync();
                 break;
             case "a":
@@ -360,16 +361,16 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
                 }
                 else
                 {
-                    await OnTypeAsync(key);
+                    await OnTypeAsync(e.Key);
                 }
                 break;
             default:
-                if (key.Length == 1
+                if (e.Key.Length == 1
                     && !e.AltKey
                     && !e.CtrlKey
                     && !e.MetaKey)
                 {
-                    await OnTypeAsync(key);
+                    await OnTypeAsync(e.Key);
                 }
                 break;
         }
@@ -377,9 +378,37 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
 
     private protected virtual Task OnTypeClosedAsync(Option<TOption> option) => Task.CompletedTask;
 
-    private protected void RefreshOptions() => _options.ForEach(x => x.InvokeStateChange());
+    private protected void RefreshOptions()
+    {
+        _options.ForEach(x => x.InvokeStateChange());
+        StateHasChanged();
+    }
 
     private protected abstract Task SelectIndexAsync(KeyboardEventArgs e, int index);
+
+    private protected abstract Task SelectItemAsync(Option<TOption> option);
+
+    private protected async Task ToggleValueAsync(Option<TOption> option, bool close)
+    {
+        if (PopoverOpen && close)
+        {
+            await TogglePopoverAsync();
+        }
+        SelectedIndex = _options.IndexOf(option);
+        if (IsSelected(option.Value))
+        {
+            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
+        }
+        else
+        {
+            if (!IsMultiselect)
+            {
+                _selectedOptions.Clear();
+            }
+            _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
+        }
+        UpdateCurrentValue();
+    }
 
     private protected abstract void UpdateCurrentValue();
 
@@ -412,6 +441,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
                 {
                     await option.ElementReference.FocusAsync();
                     await ScrollService.ScrollToId(option.Id);
+                    await SelectItemAsync(option);
                 }
                 else
                 {

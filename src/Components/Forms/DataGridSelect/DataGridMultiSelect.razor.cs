@@ -10,6 +10,11 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
 public partial class DataGridMultiSelect<TDataItem> where TDataItem : notnull
 {
+    /// <summary>
+    /// Whether this select allows multiple selections.
+    /// </summary>
+    protected override bool IsMultiselect => true;
+
     /// <inheritdoc/>
     protected override string? FormatValueAsString(IEnumerable<TDataItem>? value)
     {
