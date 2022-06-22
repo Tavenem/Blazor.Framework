@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.3.2-preview
+## 0.4.0-preview
+### Changed
+- Added RowValue to DataGridSelect and DataGridMultiSelect.
+
+## 0.3.3-preview
 ### Fixed
 - Improve Select keyboard behavior.
 

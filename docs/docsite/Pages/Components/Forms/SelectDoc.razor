@@ -229,10 +229,15 @@
     component. They will be passed down to the internal <code>DataGrid</code>.
 </p>
 
+<p>
+    The bound value is defined by the <code>RowValue</code> property, which should be a function
+    that selects a value from a data item (row).
+</p>
+
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")">
+            <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
@@ -241,7 +246,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"">
+        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowValue=""@(x => x)"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"" />
@@ -314,7 +319,7 @@
 <Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGridMultiSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")">
+            <DataGridMultiSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
@@ -323,7 +328,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"">
+        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowValue=""@(x => x)"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"" />

@@ -328,15 +328,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     public string? TextFilter { get; set; }
 
     /// <summary>
-    /// <para>
     /// A function which retrieves the value of this column for a given data item (row).
-    /// </para>
-    /// <para>
-    /// If left <see langword="null"/>, and <see cref="Value"/> is a simple property or field
-    /// accessor which has a public setter, that property's value will be retrieved. Otherwise this
-    /// column will not be bound to a value (although it may still display content, if <see
-    /// cref="ChildContent"/> has been set).
-    /// </para>
     /// </summary>
     [Parameter] public Expression<Func<TDataItem, TValue?>>? Value { get; set; }
 

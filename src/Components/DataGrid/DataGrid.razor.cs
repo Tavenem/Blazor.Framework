@@ -960,6 +960,74 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     }
 
     /// <summary>
+    /// Sets the currently selected item(s) to the set which have a given value.
+    /// </summary>
+    /// <param name="getValue">
+    /// A function which retrieves a value from a data item.
+    /// </param>
+    /// <param name="value">
+    /// The value which should indicate a selected item.
+    /// </param>
+    public async Task SetSelectionAsync<TValue>(Func<TDataItem, TValue?>? getValue, TValue? value)
+    {
+        if (SelectedItems.Count == 0
+            && value is null)
+        {
+            return;
+        }
+
+        SelectedItems.Clear();
+        SelectedItem = default;
+
+        if (value is null
+            || (getValue is null
+            && typeof(TValue).IsAssignableFrom(typeof(TDataItem))))
+        {
+            return;
+        }
+
+        if (LoadItems is null)
+        {
+            foreach (var item in Items)
+            {
+                if (getValue is null)
+                {
+                    if (item.Equals(value))
+                    {
+                        SelectedItems.Add(item);
+                    }
+                }
+                else if (getValue(item)?.Equals(value) == true)
+                {
+                    SelectedItems.Add(item);
+                }
+            }
+        }
+        else
+        {
+            foreach (var item in CurrentPageItems)
+            {
+                if (getValue is null)
+                {
+                    if (item.Equals(value))
+                    {
+                        SelectedItems.Add(item);
+                    }
+                }
+                else if (getValue(item)?.Equals(value) == true)
+                {
+                    SelectedItems.Add(item);
+                }
+            }
+        }
+
+        SelectedItem = SelectedItems.FirstOrDefault();
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        StateHasChanged();
+    }
+
+    /// <summary>
     /// Sets the currently selected items.
     /// </summary>
     /// <param name="selectedItems">
@@ -981,6 +1049,74 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
         SelectedItems.Clear();
         SelectedItems.AddRange(selectedItems.Intersect(Items));
+        SelectedItem = SelectedItems.FirstOrDefault();
+        await SelectedItemChanged.InvokeAsync(SelectedItem);
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Sets the currently selected item(s) to the set which have a given value.
+    /// </summary>
+    /// <param name="getValue">
+    /// A function which retrieves a value from a data item.
+    /// </param>
+    /// <param name="values">
+    /// The values which should indicate a selected item.
+    /// </param>
+    public async Task SetSelectionAsync<TValue>(Func<TDataItem, TValue?>? getValue, List<TValue>? values)
+    {
+        if (SelectedItems.Count == 0
+            && (values?.Count ?? 0) == 0)
+        {
+            return;
+        }
+
+        SelectedItems.Clear();
+        SelectedItem = default;
+
+        if (values is null
+            || (getValue is null
+            && typeof(TValue).IsAssignableFrom(typeof(TDataItem))))
+        {
+            return;
+        }
+
+        if (LoadItems is null)
+        {
+            foreach (var item in Items)
+            {
+                if (getValue is null)
+                {
+                    if (values.Any(x => item.Equals(x)))
+                    {
+                        SelectedItems.Add(item);
+                    }
+                }
+                else if (values.Any(x => getValue(item)?.Equals(x) == true))
+                {
+                    SelectedItems.Add(item);
+                }
+            }
+        }
+        else
+        {
+            foreach (var item in CurrentPageItems)
+            {
+                if (getValue is null)
+                {
+                    if (values.Any(x => item.Equals(x)))
+                    {
+                        SelectedItems.Add(item);
+                    }
+                }
+                else if (values.Any(x => getValue(item)?.Equals(x) == true))
+                {
+                    SelectedItems.Add(item);
+                }
+            }
+        }
+
         SelectedItem = SelectedItems.FirstOrDefault();
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);

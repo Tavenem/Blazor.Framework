@@ -4,8 +4,9 @@
 
 @attribute [CascadingTypeParameter(nameof(TDataItem))]
 @typeparam TDataItem
+@typeparam TValue
 
-@inherits DataGridSelectBase<TDataItem, TDataItem>
+@inherits PickerComponentBase<TValue>
 
 <div class="d-none">
     <CascadingValue Value="this" TValue="IDataGrid<TDataItem>" IsFixed="true">
