@@ -319,10 +319,13 @@
 </p>
 
 <p>
-    You can also set a callback on the <code>OnDrop</code> property to bypass the default drop
-    process and handle the operation yourself. If you do this, you should also override the
-    <code>OnDropped</code> callback to bypass dropped list items' default behavior of removing
-    themselves from their place on their current list on a move operation.
+    You can also set a callback on the <code>OnDrop</code> and <code>OnDropIndex</code> properties
+    to bypass the default drop process and handle the operation yourself. <code>OnDrop</code> is
+    invoked when an item is dropped on the list itself, and <code>OnDropIndex</code> is invoked when
+    an item is dropped onto a list item and provides the index of that item, in addition to the
+    dropped data. If you provide these properties, you should normally also provide a callback for
+    the <code>OnDropped</code> proerty as well, to bypass dropped list items' default behavior of
+    removing themselves from their place on their current list on a move operation.
 </p>
 
 <p>

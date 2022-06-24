@@ -5,10 +5,8 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// <summary>
 /// Displays an item in a list, with support for simple theming.
 /// </summary>
-public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListItem>, IAsyncDisposable
+public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListItem>
 {
-    private protected bool _disposedAsyncValue;
-
     /// <summary>
     /// Whether this item is disabled.
     /// </summary>
@@ -33,6 +31,16 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     /// Indicates whether this item has been selected.
     /// </summary>
     public bool IsSelected => ParentSelectedItems?.Contains(Item) == true;
+
+    /// <summary>
+    /// A unique identifier within the list.
+    /// </summary>
+    [Parameter] public Guid ListId { get; set; }
+
+    /// <summary>
+    /// Invoked when an item is dropped on this item in a list.
+    /// </summary>
+    [Parameter] public EventCallback<DropIndexEventArgs> OnDropIndex { get; set; }
 
     /// <summary>
     /// Whether to show a separator after this item.
@@ -205,14 +213,6 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
 
     [Inject] private ScrollService ScrollService { get; set; } = default!;
 
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
     /// <summary>
     /// Focuses on this list item, and scrolls to it.
     /// </summary>
@@ -235,7 +235,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         {
             await ElementList.InsertItemAsync(
                 item,
-                ElementList.IndexOfItem(Item));
+                ElementList.IndexOfListId(ListId));
         }
     }
 
@@ -265,27 +265,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
             && Item is not null
             && ElementList is not null)
         {
-            await ElementList.RemoveItemAsync(Item);
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting
-    /// unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-        if (!_disposedAsyncValue)
-        {
-            if (disposing
-                && Item is not null
-                && ElementList is not null)
-            {
-                await ElementList.RemoveItemAsync(Item);
-            }
-
-            _disposedAsyncValue = true;
+            await ElementList.RemoveListIdAsync(ListId);
         }
     }
 
@@ -321,12 +301,12 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         }
 
         var item = DragDropService.TryGetData<TListItem>(e);
-        if (item?.Equals(Item) == true)
-        {
-            return;
-        }
 
-        if (OnDrop.HasDelegate)
+        if (OnDropIndex.HasDelegate)
+        {
+            await OnDropIndex.InvokeAsync(new(e, ElementList.IndexOfListId(ListId)));
+        }
+        else if (OnDrop.HasDelegate)
         {
             await OnDrop.InvokeAsync(new(e));
         }

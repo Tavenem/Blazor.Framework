@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1-preview
+### Changed
+- Improve List drag-drop.
+
 ## 0.4.0-preview
 ### Changed
 - Added RowValue to DataGridSelect and DataGridMultiSelect.

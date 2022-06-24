@@ -190,7 +190,7 @@ public class DragDropService : IAsyncDisposable
     /// The requested data, if found; otherwise, the default value for the <typeparamref
     /// name="TData"/> type.
     /// </returns>
-    public static TData? TryGetData<TData>(IEnumerable<KeyValuePair<string, string>> e, string? type = null)
+    public static TData? TryGetData<TData>(IEnumerable<KeyValuePair<string, string>>? e, string? type = null)
     {
         if (string.IsNullOrEmpty(type)
             && TryGetDataOfType<TData>(e, out var jsonData))
@@ -198,7 +198,8 @@ public class DragDropService : IAsyncDisposable
             return jsonData;
         }
 
-        if (typeof(TData) == typeof(string))
+        if (e is not null
+            && typeof(TData) == typeof(string))
         {
             if (!string.IsNullOrEmpty(type))
             {
@@ -282,13 +283,18 @@ public class DragDropService : IAsyncDisposable
     }
 
     private static bool TryGetDataOfType<TData>(
-        IEnumerable<KeyValuePair<string, string>> e,
+        IEnumerable<KeyValuePair<string, string>>? e,
         [NotNullWhen(true)] out TData? data,
         string? type = null)
     {
         type ??= "application/json";
 
         data = default;
+
+        if (e is null)
+        {
+            return false;
+        }
 
         foreach (var (dataType, item) in e)
         {

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Tavenem.Blazor.Framework.Components.List;
 using Tavenem.Blazor.Framework.InternalComponents;
 
 namespace Tavenem.Blazor.Framework;
@@ -152,6 +153,11 @@ public partial class ElementList<TListItem>
     /// </para>
     /// </summary>
     [Parameter] public Func<TListItem, ThemeColor>? ItemThemeColor { get; set; }
+
+    /// <summary>
+    /// Invoked when an item is dropped on an item in this list.
+    /// </summary>
+    [Parameter] public EventCallback<DropIndexEventArgs> OnDropIndex { get; set; }
 
     /// <summary>
     /// <para>
@@ -320,6 +326,11 @@ public partial class ElementList<TListItem>
         .ToString();
 
     /// <summary>
+    /// The items in the list.
+    /// </summary>
+    protected List<ListData<TListItem>> ListItems { get; set; } = new();
+
+    /// <summary>
     /// The list to which this one belongs, if any.
     /// </summary>
     [CascadingParameter] protected ElementList<TListItem>? ParentList { get; set; }
@@ -334,6 +345,15 @@ public partial class ElementList<TListItem>
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var itemsChanged = false;
+        if (parameters.TryGetValue<List<TListItem>?>(nameof(Items), out var newItems)
+            && (((newItems is null) != (Items is null))
+            || (Items is not null
+            && !newItems!.SequenceEqual(Items))))
+        {
+            itemsChanged = true;
+        }
+
         var selectedItemChanged = false;
         TListItem? newSelectedItem = default;
         if (!parameters.TryGetValue<List<TListItem>>(nameof(SelectedItems), out var newSelectedItems)
@@ -347,6 +367,14 @@ public partial class ElementList<TListItem>
             && newSelectedItems?.SequenceEqual(SelectedItems) != true;
 
         await base.SetParametersAsync(parameters);
+
+        if (itemsChanged)
+        {
+            ListItems = Items?
+                .Where(x => x is not null)
+                .Select(x => new ListData<TListItem>(x!))
+                .ToList() ?? new();
+        }
 
         if (selectedItemsChanged)
         {
@@ -511,17 +539,24 @@ public partial class ElementList<TListItem>
 
     internal override bool GetIsDropTarget() => IsDropTarget || ParentList?.GetIsDropTarget() == true;
 
-    internal int? IndexOfItem(TListItem? item) => item is null ? null : Items?.IndexOf(item);
+    internal int? IndexOfListId(Guid id) => ListItems.FindIndex(x => x.ListId == id);
 
     internal async Task InsertItemAsync(TListItem item, int? index)
     {
+        if (item is null)
+        {
+            return;
+        }
+
         if (index.HasValue)
         {
             (Items ??= new()).Insert(index.Value, item);
+            ListItems.Insert(index.Value, new(item));
         }
         else
         {
             (Items ??= new()).Add(item);
+            ListItems.Add(new(item));
         }
         await ItemsChanged.InvokeAsync(Items);
         StateHasChanged();
@@ -565,21 +600,27 @@ public partial class ElementList<TListItem>
         StateHasChanged();
     }
 
-    internal async Task RemoveItemAsync(TListItem item)
+    internal async Task RemoveListIdAsync(Guid id)
     {
-        if (SelectedItems.Contains(item))
+        var item = ListItems.Find(x => x.ListId == id);
+        if (item is null)
         {
-            if (SelectedItems.IndexOf(item) == 0)
+            return;
+        }
+        if (SelectedItems.Contains(item.Item))
+        {
+            if (SelectedItems.IndexOf(item.Item) == 0)
             {
                 SelectedItem = default;
                 await SelectedItemChanged.InvokeAsync(SelectedItem);
             }
-            SelectedItems.Remove(item);
+            SelectedItems.Remove(item.Item);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
-        if (Items?.Contains(item) == true)
+        ListItems.Remove(item);
+        if (Items is not null)
         {
-            Items.Remove(item);
+            Items.Remove(item.Item);
             await ItemsChanged.InvokeAsync(Items);
         }
         StateHasChanged();

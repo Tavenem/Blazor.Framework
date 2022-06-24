@@ -11,28 +11,33 @@
      class="@CssClass"
      style="@CssStyle">
     @ChildContent
-    @if (Items is not null)
-    {
-        <CascadingValue Value="this as ElementList<TChip>" IsFixed="true">
-        <CascadingValue Value="SelectedItems">
-            @if (TemplateValue is null)
+    <CascadingValue Value="this as ElementList<TChip>" IsFixed="true">
+    <CascadingValue Value="SelectedItems">
+        @if (TemplateValue is null)
+        {
+            foreach (var item in ListItems)
             {
-                foreach (var item in Items)
-                {
-                    <Chip TChip="TChip" Item="item" />
-                }
+                <Chip @key="item.ListId"
+                      TChip="TChip"
+                      Item="item.Item"
+                      ListId="item.ListId"
+                      OnDropIndex="OnDropIndex" />
             }
-            else
+        }
+        else
+        {
+            foreach (var item in ListItems)
             {
-                foreach (var item in Items)
-                {
-                    <Chip TChip="TChip" Item="item">
-                        @TemplateValue(item)
-                    </Chip>
-                }
+                <Chip @key="item.ListId"
+                      TChip="TChip"
+                      Item="item.Item"
+                      ListId="item.ListId"
+                      OnDropIndex="OnDropIndex">
+                    @TemplateValue(item.Item)
+                </Chip>
             }
-        </CascadingValue>
-        </CascadingValue>
-    }
+        }
+    </CascadingValue>
+    </CascadingValue>
     @FollowingContent
 </div>
