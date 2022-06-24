@@ -841,6 +841,22 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     }
 
     /// <summary>
+    /// Called internally.
+    /// </summary>
+    public Task OnFilterChangedAsync()
+    {
+        if (LoadItems is null)
+        {
+            Regroup();
+            return Task.CompletedTask;
+        }
+        else
+        {
+            return LoadItemsAsync();
+        }
+    }
+
+    /// <summary>
     /// Removes a column from this grid.
     /// </summary>
     /// <param name="column">The column to remove.</param>

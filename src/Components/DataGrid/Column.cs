@@ -207,6 +207,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     public Guid Id { get; } = Guid.NewGuid();
 
     /// <summary>
+    /// A value by which this column is initially filtered.
+    /// </summary>
+    [Parameter] public TValue? InitialFilter { get; set; }
+
+    /// <summary>
     /// Gets whether this column represents boolean data.
     /// </summary>
     public bool IsBool { get; private set; }
@@ -338,6 +343,12 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
 
     [CascadingParameter] private IDataGrid<TDataItem>? DataGrid { get; set; }
 
+    private bool IsDateOnly { get; set; }
+
+    private bool IsDateTimeOffset { get; set; }
+
+    private bool IsTimeOnly { get; set; }
+
     /// <summary>
     /// Constructs a new instance of <see cref="Column{TDataItem, TValue}"/>.
     /// </summary>
@@ -380,10 +391,51 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         DataGrid?.AddColumn(this);
         _isShown = IsShown;
+        if (InitialFilter is not null
+            && !InitialFilter.Equals(default))
+        {
+            if (IsBool)
+            {
+                BoolFilter = (bool)(object)InitialFilter;
+            }
+            else if (IsDateOnly)
+            {
+                DateTimeFilter = new(
+                    ((DateOnly)(object)InitialFilter).ToDateTime(TimeOnly.MinValue),
+                    TimeSpan.Zero);
+            }
+            else if (IsDateTimeOffset)
+            {
+                DateTimeFilter = (DateTimeOffset)(object)InitialFilter;
+            }
+            else if (IsTimeOnly)
+            {
+                DateTimeFilter = new DateTimeOffset(
+                    DateOnly.MinValue.ToDateTime((TimeOnly)(object)InitialFilter),
+                    TimeSpan.Zero);
+            }
+            else if (IsDateTime)
+            {
+                DateTimeFilter = new((DateTime)(object)InitialFilter, TimeSpan.Zero);
+            }
+            else if (IsNumeric)
+            {
+                NumberFilter = Convert.ToDouble(InitialFilter);
+            }
+            else if (IsString)
+            {
+                TextFilter = (string)(object)InitialFilter;
+            }
+
+            if (DataGrid is not null)
+            {
+                await DataGrid.OnFilterChangedAsync();
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -615,6 +667,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
         ActualValue = null;
         IsBool = false;
         IsDateTime = false;
+        IsDateTimeOffset = false;
         IsEnum = false;
         IsFloat = false;
         IsNullable = false;
@@ -663,13 +716,28 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
             || targetType == typeof(double)
             || targetType == typeof(float));
 
-        IsDateTime = !IsString
+        IsDateOnly = !IsString
             && !IsBool
             && !IsNumeric
-            && (targetType == typeof(DateTime)
-            || targetType == typeof(DateTimeOffset)
-            || targetType == typeof(DateOnly)
-            || targetType == typeof(TimeOnly));
+            && targetType == typeof(DateOnly);
+        IsDateTimeOffset = !IsString
+            && !IsBool
+            && !IsNumeric
+            && !IsDateOnly
+            && targetType == typeof(DateTimeOffset);
+        IsTimeOnly = !IsString
+            && !IsBool
+            && !IsNumeric
+            && !IsDateOnly
+            && !IsDateTimeOffset
+            && targetType == typeof(TimeOnly);
+        IsDateTime = IsDateOnly
+            || IsDateTimeOffset
+            || IsTimeOnly
+            || (!IsString
+            && !IsBool
+            && !IsNumeric
+            && targetType == typeof(DateTime));
 
         IsEnum = targetType.IsEnum;
 

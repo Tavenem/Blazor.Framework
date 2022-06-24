@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2-preview
+### Added
+- Initial filter for DataGrid Column.
+
 ## 0.4.1-preview
 ### Changed
 - Improve List drag-drop.

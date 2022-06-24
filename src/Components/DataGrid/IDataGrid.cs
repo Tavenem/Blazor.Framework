@@ -28,6 +28,11 @@ public interface IDataGrid<TDataItem> where TDataItem : notnull
     public Task OnColumnSortedAsync(IColumn<TDataItem> column);
 
     /// <summary>
+    /// Called internally.
+    /// </summary>
+    public Task OnFilterChangedAsync();
+
+    /// <summary>
     /// Removes a column from this grid.
     /// </summary>
     /// <param name="column">The column to remove.</param>

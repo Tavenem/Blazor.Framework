@@ -250,6 +250,12 @@ public partial class DataGridMultiSelect<TDataItem, TValue> : IDataGrid<TDataIte
          => DataGrid?.OnColumnSortedAsync(column) ?? Task.CompletedTask;
 
     /// <summary>
+    /// Called internally.
+    /// </summary>
+    public Task OnFilterChangedAsync()
+         => DataGrid?.OnFilterChangedAsync() ?? Task.CompletedTask;
+
+    /// <summary>
     /// Removes a column from this grid.
     /// </summary>
     /// <param name="column">The column to remove.</param>
