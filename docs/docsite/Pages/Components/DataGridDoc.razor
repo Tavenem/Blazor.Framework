@@ -938,6 +938,12 @@
 </p>
 
 <p>
+    You can also provide a different dialog for adding items by assigning a <code>Component</code>
+    type to the <code>AddDialog</code> property. If this is set, it will be used instead of the
+    <code>EditDialog</code>. You can also supply <code>AddDialogParameters</code>.
+</p>
+
+<p>
     When the dialog is submitted the <code>ItemAdded</code> function is invoked (if defined). If
     this retuns false, no further action is taken. Otherwise, if the <code>Items</code> collection
     is set, the new item is added to its proper place in the data set (possibly on a different

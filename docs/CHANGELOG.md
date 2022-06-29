@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3-preview
+### Added
+- AddDialog for DataGrid.
+
 ## 0.4.2-preview
 ### Added
 - Initial filter for DataGrid Column.

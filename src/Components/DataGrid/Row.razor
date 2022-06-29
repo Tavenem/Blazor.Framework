@@ -41,14 +41,14 @@
                             <tf-icon>@DefaultIcons.Edit</tf-icon>
                         </button>
                     </Tooltip>
-                }
-                @if (DataGrid.AllowDelete)
-                {
-                    <Tooltip TooltipText="Delete" Delay="750">
-                        <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
-                            <tf-icon>@DefaultIcons.Delete</tf-icon>
-                        </button>
-                    </Tooltip>
+                    @if (DataGrid.AllowDelete)
+                    {
+                        <Tooltip TooltipText="Delete" Delay="750">
+                            <button class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
+                                <tf-icon>@DefaultIcons.Delete</tf-icon>
+                            </button>
+                        </Tooltip>
+                    }
                 }
             </span>
         </td>

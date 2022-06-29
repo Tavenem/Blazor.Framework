@@ -50,6 +50,33 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     /// <summary>
     /// <para>
+    /// The type of a component to use as the add dialog.
+    /// </para>
+    /// <para>
+    /// Must descend from <see cref="ComponentBase"/>.
+    /// </para>
+    /// <para>
+    /// When omitted, the <see cref="EditDialog"/> is used, if <see cref="AllowAdd"/> is <see
+    /// langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public Type? AddDialog { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// If provided, this callback is used to fetch the parameters used for the <see
+    /// cref="AddDialog"/>.
+    /// </para>
+    /// <para>
+    /// The dialog also receives a parameter named "Item" which contains the edited item, unless the
+    /// dialog is being used to create a new item. This parameter is added to the result of this
+    /// callback, if it exists, or to a new <see cref="DialogParameters"/> instance if not.
+    /// </para>
+    /// </summary>
+    [Parameter] public Func<Task<DialogParameters>>? AddDialogParameters { get; set; }
+
+    /// <summary>
+    /// <para>
     /// When <see langword="true"/> an add button appears in the header.
     /// </para>
     /// <para>
