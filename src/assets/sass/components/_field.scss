@@ -418,13 +418,16 @@
         color: currentColor;
         display: block;
         font: inherit;
-        height: 1.1875rem;
         margin: 0;
         min-width: 0;
         padding: 0;
         position: relative;
         width: 100%;
         -webkit-tap-highlight-color: transparent;
+
+        &:not(textarea) {
+            height: 1.1875rem;
+        }
 
         &::placeholder {
             color: currentColor;

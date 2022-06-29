@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.5-preview
+### Fixed
+- Fix TextArea ignoring Rows parameter.
+
 ## 0.4.4-preview
 ### Added
 - Use AddDialog as intended.
