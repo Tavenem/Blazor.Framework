@@ -447,8 +447,7 @@
     </TitleContent>
     <ChildContent>
         @if (EditedItem is not null
-            && _isEditDialogVisible
-            && EditDialog is null)
+            && _isEditDialogVisible)
         {
             <Form @ref="DialogEditForm" Class="d-flex flex-column mx-3">
                 @foreach (var column in _columns)

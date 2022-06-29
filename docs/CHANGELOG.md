@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.4-preview
+### Added
+- Use AddDialog as intended.
+
 ## 0.4.3-preview
 ### Added
 - AddDialog for DataGrid.

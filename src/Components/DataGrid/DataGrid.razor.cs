@@ -1814,16 +1814,21 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             }
         }
 
-        if (EditDialog is not null)
+        if (AddDialog is not null
+            || EditDialog is not null)
         {
             DialogParameters? parameters = null;
-            if (EditDialogParameters is not null)
+            if (AddDialogParameters is not null)
+            {
+                parameters = await AddDialogParameters.Invoke();
+            }
+            else if (EditDialogParameters is not null)
             {
                 parameters = await EditDialogParameters.Invoke(default);
             }
             parameters ??= new();
             var result = await DialogService.Show(
-                EditDialog,
+                (AddDialog ?? EditDialog)!,
                 "Add",
                 parameters).Result;
             if (result.Choice == DialogChoice.Ok
