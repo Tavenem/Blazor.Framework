@@ -2,6 +2,10 @@
 
 ## 0.4.5-preview
 ### Fixed
+- Codeblock does not disable child scroll.
+
+## 0.4.5-preview
+### Fixed
 - Fix TextArea ignoring Rows parameter.
 
 ## 0.4.4-preview

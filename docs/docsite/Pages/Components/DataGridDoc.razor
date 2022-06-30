@@ -561,7 +561,20 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" GroupBy=""@(x => x.IsExecutive)"" />
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" GroupBy=""@(x => x.IsExecutive)"">
+    <GroupContent>
+        @if (context is bool b && b)
+        {
+            <span>Executives</span>
+            <tf-icon>admin_panel_settings</tf-icon>
+        }
+        else
+        {
+            <span>Non-executives</span>
+            <tf-icon>engineering</tf-icon>
+        }
+    </GroupContent>
+</DataGrid>
 
 @code {
     private class DataItem
