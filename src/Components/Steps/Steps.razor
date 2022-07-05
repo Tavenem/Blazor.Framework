@@ -1,0 +1,61 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+    <ol class="step-list">
+        @foreach (var step in VisibleSteps)
+        {
+            <li class="step-selector">
+                <span class="step-separator step-separator-begin"></span>
+                <span class="@GetStepActivatorCssClass(step)" @onclick="@(_ => OnActivateStepAsync(step))">
+                    <span class="step-number"></span>
+                    @if (!string.IsNullOrEmpty(step.Title))
+                    {
+                        <span style="margin-inline-start:.5rem">@step.Title</span>
+                    }
+                </span>
+                <span class="step-separator step-separator-end"></span>
+            </li>
+        }
+    </ol>
+    <Form AutoValidate="AutoValidate"
+          EditContext="EditContext"
+          FieldChanged="FieldChanged"
+          Model="Model"
+          Validation="Validation!"
+          ValidationRequested="ValidationRequested"
+          ValidationStateChanged="OnValidationStateChanged"
+          Class="d-grid mb-3 flex-grow-1">
+        @for (var i = 0; i < _steps.Count; i++)
+        {
+            var index = i;
+            <div class="step" style="@GetStepCssStyle(index)">
+                @_steps[index].ChildContent
+            </div>
+        }
+    </Form>
+    <div class="d-flex">
+        @if (ShowPreviousButton)
+        {
+            <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
+                <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                <span>Back</span>
+            </button>
+        }
+        @if (ShowFinishButton)
+        {
+            <button @onclick="OnFinishAsync" class="@FinishButtonCssClass" disabled="@IsFinishButtonDisabled">@FinishButtonText</button>
+        }
+        else if (ShowNextButton)
+        {
+            <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
+                <span>Next</span>
+                <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+            </button>
+        }
+    </div>
+</div>
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>

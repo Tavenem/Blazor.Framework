@@ -1,0 +1,358 @@
+﻿@page "/components/steps"
+
+<PageTitle>Steps - Tavenem Blazor Framework</PageTitle>
+
+<Heading Level="HeadingLevel.H1">Steps</Heading>
+
+<p>
+    The steps component displays a single panel out of a set, along with UI that allows a user to
+    select one "step" from the set of available options, and easily progress from one to the other
+    in order. Each step can be conditionally disabled or hidden to control flow.
+</p>
+
+<Heading Level="HeadingLevel.H2">Basics</Heading>
+
+<p>
+    The <code>Steps</code> component can hold multiple <code>Step</code> child components. Each
+    child can be given a title, and will be assigned a dynamic number based on its position among
+    the currently visible steps.
+</p>
+
+<p>
+    Typically, you will assign a condition to the <code>Disabled</code> property of each
+    <code>Step</code> other than the first, to ensure that the steps are completed in order.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Steps>
+                <Step Title="First step">
+                    <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory">
+                        <Option Label="Category 1" Value="1" />
+                        <Option Label="Category 2" Value="2" />
+                        <Option Label="Category 3" Value="3" />
+                    </Select>
+                </Step>
+                <Step Title="Second step" Disabled="@(_selectedCategory < 1)">
+                    <NumericInput Label="Enter a value" Required="true" @bind-Value="_value" UpdateOnInput="true" />
+                </Step>
+                <Step Title="Third step" Disabled="@(_value is null or < 1)">
+                    <TextInput Label="Word" HelpText="Write a word" />
+                </Step>
+            </Steps>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Steps>
+    <Step Title=""First step"">
+        <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
+            <Option Label=""Category 1"" Value=""1"" />
+            <Option Label=""Category 2"" Value=""2"" />
+            <Option Label=""Category 3"" Value=""3"" />
+        </Select>
+    </Step>
+    <Step Title=""Second step"" Disabled=""@(_selectedCategory < 1)"">
+        <NumericInput Label=""Enter a value"" Required=""true"" @bind-Value=""_value"" UpdateOnInput=""true"" />
+    </Step>
+    <Step Title=""Third step"" Disabled=""@(_value is not > 1)"">
+        <TextInput Label=""Word"" HelpText=""Write a word"" />
+    </Step>
+</Steps>
+
+@code {
+    private int _selectedCategory;
+    private int? _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The number or title of a step can be clicked to skip directly to that step (if it's enabled).
+    The "next" and "previous" buttons below the step content can also be used to navigate forward
+    and backward.
+</p>
+
+<p>
+    A <code>Steps</code> component wraps its child steps' contents in a <a
+    href="./components/form">Form</a> component, and has properties which mirror the properties of a
+    <code>Form</code>. These can be used to manage and validate any input components within the
+    various steps. Note that all steps are always rendered. Non-displayed steps are hidden from
+    view, but any child controls (esp. inputs) are still available for form submission.
+</p>
+
+<Heading Level="HeadingLevel.H2">Conditional steps</Heading>
+
+<p>
+    The <code>IsVisible</code> property can be used to hide a step, removing it from the displayed
+    list. A hidden step can still be activated programmatically, which will automatically place it
+    into the list. It is up to you whether to toggle the <code>IsVisible</code> property. If not,
+    navigation away from the step will hide it again.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Steps @ref="_steps">
+                <Step Title="Category">
+                    <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory2">
+                        <Option Label="Category 1" Value="1" />
+                        <Option Label="Category 2" Value="2" />
+                        <Option Label="Category 3" Value="3" />
+                    </Select>
+                </Step>
+                <Step @ref="_toggleStep" Title="Toggle" IsVisible="_toggleStepVisible">
+                    <p>Choose a toggle state:</p>
+                    <Switch Label="On" UncheckedLabel="Off" />
+                </Step>
+                <Step Title="Value" Disabled="@(_selectedCategory2 < 1)">
+                    <NumericInput Label="Enter a value" Required="true" @bind-Value="_value2" UpdateOnInput="true" />
+                    @if (!_toggleStepVisible)
+                    {
+                        <button class="btn warning" @onclick="RevealHiddenStep">Show hidden step</button>
+                    }
+                </Step>
+                <Step Title="Word" Disabled="@(_value2 is not > 1)">
+                    <TextInput Label="Word" HelpText="Write a word" />
+                </Step>
+            </Steps>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Steps @ref=""_steps"">
+    <Step Title=""Category"">
+        <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
+            <Option Label=""Category 1"" Value=""1"" />
+            <Option Label=""Category 2"" Value=""2"" />
+            <Option Label=""Category 3"" Value=""3"" />
+        </Select>
+    </Step>
+    <Step @ref=""_toggleStep"" Title=""Toggle"" IsVisible=""_toggleStepVisible"">
+        <p>Choose a toggle state:</p>
+        <Switch Label=""On"" UncheckedLabel=""Off"" />
+    </Step>
+    <Step Title=""Value"" Disabled=""@(_selectedCategory < 1)"">
+        <NumericInput Label=""Enter a value"" Required=""true"" @bind-Value=""_value"" UpdateOnInput=""true"" />
+        @if (!_toggleStepVisible)
+        {
+            <button class=""btn warning"" @onclick=""RevealHiddenStep"">Show hidden step</button>
+        }
+    </Step>
+    <Step Title=""Word"" Disabled=""@(_value is not > 1)"">
+        <TextInput Label=""Word"" HelpText=""Write a word"" />
+    </Step>
+</Steps>
+
+@code {
+    private int _selectedCategory;
+    private Steps? _steps;
+    private Step? _toggleStep;
+    private bool _toggleStepVisible;
+    private int? _value;
+
+    private async Task RevealHiddenStep()
+    {
+        _toggleStepVisible = true;
+        await _steps!.ActivateStepAsync(_toggleStep!);
+    }
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Finishing</Heading>
+
+<p>
+    When all the steps are complete, you can replace the "Next" button with a "Finish" button by
+    assigning a callback to the <code>Finish</code> parameter. The <code>FinishDisabled</code>
+    parameter controls whether this button is enabled (e.g. so you can ensure that the final step is
+    complete), and the <code>FinishButtonText</code> parameter allows you to customize the button
+    text.
+</p>
+
+<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <div class="w-100">
+                <Steps Finish="OnSubmit" FinishButtonDisabled="@(string.IsNullOrEmpty(_word))">
+                    <Step Title="First step">
+                        <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory3">
+                            <Option Label="Category 1" Value="1" />
+                            <Option Label="Category 2" Value="2" />
+                            <Option Label="Category 3" Value="3" />
+                        </Select>
+                    </Step>
+                    <Step Title="Second step" Disabled="@(_selectedCategory3 < 1)">
+                        <NumericInput Label="Enter a value" Required="true" @bind-Value="_value3" UpdateOnInput="true" />
+                    </Step>
+                    <Step Title="Third step" Disabled="@(_value3 is null or < 1)">
+                        <TextInput Label="Word" HelpText="Write a word" @bind-Value="_word" UpdateOnInput="true" />
+                    </Step>
+                </Steps>
+                <p class="mt-4 success">@_result</p>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""w-100"">
+    <Steps Finish=""OnSubmit"" FinishButtonDisabled=""@(string.IsNullOrEmpty(_word))"">
+        <Step Title=""First step"">
+            <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
+                <Option Label=""Category 1"" Value=""1"" />
+                <Option Label=""Category 2"" Value=""2"" />
+                <Option Label=""Category 3"" Value=""3"" />
+            </Select>
+        </Step>
+        <Step Title=""Second step"" Disabled=""@(_selectedCategory < 1)"">
+            <NumericInput Label=""Enter a value"" Required=""true"" @bind-Value=""_value"" UpdateOnInput=""true"" />
+        </Step>
+        <Step Title=""Third step"" Disabled=""@(_value is not > 1)"">
+            <TextInput Label=""Word"" HelpText=""Write a word"" @bind-Value=""_word"" UpdateOnInput=""true"" />
+        </Step>
+    </Steps>
+    <p class=""mt-4 success"">@_result</p>
+</div>
+
+@code {
+    private string? _result;
+    private int _selectedCategory;
+    private int? _value;
+    private string? _word;
+
+    private void OnSubmit() => _result = ""Success!"";
+}")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Customization</Heading>
+
+<p>
+    You can assign a theme to the <code>ThemeColor</code> property to change the color of the step
+    selection list.
+</p>
+
+<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <div class="w-100">
+                <Steps ThemeColor="ThemeColor.Primary">
+                    <Step Title="First step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Second step">
+                        <p>Content</p>
+                    </Step>
+                </Steps>
+                <Steps ThemeColor="ThemeColor.Secondary">
+                    <Step Title="First step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Second step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Third step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Fourth step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Fifth step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Sixth step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Seventh step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Eighth step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Ninth step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Tenth step">
+                        <p>Content</p>
+                    </Step>
+                </Steps>
+                <Steps ThemeColor="ThemeColor.Tertiary">
+                    <Step Title="First step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Second step">
+                        <p>Content</p>
+                    </Step>
+                    <Step Title="Third step">
+                        <p>Content</p>
+                    </Step>
+                </Steps>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""w-100"">
+    <Steps ThemeColor=""ThemeColor.Primary"">
+        <Step Title=""First step"">
+            <p>Content</p>
+        </Step>
+        <Step Title=""Second step"">
+            <p>Content</p>
+        </Step>
+        <Step Title=""Third step"">
+            <p>Content</p>
+        </Step>
+    </Steps>
+    <Steps ThemeColor=""ThemeColor.Secondary"">
+        <Step Title=""First step"">
+            <p>Content</p>
+        </Step>
+        <Step Title=""Second step"">
+            <p>Content</p>
+        </Step>
+        <Step Title=""Third step"">
+            <p>Content</p>
+        </Step>
+    </Steps>
+    <Steps ThemeColor=""ThemeColor.Tertiary"">
+        <Step Title=""First step"">
+            <p>Content</p>
+        </Step>
+        <Step Title=""Second step"">
+            <p>Content</p>
+        </Step>
+        <Step Title=""Third step"">
+            <p>Content</p>
+        </Step>
+    </Steps>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<Heading Level="HeadingLevel.H2">Events</Heading>
+
+<p>
+    The <code>IsActive</code> property on each <code>Step</code> is bindable, and the
+    <code>IsActiveChanged</code> callback can be used to attach logic to the activation or
+    deactivation of a given step.
+</p>
+
+@code {
+    private string? _result;
+    private int _selectedCategory;
+    private int _selectedCategory2;
+    private int _selectedCategory3;
+    private Steps? _steps;
+    private Step? _toggleStep;
+    private bool _toggleStepVisible;
+    private int? _value;
+    private int? _value2;
+    private int? _value3;
+    private string? _word;
+
+    private async Task RevealHiddenStep()
+    {
+        _toggleStepVisible = true;
+        await _steps!.ActivateStepAsync(_toggleStep!);
+    }
+
+    private void OnSubmit() => _result = "Success!";
+}

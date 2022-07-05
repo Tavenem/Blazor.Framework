@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.4.5-preview
+## 0.5.0-preview
+### Added
+- Steps component.
+
+## 0.4.6-preview
 ### Fixed
 - Codeblock does not disable child scroll.
 
