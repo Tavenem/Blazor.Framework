@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3-preview
+### Fixed
+- Asynchronous DataGrid loading.
+
 ## 0.5.2-preview
 ### Fixed
 - Refresh after loading DataGrid items asynchronously.

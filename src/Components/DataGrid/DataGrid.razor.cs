@@ -612,9 +612,11 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private ulong CurrentPage { get; set; }
 
-    private IEnumerable<TDataItem> CurrentPageItems => CurrentItems
-        .Skip((int)Offset)
-        .Take(RowsPerPage);
+    private IEnumerable<TDataItem> CurrentPageItems => LoadItems is not null
+        ? CurrentDataPage?.Items ?? Enumerable.Empty<TDataItem>()
+        : CurrentItems
+            .Skip((int)Offset)
+            .Take(RowsPerPage);
 
     private int Debounce => LoadItems is null ? 500 : 1000;
 
@@ -669,7 +671,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     [Inject] private UtilityService UtilityService { get; set; } = default!;
 
     /// <inheritdoc/>
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         if (_columns.Count != 0)
         {
@@ -698,7 +700,15 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
 
         RecalculatePaging();
-        Regroup();
+
+        if (LoadItems is null)
+        {
+            Regroup();
+        }
+        else
+        {
+            await LoadItemsAsync();
+        }
     }
 
     /// <inheritdoc/>
@@ -852,6 +862,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             GetFilterInfo(),
             GetSortInfo()));
 
+        IsLoading = false;
         Regroup();
     }
 
@@ -2286,10 +2297,10 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     private void Regroup()
     {
         DataGroups = GroupBy is null
-        ? null
-        : CurrentPageItems
-            .GroupBy(GroupBy)
-            .ToList();
+            ? null
+            : CurrentPageItems
+                .GroupBy(GroupBy)
+                .ToList();
         StateHasChanged();
     }
 
