@@ -212,6 +212,17 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     [Parameter] public TValue? InitialFilter { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Whether this column is initially sorted.
+    /// </para>
+    /// <para>
+    /// If more than one column is initially sorted, their order of precedence is determined by the
+    /// order they are initialized.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool InitiallySorted { get; set; }
+
+    /// <summary>
     /// Gets whether this column represents boolean data.
     /// </summary>
     public bool IsBool { get; private set; }
@@ -318,9 +329,9 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     [Parameter] public Action<TDataItem, TValue?>? SetValue { get; set; }
 
     /// <summary>
-    /// Gets whether this column is currently sorted in descending order.
+    /// Whether this column is currently sorted in descending order.
     /// </summary>
-    public bool SortDescending { get; set; }
+    [Parameter] public bool SortDescending { get; set; }
 
     /// <summary>
     /// <para>
@@ -447,6 +458,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
             {
                 await DataGrid.OnFilterChangedAsync();
             }
+        }
+
+        if (InitiallySorted)
+        {
+            DataGrid?.OnColumnSortedAsync(this);
         }
     }
 

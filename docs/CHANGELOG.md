@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.4-preview
+### Added
+- Initial sort for DataGrid columns.
+
 ## 0.5.3-preview
 ### Fixed
 - Asynchronous DataGrid loading.

@@ -483,7 +483,7 @@
         <div class="row justify-content-center">
             <DataGrid Title="Employees" Items="_items">
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
-                <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
+                <Column Label="Last" Value="@(x => x.LastName)" InitiallySorted="true" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" InitialFilter="true">
                     @if (context.IsExecutive)
                     {
@@ -504,7 +504,7 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<DataGrid Title=""Employees"" Items=""_items"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
-    <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
+    <Column Label=""Last"" Value=""@(x => x.LastName)"" InitiallySorted=""true"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"" InitialFilter=""true"">
         @if (context.IsExecutive)
         {
@@ -576,6 +576,12 @@
     Each time the user chooses a sort order, it is added to a queue (or moved to the front of the
     queue). The final sort order is determined by the complete sort queue. This allows the user to
     sort first by one column, and then by another, and so on.
+</p>
+
+<p>
+    You can set the <code>InitiallySorted</code> property to <code>true</code> to specify that a
+    column should be initially sorted. Combine this with the <code>SortDescending</code> property to
+    control the direction of the initial sort.
 </p>
 
 <Heading Level="HeadingLevel.H2">Grouping</Heading>
