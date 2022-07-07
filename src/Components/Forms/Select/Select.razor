@@ -71,6 +71,7 @@
              IsOpen="ShowPicker"
              MatchWidth="true">
         <div class="@OptionListCssClass"
+             style="max-height:min(15rem, 90vh)"
              @onclick:stopPropagation="true">
             <CascadingValue Value="this" IsFixed="true">
                 @ChildContent

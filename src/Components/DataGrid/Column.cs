@@ -395,14 +395,26 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
     {
         DataGrid?.AddColumn(this);
         _isShown = IsShown;
-        if (InitialFilter is not null
+        if (IsBool)
+        {
+            if (IsNullable)
+            {
+                var filter = (bool?)(object?)InitialFilter;
+                if (filter.HasValue)
+                {
+                    BoolFilter = filter.Value;
+                }
+            }
+            else if (InitialFilter is not null
+                && (bool)(object)InitialFilter)
+            {
+                BoolFilter = true;
+            }
+        }
+        else if (InitialFilter is not null
             && !InitialFilter.Equals(default))
         {
-            if (IsBool)
-            {
-                BoolFilter = (bool)(object)InitialFilter;
-            }
-            else if (IsDateOnly)
+            if (IsDateOnly)
             {
                 DateTimeFilter = new(
                     ((DateOnly)(object)InitialFilter).ToDateTime(TimeOnly.MinValue),

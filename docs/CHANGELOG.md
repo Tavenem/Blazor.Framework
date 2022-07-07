@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1-preview
+### Fixed
+- Initial bool filters on DataGrid fixed.
+### Changed
+- Selects now have a max height.
+
 ## 0.5.0-preview
 ### Added
 - Steps component.
