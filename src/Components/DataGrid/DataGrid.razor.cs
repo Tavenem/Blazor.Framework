@@ -616,6 +616,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         .Skip((int)Offset)
         .Take(RowsPerPage);
 
+    private int Debounce => LoadItems is null ? 500 : 1000;
+
     private TDataItem? DeleteItem { get; set; }
 
     private Form? DialogEditForm { get; set; }
@@ -2281,11 +2283,15 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
     }
 
-    private void Regroup() => DataGroups = GroupBy is null
+    private void Regroup()
+    {
+        DataGroups = GroupBy is null
         ? null
         : CurrentPageItems
             .GroupBy(GroupBy)
             .ToList();
+        StateHasChanged();
+    }
 
     private async Task<bool> TrySaveEditAsync()
     {

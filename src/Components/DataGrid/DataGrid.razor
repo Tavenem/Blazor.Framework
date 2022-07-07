@@ -116,7 +116,7 @@
                                                     ValueChanged="@(v => OnFilterChangedAsync(column, v))"
                                                     PostfixIcon="@DefaultIcons.Search"
                                                     UpdateOnInput="true"
-                                                    UpdateOnInputDebounce="500"
+                                                    UpdateOnInputDebounce="Debounce"
                                                     Class="dense" />
                                     }
                                     else if (column.IsBool)
@@ -133,7 +133,7 @@
                                                         Value="@column.NumberFilter"
                                                         ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))"
                                                         UpdateOnInput="true"
-                                                        UpdateOnInputDebounce="500"
+                                                        UpdateOnInputDebounce="Debounce"
                                                         Class="dense" />
                                     }
                                     else if (column.IsDateTime)

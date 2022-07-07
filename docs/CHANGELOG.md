@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2-preview
+### Fixed
+- Refresh after loading DataGrid items asynchronously.
+- Icon display priority.
+- LightDarkToggle initial state correctly reflects darkmode.
+
 ## 0.5.1-preview
 ### Fixed
 - Initial bool filters on DataGrid fixed.

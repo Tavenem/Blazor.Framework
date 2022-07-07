@@ -20,7 +20,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    &:defined {
+    &:where(:defined) {
         display: inline-block;
     }
 

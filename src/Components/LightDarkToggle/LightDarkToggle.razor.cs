@@ -57,6 +57,10 @@ public partial class LightDarkToggle
         {
             var mode = await ThemeService.GetPreferredColorScheme();
             IsDarkMode = mode == ThemePreference.Dark;
+            if (IsDarkMode)
+            {
+                StateHasChanged();
+            }
         }
     }
 
