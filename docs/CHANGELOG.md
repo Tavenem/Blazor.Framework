@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.8-preview
+### Added
+- MaxWidth for Popover
+### Changed
+- Select Popover anchored to bottom-left, instead of center.
+
 ## 0.5.7-preview
 ### Changed
 - More style improvements.

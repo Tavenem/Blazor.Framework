@@ -103,6 +103,19 @@ public partial class Popover : IAsyncDisposable
     [Parameter] public string? MaxHeight { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Sets the max-width CSS style for the popover.
+    /// </para>
+    /// <para>
+    /// Should include a unit, such as "200px" or "10rem."
+    /// </para>
+    /// <para>
+    /// Default is "90vw."
+    /// </para>
+    /// </summary>
+    [Parameter] public string? MaxWidth { get; set; } = "90vw";
+
+    /// <summary>
     /// A number of pixels this popover is offset from the left edge of its anchor.
     /// </summary>
     [Parameter] public double? OffsetX { get; set; }
@@ -177,6 +190,7 @@ public partial class Popover : IAsyncDisposable
     protected override string? CssStyle => new CssBuilder(Style)
         .AddStyle("transition-delay", $"{Delay}ms")
         .AddStyle("max-height", MaxHeight)
+        .AddStyle("max-width", MaxWidth)
         .AddStyle("overflow-y", "auto", !string.IsNullOrEmpty(MaxHeight))
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();

@@ -104,6 +104,13 @@
     <code>MatchWidth</code> this ensures that a popover is always exactly as wide as its anchor.
 </p>
 
+<p>
+    Popovers also have <code>MaxHeight</code> and <code>MaxWidth</code> properties, which can
+    specify a maximum height and width (in CSS units). <code>MaxHeight</code> is undefined by
+    default, but <code>MaxWidth</code> defaults to <code>90vw</code> to prevent popovers from
+    exceeding screen width.
+</p>
+
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
