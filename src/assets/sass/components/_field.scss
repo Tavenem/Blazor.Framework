@@ -115,10 +115,6 @@
                         border-top-right-radius: inherit;
                     }
                 }
-
-                .btn, tf-icon {
-                    margin-top: -11px;
-                }
             }
 
             label {
@@ -529,12 +525,14 @@
     }
 
     &.show-steppers {
-        .input-core {
+        .input, .input-core {
             padding-inline-end: 1.5rem;
         }
 
-        &.dense .input-core {
-            padding-inline-end: 1.25rem;
+        &.dense {
+            .input, .input-core {
+                padding-inline-end: 1.25rem;
+            }
         }
     }
 
@@ -559,6 +557,7 @@
     button {
         background-color: transparent;
         color: inherit;
+        flex-shrink: 1;
         min-height: unset;
         min-width: unset;
         padding: 2px 0;

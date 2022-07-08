@@ -31,6 +31,7 @@
     color: var(--button-color);
     cursor: pointer;
     display: inline-flex;
+    flex: 0 0 auto;
     font-size: var(--button-font-size);
     font-weight: var(--tavenem-font-weight-semibold);
     gap: .25rem;

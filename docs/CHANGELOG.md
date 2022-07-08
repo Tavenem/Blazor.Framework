@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.6-preview
+### Changed
+- Improved styles.
+
 ## 0.5.5-preview
 ### Fixed
 - Initial int filters on DataGrid fixed.

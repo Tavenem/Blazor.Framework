@@ -4,7 +4,7 @@
     border-radius: 50%;
     color: var(--tavenem-avatar-color, var(--tavenem-color-dark-text));
     display: inline-flex;
-    flex-shrink: 0;
+    flex: 0 0 auto;
     font-size: 1.25em;
     height: 2.5em;
     justify-content: center;

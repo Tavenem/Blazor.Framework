@@ -3,7 +3,7 @@
     --dot-text: var(--tavenem-color-default-text);
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex: 1 0 auto;
     height: 100%;
     position: relative;
     width: 100%;

@@ -17,7 +17,7 @@
     <code>Items</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" />
@@ -54,7 +54,7 @@
     <code>LoadItems</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid LoadItems="_loadItems" />
@@ -259,7 +259,7 @@
     You can control which properties are included by setting the columns explicitly.
 </p>
 
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Title="Employees" Items="_items">
@@ -378,7 +378,7 @@
     Configure the additional content with the <code>ExpandedContent RenderFragment</code> property.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items">
@@ -480,7 +480,7 @@
     An initial filter value can be set for a column with the <code>InitialFilter</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Title="Employees" Items="_items">
@@ -593,7 +593,7 @@
     object, to group items by the equality of that key.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" GroupBy="@(x => x.IsExecutive)">
@@ -671,7 +671,7 @@
     default options are 10, 25, 50, and 100).
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items2" />
@@ -729,7 +729,7 @@
     The <code>SelectedItem</code> property will reflect the currently selected item.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem" />
@@ -774,7 +774,7 @@
     selected items.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
@@ -864,7 +864,7 @@
     can't be edited.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_editableItems1" AllowEdit="true" />
@@ -961,7 +961,7 @@
     edit dialog, this reset only works for <code>IFormComponent</code> inputs.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_editableItems2" AllowEdit="true" AllowInlineEdit="true" />
@@ -1018,7 +1018,7 @@
     refresh.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_editableItems3" AllowEdit="true" AllowAdd="true" />
@@ -1061,7 +1061,7 @@
     from the current page (if present).
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_editableItems3" AllowEdit="true" AllowDelete="true" />
@@ -1134,7 +1134,7 @@
     header.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" Title="Example Title">
@@ -1178,7 +1178,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" Title="Primary" ThemeColor="ThemeColor.Primary" SelectionType="SelectionType.Single" TableClass="striped hover" />
@@ -1221,7 +1221,7 @@
     You can add the <code>dense</code> class to reduce padding.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" TableClass="dense" />
@@ -1257,7 +1257,7 @@
     The <code>border</code> class will add both external and internal lines.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" TableClass="border" />
@@ -1294,7 +1294,7 @@
     the <code>hover</code> class will change the background color of hovered rows.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items" TableClass="striped hover" />
@@ -1332,7 +1332,7 @@
     property to see this in action.
 </p>
 
-<Collapse Class="outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Items="_items2" MaxHeight="300px" />
