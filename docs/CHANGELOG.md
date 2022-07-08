@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.5-preview
+### Fixed
+- Initial int filters on DataGrid fixed.
+### Changed
+- Clearer message when DataGrid has no items because of filtering.
+
 ## 0.5.4-preview
 ### Added
 - Initial sort for DataGrid columns.

@@ -179,8 +179,15 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     /// Whether this grid is displaying any items.
     /// </summary>
     public bool AnyItems => LoadItems is null
-        ? Items.Count > 0
+        ? CurrentItems.Any()
         : CurrentDataPage?.Items.Count > 0;
+
+    /// <summary>
+    /// Whether this grid would be displaying any items without filters.
+    /// </summary>
+    public bool AnyUnfilteredItems => LoadItems is null
+        ? Items.Count > 0
+        : CurrentDataPage?.TotalCount > 0;
 
     /// <summary>
     /// <para>

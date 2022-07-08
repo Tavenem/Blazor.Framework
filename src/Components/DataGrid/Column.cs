@@ -422,6 +422,25 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
                 BoolFilter = true;
             }
         }
+        else if (IsNumeric)
+        {
+            if (IsNullable)
+            {
+                if (InitialFilter is not null
+                    && !InitialFilter.Equals(default))
+                {
+                    NumberFilter = Convert.ToDouble(InitialFilter);
+                }
+            }
+            else if (InitialFilter is not null)
+            {
+                var filter = Convert.ToDouble(InitialFilter);
+                if (filter != 0)
+                {
+                    NumberFilter = filter;
+                }
+            }
+        }
         else if (InitialFilter is not null
             && !InitialFilter.Equals(default))
         {
@@ -444,10 +463,6 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
             else if (IsDateTime)
             {
                 DateTimeFilter = new((DateTime)(object)InitialFilter, TimeSpan.Zero);
-            }
-            else if (IsNumeric)
-            {
-                NumberFilter = Convert.ToDouble(InitialFilter);
             }
             else if (IsString)
             {

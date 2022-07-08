@@ -177,7 +177,14 @@
                                     }
                                     else if (NoDataContent is null)
                                     {
-                                        <span>No Data</span>
+                                        if (AnyUnfilteredItems)
+                                        {
+                                            <span>Nothing matches the current filters</span>
+                                        }
+                                        else
+                                        {
+                                            <span>No Data</span>
+                                        }
                                     }
                                     else
                                     {

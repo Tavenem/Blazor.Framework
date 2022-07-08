@@ -263,6 +263,7 @@
     <TitleContent>
         <div class="row justify-content-center">
             <DataGrid Title="Employees" Items="_items">
+                <Column Label="Id" Value="@(x => x.Id)" IsShown="false" />
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false">
@@ -274,8 +275,8 @@
                 <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false">
                     <FooterContent>
                         <div class="d-flex flex-column">
-                            <span>Longest tenure: @(((DateTime.Now - context.Min(x => x.HireDate)).Days / 365.25).ToString("F1")) years</span>
-                            <span>Average: @((new TimeSpan((long)Math.Round(context.Average(x => (DateTime.Now - x.HireDate).Ticks))).Days / 365.25).ToString("F1")) years</span>
+                            <span>Longest tenure: @(context.Any() ? ((DateTime.Now - context.Min(x => x.HireDate)).Days / 365.25).ToString("F1") : "0") years</span>
+                            <span>Average: @(context.Any() ? (new TimeSpan((long)Math.Round(context.Average(x => (DateTime.Now - x.HireDate).Ticks))).Days / 365.25).ToString("F1") : "0") years</span>
                         </div>
                     </FooterContent>
                 </Column>
@@ -284,6 +285,7 @@
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<DataGrid Title=""Employees"" Items=""_items"">
+    <Column Label=""Id"" Value=""@(x => x.Id)"" IsShown=""false"" />
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"">
@@ -295,8 +297,8 @@
     <Column Label=""Hire date"" Value=""@(x => x.HireDate)"" Format=""d"" CanFilter=""false"">
         <FooterContent>
             <div class=""d-flex flex-column"">
-                <span>Longest tenure: @(((DateTime.Now - context.Min(x => x.HireDate)).Days / 365.25).ToString(""F1"")) years</span>
-                <span>Average: @((new DateTime(context.Average(x => x.HireDate.Ticks)).Days / 365.25).ToString(""F1"")) years</span>
+                <span>Longest tenure: @(context.Any() ? ((DateTime.Now - context.Min(x => x.HireDate)).Days / 365.25).ToString(""F1"") : ""0"") years</span>
+        <span>Average: @(context.Any() ? (new DateTime(context.Average(x => x.HireDate.Ticks)).Days / 365.25).ToString(""F1"") : ""0"") years</span>
             </div>
         </FooterContent>
     </Column>
