@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.7-preview
+### Changed
+- More style improvements.
+
 ## 0.5.6-preview
 ### Changed
 - Improved styles.

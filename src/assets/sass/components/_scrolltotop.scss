@@ -1,7 +1,7 @@
 ﻿.scroll-to-top {
     bottom: 1rem;
     cursor: pointer;
-    flex: 1;
+    flex: 0 0 auto;
     position: fixed;
     right: 1rem;
     z-index: var(--tavenem-zindex-scroll-to-top);
