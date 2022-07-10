@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.9-preview
+### Changed
+- Adjusted default styles for containers.
+
 ## 0.5.8-preview
 ### Added
 - MaxWidth for Popover
