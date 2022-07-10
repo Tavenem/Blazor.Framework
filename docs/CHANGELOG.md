@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.11-preview
+### Changed
+- Removed extraneous files from package.
+
 ## 0.5.10-preview
 ### Added
 - Added README to NuGet.
