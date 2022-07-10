@@ -1,6 +1,6 @@
 name: publish
 env:
-  VERSION: '0.5.9-preview'
+  VERSION: '0.5.10-preview'
   PRERELEASE: true
 on:
   push:
@@ -40,42 +40,59 @@ jobs:
         run: dotnet test --no-restore --verbosity normal
         working-directory: ./src
 
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: Check tag
+        id: tagged
+        shell: bash
+        run: git show-ref --tags --verify --quiet -- "refs/tags/v${{ env.VERSION }}" && echo "::set-output name=tagged::0" || echo "::set-output name=tagged::1"
+
       - name: Pack
+        if: steps.tagged.outputs.tagged == 1
         run: dotnet pack ./Tavenem.Blazor.Framework.csproj --include-symbols -p:SymbolPackageFormat=snupkg -p:PackageVersion=${{ env.VERSION }} --configuration Release --no-build --nologo --output .
         working-directory: ./src
 
       - name: Push to NuGet
+        if: steps.tagged.outputs.tagged == 1
         run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
         working-directory: ./src
 
       - name: Publish
+        if: steps.tagged.outputs.tagged == 1
         run: dotnet publish --configuration Release -o publish -p:Version=${{ env.VERSION }} --no-build --nologo
         working-directory: ./docs/docsite
 
       # copy index.html to 404.html to fix GitHub Pages SPA navigation
       - name: copy index.html to 404.html
+        if: steps.tagged.outputs.tagged == 1
         run: |
           cp index.html 404.html
         working-directory: ./docs/docsite/publish/wwwroot
 
       # add .nojekyll file so GitHub pages will not treat this as a Jekyll project
       - name: Add .nojekyll file
+        if: steps.tagged.outputs.tagged == 1
         run: touch publish/wwwroot/.nojekyll
         working-directory: ./docs/docsite
 
       - name: Deploy
+        if: steps.tagged.outputs.tagged == 1
         uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
           branch: gh-pages
           folder: docs/docsite/publish/wwwroot
 
       - name: Git tag
+        if: steps.tagged.outputs.tagged == 1
         run: git tag v${{ env.VERSION }}
 
       - name: Push tag
+        if: steps.tagged.outputs.tagged == 1
         run: git push origin v${{ env.VERSION }}
 
       - name: Release
+        if: steps.tagged.outputs.tagged == 1
         id: create_release
         uses: actions/create-release@latest
         env:

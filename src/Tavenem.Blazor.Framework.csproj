@@ -14,6 +14,7 @@
     <Authors>Wil Stead</Authors>
     <Description>Blazor style and component framework.</Description>
     <Copyright>Copyright © 2022 Wil Stead</Copyright>
+    <PackageReadmeFile>../README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Tavenem/Blazor.Framework</PackageProjectUrl>
     <PackageIcon>tavenem_128.png</PackageIcon>

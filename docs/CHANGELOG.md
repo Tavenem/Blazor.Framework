@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.10-preview
+### Added
+- Added README to NuGet.
+
 ## 0.5.9-preview
 ### Changed
 - Adjusted default styles for containers.
