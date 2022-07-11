@@ -236,7 +236,6 @@
         --list-active-bg: var(--tavenem-theme-color-hover-bright, var(--tavenem-color-primary-hover-bright));
         --list-active-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
         --list-active-hover-bg: var(--tavenem-theme-color-hover-bright-2, var(--tavenem-color-primary-hover-bright-2));
-        --list-color: var(--tavenem-theme-color-text, var(--tavenem-color-text));
         --list-hover-bg: var(--tavenem-theme-color-hover-bright, var(--tavenem-color-action-hover-bg));
         --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
         background-color: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-surface));
@@ -267,7 +266,6 @@
             --list-active-bg: var(--tavenem-theme-color-hover);
             --list-active-color: var(--tavenem-theme-color);
             --list-active-hover-bg: var(--tavenem-theme-color-hover-bright);
-            --list-color: var(--tavenem-color-text);
             --list-hover-bg: var(--tavenem-theme-color-hover);
             color: var(--list-color);
         }

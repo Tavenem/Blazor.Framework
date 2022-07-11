@@ -59,6 +59,7 @@ h1, h2, h3, h4, h5, h6,
     color: var(--tavenem-color-dark-text);
     flex: 0 0 auto;
     padding: 1rem;
+    width: 100%;
 
     > *:first-child {
         border-top-left-radius: inherit;

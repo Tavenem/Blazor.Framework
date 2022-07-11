@@ -176,6 +176,7 @@ a.btn:not(.disabled, :disabled) {
     --button-default-hover-bg: var(--tavenem-color-action-hover-bg);
     --button-default-hover-shadow: none;
     --button-default-shadow: none;
+    --button-hover-color: var(--button-inherited-hover-color, inherit);
     min-width: 0;
 
     &.small {
@@ -218,6 +219,7 @@ a.btn-text:not(.disabled, :disabled) {
     --button-default-hover-shadow: none;
     --button-default-shadow: none;
     --button-font-size: var(--button-inherited-font-size-icon, 1.5rem);
+    --button-hover-color: var(--button-inherited-hover-color, inherit);
     --button-padding-x: var(--button-inherited-padding-x-icon, var(--button-default-padding-y));
     --button-padding-y: var(--button-inherited-padding-y-icon, var(--button-default-padding-y));
     border-radius: 9999px;

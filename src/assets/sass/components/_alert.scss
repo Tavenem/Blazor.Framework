@@ -1,10 +1,11 @@
 ﻿.alert {
+    --alert-bg-color: var(--tavenem-color-bg-surface);
     --tavenem-theme-color: var(--tavenem-theme-color-darken-base);
     --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-2);
     align-items: center;
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    background-color: var(--tavenem-color-bg-surface);
+    background-color: var(--alert-bg-color);
     border-radius: var(--tavenem-border-radius);
     column-gap: .75rem;
     display: inline-flex;
@@ -63,6 +64,7 @@
     }
 
     &.filled {
+        --alert-bg-color: var(--tavenem-theme-color, var(--tavenem-color-default));
         --tavenem-theme-color: var(--tavenem-theme-color-base);
         --tavenem-theme-color-darken: var(--tavenem-theme-color-darken);
 
@@ -79,8 +81,8 @@
     }
 
     @each $theme in $theme-colors {
-        &.#{$theme} {
-            background-color: var(--tavenem-theme-color-hover);
+        &:where(.#{$theme}) {
+            --alert-bg-color: var(--tavenem-theme-color-hover);
         }
     }
 }

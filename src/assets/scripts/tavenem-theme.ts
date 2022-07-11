@@ -55,8 +55,9 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
     }
     _saved_theme = theme;
 
+    const preferred = getPreferredColorScheme();
     if (theme == ThemePreference.Auto) {
-        theme = getPreferredColorScheme();
+        theme = preferred;
     }
 
     if (theme == ThemePreference.Dark) {
@@ -65,7 +66,9 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
         document.documentElement.setAttribute('data-theme', 'light');
     }
 
-    if (manual) {
+    if (theme == preferred) {
+        localStorage.removeItem('tavenem-theme');
+    } else if (manual) {
         localStorage.setItem('tavenem-theme', theme.toString());
     }
 

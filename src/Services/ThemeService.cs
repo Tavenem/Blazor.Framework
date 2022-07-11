@@ -67,7 +67,7 @@ public class ThemeService : IAsyncDisposable
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module
-            .InvokeVoidAsync("setColorScheme", theme)
+            .InvokeVoidAsync("setColorScheme", theme, true)
             .ConfigureAwait(false);
     }
 

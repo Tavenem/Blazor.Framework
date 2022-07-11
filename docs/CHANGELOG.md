@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.12-preview
+### Changed
+- Style changes.
+- LightDarkToggle state saved to localStorage when different from system preference.
+
 ## 0.5.11-preview
 ### Changed
 - Removed extraneous files from package.

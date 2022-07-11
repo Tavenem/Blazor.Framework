@@ -28,8 +28,8 @@
 }
 
 .tooltip {
-    --tooltip-color: var(--tavenem-color-dark-text);
-    --tooltip-color-bg: var(--tavenem-color-dark);
+    --tooltip-color: var(--tavenem-color-text);
+    --tooltip-color-bg: var(--tavenem-color-bg-surface);
     align-items: center;
     background-color: var(--tooltip-color-bg);
     border-radius: var(--tavenem-border-radius);
