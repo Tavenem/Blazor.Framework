@@ -66,16 +66,19 @@ public partial class DialogInstance
         .Add(Options.Origin.ToCSS())
         .ToString();
 
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
+    /// <inheritdoc />
     protected override string? CssClass => new CssBuilder()
         .Add("fullscreen", Options.FullScreen)
         .Add($"dialog-{Options.Breakpoint.ToCSS()}", Options.Breakpoint != Breakpoint.None && !Options.FullScreen)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
+        .ToString();
+
+    /// <inheritdoc />
+    protected override string? CssStyle => new CssBuilder()
+        .AddStyle("max-height", "90vh")
+        .AddStyle(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
     [Inject] private IKeyListener KeyListener { get; set; } = default!;

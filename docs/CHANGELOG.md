@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.5.16-preview
+## 0.5.18-preview
+### Changed
+- Max height for dialogs.
+
+## 0.5.17-preview
 ### Changed
 - Update to .NET 7 preview 6.
 

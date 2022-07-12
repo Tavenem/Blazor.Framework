@@ -1,6 +1,6 @@
 name: publish
 env:
-  VERSION: '0.5.17-preview'
+  VERSION: '0.5.18-preview'
   PRERELEASE: true
 on:
   push:
@@ -103,4 +103,4 @@ jobs:
           draft: false
           prerelease: ${{ env.PRERELEASE }}
           body: See [changelog](docs/CHANGELOG.md)
-          files: docs/docsite/publish/wwwroot/Blazor.Framework/_content/Tavenem.Blazor.Framework/framework.css
+          files: docs/docsite/publish/wwwroot/_content/Tavenem.Blazor.Framework/framework.css
