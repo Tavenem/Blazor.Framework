@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.15-preview
+### Fixed
+- Tabs.ActivePanelIndexChanged fires as expected.
+
 ## 0.5.14-preview
 ### Changed
 - Align content to start in card body.

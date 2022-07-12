@@ -762,6 +762,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
                 ActiveItem = Items[ActivePanelIndex - _panels.Count];
             }
         }
+        await ActivePanelIndexChanged.InvokeAsync(index);
 
         CenterScrollPositionAroundSelectedItem();
         SetSliderState();
