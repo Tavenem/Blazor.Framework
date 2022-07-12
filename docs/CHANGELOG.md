@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.16-preview
+### Fixed
+- MultiSelect binding.
+
 ## 0.5.15-preview
 ### Fixed
 - Tabs.ActivePanelIndexChanged fires as expected.

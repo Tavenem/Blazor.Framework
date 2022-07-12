@@ -19,8 +19,8 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = new();
     private readonly AdjustableTimer _typeTimer;
 
+    private protected bool _valueUpdated;
     private bool _disposedValue;
-    private bool _valueUpdated;
 
     /// <summary>
     /// Whether all (non-<see langword="null"/>) options are currently selected.

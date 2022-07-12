@@ -27,6 +27,22 @@ public partial class MultiSelect<TValue>
     /// </summary>
     public MultiSelect() => Clearable = true;
 
+    /// <inheritdoc/>
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var oldValue = Value;
+
+        await base.SetParametersAsync(parameters);
+
+        if (((oldValue is null) != (Value is null))
+            || (oldValue is not null
+            && Value is not null
+            && !oldValue.SequenceEqual(Value)))
+        {
+            _valueUpdated = true;
+        }
+    }
+
     /// <summary>
     /// Selects all options.
     /// </summary>

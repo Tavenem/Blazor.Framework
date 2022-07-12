@@ -153,7 +153,7 @@ public partial class DataGridMultiSelect<TDataItem, TValue> : IDataGrid<TDataIte
         if (((oldValue is null) != (Value is null))
             || (oldValue is not null
             && Value is not null
-            && !oldValue.Equals(Value)))
+            && !oldValue.SequenceEqual(Value)))
         {
             _valueUpdated = true;
         }
