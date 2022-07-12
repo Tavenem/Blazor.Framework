@@ -68,7 +68,7 @@
       "System.Reflection.Primitives.dll": "sha256-gVBzujxdn1sRaBKsQcdjWr8tkDVL1n14RE8Fq0khBqI=",
       "System.Resources.ResourceManager.dll": "sha256-2n8FKk6kCefTNsbtlA1g0x+Xq5ml9XMbU3z9NQQA5Zc=",
       "System.Runtime.CompilerServices.Unsafe.dll": "sha256-LgbzfcQF3LPY9aLpaItxT6FV4iygZjOJOqgnt2SqjO8=",
-      "System.Runtime.dll": "sha256-vvU7EV1u8ZYf1ErogsnVWvYFc53HIf3lQ5xAz+lvezk=",
+      "System.Runtime.dll": "sha256-8iSYav09AOsTJHwST553TmBHXF2pYjhPla+2ABg9FHk=",
       "System.Runtime.Extensions.dll": "sha256-95lSSYPbgLl0g3iPGUHVCNaKJjCOaxu5gTM67intDCM=",
       "System.Runtime.InteropServices.dll": "sha256-I3k4kOSSSwmSIi7RoRawXspjQpm\/haa7wtbV5AvTsuw=",
       "System.Runtime.InteropServices.RuntimeInformation.dll": "sha256-wUrgkgRk1juc5jXf5\/yms3eex6ym0ELPdmhPjS6kFpY=",
@@ -83,7 +83,7 @@
       "System.Text.Encoding.Extensions.dll": "sha256-O6Lcq\/OW36SJzIDBxgFDgAG35G5RtJNrnTb5NFCWp8E=",
       "System.Text.Encodings.Web.dll": "sha256-pL\/0qLLJCwQTLxk1txHigJ+xxsQFcKdloRQmVASw8FM=",
       "System.Text.Json.dll": "sha256-y8eBsOCxNy0meHNyGGfOS2bJtBsUyw6tEXeN7fglEmI=",
-      "System.Text.RegularExpressions.dll": "sha256-nuVTINZudlCH9AhfF5ASGOxnioaY3e6\/+ui2qnHuVSQ=",
+      "System.Text.RegularExpressions.dll": "sha256-HO85EqJ9dXTYXlTn7KIxXiXtR7eb780AK1PprDtynpc=",
       "System.Threading.dll": "sha256-eTSV0UiDU7MMv39LeU0\/GqVXjFOfckKVH5QuhIt3M14=",
       "System.Threading.Tasks.dll": "sha256-nDVPEyJf00\/21HMCEqW8QjU39XyrbRwFuAgfPcOd\/gs=",
       "System.Threading.Tasks.Parallel.dll": "sha256-jLnn\/GPlLhsmDMVBbvDdbBxRX4MW\/\/NIyUyTL6y4qYs=",
@@ -92,8 +92,8 @@
       "System.Xml.ReaderWriter.dll": "sha256-cEhXTAbbqboMVHFMBs6dsIRyNxxfsgLbaIjZTCzha\/8=",
       "System.Xml.XDocument.dll": "sha256-N7qAjw3b9e6Bg+L677GKTJjYHFIs\/V1Rv0wC7hrupK0=",
       "System.Xml.XPath.XDocument.dll": "sha256-qfl\/ZklpkARvK7u3R8farOgx5RzbOM64gNNth6ooIQc=",
-      "Tavenem.Blazor.Framework.dll": "sha256-Kse1\/hsnwbwAi19i6eTzS15tJu3QO5NFEy8xez+4DqE=",
-      "Tavenem.Blazor.Framework.Docs.dll": "sha256-BMroYJjATNRU2hXHZe6UyrP5vYf1NbUtEAICtvBGBs0="
+      "Tavenem.Blazor.Framework.dll": "sha256-vANb\/V91xEl6rCjE0QoAHTRYUVt1WPd0l0u5Yx0EqOw=",
+      "Tavenem.Blazor.Framework.Docs.dll": "sha256-siXnxYV0u805mFSmBRRlCLLJuTadPvyZa\/4uomPWv\/o="
     },
     "extensions": null,
     "lazyAssembly": null,
