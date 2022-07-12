@@ -1,6 +1,10 @@
 # Changelog
 
 ## 0.5.16-preview
+### Changed
+- Update to .NET 7 preview 6.
+
+## 0.5.16-preview
 ### Fixed
 - MultiSelect binding.
 
