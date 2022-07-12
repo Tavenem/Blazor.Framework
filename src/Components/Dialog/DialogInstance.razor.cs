@@ -74,13 +74,6 @@ public partial class DialogInstance
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    /// <inheritdoc />
-    protected override string? CssStyle => new CssBuilder()
-        .AddStyle("max-height", "90vh")
-        .AddStyle(Style)
-        .AddStyleFromDictionary(AdditionalAttributes)
-        .ToString();
-
     [Inject] private IKeyListener KeyListener { get; set; } = default!;
 
     [CascadingParameter] private FrameworkLayout? Parent { get; set; }

@@ -471,9 +471,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
                         src: node.src,
                         srcset: node.srcset,
                         alt: node.alt,
-                        height: node.height,
+                        height: node.getAttribute('height'),
                         sizes: node.sizes,
-                        width: node.width,
+                        width: node.getAttribute('width'),
                     };
                 }
                 return getCommonAttrs(node, attrs);

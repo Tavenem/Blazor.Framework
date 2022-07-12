@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.19-preview
+### Fixed
+- Correct height and width attribute for img in Editor.
+
 ## 0.5.18-preview
 ### Changed
 - Max height for dialogs.

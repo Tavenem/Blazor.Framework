@@ -87,7 +87,9 @@
         z-index: calc(var(--tavenem-zindex-dialog) + 2);
 
         > div {
-            max-height: calc(100% - 4rem);
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 4rem);
 
             > .header {
                 align-items: flex-end;
