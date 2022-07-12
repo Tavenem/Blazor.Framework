@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.14-preview
+### Changed
+- Align content to start in card body.
+
 ## 0.5.13-preview
 ### Added
 - Editor.SetModeAsync
