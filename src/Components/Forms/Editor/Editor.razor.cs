@@ -47,6 +47,10 @@ public partial class Editor : IDisposable
     /// cref="Syntax"/> does not have a supported value.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Note: this property is only referenced during initialization. Subsequent changes will be
+    /// ignored.
+    /// </remarks>
     [Parameter] public EditorMode EditorMode { get; set; } = EditorMode.WYSIWYG;
 
     /// <summary>
@@ -312,9 +316,6 @@ public partial class Editor : IDisposable
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var newMode = EditorMode.None;
-        var pendingMode = false;
-
         var newReadOnly = false;
         var pendingReadOnly = false;
 
@@ -326,12 +327,6 @@ public partial class Editor : IDisposable
 
         if (_initialized)
         {
-            if (parameters.TryGetValue(nameof(EditorMode), out newMode)
-                && newMode != EditorMode)
-            {
-                pendingMode = true;
-            }
-
             if (parameters.TryGetValue(nameof(ReadOnly), out newReadOnly)
                 && newReadOnly != ReadOnly)
             {
@@ -356,11 +351,6 @@ public partial class Editor : IDisposable
         if (pendingSyntax)
         {
             await SetSyntax(newSyntax);
-        }
-
-        if (pendingMode)
-        {
-            await SetModeAsync(newMode);
         }
 
         if (pendingValue)
@@ -401,6 +391,29 @@ public partial class Editor : IDisposable
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Sets the <see cref="EditorMode"/> of this editor.
+    /// </summary>
+    /// <param name="value">
+    /// <para>
+    /// The mode to set.
+    /// </para>
+    /// <para>
+    /// <see cref="EditorMode.WYSIWYG"/> is only supported when <see cref="Syntax"/> is set to <see
+    /// cref="EditorSyntax.HTML"/> or <see cref="EditorSyntax.Markdown"/>. When <see cref="Syntax"/>
+    /// has any other value, the <see cref="EditorMode"/> is ignored.
+    /// </para>
+    /// </param>
+    public async Task SetModeAsync(EditorMode value)
+    {
+        EditorMode = value;
+        EditorService.EditMode = value;
+        if (_initialized)
+        {
+            await EditorService.SetEditorMode(value);
+        }
     }
 
     /// <inheritdoc/>
@@ -475,7 +488,7 @@ public partial class Editor : IDisposable
             yield break;
         }
 
-        if (!Regex.IsMatch(value, @"^(0?\.?[\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$"))
+        if (!FontSizeRegex().IsMatch(value))
         {
             yield return "Invalid font size";
         }
@@ -494,9 +507,9 @@ public partial class Editor : IDisposable
             yield break;
         }
 
-        if (!Regex.IsMatch(value, @"^(0?\.?[\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|(normal|inherit|initial|revert|revert-layer|unset)$"))
+        if (!LineHeightRegex().IsMatch(value))
         {
-            yield return "Invalid font size";
+            yield return "Invalid line height";
         }
     }
 
@@ -746,16 +759,6 @@ public partial class Editor : IDisposable
         _isLineHeightDialogVisible = false;
     }
 
-    private async Task SetModeAsync(EditorMode value)
-    {
-        EditorMode = value;
-        EditorService.EditMode = value;
-        if (_initialized)
-        {
-            await EditorService.SetEditorMode(value);
-        }
-    }
-
     private async Task SetReadOnly(bool value)
     {
         EditorService.ReadOnly = value;
@@ -920,4 +923,10 @@ public partial class Editor : IDisposable
         public string? Title { get; set; }
         public string? Url { get; set; }
     }
+
+    [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$")]
+    private static partial Regex FontSizeRegex();
+
+    [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|(normal|inherit|initial|revert|revert-layer|unset)$")]
+    private static partial Regex LineHeightRegex();
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.13-preview
+### Added
+- Editor.SetModeAsync
+### Changed
+- Editor.EditorMode now sets initial state only.
+
 ## 0.5.12-preview
 ### Changed
 - Style changes.
