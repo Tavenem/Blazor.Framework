@@ -16,7 +16,7 @@
 }
 
 .dialog-container {
-    align-items: center;
+    overflow: auto;
     display: flex;
     height: 100%;
     justify-content: center;
