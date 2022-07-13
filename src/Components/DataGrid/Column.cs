@@ -441,43 +441,112 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where
                 }
             }
         }
-        else if (InitialFilter is not null
-            && !InitialFilter.Equals(default))
+        else if (IsDateOnly)
         {
-            if (IsDateOnly)
+            if (IsNullable)
             {
-                DateTimeFilter = new(
-                    ((DateOnly)(object)InitialFilter).ToDateTime(TimeOnly.MinValue),
-                    TimeSpan.Zero);
+                if (InitialFilter is not null
+                    && !InitialFilter.Equals(default))
+                {
+                    DateTimeFilter = new(
+                        ((DateOnly)(object)InitialFilter).ToDateTime(TimeOnly.MinValue),
+                        TimeSpan.Zero);
+                }
             }
-            else if (IsDateTimeOffset)
+            else if (InitialFilter is not null)
             {
-                DateTimeFilter = (DateTimeOffset)(object)InitialFilter;
+                var filter = (DateOnly)(object)InitialFilter;
+                if (filter != DateOnly.MinValue)
+                {
+                    DateTimeFilter = new(filter.ToDateTime(TimeOnly.MinValue),
+                        TimeSpan.Zero);
+                }
             }
-            else if (IsTimeOnly)
+        }
+        else if (IsDateTimeOffset)
+        {
+            if (IsNullable)
             {
-                DateTimeFilter = new DateTimeOffset(
-                    DateOnly.MinValue.ToDateTime((TimeOnly)(object)InitialFilter),
-                    TimeSpan.Zero);
+                if (InitialFilter is not null
+                    && !InitialFilter.Equals(default))
+                {
+                    DateTimeFilter = (DateTimeOffset)(object)InitialFilter;
+                }
             }
-            else if (IsDateTime)
+            else if (InitialFilter is not null)
             {
-                DateTimeFilter = new((DateTime)(object)InitialFilter, TimeSpan.Zero);
+                var filter = (DateTimeOffset)(object)InitialFilter;
+                if (filter != DateTimeOffset.MinValue)
+                {
+                    DateTimeFilter = filter;
+                }
             }
-            else if (IsString)
+        }
+        else if (IsTimeOnly)
+        {
+            if (IsNullable)
             {
-                TextFilter = (string)(object)InitialFilter;
+                if (InitialFilter is not null
+                    && !InitialFilter.Equals(default))
+                {
+                    DateTimeFilter = new(
+                        DateOnly.MinValue.ToDateTime((TimeOnly)(object)InitialFilter),
+                        TimeSpan.Zero);
+                }
             }
-
-            if (DataGrid is not null)
+            else if (InitialFilter is not null)
             {
-                await DataGrid.OnFilterChangedAsync();
+                var filter = (TimeOnly)(object)InitialFilter;
+                if (filter != TimeOnly.MinValue)
+                {
+                    DateTimeFilter = new(
+                        DateOnly.MinValue.ToDateTime(filter),
+                        TimeSpan.Zero);
+                }
+            }
+        }
+        else if (IsDateTime)
+        {
+            if (IsNullable)
+            {
+                if (InitialFilter is not null
+                    && !InitialFilter.Equals(default))
+                {
+                    DateTimeFilter = new((DateTime)(object)InitialFilter, TimeSpan.Zero);
+                }
+            }
+            else if (InitialFilter is not null)
+            {
+                var filter = (DateTime)(object)InitialFilter;
+                if (filter != DateTime.MinValue)
+                {
+                    DateTimeFilter = new(filter, TimeSpan.Zero);
+                }
+            }
+        }
+        else if (IsString)
+        {
+            if (IsNullable)
+            {
+                if (InitialFilter is not null
+                    && !InitialFilter.Equals(default))
+                {
+                    TextFilter = (string)(object)InitialFilter;
+                }
+            }
+            else if (InitialFilter is not null)
+            {
+                var filter = (string)(object)InitialFilter;
+                if (!string.IsNullOrEmpty(filter))
+                {
+                    TextFilter = filter;
+                }
             }
         }
 
-        if (InitiallySorted)
+        if (InitiallySorted && DataGrid is not null)
         {
-            DataGrid?.OnColumnSortedAsync(this);
+            await DataGrid.OnColumnSortedAsync(this);
         }
     }
 

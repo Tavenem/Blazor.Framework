@@ -24,7 +24,7 @@ internal static class ColumnExtensions
         {
             return column.FilterMatches(item, column.DateTimeFilter);
         }
-        return false;
+        return true;
     }
 
     public static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, string? filter) where TDataItem : notnull

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.20-preview
+### Fixed
+- DataGrid: columns with unsupported types no longer filtered.
+
 ## 0.5.19-preview
 ### Fixed
 - Correct height and width attribute for img in Editor.
