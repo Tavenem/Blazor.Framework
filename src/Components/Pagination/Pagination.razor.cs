@@ -170,6 +170,8 @@ public partial class Pagination
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
+    private ElementReference ElementReference { get; set; }
+
     private ulong FirstPage
     {
         get
@@ -215,6 +217,8 @@ public partial class Pagination
         }
     }
 
+    private ElementReference LastPageElement { get; set; }
+
     private string? PageCssClass => new CssBuilder("btn btn-text")
         .Add(PageClass)
         .ToString();
@@ -259,6 +263,7 @@ public partial class Pagination
         {
             CurrentPage = 0;
             await CurrentPageChanged.InvokeAsync(CurrentPage);
+            await ElementReference.FocusFirstAsync(2);
         }
     }
 
@@ -273,6 +278,10 @@ public partial class Pagination
         {
             await NextRequested.InvokeAsync();
         }
+        if (CurrentPage == PageCount - 1)
+        {
+            await ElementReference.FocusFirstAsync(1);
+        }
     }
 
     private async Task OnLastAsync()
@@ -286,6 +295,7 @@ public partial class Pagination
         {
             await LastRequested.InvokeAsync();
         }
+        await ElementReference.FocusFirstAsync(1);
     }
 
     private async Task OnPreviousAsync()
@@ -294,6 +304,10 @@ public partial class Pagination
         {
             CurrentPage--;
             await CurrentPageChanged.InvokeAsync(CurrentPage);
+            if (CurrentPage == 0)
+            {
+                await ElementReference.FocusFirstAsync(2);
+            }
         }
     }
 
@@ -301,5 +315,6 @@ public partial class Pagination
     {
         CurrentPage = value;
         await CurrentPageChanged.InvokeAsync(CurrentPage);
+        await ElementReference.FocusFirstAsync(2 + (int)(CurrentPage - FirstPage));
     }
 }

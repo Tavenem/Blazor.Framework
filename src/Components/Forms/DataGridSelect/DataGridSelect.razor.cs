@@ -127,14 +127,16 @@ public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem> wh
     {
         new()
         {
-            Key = "/Escape|ArowDown|ArrowUp|Delete| |Enter/",
+            Key = "Escape",
             SubscribeDown = true,
-            PreventDown = "key+none|key+ctrl",
+            PreventDown = "key+none",
         },
         new()
         {
-            Key = "Tab",
+            Key = "/ArowDown|ArrowUp|Delete| |Enter/",
             SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
         }
     };
 
@@ -353,7 +355,6 @@ public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem> wh
         switch (e.Key)
         {
             case "Escape":
-            case "Tab":
                 if (PopoverOpen)
                 {
                     await TogglePopoverAsync();

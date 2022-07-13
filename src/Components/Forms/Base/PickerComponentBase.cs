@@ -172,14 +172,16 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     {
         new()
         {
-            Key = "/Escape|Delete| |Enter/",
+            Key = "Escape",
             SubscribeDown = true,
             PreventDown = "key+none",
         },
         new()
         {
-            Key = "Tab",
+            Key = "/Delete| |Enter/",
             SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
         }
     };
 
@@ -260,6 +262,10 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         if (PopoverOpen)
         {
             OnOpenPopover();
+            if (Popover is not null)
+            {
+                await Popover.ElementReference.FocusFirstAsync();
+            }
         }
         else
         {
@@ -289,7 +295,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         switch (e.Key)
         {
             case "Escape":
-            case "Tab":
                 if (PopoverOpen)
                 {
                     await TogglePopoverAsync();

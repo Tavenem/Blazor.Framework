@@ -181,14 +181,16 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
     {
         new()
         {
-            Key = "/^(?!Tab$)/",
+            Key = "Escape",
             SubscribeDown = true,
-            PreventDown = "any",
+            PreventDown = "key+none",
         },
         new()
         {
-            Key = "Tab",
+            Key = "/^(?!Tab$)/",
             SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
         }
     };
 
@@ -332,7 +334,6 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
         switch (e.Key)
         {
             case "Escape":
-            case "Tab":
                 if (PopoverOpen)
                 {
                     await TogglePopoverAsync();

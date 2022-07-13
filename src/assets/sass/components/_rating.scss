@@ -6,6 +6,7 @@
     --rating-color: var(--tavenem-color-text);
     color: var(--rating-color);
     display: inline-flex;
+    flex: 0 0 auto;
 
     legend, .field-helpers {
         color: var(--rating-color);

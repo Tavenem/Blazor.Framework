@@ -403,6 +403,13 @@ function focusPopovers(isIn: boolean, e: FocusEvent) {
                 popover = popover.parentElement?.closest('.popover');
             }
         }
+        if (popoverIds.length == 0) {
+            const childPopover = e.target.querySelector('.popover') as IPopoverElement;
+            if (childPopover
+                && childPopover.focusId == e.target.id) {
+                popoverIds.unshift(childPopover.id);
+            }
+        }
     }
 
     for (var id in map) {

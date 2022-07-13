@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.21-preview
+### Changed
+- Improved keyboard navigation within selects.
+- Preserve focus after pagination operations.
+
 ## 0.5.20-preview
 ### Fixed
 - DataGrid: columns with unsupported types no longer filtered.

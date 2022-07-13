@@ -7,14 +7,11 @@
     stopUp: string | undefined | null;
     subscribeDown: boolean;
     subscribeUp: boolean;
+    targetOnly: boolean;
 }
 
 interface IKeyListenerOptions {
     keys: IKeyOptions[];
-}
-
-interface IKeyListenerObserver extends MutationObserver {
-    keyListener?: KeyListener | undefined | null;
 }
 
 interface IKeyListenerElement extends Element {
@@ -143,13 +140,19 @@ class KeyListener {
         let invoke = false;
         if (self._keyOptions.hasOwnProperty(key)) {
             const keyOptions = self._keyOptions[key];
-            self.processKeyDown(args, keyOptions);
-            if (keyOptions.subscribeDown) {
-                invoke = true;
+            if (args.target == args.currentTarget
+                || !keyOptions.targetOnly) {
+                self.processKeyDown(args, keyOptions);
+                if (keyOptions.subscribeDown) {
+                    invoke = true;
+                }
             }
         }
         for (const keyOptions of self._regexOptions) {
-            if (keyOptions.regex && keyOptions.regex.test(args.key)) {
+            if ((args.target == args.currentTarget
+                || !keyOptions.targetOnly)
+                && keyOptions.regex
+                && keyOptions.regex.test(args.key)) {
                 self.processKeyDown(args, keyOptions);
                 if (keyOptions.subscribeDown) {
                     invoke = true;

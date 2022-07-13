@@ -3,15 +3,24 @@
 @inherits TavenemComponentBase
 
 @ChildContent
-<nav @attributes="AdditionalAttributes" role="navigation" class="@CssClass" style="@CssStyle">
+<nav @ref="ElementReference"
+     @attributes="AdditionalAttributes"
+     role="navigation"
+     class="@CssClass"
+     style="@CssStyle"
+     tabindex="-1">
     <ol>
         <li>
-            <button @onclick="OnFirstAsync" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == 0)">
+            <button @onclick="OnFirstAsync"
+                    class="@PageCssClassControl"
+                    disabled="@(Disabled || CurrentPage == 0)">
                 <tf-icon>@FirstPageIcon</tf-icon>
             </button>
         </li>
         <li>
-            <button @onclick="OnPreviousAsync" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == 0)">
+            <button @onclick="OnPreviousAsync"
+                    class="@PageCssClassControl"
+                    disabled="@(Disabled || CurrentPage == 0)">
                 <tf-icon>@PreviousPageIcon</tf-icon>
             </button>
         </li>
@@ -42,12 +51,17 @@
             <li>&hellip;</li>
         }
         <li>
-            <button @onclick="OnNextAsync" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == PageCount - 1)">
+            <button @onclick="OnNextAsync"
+                    class="@PageCssClassControl"
+                    disabled="@(Disabled || CurrentPage == PageCount - 1)">
                 <tf-icon>@NextPageIcon</tf-icon>
             </button>
         </li>
         <li>
-            <button @onclick="OnLastAsync" class="@PageCssClassControl" disabled="@(Disabled || CurrentPage == PageCount - 1)">
+            <button @ref="LastPageElement"
+                    @onclick="OnLastAsync"
+                    class="@PageCssClassControl"
+                    disabled="@(Disabled || CurrentPage == PageCount - 1)">
                 <tf-icon>@LastPageIcon</tf-icon>
             </button>
         </li>

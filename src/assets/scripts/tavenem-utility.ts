@@ -96,6 +96,11 @@ export function focusFirstElement(element: HTMLElement, skip = 0, min = 0) {
         const tabbables = getTabbableElements(element);
         if (tabbables.length <= min) {
             element.focus();
+        } else if (tabbables.length <= skip) {
+            const tabbable = tabbables[tabbables.length - 1];
+            if (tabbable instanceof HTMLElement) {
+                tabbable.focus();
+            }
         } else {
             const tabbable = tabbables[skip];
             if (tabbable instanceof HTMLElement) {
@@ -110,6 +115,11 @@ export function focusLastElement(element: HTMLElement, skip = 0, min = 0) {
         const tabbables = getTabbableElements(element);
         if (tabbables.length <= min) {
             element.focus();
+        } else if (tabbables.length - skip - 1 < 0) {
+            const tabbable = tabbables[0];
+            if (tabbable instanceof HTMLElement) {
+                tabbable.focus();
+            }
         } else {
             const tabbable = tabbables[tabbables.length - skip - 1];
             if (tabbable instanceof HTMLElement) {
@@ -691,7 +701,7 @@ function getTabbableElements(element: HTMLElement) {
         "a[href]:not([tabindex='-1'])," +
         "area[href]:not([tabindex='-1'])," +
         "button:not([disabled]):not([tabindex='-1'])," +
-        "input:not([disabled]):not([tabindex='-1']):not([type='hidden'])," +
+        "input:not([disabled]):not([tabindex='-1']):not([type='hidden']):not([hidden])," +
         "select:not([disabled]):not([tabindex='-1'])," +
         "textarea:not([disabled]):not([tabindex='-1'])," +
         "iframe:not([tabindex='-1'])," +

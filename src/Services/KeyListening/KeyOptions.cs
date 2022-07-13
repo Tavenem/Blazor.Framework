@@ -194,4 +194,9 @@ public class KeyOptions
     /// </para>
     /// </summary>
     public string? StopUp { get; set; }
+
+    /// <summary>
+    /// Only handle events on this target (not propagated events).
+    /// </summary>
+    public bool TargetOnly { get; set; }
 }

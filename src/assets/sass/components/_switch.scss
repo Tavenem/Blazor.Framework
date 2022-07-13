@@ -2,6 +2,7 @@
     --switch-inherited-color: var(--tavenem-color-action);
     --switch-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
     display: inline-flex;
+    flex: 0 0 auto;
     flex-direction: column;
 
     label {

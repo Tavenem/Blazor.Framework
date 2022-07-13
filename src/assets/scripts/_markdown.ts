@@ -644,7 +644,6 @@ class MarkdownParseState {
         }
         for (let i = 0; i < tokens.length; i++) {
             const token = tokens[i];
-            console.log(JSON.stringify(token));
 
             const handler = this.tokenHandlers[token.type];
             if (handler) {

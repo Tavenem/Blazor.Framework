@@ -210,12 +210,6 @@ public partial class DateTimeInput<TValue>
     /// </summary>
     [Parameter] public TimeZoneInfo TimeZone { get; set; }
 
-    /// <inheritdoc />
-    protected override string? CssStyle => new CssBuilder(Style)
-        .AddStyleFromDictionary(AdditionalAttributes)
-        .AddStyle("min-width", "310px")
-        .ToString();
-
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
