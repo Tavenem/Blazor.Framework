@@ -47,10 +47,17 @@ public class UtilityService : IAsyncDisposable
     /// </param>
     public async ValueTask DownloadAsync(string fileName, string fileType, DotNetStreamReference streamReference)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("downloadStream", fileName, fileType, streamReference)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("downloadStream", fileName, fileType, streamReference)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     /// <summary>
@@ -62,10 +69,16 @@ public class UtilityService : IAsyncDisposable
     /// </param>
     public async ValueTask DownloadAsync(string fileName, string url)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("downloadUrl", fileName, url)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("downloadUrl", fileName, url)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -84,10 +97,18 @@ public class UtilityService : IAsyncDisposable
         DotNetStreamReference streamReference,
         bool revoke = true)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        return await module
-            .InvokeAsync<string>("openStream", fileName, fileType, streamReference, revoke)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            return await module
+                .InvokeAsync<string>("openStream", fileName, fileType, streamReference, revoke)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
+        return null;
     }
 
     /// <summary>
@@ -157,10 +178,16 @@ public class UtilityService : IAsyncDisposable
             features = "noopener";
         }
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("open", url, target, features)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("open", url, target, features)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -169,10 +196,14 @@ public class UtilityService : IAsyncDisposable
     /// <param name="url">The URL to revoke.</param>
     public async ValueTask RevokeURLAsync(string url)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("revokeURL", url)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("revokeURL", url)
+                .ConfigureAwait(false);
+        }
+        catch { }
     }
 
     /// <summary>
@@ -181,29 +212,54 @@ public class UtilityService : IAsyncDisposable
     /// <param name="elementId">The id of an HTML element.</param>
     public async ValueTask Shake(string? elementId)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("shake", elementId)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("shake", elementId)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     internal async ValueTask CancelOutsideEventListener()
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("cancelOutsideEvent");
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("cancelOutsideEvent");
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     internal async ValueTask<string[]> GetFontsAsync()
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        return await module.InvokeAsync<string[]>("getFonts");
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            return await module.InvokeAsync<string[]>("getFonts");
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        return Array.Empty<string>();
     }
 
     internal async ValueTask RegisterComponents()
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("registerComponents")
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("registerComponents")
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 }

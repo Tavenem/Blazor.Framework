@@ -81,12 +81,18 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "activateCommand",
-            ElementId,
-            type,
-            parameters).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "activateCommand",
+                ElementId,
+                type,
+                parameters).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     public async ValueTask DisposeAsync()
@@ -103,18 +109,32 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "focusEditor",
-            ElementId).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "focusEditor",
+                ElementId).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     public async ValueTask<string?> GetSelectedText()
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        return await module.InvokeAsync<string?>(
-            "getSelectedText",
-            ElementId).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            return await module.InvokeAsync<string?>(
+                "getSelectedText",
+                ElementId).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
+        return null;
     }
 
     [JSInvokable]
@@ -130,11 +150,17 @@ internal class EditorService : IAsyncDisposable
         _commandsActive.Clear();
         _commandsEnabled.Clear();
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setEditorMode",
-            ElementId,
-            value).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "setEditorMode",
+                ElementId,
+                value).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     public async ValueTask SetReadOnly(bool value)
@@ -144,11 +170,18 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setReadOnly",
-            ElementId,
-            value).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "setReadOnly",
+                ElementId,
+                value).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     public async ValueTask SetSyntax(EditorSyntax value)
@@ -161,11 +194,17 @@ internal class EditorService : IAsyncDisposable
         _commandsActive.Clear();
         _commandsEnabled.Clear();
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setSyntax",
-            ElementId,
-            value.ToString()).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "setSyntax",
+                ElementId,
+                value.ToString()).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     public async ValueTask SetValue(string? value)
@@ -175,11 +214,18 @@ internal class EditorService : IAsyncDisposable
             return;
         }
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "setValue",
-            ElementId,
-            value).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "setValue",
+                ElementId,
+                value).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     [JSInvokable]
@@ -203,11 +249,18 @@ internal class EditorService : IAsyncDisposable
 
     public async ValueTask UpdateSelectedText(string? value)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "updateSelectedText",
-            ElementId,
-            value).ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "updateSelectedText",
+                ElementId,
+                value).ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     protected virtual async ValueTask DisposeAsync(bool disposing)
@@ -219,9 +272,13 @@ internal class EditorService : IAsyncDisposable
                 _themeService.OnThemeChange -= SetCodeEditorTheme;
                 if (_moduleTask.IsValueCreated)
                 {
-                    var module = await _moduleTask.Value.ConfigureAwait(false);
-                    await DisposeEditorAsync();
-                    await module.DisposeAsync().ConfigureAwait(false);
+                    try
+                    {
+                        var module = await _moduleTask.Value.ConfigureAwait(false);
+                        await DisposeEditorAsync();
+                        await module.DisposeAsync().ConfigureAwait(false);
+                    }
+                    catch { }
                 }
                 _dotNetRef?.Dispose();
             }
@@ -238,10 +295,14 @@ internal class EditorService : IAsyncDisposable
         {
             return;
         }
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "disposeEditor",
-            ElementId);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "disposeEditor",
+                ElementId);
+        }
+        catch { }
     }
 
     private async void SetCodeEditorTheme(object? sender, ThemePreference value)
@@ -250,10 +311,16 @@ internal class EditorService : IAsyncDisposable
         {
             return;
         }
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("setCodeEditorTheme", value)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("setCodeEditorTheme", value)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     private async void SubscribeInput(EventHandler<string?> value)
@@ -266,22 +333,29 @@ internal class EditorService : IAsyncDisposable
         if (_onInput is null)
         {
             _dotNetRef ??= DotNetObjectReference.Create(this);
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync(
-                "initializeEditor",
-                ElementId,
-                _dotNetRef,
-                new
-                {
-                    AutoFocus,
-                    InitialValue,
-                    Mode = EditMode,
-                    Placeholder,
-                    ReadOnly,
-                    Syntax = Syntax.ToString(),
-                    Theme = await _themeService.GetPreferredColorScheme(),
-                    UpdateOnInput,
-                });
+            try
+            {
+                var module = await _moduleTask.Value.ConfigureAwait(false);
+                await module.InvokeVoidAsync(
+                    "initializeEditor",
+                    ElementId,
+                    _dotNetRef,
+                    new
+                    {
+                        AutoFocus,
+                        InitialValue,
+                        Mode = EditMode,
+                        Placeholder,
+                        ReadOnly,
+                        Syntax = Syntax.ToString(),
+                        Theme = await _themeService.GetPreferredColorScheme(),
+                        UpdateOnInput,
+                    });
+            }
+            catch (JSException) { }
+            catch (JSDisconnectedException) { }
+            catch (TaskCanceledException) { }
+            catch (ObjectDisposedException) { }
         }
 
         _onInput += value;

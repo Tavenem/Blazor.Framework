@@ -30,6 +30,7 @@ internal class PopoverHandler : IDisposable
         {
             await _jsInterop.InvokeVoidAsync("popoverDisconnect", Id);
         }
+        catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
         finally
@@ -49,18 +50,41 @@ internal class PopoverHandler : IDisposable
     public async Task Initialize()
     {
         _dotNetRef = DotNetObjectReference.Create(this);
-        await _jsInterop.InvokeVoidAsync("popoverConnect", Id, _dotNetRef, AnchorId, FocusId);
-        IsConnected = true;
+        try
+        {
+            await _jsInterop.InvokeVoidAsync("popoverConnect", Id, _dotNetRef, AnchorId, FocusId);
+            IsConnected = true;
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     [JSInvokable]
     public void OnFocusLeft() => FocusLeft?.Invoke(this, EventArgs.Empty);
 
-    public ValueTask SetOffsetAsync(double? x, double? y)
-        => _jsInterop.InvokeVoidAsync("setPopoverOffset", Id, x, y);
+    public async ValueTask SetOffsetAsync(double? x, double? y)
+    {
+        try
+        {
+            await _jsInterop.InvokeVoidAsync("setPopoverOffset", Id, x, y);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
 
-    public ValueTask SetPositionAsync(double? x, double? y)
-        => _jsInterop.InvokeVoidAsync("setPopoverPosition", Id, x, y);
+    public async ValueTask SetPositionAsync(double? x, double? y)
+    {
+        try
+        {
+            await _jsInterop.InvokeVoidAsync("setPopoverPosition", Id, x, y);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

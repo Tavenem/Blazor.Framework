@@ -99,13 +99,21 @@ internal class ResizeObserver : IResizeObserver
             _cachedValueIds.Add(id, item);
         }
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        var results = await module.InvokeAsync<IEnumerable<BoundingClientRect>>(
-            "connect",
-            _id.ToString(),
-            _dotNetRef,
-            filteredElements,
-            elementIds);
+        var results = Enumerable.Empty<BoundingClientRect>();
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            results = await module.InvokeAsync<IEnumerable<BoundingClientRect>>(
+                "connect",
+                _id.ToString(),
+                _dotNetRef,
+                filteredElements,
+                elementIds);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
 
         var counter = 0;
         foreach (var item in results)
@@ -122,7 +130,8 @@ internal class ResizeObserver : IResizeObserver
     /// </summary>
     /// <param name="element">An element reference.</param>
     /// <returns>The current bounding area.</returns>
-    public async Task<BoundingClientRect?> Observe(ElementReference element) => (await Observe(new[] { element })).FirstOrDefault();
+    public async Task<BoundingClientRect?> Observe(ElementReference element)
+        => (await Observe(new[] { element })).FirstOrDefault();
 
     /// <summary>
     /// Invoked by JS interop.
@@ -186,13 +195,13 @@ internal class ResizeObserver : IResizeObserver
                 _cachedValues.Clear();
                 if (_moduleTask.IsValueCreated)
                 {
-                    var module = await _moduleTask.Value.ConfigureAwait(false);
                     try
                     {
+                        var module = await _moduleTask.Value.ConfigureAwait(false);
                         await module.InvokeVoidAsync("dispose", _id).ConfigureAwait(false);
+                        await module.DisposeAsync().ConfigureAwait(false);
                     }
                     catch { }
-                    await module.DisposeAsync().ConfigureAwait(false);
                 }
             }
 

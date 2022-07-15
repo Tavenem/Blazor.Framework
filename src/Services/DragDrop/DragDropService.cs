@@ -244,8 +244,12 @@ public class DragDropService : IAsyncDisposable
     {
         if (_moduleTask.IsValueCreated)
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.DisposeAsync().ConfigureAwait(false);
+            try
+            {
+                var module = await _moduleTask.Value.ConfigureAwait(false);
+                await module.DisposeAsync().ConfigureAwait(false);
+            }
+            catch { }
         }
 
         GC.SuppressFinalize(this);
@@ -253,20 +257,39 @@ public class DragDropService : IAsyncDisposable
 
     internal async ValueTask CancelDragListener(string? elementId)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("cancelDragListener", elementId);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("cancelDragListener", elementId);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     internal async ValueTask CancelDropListener(string? elementId)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("cancelDropListener", elementId);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("cancelDropListener", elementId);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     internal async ValueTask StartDragListener(DotNetObjectReference<DragDropListener> dotNetRef, string? elementId)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("listenForDrag", dotNetRef, elementId);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("listenForDrag", dotNetRef, elementId);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     internal async ValueTask StartDropListener(
@@ -274,12 +297,19 @@ public class DragDropService : IAsyncDisposable
         string? elementId,
         DragEffect? effect)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync(
-            "listenForDrop",
-            dotNetRef,
-            elementId,
-            effect?.ToJsString());
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync(
+                "listenForDrop",
+                dotNetRef,
+                elementId,
+                effect?.ToJsString());
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     private static bool TryGetDataOfType<TData>(

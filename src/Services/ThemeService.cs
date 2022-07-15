@@ -46,10 +46,17 @@ public class ThemeService : IAsyncDisposable
     /// <returns>A <see cref="ThemePreference"/> value.</returns>
     public async ValueTask<ThemePreference> GetPreferredColorScheme()
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        return await module
-            .InvokeAsync<ThemePreference>("getPreferredColorScheme")
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            return await module
+                .InvokeAsync<ThemePreference>("getPreferredColorScheme")
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        return ThemePreference.Light;
     }
 
     /// <summary>
@@ -65,10 +72,16 @@ public class ThemeService : IAsyncDisposable
     /// <param name="theme">A <see cref="ThemePreference"/> value.</param>
     public async ValueTask SetColorScheme(ThemePreference theme)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("setColorScheme", theme, true)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("setColorScheme", theme, true)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -87,8 +100,12 @@ public class ThemeService : IAsyncDisposable
                 await CancelListener();
                 if (_moduleTask.IsValueCreated)
                 {
-                    var module = await _moduleTask.Value.ConfigureAwait(false);
-                    await module.DisposeAsync().ConfigureAwait(false);
+                    try
+                    {
+                        var module = await _moduleTask.Value.ConfigureAwait(false);
+                        await module.DisposeAsync().ConfigureAwait(false);
+                    }
+                    catch { }
                 }
                 _dotNetRef?.Dispose();
             }
@@ -102,16 +119,27 @@ public class ThemeService : IAsyncDisposable
         if (_moduleTask.IsValueCreated
             && _dotNetRef is not null)
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("cancelListener", _dotNetRef);
+            try
+            {
+                var module = await _moduleTask.Value.ConfigureAwait(false);
+                await module.InvokeVoidAsync("cancelListener", _dotNetRef);
+            }
+            catch { }
         }
     }
 
     private async ValueTask Initialize()
     {
         _dotNetRef ??= DotNetObjectReference.Create(this);
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("listenForThemeChange", _dotNetRef);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("listenForThemeChange", _dotNetRef);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     private async void Subscribe(EventHandler<ThemePreference> value)

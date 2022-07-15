@@ -47,10 +47,16 @@ public class ScrollService : IAsyncDisposable
     /// <param name="setHistory">Whether to add this fragment to the current URL and history.</param>
     public async ValueTask ScrollToId(string? elementId, ScrollLogicalPosition position = ScrollLogicalPosition.Start, bool setHistory = true)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("scrollToId", elementId, position.ToString().ToLowerInvariant(), setHistory)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("scrollToId", elementId, position.ToString().ToLowerInvariant(), setHistory)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -59,16 +65,28 @@ public class ScrollService : IAsyncDisposable
     /// <param name="selector">A CSS selector.</param>
     public async ValueTask ScrollToTop(string? selector = null)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("scrollToTop", selector)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("scrollToTop", selector)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     internal async ValueTask CancelScrollListener(string? selector)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("cancelScrollListener", selector);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("cancelScrollListener", selector);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -83,15 +101,29 @@ public class ScrollService : IAsyncDisposable
     /// </param>
     internal async ValueTask ScrollSpy(DotNetObjectReference<FrameworkLayout> dotNetRef, string className)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync("scrollSpy", dotNetRef, className)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("scrollSpy", dotNetRef, className)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     internal async ValueTask StartScrollListener(DotNetObjectReference<ScrollListener> dotNetRef, string? selector)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module.InvokeVoidAsync("listenForScroll", dotNetRef, selector);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module.InvokeVoidAsync("listenForScroll", dotNetRef, selector);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 }

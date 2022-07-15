@@ -109,9 +109,10 @@ public class SnackbarService : IDisposable
         _lock.EnterWriteLock();
         try
         {
-            if (PreventDuplicates && _snackbars.ContainsKey(options.Position))
+            if (_snackbars.TryGetValue(options.Position, out var value)
+                && PreventDuplicates)
             {
-                var duplicate = _snackbars[options.Position].FirstOrDefault(x =>
+                var duplicate = value.FirstOrDefault(x =>
                     x.Properties.Options.Equals(options));
                 if (duplicate is not null)
                 {
@@ -122,9 +123,9 @@ public class SnackbarService : IDisposable
 
             snackbar = new Snackbar(options);
             snackbar.OnClose += Remove;
-            if (_snackbars.ContainsKey(options.Position))
+            if (value is not null)
             {
-                _snackbars[options.Position].Insert(0, snackbar);
+                value.Insert(0, snackbar);
             }
             else
             {
@@ -195,9 +196,9 @@ public class SnackbarService : IDisposable
         _lock.EnterWriteLock();
         try
         {
-            if (_snackbars.ContainsKey(snackbar.Properties.Options.Position))
+            if (_snackbars.TryGetValue(snackbar.Properties.Options.Position, out var value))
             {
-                _snackbars[snackbar.Properties.Options.Position].Remove(snackbar);
+                value.Remove(snackbar);
                 if (_snackbars[snackbar.Properties.Options.Position].Count == 0)
                 {
                     _snackbars.Remove(snackbar.Properties.Options.Position);

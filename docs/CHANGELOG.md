@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.22-preview
+### Changed
+- Harden JS Interop calls.
+
 ## 0.5.21-preview
 ### Changed
 - Improved keyboard navigation within selects.

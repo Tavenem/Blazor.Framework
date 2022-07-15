@@ -78,8 +78,10 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
                 .ConfigureAwait(false);
             _isObserving = true;
         }
+        catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
     }
 
     /// <summary>

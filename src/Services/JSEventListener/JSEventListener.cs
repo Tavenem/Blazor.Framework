@@ -39,8 +39,12 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
                 await UnsubscribeAsync(callback.Key);
             }
 
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.DisposeAsync().ConfigureAwait(false);
+            try
+            {
+                var module = await _moduleTask.Value.ConfigureAwait(false);
+                await module.DisposeAsync().ConfigureAwait(false);
+            }
+            catch { }
         }
         _dotNetRef.Dispose();
 
@@ -112,18 +116,25 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
 
         _callbackResolver.Add(key, (type, callback));
 
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        await module
-            .InvokeVoidAsync(
-                "subscribe",
-                eventName,
-                elementId,
-                correctOffset,
-                throttle,
-                key.ToString(),
-                properties,
-                _dotNetRef)
-            .ConfigureAwait(false);
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync(
+                    "subscribe",
+                    eventName,
+                    elementId,
+                    correctOffset,
+                    throttle,
+                    key.ToString(),
+                    properties,
+                    _dotNetRef)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
 
         return key;
     }

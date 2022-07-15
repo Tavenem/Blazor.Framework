@@ -46,9 +46,9 @@ internal class PopoverService : IAsyncDisposable
     {
         if (!_disposedValue)
         {
-            if (disposing)
+            if (disposing && _moduleTask.IsValueCreated)
             {
-                if (_moduleTask.IsValueCreated)
+                try
                 {
                     var module = await _moduleTask.Value.ConfigureAwait(false);
                     if (_popoversInitialized)
@@ -57,6 +57,7 @@ internal class PopoverService : IAsyncDisposable
                     }
                     await module.DisposeAsync().ConfigureAwait(false);
                 }
+                catch { }
             }
 
             _disposedValue = true;
@@ -81,6 +82,7 @@ internal class PopoverService : IAsyncDisposable
             await module.InvokeVoidAsync("popoverInitialize");
             _popoversInitialized = true;
         }
+        catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
         finally
@@ -89,11 +91,18 @@ internal class PopoverService : IAsyncDisposable
         }
     }
 
-    internal async Task<PopoverHandler> RegisterPopoverAsync(string? anchorId = null, string? focusId = null)
+    internal async Task<PopoverHandler?> RegisterPopoverAsync(string? anchorId = null, string? focusId = null)
     {
-        var module = await _moduleTask.Value.ConfigureAwait(false);
-        var handler = new PopoverHandler(module, anchorId, focusId);
-        _popoverHandlers.Add(handler);
+        PopoverHandler? handler = null;
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            handler = new PopoverHandler(module, anchorId, focusId);
+            _popoverHandlers.Add(handler);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
         return handler;
     }
 
