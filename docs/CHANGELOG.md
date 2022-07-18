@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.23-preview
+### Changed
+- Updated icon.
+
 ## 0.5.22-preview
 ### Changed
 - Harden JS Interop calls.
