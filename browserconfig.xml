@@ -2,8 +2,8 @@
 <browserconfig>
     <msapplication>
         <tile>
-            <square150x150logo src="/Blazor.Framework/images/mstile-150x150.png"/>
-            <TileColor>#f1e4ff</TileColor>
+            <square150x150logo src="/Blazor.Framework/mstile-150x150.png?v=2"/>
+            <TileColor>#a03dff</TileColor>
         </tile>
     </msapplication>
 </browserconfig>
