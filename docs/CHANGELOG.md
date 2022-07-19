@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.24-preview
+### Fixed
+- Extracted internal Dialogs to separate components to avoid nesting dialog problem.
+
 ## 0.5.23-preview
 ### Changed
 - Updated icon.

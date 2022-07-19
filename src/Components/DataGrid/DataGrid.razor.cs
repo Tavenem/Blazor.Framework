@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using System.Reflection;
 using System.Text;
 using Tavenem.Blazor.Framework.Components.DataGrid;
+using Tavenem.Blazor.Framework.Components.DataGrid.InternalDialogs;
 using Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 
 namespace Tavenem.Blazor.Framework;
@@ -41,11 +42,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     private readonly List<Guid> _sortOrder = new();
 
     private bool _disposedValue;
-    private bool _isColumnFilterDialogVisible;
-    private bool _isDeleteDialogVisible;
-    private bool _isEditDialogVisible;
-    private bool _isExportDialogVisible;
-    private bool _isExportTooLargeDialogVisible;
     private bool _nullGroupExpanded;
 
     /// <summary>
@@ -134,11 +130,11 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     /// </para>
     /// <para>
     /// Exporting to CSV, Excel, and HTML formats is supported by default. These formats include the
-    /// current set of visible columns, plus any columns with <see
-    /// cref="IColumn{TDataItem}.ExportHidden"/> set to <see langword="true"/>. All data which
-    /// matches the current set of filters is included, in the curent sort order. If <see
-    /// cref="LoadItems"/> is not <see langword="null"/> a new call is made which attempts to fetch
-    /// all matching items, rather than just the items for the current page.
+    /// current set of visible columns, plus any columns with <see cref="IColumn.ExportHidden"/> set
+    /// to <see langword="true"/>. All data which matches the current set of filters is included, in
+    /// the curent sort order. If <see cref="LoadItems"/> is not <see langword="null"/> a new call
+    /// is made which attempts to fetch all matching items, rather than just the items for the
+    /// current page.
     /// </para>
     /// <para>
     /// Exporting to PDF is also supported if the <see cref="PdfExport"/> property is assigned.
@@ -164,10 +160,10 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     /// <summary>
     /// <para>
-    /// When <see langword="true"/>, if any column has <see
-    /// cref="IColumn{TDataItem}.IsQuickFilter"/> set to <see langword="true"/>, a universal search
-    /// box will appear in the data table header and will filter the data by items which have each
-    /// (space delimited) term in the query in at least one quick filter column.
+    /// When <see langword="true"/>, if any column has <see cref="IColumn.IsQuickFilter"/> set to
+    /// <see langword="true"/>, a universal search box will appear in the data table header and will
+    /// filter the data by items which have each (space delimited) term in the query in at least one
+    /// quick filter column.
     /// </para>
     /// <para>
     /// Default is <see langword="true"/>.
@@ -417,9 +413,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     [Parameter] public Func<DataGridRequest, Task<Stream>>? PdfExport { get; set; }
 
     /// <summary>
-    /// If any column has <see cref="IColumn{TDataItem}.IsQuickFilter"/> set to <see
-    /// langword="true"/>, the data will include only items which have each (space delimited) term
-    /// in this value in at least one quick filter column.
+    /// If any column has <see cref="IColumn.IsQuickFilter"/> set to <see langword="true"/>, the
+    /// data will include only items which have each (space delimited) term in this value in at
+    /// least one quick filter column.
     /// </summary>
     [Parameter] public string? QuickFilter { get; set; }
 
@@ -535,8 +531,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     private readonly List<IColumn<TDataItem>> _columns = new();
     internal IEnumerable<IColumn<TDataItem>> Columns => _columns;
 
-    internal TDataItem? EditedItem { get; set; }
-
     internal Row<TDataItem>? EditingRow { get; set; }
 
     internal Form? TableEditForm { get; set; }
@@ -629,13 +623,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private TDataItem? DeleteItem { get; set; }
 
-    private Form? DialogEditForm { get; set; }
-
     [Inject] private DialogService DialogService { get; set; } = default!;
-
-    private ExportFileType ExportFileType { get; set; } = ExportFileType.Excel;
-
-    private string? ExportName { get; set; }
 
     private string? FormStyle => new CssBuilder("overflow:auto")
         .AddStyle("max-height", MaxHeight)
@@ -1194,8 +1182,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     internal async Task OnDeleteAsync(Row<TDataItem> row)
     {
-        if (EditingRow?.Equals(row) == false
-            || EditedItem?.Equals(row.Item) == false)
+        if (EditingRow?.Equals(row) == false)
         {
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
@@ -1205,14 +1192,46 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
 
         DeleteItem = row.Item;
-        _isDeleteDialogVisible = true;
-        StateHasChanged();
+        if (DeleteItem is null)
+        {
+            return;
+        }
+
+        var confirmed = await DialogService.ShowMessageBox("Confirm Delete", new MessageBoxOptions
+        {
+            Message = new("<p>Are you sure you want to delete this item?</p>"),
+            OkText = "Delete",
+        });
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        if (ItemDeleted is not null)
+        {
+            var success = await ItemDeleted.Invoke(DeleteItem);
+            if (!success)
+            {
+                return;
+            }
+        }
+        if (LoadItems is null)
+        {
+            Items.Remove(DeleteItem);
+        }
+        else if (CurrentDataPage is null)
+        {
+            await LoadItemsAsync();
+        }
+        else
+        {
+            CurrentDataPage.Items.Remove(DeleteItem);
+        }
     }
 
     internal async Task OnEditAsync(Row<TDataItem> row)
     {
-        if (EditingRow is not null
-            || EditedItem is not null)
+        if (EditingRow is not null)
         {
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
@@ -1262,8 +1281,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
         else if (UseEditDialog)
         {
-            EditedItem = row.Item;
-            _isEditDialogVisible = true;
+            await ShowEditDialogAsync(row.Item);
             StateHasChanged();
         }
         else
@@ -1299,8 +1317,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     internal async Task OnSelectAsync(Row<TDataItem> row)
     {
-        if (EditingRow is not null
-            || EditedItem is not null)
+        if (EditingRow is not null)
         {
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
@@ -1333,8 +1350,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     internal async Task OnSelectAsync(Row<TDataItem> row, bool value)
     {
-        if (EditingRow is not null
-            || EditedItem is not null)
+        if (EditingRow is not null)
         {
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
@@ -1479,25 +1495,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     private static string? GetColumnHeaderClass(IColumn<TDataItem> column) => new CssBuilder("column-header")
         .Add("clickable", column.GetIsSortable())
         .ToString();
-
-    private async Task<IEnumerable<TDataItem>?> TryGetAllItemsAsync()
-    {
-        if (LoadItems is null)
-        {
-            return CurrentItems;
-        }
-
-        var results = await LoadItems.Invoke(new(
-            0,
-            0,
-            GetFilterInfo(true),
-            GetSortInfo(true)));
-        if (results.HasMore)
-        {
-            return null;
-        }
-        return results.Items;
-    }
 
     private string? GetColumnHeaderIconClass(IColumn<TDataItem> column) => new CssBuilder()
         .Add("active", _sortOrder.Contains(column.Id))
@@ -1723,7 +1720,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         return filterInfo?.ToArray();
     }
 
-    private async Task<Stream?> GetHTMLAsync()
+    private async Task<Stream?> GetHTMLAsync(string? title)
     {
         var items = await TryGetAllItemsAsync();
         if (items is null)
@@ -1758,18 +1755,16 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             sb.AppendLine("</tr>");
         }
 
-        string title;
-        if (!string.IsNullOrWhiteSpace(ExportName))
+        if (string.IsNullOrEmpty(title))
         {
-            title = ExportName.Trim();
-        }
-        else if (!string.IsNullOrWhiteSpace(Title))
-        {
-            title = Title.Trim();
-        }
-        else
-        {
-            title = $"{typeof(TDataItem).Name} Data";
+            if (!string.IsNullOrWhiteSpace(Title))
+            {
+                title = Title.Trim();
+            }
+            else
+            {
+                title = $"{typeof(TDataItem).Name} Data";
+            }
         }
         var html = string.Format(HtmlTemplate, title, HtmlHeaderContent, sb.ToString());
         return new MemoryStream(Encoding.UTF8.GetBytes(html));
@@ -1824,8 +1819,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private async Task OnAddAsync()
     {
-        if (EditingRow is not null
-            || EditedItem is not null)
+        if (EditingRow is not null)
         {
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
@@ -1887,11 +1881,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             {
                 newItem = default;
             }
-            EditedItem = newItem;
             if (newItem is not null)
             {
-                IsAdding = true;
-                _isEditDialogVisible = true;
+                await ShowEditDialogAsync(newItem, true);
             }
         }
     }
@@ -1912,13 +1904,7 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private async Task OnCancelEditAsync()
     {
-        if (EditedItem is not null)
-        {
-            DialogEditForm?.ResetAsync();
-            _isEditDialogVisible = false;
-            EditedItem = default;
-        }
-        else if (EditingRow is not null)
+        if (EditingRow is not null)
         {
             await EditingRow.CancelEditAsync();
         }
@@ -2005,35 +1991,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         return OnColumnSortedAsync(column);
     }
 
-    private async Task OnConfirmDeleteAsync()
-    {
-        _isDeleteDialogVisible = false;
-        if (DeleteItem is null)
-        {
-            return;
-        }
-        if (ItemDeleted is not null)
-        {
-            var success = await ItemDeleted.Invoke(DeleteItem);
-            if (!success)
-            {
-                return;
-            }
-        }
-        if (LoadItems is null)
-        {
-            Items.Remove(DeleteItem);
-        }
-        else if (CurrentDataPage is null)
-        {
-            await LoadItemsAsync();
-        }
-        else
-        {
-            CurrentDataPage.Items.Remove(DeleteItem);
-        }
-    }
-
     private Task OnDateTimeFilterChangedAsync(IColumn<TDataItem> column, DateTimeOffset? value)
     {
         column.DateTimeFilter = value;
@@ -2045,85 +2002,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         else
         {
             return LoadItemsAsync();
-        }
-    }
-
-    private async Task OnExportAsync()
-    {
-        IsLoading = true;
-        _isExportDialogVisible = false;
-        StateHasChanged();
-
-        var stream = ExportFileType switch
-        {
-            ExportFileType.CSV => await GetCSVAsync(),
-            ExportFileType.Excel => await GetExcelAsync(),
-            ExportFileType.HTML => await GetHTMLAsync(),
-            ExportFileType.PDF => await GetPDFAsync(),
-            _ => null,
-        };
-        if (stream is null)
-        {
-            if (ExportFileType != ExportFileType.PDF)
-            {
-                _isExportTooLargeDialogVisible = true;
-            }
-            return;
-        }
-
-        var type = ExportFileType switch
-        {
-            ExportFileType.CSV => "text/csv",
-            ExportFileType.Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            ExportFileType.HTML => "text/html",
-            ExportFileType.PDF => "application/pdf",
-            _ => "text/plain",
-        };
-        var extension = ExportFileType switch
-        {
-            ExportFileType.CSV => "csv",
-            ExportFileType.Excel => "xlsx",
-            ExportFileType.HTML => "html",
-            ExportFileType.PDF => "pdf",
-            _ => "txt",
-        };
-
-        string title;
-        if (!string.IsNullOrWhiteSpace(ExportName))
-        {
-            title = ExportName.Trim();
-        }
-        else if (!string.IsNullOrWhiteSpace(Title))
-        {
-            title = Title.Trim();
-        }
-        else
-        {
-            title = $"exported_{typeof(TDataItem).Name}_data";
-        }
-        var fileName = $"{title}.{extension}";
-        using var streamReference = new DotNetStreamReference(stream);
-        try
-        {
-            if (ExportFileType is ExportFileType.HTML
-                or ExportFileType.PDF)
-            {
-                var url = await UtilityService.OpenAsync(fileName, type, streamReference, false);
-                if (!string.IsNullOrEmpty(url))
-                {
-                    _objectUrls.Add(url);
-                }
-            }
-            else
-            {
-                await UtilityService.DownloadAsync(fileName, type, streamReference);
-            }
-        }
-        finally
-        {
-            stream.Dispose();
-            IsLoading = false;
-            StateHasChanged();
         }
     }
 
@@ -2218,14 +2096,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         await CurrentPageChanged.InvokeAsync();
     }
 
-    private void OnSetAllColumnsVisiblity(bool value)
-    {
-        foreach (var column in _columns.Where(x => x.CanHide))
-        {
-            column.SetIsShown(value);
-        }
-    }
-
     private async Task OnSetSelectAllAsync(bool? value)
     {
         var changed = false;
@@ -2311,60 +2181,188 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         StateHasChanged();
     }
 
-    private async Task<bool> TrySaveEditAsync()
+    private async Task ShowColumnFilterDialogAsync()
     {
-        if (EditingRow is null)
-        {
-            if (EditedItem is not null)
+        var result = await DialogService.Show<ColumnFilterDialog>(
+            "Select Columns",
+            new DialogParameters
             {
-                if (DialogEditForm is not null)
-                {
-                    var valid = await DialogEditForm.ValidateAsync();
-                    if (!valid)
-                    {
-                        return false;
-                    }
-                }
+                { nameof(ColumnFilterDialog.Columns), _columns.Cast<IColumn>().ToList() },
+            }).Result;
+        if (result.Choice != DialogChoice.Ok
+            || result.Data is not List<IColumn> columns)
+        {
+            return;
+        }
 
-                if (IsAdding)
+        foreach (var column in columns.Where(x => x.CanHide))
+        {
+            column.SetIsShown(column.IsShown);
+        }
+    }
+
+    private async Task ShowEditDialogAsync(TDataItem? item = default, bool adding = false)
+    {
+        var result = await DialogService.Show<EditDialog<TDataItem>>(
+            adding ? "Add" : "Edit",
+            new DialogParameters
+            {
+                { "Columns", _columns },
+                { "EditedItem", item },
+            }).Result;
+        if (result.Choice != DialogChoice.Ok
+            || result.Data is not TDataItem editedItem
+            || editedItem is null)
+        {
+            return;
+        }
+
+        if (adding)
+        {
+            var success = true;
+            if (ItemAdded is not null)
+            {
+                success = await ItemAdded.Invoke(editedItem);
+            }
+            if (success)
+            {
+                if (LoadItems is null)
                 {
-                    var success = true;
-                    if (ItemAdded is not null)
-                    {
-                        success = await ItemAdded.Invoke(EditedItem);
-                    }
-                    if (success)
-                    {
-                        if (LoadItems is null)
-                        {
-                            Items.Add(EditedItem);
-                        }
-                        else if (CurrentDataPage is null)
-                        {
-                            await LoadItemsAsync();
-                        }
-                        else
-                        {
-                            CurrentDataPage.Items.Add(EditedItem);
-                        }
-                    }
+                    Items.Add(editedItem);
+                }
+                else if (CurrentDataPage is null)
+                {
+                    await LoadItemsAsync();
                 }
                 else
                 {
-                    if (ItemSaved is not null)
-                    {
-                        var success = await ItemSaved.Invoke(EditedItem);
-                        if (!success && DialogEditForm is not null)
-                        {
-                            await DialogEditForm.ResetAsync();
-                        }
-                    }
+                    CurrentDataPage.Items.Add(editedItem);
                 }
-                _isEditDialogVisible = false;
-                EditedItem = default;
             }
         }
+        else if (ItemSaved is not null)
+        {
+            await ItemSaved.Invoke(editedItem);
+        }
+    }
+
+    private async Task ShowExportDialogAsync()
+    {
+        var result = await DialogService.Show<ExportDialog>(
+            "Export",
+            new DialogParameters
+            {
+                { nameof(ExportDialog.ShowPdf), PdfExport is not null },
+            }).Result;
+        if (result.Choice != DialogChoice.Ok
+            || result.Data is not ExportData data)
+        {
+            return;
+        }
+
+        IsLoading = true;
+        StateHasChanged();
+
+        var stream = data.FileType switch
+        {
+            ExportFileType.CSV => await GetCSVAsync(),
+            ExportFileType.Excel => await GetExcelAsync(),
+            ExportFileType.HTML => await GetHTMLAsync(data.FileName),
+            ExportFileType.PDF => await GetPDFAsync(),
+            _ => null,
+        };
+        if (stream is null)
+        {
+            if (data.FileType != ExportFileType.PDF)
+            {
+                await DialogService.ShowMessageBox("Export too large", new()
+                {
+                    Message = new(
+@"<p>This query resulted in too many results to export.</p>
+<p>Try narrowing down the data by searching for the information you need, using the filter controls in the column headers.</p>"),
+                });
+            }
+            return;
+        }
+
+        var type = data.FileType switch
+        {
+            ExportFileType.CSV => "text/csv",
+            ExportFileType.Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ExportFileType.HTML => "text/html",
+            ExportFileType.PDF => "application/pdf",
+            _ => "text/plain",
+        };
+        var extension = data.FileType switch
+        {
+            ExportFileType.CSV => "csv",
+            ExportFileType.Excel => "xlsx",
+            ExportFileType.HTML => "html",
+            ExportFileType.PDF => "pdf",
+            _ => "txt",
+        };
+
+        string title;
+        if (!string.IsNullOrWhiteSpace(data.FileName))
+        {
+            title = data.FileName.Trim();
+        }
+        else if (!string.IsNullOrWhiteSpace(Title))
+        {
+            title = Title.Trim();
+        }
         else
+        {
+            title = $"exported_{typeof(TDataItem).Name}_data";
+        }
+        var fileName = $"{title}.{extension}";
+        using var streamReference = new DotNetStreamReference(stream);
+        try
+        {
+            if (data.FileType is ExportFileType.HTML
+                or ExportFileType.PDF)
+            {
+                var url = await UtilityService.OpenAsync(fileName, type, streamReference, false);
+                if (!string.IsNullOrEmpty(url))
+                {
+                    _objectUrls.Add(url);
+                }
+            }
+            else
+            {
+                await UtilityService.DownloadAsync(fileName, type, streamReference);
+            }
+        }
+        finally
+        {
+            stream.Dispose();
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<IEnumerable<TDataItem>?> TryGetAllItemsAsync()
+    {
+        if (LoadItems is null)
+        {
+            return CurrentItems;
+        }
+
+        var results = await LoadItems.Invoke(new(
+            0,
+            0,
+            GetFilterInfo(true),
+            GetSortInfo(true)));
+        if (results.HasMore)
+        {
+            return null;
+        }
+        return results.Items;
+    }
+
+    private async Task<bool> TrySaveEditAsync()
+    {
+        if (EditingRow is not null)
         {
             if (ItemSaved is not null)
             {

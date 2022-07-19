@@ -139,7 +139,7 @@
                 </Tooltip>
                 <Tooltip TooltipText="image" Delay="750" Side="Side.Top">
                     <button class="@ActiveButtonClass(EditorCommandType.InsertImage)"
-                            @onclick="ShowImgDialog"
+                            @onclick="ShowImgDialogAsync"
                             disabled="@IsDisabled(EditorCommandType.InsertImage)">
                         <tf-icon>@DefaultIcons.Image</tf-icon>
                     </button>
@@ -271,14 +271,14 @@
                 </Tooltip>
                 <Tooltip TooltipText="font size" Delay="750">
                     <button class="btn btn-icon rounded small"
-                            @onclick="ShowFontSizeDialog"
+                            @onclick="ShowFontSizeDialogAsync"
                             disabled="@IsDisabled(EditorCommandType.SetFontSize)">
                         <tf-icon>@DefaultIcons.FontSize</tf-icon>
                     </button>
                 </Tooltip>
                 <Tooltip TooltipText="line height" Delay="750">
                     <button class="btn btn-icon rounded small"
-                            @onclick="ShowLineHeightDialog"
+                            @onclick="ShowLineHeightDialogAsync"
                             disabled="@IsDisabled(EditorCommandType.SetLineHeight)">
                         <tf-icon>@DefaultIcons.LineHeight</tf-icon>
                     </button>
@@ -602,132 +602,3 @@
         </div>
     }
 </div>
-
-<Dialog @bind-IsVisible="_isLinkDialogVisible">
-    <TitleContent>
-        <h6>Link</h6>
-    </TitleContent>
-    <ChildContent>
-        <Form @ref="LinkForm" Model="Link">
-            <TextInput Label="URL"
-                       @bind-Value="Link.Url"
-                       Validation="ValidateUri"
-                       Required="true" />
-            <TextInput Label="Title (optional)"
-                       @bind-Value="Link.Title" />
-        </Form>
-    </ChildContent>
-    <FooterContent>
-        <div class="message-box-buttons">
-            <button @onclick="@(_ => _isLinkDialogVisible = false)" class="btn btn-text">Cancel</button>
-            <button @onclick="SubmitLinkDialogAsync" class="btn btn-text primary">Ok</button>
-        </div>
-    </FooterContent>
-</Dialog>
-
-<Dialog @bind-IsVisible="_isImgDialogVisible">
-    <TitleContent>
-        <h6>Image</h6>
-    </TitleContent>
-    <ChildContent>
-        <Form @ref="ImgForm" Model="Img">
-            <TextInput Label="URL"
-                       @bind-Value="Img.Src"
-                       Validation="ValidateUri"
-                       Required="true" />
-            <TextInput Label="Title (optional)"
-                       @bind-Value="Img.Title" />
-            <TextInput Label="Alt (optional)"
-                       @bind-Value="Img.Alt" />
-        </Form>
-    </ChildContent>
-    <FooterContent>
-        <div class="message-box-buttons">
-            <button @onclick="@(_ => _isImgDialogVisible = false)" class="btn btn-text">Cancel</button>
-            <button @onclick="SubmitImgDialogAsync" class="btn btn-text primary">Ok</button>
-        </div>
-    </FooterContent>
-</Dialog>
-
-<Dialog @bind-IsVisible="_isFontSizeDialogVisible">
-    <TitleContent>
-        <h6>Font Size</h6>
-    </TitleContent>
-    <ChildContent>
-        <TextInput @ref="FontSizeInput"
-                   @bind-Value="NewFontSize"
-                   Placeholder="font size"
-                   Suggestions="FontSizes"
-                   Validation="ValidateFontSizeAsync" />
-    </ChildContent>
-    <FooterContent>
-        <div class="message-box-buttons">
-            <button @onclick="@(_ => _isFontSizeDialogVisible = false)" class="btn btn-text">Cancel</button>
-            <button @onclick="SetFontSizeAsync" class="btn btn-text primary">Ok</button>
-        </div>
-    </FooterContent>
-</Dialog>
-
-<Dialog @bind-IsVisible="_isLineHeightDialogVisible">
-    <TitleContent>
-        <h6>Line Height</h6>
-    </TitleContent>
-    <ChildContent>
-        <TextInput @ref="LineHeightInput"
-                   @bind-Value="NewLineHeight"
-                   Placeholder="line height"
-                   Suggestions="LineHeights"
-                   Validation="ValidateLineHeightAsync" />
-    </ChildContent>
-    <FooterContent>
-        <div class="message-box-buttons">
-            <button @onclick="@(_ => _isLineHeightDialogVisible = false)" class="btn btn-text">Cancel</button>
-            <button @onclick="SetLineHeightAsync" class="btn btn-text primary">Ok</button>
-        </div>
-    </FooterContent>
-</Dialog>
-
-<Dialog @bind-IsVisible="_isSyntaxDialogVisible">
-    <TitleContent>
-        <h6>Syntax</h6>
-    </TitleContent>
-    <ChildContent>
-        <Select TValue="EditorSyntax"
-                Value="NewCodeSyntax"
-                ValueChanged="@(v => SetCodeSyntaxAsync(v))"
-                Class="dense">
-            @foreach (var syntax in Enum.GetValues<EditorSyntax>())
-            {
-                switch (syntax)
-                {
-                    case EditorSyntax.None:
-                        <Option Value="syntax" Label="Plain text" />
-                        break;
-                    case EditorSyntax.Cpp:
-                        <Option Value="syntax" Label="C++" />
-                        break;
-                    case EditorSyntax.CSharp:
-                        <Option Value="syntax" Label="C#" />
-                        break;
-                    case EditorSyntax.LaTeX:
-                        <Option Value="syntax" Label="LaTeX">
-                            <span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span>
-                        </Option>
-                        break;
-                    case EditorSyntax.ObjectiveC:
-                        <Option Value="syntax" Label="Objective-C" />
-                        break;
-                    default:
-                        <Option Value="syntax" Label="@syntax.ToString()" />
-                        break;
-                }
-            }
-        </Select>
-    </ChildContent>
-    <FooterContent>
-        <div class="message-box-buttons">
-            <button @onclick="@(_ => _isSyntaxDialogVisible = false)" class="btn btn-text">Cancel</button>
-            <button @onclick="SubmitLinkDialogAsync" class="btn btn-text primary">Ok</button>
-        </div>
-    </FooterContent>
-</Dialog>

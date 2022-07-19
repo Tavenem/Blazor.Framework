@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+using Tavenem.Blazor.Framework.Components.Forms.Editor.InternalDialogs;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -14,11 +14,6 @@ public partial class Editor : IDisposable
 {
     private bool _disposedValue;
     private bool _initialized;
-    private bool _isFontSizeDialogVisible;
-    private bool _isLineHeightDialogVisible;
-    private bool _isLinkDialogVisible;
-    private bool _isImgDialogVisible;
-    private bool _isSyntaxDialogVisible;
 
     /// <summary>
     /// Whether this editor should receive focus on page load.
@@ -210,6 +205,8 @@ public partial class Editor : IDisposable
 
     private int CurrentLength { get; set; }
 
+    [Inject] DialogService DialogService { get; set; } = default!;
+
     private bool DisplayCommands => IsWysiwyg
         || Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
 
@@ -232,17 +229,9 @@ public partial class Editor : IDisposable
 
     private List<string> Fonts { get; } = new() { "sans-serif", "serif", "monospace", "cursive" };
 
-    private TextInput? FontSizeInput { get; set; }
-
-    private List<string> FontSizes { get; } = new() { "Reset", ".75em", ".875em", "1em", "1.25em", "1.5em", "1.75em", "2em", "2.5em", "3em" };
-
     private Dropdown? ForegroundContext { get; set; }
 
     private ColorInput<string>? ForegroundPicker { get; set; }
-
-    private ImgInfo Img { get; set; } = new();
-
-    private Form? ImgForm { get; set; }
 
     private bool IsWysiwyg => EditorMode == EditorMode.WYSIWYG
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
@@ -251,14 +240,6 @@ public partial class Editor : IDisposable
         .Add("filled", IsActive(EditorCommandType.Italic))
         .Add("outlined", IsActive(EditorCommandType.Italic))
         .ToString();
-
-    private TextInput? LineHeightInput { get; set; }
-
-    private List<string> LineHeights { get; } = new() { "Reset", "normal", "1", "1.2", "1.5", "2" };
-
-    private LinkInfo Link { get; set; } = new();
-
-    private Form? LinkForm { get; set; }
 
     private string? ListGroupClass => new CssBuilder("small")
         .Add("button-group", IsActive(EditorCommandType.ListBullet))
@@ -275,13 +256,7 @@ public partial class Editor : IDisposable
 
     private string? NewFontFamily { get; set; } = "sans-serif";
 
-    private string? NewFontSize { get; set; } = "1em";
-
     private string? NewForeground { get; set; } = "black";
-
-    private string? NewLineHeight { get; set; } = "normal";
-
-    private EditorSyntax NewCodeSyntax { get; set; }
 
     private bool ShowAll { get; set; }
 
@@ -474,66 +449,6 @@ public partial class Editor : IDisposable
         }
     }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    private static async IAsyncEnumerable<string> ValidateFontSizeAsync(string? value, object? _)
-    {
-        if (string.IsNullOrEmpty(value)
-            || value == "Reset")
-        {
-            yield break;
-        }
-
-        if (double.TryParse(value, out var _))
-        {
-            yield break;
-        }
-
-        if (!FontSizeRegex().IsMatch(value))
-        {
-            yield return "Invalid font size";
-        }
-    }
-
-    private static async IAsyncEnumerable<string> ValidateLineHeightAsync(string? value, object? _)
-    {
-        if (string.IsNullOrEmpty(value)
-            || value == "Reset")
-        {
-            yield break;
-        }
-
-        if (double.TryParse(value, out var _))
-        {
-            yield break;
-        }
-
-        if (!LineHeightRegex().IsMatch(value))
-        {
-            yield return "Invalid line height";
-        }
-    }
-
-    private static async IAsyncEnumerable<string> ValidateUri(string? value, object? _)
-    {
-        if (string.IsNullOrEmpty(value))
-        {
-            yield break;
-        }
-
-        if (value.StartsWith('#'))
-        {
-            yield break;
-        }
-
-        if (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out var _))
-        {
-            yield break;
-        }
-
-        yield return "Must be a valid URL";
-    }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-
     private string ActiveButtonClass(EditorCommandType type) => EditorService
         .CommandsActive
         .TryGetValue(type, out var v)
@@ -696,67 +611,16 @@ public partial class Editor : IDisposable
         return CommandAsync(EditorCommandType.BackgroundColor, value);
     }
 
-    private Task SetCodeSyntaxAsync(EditorSyntax value)
-    {
-        NewCodeSyntax = value;
-        return CommandAsync(EditorCommandType.SetCodeSyntax, value.ToString());
-    }
-
     private Task SetFontFamilyAsync(string? value)
     {
         NewFontFamily = value;
         return CommandAsync(EditorCommandType.SetFontFamily, value);
     }
 
-    private async Task SetFontSizeAsync()
-    {
-        if (NewFontSize == "Reset")
-        {
-            NewFontSize = null;
-        }
-
-        if (FontSizeInput is not null)
-        {
-            await FontSizeInput.ValidateAsync();
-            if (!FontSizeInput.IsValid)
-            {
-                return;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(NewFontSize)
-            && double.TryParse(NewFontSize, out var _))
-        {
-            NewFontSize = $"{NewFontSize}em";
-        }
-        await CommandAsync(EditorCommandType.SetFontSize, NewFontSize);
-        _isFontSizeDialogVisible = false;
-    }
-
     private Task SetForegroundAsync(string? value)
     {
         NewForeground = value;
         return CommandAsync(EditorCommandType.ForegroundColor, value);
-    }
-
-    private async Task SetLineHeightAsync()
-    {
-        if (NewLineHeight == "Reset")
-        {
-            NewLineHeight = null;
-        }
-
-        if (LineHeightInput is not null)
-        {
-            await LineHeightInput.ValidateAsync();
-            if (!LineHeightInput.IsValid)
-            {
-                return;
-            }
-        }
-
-        await CommandAsync(EditorCommandType.SetLineHeight, NewLineHeight);
-        _isLineHeightDialogVisible = false;
     }
 
     private async Task SetReadOnly(bool value)
@@ -795,30 +659,50 @@ public partial class Editor : IDisposable
         }
     }
 
-    private void ShowCodeSyntaxDialog()
+    private async Task ShowImgDialogAsync()
     {
-        NewCodeSyntax = EditorSyntax.None;
-        _isSyntaxDialogVisible = true;
+        var result = await DialogService.Show<ImgDialog>("Image").Result;
+        if (result.Choice != DialogChoice.Ok
+            || result.Data is not ImgInfo img
+            || string.IsNullOrEmpty(img.Src)
+            || !Uri.TryCreate(img.Src, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return;
+        }
+
+        if (!uri.IsAbsoluteUri
+            && Uri.TryCreate("http://" + img.Src, UriKind.Absolute, out var uri2))
+        {
+            uri = uri2;
+        }
+
+        var title = string.IsNullOrEmpty(img.Title)
+            ? null
+            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(img.Title);
+        var alt = string.IsNullOrEmpty(img.Alt)
+            ? null
+            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(img.Alt);
+        await CommandAsync(EditorCommandType.InsertImage, uri, title, alt);
     }
 
-    private void ShowImgDialog()
+    private async Task ShowFontSizeDialogAsync()
     {
-        Img.Alt = null;
-        Img.Src = null;
-        Img.Title = null;
-        _isImgDialogVisible = true;
+        var result = await DialogService.Show<FontSizeDialog>("Font Size").Result;
+        if (result.Choice == DialogChoice.Ok
+            && result.Data is string newFontSize)
+        {
+            await CommandAsync(EditorCommandType.SetFontSize, newFontSize);
+        }
     }
 
-    private void ShowFontSizeDialog()
+    private async Task ShowLineHeightDialogAsync()
     {
-        NewFontSize = "1em";
-        _isFontSizeDialogVisible = true;
-    }
-
-    private void ShowLineHeightDialog()
-    {
-        NewLineHeight = "normal";
-        _isLineHeightDialogVisible = true;
+        var result = await DialogService.Show<LineHeightDialog>("Line Height").Result;
+        if (result.Choice == DialogChoice.Ok
+            && result.Data is string newLineHeight)
+        {
+            await CommandAsync(EditorCommandType.SetLineHeight, newLineHeight);
+        }
     }
 
     private async Task ShowLinkDialogAsync()
@@ -829,74 +713,25 @@ public partial class Editor : IDisposable
             return;
         }
 
-        Link.Title = null;
-        Link.Url = null;
-        _isLinkDialogVisible = true;
-    }
-
-    private async Task SubmitImgDialogAsync()
-    {
-        if (ImgForm is null
-            || string.IsNullOrEmpty(Img.Src))
+        var result = await DialogService.Show<LinkDialog>("Link").Result;
+        if (result.Choice != DialogChoice.Ok
+            || result.Data is not LinkInfo link
+            || string.IsNullOrEmpty(link.Url)
+            || !Uri.TryCreate(link.Url, UriKind.RelativeOrAbsolute, out var uri))
         {
             return;
         }
 
-        var valid = await ImgForm.ValidateAsync();
-        if (!valid)
-        {
-            return;
-        }
-
-        if (!Uri.TryCreate(Img.Src, UriKind.RelativeOrAbsolute, out var uri))
-        {
-            return;
-        }
         if (!uri.IsAbsoluteUri
-            && Uri.TryCreate("http://" + Img.Src, UriKind.Absolute, out var uri2))
+            && Uri.TryCreate("http://" + link.Url, UriKind.Absolute, out var uri2))
         {
             uri = uri2;
         }
 
-        var title = string.IsNullOrEmpty(Img.Title)
+        var title = string.IsNullOrEmpty(link.Title)
             ? null
-            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Img.Title);
-        var alt = string.IsNullOrEmpty(Img.Alt)
-            ? null
-            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Img.Alt);
-        await CommandAsync(EditorCommandType.InsertImage, uri, title, alt);
-        _isImgDialogVisible = false;
-    }
-
-    private async Task SubmitLinkDialogAsync()
-    {
-        if (LinkForm is null
-            || string.IsNullOrEmpty(Link.Url))
-        {
-            return;
-        }
-
-        var valid = await LinkForm.ValidateAsync();
-        if (!valid)
-        {
-            return;
-        }
-
-        if (!Uri.TryCreate(Link.Url, UriKind.RelativeOrAbsolute, out var uri))
-        {
-            return;
-        }
-        if (!uri.IsAbsoluteUri
-            && Uri.TryCreate("http://" + Link.Url, UriKind.Absolute, out var uri2))
-        {
-            uri = uri2;
-        }
-
-        var title = string.IsNullOrEmpty(Link.Title)
-            ? null
-            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(Link.Title);
+            : System.Text.Encodings.Web.HtmlEncoder.Default.Encode(link.Title);
         await CommandAsync(EditorCommandType.InsertLink, uri.ToString(), title);
-        _isLinkDialogVisible = false;
     }
 
     private async Task ToggleModeAsync()
@@ -910,23 +745,4 @@ public partial class Editor : IDisposable
             await EditorService.SetEditorMode(EditorMode);
         }
     }
-
-    private class ImgInfo
-    {
-        public string? Alt { get; set; }
-        public string? Src { get; set; }
-        public string? Title { get; set; }
-    }
-
-    private class LinkInfo
-    {
-        public string? Title { get; set; }
-        public string? Url { get; set; }
-    }
-
-    [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$")]
-    private static partial Regex FontSizeRegex();
-
-    [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|(normal|inherit|initial|revert|revert-layer|unset)$")]
-    private static partial Regex LineHeightRegex();
 }

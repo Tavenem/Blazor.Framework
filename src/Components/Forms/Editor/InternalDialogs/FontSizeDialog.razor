@@ -1,0 +1,15 @@
+﻿<Dialog>
+    <ChildContent>
+        <TextInput @ref="FontSizeInput"
+                   @bind-Value="NewFontSize"
+                   Placeholder="font size"
+                   Suggestions="FontSizes"
+                   Validation="ValidateFontSizeAsync" />
+    </ChildContent>
+    <FooterContent>
+        <div class="message-box-buttons">
+            <button @onclick="@(_ => Dialog?.Cancel())" class="btn btn-text">Cancel</button>
+            <button @onclick="SubmitAsync" class="btn btn-text primary">Ok</button>
+        </div>
+    </FooterContent>
+</Dialog>

@@ -1,0 +1,39 @@
+﻿<Dialog>
+    <ChildContent>
+        <div class="d-flex flex-column mx-auto">
+            <TextInput @bind-Value="ExportName" Label="File name" />
+            <Select @bind-Value="ExportFileType" Label="File type">
+                <Option Value="@ExportFileType.Excel" Label="Excel" />
+                <Option Value="@ExportFileType.CSV" Label="CSV" />
+                <Option Value="@ExportFileType.HTML" Label="HTML" />
+                @if (ShowPdf)
+                {
+                    <Option Value="@ExportFileType.PDF" Label="PDF" />
+                }
+            </Select>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <button class="btn btn-text" @onclick="@(_ => Dialog?.Close())">Cancel</button>
+        <button class="btn btn-text primary" @onclick="Ok">Export</button>
+    </FooterContent>
+</Dialog>
+
+@code {
+    [Parameter] public bool ShowPdf { get; set; }
+
+    [CascadingParameter] private DialogInstance? Dialog { get; set; }
+
+    private ExportFileType ExportFileType { get; set; } = ExportFileType.Excel;
+
+    private string? ExportName { get; set; }
+
+    private void Ok()
+    {
+        Dialog?.Close(DialogResult.Ok(new ExportData
+        {
+            FileName = ExportName,
+            FileType = ExportFileType,
+        }));
+    }
+}
