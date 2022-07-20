@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.25-preview
+### Changed
+- Minor style change to form controls within tables.
+
 ## 0.5.24-preview
 ### Fixed
 - Extracted internal Dialogs to separate components to avoid nesting dialog problem.
