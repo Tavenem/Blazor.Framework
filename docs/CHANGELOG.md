@@ -4,6 +4,7 @@
 ### Fixed
 - DataGrid async loading quick filter fixed.
 - Dialog style fixes.
+- Improve popover behavior
 
 ## 0.5.25-preview
 ### Changed

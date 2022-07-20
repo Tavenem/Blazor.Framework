@@ -427,6 +427,10 @@ function focusPopovers(isIn: boolean, e: FocusEvent) {
                 if (focusTimer) {
                     clearTimeout(focusTimer);
                     delete map[id].focusTimer;
+                    setTimeout(() => {
+                        clearTimeout(focusTimer);
+                        delete map[id].focusTimer;
+                    }, 100);
                 }
                 continue;
             }
