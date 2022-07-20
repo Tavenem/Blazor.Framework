@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.26-preview
+### Fixed
+- DataGrid async loading quick filter fixed.
+- Dialog style fixes.
+
 ## 0.5.25-preview
 ### Changed
 - Minor style change to form controls within tables.

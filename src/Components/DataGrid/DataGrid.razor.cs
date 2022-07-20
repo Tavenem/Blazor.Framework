@@ -857,6 +857,19 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             GetFilterInfo(),
             GetSortInfo()));
 
+        if (CurrentDataPage?.TotalCount.HasValue == true)
+        {
+            PageCount = CurrentDataPage.TotalCount.Value / RowsPerPage;
+            if (CurrentDataPage.TotalCount.Value % RowsPerPage != 0)
+            {
+                PageCount++;
+            }
+        }
+        else
+        {
+            PageCount = null;
+        }
+
         IsLoading = false;
         Regroup();
     }
@@ -873,22 +886,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             return LoadItemsAsync();
         }
         return Task.CompletedTask;
-    }
-
-    /// <summary>
-    /// Called internally.
-    /// </summary>
-    public Task OnFilterChangedAsync()
-    {
-        if (LoadItems is null)
-        {
-            Regroup();
-            return Task.CompletedTask;
-        }
-        else
-        {
-            return LoadItemsAsync();
-        }
     }
 
     /// <summary>
@@ -1645,17 +1642,21 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         {
             if (column.IsString)
             {
-                if (string.IsNullOrEmpty(column.TextFilter))
+                if (string.IsNullOrEmpty(column.TextFilter)
+                    && (!column.IsString
+                    || !column.IsQuickFilter
+                    || string.IsNullOrEmpty(quickFilter)))
                 {
                     continue;
                 }
-                var exact = column.TextFilter.Length >= 2
+                var exact = !string.IsNullOrEmpty(column.TextFilter)
+                    && column.TextFilter.Length >= 2
                     && column.TextFilter[0] == '"'
                     && column.TextFilter[^1] == '"';
                 (filterInfo ??= new()).Add(new(
                     column.MemberName!,
                     exact
-                        ? column.TextFilter[1..^1]
+                        ? column.TextFilter![1..^1]
                         : column.TextFilter,
                     exact,
                     column.IsString && column.IsQuickFilter ? quickFilter : null,
@@ -1960,6 +1961,10 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                 {
                     PageCount++;
                 }
+            }
+            else
+            {
+                PageCount = null;
             }
 
             if (decrease)
