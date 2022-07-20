@@ -55,8 +55,7 @@
 
     <!-- Run restore only once for multi targeting builds -->
     <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net7.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
-    <!-- If multitargeting, set this value to true only for a given target framework -->
-    <ShouldRunClientAssetsBuild Condition="'$(TargetFramework)' == 'net7.0'">true</ShouldRunClientAssetsBuild>
+    <ShouldRunClientAssetsBuild>true</ShouldRunClientAssetsBuild>
   </PropertyGroup>
 
   <ItemGroup>

@@ -30,6 +30,8 @@ Tavenem.Blazor.Framework is available as a [NuGet package](https://www.nuget.org
 
 ## Roadmap
 
+This project is currently in preview. The first production release is currently planned to coincide with the production release of .NET 7. Breaking changes are possible (even likely) prior to the v1.0 release.
+
 Additional components may be added based on user feedback.
 
 ## Contributing
