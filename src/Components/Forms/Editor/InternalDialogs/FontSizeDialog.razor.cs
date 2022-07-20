@@ -53,13 +53,22 @@ public partial class FontSizeDialog
             yield break;
         }
 
+#if NET7_0_OR_GREATER
         if (!FontSizeRegex().IsMatch(value))
         {
             yield return "Invalid font size";
         }
+#else
+        if (!Regex.IsMatch(value, "^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$"))
+        {
+            yield return "Invalid font size";
+        }
+#endif
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+#if NET7_0_OR_GREATER
     [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$")]
     private static partial Regex FontSizeRegex();
+#endif
 }

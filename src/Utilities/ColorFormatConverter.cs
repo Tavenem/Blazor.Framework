@@ -1034,7 +1034,7 @@ public struct ColorFormatConverter
         Blue = blue;
         AlphaByte = alpha;
 
-        AlphaFloat = float.Clamp(alpha / 255f, 0, 1);
+        AlphaFloat = Math.Clamp(alpha / 255f, 0, 1);
 
         var hsl = RGBToHSL(red, green, blue);
 
@@ -1067,7 +1067,7 @@ public struct ColorFormatConverter
         Blue = blue;
         AlphaFloat = alpha;
 
-        AlphaByte = (byte)int.Clamp((int)Math.Round(alpha * 255), 0, 255);
+        AlphaByte = (byte)Math.Clamp((int)Math.Round(alpha * 255), 0, 255);
 
         var hsl = RGBToHSL(red, green, blue);
 
@@ -2791,7 +2791,7 @@ public struct ColorFormatConverter
                 else
                 {
                     AlphaFloat = alpha;
-                    AlphaByte = (byte)int.Clamp((int)(alpha * 255), 0, 255);
+                    AlphaByte = (byte)Math.Clamp((int)(alpha * 255), 0, 255);
                 }
             }
             else
@@ -2905,7 +2905,7 @@ public struct ColorFormatConverter
                 else
                 {
                     AlphaFloat = alpha;
-                    AlphaByte = (byte)int.Clamp((int)Math.Round(alpha * 255), 0, 255);
+                    AlphaByte = (byte)Math.Clamp((int)Math.Round(alpha * 255), 0, 255);
                 }
             }
             else
@@ -2989,7 +2989,7 @@ public struct ColorFormatConverter
                 else
                 {
                     AlphaByte = alpha;
-                    AlphaFloat = float.Clamp(alpha / 255f, 0, 1);
+                    AlphaFloat = Math.Clamp(alpha / 255f, 0, 1);
                 }
             }
             else
@@ -3070,9 +3070,9 @@ public struct ColorFormatConverter
     /// </param>
     public static ColorFormatConverter FromHSLA(int hue, int saturation, int lightness, byte alpha = 255)
     {
-        var h = (ushort)int.Clamp(hue % 360, 0, 359);
-        var s = (byte)int.Clamp(saturation, 0, 100);
-        var l = (byte)int.Clamp(lightness, 0, 100);
+        var h = (ushort)Math.Clamp(hue % 360, 0, 359);
+        var s = (byte)Math.Clamp(saturation, 0, 100);
+        var l = (byte)Math.Clamp(lightness, 0, 100);
         var rgb = HSLToRGB(h, s, l);
         return new ColorFormatConverter(
             rgb[0],
@@ -3082,7 +3082,7 @@ public struct ColorFormatConverter
             s,
             l,
             alpha,
-            float.Clamp(alpha / 255f, 0, 1));
+            Math.Clamp(alpha / 255f, 0, 1));
     }
 
     /// <summary>
@@ -3107,9 +3107,9 @@ public struct ColorFormatConverter
     /// </param>
     public static ColorFormatConverter FromHSLA(int hue, int saturation, int lightness, float alpha)
     {
-        var h = (ushort)int.Clamp(hue % 360, 0, 359);
-        var s = (byte)int.Clamp(saturation, 0, 100);
-        var l = (byte)int.Clamp(lightness, 0, 100);
+        var h = (ushort)Math.Clamp(hue % 360, 0, 359);
+        var s = (byte)Math.Clamp(saturation, 0, 100);
+        var l = (byte)Math.Clamp(lightness, 0, 100);
         var rgb = HSLToRGB(h, s, l);
         return new ColorFormatConverter(
             rgb[0],
@@ -3118,7 +3118,7 @@ public struct ColorFormatConverter
             h,
             s,
             l,
-            (byte)int.Clamp((int)Math.Round(alpha * 255), 0, 255),
+            (byte)Math.Clamp((int)Math.Round(alpha * 255), 0, 255),
             alpha);
     }
 
@@ -3127,7 +3127,7 @@ public struct ColorFormatConverter
         var rgb = new byte[3];
         if (Math.Abs(saturation) < Epsilon)
         {
-            rgb[0] = (byte)int.Clamp((int)Math.Ceiling(lightness * 2.55), 0, 255);
+            rgb[0] = (byte)Math.Clamp((int)Math.Ceiling(lightness * 2.55), 0, 255);
             rgb[1] = rgb[0];
             rgb[2] = rgb[0];
             return rgb;
@@ -3173,9 +3173,9 @@ public struct ColorFormatConverter
             }
         }
 
-        rgb[0] = (byte)int.Clamp((int)Math.Round(T[0] * 255), 0, 255);
-        rgb[1] = (byte)int.Clamp((int)Math.Round(T[1] * 255), 0, 255);
-        rgb[2] = (byte)int.Clamp((int)Math.Round(T[2] * 255), 0, 255);
+        rgb[0] = (byte)Math.Clamp((int)Math.Round(T[0] * 255), 0, 255);
+        rgb[1] = (byte)Math.Clamp((int)Math.Round(T[1] * 255), 0, 255);
+        rgb[2] = (byte)Math.Clamp((int)Math.Round(T[2] * 255), 0, 255);
         return rgb;
     }
 

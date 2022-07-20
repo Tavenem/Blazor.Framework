@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System.Collections.ObjectModel;
 using Tavenem.Blazor.Framework.Services.Editor;
 
 namespace Tavenem.Blazor.Framework.Services;
@@ -57,8 +58,8 @@ internal class EditorService : IAsyncDisposable
     /// <param name="themeService">An instance of <see cref="ThemeService"/>.</param>
     public EditorService(IJSRuntime jsRuntime, ThemeService themeService)
     {
-        CommandsActive = _commandsActive.AsReadOnly();
-        CommandsEnabled = _commandsEnabled.AsReadOnly();
+        CommandsActive = new ReadOnlyDictionary<EditorCommandType, bool>(_commandsActive);
+        CommandsEnabled = new ReadOnlyDictionary<EditorCommandType, bool>(_commandsEnabled);
         _moduleTask = new(
             () => jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Components.Forms;
@@ -36,8 +35,9 @@ public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccesse
 
     /// <summary>
     /// <para>
-    /// The validation message displayed when this field's <see cref="InputBase{TValue}.Value"/>
-    /// cannot be converted to or from its string representation.
+    /// The validation message displayed when this field's <see
+    /// cref="FormComponentBase{TValue}.Value"/> cannot be converted to or from its string
+    /// representation.
     /// </para>
     /// <para>
     /// Default is "{DisplayName} must be a number".

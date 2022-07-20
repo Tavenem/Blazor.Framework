@@ -262,6 +262,7 @@ public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>,
         _selectedOptions.Clear();
         CurrentValueAsString = null;
         SelectedIndex = -1;
+        _options.ForEach(x => x.InvokeStateChange());
         return Task.CompletedTask;
     }
 

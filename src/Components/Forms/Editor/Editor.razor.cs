@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Components.Forms.Editor.InternalDialogs;
 using Tavenem.Blazor.Framework.Services;
 
@@ -161,8 +161,8 @@ public partial class Editor : IDisposable
 
     /// <summary>
     /// <para>
-    /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the value
-    /// changes (rather than on blur).
+    /// Whether the bound <see cref="FormComponentBase{TValue}.Value"/> should update whenever the
+    /// value changes (rather than on blur).
     /// </para>
     /// <para>
     /// When set to <see langword="true"/> a short debounce interval is applied to prevent excessive

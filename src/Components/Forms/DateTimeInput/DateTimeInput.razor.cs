@@ -736,10 +736,7 @@ public partial class DateTimeInput<TValue>
 
         await base.SetParametersAsync(parameters);
 
-        if (FormatProvider is null)
-        {
-            FormatProvider = Culture;
-        }
+        FormatProvider ??= Culture;
 
         if (!setCalendar && setDate)
         {

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0-preview
+### Changed
+- Multitarget .NET 6 and 7-preview.
+- Remove dependency on framework InputBase.
+### Fixed
+- Select option correctly clears selection icon after clear.
+
 ## 0.5.27-preview
 ### Fixed
 - DataGrid async pagination behavior fixed.

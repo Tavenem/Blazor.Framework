@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -35,7 +35,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.6.22330.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.7" Condition="'$(TargetFramework)' == 'net6.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.6.22330.3" Condition="'$(TargetFramework)' == 'net7.0'" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -53,9 +54,9 @@
     <ClientAssetsRestoreOutputs>$(ClientAssetsDirectory)node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
 
     <!-- Run restore only once for multi targeting builds -->
-    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
+    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net7.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
     <!-- If multitargeting, set this value to true only for a given target framework -->
-    <ShouldRunClientAssetsBuild>true</ShouldRunClientAssetsBuild>
+    <ShouldRunClientAssetsBuild Condition="'$(TargetFramework)' == 'net7.0'">true</ShouldRunClientAssetsBuild>
   </PropertyGroup>
 
   <ItemGroup>

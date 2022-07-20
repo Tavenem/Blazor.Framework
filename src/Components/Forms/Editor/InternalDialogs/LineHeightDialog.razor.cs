@@ -49,13 +49,22 @@ public partial class LineHeightDialog
             yield break;
         }
 
+#if NET7_0_OR_GREATER
         if (!LineHeightRegex().IsMatch(value))
         {
             yield return "Invalid line height";
         }
+#else
+        if (!Regex.IsMatch(value, "^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|(normal|inherit|initial|revert|revert-layer|unset)$"))
+        {
+            yield return "Invalid line height";
+        }
+#endif
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+#if NET7_0_OR_GREATER
     [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|(normal|inherit|initial|revert|revert-layer|unset)$")]
     private static partial Regex LineHeightRegex();
+#endif
 }
