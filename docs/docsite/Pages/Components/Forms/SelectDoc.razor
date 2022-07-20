@@ -657,4 +657,12 @@
     private int[] _options1 = Enumerable.Range(1, 25).ToArray();
     private List<KeyValuePair<int, string>> _options2 = new() { new(1, "Option 1"), new(2, "Option 2"), new(3, "Option 3") };
     private string? _value = "Option 1";
+    private Func<DataGridRequest, Task<DataPage<DataItem>>> _loadItems => async request =>
+    {
+        await Task.Delay(1000);
+        return new DataPage<DataItem>(
+            _items.Query(request).ToList(),
+            (ulong)_items.Count,
+            (ulong)_items.Count > request.Offset + request.Count);
+    };
 }

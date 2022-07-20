@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.27-preview
+### Fixed
+- DataGrid async pagination behavior fixed.
+- DataGrid async quick filtering now works on hidden columns.
+
 ## 0.5.26-preview
 ### Fixed
 - DataGrid async loading quick filter fixed.

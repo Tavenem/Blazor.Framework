@@ -257,6 +257,8 @@ public partial class Pagination
         }
     }
 
+    internal ValueTask FocusFirstAsync() => ElementReference.FocusFirstAsync(2);
+
     private async Task OnFirstAsync()
     {
         if (CurrentPage > 0)

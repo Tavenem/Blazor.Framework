@@ -639,6 +639,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private ulong? PageCount { get; set; }
 
+    private Pagination? Pagination { get; set; }
+
     private bool? SelectAllValue
     {
         get
@@ -1637,7 +1639,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         List<FilterInfo>? filterInfo = null;
         var quickFilter = QuickFilter?.Trim('"').Trim();
         foreach (var column in _columns
-            .Where(x => (x.GetIsShown() || (export && x.ExportHidden))
+            .Where(x => (x.GetIsShown()
+                || (x.IsQuickFilter && !string.IsNullOrEmpty(quickFilter))
+                || (export && x.ExportHidden))
                 && x.MemberName is not null))
         {
             if (column.IsString)
@@ -1653,11 +1657,16 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                     && column.TextFilter.Length >= 2
                     && column.TextFilter[0] == '"'
                     && column.TextFilter[^1] == '"';
+                string? textFilter = null;
+                if (column.GetIsShown())
+                {
+                    textFilter = exact
+                        ? column.TextFilter![1..^1]
+                        : column.TextFilter;
+                }
                 (filterInfo ??= new()).Add(new(
                     column.MemberName!,
-                    exact
-                        ? column.TextFilter![1..^1]
-                        : column.TextFilter,
+                    textFilter,
                     exact,
                     column.IsString && column.IsQuickFilter ? quickFilter : null,
                     null,
@@ -2094,6 +2103,10 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     {
         CurrentPage = value;
         Offset = CurrentPage * RowsPerPage;
+        if (Pagination is not null)
+        {
+            await Pagination.FocusFirstAsync();
+        }
         if (LoadItems is not null)
         {
             await LoadItemsAsync();
