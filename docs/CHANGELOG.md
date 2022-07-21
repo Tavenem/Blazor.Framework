@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0-preview
+### Changed
+- Make DataGrid TDataItem type nullable.
+
 ## 0.6.0-preview
 ### Changed
 - Multitarget .NET 6 and 7-preview.

@@ -5,7 +5,7 @@ namespace Tavenem.Blazor.Framework.Components.DataGrid.InternalDialogs;
 /// <summary>
 /// The auto-generated edit dialog for a <see cref="DataGrid{TDataItem}"/>.
 /// </summary>
-public partial class EditDialog<TDataItem> where TDataItem : notnull
+public partial class EditDialog<TDataItem>
 {
     /// <summary>
     /// The list of columns.

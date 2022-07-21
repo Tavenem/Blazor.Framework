@@ -14,7 +14,7 @@ namespace Tavenem.Blazor.Framework;
 /// A rich data grid for displaying collections of items in rows and columns.
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposable where TDataItem : notnull
+public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposable
 {
     private const string HtmlTemplate = """
         <!DOCTYPE html>
@@ -1042,7 +1042,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             {
                 if (getValue is null)
                 {
-                    if (item.Equals(value))
+                    if (item is not null
+                        && item.Equals(value))
                     {
                         SelectedItems.Add(item);
                     }
@@ -1059,7 +1060,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             {
                 if (getValue is null)
                 {
-                    if (item.Equals(value))
+                    if (item is not null
+                        && item.Equals(value))
                     {
                         SelectedItems.Add(item);
                     }
@@ -1138,7 +1140,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             {
                 if (getValue is null)
                 {
-                    if (values.Any(x => item.Equals(x)))
+                    if (item is not null
+                        && values.Any(x => item.Equals(x)))
                     {
                         SelectedItems.Add(item);
                     }
@@ -1155,7 +1158,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
             {
                 if (getValue is null)
                 {
-                    if (values.Any(x => item.Equals(x)))
+                    if (item is not null
+                        && values.Any(x => item.Equals(x)))
                     {
                         SelectedItems.Add(item);
                     }
@@ -1291,6 +1295,11 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     internal async Task OnToggleRowExpansionAsync(Row<TDataItem> row)
     {
+        if (row.Item is null)
+        {
+            return;
+        }
+
         var hash = row.Item.GetHashCode();
         var rowIsExpanded = _rowCurrentExpansion.Contains(hash);
         if (rowIsExpanded)
@@ -1392,7 +1401,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
 
         TDataItem? next = default;
-        if (CurrentPageItems.Last().Equals(SelectedItem))
+        var last = CurrentPageItems.Last();
+        if (last is not null
+            && last.Equals(SelectedItem))
         {
             var hasNext = (PageCount.HasValue
                 && CurrentPage < PageCount - 1)
@@ -1405,7 +1416,10 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
         else
         {
-            next = CurrentPageItems.SkipWhile(x => !x.Equals(SelectedItem)).Skip(1).FirstOrDefault();
+            next = CurrentPageItems
+                .SkipWhile(x => x is null || !x.Equals(SelectedItem))
+                .Skip(1)
+                .FirstOrDefault();
         }
 
         if (next is not null)
@@ -1423,7 +1437,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
 
         TDataItem? previous = default;
-        if (CurrentPageItems.First().Equals(SelectedItem))
+        var first = CurrentPageItems.First();
+        if (first is not null
+            && first.Equals(SelectedItem))
         {
             if (CurrentPage > 0)
             {
@@ -1433,7 +1449,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         }
         else
         {
-            previous = CurrentPageItems.TakeWhile(x => !x.Equals(SelectedItem)).LastOrDefault();
+            previous = CurrentPageItems
+                .TakeWhile(x => x is not null && !x.Equals(SelectedItem))
+                .LastOrDefault();
         }
 
         if (previous is not null)

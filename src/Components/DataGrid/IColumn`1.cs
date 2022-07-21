@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework.Components.DataGrid;
 /// A column for a <see cref="DataGrid{TDataItem}"/>
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public interface IColumn<TDataItem> : IColumn where TDataItem : notnull
+public interface IColumn<TDataItem> : IColumn
 {
     /// <summary>
     /// An optional function which gets a CSS class for this column for a given data item (row).

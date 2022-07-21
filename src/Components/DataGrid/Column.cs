@@ -18,7 +18,7 @@ namespace Tavenem.Blazor.Framework;
 /// </para>
 /// </typeparam>
 [CascadingTypeParameter(nameof(TValue))]
-public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem> where TDataItem : notnull
+public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
 {
     private Action<TDataItem, TValue?>? _defaultSetValue;
     private bool _disposedValue;

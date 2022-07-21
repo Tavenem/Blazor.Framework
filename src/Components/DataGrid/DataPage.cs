@@ -14,4 +14,4 @@
 /// </para>
 /// </param>
 /// <param name="HasMore">Whether additional items are available.</param>
-public record DataPage<TDataItem>(List<TDataItem> Items, ulong? TotalCount, bool HasMore) where TDataItem : notnull;
+public record DataPage<TDataItem>(List<TDataItem> Items, ulong? TotalCount, bool HasMore);

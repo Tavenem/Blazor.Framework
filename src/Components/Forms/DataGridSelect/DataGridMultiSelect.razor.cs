@@ -12,7 +12,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
 /// <typeparam name="TValue">The type of bound value.</typeparam>
-public partial class DataGridMultiSelect<TDataItem, TValue> : IDataGrid<TDataItem> where TDataItem : notnull
+public partial class DataGridMultiSelect<TDataItem, TValue> : IDataGrid<TDataItem>
 {
     private readonly List<IColumn<TDataItem>> _columns = new();
 
@@ -93,7 +93,7 @@ public partial class DataGridMultiSelect<TDataItem, TValue> : IDataGrid<TDataIte
             var firstLabel = ItemLabel?.Invoke(first)
                 ?? (first is IFormattable formattable
                 ? formattable.ToString(Format, FormatProvider)
-                : first.ToString());
+                : first?.ToString());
             if (DataGrid.SelectedItems.Count == 1)
             {
                 return firstLabel;

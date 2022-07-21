@@ -22,7 +22,7 @@ public static class DataGridRequestExtensions
     /// </exception>
     public static long Count<TDataItem>(
         this IEnumerable<TDataItem> items,
-        DataGridRequest request) where TDataItem : notnull => items.Where(request).LongCount();
+        DataGridRequest request) => items.Where(request).LongCount();
 
     /// <summary>
     /// Performs a LINQ query based on the given request information.
@@ -54,7 +54,7 @@ public static class DataGridRequestExtensions
     public static IEnumerable<TDataItem> Query<TDataItem>(
         this IEnumerable<TDataItem> items,
         DataGridRequest request,
-        uint? limit = null) where TDataItem : notnull
+        uint? limit = null)
     {
         items = items.Where(request);
 
@@ -125,7 +125,7 @@ public static class DataGridRequestExtensions
         return items;
     }
 
-    private static bool FilterMatches<TDataItem>(TDataItem item, FilterInfo filter) where TDataItem : notnull
+    private static bool FilterMatches<TDataItem>(TDataItem item, FilterInfo filter)
     {
         var dataType = typeof(TDataItem);
         var propertyInfo = dataType.GetProperty(filter.Property);
@@ -290,7 +290,7 @@ public static class DataGridRequestExtensions
         return false;
     }
 
-    private static bool QuickFilterMatches<TDataItem>(TDataItem item, FilterInfo filter, string term) where TDataItem : notnull
+    private static bool QuickFilterMatches<TDataItem>(TDataItem item, FilterInfo filter, string term)
     {
         if (string.IsNullOrEmpty(filter.QuickFilter))
         {
@@ -311,7 +311,7 @@ public static class DataGridRequestExtensions
         return FilterMatches(propertyInfo.GetValue(item) as string, term);
     }
 
-    private static IEnumerable<TDataItem> Where<TDataItem>(this IEnumerable<TDataItem> items, DataGridRequest request) where TDataItem : notnull
+    private static IEnumerable<TDataItem> Where<TDataItem>(this IEnumerable<TDataItem> items, DataGridRequest request)
     {
         if (request.Filters is null
             || request.Filters.Length == 0)

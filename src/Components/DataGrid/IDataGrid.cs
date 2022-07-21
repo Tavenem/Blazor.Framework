@@ -4,7 +4,7 @@
 /// A rich data grid for displaying collections of items in rows and columns.
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public interface IDataGrid<TDataItem> where TDataItem : notnull
+public interface IDataGrid<TDataItem>
 {
     /// <summary>
     /// Adds a new column to this grid.
