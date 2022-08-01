@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.3-preview
+### Changed
+- Drag indicator for list items.
+
 ## 0.7.2-preview
 ### Fixed
 - Collapsible & draggable list items.

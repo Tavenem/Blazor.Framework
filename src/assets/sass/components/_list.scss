@@ -261,6 +261,13 @@
         }
     }
 
+    &.can-drag > *:hover:before {
+        content: '⋮⋮';
+        left: 0;
+        position: absolute;
+        top: .5rem;
+    }
+
     @each $theme in $theme-colors {
         &:where(.#{$theme}) {
             --list-active-bg: var(--tavenem-theme-color-hover);
