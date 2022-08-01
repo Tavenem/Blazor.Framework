@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1-preview
+### Fixed
+- DataGrid bool filter behavior.
+
 ## 0.7.0-preview
 ### Changed
 - Make DataGrid TDataItem type nullable.

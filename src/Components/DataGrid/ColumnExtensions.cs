@@ -148,37 +148,26 @@ internal static class ColumnExtensions
 
     private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, bool? filter)
     {
+        if (!filter.HasValue)
+        {
+            return true;
+        }
+
         if (!column.IsBool)
         {
             return false;
         }
 
-        bool? value = null;
         if (column is Column<TDataItem, bool> boolColumn)
         {
-            if (!filter.HasValue)
-            {
-                return true;
-            }
-
-            value = boolColumn.GetCellValue(item);
+            return boolColumn.GetCellValue(item) == filter.Value;
         }
         else if (column is Column<TDataItem, bool?> nullableBoolColumn)
         {
-            value = nullableBoolColumn.GetCellValue(item) == true;
+            var value = nullableBoolColumn.GetCellValue(item) == true;
+            return value == filter.Value;
         }
-        if (value is null)
-        {
-            return !filter.HasValue;
-        }
-
-        if (!filter.HasValue
-            || value is not bool b)
-        {
-            return false;
-        }
-
-        return b == filter;
+        return false;
     }
 
     private static bool FilterMatches<TDataItem>(this IColumn<TDataItem> column, TDataItem item, double? filter)
