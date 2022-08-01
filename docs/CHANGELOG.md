@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2-preview
+### Fixed
+- Collapsible & draggable list items.
+
 ## 0.7.1-preview
 ### Fixed
 - DataGrid bool filter behavior.

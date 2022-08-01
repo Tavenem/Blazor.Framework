@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Tavenem.Blazor.Framework.Components.List;
 using Tavenem.Blazor.Framework.InternalComponents;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -342,6 +343,8 @@ public partial class ElementList<TListItem>
 
     private protected bool NoDropTargetChildren => _dropTargetElements.Count == 0;
 
+    private int? DropIndex { get; set; }
+
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -541,26 +544,7 @@ public partial class ElementList<TListItem>
 
     internal int? IndexOfListId(Guid id) => ListItems.FindIndex(x => x.ListId == id);
 
-    internal async Task InsertItemAsync(TListItem item, int? index)
-    {
-        if (item is null)
-        {
-            return;
-        }
-
-        if (index.HasValue)
-        {
-            (Items ??= new()).Insert(index.Value, item);
-            ListItems.Insert(index.Value, new(item));
-        }
-        else
-        {
-            (Items ??= new()).Add(item);
-            ListItems.Add(new(item));
-        }
-        await ItemsChanged.InvokeAsync(Items);
-        StateHasChanged();
-    }
+    internal void InsertItem(int? index) => DropIndex = index;
 
     internal async ValueTask OnToggleItemSelectionAsync(TListItem? item, bool force = false)
     {
@@ -645,7 +629,17 @@ public partial class ElementList<TListItem>
         var item = DragDropService.TryGetData<TListItem>(e);
         if (item is not null)
         {
-            (Items ??= new()).Add(item);
+            if (DropIndex.HasValue)
+            {
+                (Items ??= new()).Insert(DropIndex.Value, item);
+                ListItems.Insert(DropIndex.Value, new(item));
+                DropIndex = null;
+            }
+            else
+            {
+                (Items ??= new()).Add(item);
+                ListItems.Add(new(item));
+            }
             await ItemsChanged.InvokeAsync(Items);
             StateHasChanged();
         }

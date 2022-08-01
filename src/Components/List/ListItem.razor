@@ -10,28 +10,30 @@
 }
 @if (IsCollapsibleValue)
 {
-    <ListItemCollapse @ref="CollapseReference"
-                      TListItem="TListItem"
-                      Id="@Id"
-                      Class="@CollapseClass"
-                      Style="@Style"
-                      Title="@(ChildContent is null ? Item?.ToString() : null)"
-                      TitleIsToggle="true">
-        <TitleContent>@ChildContent</TitleContent>
-        <ChildContent>
-            @if (Item is not null)
-            {
-                if (ElementList?.CollapsibleTemplate is null)
+    <CascadingValue Value="this">
+        <ListItemCollapse @ref="CollapseReference"
+                          TListItem="TListItem"
+                          Id="@Id"
+                          Class="@CollapseClass"
+                          Style="@Style"
+                          Title="@(ChildContent is null ? Item?.ToString() : null)"
+                          TitleIsToggle="true">
+            <TitleContent>@ChildContent</TitleContent>
+            <ChildContent>
+                @if (Item is not null)
                 {
-                    <span>@(Item?.ToString())</span>
+                    if (ElementList?.CollapsibleTemplate is null)
+                    {
+                        <span>@(Item?.ToString())</span>
+                    }
+                    else
+                    {
+                        @ElementList.CollapsibleTemplate(Item)
+                    }
                 }
-                else
-                {
-                    @ElementList.CollapsibleTemplate(Item)
-                }
-            }
-        </ChildContent>
-    </ListItemCollapse>
+            </ChildContent>
+        </ListItemCollapse>
+    </CascadingValue>
 }
 else
 {

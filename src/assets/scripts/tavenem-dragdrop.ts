@@ -73,7 +73,8 @@ export function cancelDropListener(elementId: string) {
 export function listenForDrag(
     this: any,
     dotnetReference: DotNet.DotNetObject | null | undefined,
-    elementId: string | null | undefined) {
+    elementId: string | null | undefined,
+    dragElementId: string | null | undefined) {
     if (!dotnetReference || !elementId) {
         return;
     }
@@ -82,7 +83,7 @@ export function listenForDrag(
         return;
     }
 
-    element.dragstartListener = getDragData.bind(this, dotnetReference);
+    element.dragstartListener = getDragData.bind(this, dotnetReference, dragElementId);
     element.dragendListener = droppedHandler.bind(this, dotnetReference);
 
     element.addEventListener('dragstart', element.dragstartListener);
@@ -243,6 +244,7 @@ function droppedHandler(
 async function getDragData(
     this: any,
     dotnetReference: DotNet.DotNetObject,
+    dragElementId: string | null | undefined,
     event: DragEvent) {
     if (!event.dataTransfer) {
         return;
@@ -252,6 +254,13 @@ async function getDragData(
         const data = dotnetReference.invokeMethod<IDragStartData | null | undefined>('GetDragData');
         if (!data || !data.data) {
             return;
+        }
+
+        if (dragElementId) {
+            const dragElement = document.getElementById(dragElementId);
+            if (dragElement) {
+                event.dataTransfer.setDragImage(dragElement, 0, 0);
+            }
         }
 
         if (data.effectAllowed) {

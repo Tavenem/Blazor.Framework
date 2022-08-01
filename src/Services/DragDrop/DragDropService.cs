@@ -279,12 +279,15 @@ public class DragDropService : IAsyncDisposable
         catch (TaskCanceledException) { }
     }
 
-    internal async ValueTask StartDragListener(DotNetObjectReference<DragDropListener> dotNetRef, string? elementId)
+    internal async ValueTask StartDragListener(
+        DotNetObjectReference<DragDropListener> dotNetRef,
+        string? elementId,
+        string? dragElementId)
     {
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("listenForDrag", dotNetRef, elementId);
+            await module.InvokeVoidAsync("listenForDrag", dotNetRef, elementId, dragElementId);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }

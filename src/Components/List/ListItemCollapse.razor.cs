@@ -9,7 +9,7 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 public partial class ListItemCollapse<TListItem>
 {
     /// <summary>
-    /// The id of the header element.
+    /// The id of the collapse element.
     /// </summary>
     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
@@ -19,9 +19,11 @@ public partial class ListItemCollapse<TListItem>
 
     internal ElementReference ElementReference { get; set; }
 
-    private string? HeaderClass => new CssBuilder("header")
+    private string? HeaderClass => new CssBuilder("header flex-wrap")
         .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
         .ToString();
+
+    private string HeaderId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     private bool IsDraggable => ListItem?.GetIsDraggable() == true;
 
@@ -34,6 +36,7 @@ public partial class ListItemCollapse<TListItem>
     {
         if (firstRender)
         {
+            DragDropListener.DragElementId = HeaderId;
             DragDropListener.ElementId = Id;
             DragDropListener.GetData = GetDragData;
             DragDropListener.GetEffect = GetDropEffect;
@@ -123,7 +126,7 @@ public partial class ListItemCollapse<TListItem>
         }
         else if (item is not null)
         {
-            await ListItem.DropItemAsync(item);
+            ListItem.DropItem();
         }
     }
 

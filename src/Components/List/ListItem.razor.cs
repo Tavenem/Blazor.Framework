@@ -229,15 +229,8 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         await ScrollService.ScrollToId(Id);
     }
 
-    internal async Task DropItemAsync(TListItem item)
-    {
-        if (ElementList is not null)
-        {
-            await ElementList.InsertItemAsync(
-                item,
-                ElementList.IndexOfListId(ListId));
-        }
-    }
+    internal void DropItem() => ElementList?
+        .InsertItem(ElementList.IndexOfListId(ListId));
 
     internal override DragEffect GetDragEffectAllowed()
         => ElementList?.DragEffectAllowedValue ?? DragEffectAllowed;
@@ -312,7 +305,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         }
         else if (item is not null)
         {
-            await DropItemAsync(item);
+            DropItem();
         }
     }
 

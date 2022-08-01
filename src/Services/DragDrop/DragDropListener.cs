@@ -40,6 +40,12 @@ internal class DragDropListener : IDisposable
     private EventHandler<IEnumerable<KeyValuePair<string, string>>>? _onDrop;
     private EventHandler<DragEffect>? _onDropped;
 
+    /// <summary>
+    /// The id of the element which will be used to generate the ghost image during a drag
+    /// operation.
+    /// </summary>
+    public string? DragElementId { get; set; }
+
     private DragEffect _dropEffect = DragEffect.All;
     /// <summary>
     /// <para>
@@ -70,11 +76,6 @@ internal class DragDropListener : IDisposable
     }
 
     /// <summary>
-    /// The id of the element to which the event will be attached.
-    /// </summary>
-    public string? ElementId { get; set; }
-
-    /// <summary>
     /// <para>
     /// Indicates whether a current drag operation is valid for this drop target.
     /// </para>
@@ -84,6 +85,11 @@ internal class DragDropListener : IDisposable
     /// </para>
     /// </summary>
     public bool? DropValid { get; set; }
+
+    /// <summary>
+    /// The id of the element to which the event will be attached.
+    /// </summary>
+    public string? ElementId { get; set; }
 
     /// <summary>
     /// Raised when <see cref="DropValid"/> changes.
@@ -308,7 +314,7 @@ internal class DragDropListener : IDisposable
     private ValueTask StartDragListener()
     {
         _dotNetRef ??= DotNetObjectReference.Create(this);
-        return _dragDropService.StartDragListener(_dotNetRef, ElementId);
+        return _dragDropService.StartDragListener(_dotNetRef, ElementId, DragElementId);
     }
 
     private ValueTask StartDropListener()
