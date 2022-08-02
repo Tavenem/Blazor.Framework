@@ -159,8 +159,6 @@ public partial class FocusTrap : IAsyncDisposable
         ? FocusLastAsync().AsTask()
         : FocusFirstAsync().AsTask();
 
-    private Task OnRootFocusAsync() => FocusFallbackAsync().AsTask();
-
     private void OnRootKeyEvent(KeyboardEventArgs args) => HandleKeyEvent(args);
 
     private Task OnTopFocusAsync() => FocusFirstAsync().AsTask();

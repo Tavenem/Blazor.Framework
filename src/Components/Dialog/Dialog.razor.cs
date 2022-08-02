@@ -124,6 +124,12 @@ public partial class Dialog
         {
             dialog.StateHasChanged();
         }
+        if (firstRender
+            && IsVisible
+            && DialogInstance is null)
+        {
+            Show();
+        }
     }
 
     private void Close(DialogResult? dialogResult = null)

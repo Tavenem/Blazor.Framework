@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.4-preview
+### Fixed
+- Display initially shown inline dialogs.
+- Drag not working in focus traps.
+
 ## 0.7.3-preview
 ### Changed
 - Drag indicator for list items.
