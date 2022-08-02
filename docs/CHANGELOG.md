@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.6-preview
+### Added
+- ElementList.GetItemDragData.
+
 ## 0.7.5-preview
 ### Fixed
 - Dragging custom types.

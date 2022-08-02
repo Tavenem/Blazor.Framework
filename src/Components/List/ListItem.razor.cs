@@ -229,6 +229,22 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         await ScrollService.ScrollToId(Id);
     }
 
+    private protected override DragStartData GetDragDataInner()
+    {
+        if (!GetIsDraggable() || GetDragEffectAllowed() == DragEffect.None)
+        {
+            return DragStartData.None;
+        }
+
+        if (Item is not null
+            && ElementList?.GetItemDragData is not null)
+        {
+            return ElementList.GetItemDragData.Invoke(Item);
+        }
+
+        return base.GetDragDataInner();
+    }
+
     internal void DropItem() => ElementList?
         .InsertItem(ElementList.IndexOfListId(ListId));
 

@@ -55,6 +55,17 @@ public partial class ElementList<TListItem>
     [Parameter] public RenderFragment? FollowingContent { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Invoked when a drag operation starts for a list item, to get the data to be dragged, and the
+    /// allowed drop type.
+    /// </para>
+    /// <para>
+    /// If not set, defaults to returning the list item itself.
+    /// </para>
+    /// </summary>
+    [Parameter] public Func<TListItem, DragStartData>? GetItemDragData { get; set; }
+
+    /// <summary>
     /// A function which returns the name of the icon to be displayed before an
     /// item's content.
     /// </summary>

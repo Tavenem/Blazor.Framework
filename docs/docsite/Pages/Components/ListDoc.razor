@@ -325,7 +325,9 @@
     an item is dropped onto a list item and provides the index of that item, in addition to the
     dropped data. If you provide these properties, you should normally also provide a callback for
     the <code>OnDropped</code> proerty as well, to bypass dropped list items' default behavior of
-    removing themselves from their place on their current list on a move operation.
+    removing themselves from their place on their current list on a move operation. You can also
+    override the <code>GetItemDragData</code> function to control the dragged data; otherwise the
+    list items themselves are used.
 </p>
 
 <p>
