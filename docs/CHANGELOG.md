@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.8-preview
+### Fixed
+- External ElementList changes.
+
 ## 0.7.7-preview
 ### Fixed
 - Dialog title.

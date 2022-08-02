@@ -382,7 +382,21 @@ public partial class ElementList<TListItem>
 
         await base.SetParametersAsync(parameters);
 
-        if (itemsChanged)
+        var listItemsChanged = itemsChanged || ListItems.Count != (Items?.Count ?? 0);
+        if (!listItemsChanged)
+        {
+            for (var i = 0; i < ListItems.Count; i++)
+            {
+                if (!EqualityComparer<TListItem>
+                    .Default
+                    .Equals(ListItems[i].Item, Items![i]))
+                {
+                    listItemsChanged = true;
+                    break;
+                }
+            }
+        }
+        if (listItemsChanged)
         {
             ListItems = Items?
                 .Where(x => x is not null)
