@@ -105,7 +105,7 @@ public class DragDropService : IAsyncDisposable
             if (!string.IsNullOrEmpty(type)
                 && !string.IsNullOrEmpty(str))
             {
-                data.Add(new(type, str));
+                data.Add(new(type.ToLowerInvariant(), str));
             }
 
             string? json = null;
@@ -126,7 +126,7 @@ public class DragDropService : IAsyncDisposable
             {
                 if (string.IsNullOrEmpty(type))
                 {
-                    data.Add(new($"application/json-{typeof(TData).Name}", json));
+                    data.Add(new($"application/json-{typeof(TData).Name.ToLowerInvariant()}", json));
                 }
 
                 data.Add(new("application/json", json));

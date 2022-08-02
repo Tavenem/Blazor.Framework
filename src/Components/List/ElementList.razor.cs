@@ -525,7 +525,7 @@ public partial class ElementList<TListItem>
             return DragEffect.None;
         }
 
-        var hasListItem = types.Contains($"application/json-{typeof(TListItem).Name}");
+        var hasListItem = types.Contains($"application/json-{typeof(TListItem).Name.ToLowerInvariant()}");
         if (!hasListItem
             && types.Any(x => x.StartsWith("application/json-")))
         {

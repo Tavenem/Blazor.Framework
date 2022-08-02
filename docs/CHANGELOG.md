@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.5-preview
+### Fixed
+- Dragging custom types.
+
 ## 0.7.4-preview
 ### Fixed
 - Display initially shown inline dialogs.
