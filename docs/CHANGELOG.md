@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.7-preview
+### Fixed
+- Dialog title.
+
 ## 0.7.6-preview
 ### Added
 - ElementList.GetItemDragData.

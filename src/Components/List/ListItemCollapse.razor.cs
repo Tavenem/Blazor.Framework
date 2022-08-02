@@ -97,7 +97,7 @@ public partial class ListItemCollapse<TListItem>
             return DragEffect.None;
         }
 
-        if (!types.Contains($"application/json-{typeof(TListItem).Name}")
+        if (!types.Contains($"application/json-{typeof(TListItem).Name.ToLowerInvariant()}")
             && types.Any(x => x.StartsWith("application/json-")))
         {
             return DragEffect.None;
