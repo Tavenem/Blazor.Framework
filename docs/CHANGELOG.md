@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.9-preview
+### Changed
+- Give dialogs flat background.
+
 ## 0.7.8-preview
 ### Fixed
 - External ElementList changes.
