@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.11-preview
+### Fixed
+- Disposed object exceptions on timers.
+
 ## 0.7.10-preview
 ### Fixed
 - Null references on disposed timers.

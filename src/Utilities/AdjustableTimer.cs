@@ -39,7 +39,11 @@ internal class AdjustableTimer : IDisposable
         {
             if (!tokenSource.IsCancellationRequested)
             {
-                tokenSource.Cancel();
+                try
+                {
+                    tokenSource.Cancel();
+                }
+                catch (ObjectDisposedException) { }
             }
         }
     }
@@ -55,6 +59,11 @@ internal class AdjustableTimer : IDisposable
     /// </remarks>
     public void Change(int waitMilliseconds)
     {
+        if (_disposedValue)
+        {
+            return;
+        }
+
         _waitMilliseconds = waitMilliseconds;
         Start();
     }
@@ -71,7 +80,7 @@ internal class AdjustableTimer : IDisposable
     {
         if (_disposedValue)
         {
-            throw new ObjectDisposedException(typeof(AdjustableTimer).FullName);
+            return;
         }
 
         Cancel();
