@@ -35,11 +35,19 @@ internal class AsyncAdjustableTimer : IDisposable
     /// </summary>
     public void Cancel()
     {
+        if (_disposedValue)
+        {
+            return;
+        }
         foreach (var tokenSource in _cancelTokenSources)
         {
             if (!tokenSource.IsCancellationRequested)
             {
-                tokenSource.Cancel();
+                try
+                {
+                    tokenSource.Cancel();
+                }
+                catch (ObjectDisposedException) { }
             }
         }
     }
@@ -55,6 +63,10 @@ internal class AsyncAdjustableTimer : IDisposable
     /// </remarks>
     public void Change(int waitMilliseconds)
     {
+        if (_disposedValue)
+        {
+            return;
+        }
         _waitMilliseconds = waitMilliseconds;
         Start();
     }
@@ -71,7 +83,7 @@ internal class AsyncAdjustableTimer : IDisposable
     {
         if (_disposedValue)
         {
-            throw new ObjectDisposedException(typeof(AdjustableTimer).FullName);
+            return;
         }
 
         Cancel();

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.10-preview
+### Fixed
+- Null references on disposed timers.
+
 ## 0.7.9-preview
 ### Changed
 - Give dialogs flat background.
