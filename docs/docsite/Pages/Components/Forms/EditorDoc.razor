@@ -52,9 +52,10 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="w-100">
-                <Editor @bind-Value="_value2" UpdateOnInput="true" Label="On Input" />
+                <Editor Syntax="EditorSyntax.HTML" @bind-Value="_value2" UpdateOnInput="true" Label="On Input" />
                 <div>Bound value:</div>
                 <div>@_value2</div>
+                <button @onclick="@(_ => _value2 = "updated")">Update</button>
             </div>
         </div>
     </TitleContent>

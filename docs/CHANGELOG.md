@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.1-preview
+### Fixed
+- Setting editor value in HTML WYSIWYG mode.
+
 ## 0.8.0-preview
 ### Changed
 - Initially sorted columns are included in sort order, even when hidden.

@@ -1470,7 +1470,7 @@ export function setValue(elementId: string, value?: string) {
             wysiwygEditor.view.state.apply(
                 wysiwygEditor.view.state.tr.replaceRangeWith(
                     0,
-                    wysiwygEditor.view.state.doc.nodeSize,
+                    wysiwygEditor.view.state.doc.content.size,
                     content)));
     } else {
         wysiwygEditor.view.updateState(
