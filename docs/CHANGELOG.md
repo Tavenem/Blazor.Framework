@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0-preview
+### Changed
+- Initially sorted columns are included in sort order, even when hidden.
+
 ## 0.7.11-preview
 ### Fixed
 - Disposed object exceptions on timers.

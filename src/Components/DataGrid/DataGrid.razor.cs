@@ -584,7 +584,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
                 foreach (var id in _sortOrder)
                 {
                     var column = _columns.Find(x => x.Id == id);
-                    if (column?.GetIsShown() != true)
+                    if (column?.GetIsShown() != true
+                        && column?.InitiallySorted != true)
                     {
                         continue;
                     }
@@ -1658,7 +1659,8 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         var quickFilter = QuickFilter?.Trim('"').Trim();
         foreach (var column in _columns
             .Where(x => (x.GetIsShown()
-                || (x.IsQuickFilter && !string.IsNullOrEmpty(quickFilter))
+                || (x.IsQuickFilter
+                    && !string.IsNullOrEmpty(quickFilter))
                 || (export && x.ExportHidden))
                 && x.MemberName is not null))
         {
@@ -1832,7 +1834,9 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
         {
             var column = _columns.Find(x => x.Id == id);
             if (column is null
-                || (!column.GetIsShown() && (!export || !column.ExportHidden))
+                || (!column.GetIsShown()
+                    && (!export || !column.ExportHidden)
+                    && !column.InitiallySorted)
                 || column.MemberName is null)
             {
                 continue;

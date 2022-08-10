@@ -138,6 +138,17 @@ public interface IColumn : IDisposable
     public Guid Id { get; }
 
     /// <summary>
+    /// <para>
+    /// Whether this column is initially sorted.
+    /// </para>
+    /// <para>
+    /// If more than one column is initially sorted, their order of precedence is determined by the
+    /// order they are initialized.
+    /// </para>
+    /// </summary>
+    public bool InitiallySorted { get; set; }
+
+    /// <summary>
     /// Gets whether this column represents boolean data.
     /// </summary>
     public bool IsBool { get; }
