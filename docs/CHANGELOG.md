@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.2-preview
+### Fixed
+- Popover placement within dialogs.
+
 ## 0.8.1-preview
 ### Fixed
 - Setting editor value in HTML WYSIWYG mode.

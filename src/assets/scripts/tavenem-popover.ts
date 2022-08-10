@@ -565,17 +565,6 @@ function placePopover(popoverNode: IPopoverElement): void {
             && popoverNode.clientY) {
             absLeft = popoverNode.clientX + left;
             absTop = popoverNode.clientY + top;
-        } else if (anchorElement) {
-            const anchorOffsetParent = getOffsetParent(anchorElement);
-            if (anchorOffsetParent != anchorElement.parentElement) {
-                const anchorOffsetBoundingRect = anchorOffsetParent.getBoundingClientRect();
-                absLeft += anchorOffsetBoundingRect.left;
-                absTop += anchorOffsetBoundingRect.top;
-            }
-        } else if (popoverNode.parent
-            && offsetParent != popoverNode.parent) {
-            absLeft += offsetBoundingRect.left;
-            absTop += offsetBoundingRect.top;
         }
 
         const deltaToLeft = absLeft + offsetX;
