@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.8.5-preview
+### Fixed
+- Column filtering on initially hidden columns.
+- Load async items after column filtering.
+
 ## 0.8.4-preview
 ### Fixed
 - Column initial sorting in DataGridSelects.

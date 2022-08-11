@@ -2234,22 +2234,13 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private async Task ShowColumnFilterDialogAsync()
     {
-        var result = await DialogService.Show<ColumnFilterDialog>(
+        await DialogService.Show<ColumnFilterDialog>(
             "Select Columns",
             new DialogParameters
             {
                 { nameof(ColumnFilterDialog.Columns), _columns.Cast<IColumn>().ToList() },
             }).Result;
-        if (result.Choice != DialogChoice.Ok
-            || result.Data is not List<IColumn> columns)
-        {
-            return;
-        }
-
-        foreach (var column in columns.Where(x => x.CanHide))
-        {
-            column.SetIsShown(column.IsShown);
-        }
+        await LoadItemsAsync();
     }
 
     private async Task ShowEditDialogAsync(TDataItem? item = default, bool adding = false)

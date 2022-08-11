@@ -2,17 +2,20 @@
     <ChildContent>
         <div class="d-flex flex-column mx-auto">
             <Checkbox TValue="bool"
-                      Value="Columns.Where(x => x.CanHide).All(y => y.IsShown)"
+                      Value="Columns.Where(x => x.CanHide).All(y => y.GetIsShown())"
                       ValueChanged="OnSetAllColumnsVisiblity"
                       Label="All" />
             @foreach (var column in Columns.Where(x => x.CanHide))
             {
-                <Checkbox TValue="bool" @bind-Value="column.IsShown" Label="@column.GetLabel()" />
+                <Checkbox TValue="bool"
+                          Label="@column.GetLabel()"
+                          Value="column.GetIsShown()"
+                          ValueChanged="@(v => column.SetIsShown(v))" />
             }
         </div>
     </ChildContent>
     <FooterContent>
-        <button class="btn btn-text" @onclick="@(_ => Dialog?.Close(DialogResult.Ok(Columns)))">Close</button>
+        <button class="btn btn-text" @onclick="@(_ => Dialog?.Close(DialogResult.DefaultOk))">Close</button>
     </FooterContent>
 </Dialog>
 
@@ -21,19 +24,11 @@
 
     [CascadingParameter] DialogInstance? Dialog { get; set; }
 
-    protected override void OnInitialized()
-    {
-        foreach (var column in Columns)
-        {
-            column.IsShown = column.GetIsShown();
-        }
-    }
-
     private void OnSetAllColumnsVisiblity(bool value)
     {
         foreach (var column in Columns.Where(x => x.CanHide))
         {
-            column.IsShown = value;
+            column.SetIsShown(value);
         }
     }
 }
