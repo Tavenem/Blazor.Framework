@@ -95,6 +95,12 @@ public class Form : EditForm, IDisposable
         .ToString();
 
     /// <summary>
+    /// This is the resolved <see cref="EditContext"/>. It will be the <see
+    /// cref="EditForm.EditContext"/> parameter if supplied, or a new one otherwise.
+    /// </summary>
+    protected EditContext? InnerEditContext { get; set; }
+
+    /// <summary>
     /// Constructs an instance of <see cref="Form"/>.
     /// </summary>
     public Form()
@@ -109,7 +115,14 @@ public class Form : EditForm, IDisposable
         if (EditContext is null
             && Model is null)
         {
-            EditContext = new(new ExpandoObject());
+            if (InnerEditContext is null)
+            {
+                EditContext = new(new ExpandoObject());
+            }
+            else
+            {
+                EditContext = InnerEditContext;
+            }
         }
 
         base.OnParametersSet();
@@ -119,17 +132,21 @@ public class Form : EditForm, IDisposable
             return;
         }
 
-        EditContext.OnFieldChanged += Update;
-        EditContext.OnValidationRequested += (s, e) => _ = ValidationRequested.InvokeAsync(e);
-        EditContext.OnValidationStateChanged += (s, e) => _ = ValidationStateChanged.InvokeAsync(e);
+        if (InnerEditContext is null)
+        {
+            InnerEditContext = EditContext;
+            InnerEditContext.OnFieldChanged += Update;
+            InnerEditContext.OnValidationRequested += (s, e) => _ = ValidationRequested.InvokeAsync(e);
+            InnerEditContext.OnValidationStateChanged += (s, e) => _ = ValidationStateChanged.InvokeAsync(e);
+        }
     }
 
     /// <inheritdoc />
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        Debug.Assert(EditContext is not null);
+        Debug.Assert(InnerEditContext is not null);
 
-        builder.OpenRegion(EditContext.GetHashCode());
+        builder.OpenRegion(InnerEditContext.GetHashCode());
 
         builder.OpenElement(0, "form");
         builder.AddMultipleAttributes(1, AdditionalAttributes);
@@ -146,8 +163,8 @@ public class Form : EditForm, IDisposable
 
         builder.OpenComponent<CascadingValue<EditContext>>(10);
         builder.AddAttribute(11, "IsFixed", true);
-        builder.AddAttribute(12, "Value", EditContext);
-        builder.AddAttribute(13, "ChildContent", ChildContent?.Invoke(EditContext));
+        builder.AddAttribute(12, "Value", InnerEditContext);
+        builder.AddAttribute(13, "ChildContent", ChildContent?.Invoke(InnerEditContext));
         builder.CloseComponent();
 
         builder.CloseElement();
@@ -175,9 +192,9 @@ public class Form : EditForm, IDisposable
     /// <returns>The current validation messages.</returns>
     public IEnumerable<string> GetValidationMessages()
     {
-        if (EditContext is not null)
+        if (InnerEditContext is not null)
         {
-            foreach (var message in EditContext.GetValidationMessages())
+            foreach (var message in InnerEditContext.GetValidationMessages())
             {
                 yield return message;
             }
@@ -206,7 +223,7 @@ public class Form : EditForm, IDisposable
     /// </returns>
     public bool IsModified()
     {
-        if (EditContext?.IsModified() == true)
+        if (InnerEditContext?.IsModified() == true)
         {
             return true;
         }
@@ -219,7 +236,7 @@ public class Form : EditForm, IDisposable
     /// </summary>
     public void MarkAsUnmodified()
     {
-        EditContext?.MarkAsUnmodified();
+        InnerEditContext?.MarkAsUnmodified();
 
         foreach (var field in _fields)
         {
@@ -255,12 +272,12 @@ public class Form : EditForm, IDisposable
     /// </returns>
     public async Task<bool> ValidateAsync()
     {
-        var valid = EditContext?.GetValidationMessages().Any() != true;
+        var valid = InnerEditContext?.GetValidationMessages().Any() != true;
 
         var formMessages = new List<string>();
         if (Validation is not null)
         {
-            await foreach (var error in Validation(Model ?? EditContext?.Model))
+            await foreach (var error in Validation(Model ?? InnerEditContext?.Model))
             {
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -294,9 +311,9 @@ public class Form : EditForm, IDisposable
             if (disposing)
             {
                 _timer.Dispose();
-                if (EditContext is not null)
+                if (InnerEditContext is not null)
                 {
-                    EditContext.OnFieldChanged -= Update;
+                    InnerEditContext.OnFieldChanged -= Update;
                 }
             }
 
@@ -322,11 +339,11 @@ public class Form : EditForm, IDisposable
 
     private async Task HandleSubmitAsync()
     {
-        Debug.Assert(EditContext is not null);
+        Debug.Assert(InnerEditContext is not null);
 
         if (OnSubmit.HasDelegate)
         {
-            await OnSubmit.InvokeAsync(EditContext);
+            await OnSubmit.InvokeAsync(InnerEditContext);
         }
         else
         {
@@ -334,12 +351,12 @@ public class Form : EditForm, IDisposable
 
             if (isValid && OnValidSubmit.HasDelegate)
             {
-                await OnValidSubmit.InvokeAsync(EditContext);
+                await OnValidSubmit.InvokeAsync(InnerEditContext);
             }
 
             if (!isValid && OnInvalidSubmit.HasDelegate)
             {
-                await OnInvalidSubmit.InvokeAsync(EditContext);
+                await OnInvalidSubmit.InvokeAsync(InnerEditContext);
             }
         }
     }
