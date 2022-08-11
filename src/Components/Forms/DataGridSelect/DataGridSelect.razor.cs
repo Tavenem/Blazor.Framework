@@ -15,7 +15,9 @@ namespace Tavenem.Blazor.Framework;
 public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem>
 {
     private readonly List<IColumn<TDataItem>> _columns = new();
+    private readonly List<Guid> _initialSortOrder = new();
 
+    private bool _initialized;
     private bool _valueUpdated;
 
     /// <summary>
@@ -196,6 +198,17 @@ public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem>
                 DataGrid.AddColumn(column);
             }
         }
+        if (firstRender)
+        {
+            _initialized = true;
+            if (DataGrid is not null)
+            {
+                foreach (var id in _initialSortOrder)
+                {
+                    await DataGrid.OnColumnSortedAsync(id);
+                }
+            }
+        }
         if (_valueUpdated && DataGrid?.AnyItems == true)
         {
             _valueUpdated = false;
@@ -250,8 +263,19 @@ public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem>
     /// <summary>
     /// Called internally.
     /// </summary>
-    public Task OnColumnSortedAsync(IColumn<TDataItem> column)
-         => DataGrid?.OnColumnSortedAsync(column) ?? Task.CompletedTask;
+    public async Task OnColumnSortedAsync(IColumn<TDataItem> column)
+    {
+        if (!_initialized)
+        {
+            _initialSortOrder.Remove(column.Id);
+            _initialSortOrder.Add(column.Id);
+            return;
+        }
+        if (DataGrid is not null)
+        {
+            await DataGrid.OnColumnSortedAsync(column);
+        }
+    }
 
     /// <summary>
     /// Removes a column from this grid.

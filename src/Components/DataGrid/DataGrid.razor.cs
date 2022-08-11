@@ -1184,6 +1184,17 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     internal bool GetRowWasExpanded(TDataItem item) => item is not null
         && _rowExpansion.Contains(item.GetHashCode());
 
+    internal Task OnColumnSortedAsync(Guid id)
+    {
+        _sortOrder.Remove(id);
+        _sortOrder.Insert(0, id);
+        if (LoadItems is not null)
+        {
+            return LoadItemsAsync();
+        }
+        return Task.CompletedTask;
+    }
+
     internal async Task OnDeleteAsync(Row<TDataItem> row)
     {
         if (EditingRow?.Equals(row) == false)

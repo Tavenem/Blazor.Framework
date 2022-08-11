@@ -1,9 +1,12 @@
 # Changelog
 
+## 0.8.4-preview
+### Fixed
+- Column initial sorting in DataGridSelects.
+
 ## 0.8.3-preview
 ### Fixed
 - Form with explicitly null `EditContext`.
-- Column initial sorting in DataGridSelects.
 
 ## 0.8.2-preview
 ### Fixed
