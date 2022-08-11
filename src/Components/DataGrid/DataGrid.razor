@@ -360,8 +360,7 @@
                 <span>of</span>
                 <span>@((LoadItems is null ? (ulong)CurrentItems.Count() : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
             }
-            <Pagination @ref="Pagination"
-                        CurrentPage="CurrentPage"
+            <Pagination CurrentPage="CurrentPage"
                         CurrentPageChanged="OnPageChangedAsync"
                         LastRequested="OnLastPageAsync"
                         NextRequested="OnNextPageAsync"

@@ -640,8 +640,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
 
     private ulong? PageCount { get; set; }
 
-    private Pagination? Pagination { get; set; }
-
     private bool? SelectAllValue
     {
         get
@@ -2136,10 +2134,6 @@ public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposabl
     {
         CurrentPage = value;
         Offset = CurrentPage * RowsPerPage;
-        if (Pagination is not null)
-        {
-            await Pagination.FocusFirstAsync();
-        }
         if (LoadItems is not null)
         {
             await LoadItemsAsync();
