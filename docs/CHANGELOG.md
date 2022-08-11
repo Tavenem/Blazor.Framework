@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.1-preview
+### Changed
+- Update to .NET 7 preview 7.
+- Update dependencies.
+
 ## 0.9.0-preview
 ### Fixed
 - Removed required attribute from hidden inputs.
