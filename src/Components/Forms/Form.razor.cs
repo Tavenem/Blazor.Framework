@@ -44,6 +44,22 @@ public class Form : EditForm, IDisposable
     [Parameter] public string? Class { get; set; }
 
     /// <summary>
+    /// <para>
+    /// Whether the default browser validation behavior should be disabled.
+    /// </para>
+    /// <para>
+    /// Default is true.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// Note: browser validation can cause unexpected behavior for Blazor components in some
+    /// situations. Only enable browser validation when you need to support plain HTML inputs, and
+    /// only after careful testing to ensure that your Blazor components respond without issues in a
+    /// browser-validated form.
+    /// </remarks>
+    [Parameter] public bool DisableBrowserValidation { get; set; } = true;
+
+    /// <summary>
     /// Invoked when a field value changes.
     /// </summary>
     [Parameter] public EventCallback<FieldChangedEventArgs> FieldChanged { get; set; }
@@ -150,21 +166,22 @@ public class Form : EditForm, IDisposable
 
         builder.OpenElement(0, "form");
         builder.AddMultipleAttributes(1, AdditionalAttributes);
-        builder.AddAttribute(2, "onsubmit", _handleSubmitDelegate);
-        builder.AddAttribute(3, "class", CssClass);
-        builder.AddAttribute(4, "style", CssStyle);
+        builder.AddAttribute(2, "novalidate", DisableBrowserValidation ? "true" : "false");
+        builder.AddAttribute(3, "onsubmit", _handleSubmitDelegate);
+        builder.AddAttribute(4, "class", CssClass);
+        builder.AddAttribute(5, "style", CssStyle);
 
-        builder.OpenElement(5, "button");
-        builder.AddAttribute(6, "type", "submit");
-        builder.AddAttribute(7, "disabled");
-        builder.AddAttribute(8, "style", "display:none");
-        builder.AddAttribute(9, "aria-hidden", "true");
+        builder.OpenElement(6, "button");
+        builder.AddAttribute(7, "type", "submit");
+        builder.AddAttribute(8, "disabled");
+        builder.AddAttribute(9, "style", "display:none");
+        builder.AddAttribute(10, "aria-hidden", "true");
         builder.CloseElement();
 
-        builder.OpenComponent<CascadingValue<EditContext>>(10);
-        builder.AddAttribute(11, "IsFixed", true);
-        builder.AddAttribute(12, "Value", InnerEditContext);
-        builder.AddAttribute(13, "ChildContent", ChildContent?.Invoke(InnerEditContext));
+        builder.OpenComponent<CascadingValue<EditContext>>(11);
+        builder.AddAttribute(12, "IsFixed", true);
+        builder.AddAttribute(13, "Value", InnerEditContext);
+        builder.AddAttribute(14, "ChildContent", ChildContent?.Invoke(InnerEditContext));
         builder.CloseComponent();
 
         builder.CloseElement();

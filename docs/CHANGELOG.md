@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0-preview
+### Fixed
+- Removed required attribute from hidden inputs.
+### Changed
+- Disable browser validation in Forms by default.
+
 ## 0.8.6-preview - 0.8.9-preview
 ### Fixed
 - Pagination focus.
