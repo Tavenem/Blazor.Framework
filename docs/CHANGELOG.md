@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.6-preview
+### Fixed
+- Pagination focus.
+
 ## 0.8.5-preview
 ### Fixed
 - Column filtering on initially hidden columns.

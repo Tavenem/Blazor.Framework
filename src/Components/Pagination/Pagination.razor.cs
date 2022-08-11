@@ -284,6 +284,10 @@ public partial class Pagination
         {
             await ElementReference.FocusFirstAsync(1);
         }
+        else
+        {
+            await ElementReference.FocusFirstAsync(2 + (int)(CurrentPage - FirstPage));
+        }
     }
 
     private async Task OnLastAsync()
@@ -302,14 +306,19 @@ public partial class Pagination
 
     private async Task OnPreviousAsync()
     {
-        if (CurrentPage > 0)
+        if (CurrentPage == 0)
         {
-            CurrentPage--;
-            await CurrentPageChanged.InvokeAsync(CurrentPage);
-            if (CurrentPage == 0)
-            {
-                await ElementReference.FocusFirstAsync(2);
-            }
+            return;
+        }
+        CurrentPage--;
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
+        if (CurrentPage == 0)
+        {
+            await ElementReference.FocusFirstAsync(2);
+        }
+        else
+        {
+            await ElementReference.FocusFirstAsync(2 + (int)(CurrentPage - FirstPage - 1));
         }
     }
 
