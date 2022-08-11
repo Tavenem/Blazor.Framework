@@ -276,6 +276,7 @@ public partial class Pagination
         if (PageCount.HasValue)
         {
             CurrentPage++;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
         else
         {
@@ -288,10 +289,6 @@ public partial class Pagination
         else
         {
             await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage));
-        }
-        if (PageCount.HasValue)
-        {
-            await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
     }
 
@@ -319,6 +316,7 @@ public partial class Pagination
             return;
         }
         CurrentPage--;
+        await CurrentPageChanged.InvokeAsync(CurrentPage);
         if (CurrentPage == 0)
         {
             await ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
@@ -327,7 +325,6 @@ public partial class Pagination
         {
             await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage - 1));
         }
-        await CurrentPageChanged.InvokeAsync(CurrentPage);
     }
 
     private async Task OnSetPageAsync(ulong value)
