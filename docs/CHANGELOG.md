@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.6-preview
+## 0.8.6-preview - 0.8.7-preview
 ### Fixed
 - Pagination focus.
 

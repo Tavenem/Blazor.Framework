@@ -197,6 +197,10 @@ public partial class Pagination
         }
     }
 
+    private int FocusSkipFirst => CurrentPage == 0 ? 0 : 1;
+
+    private int FocusSkipFirstPrev => CurrentPage == 0 ? 0 : 2;
+
     private ulong LastPage
     {
         get
@@ -257,7 +261,7 @@ public partial class Pagination
         }
     }
 
-    internal ValueTask FocusFirstAsync() => ElementReference.FocusFirstAsync(2);
+    internal ValueTask FocusFirstAsync() => ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
 
     private async Task OnFirstAsync()
     {
@@ -265,7 +269,7 @@ public partial class Pagination
         {
             CurrentPage = 0;
             await CurrentPageChanged.InvokeAsync(CurrentPage);
-            await ElementReference.FocusFirstAsync(2);
+            await ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
         }
     }
 
@@ -282,11 +286,11 @@ public partial class Pagination
         }
         if (CurrentPage == PageCount - 1)
         {
-            await ElementReference.FocusFirstAsync(1);
+            await ElementReference.FocusFirstAsync(FocusSkipFirst);
         }
         else
         {
-            await ElementReference.FocusFirstAsync(2 + (int)(CurrentPage - FirstPage));
+            await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage));
         }
     }
 
@@ -301,7 +305,7 @@ public partial class Pagination
         {
             await LastRequested.InvokeAsync();
         }
-        await ElementReference.FocusFirstAsync(1);
+        await ElementReference.FocusFirstAsync(FocusSkipFirst);
     }
 
     private async Task OnPreviousAsync()
@@ -314,11 +318,11 @@ public partial class Pagination
         await CurrentPageChanged.InvokeAsync(CurrentPage);
         if (CurrentPage == 0)
         {
-            await ElementReference.FocusFirstAsync(2);
+            await ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
         }
         else
         {
-            await ElementReference.FocusFirstAsync(2 + (int)(CurrentPage - FirstPage - 1));
+            await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage - 1));
         }
     }
 
@@ -326,6 +330,6 @@ public partial class Pagination
     {
         CurrentPage = value;
         await CurrentPageChanged.InvokeAsync(CurrentPage);
-        await ElementReference.FocusFirstAsync(2 + (int)(CurrentPage - FirstPage));
+        await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage));
     }
 }
