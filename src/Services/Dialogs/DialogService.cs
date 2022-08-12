@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -93,7 +94,7 @@ public class DialogService
     /// <param name="options">The options to configure the dialog.</param>
     /// <returns>A reference to the dialog.</returns>
     public DialogReference Show(
-        Type type,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
         string? title = null,
         DialogParameters? parameters = null,
         DialogOptions? options = null)

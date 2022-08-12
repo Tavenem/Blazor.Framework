@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.0-preview
+### Changed
+- Enable library trimming.
+- Removed default getter and setter implementations from InputValueConverter. These relied on reflection of unknown types and were unsuited to trimming.
+
 ## 0.9.2-preview
 ### Fixed
 - Card styles.

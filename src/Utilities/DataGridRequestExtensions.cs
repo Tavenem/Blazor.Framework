@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace Tavenem.Blazor.Framework;
@@ -20,7 +21,7 @@ public static class DataGridRequestExtensions
     /// Any property was not found, or its value could not be accessed, on <typeparamref
     /// name="TDataItem"/>.
     /// </exception>
-    public static long Count<TDataItem>(
+    public static long Count<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>(
         this IEnumerable<TDataItem> items,
         DataGridRequest request) => items.Where(request).LongCount();
 
@@ -51,7 +52,7 @@ public static class DataGridRequestExtensions
     /// Any property was not found, or its value could not be accessed, on <typeparamref
     /// name="TDataItem"/>.
     /// </exception>
-    public static IEnumerable<TDataItem> Query<TDataItem>(
+    public static IEnumerable<TDataItem> Query<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>(
         this IEnumerable<TDataItem> items,
         DataGridRequest request,
         uint? limit = null)
@@ -125,7 +126,7 @@ public static class DataGridRequestExtensions
         return items;
     }
 
-    private static bool FilterMatches<TDataItem>(TDataItem item, FilterInfo filter)
+    private static bool FilterMatches<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>(TDataItem item, FilterInfo filter)
     {
         var dataType = typeof(TDataItem);
         var propertyInfo = dataType.GetProperty(filter.Property);
@@ -290,7 +291,7 @@ public static class DataGridRequestExtensions
         return false;
     }
 
-    private static bool QuickFilterMatches<TDataItem>(TDataItem item, FilterInfo filter, string term)
+    private static bool QuickFilterMatches<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>(TDataItem item, FilterInfo filter, string term)
     {
         if (string.IsNullOrEmpty(filter.QuickFilter))
         {
@@ -311,7 +312,7 @@ public static class DataGridRequestExtensions
         return FilterMatches(propertyInfo.GetValue(item) as string, term);
     }
 
-    private static IEnumerable<TDataItem> Where<TDataItem>(this IEnumerable<TDataItem> items, DataGridRequest request)
+    private static IEnumerable<TDataItem> Where<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>(this IEnumerable<TDataItem> items, DataGridRequest request)
     {
         if (request.Filters is null
             || request.Filters.Length == 0)

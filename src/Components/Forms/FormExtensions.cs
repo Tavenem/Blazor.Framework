@@ -128,7 +128,7 @@ internal static class FormExtensions
         "0.###################################################################################################################################################################################################################################################################################################################################################",
         CultureInfo.InvariantCulture.NumberFormat);
 
-    public static bool TryParseValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>(
+    public static bool TryParseValue<TValue>(
         this string? value,
         TValue min,
         TValue max,

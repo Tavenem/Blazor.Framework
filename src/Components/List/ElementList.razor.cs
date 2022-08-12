@@ -9,7 +9,7 @@ namespace Tavenem.Blazor.Framework;
 /// A collection of <see cref="ListItem{T}"/> items with bindable selection,
 /// and drag-drop support.
 /// </summary>
-public partial class ElementList<TListItem>
+public partial class ElementList<TListItem> : DropTarget<TListItem>
 {
     private readonly HashSet<string> _dropTargetElements = new();
 

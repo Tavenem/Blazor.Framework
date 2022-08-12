@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Tavenem.Blazor.Framework.Services;
@@ -176,6 +177,10 @@ internal class DragDropListener : IDisposable
     /// Invoked by javascript interop.
     /// </summary>
     [JSInvokable]
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "The potential breakage is accepted; it is up to implementers to enure that types participating in drag-drop are preserved.")]
     public DragStartData? GetDragData()
     {
         if (GetData is null)

@@ -2,6 +2,7 @@ using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using Tavenem.Blazor.Framework.Components.DataGrid;
@@ -14,7 +15,11 @@ namespace Tavenem.Blazor.Framework;
 /// A rich data grid for displaying collections of items in rows and columns.
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public partial class DataGrid<TDataItem> : IDataGrid<TDataItem>, IAsyncDisposable
+public partial class DataGrid<[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+    | DynamicallyAccessedMemberTypes.PublicFields
+    | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>
+    : IDataGrid<TDataItem>, IAsyncDisposable
 {
     private const string HtmlTemplate = """
         <!DOCTYPE html>

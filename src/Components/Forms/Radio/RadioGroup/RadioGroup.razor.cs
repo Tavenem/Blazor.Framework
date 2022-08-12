@@ -8,7 +8,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A group for radio buttons.
 /// </summary>
-public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
+public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue> : FormComponentBase<TValue>
 {
     private readonly string _defaultGroupName = Guid.NewGuid().ToHtmlId();
 

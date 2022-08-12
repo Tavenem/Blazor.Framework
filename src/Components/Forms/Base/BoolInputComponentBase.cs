@@ -6,7 +6,8 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// A base class for input components which express a boolean state (possibly including a third
 /// "null" or "indeterminate" state).
 /// </summary>
-public abstract class BoolInputComponentBase<TValue> : FormComponentBase<TValue>
+public abstract class BoolInputComponentBase<TValue>
+    : FormComponentBase<TValue>
 {
     /// <summary>
     /// <para>

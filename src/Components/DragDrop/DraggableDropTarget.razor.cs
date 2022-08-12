@@ -8,7 +8,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 /// <typeparam name="TDragItem">The type of data dragged from this item.</typeparam>
 /// <typeparam name="TDropItem">The type of data dropped onto this target.</typeparam>
-public partial class DraggableDropTarget<TDragItem, TDropItem>
+public partial class DraggableDropTarget<TDragItem, TDropItem> : DropTarget<TDropItem>
 {
     /// <summary>
     /// <para>

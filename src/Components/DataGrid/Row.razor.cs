@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 
@@ -6,7 +7,10 @@ namespace Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 /// Represents a row in a <see cref="DataGrid{TDataItem}"/>.
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
-public partial class Row<TDataItem>
+public partial class Row<[DynamicallyAccessedMembers(
+    DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+    | DynamicallyAccessedMemberTypes.PublicFields
+    | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>
 {
     /// <summary>
     /// Gets whether the row is expanded.

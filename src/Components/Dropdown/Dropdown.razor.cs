@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -221,6 +222,10 @@ public partial class Dropdown : IAsyncDisposable
     /// <summary>
     /// Constructs a new instance of <see cref="Dropdown"/>.
     /// </summary>
+    [DynamicDependency(
+        DynamicallyAccessedMemberTypes.All,
+        "Microsoft.AspNetCore.Components.Web.MouseEventArgs",
+        "Microsoft.AspNetCore.Components.Web")]
     public Dropdown()
     {
         _delay = new(OpenDelayed, 0);
@@ -244,6 +249,10 @@ public partial class Dropdown : IAsyncDisposable
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Parameter type MouseEventArgs specified as a DynamicDependency")]
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

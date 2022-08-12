@@ -11,7 +11,7 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The numeric type bound to the input value.
 /// </typeparam>
-public partial class NumericInput<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
+public partial class NumericInput<TValue> : InputComponentBase<TValue>
 {
     private readonly TValue _maxDefault, _minDefault, _one, _zero;
     private readonly AdjustableTimer _timer;

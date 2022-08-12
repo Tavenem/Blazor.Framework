@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework;
 /// A collection of <see cref="Chip{T}"/> components with bindable selection,
 /// and drag-drop support.
 /// </summary>
-public partial class ChipSet<TChip>
+public partial class ChipSet<TChip> : ElementList<TChip>
 {
     /// <summary>
     /// Whether chips should display a close button that sets its <c>display</c> property to

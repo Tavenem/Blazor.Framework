@@ -13,7 +13,8 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// <typeparam name="TOption">
 /// The type of option values.
 /// </typeparam>
-public abstract class SelectBase<TValue, TOption> : PickerComponentBase<TValue>, ISelect<TOption>
+public abstract class SelectBase<TValue, TOption>
+    : PickerComponentBase<TValue>, ISelect<TOption>
 {
     private protected readonly List<Option<TOption>> _options = new();
     private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = new();

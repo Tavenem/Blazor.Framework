@@ -1,4 +1,6 @@
-﻿namespace Tavenem.Blazor.Framework;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// Provides a mechanism for listening to javascript events.
@@ -29,7 +31,7 @@ public interface IJSEventListener
     /// <returns>
     /// A unique id for the subscription, which can be used to <see cref="UnsubscribeAsync(Guid)"/>.
     /// </returns>
-    Task<Guid> SubscribeAsync<T>(
+    Task<Guid> SubscribeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(
         string eventName,
         string elementId,
         bool correctOffset,

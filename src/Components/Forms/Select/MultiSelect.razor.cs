@@ -13,7 +13,7 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The type of bound value.
 /// </typeparam>
-public partial class MultiSelect<TValue>
+public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValue>
 {
     private readonly object _selectAll = new();
 

@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A radio button input component.
 /// </summary>
-public partial class RadioButton<TValue>
+public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
 {
     /// <summary>
     /// Custom HTML attributes for the component.

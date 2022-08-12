@@ -10,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A rich text editor which supports any content type.
 /// </summary>
-public partial class Editor : IDisposable
+public partial class Editor : FormComponentBase<string?>
 {
     private bool _disposedValue;
     private bool _initialized;
@@ -358,14 +358,6 @@ public partial class Editor : IDisposable
         EditorService.OnInput += OnInput;
         EditorService.CommandsUpdated += CommandsUpdated;
         _initialized = true;
-    }
-
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>

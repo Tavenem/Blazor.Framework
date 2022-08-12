@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace Tavenem.Blazor.Framework.Services;
@@ -55,6 +56,10 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
     /// Invoked by javascript.
     /// </summary>
     [JSInvokable]
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only used for MouseEventArgs, which is preserved by caller of SubscribeAsync")]
     public async Task OnEventOccur(Guid key, string @eventData)
     {
         if (!_callbackResolver.ContainsKey(key))
@@ -100,7 +105,7 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
     /// <returns>
     /// A unique id for the subscription, which can be used to <see cref="UnsubscribeAsync(Guid)"/>.
     /// </returns>
-    public async Task<Guid> SubscribeAsync<T>(
+    public async Task<Guid> SubscribeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(
         string eventName,
         string elementId,
         bool correctOffset,

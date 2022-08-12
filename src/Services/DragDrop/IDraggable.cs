@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -35,6 +36,7 @@ public interface IDraggable
     /// complete object.
     /// </para>
     /// </remarks>
+    [RequiresUnreferencedCode("This method uses System.Text.Json.JsonSerializer.Serialize(object?, Type) to produce JSON. It is safe to suppress this warning if you indicate to the trimmer that all members of the type require dynamic access.")]
     public string? ToDraggedJson() => JsonSerializer.Serialize(this, GetType());
 
     /// <summary>

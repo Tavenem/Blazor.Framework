@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Tavenem.Blazor.Framework;
@@ -9,6 +10,7 @@ internal static class ElementReferenceExtensions
     private static readonly PropertyInfo? _jsRuntimeProperty =
             typeof(WebElementReferenceContext).GetProperty("JSRuntime", BindingFlags.Instance | BindingFlags.NonPublic);
 
+    [RequiresUnreferencedCode("Uses reflection to serialize parameters of callback.")]
     public static async ValueTask<int> AddEventListenerAsync<T>(
         this ElementReference elementReference,
         DotNetObjectReference<T> dotNetRef,
@@ -104,6 +106,7 @@ internal static class ElementReferenceExtensions
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-utility.js");
 
+    [RequiresUnreferencedCode("Uses reflection to serialize type.")]
     private static Dictionary<string, object> GetSerializationSpec(Type type)
     {
         var props = type.GetProperties();
@@ -157,7 +160,13 @@ internal static class ElementReferenceExtensions
         }
     }
 
-    private static async ValueTask<TValue?> InvokeAsync<TValue>(this ElementReference elementReference, string identifier, params object?[]? args)
+    private static async ValueTask<TValue?> InvokeAsync<[DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.PublicConstructors
+        | DynamicallyAccessedMemberTypes.PublicFields
+        | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(
+        this ElementReference elementReference,
+        string identifier,
+        params object?[]? args)
     {
         IJSObjectReference? module = null;
         try

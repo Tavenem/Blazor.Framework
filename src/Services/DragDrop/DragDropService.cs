@@ -63,6 +63,10 @@ public class DragDropService : IAsyncDisposable
     /// <returns>
     /// A configured <see cref="DragStartData"/> instance.
     /// </returns>
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "The potential breakage is accepted; it is up to implementers to enure that types participating in drag-drop are preserved.")]
     public static DragStartData GetDragStartData<TData>(TData item, string? type = null, DragEffect effectAllowed = DragEffect.All)
     {
         var data = new List<KeyValuePair<string, object>>();
@@ -190,6 +194,10 @@ public class DragDropService : IAsyncDisposable
     /// The requested data, if found; otherwise, the default value for the <typeparamref
     /// name="TData"/> type.
     /// </returns>
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "The potential breakage is accepted; it is up to implementers to enure that types participating in drag-drop are preserved.")]
     public static TData? TryGetData<TData>(IEnumerable<KeyValuePair<string, string>>? e, string? type = null)
     {
         if (string.IsNullOrEmpty(type)
@@ -315,6 +323,7 @@ public class DragDropService : IAsyncDisposable
         catch (ObjectDisposedException) { }
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
     private static bool TryGetDataOfType<TData>(
         IEnumerable<KeyValuePair<string, string>>? e,
         [NotNullWhen(true)] out TData? data,

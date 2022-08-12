@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// <summary>
 /// This class is for internal use only. It will not function properly if used directly.
 /// </summary>
-public partial class ListItemCollapse<TListItem>
+public partial class ListItemCollapse<TListItem> : Collapse
 {
     /// <summary>
     /// The id of the collapse element.

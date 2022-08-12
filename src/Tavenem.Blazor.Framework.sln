@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Do
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Test", "..\test\Tavenem.Blazor.Framework.Test.csproj", "{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tavenem.Blazor.Framework.TrimTest", "..\test\trim_test\Tavenem.Blazor.Framework.TrimTest.csproj", "{0BA7B8A2-4843-4728-B4BC-7C406600A4D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA7B8A2-4843-4728-B4BC-7C406600A4D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA7B8A2-4843-4728-B4BC-7C406600A4D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA7B8A2-4843-4728-B4BC-7C406600A4D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA7B8A2-4843-4728-B4BC-7C406600A4D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

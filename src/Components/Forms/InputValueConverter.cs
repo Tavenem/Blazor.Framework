@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -7,29 +6,8 @@ namespace Tavenem.Blazor.Framework;
 /// Converts an HTML input element's value string to and from a bound data type.
 /// </summary>
 /// <typeparam name="TValue">The bound data type.</typeparam>
-public class InputValueConverter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
+public class InputValueConverter<TValue>
 {
-    private static readonly Func<string?, IFormatProvider?, TValue?> DefaultGetter = (input, formatProvider) =>
-    {
-        var result = Convert.ChangeType(input, typeof(TValue), formatProvider);
-        if (result is TValue value)
-        {
-            return value;
-        }
-
-        throw new InvalidOperationException("Conversion using the default getter failed");
-    };
-
-    private static readonly Func<TValue?, IFormatProvider?, string?, string?> DefaultSetter = (value, formatProvider, format) =>
-    {
-        if (value is IFormattable formattable)
-        {
-            return formattable.ToString(format, formatProvider);
-        }
-
-        return value?.ToString();
-    };
-
     /// <summary>
     /// An optional format string used during conversion.
     /// </summary>
@@ -71,34 +49,14 @@ public class InputValueConverter<[DynamicallyAccessedMembers(DynamicallyAccessed
     /// <para>
     /// A function to convert the bound value to an input value.
     /// </para>
-    /// <para>
-    /// If left <see langword="null"/> and <typeparamref name="TValue"/> implements <see
-    /// cref="IFormattable"/>, its <see cref="IFormattable.ToString(string?, IFormatProvider?)"/>
-    /// will be used. If it does not, <see cref="object.ToString()"/> is used.
-    /// </para>
     /// </param>
-    public InputValueConverter(Func<string?, IFormatProvider?, TValue?> getter, Func<TValue?, IFormatProvider?, string?, string?>? setter = null)
+    public InputValueConverter(
+        Func<string?, IFormatProvider?, TValue?> getter,
+        Func<TValue?, IFormatProvider?, string?, string?> setter)
     {
         Getter = getter;
-        Setter = setter ?? DefaultSetter;
+        Setter = setter;
     }
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="InputValueConverter{TValue}"/>.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Uses a default getter implementation: <see cref="Convert.ChangeType(object?, Type)"/> is
-    /// used. If the type does not implement <see cref="IConvertible"/> or the conversion to string
-    /// is invalid, exceptions might be thrown.
-    /// </para>
-    /// <para>
-    /// Uses a default setter implementation: if <typeparamref name="TValue"/> implements <see
-    /// cref="IFormattable"/>, its <see cref="IFormattable.ToString(string?, IFormatProvider?)"/>
-    /// will be used. If it does not, <see cref="object.ToString()"/> is used.
-    /// </para>
-    /// </remarks>
-    public InputValueConverter() : this(DefaultGetter, null) { }
 
     /// <summary>
     /// Tries to convert an input value to a bound value.

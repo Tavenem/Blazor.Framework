@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using Tavenem.Blazor.Framework.Components.DataGrid;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -12,7 +13,13 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
 /// <typeparam name="TValue">The type of bound value.</typeparam>
-public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem>
+public partial class DataGridSelect<
+    [DynamicallyAccessedMembers(
+        DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+        | DynamicallyAccessedMemberTypes.PublicFields
+        | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem,
+    TValue>
+    : PickerComponentBase<TValue>, IDataGrid<TDataItem>
 {
     private readonly List<IColumn<TDataItem>> _columns = new();
     private readonly List<Guid> _initialSortOrder = new();
@@ -300,6 +307,10 @@ public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem>
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "The potential breakage is accepted; it is up to implementers to enure that the selected value type is preserved.")]
     protected override string? FormatValueAsString(TValue? value)
     {
         if (Converter is not null
@@ -311,6 +322,10 @@ public partial class DataGridSelect<TDataItem, TValue> : IDataGrid<TDataItem>
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "The potential breakage is accepted; it is up to implementers to enure that the selected data type is preserved.")]
     protected override bool TryParseValueFromString(
         string? value,
         [MaybeNullWhen(false)] out TValue result,

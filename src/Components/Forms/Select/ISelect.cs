@@ -11,12 +11,12 @@ public interface ISelect<TOption>
     /// <summary>
     /// Whether all options are currently selected.
     /// </summary>
-    public bool AllSelected { get; }
+    bool AllSelected { get; }
 
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void Add(Option<TOption> option);
+    void Add(Option<TOption> option);
 
     /// <summary>
     /// Determine whether the given value is currently selected.
@@ -26,12 +26,12 @@ public interface ISelect<TOption>
     /// <see langword="true"/> if the given value is currently selected; otherwise <see
     /// langword="false"/>.
     /// </returns>
-    public bool IsSelected(TOption option);
+    bool IsSelected(TOption option);
 
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void Remove(Option<TOption> option);
+    void Remove(Option<TOption> option);
 
     /// <summary>
     /// <para>
@@ -41,11 +41,11 @@ public interface ISelect<TOption>
     /// Has no effect on single-select components.
     /// </para>
     /// </summary>
-    public Task SelectAllAsync();
+    Task SelectAllAsync();
 
     /// <summary>
     /// Toggle the given option's selected state.
     /// </summary>
     /// <param name="option">The option to toggle.</param>
-    public Task ToggleValueAsync(Option<TOption> option);
+    Task ToggleValueAsync(Option<TOption> option);
 }
