@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.1-preview
+### Fixed
+- Field style.
+
 ## 0.10.0-preview
 ### Changed
 - Enable library trimming.
