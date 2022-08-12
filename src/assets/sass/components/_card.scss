@@ -18,7 +18,7 @@
     > {
         * {
             border-radius: 0;
-            flex: 1 1 auto;
+            flex: 0 0 auto;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -46,10 +46,6 @@
 
             > {
                 * {
-                    flex: 1 1 auto;
-                }
-
-                .avatar {
                     flex: 0 0 auto;
                 }
 
@@ -57,8 +53,6 @@
                 .btn-text,
                 .btn-icon,
                 tf-close {
-                    flex: 0 0 auto;
-
                     &:first-child {
                         margin-inline-start: -.5rem;
                     }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2-preview
+### Fixed
+- Card styles.
+
 ## 0.9.1-preview
 ### Changed
 - Update to .NET 7 preview 7.
