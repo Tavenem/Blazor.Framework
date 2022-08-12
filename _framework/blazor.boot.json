@@ -93,8 +93,8 @@
       "System.Xml.ReaderWriter.dll": "sha256-SpuMPtk24PPuKf1C8Rlc191eTr6MTiRAfDFJZkfNnRs=",
       "System.Xml.XDocument.dll": "sha256-YcHDecavqXKraixJiZGvuAmocbOW0+K1nQxcLp7JtGU=",
       "System.Xml.XPath.XDocument.dll": "sha256-tkTr1iYUdI59w8dDm0TpKZrpLy25h7QCkUSAsnj+hDo=",
-      "Tavenem.Blazor.Framework.dll": "sha256-EL8xyiqXbXOyd6b7y9BR\/4x\/cjbvqHOMofggi98M\/Oc=",
-      "Tavenem.Blazor.Framework.Docs.dll": "sha256-UjhOyLy0mZpKH9JFp81gyHoRrfWK37nmlDs\/HznUe2c="
+      "Tavenem.Blazor.Framework.dll": "sha256-vFukR3vdHpowPRnx7YulF\/gjn4wG+WCsXeyLsS1UUeM=",
+      "Tavenem.Blazor.Framework.Docs.dll": "sha256-so69ZTA6DqNkogCNuJXzqgecFFdS5OoP3NlUAJgzyWs="
     },
     "extensions": null,
     "lazyAssembly": null,
