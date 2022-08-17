@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.3-preview
+### Changed
+- Disable library trimming; too many unidentified (de)serialized objects needed for JS interop.
+
 ## 0.10.2-preview
 ### Fixed
 - Dependency update, fix broken dependency chain.
