@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2-preview
+### Fixed
+- Dependency update, fix broken dependency chain.
+
 ## 0.10.1-preview
 ### Fixed
 - Field style.
