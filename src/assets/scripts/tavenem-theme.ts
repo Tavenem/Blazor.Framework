@@ -29,15 +29,7 @@ export function getPreferredColorScheme(): ThemePreference {
         }
     }
 
-    if (window.matchMedia) {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return ThemePreference.Dark;
-        } else {
-            return ThemePreference.Light;
-        }
-    }
-
-    return ThemePreference.Light;
+    return getNativePreferredColorScheme();
 }
 
 export function listenForThemeChange(dotNetRef: DotNet.DotNetObject) {
@@ -47,15 +39,17 @@ export function listenForThemeChange(dotNetRef: DotNet.DotNetObject) {
 export function setColorScheme(theme: ThemePreference, manual?: boolean) {
     if (manual) {
         _manualColorTheme = (theme != ThemePreference.Auto);
+    } else if (_manualColorTheme) {
+        return;
     } else {
-        localStorage.removeItem('tavenem-theme');
-        if (_manualColorTheme) {
+        const local = localStorage.getItem('tavenem-theme');
+        if (local) {
             return;
         }
     }
     _saved_theme = theme;
 
-    const preferred = getPreferredColorScheme();
+    const preferred = getNativePreferredColorScheme();
     if (theme == ThemePreference.Auto) {
         theme = preferred;
     }
@@ -77,6 +71,18 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
             listener.invokeMethodAsync('NotifyThemeChanged', theme);
         }
     }
+}
+
+function getNativePreferredColorScheme(): ThemePreference {
+    if (window.matchMedia) {
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return ThemePreference.Dark;
+        } else {
+            return ThemePreference.Light;
+        }
+    }
+
+    return ThemePreference.Light;
 }
 
 function setPreferredColorScheme() {
