@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.7-preview
+### Changed
+- Preserve collapse child padding
+
 ## 0.10.6-preview
 ### Changed
 - Collapse body form fields align stretch

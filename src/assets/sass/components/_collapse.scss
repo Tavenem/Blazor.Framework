@@ -129,20 +129,16 @@
         > * {
             margin-left: 0;
             margin-right: 0;
-            padding-left: 0;
-            padding-right: 0;
         }
 
         > *:first-child {
             border-top-left-radius: 0;
             border-top-right-radius: 0;
             margin-top: 0;
-            padding-top: 0;
         }
 
         > *:last-child {
             margin-bottom: 0;
-            padding-bottom: 0;
         }
 
         > *:only-child {
@@ -150,8 +146,6 @@
             border-top-right-radius: 0;
             margin-bottom: 0;
             margin-top: 0;
-            padding-bottom: 0;
-            padding-top: 0;
         }
 
         > .list {
