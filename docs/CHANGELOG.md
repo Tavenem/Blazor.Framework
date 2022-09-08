@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.5-preview
+### Changed
+- Collapse body align start
+
 ## 0.10.4-preview
 ### Fixed
 - Light/dark theme persistence.
