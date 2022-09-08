@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.6-preview
+### Changed
+- Collapse body form fields align stretch
+
 ## 0.10.5-preview
 ### Changed
 - Collapse body align start
