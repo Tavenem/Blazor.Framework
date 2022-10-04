@@ -13,7 +13,7 @@
     <Version>1.0.0</Version>
     <Authors>Wil Stead</Authors>
     <Description>Blazor style and component framework.</Description>
-    <Copyright>Copyright © 2022 Wil Stead</Copyright>
+    <Copyright>Copyright © Wil Stead</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Tavenem/Blazor.Framework</PackageProjectUrl>
@@ -36,7 +36,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.7" Condition="'$(TargetFramework)' == 'net6.0'" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-preview.7.22376.6" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-rc.1.22427.2" Condition="'$(TargetFramework)' == 'net7.0'" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -55,7 +55,6 @@
 
     <!-- Run restore only once for multi targeting builds -->
     <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net7.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
-    <ShouldRunClientAssetsBuild>true</ShouldRunClientAssetsBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -74,7 +73,7 @@
     <Exec Command="npm dedupe" WorkingDirectory="$(ClientAssetsDirectory)" />
   </Target>
   
-  <Target Name="ClientAssetsBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
+  <Target Name="ClientAssetsBuild" Condition="'$(TargetFramework)' == 'net7.0'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
     <PropertyGroup>
       <_ClientAssetsOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)clientassets'))/</_ClientAssetsOutputFullPath>
     </PropertyGroup>

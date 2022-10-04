@@ -68,7 +68,7 @@ public partial class FontSizeDialog
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
 #if NET7_0_OR_GREATER
-    [RegexGenerator("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$")]
+    [GeneratedRegex("^(0?\\.?[\\d]+(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$")]
     private static partial Regex FontSizeRegex();
 #endif
 }

@@ -28,6 +28,7 @@
     }
     @if ((ShowLength && MaxLength.HasValue)
         || !string.IsNullOrEmpty(HelpText)
+        || HelpTextContent.HasValue
         || !IsValid)
     {
         <div class="@HelpersClass">
@@ -39,6 +40,10 @@
                         <li>@message</li>
                     }
                 </ul>
+            }
+            else if (HelpTextContent.HasValue)
+            {
+                <div class="mr-auto">@HelpTextContent.Value</div>
             }
             else if (!string.IsNullOrEmpty(HelpText))
             {

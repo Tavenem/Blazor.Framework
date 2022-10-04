@@ -301,6 +301,30 @@
 </Collapse>
 
 <p>
+    You can provide markup content for the help text by using the <code>HelpTextContent</code>
+    property instead (which overrides <code>HelpText</code>).
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextInput Label="Normal" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" />
+                <TextInput Label="Filled" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="filled" />
+                <TextInput Label="Outlined" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="outlined" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextInput Label=""Normal"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" />
+    <TextInput Label=""Filled"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" Class=""filled"" />
+    <TextInput Label=""Outlined"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
     You can hide the help text until the input has focus by setting the
     <code>DisplayHelpTextOnFocus</code> property to <code>true</code>.
 </p>

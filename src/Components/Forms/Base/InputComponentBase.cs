@@ -58,7 +58,18 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// <summary>
     /// Any help text displayed below the input.
     /// </summary>
+    /// <remarks>
+    /// If <see cref="HelpTextContent"/> is provided, this property is ignored.
+    /// </remarks>
     [Parameter] public string? HelpText { get; set; }
+
+    /// <summary>
+    /// Any help text displayed below the input, as markup content.
+    /// </summary>
+    /// <remarks>
+    /// If provided, overrides <see cref="HelpText"/>.
+    /// </remarks>
+    [Parameter] public MarkupString? HelpTextContent { get; set; }
 
     /// <summary>
     /// <para>

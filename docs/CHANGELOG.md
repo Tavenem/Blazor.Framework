@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.8-preview
+### Added
+- `HelpTextContent` added to `InputComponentBase`, which overrides `HelpText` if provided
+### Changed
+- Update to .NET 7 RC 1.
+
 ## 0.10.7-preview
 ### Changed
 - Preserve collapse child padding
