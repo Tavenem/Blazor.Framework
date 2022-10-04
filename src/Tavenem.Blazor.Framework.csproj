@@ -101,7 +101,7 @@
     </DefineStaticWebAssets>
   </Target>
 	
-  <Target Name="CssLibCopy" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" Inputs="@(CssLibFiles)" Outputs="$(IntermediateOutputPath)csslibs.complete.txt">
+  <Target Name="CssLibCopy" Condition="'$(TargetFramework)' == 'net7.0'" DependsOnTargets="ClientAssetsRestore" Inputs="@(CssLibFiles)" Outputs="$(IntermediateOutputPath)csslibs.complete.txt">
     <PropertyGroup>
       <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
     </PropertyGroup>
@@ -117,7 +117,7 @@
     <WriteLinesToFile File="$(IntermediateOutputPath)csslibs.complete.txt" Lines="@(_CssLibCopyOutput)" />
   </Target>
 	
-  <Target Name="SassBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="CssLibCopy" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles);@(CssLibFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+  <Target Name="SassBuild" Condition="'$(TargetFramework)' == 'net7.0'" DependsOnTargets="CssLibCopy" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles);@(CssLibFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
     <PropertyGroup>
       <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))</_SassOutputFullPath>
       <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.9-preview
+### Fixed
+- Fix build
+
 ## 0.10.8-preview
 ### Added
 - `HelpTextContent` added to `InputComponentBase`, which overrides `HelpText` if provided
