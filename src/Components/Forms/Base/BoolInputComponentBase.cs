@@ -84,6 +84,7 @@ public abstract class BoolInputComponentBase<TValue>
         .Add("disabled", Disabled)
         .Add("read-only", ReadOnly)
         .Add("required", Required)
+        .Add("no-label", string.IsNullOrEmpty(Label))
         .ToString();
 
     /// <summary>

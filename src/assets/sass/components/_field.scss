@@ -47,7 +47,7 @@
         content: " *";
     }
 
-    &:not(.filled, .outlined) > {
+    &:not(.filled, .outlined, .no-label) > {
         .input, .input-content {
             margin-top: 1rem;
         }
@@ -132,6 +132,10 @@
                 padding-right: 12px;
             }
         }
+    }
+
+    &.filled.no-label > .input {
+        padding-top: 11px;
     }
 
     &.outlined > {

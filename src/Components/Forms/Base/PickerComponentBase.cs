@@ -126,6 +126,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         .Add("shrink", ShrinkWhen)
         .Add("required", Required)
         .Add("open", ShowPicker)
+        .Add("no-label", string.IsNullOrEmpty(Label))
         .ToString();
 
     /// <summary>

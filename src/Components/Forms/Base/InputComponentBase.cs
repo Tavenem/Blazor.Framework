@@ -143,6 +143,7 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
         .Add("field")
         .Add("shrink", ShrinkWhen)
         .Add("required", Required)
+        .Add("no-label", string.IsNullOrEmpty(Label))
         .ToString();
 
     /// <summary>
