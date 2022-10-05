@@ -151,10 +151,6 @@ public partial class DataGridSelect<
         && !Required
         && DataGrid?.SelectedItems.Count > 0;
 
-    private protected string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
-        .Add("invisible", !CanClear)
-        .ToString();
-
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
 
     private protected override List<KeyOptions> KeyOptions { get; set; } = new()

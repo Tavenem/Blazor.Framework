@@ -94,10 +94,6 @@ public partial class DataGridMultiSelect<
         .Add("select")
         .ToString();
 
-    private protected string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
-        .Add("invisible", !CanClear)
-        .ToString();
-
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
