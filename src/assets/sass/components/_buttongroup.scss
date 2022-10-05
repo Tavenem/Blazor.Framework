@@ -38,12 +38,12 @@
                 margin-left: -1px;
             }
 
-            &:not(:last-child) {
+            &:not(:last-of-type) {
                 border-bottom-right-radius: 0;
                 border-top-right-radius: 0;
             }
 
-            &:last-child {
+            &:last-of-type {
                 border-bottom-right-radius: inherit;
                 border-top-right-radius: inherit;
             }
@@ -68,13 +68,13 @@
                 margin-top: -1px;
             }
 
-            &:not(:last-child) {
+            &:not(:last-of-type) {
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
                 border-bottom-style: solid;
             }
 
-            &:last-child {
+            &:last-of-type {
                 border-bottom-left-radius: inherit;
                 border-bottom-right-radius: inherit;
             }
@@ -187,7 +187,7 @@
                 margin-left: -1px;
             }
 
-            &:not(:last-child) {
+            &:not(:last-of-type) {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
@@ -210,7 +210,7 @@
                 margin-top: -1px;
             }
 
-            &:not(:last-child) {
+            &:not(:last-of-type) {
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
                 border-bottom-style: solid;
