@@ -204,6 +204,12 @@ public partial class TextInput : InputComponentBase<string?>
     [Parameter] public bool ShowLength { get; set; } = true;
 
     /// <summary>
+    /// The maximum number of characters which the input should show. Its minimum size will be set
+    /// to allow this number of characters.
+    /// </summary>
+    [Parameter] public int? Size { get; set; }
+
+    /// <summary>
     /// <para>
     /// Whether the browser's built-in spellcheck feature should be enabled for this field.
     /// </para>
@@ -305,6 +311,8 @@ public partial class TextInput : InputComponentBase<string?>
     private string? CurrentInput { get; set; }
 
     private int CurrentLength { get; set; }
+
+    private int EffectiveSize => Math.Max(1, Size ?? 1);
 
     private IEnumerable<string> FilteredSuggestions
     {

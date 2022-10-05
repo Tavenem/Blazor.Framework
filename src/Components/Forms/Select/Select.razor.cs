@@ -13,6 +13,26 @@ namespace Tavenem.Blazor.Framework;
 /// </typeparam>
 public partial class Select<TValue> : SelectBase<TValue, TValue>
 {
+    /// <inheritdoc />
+    protected override string? InputCssStyle => new CssBuilder(base.InputCssStyle)
+        .AddStyle(
+            "min-width",
+            $"{Size ?? 0}ch",
+            Size.HasValue)
+        .AddStyle(
+            "min-width",
+            () => $"{Math.Max(MaxOptionSize, Options!.Max(OptionSize!))}ch",
+            !Size.HasValue && OptionSize is not null && OptionTemplate is not null && Options?.Any() == true)
+        .AddStyle(
+            "min-width",
+            () => $"{Math.Max(MaxOptionSize, Options!.Select(Labels!).Max(x => x.Length))}ch",
+            !Size.HasValue && (OptionSize is null || OptionTemplate is null) && Labels is not null && Options?.Any() == true)
+        .AddStyle(
+            "min-width",
+            () => $"{MaxOptionSize}ch",
+            !Size.HasValue && (OptionSize is null || OptionTemplate is null) && (Labels is null || Options?.Any() != true))
+        .ToString();
+
     /// <summary>
     /// Constructs a new instance of <see cref="Select{TValue}"/>.
     /// </summary>

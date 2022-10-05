@@ -209,6 +209,11 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 
     private Slider<ushort>? HueSlider { get; set; }
 
+    private string? InputContainerStyle => new CssBuilder(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
+        .AddStyle("min-width", "312px")
+        .ToString();
+
     [Inject] IJSEventListener JSEventListener { get; set; } = default!;
 
     private string OverlayStyle => Disabled

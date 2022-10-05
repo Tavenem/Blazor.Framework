@@ -131,6 +131,12 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     [Parameter] public bool ShowStepButtons { get; set; } = true;
 
     /// <summary>
+    /// The maximum number of characters which the input should show. Its minimum size will be set
+    /// to allow this number of characters.
+    /// </summary>
+    [Parameter] public int? Size { get; set; }
+
+    /// <summary>
     /// <para>
     /// The icon used for the decrement stepper.
     /// </para>
@@ -203,6 +209,8 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         || (CurrentValue is not null
         && (FormExtensions.ValuesEqual(CurrentValue, Min)
         || FormExtensions.ValueIsLess(CurrentValue, Min)));
+
+    private int EffectiveSize => Math.Max(1, Size ?? 1);
 
     private bool IncrementDisabled => Disabled
         || ReadOnly

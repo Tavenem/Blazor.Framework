@@ -145,7 +145,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// <summary>
     /// The final value assigned to the input element's style attribute.
     /// </summary>
-    protected string? InputCssStyle => new CssBuilder(InputStyle)
+    protected virtual string? InputCssStyle => new CssBuilder(InputStyle)
         .AddStyleFromDictionary(InputAttributes)
         .ToString();
 

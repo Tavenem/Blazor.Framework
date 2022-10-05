@@ -117,18 +117,18 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <DateTimeInput @bind-Value="_value1" Label="String" Class="w-100" />
+                <DateTimeInput @bind-Value="_value1" Label="String" />
                 <span>Bound value: @_value1</span>
-                <DateTimeInput @bind-Value="_value2" Label="DateTime" Class="w-100" />
+                <DateTimeInput @bind-Value="_value2" Label="DateTime" />
                 <span>Bound value: @_value2.ToString()</span>
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <DateTimeInput @bind-Value=""_value1"" Label=""String"" Class=""w-100"" />
+    <DateTimeInput @bind-Value=""_value1"" Label=""String"" />
     <span>Bound value: @_value1</span>
-    <DateTimeInput @bind-Value=""_value2"" Label=""DateTime"" Class=""w-100"" />
+    <DateTimeInput @bind-Value=""_value2"" Label=""DateTime"" />
     <span>Bound value: @_value2.ToString()</span>
 </div>
 
@@ -255,13 +255,13 @@
 
 <Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <DateTimeInput TValue="string" DateType="_dateType" Class="w-100" />
+        <div class="row align-items-baseline justify-content-center">
+            <DateTimeInput TValue="string" DateType="_dateType" />
             <Select Label="Date Type" @bind-Value="_dateType" Options="Enum.GetValues<DateType>()" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DateTimeInput TValue=""string"" ShowTime=""true"" Class=""w-100"" />
+        @CodeFormatter.CodeToMarkup(@"<DateTimeInput TValue=""string"" ShowTime=""true"" />
 <Select Label=""Date Type"" @bind-Value=""_dateType"" Options=""Enum.GetValues<DateType>()"" />
 
 @code {

@@ -386,6 +386,11 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 
     private string HourTitle => DisplayedTime.ToString(ShowAMPM ? "%h" : "HH", Culture);
 
+    private string? InputContainerStyle => new CssBuilder(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
+        .AddStyle("min-width", "341.69px")
+        .ToString();
+
     private string InputType
     {
         get

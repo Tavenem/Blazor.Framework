@@ -418,7 +418,7 @@ else
     <div @attributes="AdditionalAttributes"
          id="@ContainerId"
          class="@CssClass"
-         style="@CssStyle"
+         style="@InputContainerStyle"
          tabindex="-1"
          @onclick="OnClickContainerAsync">
         <div id="@InputId"
@@ -441,6 +441,7 @@ else
                    placeholder="@Placeholder"
                    readonly
                    required="@Required"
+                   size="1"
                    tabindex="@(DisplayType == PickerDisplayType.Inline ? -1 : TabIndex)"
                    value="@DisplayString"
                    @onclick="TogglePopoverAsync"
@@ -474,7 +475,8 @@ else
                      FocusId="@ContainerId"
                      FocusOut="ClosePopoverAsync"
                      IsOpen="ShowPicker"
-                     PopoverOrigin="Origin.Top_Left">
+                     PopoverOrigin="Origin.Top_Left"
+                     Style="min-width: 341.69px">
                 @_contentRenderFragment
             </Popover>
         }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.0-preview
+### Added
+- `Size` to `TextInput`, `NumericInput`, `Select`, `MultiSelect`, `DataGridSelect`, and `DataGridMultiSelect`: specify the minimum width of the inner input control in displayed characters
+- `OptionSize` to `Select` and `MultiSelect` to calculate size for templated options
+- [`Nerdbank.GitVersioning`](https://github.com/dotnet/Nerdbank.GitVersioning)
+### Changed
+- Removed minimum width for most input controls
+- Minimum width for selects calculated automatically in most situations
+
 ## 0.10.11-preview
 ### Changed
 - Removed top margin from form controls when there is no label

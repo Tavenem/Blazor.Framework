@@ -79,7 +79,7 @@
                                        Disabled="Disabled"
                                        ReadOnly="ReadOnly"
                                        ThemeColor="ThemeColor"
-                                       Class="outlined dense" />
+                                       Class="outlined dense flex-grow-1" />
                             break;
                         case ColorMode.HSL:
                             <NumericInput TValue="ushort"
@@ -89,7 +89,7 @@
                                           HelpText="H"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
-                                          Class="outlined dense"
+                                          Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
                             <NumericInput TValue="byte"
@@ -99,7 +99,7 @@
                                           HelpText="S"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
-                                          Class="outlined dense"
+                                          Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
                             <NumericInput TValue="byte"
@@ -109,7 +109,7 @@
                                           HelpText="L"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
-                                          Class="outlined dense"
+                                          Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
                             break;
@@ -120,7 +120,7 @@
                                           HelpText="R"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
-                                          Class="outlined dense"
+                                          Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
                             <NumericInput TValue="byte"
@@ -129,7 +129,7 @@
                                           HelpText="G"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
-                                          Class="outlined dense"
+                                          Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
                             <NumericInput TValue="byte"
@@ -138,7 +138,7 @@
                                           HelpText="B"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
-                                          Class="outlined dense"
+                                          Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
                             break;
@@ -154,7 +154,7 @@
                                       HelpText="A"
                                       Disabled="Disabled"
                                       ReadOnly="ReadOnly"
-                                      Class="outlined dense"
+                                      Class="outlined dense flex-grow-1"
                                       ShowStepButtons="false"
                                       ThemeColor="ThemeColor" />
                     }
@@ -217,7 +217,7 @@ else
     <div @attributes="AdditionalAttributes"
          id="@ContainerId"
          class="@CssClass"
-         style="@CssStyle"
+         style="@InputContainerStyle"
          tabindex="-1"
          @onclick="OnClickContainerAsync">
         <div id="@InputId"
@@ -244,6 +244,7 @@ else
                    placeholder="@Placeholder"
                    readonly
                    required="@Required"
+                   size="1"
                    tabindex="@(DisplayType == PickerDisplayType.Inline ? -1 : TabIndex)"
                    value="@DisplayString"
                    @onclick="TogglePopoverAsync"

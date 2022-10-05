@@ -118,6 +118,32 @@ public abstract class SelectBase<TValue, TOption>
         .Where(x => x is not null)
         .Cast<TOption>();
 
+    /// <summary>
+    /// An optional function which determines the size of options provided by the <see
+    /// cref="OptionTemplate"/> property.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This function is not utilized for <see cref="OptionPairs"/>: an automatic determination is
+    /// made using the length of the resulting strings.
+    /// </para>
+    /// <para>
+    /// This function is ignored if the <see cref="Size"/> property is provided.
+    /// </para>
+    /// </remarks>
+    [Parameter] public Func<TOption, int>? OptionSize { get; set; }
+
+    /// <summary>
+    /// The maximum number of characters which the select should show. Its minimum size will be set
+    /// to allow this number of characters.
+    /// </summary>
+    /// <remarks>
+    /// When this property is not set, <see cref="OptionSize"/> will be used. If that property is
+    /// also unset, an automatic determination will be made. In the event that no automatic minimum
+    /// width can be determined, the select will be a minimum width.
+    /// </remarks>
+    [Parameter] public int? Size { get; set; }
+
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")
@@ -168,6 +194,10 @@ public abstract class SelectBase<TValue, TOption>
         && !Required
         && _selectedOptions.Count > 0;
 
+    private protected string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
+        .Add("invisible", !CanClear)
+        .ToString();
+
     private protected virtual string? OptionListCssClass => new CssBuilder("list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
@@ -194,6 +224,8 @@ public abstract class SelectBase<TValue, TOption>
             TargetOnly = true,
         }
     };
+
+    private protected int MaxOptionSize { get; set; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="SelectBase{TValue, TOption}"/>.
@@ -248,7 +280,11 @@ public abstract class SelectBase<TValue, TOption>
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void Add(Option<TOption> option) => _options.Add(option);
+    public void Add(Option<TOption> option)
+    {
+        _options.Add(option);
+        MaxOptionSize = Math.Max(MaxOptionSize, option.Label?.Length ?? 0);
+    }
 
     /// <summary>
     /// <para>
@@ -287,7 +323,13 @@ public abstract class SelectBase<TValue, TOption>
     /// <summary>
     /// Called internally.
     /// </summary>
-    public virtual void Remove(Option<TOption> option) => _options.Remove(option);
+    public virtual void Remove(Option<TOption> option)
+    {
+        _options.Remove(option);
+        MaxOptionSize = _options.Count == 0
+            ? 0
+            : _options.Max(x => x.Label?.Length ?? 0);
+    }
 
     /// <summary>
     /// <para>

@@ -22,6 +22,26 @@ public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValu
     /// </summary>
     protected override bool IsMultiselect => true;
 
+    /// <inheritdoc />
+    protected override string? InputCssStyle => new CssBuilder(base.InputCssStyle)
+        .AddStyle(
+            "min-width",
+            $"{(Size ?? 0) + 2 + (_options.Count - 1).ToString("N0").Length}ch",
+            Size.HasValue)
+        .AddStyle(
+            "min-width",
+            () => $"{Math.Max(MaxOptionSize, Options!.Max(OptionSize!)) + 2 + (_options.Count - 1).ToString("N0").Length}ch",
+            !Size.HasValue && OptionSize is not null && OptionTemplate is not null && Options?.Any() == true)
+        .AddStyle(
+            "min-width",
+            () => $"{Math.Max(MaxOptionSize, Options!.Select(Labels!).Max(x => x.Length)) + 2 + (_options.Count - 1).ToString("N0").Length}ch",
+            !Size.HasValue && (OptionSize is null || OptionTemplate is null) && Labels is not null && Options?.Any() == true)
+        .AddStyle(
+            "min-width",
+            () => $"{MaxOptionSize + 2 + (_options.Count - 1).ToString("N0").Length}ch",
+            !Size.HasValue && (OptionSize is null || OptionTemplate is null) && (Labels is null || Options?.Any() != true))
+        .ToString();
+
     /// <summary>
     /// Constructs a new instance of <see cref="MultiSelect{TValue}"/>.
     /// </summary>

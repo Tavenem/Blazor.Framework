@@ -80,6 +80,15 @@ public partial class DataGridSelect<
     /// </summary>
     [Parameter] public Func<TDataItem, TValue?>? RowValue { get; set; }
 
+    /// <summary>
+    /// The maximum number of characters which the select should show. Its minimum size will be set
+    /// to allow this number of characters.
+    /// </summary>
+    /// <remarks>
+    /// When this property is not set, the select will be a minimum width.
+    /// </remarks>
+    [Parameter] public int? Size { get; set; }
+
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")
@@ -123,12 +132,28 @@ public partial class DataGridSelect<
         }
     }
 
+    /// <inheritdoc />
+    protected override string? InputCssStyle => new CssBuilder(base.InputCssStyle)
+        .AddStyle(
+            "min-width",
+            $"{Size ?? 0}ch",
+            Size.HasValue)
+        .AddStyle(
+            "min-width",
+            () => $"{Items.Select(ItemLabel!).Max(x => x.Length)}ch",
+            !Size.HasValue && ItemLabel is not null && Items.Count > 0)
+        .ToString();
+
     private protected override bool CanClear => AllowClear
         && Clearable
         && !Disabled
         && !ReadOnly
         && !Required
         && DataGrid?.SelectedItems.Count > 0;
+
+    private protected string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
+        .Add("invisible", !CanClear)
+        .ToString();
 
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
 
