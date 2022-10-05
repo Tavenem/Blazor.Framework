@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.2-preview
+### Changed
+- Hide clear icon instead of remove it in clearable inputs, to prevent width changes
+
 ## 0.11.1-preview
 ### Changed
 - Made some extension methods public:

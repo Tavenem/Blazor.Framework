@@ -154,14 +154,14 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     protected Popover? Popover { get; set; }
 
-    private protected virtual bool CanClear => AllowClear
-        && Clearable
-        && !Disabled
-        && !ReadOnly
-        && !Required
+    private protected virtual bool CanClear => ShowClear
         && !string.IsNullOrEmpty(CurrentValueAsString);
 
     private protected bool Clearable { get; set; }
+
+    private protected string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
+        .Add("invisible", !CanClear)
+        .ToString();
 
     private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
 
@@ -187,6 +187,12 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     };
 
     private protected bool PopoverOpen { get; set; }
+
+    private protected virtual bool ShowClear => AllowClear
+        && Clearable
+        && !Disabled
+        && !ReadOnly
+        && !Required;
 
     private protected bool ShowPicker => PopoverOpen
         && !Disabled

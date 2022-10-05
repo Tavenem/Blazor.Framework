@@ -187,16 +187,8 @@ public abstract class SelectBase<TValue, TOption>
     /// </summary>
     protected virtual bool IsMultiselect => false;
 
-    private protected override bool CanClear => AllowClear
-        && Clearable
-        && !Disabled
-        && !ReadOnly
-        && !Required
+    private protected override bool CanClear => ShowClear
         && _selectedOptions.Count > 0;
-
-    private protected string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
-        .Add("invisible", !CanClear)
-        .ToString();
 
     private protected virtual string? OptionListCssClass => new CssBuilder("list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())

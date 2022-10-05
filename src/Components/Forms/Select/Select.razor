@@ -32,12 +32,15 @@
                value="@DisplayString"
                @onclick="TogglePopoverAsync"
                @onclick:stopPropagation="true" />
-        <button class="@ClearButtonCssClass"
-                tabindex="-1"
-                @onclick="ClearAsync"
-                @onclick:stopPropagation="true">
-            <tf-icon>@ClearIcon</tf-icon>
-        </button>
+        @if (ShowClear)
+        {
+            <button class="@ClearButtonCssClass"
+                    tabindex="-1"
+                    @onclick="ClearAsync"
+                    @onclick:stopPropagation="true">
+                <tf-icon>@ClearIcon</tf-icon>
+            </button>
+        }
         <tf-icon class="expand" @onclick="TogglePopoverAsync" @onclick:stopPropagation="true">@DefaultIcons.Expand</tf-icon>
     </div>
     @if (!string.IsNullOrEmpty(Label))

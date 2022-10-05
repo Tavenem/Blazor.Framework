@@ -50,9 +50,9 @@
                @onchange="OnChangeAsync"
                @onfocusin="OnFocusIn"
                @onfocusout="OnFocusOut" />
-        @if (CanClear)
+        @if (ShowClear)
         {
-            <button class="btn btn-icon small" tabindex="-1" @onclick="Clear">
+            <button class="@ClearButtonCssClass" tabindex="-1" @onclick="Clear">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }

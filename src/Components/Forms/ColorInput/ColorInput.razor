@@ -249,9 +249,9 @@ else
                    value="@DisplayString"
                    @onclick="TogglePopoverAsync"
                    @onclick:stopPropagation="true" />
-            @if (CanClear)
+            @if (ShowClear)
             {
-                <button class="btn btn-icon small" disabled="@(Disabled || ReadOnly)" tabindex="-1" @onclick="ClearAsync">
+                <button class="@ClearButtonCssClass" disabled="@(Disabled || ReadOnly)" tabindex="-1" @onclick="ClearAsync">
                     <tf-icon>@ClearIcon</tf-icon>
                 </button>
             }

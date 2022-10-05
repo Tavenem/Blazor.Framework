@@ -301,12 +301,13 @@ public partial class TextInput : InputComponentBase<string?>
     }
 
     private bool _canClear = false;
-    private bool CanClear => Clearable
-        && !Disabled
-        && !ReadOnly
-        && !Required
+    private bool CanClear => ShowClear
         && (!string.IsNullOrEmpty(CurrentValue)
         || _canClear);
+
+    private string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
+        .Add("invisible", !CanClear)
+        .ToString();
 
     private string? CurrentInput { get; set; }
 
@@ -381,6 +382,11 @@ public partial class TextInput : InputComponentBase<string?>
     private bool HasSuggestions => Suggestions?.Any() == true
         || SuggestionValues?.Any() == true
         || LoadedSuggestions?.Any() == true;
+
+    private bool ShowClear => Clearable
+        && !Disabled
+        && !ReadOnly
+        && !Required;
 
     private string? SuggestionListCssClass => new CssBuilder("list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
@@ -513,10 +519,7 @@ public partial class TextInput : InputComponentBase<string?>
         if (Converter is not null
             && Converter.TryGetValue(value, out result))
         {
-            if (result is null)
-            {
-                result = default!;
-            }
+            result ??= default!;
         }
         else
         {
