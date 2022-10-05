@@ -46,6 +46,8 @@ jobs:
         id: checkTag
         with: 
           tag: 'v${{ steps.nbgv.outputs.Version }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pack
         if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
