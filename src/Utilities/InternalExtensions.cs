@@ -1,18 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Tavenem.Blazor.Framework;
 
-internal static class Extensions
+internal static class InternalExtensions
 {
-    private const string Letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private const string NextBoundaryRegex = ".*\\b";
     private const string PreviousBoundaryRegex = "\\b[\\w]*";
     private const string WholeWordRegex = "\\b";
-
-    private static readonly Random _Random = new();
 
     public static IEnumerable<HighlightingChunk> GetHighlightingChunks(
         this string? text,
@@ -73,16 +69,6 @@ internal static class Extensions
             });
     }
 
-    public static string ToHtmlId(this Guid guid)
-    {
-        var str = guid.ToString("N");
-        if (char.IsDigit(str, 0))
-        {
-            return Letters[_Random.Next(Letters.Length)] + str;
-        }
-        return str;
-    }
-
     public static IEnumerable<string> ReadLines(this string value)
     {
         string? line;
@@ -103,77 +89,6 @@ internal static class Extensions
 
         return new StringBuilder(Regex.Replace(value.ToString(), pattern, replacement, options));
     }
-
-    public static string? ToCSS(this Enum value)
-    {
-        if (value is null || Convert.ToInt32(value) == 0)
-        {
-            return null;
-        }
-
-        return value
-            .ToString()
-            .ToLowerInvariant()
-            .Replace('_', '-');
-    }
-
-    public static string ToCSS(this double value, int precision = 5)
-    {
-        if (value is < 0.00001 and > -0.00001)
-        {
-            return "0";
-        }
-        return precision <= 0
-            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
-    }
-
-    public static string ToCSS(this float value, int precision = 5)
-    {
-        if (value is < 0.00001f and > -0.00001f)
-        {
-            return "0";
-        }
-        return precision <= 0
-            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
-    }
-
-    [return: NotNullIfNotNull("value")]
-    public static string? ToHumanReadable(this string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return value;
-        }
-
-        var sb = new StringBuilder();
-        var lower = false;
-        for (var i = 0; i < value.Length; i++)
-        {
-            if (value[i] == '_')
-            {
-                sb.Append(' ');
-                lower = false;
-            }
-            else if (lower && char.IsUpper(value[i]))
-            {
-                sb.Append(' ')
-                    .Append(value[i]);
-                lower = false;
-            }
-            else
-            {
-                sb.Append(value[i]);
-                lower = char.IsLower(value[i]);
-            }
-        }
-
-        return sb.ToString();
-    }
-
-    public static string ToHumanReadable(this Enum value)
-        => ToHumanReadable(value.ToString());
 
     [return: NotNullIfNotNull("value")]
     public static string? ToJsString(this string? value)
@@ -196,28 +111,6 @@ internal static class Extensions
         DragEffect.LinkMove => "linkMove",
         _ => "all",
     };
-
-    public static string ToPixels(this double value, int precision = 5)
-    {
-        if (value is < 0.00001 and > -0.00001)
-        {
-            return "0px";
-        }
-        return precision <= 0
-            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}px"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
-    }
-
-    public static string ToPixels(this float value, int precision = 5)
-    {
-        if (value is < 0.00001f and > -0.00001f)
-        {
-            return "0px";
-        }
-        return precision <= 0
-            ? $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture)}px"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
-    }
 
     [return: NotNullIfNotNull("value")]
     public static string? ToTrimmedString(this StringBuilder? value)

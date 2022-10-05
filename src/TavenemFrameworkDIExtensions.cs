@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// Extension to <c>Microsoft.Extensions.DependencyInjection</c> for
 /// <c>Tavenem.Blazor.Framework</c>.
 /// </summary>
-public static class FrameworkExtensions
+public static class TavenemFrameworkDIExtensions
 {
     /// <summary>
     /// Add the required services for <c>Tavenem.Blazor.Framework</c>.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.1-preview
+### Changed
+- Made some extension methods public:
+  - `ToHtmlId` (`Guid`) - format suitable for use as an HTML id
+  - `ToHumanReadable` (`string` or `Enum`): replaces '_' with ' ' and inserts spaces into `camelCase` and `PascalCase` terms
+  - `ToCSS` (`Enum`): formats in lowercase, replaces '_' with '-'
+  - `ToCSS` (floating point types): formats in the most compact notation suitable for a CSS property value
+  - `ToPixels` (floating point types): as `ToCss`, followed by "px"
+
 ## 0.11.0-preview
 ### Added
 - `Size` to `TextInput`, `NumericInput`, `Select`, `MultiSelect`, `DataGridSelect`, and `DataGridMultiSelect`: specify the minimum width of the inner input control in displayed characters
