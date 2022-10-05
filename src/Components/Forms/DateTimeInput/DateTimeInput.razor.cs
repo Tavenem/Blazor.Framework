@@ -257,6 +257,7 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 
     private string? ButtonClass => new CssBuilder(InputClass)
         .AddClassFromDictionary(InputAttributes)
+        .Add(ThemeColor.ToCSS())
         .Add("picker-btn btn btn-icon")
         .ToString();
 

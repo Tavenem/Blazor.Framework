@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.4-preview
+### Fixed
+- Tooltip delay
+### Changed
+- Apply theme color to color and date picker buttons
+
 ## 0.11.3-preview
 ### Fixed
 - Button group style for tooltips

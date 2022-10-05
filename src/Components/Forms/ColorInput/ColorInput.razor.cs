@@ -181,6 +181,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 
     private string? ButtonClass => new CssBuilder(InputClass)
         .AddClassFromDictionary(InputAttributes)
+        .Add(ThemeColor.ToCSS())
         .Add("picker-btn btn")
         .Add("btn-icon", IconButton)
         .ToString();

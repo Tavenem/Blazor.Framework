@@ -7,7 +7,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Tooltip : IDisposable
 {
-    private readonly AdjustableTimer _timer;
+    private readonly AdjustableTimer _hideTimer;
+    private readonly AdjustableTimer _showTimer;
 
     private bool _disposedValue;
     private bool _visible;
@@ -25,7 +26,7 @@ public partial class Tooltip : IDisposable
     /// <summary>
     /// The delay before showing the tooltip, in milliseconds.
     /// </summary>
-    [Parameter] public double Delay { get; set; } = 0;
+    [Parameter] public int Delay { get; set; } = 0;
 
     /// <summary>
     /// <para>
@@ -133,7 +134,11 @@ public partial class Tooltip : IDisposable
     /// <summary>
     /// Contructs a new instance of <see cref="Tooltip"/>.
     /// </summary>
-    public Tooltip() => _timer = new(Hide, 200);
+    public Tooltip()
+    {
+        _hideTimer = new(Hide, 200);
+        _showTimer = new(Show, 200);
+    }
 
     /// <inheritdoc/>
     public void Dispose()
@@ -158,7 +163,8 @@ public partial class Tooltip : IDisposable
         {
             if (disposing)
             {
-                _timer.Dispose();
+                _hideTimer.Dispose();
+                _showTimer.Dispose();
             }
 
             _disposedValue = true;
@@ -168,6 +174,7 @@ public partial class Tooltip : IDisposable
     private void Hide()
     {
         _visible = false;
+        _showTimer.Cancel();
         StateHasChanged();
     }
 
@@ -177,15 +184,30 @@ public partial class Tooltip : IDisposable
         {
             return;
         }
-        _timer.Cancel();
-        _visible = true;
+        _hideTimer.Cancel();
+        if (Delay > 0)
+        {
+            _showTimer.Change(Delay);
+            _showTimer.Start();
+        }
+        else
+        {
+            _visible = true;
+        }
     }
 
     private void OnMouseOut()
     {
         if (!_disposedValue)
         {
-            _timer.Start();
+            _showTimer.Cancel();
+            _hideTimer.Start();
         }
+    }
+
+    private void Show()
+    {
+        _visible = true;
+        StateHasChanged();
     }
 }
