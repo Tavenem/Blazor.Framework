@@ -39,54 +39,59 @@ jobs:
         working-directory: ./src
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --configuration Release --no-build --verbosity normal
         working-directory: ./src
 
+      - uses: mukunku/tag-exists-action@v1.0.0
+        id: checkTag
+        with: 
+          tag: 'v${{ steps.nbgv.outputs.Version }}'
+
       - name: Pack
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: dotnet pack ./Tavenem.Blazor.Framework.csproj --include-symbols -p:SymbolPackageFormat=snupkg -p:PackageVersion=${{ steps.nbgv.outputs.Version }} --configuration Release --no-build --nologo --output .
         working-directory: ./src
 
       - name: Push to NuGet
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: dotnet nuget push *.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
         working-directory: ./src
 
       - name: Publish
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: dotnet publish --configuration Release -o publish -p:Version=${{ steps.nbgv.outputs.Version }} --no-build --nologo
         working-directory: ./docs/docsite
 
       # copy index.html to 404.html to fix GitHub Pages SPA navigation
       - name: copy index.html to 404.html
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: |
           cp index.html 404.html
         working-directory: ./docs/docsite/publish/wwwroot
 
       # add .nojekyll file so GitHub pages will not treat this as a Jekyll project
       - name: Add .nojekyll file
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: touch publish/wwwroot/.nojekyll
         working-directory: ./docs/docsite
 
       - name: Deploy
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
           branch: gh-pages
           folder: docs/docsite/publish/wwwroot
 
       - name: Git tag
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: git tag v${{ steps.nbgv.outputs.Version }}
 
       - name: Push tag
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         run: git push origin v${{ steps.nbgv.outputs.Version }}
 
       - name: Release
-        if: steps.nbgv.outputs.PublicRelease && steps.nbgv.outputs.VersionHeight == 1
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         id: create_release
         uses: softprops/action-gh-release@v0.1.14
         env:
