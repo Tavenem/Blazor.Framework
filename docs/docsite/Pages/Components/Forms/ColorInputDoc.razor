@@ -100,8 +100,10 @@
 </dl>
 
 <p>
-    The string returned will always be a hexadecimal string for colors with no alpha component, or
-    an <code>rgba</code> function for colors with an alpha component. 
+    The string returned will be a hexadecimal string for colors with no alpha component, or an
+    <code>rgba</code> function for colors with an alpha component, for maximum CSS compatibility. If
+    you set the <code>OutputHexStrings</code> property to <code>true</code>, the output will always
+    be a hexadecimal string (either 6- or 8-digit).
 </p>
 
 <Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

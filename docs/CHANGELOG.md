@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.6-preview
+### Added
+- `OutputHexStrings` property to `ColorInput`
+
 ## 0.11.5-preview
 ### Added
 - `DismissOnTap` property to tooltips
