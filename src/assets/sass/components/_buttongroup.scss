@@ -192,6 +192,11 @@
                 border-bottom-right-radius: 0;
             }
         }
+
+        .tooltip-root:not(:last-of-type) > .btn:not(.tooltip-trigger) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     }
 
     &.vertical {
@@ -215,6 +220,12 @@
                 border-bottom-right-radius: 0;
                 border-bottom-style: solid;
             }
+        }
+
+        > .tooltip-root:not(:last-of-type) > .btn:not(.tooltip-trigger) {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-style: solid;
         }
     }
 

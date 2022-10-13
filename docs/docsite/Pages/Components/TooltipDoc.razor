@@ -11,7 +11,7 @@
 <Heading Level="HeadingLevel.H2">Basics</Heading>
 
 <p>
-    Wrap any content with a <code>Toolltip</code> component and set the <code>TooltipText</code>
+    Wrap any content with a <code>Tooltip</code> component and set the <code>TooltipText</code>
     property to the tooltip to create a simple tooltip.
 </p>
 
@@ -85,10 +85,11 @@
 
 <p>
     Tooltips normally appear when the element either receives focus, or when the mouse pointer
-    enters the element. On devices where hovering is not supported by the default input method, a
-    small help icon will appear near the element. The tooltip will appear when this icon is tapped.
-    You can hide the icon by adding the <code>no-help</code> class to the tooltip, if you intend to
-    provide alternate means to present the tooltip's information to touch device users.
+    enters the element, and disappear whent he element loses focus, or is tapped with the pointer.
+    On devices where hovering is not supported by the default input method, a small help icon will
+    appear near the element. The tooltip will appear when this icon is tapped. You can hide the icon
+    by adding the <code>no-help</code> class to the tooltip, if you intend to provide alternate
+    means to present the tooltip's information to touch device users.
 </p>
 
 <p>
@@ -112,6 +113,11 @@
 
 <p>
     Control the delay before the tooltip appears with the <code>Delay</code> property.
+</p>
+
+<p>
+    Cause the tooltip to be dismissed when tapped with the pointer by setting the
+    <code>DismissOnTap</code> property to <code>true</code>.
 </p>
 
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

@@ -5,11 +5,17 @@
 <div @attributes="AdditionalAttributes"
      class="@CssClass"
      style="@CssStyle"
+     @onclick="OnDismiss"
      @onfocusin="OnMouseOver"
      @onfocusout="OnMouseOut"
      @onmouseover="OnMouseOver"
-     @onmouseout="OnMouseOut">
-    <button class="btn btn-icon info tooltip-trigger" tabindex="-1">
+     @onmouseleave="OnMouseOut">
+    <button class="btn btn-icon info tooltip-trigger"
+            @onclick="Toggle"
+            @onclick:stopPropagation="true"
+            @onfocusin:stopPropagation="true"
+            @onmouseover:stopPropagation="true"
+            tabindex="-1">
         <tf-icon>@DefaultIcons.Help</tf-icon>
     </button>
     @ChildContent
@@ -22,7 +28,8 @@
                  MaxHeight="@MaxHeight"
                  PopoverOrigin="PopoverOrigin"
                  Style="@TooltipStyle"
-                 ThemeColor="ThemeColor">
+                 ThemeColor="ThemeColor"
+                 @onclick:stopPropagation="@(!DismissOnTap)">
             @if (TooltipContent is not null)
             {
                 @TooltipContent

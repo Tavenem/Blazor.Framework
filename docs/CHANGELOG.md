@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.5-preview
+### Added
+- `DismissOnTap` property to tooltips
+### Fixed
+- Button group styling
+- Behavior of mobile tooltip icon
+### Changed
+- Tooltips are dismissed when interacting with the underlying element
+
 ## 0.11.4-preview
 ### Fixed
 - Tooltip delay

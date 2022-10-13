@@ -10,6 +10,7 @@ public partial class Tooltip : IDisposable
     private readonly AdjustableTimer _hideTimer;
     private readonly AdjustableTimer _showTimer;
 
+    private bool _dismissed;
     private bool _disposedValue;
     private bool _visible;
 
@@ -27,6 +28,16 @@ public partial class Tooltip : IDisposable
     /// The delay before showing the tooltip, in milliseconds.
     /// </summary>
     [Parameter] public int Delay { get; set; } = 0;
+
+    /// <summary>
+    /// <para>
+    /// Whether the tooltip should be dismissed when it is tapped with the pointer.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>, which permits interaction with the tooltip content.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool DismissOnTap { get; set; }
 
     /// <summary>
     /// <para>
@@ -151,7 +162,16 @@ public partial class Tooltip : IDisposable
     /// <summary>
     /// Toggles the visibility of this tooltip.
     /// </summary>
-    public void Toggle() => _visible = !_visible;
+    public void Toggle()
+    {
+        _visible = !_visible;
+        if (!_disposedValue)
+        {
+            _dismissed = false;
+            _hideTimer.Cancel();
+            _showTimer.Cancel();
+        }
+    }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting
@@ -174,13 +194,26 @@ public partial class Tooltip : IDisposable
     private void Hide()
     {
         _visible = false;
-        _showTimer.Cancel();
+        if (!_disposedValue)
+        {
+            _showTimer.Cancel();
+        }
         StateHasChanged();
+    }
+
+    private void OnDismiss()
+    {
+        if (!_disposedValue)
+        {
+            _dismissed = true;
+            _showTimer.Cancel();
+            _hideTimer.Start();
+        }
     }
 
     private void OnMouseOver()
     {
-        if (_disposedValue)
+        if (_disposedValue || _dismissed)
         {
             return;
         }
@@ -200,6 +233,7 @@ public partial class Tooltip : IDisposable
     {
         if (!_disposedValue)
         {
+            _dismissed = false;
             _showTimer.Cancel();
             _hideTimer.Start();
         }
