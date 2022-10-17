@@ -49,7 +49,8 @@
                @oninput="OnInputAsync"
                @onchange="OnChangeAsync"
                @onfocusin="OnFocusIn"
-               @onfocusout="OnFocusOut" />
+               @onfocusout="OnFocusOut"
+               @onkeyup="OnKeyUpAsync" />
         @if (ShowClear)
         {
             <button class="@ClearButtonCssClass" tabindex="-1" @onclick="Clear">

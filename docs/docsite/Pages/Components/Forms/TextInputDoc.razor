@@ -758,6 +758,12 @@
     start index to the end of the input is selected.
 </p>
 
+<p>
+    The <code>OnValidEnter</code> callback is invoked after the <kbd>Enter</kbd> key is pressed
+    while the input has focus, but only if the current input is valid. It can be used to safely hook
+    submission-type logic for text inputs, without duplicating validation logic.
+</p>
+
 <Heading Level="HeadingLevel.H2">Customization</Heading>
 
 <p>

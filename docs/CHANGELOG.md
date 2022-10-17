@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.7-preview
+### Added
+- `OnValidEnter` callback to `TextInput`
+### Changed
+- Update to .NET 7 RC 2.
+
 ## 0.11.6-preview
 ### Added
 - `OutputHexStrings` property to `ColorInput`

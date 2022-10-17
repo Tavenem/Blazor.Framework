@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
 
@@ -125,6 +126,11 @@ public partial class TextInput : InputComponentBase<string?>
     /// The maximum length of the input string.
     /// </summary>
     [Parameter] public int? MaxLength { get; set; }
+
+    /// <summary>
+    /// Invoked when the enter key is pressed, and the input is valid.
+    /// </summary>
+    [Parameter] public EventCallback OnValidEnter { get; set; }
 
     /// <summary>
     /// <para>
@@ -564,6 +570,8 @@ public partial class TextInput : InputComponentBase<string?>
         catch { }
     }
 
+    private Task OnChangeAsync(ChangeEventArgs e) => SetValueAsync(e.Value as string);
+
     private void OnClick() => SuggestionsClosed = false;
 
     private void OnFocusIn()
@@ -610,7 +618,17 @@ public partial class TextInput : InputComponentBase<string?>
         }
     }
 
-    private Task OnChangeAsync(ChangeEventArgs e) => SetValueAsync(e.Value as string);
+    private async Task OnKeyUpAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await ValidateAsync();
+            if (IsValid)
+            {
+                await OnValidEnter.InvokeAsync();
+            }
+        }
+    }
 
     private void OnTimer()
     {
