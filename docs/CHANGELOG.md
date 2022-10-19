@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.8-preview
+### Fixed
+- Event support for .NET 6
+
 ## 0.11.7-preview
 ### Added
 - `OnValidEnter` callback to `TextInput`
