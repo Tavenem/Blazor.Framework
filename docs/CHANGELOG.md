@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.11.8-preview
+## 0.11.8-preview-0.11.9-preview
 ### Fixed
 - Event support for .NET 6
 
