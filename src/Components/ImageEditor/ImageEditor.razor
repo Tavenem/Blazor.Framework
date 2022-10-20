@@ -1,0 +1,314 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+<div class="@CssClass" style="@CssStyle">
+    @if (IsLoading)
+    {
+        <div class="overlay">
+            <tf-progress-circle class="primary"></tf-progress-circle>
+        </div>
+    }
+    @if (!Editing && ShowEditButton && (AllowEditNoImage || HasImage))
+    {
+        <button class="btn btn-icon image-edit-button @ThemeClass" @onclick="BeginEditAsync">
+            <tf-icon>@EditIcon</tf-icon>
+        </button>
+    }
+    <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle"></div>
+    @if (Editing)
+    {
+        <div class="image-editor-controls gap-2">
+            @if (IsCropping)
+            {
+                <div class="image-editor-toolbar" role="toolbar" aria-label="Cropping toolbar">
+                    <Tooltip TooltipText="Crop" Delay="1000">
+                        <button class="btn btn-icon @ThemeClass" @onclick="CropAsync" aria-label="Crop">
+                            <tf-icon>crop</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="Cancel" Delay="1000">
+                        <button class="btn btn-icon @ThemeClass" @onclick="CancelAsync" aria-label="Cancel crop">
+                            <tf-icon>cancel</tf-icon>
+                        </button>
+                    </Tooltip>
+                    @if (ShowCropAspectRatioControls)
+                    {
+                        <div class="button-group-text small @ThemeClass" role="group" aria-label="Aspect ratio group">
+                            <Tooltip TooltipText="Free" Delay="1000">
+                            <button class="@GetAspectRatioClass(null)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(null))"
+                                    aria-label="Free crop">
+                                <tf-icon>crop_free</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="Original" Delay="1000">
+                            <button class="@GetAspectRatioClass(-1)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(-1))" 
+                                    aria-label="Original aspect ratio">
+                                <tf-icon>crop_original</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="Square" Delay="1000">
+                            <button class="@GetAspectRatioClass(1)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(1))"
+                                    aria-label="Square aspect ratio">
+                                <tf-icon>crop_square</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="5:4" Delay="1000">
+                            <button class="@GetAspectRatioClass(5.0/4.0)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(5.0/4.0))"
+                                    aria-label="5:4 aspect ratio">
+                                <tf-icon>crop_5_4</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="4:3" Delay="1000">
+                            <button class="@GetAspectRatioClass(4.0/3.0)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(4.0/3.0))"
+                                    aria-label="4:3 aspect ratio">
+                                <tf-icon>crop_landscape</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="3:2" Delay="1000">
+                            <button class="@GetAspectRatioClass(3.0/2.0)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(3.0/2.0))"
+                                    aria-label="3:2 aspect ratio">
+                                <tf-icon>crop_3_2</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="16:9" Delay="1000">
+                            <button class="@GetAspectRatioClass(16.0/9.0)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(16.0/9.0))"
+                                    aria-label="16:9 aspect ratio">
+                                <tf-icon>crop_16_9</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="7:5" Delay="1000">
+                            <button class="@GetAspectRatioClass(7.0/5.0)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(7.0/5.0))"
+                                    aria-label="7:5 aspect ratio">
+                                <tf-icon>crop_7_5</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="3:4" Delay="1000">
+                            <button class="@GetAspectRatioClass(3.0/4.0)"
+                                    @onclick="@(_ => SetCropAspectRatioAsync(3.0/4.0))"
+                                    aria-label="3:4 aspect ratio">
+                                    <tf-icon>crop_portrait</tf-icon>
+                                </button>
+                            </Tooltip>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="image-editor-toolbar" role="toolbar" aria-label="Image file toolbar">
+                    <div class="button-group-text small @ThemeClass" role="group" aria-label="History group">
+                        <Tooltip TooltipText="Undo" Delay="1000">
+                            <button class="btn btn-icon" @onclick="UndoAsync" disabled="@(!UndoHistoryHasState)" aria-label="Undo">
+                                <tf-icon>undo</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="Redo" Delay="1000">
+                            <button class="btn btn-icon" @onclick="RedoAsync" disabled="@(!RedoHistoryHasState)" aria-label="Redo">
+                                <tf-icon>redo</tf-icon>
+                            </button>
+                        </Tooltip>
+                    </div>
+                    <div id="@SaveGroupId" class="button-group-text small @ThemeClass" role="group" aria-label="Save group">
+                        @if (AllowSaving)
+                        {
+                            <Tooltip TooltipText="Save" Delay="1000">
+                                <button class="btn btn-icon" @onclick="@(_ => SaveAsync(Format))" aria-label="Save">
+                                    <tf-icon>save</tf-icon>
+                                </button>
+                            </Tooltip>
+                        }
+                        <Tooltip TooltipText="Download" Delay="1000">
+                            <button class="btn btn-icon" @onclick="@(_ => ExportImageAsync(Format))" aria-label="Download">
+                                <tf-icon>file_download</tf-icon>
+                            </button>
+                        </Tooltip>
+                        @if (ShowFormats)
+                        {
+                            <Tooltip TooltipText="Save format" Delay="1000">
+                                <Dropdown AnchorId="@SaveGroupId" Icon="arrow_drop_down" Class="dense rounded-right">
+                                    <span @onclick="@(_ => Format = "image/png")">
+                                        @if (Format == "image/png")
+                                        {
+                                            <tf-icon class="@ThemeClass">done</tf-icon>
+                                        }
+                                        <span>PNG</span>
+                                    </span>
+                                    <span @onclick="@(_ => Format = "image/jpeg")">
+                                        @if (Format == "image/jpeg")
+                                        {
+                                            <tf-icon class="@ThemeClass">done</tf-icon>
+                                        }
+                                        <span>JPEG</span>
+                                    </span>
+                                    <span @onclick="@(_ => Format = "image/webp")">
+                                        @if (Format == "image/webp")
+                                        {
+                                            <tf-icon class="@ThemeClass">done</tf-icon>
+                                        }
+                                        <span>WebP</span>
+                                    </span>
+                                </Dropdown>
+                            </Tooltip>
+                        }
+                    </div>
+                    <Tooltip TooltipText="Cancel edit" Delay="1000" Side="Side.Left">
+                        <button class="btn btn-icon @ThemeClass" @onclick="CancelEditAsync" aria-label="Cancel edit">
+                            <tf-icon>cancel</tf-icon>
+                        </button>
+                    </Tooltip>
+                </div>
+                @if (ShowRotateControls || ShowCropControls || ShowFlipControls)
+                {
+                    <div class="image-editor-toolbar" role="toolbar" aria-label="Image manipulation toolbar">
+                        @if (ShowRotateControls)
+                        {
+                            <div class="button-group-text small @ThemeClass" role="group" aria-label="Rotate group">
+                                <Tooltip TooltipText="Rotate left" Delay="1000" Side="Side.Right">
+                                    <button class="btn btn-icon" @onclick="RotateCounterClockwiseAsync" aria-label="Rotate left">
+                                        <tf-icon>rotate_left</tf-icon>
+                                    </button>
+                                </Tooltip>
+                                <Tooltip TooltipText="Rotate right" Delay="1000">
+                                    <button class="btn btn-icon" @onclick="RotateClockwiseAsync" aria-label="Rotate right">
+                                        <tf-icon>rotate_right</tf-icon>
+                                    </button>
+                                </Tooltip>
+                            </div>
+                        }
+                        @if (ShowCropControls)
+                        {
+                            <Tooltip TooltipText="Crop" Delay="1000">
+                                <button class="btn btn-icon @ThemeClass" @onclick="StartCropAsync" aria-label="Crop">
+                                    <tf-icon>crop</tf-icon>
+                                </button>
+                            </Tooltip>
+                        }
+                        @if (ShowFlipControls)
+                        {
+                            <div class="button-group-text small @ThemeClass" role="group" aria-label="Rotate group">
+                                <Tooltip TooltipText="Flip horizontally" Delay="1000" Side="Side.Left">
+                                    <button class="btn btn-icon" @onclick="FlipHorizontalAsync" aria-label="Flip horizontally">
+                                        <tf-icon>swap_horiz</tf-icon>
+                                    </button>
+                                </Tooltip>
+                                <Tooltip TooltipText="Flip vertically" Delay="1000" Side="Side.Left">
+                                    <button class="btn btn-icon" @onclick="FlipVerticalAsync" aria-label="Flip vertically">
+                                        <tf-icon>swap_vert</tf-icon>
+                                    </button>
+                                </Tooltip>
+                            </div>
+                        }
+                    </div>
+                }
+                @if (ShowDrawingControls)
+                {
+                    <div class="image-editor-toolbar" role="toolbar" aria-label="Drawing toolbar">
+                        @if (DrawingMode == DrawingMode.Brush)
+                        {
+                            @if (IsErasing)
+                            {
+                                <Tooltip TooltipText="Draw" Delay="1000">
+                                    <button class="btn btn-icon @ThemeClass" @onclick="@(_ => SetIsErasingAsync(false))" aria-label="Draw">
+                                        <tf-icon>draw</tf-icon>
+                                    </button>
+                                </Tooltip>
+                            }
+                            else
+                            {
+                                <div class="image-editor-toolbar" role="toolbar" aria-label="Color toolbar">
+                                    <Tooltip TooltipText="Color" Delay="1000" Side="Side.Right">
+                                        <ColorInput DisplayType="PickerDisplayType.Button"
+                                                    TValue="string"
+                                                    Value="BrushColor"
+                                                    ValueChanged="@(v => SetBrushColorAsync(v))"
+                                                    OutputHexStrings="true"
+                                                    ShowAlpha="false"
+                                                    ThemeColor="ThemeColor" />
+                                    </Tooltip>
+                                    <Tooltip TooltipText="Erase" Delay="1000">
+                                        <button class="btn btn-icon @ThemeClass" @onclick="@(_ => SetIsErasingAsync(true))" aria-label="Erase">
+                                            <tf-icon>backspace</tf-icon>
+                                        </button>
+                                    </Tooltip>
+                                </div>
+                            }
+                            <Tooltip TooltipText="Brush size"
+                                     Delay="1000"
+                                     Class="d-inline-flex align-items-center gap-2">
+                                <tf-icon>line_weight</tf-icon>
+                                <Slider TValue="double"
+                                        Value="BrushSize"
+                                        ValueChanged="@(v => SetBrushSizeAsync(v))"
+                                        Min="1"
+                                        Max="100"
+                                        Step="0.1"
+                                        ThemeColor="ThemeColor"
+                                        aria-label="Brush size" />
+                            </Tooltip>
+                            <Tooltip TooltipText="Done drawing" Delay="1000">
+                                <button class="btn btn-icon @ThemeClass"
+                                        @onclick="@(_ => SetDrawingModeAsync(DrawingMode.None))"
+                                        aria-label="Stop drawing">
+                                    <tf-icon>done</tf-icon>
+                                </button>
+                            </Tooltip>
+                        }
+                        else if (TextMode)
+                        {
+                            <div class="image-editor-toolbar" role="toolbar" aria-label="Color toolbar">
+                                <Tooltip TooltipText="Color" Delay="1000" Side="Side.Right">
+                                    <ColorInput DisplayType="PickerDisplayType.Button"
+                                                TValue="string"
+                                                Value="BrushColor"
+                                                ValueChanged="@(v => SetBrushColorAsync(v))"
+                                                OutputHexStrings="true"
+                                                ShowAlpha="false"
+                                                ThemeColor="ThemeColor" />
+                                </Tooltip>
+                                <Tooltip TooltipText="Add text" Delay="1000">
+                                    <button class="btn btn-icon @ThemeClass" @onclick="AddTextAsync" aria-label="Add text">
+                                        <tf-icon>text_fields</tf-icon>
+                                    </button>
+                                </Tooltip>
+                            </div>
+                            <Tooltip TooltipText="Done adding text" Delay="1000">
+                                <button class="btn btn-icon @ThemeClass"
+                                        @onclick="@(_ => TextMode = false)"
+                                        aria-label="Stop adding text">
+                                    <tf-icon>done</tf-icon>
+                                </button>
+                            </Tooltip>
+                        }
+                        else
+                        {
+                            <Tooltip TooltipText="Draw" Delay="1000">
+                                <button class="btn btn-icon @ThemeClass"
+                                        @onclick="@(_ => SetDrawingModeAsync(DrawingMode.Brush))"
+                                        aria-label="Draw">
+                                    <tf-icon>draw</tf-icon>
+                                </button>
+                            </Tooltip>
+                            <Tooltip TooltipText="Add text" Delay="1000">
+                                <button class="btn btn-icon @ThemeClass"
+                                        @onclick="@(_ => TextMode = true)"
+                                        aria-label="Add text">
+                                    <tf-icon>text_fields</tf-icon>
+                                </button>
+                            </Tooltip>
+                        }
+                    </div>
+                }
+                @ChildContent
+            }
+        </div>
+    }
+</div>

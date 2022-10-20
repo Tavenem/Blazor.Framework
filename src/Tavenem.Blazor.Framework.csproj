@@ -65,6 +65,7 @@
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.js;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts;$(ClientAssetsDirectory)scripts\**\_*.ts" />
     <ScssFiles Include="$(ClientAssetsDirectory)**\*.scss" Exclude="$(ClientAssetsDirectory)**\_*.scss" />
+    <ClientAssetsInputs Remove="assets\scripts\tavenem-image-editor.ts" />
     <CssLibFiles Include="$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
   </ItemGroup>
 

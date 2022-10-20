@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0-preview
+### Added
+- Image editor
+
 ## 0.11.8-preview-0.11.9-preview
 ### Fixed
 - Event support for .NET 6
