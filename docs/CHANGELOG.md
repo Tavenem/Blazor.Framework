@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.4-preview
+### Fixed
+- Change retention of object URLs for image editor, to enable re-editing
+
 ## 0.12.3-preview
 ### Fixed
 - Revoke object URL called when no URL was provisioned

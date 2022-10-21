@@ -522,7 +522,12 @@ class ImageEditor {
         }
         if (imageUrl) {
             this.originalSrc = imageUrl;
-            const texture = await Assets.load(imageUrl);
+            let texture: Texture;
+            if (imageUrl.startsWith("blob")) {
+                texture = await Texture.fromURL(imageUrl);
+            } else {
+                texture = await Assets.load(imageUrl) as Texture;
+            }
             this.backgroundImage = Sprite.from(texture);
             this.backgroundImage.interactive = false;
             this.originalHeight = this.backgroundImage.height;
@@ -937,6 +942,18 @@ export function destroy(containerId: string) {
         editor.destroy();
     }
     delete editors[containerId];
+
+    const container = document.getElementById(containerId);
+    if (!(container instanceof HTMLElement)) {
+        return;
+    }
+
+    const imageElement = container.querySelector('img');
+    if (imageElement
+        && imageElement.src
+        && imageElement.src.startsWith("blob")) {
+        URL.revokeObjectURL(imageElement.src);
+    }
 }
 
 export function editText(containerId: string, text?: string) {
@@ -1073,11 +1090,22 @@ export function loadImage(containerId: string, imageUrl?: string) {
     if (!(container instanceof HTMLElement)) {
         return;
     }
-    const img = document.createElement('img');
-    if (imageUrl) {
-        img.src = imageUrl;
+
+    let imageElement = container.querySelector('img');
+    if (imageElement
+        && imageElement.src
+        && imageElement.src.startsWith("blob")) {
+        URL.revokeObjectURL(imageElement.src);
     }
-    container.appendChild(img);
+
+    if (!imageElement) {
+        imageElement = document.createElement('img');
+        container.appendChild(imageElement);
+    }
+
+    if (imageUrl) {
+        imageElement.src = imageUrl;
+    }
 }
 
 export async function loadImageFromStream(containerId: string, imageStream?: DotNetStreamReference) {
@@ -1095,18 +1123,24 @@ export async function loadImageFromStream(containerId: string, imageStream?: Dot
         return;
     }
 
+    let imageElement = container.querySelector('img');
+    if (imageElement
+        && imageElement.src
+        && imageElement.src.startsWith("blob")) {
+        URL.revokeObjectURL(imageElement.src);
+    }
+
     const buffer: ArrayBuffer = await imageStream.arrayBuffer();
     const blob = new Blob([buffer]);
     const imageUrl = URL.createObjectURL(blob);
 
-    const img = document.createElement('img');
-    if (imageUrl) {
-        img.onload = () => {
-            URL.revokeObjectURL(imageUrl);
-        };
-        img.src = imageUrl;
+    if (!imageElement) {
+        imageElement = document.createElement('img');
+        container.appendChild(imageElement);
     }
-    container.appendChild(img);
+    if (imageUrl) {
+        imageElement.src = imageUrl;
+    }
 }
 
 export function redo(containerId: string) {
