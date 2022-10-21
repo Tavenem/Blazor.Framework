@@ -1101,12 +1101,12 @@ export async function loadImageFromStream(containerId: string, imageStream?: Dot
 
     const img = document.createElement('img');
     if (imageUrl) {
+        img.onload = () => {
+            URL.revokeObjectURL(imageUrl);
+        };
         img.src = imageUrl;
     }
     container.appendChild(img);
-    img.onload = () => {
-        URL.revokeObjectURL(imageUrl);
-    };
 }
 
 export function redo(containerId: string) {

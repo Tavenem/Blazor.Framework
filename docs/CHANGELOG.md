@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.3-preview
+### Fixed
+- Revoke object URL called when no URL was provisioned
+
 ## 0.12.2-preview
 ### Fixed
 - Prevented image editor from entering edit mode when loading an image from a stream
