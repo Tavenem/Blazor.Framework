@@ -1009,22 +1009,6 @@ export function getStream(containerId: string, type?: string, quality?: number) 
     }
 }
 
-export function loadImage(containerId: string, imageUrl?: string) {
-    let editor = editors[containerId];
-    if (editor) {
-        destroy(containerId);
-    }
-    const container = document.getElementById(containerId);
-    if (!(container instanceof HTMLElement)) {
-        return;
-    }
-    const img = document.createElement('img');
-    if (imageUrl) {
-        img.src = imageUrl;
-    }
-    container.appendChild(img);
-}
-
 export async function loadEditor(
     dotNetObjectReference: DotNet.DotNetObject,
     containerId: string,
@@ -1080,20 +1064,49 @@ export async function loadEditor(
     }
 }
 
-export async function loadEditorFromStream(
-    dotNetObjectReference: DotNet.DotNetObject,
-    containerId: string,
-    imageStream?: DotNetStreamReference,
-    cropAspectRatio?: number) {
-    if (!imageStream) {
-        loadEditor(dotNetObjectReference, containerId, undefined, cropAspectRatio);
+export function loadImage(containerId: string, imageUrl?: string) {
+    let editor = editors[containerId];
+    if (editor) {
+        destroy(containerId);
+    }
+    const container = document.getElementById(containerId);
+    if (!(container instanceof HTMLElement)) {
         return;
     }
+    const img = document.createElement('img');
+    if (imageUrl) {
+        img.src = imageUrl;
+    }
+    container.appendChild(img);
+}
+
+export async function loadImageFromStream(containerId: string, imageStream?: DotNetStreamReference) {
+    if (!imageStream) {
+        loadImage(containerId);
+        return;
+    }
+
+    let editor = editors[containerId];
+    if (editor) {
+        destroy(containerId);
+    }
+    const container = document.getElementById(containerId);
+    if (!(container instanceof HTMLElement)) {
+        return;
+    }
+
     const buffer: ArrayBuffer = await imageStream.arrayBuffer();
     const blob = new Blob([buffer]);
     const imageUrl = URL.createObjectURL(blob);
-    loadEditor(dotNetObjectReference, containerId, imageUrl, cropAspectRatio);
-    URL.revokeObjectURL(imageUrl);
+
+    const img = document.createElement('img');
+    if (imageUrl) {
+        img.src = imageUrl;
+    }
+    container.appendChild(img);
+    img.onload = () => {
+        URL.revokeObjectURL(imageUrl);
+    };
 }
 
 export function redo(containerId: string) {
@@ -1129,6 +1142,24 @@ export async function setBackgroundImage(containerId: string, imageUrl?: string)
     const editor = editors[containerId];
     if (editor) {
         await editor.setBackgroundImage(imageUrl);
+    }
+}
+
+export async function setBackgroundImageFromStream(containerId: string, imageStream?: DotNetStreamReference) {
+    if (!imageStream) {
+        setBackgroundImage(containerId);
+        return;
+    }
+
+    const editor = editors[containerId];
+    if (editor) {
+        const buffer: ArrayBuffer = await imageStream.arrayBuffer();
+        const blob = new Blob([buffer]);
+        const imageUrl = URL.createObjectURL(blob);
+
+        await editor.setBackgroundImage(imageUrl);
+
+        URL.revokeObjectURL(imageUrl);
     }
 }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.2-preview
+### Fixed
+- Prevented image editor from entering edit mode when loading an image from a stream
+
 ## 0.12.1-preview
 ### Added
 - Additional bindable properties and callbacks for image editor

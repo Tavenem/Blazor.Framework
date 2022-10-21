@@ -9,6 +9,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
 {
+    private const string BrushColorDefault = "#000000";
     private const double BrushSizeDefault = 12;
 
     private IJSObjectReference? _module;
@@ -40,7 +41,7 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
     /// <summary>
     /// Gets the current brush color, as a hex string.
     /// </summary>
-    public string? BrushColor { get; private set; } = "#000000";
+    public string? BrushColor { get; private set; } = BrushColorDefault;
 
     /// <summary>
     /// Gets the current brush width, in pixels.
@@ -356,6 +357,14 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
             await EditingChanged.InvokeAsync(Editing);
         }
         await _module.InvokeVoidAsync("loadEditor", Interop.Reference, ContainerId, CropAspectRatio);
+        if (Math.Abs(BrushSize - BrushSizeDefault) > 0.00001)
+        {
+            await SetBrushSizeAsync();
+        }
+        if (BrushColor != BrushColorDefault)
+        {
+            await SetBrushColorAsync();
+        }
         await SetLoadingAsync(false);
     }
 
@@ -509,14 +518,6 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
             await _module.InvokeVoidAsync("loadImage", ContainerId, imageUrl);
         }
         HasImage = !string.IsNullOrEmpty(imageUrl);
-        if (BrushSize != BrushSizeDefault)
-        {
-            await SetBrushSizeAsync();
-        }
-        if (BrushColor is not null)
-        {
-            await SetBrushColorAsync();
-        }
         await SetLoadingAsync(false);
     }
 
@@ -538,14 +539,16 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
             return;
         }
         await SetLoadingAsync();
-        Editing = true;
-        if (EditingChanged.HasDelegate)
-        {
-            await EditingChanged.InvokeAsync(Editing);
-        }
         using (var streamReference = new DotNetStreamReference(stream))
         {
-            await _module.InvokeVoidAsync("loadEditorFromStream", Interop.Reference, ContainerId, streamReference, CropAspectRatio);
+            if (Editing)
+            {
+                await _module.InvokeVoidAsync("setBackgroundImageFromStream", ContainerId, streamReference);
+            }
+            else
+            {
+                await _module.InvokeVoidAsync("loadImageFromStream", ContainerId, streamReference);
+            }
         }
         HasImage = true;
         await SetLoadingAsync(false);
