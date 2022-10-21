@@ -68,7 +68,8 @@
             The editor can be made to leave cropping mode with the <code>CancelAsync</code> method.
         </p>
         <p>
-            The aspect ratio to use when cropping can be set to a particular value with the
+            The aspect ratio to use when cropping can be bound with the <code>CropAspectRatio</code>
+            property. It can also be set programmatically with the
             <code>SetCropAspectRatioAsync</code> method. It accepts a <code>double</code> value to
             use as the ratio. A negative value indicates that the image's own aspect ratio should be
             preserved, while zero or <code>null</code> permits cropping freely. The value you
@@ -78,6 +79,16 @@
             To disable image cropping by the user, set the <code>ShowCropControls</code> property to
             <code>false</code>. You can disable the aspect ratio selection specifically by setting
             the <code>ShowCropAspectRatioControls</code> property to <code>false</code>.
+        </p>
+        <p>
+            If necessary you can provide a function for the <code>VerifyCrop</code> property, which
+            receives a reference to the control, the proposed bounds of a crop operation
+            (<code>x</code>, <code>y</code>, <code>width</code> and <code>height</code>), and should
+            return a <code>Task&lt;bool></code>. If the result of your function is <code>true</code>
+            the crop operation will be permitted to proceed. Otherwise it will be canceled. The
+            bounds are guaranteed to have a non-zero width and height. Attempted crop operations
+            with zero dimensions will fail automatically, without invoking your verification
+            function unnecessarily.
         </p>
     </dd>
     <dt>Draw</dt>

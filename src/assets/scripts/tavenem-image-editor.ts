@@ -367,6 +367,26 @@ class ImageEditor {
         this.saveState();
     }
 
+    getCropBounds() {
+        if (!this._cropRect
+            || this._cropRect.height <= 0
+            || this._cropRect.width <= 0
+            || this.editor.stage.children.length < 1) {
+            return {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+            };
+        }
+        return {
+            x: this._cropRect.x - (this._cropRect.width / 2),
+            y: this._cropRect.y - (this._cropRect.height / 2),
+            width: this._cropRect.width,
+            height: this._cropRect.height,
+        };
+    }
+
     async getStream(type?: string, quality?: number) {
         type = type || "image/png";
         quality = quality || 0.92;
@@ -965,6 +985,20 @@ export function flipVertical(containerId: string) {
     const editor = editors[containerId];
     if (editor) {
         editor.flip(true);
+    }
+}
+
+export function getCropBounds(containerId: string) {
+    const editor = editors[containerId];
+    if (editor) {
+        return editor.getCropBounds();
+    } else {
+        return {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+        };
     }
 }
 

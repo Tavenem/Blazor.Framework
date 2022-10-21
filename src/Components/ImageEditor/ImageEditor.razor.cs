@@ -48,6 +48,22 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
     public double BrushSize { get; private set; } = BrushSizeDefault;
 
     /// <summary>
+    /// <para>
+    /// The aspect ratio used when cropping an image.
+    /// </para>
+    /// <para>
+    /// Unless prevented with <see cref="ShowCropAspectRatioControls"/>, this value can be changed
+    /// by the user with the UI.
+    /// </para>
+    /// </summary>
+    [Parameter] public double? CropAspectRatio { get; set; }
+
+    /// <summary>
+    /// A callback invoked when the aspect ratio used when cropping an image changes.
+    /// </summary>
+    [Parameter] public EventCallback<double?> CropAspectRatioChanged { get; set; }
+
+    /// <summary>
     /// Gets the current <see cref="Framework.DrawingMode"/> of the editor.
     /// </summary>
     public DrawingMode DrawingMode { get; private set; }
@@ -65,7 +81,7 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
     /// <summary>
     /// Gets or sets whether the editor is in edit mode (vs. image mode).
     /// </summary>
-    public bool Editing { get; set; }
+    [Parameter] public bool Editing { get; set; }
 
     /// <summary>
     /// A callback invoked when the editor switches from preview to edit mode, or vice versa.
@@ -176,6 +192,23 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
+    /// <summary>
+    /// <para>
+    /// If provided, any attempted crop will be validated by this function, which receives a
+    /// reference to the control, the proposed bounds, and should return a <see
+    /// cref="Task{TRsesult}"/> of <see cref="bool"/>.
+    /// </para>
+    /// <para>
+    /// If the result is <see langword="true"/> the crop operation will be permitted to proceed.
+    /// Otherwise it will be canceled.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// The bounds are guaranteed to have a non-zero width and height. Attempted crop operations
+    /// with zero dimensions will fail automatically, without invoking this function unnecessarily.
+    /// </remarks>
+    [Parameter] public Func<ImageEditor, CropBounds, Task<bool>>? VerifyCrop { get; set; }
+
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("image-editor-wrapper")
@@ -186,8 +219,6 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
     private string? ContainerCssClass => new CssBuilder(ImageClass)
         .Add("image-editor-container")
         .ToString();
-
-    private double? CropAspectRatio { get; set; }
 
     [Inject] private DialogService DialogService { get; set; } = default!;
 
@@ -217,17 +248,27 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var wasEditing = Editing;
+        var aspectRatio = CropAspectRatio;
+
         await base.SetParametersAsync(parameters);
+
+        var beganEdit = false;
         if (wasEditing != Editing)
         {
             if (Editing)
             {
                 await BeginEditAsync();
+                beganEdit = true;
             }
             else
             {
                 await CancelEditAsync();
             }
+        }
+
+        if (!beganEdit && CropAspectRatio != aspectRatio)
+        {
+            await SetCropAspectRatioAsync(CropAspectRatio);
         }
     }
 
@@ -679,6 +720,7 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
             return;
         }
         CropAspectRatio = ratio;
+        await CropAspectRatioChanged.InvokeAsync();
         await _module.InvokeVoidAsync("setCropAspectRatio", ContainerId, ratio);
     }
 
@@ -732,6 +774,19 @@ public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
         if (IsDisposed || _module is null)
         {
             return;
+        }
+        if (VerifyCrop is not null)
+        {
+            var bounds = await _module.InvokeAsync<CropBounds>("getCropBounds", ContainerId);
+            if (bounds.Width > 0 && bounds.Height > 0)
+            {
+                var verified = await VerifyCrop.Invoke(this, bounds);
+                if (!verified)
+                {
+                    await CancelAsync();
+                    return;
+                }
+            }
         }
         await _module.InvokeVoidAsync("crop", ContainerId);
         IsCropping = false;

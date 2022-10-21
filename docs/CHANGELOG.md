@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.1-preview
+### Added
+- Additional bindable properties and callbacks for image editor
+
 ## 0.12.0-preview
 ### Added
 - Image editor
