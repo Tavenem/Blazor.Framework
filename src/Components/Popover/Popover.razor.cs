@@ -272,11 +272,18 @@ public partial class Popover : IAsyncDisposable
             _handler = await PopoverService.RegisterPopoverAsync(AnchorId, FocusId);
             StateHasChanged();
         }
-        else if (!_initialized && _handler is not null)
+        else if (_handler is not null)
         {
-            await _handler.Initialize();
-            _handler.FocusLeft += OnFocusOut;
-            _initialized = true;
+            if (!_initialized)
+            {
+                await _handler.Initialize();
+                _handler.FocusLeft += OnFocusOut;
+                _initialized = true;
+            }
+            else
+            {
+                await _handler.RepositionPopoverAsync();
+            }
         }
     }
 

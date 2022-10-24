@@ -213,6 +213,13 @@ export function popoverInitialize() {
     }
 }
 
+export function repositionPopover(id: string) {
+    const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
+    if (popoverNode) {
+        placePopover(popoverNode);
+    }
+}
+
 export function setPopoverOffset(id: string, offsetX: number | null, offsetY: number | null) {
     const popoverNode = document.getElementById('popover-' + id) as IPopoverElement;
     if (!popoverNode) {

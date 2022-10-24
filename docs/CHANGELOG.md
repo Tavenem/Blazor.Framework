@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.5-preview
+### Changed
+- Reposition popovers on refresh to ensure layout changes haven't invalidated previously calculated position
+
 ## 0.12.4-preview
 ### Fixed
 - Change retention of object URLs for image editor, to enable re-editing

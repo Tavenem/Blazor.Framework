@@ -64,6 +64,17 @@ internal class PopoverHandler : IDisposable
     [JSInvokable]
     public void OnFocusLeft() => FocusLeft?.Invoke(this, EventArgs.Empty);
 
+    public async ValueTask RepositionPopoverAsync()
+    {
+        try
+        {
+            await _jsInterop.InvokeVoidAsync("repositionPopover", Id);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
     public async ValueTask SetOffsetAsync(double? x, double? y)
     {
         try
