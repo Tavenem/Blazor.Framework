@@ -686,8 +686,8 @@ function placePopovers(): void {
     }
 }
 
-document.addEventListener('focusin', focusPopovers.bind(this, true));
-document.addEventListener('focusout', focusPopovers.bind(this, false));
+document.addEventListener('focusin', focusPopovers.bind(undefined, true));
+document.addEventListener('focusout', focusPopovers.bind(undefined, false));
 window.addEventListener('resize', () => {
     placePopovers();
 });

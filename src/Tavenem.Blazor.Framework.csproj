@@ -30,13 +30,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.96.0" />
+    <PackageReference Include="ClosedXML" Version="0.97.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.7" Condition="'$(TargetFramework)' == 'net6.0'" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0-rc.2.22476.2" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.11" Condition="'$(TargetFramework)' == 'net6.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -55,7 +55,6 @@
 
     <!-- Run restore only once for multi targeting builds -->
     <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net7.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
-    <ShouldRunClientAssetsBuild>true</ShouldRunClientAssetsBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -65,8 +64,7 @@
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.js;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts;$(ClientAssetsDirectory)scripts\**\_*.ts" />
     <ScssFiles Include="$(ClientAssetsDirectory)**\*.scss" Exclude="$(ClientAssetsDirectory)**\_*.scss" />
-    <ClientAssetsInputs Remove="assets\scripts\tavenem-image-editor.ts" />
-    <CssLibFiles Include="$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
+    <CssLibFiles Include="$(ClientAssetsDirectory)node_modules\highlight.js\styles\stackoverflow-light.css;$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
@@ -75,7 +73,7 @@
     <Exec Command="npm dedupe" WorkingDirectory="$(ClientAssetsDirectory)" />
   </Target>
   
-  <Target Name="ClientAssetsBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
+  <Target Name="ClientAssetsBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
     <PropertyGroup>
       <_ClientAssetsOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)clientassets'))/</_ClientAssetsOutputFullPath>
     </PropertyGroup>
@@ -103,7 +101,7 @@
     </DefineStaticWebAssets>
   </Target>
 	
-  <Target Name="CssLibCopy" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="ClientAssetsRestore" Inputs="@(CssLibFiles)" Outputs="$(IntermediateOutputPath)csslibs.complete.txt">
+  <Target Name="CssLibCopy" DependsOnTargets="ClientAssetsRestore" Inputs="@(CssLibFiles)" Outputs="$(IntermediateOutputPath)csslibs.complete.txt">
     <PropertyGroup>
       <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
     </PropertyGroup>
@@ -119,7 +117,7 @@
     <WriteLinesToFile File="$(IntermediateOutputPath)csslibs.complete.txt" Lines="@(_CssLibCopyOutput)" />
   </Target>
 	
-  <Target Name="SassBuild" Condition="'$(ShouldRunClientAssetsBuild)' == 'true'" DependsOnTargets="CssLibCopy" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles);@(CssLibFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+  <Target Name="SassBuild" DependsOnTargets="CssLibCopy" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles);@(CssLibFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
     <PropertyGroup>
       <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))</_SassOutputFullPath>
       <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>

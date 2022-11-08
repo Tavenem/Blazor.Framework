@@ -1,5 +1,8 @@
-﻿@import "math.css";
+﻿@use "sass:meta";
+
+@import "math.css";
 @import "katex.min.css";
+@import "stackoverflow-light.css";
 
 @import "variables";
 @import "animations";
@@ -47,6 +50,10 @@
 @import "components/toolbar";
 @import "components/tooltip";
 @import "blazor";
+
+[data-theme="dark"] {
+    @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
+}
 
 *[id] {
     scroll-margin-top: 4rem;

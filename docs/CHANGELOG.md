@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0
+First stable release
+
+### Added
+- SyntaxHighlighter component
+### Changed
+- Update to .NET 7
+
 ## 0.12.5-preview
 ### Changed
 - Reposition popovers on refresh to ensure layout changes haven't invalidated previously calculated position
@@ -32,7 +40,7 @@
 ### Added
 - `OnValidEnter` callback to `TextInput`
 ### Changed
-- Update to .NET 7 RC 2.
+- Update to .NET 7 RC 2
 
 ## 0.11.6-preview
 ### Added

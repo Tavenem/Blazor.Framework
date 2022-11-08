@@ -53,6 +53,13 @@ export default [{
     },
     plugins: plugins,
 }, {
+    input: "./scripts/tavenem-highlight.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
     input: "./scripts/tavenem-image-editor.ts",
     output: {
         format: 'es',
