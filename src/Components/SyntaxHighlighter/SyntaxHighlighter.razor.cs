@@ -11,12 +11,6 @@ public partial class SyntaxHighlighter : IAsyncDisposable
     private bool _disposed;
     private IJSObjectReference? _module;
 
-    /// <inheritdoc />
-    protected override string? CssClass => new CssBuilder(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
-        .Add("codeblock")
-        .ToString();
-
     private string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;

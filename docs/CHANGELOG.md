@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1
+### Changed
+Do not use `codeblock` class on entire SyntaxHighlighter
+
 ## 1.0
 First stable release
 
