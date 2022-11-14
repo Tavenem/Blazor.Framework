@@ -203,7 +203,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         .Add("form-field picker")
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
-        .Add("invalid", !IsValid)
+        .Add("invalid", IsInvalidAndTouched)
         .ToString();
 
     private string ButtonIcon => Icon ?? DefaultIcons.ColorSelect;

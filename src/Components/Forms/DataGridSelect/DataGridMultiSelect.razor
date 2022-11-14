@@ -53,10 +53,10 @@
         <label for="@Id">@Label</label>
     }
     @if (!string.IsNullOrEmpty(HelpText)
-        || !IsValid)
+        || IsInvalidAndTouched)
     {
         <div class="field-helpers">
-            @if (!IsValid)
+            @if (IsInvalidAndTouched)
             {
                 <ul class="mr-auto mb-0 pl-0">
                     @foreach (var message in GetValidationMessages())

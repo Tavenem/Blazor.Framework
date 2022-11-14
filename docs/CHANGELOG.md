@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2
+### Changed
+Improve form validation for required fields
+
 ## 1.1
 ### Changed
 Do not use `codeblock` class on entire SyntaxHighlighter

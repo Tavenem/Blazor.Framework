@@ -29,10 +29,10 @@
     @if ((ShowLength && MaxLength.HasValue)
         || !string.IsNullOrEmpty(HelpText)
         || HelpTextContent.HasValue
-        || !IsValid)
+        || IsInvalidAndTouched)
     {
         <div class="@HelpersClass">
-            @if (!IsValid)
+            @if (IsInvalidAndTouched)
             {
                 <ul class="mr-auto mb-0 pl-0">
                     @foreach (var message in GetValidationMessages())

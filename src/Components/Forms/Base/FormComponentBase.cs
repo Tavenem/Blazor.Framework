@@ -26,6 +26,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     private Type? _nullableUnderlyingType;
     private bool _previousParsingAttemptFailed;
     private ValidationMessageStore? _parsingValidationMessages;
+    private ValidationMessageStore? _requiredValidationMessages;
 
     /// <summary>
     /// Custom HTML attributes for the component.
@@ -172,7 +173,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         .Add("form-field")
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
-        .Add("invalid", !IsValid)
+        .Add("invalid", IsInvalidAndTouched)
         .ToString();
 
     /// <summary>
@@ -196,7 +197,32 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
             {
                 Value = value;
                 _ = ValueChanged.InvokeAsync(Value);
-                EditContext?.NotifyFieldChanged(FieldIdentifier);
+
+                // EditContext may be null if the input is not a child component of EditForm.
+                if (EditContext is not null)
+                {
+                    if (Required)
+                    {
+                        if (HasValue)
+                        {
+                            if (_requiredValidationMessages is not null
+                                && _requiredValidationMessages[FieldIdentifier].Any())
+                            {
+                                _requiredValidationMessages.Clear(FieldIdentifier);
+                                EditContext.NotifyValidationStateChanged();
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(RequiredValidationMessage))
+                        {
+                            var validationErrorMessage = GetRequiredValidationMessage() ?? "Field is required";
+                            _requiredValidationMessages ??= new ValidationMessageStore(EditContext);
+                            _requiredValidationMessages.Add(FieldIdentifier, validationErrorMessage);
+                            EditContext.NotifyValidationStateChanged();
+                        }
+                    }
+
+                    EditContext.NotifyFieldChanged(FieldIdentifier);
+                }
             }
         }
     }
@@ -275,6 +301,8 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     /// </summary>
     [CascadingParameter] private protected bool IsNested { get; set; }
 
+    private protected bool IsInvalidAndTouched => !IsValid && IsTouched;
+
     [CascadingParameter] private Form? Form { get; set; }
 
     /// <summary>
@@ -336,6 +364,20 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         {
             InitialValue = Value;
             _initialParametersSet = true;
+
+            // Set initial required validation
+            if (EditContext is not null
+                && Required
+                && !HasValue
+                && !string.IsNullOrEmpty(RequiredValidationMessage))
+            {
+                var validationErrorMessage = GetRequiredValidationMessage() ?? "Field is required";
+                _requiredValidationMessages ??= new ValidationMessageStore(EditContext);
+                _requiredValidationMessages.Add(FieldIdentifier, validationErrorMessage);
+                EditContext.NotifyValidationStateChanged();
+            }
+
+            await ValidateAsync();
         }
     }
 
@@ -390,7 +432,62 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     /// Required fields without values will be considered invalid even if they have not yet been
     /// touched.
     /// </remarks>
-    public Task ValidateAsync() => ValidateAsync(true);
+    public async Task ValidateAsync()
+    {
+        var value = Value;
+
+        var valid = EditContext?
+            .GetValidationMessages(FieldIdentifier)
+            .Any() != true;
+
+        valid = valid
+            && !HasConversionError
+            && (!Required || HasValue);
+
+        var fieldMessages = new List<string>();
+        if (Validation is not null)
+        {
+            await foreach (var error in Validation(Value, Form?.Model ?? EditContext?.Model))
+            {
+                if (!string.IsNullOrEmpty(error))
+                {
+                    fieldMessages.Add(error);
+                    valid = false;
+                }
+            }
+        }
+
+        var messagesChanged = fieldMessages.Count == 0
+            ? (_customValidationMessages?.Count ?? 0) > 0
+            : _customValidationMessages?.SequenceEqual(fieldMessages) != true;
+        _customValidationMessages = fieldMessages.Count == 0
+            ? null
+            : fieldMessages;
+
+        if (!EqualityComparer<TValue>.Default.Equals(value, Value))
+        {
+            return;
+        }
+
+        var update = false;
+        if (messagesChanged)
+        {
+            update = true;
+            EditContext?.NotifyValidationStateChanged();
+        }
+
+        if (IsValid != valid)
+        {
+            update = true;
+            IsValid = valid;
+            await IsValidChanged.InvokeAsync(IsValid);
+        }
+
+        if (update)
+        {
+            StateHasChanged();
+        }
+    }
 
     /// <summary>
     /// <para>
@@ -558,7 +655,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         ? null
         : string.Format(RequiredValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
 
-    private Task OnTimerAsync() => InvokeAsync(ValidateAutoAsync);
+    private Task OnTimerAsync() => InvokeAsync(ValidateAsync);
 
     private void OnValidateStateChanged(object? sender, ValidationStateChangedEventArgs e)
     {
@@ -618,63 +715,4 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
             }
         }
     }
-
-    private async Task ValidateAsync(bool ignoreTouched)
-    {
-        var value = Value;
-
-        var valid = EditContext?
-            .GetValidationMessages(FieldIdentifier)
-            .Any() != true;
-
-        valid = valid
-            && !HasConversionError
-            && ((!ignoreTouched && !IsTouched) || !Required || HasValue);
-
-        var fieldMessages = new List<string>();
-        if (Validation is not null)
-        {
-            await foreach (var error in Validation(Value, Form?.Model ?? EditContext?.Model))
-            {
-                if (!string.IsNullOrEmpty(error))
-                {
-                    fieldMessages.Add(error);
-                    valid = false;
-                }
-            }
-        }
-
-        var messagesChanged = fieldMessages.Count == 0
-            ? (_customValidationMessages?.Count ?? 0) > 0
-            : _customValidationMessages?.SequenceEqual(fieldMessages) != true;
-        _customValidationMessages = fieldMessages.Count == 0
-            ? null
-            : fieldMessages;
-
-        if (!EqualityComparer<TValue>.Default.Equals(value, Value))
-        {
-            return;
-        }
-
-        var update = false;
-        if (messagesChanged)
-        {
-            update = true;
-            EditContext?.NotifyValidationStateChanged();
-        }
-
-        if (IsValid != valid)
-        {
-            update = true;
-            IsValid = valid;
-            await IsValidChanged.InvokeAsync(IsValid);
-        }
-
-        if (update)
-        {
-            StateHasChanged();
-        }
-    }
-
-    private Task ValidateAutoAsync() => ValidateAsync(false);
 }

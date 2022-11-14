@@ -46,7 +46,7 @@
                @onchange="OnChangeAsync" />
         <span class="label" style="@($"left:{BarWidth.ToString("F2").TrimEnd('0').TrimEnd('.')}%")">@InputValue</span>
     </div>
-    @if (!IsValid)
+    @if (IsInvalidAndTouched)
     {
         <div class="field-helpers">
             <ul class="mr-auto mb-0 pl-0">
