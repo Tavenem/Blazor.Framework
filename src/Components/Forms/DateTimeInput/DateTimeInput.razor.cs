@@ -918,7 +918,7 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
     private string? GetCenturyClass(int century) => new CssBuilder("btn btn-text")
         .Add("large active", Value is not null && century == ValueCentury)
         .Add("outlined",
-            century == Calendar.GetYear(DateTime.Today) / CloseDelay
+            century == Calendar.GetYear(DateTime.Today) / 100
             && (Value is null
             || century != ValueCentury))
         .ToString();
@@ -936,7 +936,7 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
     private string? GetDecadeClass(byte value) => new CssBuilder("btn btn-text")
         .Add("active", Value is not null && value == ValueDecade)
         .Add("outlined",
-            value == Calendar.GetYear(DateTime.Today) % CloseDelay / 10
+            value == Calendar.GetYear(DateTime.Today) % 100 / 10
             && (Value is null
             || value != ValueDecade))
         .ToString();
@@ -1002,13 +1002,13 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 
     private bool IsCenturyOutOfRange(int value)
     {
-        var firstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (value * CloseDelay) - 1);
+        var firstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (value * 100) - 1);
         var firstDateInCentury = new DateTime(firstYearInCentury, 1, 1);
         if (firstDateInCentury > Max)
         {
             return true;
         }
-        var lastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (value * CloseDelay) + 98);
+        var lastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (value * 100) + 98);
         var monthsInYear = Calendar.GetMonthsInYear(lastYearInCentury);
         var lastDateInCentury = new DateTime(lastYearInCentury, monthsInYear, Calendar.GetDaysInMonth(lastYearInCentury, monthsInYear));
         return lastDateInCentury < Min;
@@ -1116,8 +1116,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
             return;
         }
         Century++;
-        FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) - 1);
-        LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) + 98);
+        FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) - 1);
+        LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) + 98);
         DecadeCount = (byte)((LastYearInCentury - FirstYearInCentury) / 10);
         if ((LastYearInCentury - FirstYearInCentury) % 10 != 0)
         {
@@ -1174,8 +1174,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
             return;
         }
         Century--;
-        FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) - 1);
-        LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) + 98);
+        FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) - 1);
+        LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) + 98);
         DecadeCount = (byte)((LastYearInCentury - FirstYearInCentury) / 10);
         if ((LastYearInCentury - FirstYearInCentury) % 10 != 0)
         {
@@ -1194,8 +1194,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         if (Decade == 1)
         {
             Century--;
-            FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) - 1);
-            LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) + 98);
+            FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) - 1);
+            LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) + 98);
             DecadeCount = (byte)((LastYearInCentury - FirstYearInCentury) / 10);
             if ((LastYearInCentury - FirstYearInCentury) % 10 != 0)
             {
@@ -1622,15 +1622,15 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
             WeekdayNames.Add(Culture.DateTimeFormat.AbbreviatedDayNames[i]);
         }
 
-        CenturyCount = (Calendar.MaxSupportedDateTime.Year - Calendar.MinSupportedDateTime.Year) / CloseDelay;
-        if ((Calendar.MaxSupportedDateTime.Year - Calendar.MinSupportedDateTime.Year) % CloseDelay != 0)
+        CenturyCount = (Calendar.MaxSupportedDateTime.Year - Calendar.MinSupportedDateTime.Year) / 100;
+        if ((Calendar.MaxSupportedDateTime.Year - Calendar.MinSupportedDateTime.Year) % 100 != 0)
         {
             CenturyCount++;
         }
 
         var calendarYear = Calendar.GetYear(DateTimeOffset.DateTime);
-        ValueDecade = (byte)(calendarYear % CloseDelay / 10);
-        ValueCentury = calendarYear % 1000 / CloseDelay;
+        ValueDecade = (byte)(calendarYear % 100 / 10);
+        ValueCentury = calendarYear % 1000 / 100;
 
         if (Century >= CenturyCount)
         {
@@ -1667,8 +1667,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 
     private void SetCenturyDecadeValues()
     {
-        FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) - 1);
-        LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * CloseDelay) + 98);
+        FirstYearInCentury = Math.Max(Calendar.MinSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) - 1);
+        LastYearInCentury = Math.Min(Calendar.MaxSupportedDateTime.Year, Calendar.MinSupportedDateTime.Year + (Century * 100) + 98);
         DecadeCount = (byte)((LastYearInCentury - FirstYearInCentury) / 10);
         if ((LastYearInCentury - FirstYearInCentury) % 10 != 0)
         {
@@ -1732,8 +1732,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         LastDateInYear = new DateTime(Year, monthsInYear, Calendar.GetDaysInMonth(Year, monthsInYear));
         FirstDateInMonth = new DateTime(Year, Month, 1);
         var calendarYear = Calendar.GetYear(FirstDateInMonth);
-        Decade = (byte)(calendarYear % CloseDelay / 10);
-        Century = calendarYear / CloseDelay;
+        Decade = (byte)(calendarYear % 100 / 10);
+        Century = calendarYear / 100;
         SetCenturyDecadeValues();
         DaysInMonth = (byte)Calendar.GetDaysInMonth(Year, Month);
         LastDateInMonth = FirstDateInMonth.AddDays(DaysInMonth);
@@ -1889,8 +1889,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         CurrentValue = newValue;
 
         var calendarYear = Calendar.GetYear(DateTimeOffset.DateTime);
-        ValueDecade = (byte)(calendarYear % CloseDelay / 10);
-        ValueCentury = calendarYear / CloseDelay;
+        ValueDecade = (byte)(calendarYear % 100 / 10);
+        ValueCentury = calendarYear / 100;
     }
 
     private async Task SetViewAsync(DatePickerView view)
