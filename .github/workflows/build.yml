@@ -16,10 +16,10 @@ jobs:
           dotnet-version: '7.0.x'
           include-prerelease: true
       
-      - name: Use Node.js 18.x
+      - name: Use Node.js 19.x
         uses: actions/setup-node@v1
         with:
-          node-version: 18.x
+          node-version: 19.x
 
       - name: Install dependencies
         run: dotnet restore

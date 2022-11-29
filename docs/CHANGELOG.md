@@ -1,12 +1,17 @@
 # Changelog
 
+## 1.3
+### Fixed
+- `DateTimeInput` year navigation bug
+- `MultiSelect` behavior
+
 ## 1.2
 ### Changed
-Improve form validation for required fields
+- Improve form validation for required fields
 
 ## 1.1
 ### Changed
-Do not use `codeblock` class on entire SyntaxHighlighter
+- Do not use `codeblock` class on entire SyntaxHighlighter
 
 ## 1.0
 First stable release

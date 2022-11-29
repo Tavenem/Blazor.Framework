@@ -42,6 +42,8 @@ public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValu
             !Size.HasValue && (OptionSize is null || OptionTemplate is null) && (Labels is null || Options?.Any() != true))
         .ToString();
 
+    private Option<TValue>? SelectAllOption { get; set; }
+
     /// <summary>
     /// Constructs a new instance of <see cref="MultiSelect{TValue}"/>.
     /// </summary>
@@ -60,6 +62,16 @@ public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValu
             && !oldValue.SequenceEqual(Value)))
         {
             _valueUpdated = true;
+        }
+    }
+
+    /// <inheritdoc/>
+    public override async Task ClearAsync()
+    {
+        await base.ClearAsync();
+        if (SelectAllOption is not null)
+        {
+            SelectAllOption.InvokeStateChange();
         }
     }
 
@@ -231,6 +243,10 @@ public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValu
             }
 
             await ToggleValueAsync(_options[index]);
+            if (PopoverOpen)
+            {
+                await TogglePopoverAsync();
+            }
         }
 
         if (ShowPicker)

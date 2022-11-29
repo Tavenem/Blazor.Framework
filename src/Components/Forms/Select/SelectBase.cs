@@ -278,20 +278,14 @@ public abstract class SelectBase<TValue, TOption>
         MaxOptionSize = Math.Max(MaxOptionSize, option.Label?.Length ?? 0);
     }
 
-    /// <summary>
-    /// <para>
-    /// Clears the current selected value.
-    /// </para>
-    /// <para>
-    /// If the bound type is non-nullable, this may set the default value.
-    /// </para>
-    /// </summary>
+    /// <inheritdoc/>
     public override Task ClearAsync()
     {
         _selectedOptions.Clear();
         CurrentValueAsString = null;
         SelectedIndex = -1;
         _options.ForEach(x => x.InvokeStateChange());
+        StateHasChanged();
         return Task.CompletedTask;
     }
 
@@ -338,7 +332,7 @@ public abstract class SelectBase<TValue, TOption>
     /// </summary>
     /// <param name="option">The option to toggle.</param>
     public Task ToggleValueAsync(Option<TOption> option)
-        => ToggleValueAsync(option, true);
+        => ToggleValueAsync(option, !IsMultiselect);
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
