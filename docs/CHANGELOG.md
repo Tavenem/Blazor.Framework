@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4-preview1
+### Changed
+- Improve form validation for required fields
+
 ## 1.3
 ### Fixed
 - `DateTimeInput` year navigation bug
