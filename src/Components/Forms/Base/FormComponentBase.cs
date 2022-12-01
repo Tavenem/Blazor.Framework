@@ -205,8 +205,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
                     {
                         if (HasValue)
                         {
-                            if (_requiredValidationMessages is not null
-                                && _requiredValidationMessages[FieldIdentifier].Any())
+                            if (_requiredValidationMessages?[FieldIdentifier].Any() == true)
                             {
                                 _requiredValidationMessages.Clear(FieldIdentifier);
                                 EditContext.NotifyValidationStateChanged();
@@ -514,7 +513,8 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
             yield break;
         }
 
-        if (Required
+        if (EditContext is null
+            && Required
             && !HasValue
             && !string.IsNullOrEmpty(RequiredValidationMessage))
         {
