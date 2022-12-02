@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4
+### Changed
+- Minor style fix for alerts
+
 ## 1.4-preview1
 ### Changed
 - Improve form validation for required fields
