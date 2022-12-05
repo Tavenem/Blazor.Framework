@@ -49,7 +49,7 @@ public abstract class SelectBase<TValue, TOption>
     /// <summary>
     /// A function to retrieve labels for the values in <see cref="Options"/>.
     /// </summary>
-    [Parameter] public Func<TOption?, string>? Labels { get; set; }
+    [Parameter] public Func<TOption?, string?>? Labels { get; set; }
 
     /// <summary>
     /// <para>

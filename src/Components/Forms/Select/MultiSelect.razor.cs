@@ -34,7 +34,7 @@ public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValu
             !Size.HasValue && OptionSize is not null && OptionTemplate is not null && Options?.Any() == true)
         .AddStyle(
             "min-width",
-            () => $"{Math.Max(MaxOptionSize, Options!.Select(Labels!).Max(x => x.Length)) + 2 + (_options.Count - 1).ToString("N0").Length}ch",
+            () => $"{Math.Max(MaxOptionSize, Options!.Select(Labels!).Max(x => x?.Length ?? 0)) + 2 + (_options.Count - 1).ToString("N0").Length}ch",
             !Size.HasValue && (OptionSize is null || OptionTemplate is null) && Labels is not null && Options?.Any() == true)
         .AddStyle(
             "min-width",

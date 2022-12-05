@@ -51,7 +51,7 @@ public partial class DataGridSelect<
     /// If omitted, the <see cref="object.ToString"/> method will be invoked on the item.
     /// </para>
     /// </summary>
-    [Parameter] public Func<TDataItem, string>? ItemLabel { get; set; }
+    [Parameter] public Func<TDataItem, string?>? ItemLabel { get; set; }
 
     /// <summary>
     /// <para>
@@ -140,7 +140,7 @@ public partial class DataGridSelect<
             Size.HasValue)
         .AddStyle(
             "min-width",
-            () => $"{Items.Select(ItemLabel!).Max(x => x.Length)}ch",
+            () => $"{Items.Select(ItemLabel!).Max(x => x?.Length ?? 0)}ch",
             !Size.HasValue && ItemLabel is not null && Items.Count > 0)
         .ToString();
 
