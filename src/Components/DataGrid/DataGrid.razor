@@ -341,7 +341,7 @@
         </table>
     </Form>
     @if ((LoadItems is null
-        && CurrentItems.Count() > RowsPerPage)
+    && ItemCount > RowsPerPage)
         || CurrentDataPage?.TotalCount > RowsPerPage)
     {
         <div class="datagrid-pagination">
@@ -354,11 +354,11 @@
                         Options="RowsPerPageOptions"
                         InputClass="text-center" />
             }
-            <span>@((Offset + 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)CurrentPageItems.Count()).ToString("N0"))</span>
+            <span>@((Offset + 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)ItemCount).ToString("N0"))</span>
             @if (LoadItems is null || CurrentDataPage?.TotalCount.HasValue == true)
             {
                 <span>of</span>
-                <span>@((LoadItems is null ? (ulong)CurrentItems.Count() : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
+                <span>@((LoadItems is null ? (ulong)ItemCount : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
             }
             <Pagination CurrentPage="CurrentPage"
                         CurrentPageChanged="OnPageChangedAsync"

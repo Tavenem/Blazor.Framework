@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5
+### Changed
+- Fix `DataGrid` paging when grouped or filtered
+
 ## 1.4
 ### Changed
 - Minor style fix for alerts
