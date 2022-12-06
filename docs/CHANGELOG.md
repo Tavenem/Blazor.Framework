@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7
+### Fixed
+- `DataGrid` page count
+
 ## 1.6
 ### Changed
 - Select input style tweaks

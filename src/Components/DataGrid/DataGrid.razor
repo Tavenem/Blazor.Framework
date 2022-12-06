@@ -354,7 +354,7 @@
                         Options="RowsPerPageOptions"
                         InputClass="text-center" />
             }
-            <span>@((Offset + 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)ItemCount).ToString("N0"))</span>
+            <span>@((Offset + 1).ToString("N0"))</span><span>&ndash;</span><span>@((Offset + (ulong)CurrentPageItems.Count()).ToString("N0"))</span>
             @if (LoadItems is null || CurrentDataPage?.TotalCount.HasValue == true)
             {
                 <span>of</span>
