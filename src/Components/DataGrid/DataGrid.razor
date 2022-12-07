@@ -358,7 +358,7 @@
             @if (LoadItems is null || CurrentDataPage?.TotalCount.HasValue == true)
             {
                 <span>of</span>
-                <span>@((LoadItems is not null ? (ulong)ItemCount : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
+                <span>@((LoadItems is null ? (ulong)ItemCount : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
             }
             <Pagination CurrentPage="CurrentPage"
                         CurrentPageChanged="OnPageChangedAsync"
