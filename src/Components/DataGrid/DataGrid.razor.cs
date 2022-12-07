@@ -78,6 +78,13 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     /// <summary>
     /// <para>
+    /// If provided, use for adding inline options.
+    /// </para>
+    /// </summary>
+    [Parameter] public DialogOptions? AddDialogOptions { get; set; }
+
+    /// <summary>
+    /// <para>
     /// When <see langword="true"/> an add button appears in the header.
     /// </para>
     /// <para>
@@ -232,6 +239,14 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// </para>
     /// </summary>
     [Parameter] public Func<TDataItem?, Task<DialogParameters>>? EditDialogParameters { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// If provided, includes inline options for dialog/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public DialogOptions? EditDialogOptions { get; set; }
+
 
     /// <summary>
     /// This optional content is displayed when a row is expanded.
@@ -1262,6 +1277,13 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         if (EditDialog is not null)
         {
+            DialogOptions? options = null;
+            if (EditDialogOptions is not null)
+            {
+                options = EditDialogOptions;
+            }
+            options ??= new();
+
             DialogParameters? parameters = null;
             if (EditDialogParameters is not null)
             {
@@ -1271,7 +1293,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var result = await DialogService.Show(
                 EditDialog,
                 "Edit",
-                parameters).Result;
+                parameters, options).Result;
             if (result.Choice == DialogChoice.Ok
                 && result.Data is TDataItem item)
             {
@@ -1889,10 +1911,21 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 parameters = await EditDialogParameters.Invoke(default);
             }
             parameters ??= new();
+
+            DialogOptions? options = null;
+            if (AddDialogOptions is not null)
+            {
+                options = AddDialogOptions;
+            } else if (EditDialogOptions is not null)
+            {
+                options = EditDialogOptions;
+            }
+            options ??= new();
+
             var result = await DialogService.Show(
                 (AddDialog ?? EditDialog)!,
                 "Add",
-                parameters).Result;
+                parameters, options).Result;
             if (result.Choice == DialogChoice.Ok
                 && result.Data is TDataItem item)
             {
