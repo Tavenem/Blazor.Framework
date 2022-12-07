@@ -258,16 +258,15 @@ public partial class Rating : FormComponentBase<byte>
         CurrentValue = value;
         HasConversionError = false;
 
-        if (!IsTouched
-            && !Equals(value, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
         if (!IsNested)
         {
             EvaluateDebounced();
+        }
+
+        if (!IsTouched
+            && !Equals(value, InitialValue))
+        {
+            SetTouchedDebounced();
         }
     }
 }

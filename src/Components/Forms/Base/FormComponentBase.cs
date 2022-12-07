@@ -17,6 +17,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
 
     private readonly EventHandler<ValidationStateChangedEventArgs> _validationStateChangedHandler;
     private readonly AsyncAdjustableTimer _timer;
+    private readonly AsyncAdjustableTimer _touchedTimer;
 
     private List<string>? _customValidationMessages;
     private bool _hasInitializedParameters;
@@ -237,6 +238,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
             _parsingValidationMessages?.Clear();
 
             bool parsingFailed;
+            var previousValue = CurrentValue;
 
             if (_nullableUnderlyingType != null && string.IsNullOrEmpty(value))
             {
@@ -263,6 +265,23 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
 
                     // Since we're not writing to CurrentValue, we'll need to notify about modification from here
                     EditContext.NotifyFieldChanged(FieldIdentifier);
+                }
+            }
+
+            if (!parsingFailed)
+            {
+                if (!IsNested
+                    && (HasConversionError
+                    || !EqualityComparer<TValue>.Default.Equals(previousValue, CurrentValue)))
+                {
+                    EvaluateDebounced();
+                }
+
+                if (!IsTouched
+                    && (!EqualityComparer<TValue>.Default.Equals(CurrentValue, InitialValue)
+                    || HasConversionError))
+                {
+                    SetTouchedDebounced();
                 }
             }
 
@@ -310,6 +329,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     protected FormComponentBase()
     {
         _timer = new(OnTimerAsync, 300);
+        _touchedTimer = new(OnTouchedTimerAsync, 500);
         _validationStateChangedHandler = OnValidateStateChanged;
     }
 
@@ -321,6 +341,8 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
             _dummyModel = new();
             ValueExpression = () => _dummyModel.This_field!;
         }
+
+        var wasRequired = Required;
 
         parameters.SetParameterProperties(this);
 
@@ -378,6 +400,35 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
 
             await ValidateAsync();
         }
+        else if (wasRequired != Required)
+        {
+            // respond to changes in required status
+            if (EditContext is not null)
+            {
+                if (Required)
+                {
+                    if (HasValue)
+                    {
+                        if (_requiredValidationMessages?[FieldIdentifier].Any() == true)
+                        {
+                            _requiredValidationMessages.Clear(FieldIdentifier);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(RequiredValidationMessage))
+                    {
+                        var validationErrorMessage = GetRequiredValidationMessage() ?? "Field is required";
+                        _requiredValidationMessages ??= new ValidationMessageStore(EditContext);
+                        _requiredValidationMessages.Add(FieldIdentifier, validationErrorMessage);
+                    }
+                }
+                else if (_requiredValidationMessages?[FieldIdentifier].Any() == true)
+                {
+                    _requiredValidationMessages.Clear(FieldIdentifier);
+                }
+                EditContext.NotifyValidationStateChanged();
+            }
+            await ValidateAsync();
+        }
     }
 
     /// <inheritdoc/>
@@ -413,6 +464,8 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     /// </summary>
     public async Task ResetAsync()
     {
+        _touchedTimer.Cancel();
+
         CurrentValue = InitialValue;
 
         if (IsTouched)
@@ -546,6 +599,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
             if (disposing)
             {
                 _timer.Dispose();
+                _touchedTimer.Dispose();
                 Form?.Remove(this);
             }
 
@@ -590,21 +644,6 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         }
 
         HasConversionError = !success;
-
-        if (!IsTouched
-            && (!EqualityComparer<TValue>.Default.Equals(result, InitialValue)
-            || HasConversionError))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && (HasConversionError
-            || !EqualityComparer<TValue>.Default.Equals(result, CurrentValue)))
-        {
-            EvaluateDebounced();
-        }
 
         return success;
     }
@@ -657,6 +696,8 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
 
     private Task OnTimerAsync() => InvokeAsync(ValidateAsync);
 
+    private Task OnTouchedTimerAsync() => InvokeAsync(SetTouchedAsync);
+
     private void OnValidateStateChanged(object? sender, ValidationStateChangedEventArgs e)
     {
         UpdateAdditionalValidationAttributes();
@@ -667,6 +708,20 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         }
 
         StateHasChanged();
+    }
+
+    private async Task SetTouchedAsync()
+    {
+        IsTouched = true;
+        await IsTouchedChanged.InvokeAsync(true);
+    }
+
+    private protected void SetTouchedDebounced()
+    {
+        if (!_disposedValue)
+        {
+            _touchedTimer.Start();
+        }
     }
 
     private void UpdateAdditionalValidationAttributes()

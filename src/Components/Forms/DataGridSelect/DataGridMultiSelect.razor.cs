@@ -429,24 +429,6 @@ public partial class DataGridMultiSelect<
 
         HasConversionError = !success;
 
-        if (!IsTouched
-            && (((result is null) != (InitialValue is null))
-            || (InitialValue is not null && result?.SequenceEqual(InitialValue) != true)
-            || HasConversionError))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && (HasConversionError
-            || (Validation is not null
-            && (((result is null) != (CurrentValue is null))
-            || (CurrentValue is not null && result?.SequenceEqual(CurrentValue) != true)))))
-        {
-            EvaluateDebounced();
-        }
-
         return success;
     }
 

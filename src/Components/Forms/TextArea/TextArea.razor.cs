@@ -219,27 +219,11 @@ public partial class TextArea : InputComponentBase<string?>
         if (Converter is not null
             && Converter.TryGetValue(value, out result))
         {
-            if (result is null)
-            {
-                result = default!;
-            }
+            result ??= default!;
         }
         else
         {
             result = value;
-        }
-
-        if (!IsTouched
-            && !string.Equals(result, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && !string.Equals(result, CurrentValue))
-        {
-            EvaluateDebounced();
         }
 
         return true;

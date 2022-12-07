@@ -532,19 +532,6 @@ public partial class TextInput : InputComponentBase<string?>
             result = value;
         }
 
-        if (!IsTouched
-            && !string.Equals(result, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && !string.Equals(result, CurrentValue))
-        {
-            EvaluateDebounced();
-        }
-
         return true;
     }
 

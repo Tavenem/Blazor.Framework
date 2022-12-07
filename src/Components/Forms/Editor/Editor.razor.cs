@@ -392,20 +392,6 @@ public partial class Editor : FormComponentBase<string?>
         result = value;
         validationErrorMessage = null;
         HasConversionError = false;
-
-        if (!IsTouched
-            && !string.Equals(result, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && !string.Equals(result, CurrentValue))
-        {
-            EvaluateDebounced();
-        }
-
         return true;
     }
 

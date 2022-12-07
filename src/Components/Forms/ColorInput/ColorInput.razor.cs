@@ -702,17 +702,16 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
             newValue = default;
         }
 
-        if (!IsTouched
-            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
         if (!IsNested
             && !EqualityComparer<TValue>.Default.Equals(newValue, CurrentValue))
         {
             EvaluateDebounced();
+        }
+
+        if (!IsTouched
+            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
+        {
+            SetTouchedDebounced();
         }
 
         CurrentValue = newValue;

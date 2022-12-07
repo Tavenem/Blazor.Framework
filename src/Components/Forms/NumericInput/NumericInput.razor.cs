@@ -582,21 +582,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
             validationErrorMessage = GetConversionValidationMessage();
         }
 
-        if (!IsTouched
-            && (!EqualityComparer<TValue>.Default.Equals(result, InitialValue)
-            || HasConversionError))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && (HasConversionError
-            || !EqualityComparer<TValue>.Default.Equals(result, CurrentValue)))
-        {
-            EvaluateDebounced();
-        }
-
         return success;
     }
 
@@ -662,16 +647,15 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         SetDisplay();
         HasConversionError = false;
 
-        if (!IsTouched
-            && !EqualityComparer<TValue>.Default.Equals(value, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
         if (!IsNested)
         {
             EvaluateDebounced();
+        }
+
+        if (!IsTouched
+            && !EqualityComparer<TValue>.Default.Equals(value, InitialValue))
+        {
+            SetTouchedDebounced();
         }
     }
 }

@@ -411,21 +411,6 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
             validationErrorMessage = GetConversionValidationMessage();
         }
 
-        if (!IsTouched
-            && (!EqualityComparer<TValue>.Default.Equals(result, InitialValue)
-            || HasConversionError))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && (HasConversionError
-            || !EqualityComparer<TValue>.Default.Equals(result, CurrentValue)))
-        {
-            EvaluateDebounced();
-        }
-
         return success;
     }
 

@@ -117,19 +117,15 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <DateTimeInput @bind-Value="_value1" Label="String" />
-                <span>Bound value: @_value1</span>
-                <DateTimeInput @bind-Value="_value2" Label="DateTime" />
-                <span>Bound value: @_value2.ToString()</span>
+                <DateTimeInput @bind-Value="_value1" Label="String" HelpText="@($"Bound value: {_value1}")" />
+                <DateTimeInput @bind-Value="_value2" Label="DateTime" HelpText="@($"Bound value: {_value2}")" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <DateTimeInput @bind-Value=""_value1"" Label=""String"" />
-    <span>Bound value: @_value1</span>
-    <DateTimeInput @bind-Value=""_value2"" Label=""DateTime"" />
-    <span>Bound value: @_value2.ToString()</span>
+    <DateTimeInput @bind-Value=""_value1"" Label=""String"" HelpText=""@($""Bound value: {_value1}"")"" />
+    <DateTimeInput @bind-Value=""_value2"" Label=""DateTime"" HelpText=""@($""Bound value: {_value2}"")"" />
 </div>
 
 @code {
