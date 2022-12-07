@@ -141,8 +141,7 @@ public abstract class BoolInputComponentBase<TValue>
 
         if (!IsTouched)
         {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
+            SetTouchedDebounced();
         }
 
         if (!IsNested)

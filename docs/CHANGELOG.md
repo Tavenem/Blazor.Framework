@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.8
+### Changed
+- Add slight delay to setting `IsTouched` on inputs, to avoid a flash of invalid style
+### Fixed
+- Input controls now respond to dynamic changes to the `Required` property
+- `DateTimeInput` navigation bug
+
 ## 1.7
 ### Fixed
 - `DataGrid` page count

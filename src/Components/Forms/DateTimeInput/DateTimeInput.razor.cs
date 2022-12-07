@@ -637,7 +637,6 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var setDate = false;
-        var setCalendar = false;
         var scrollToYear = false;
 
         if (parameters.TryGetValue<DateTime>(nameof(Min), out var min))
@@ -654,14 +653,12 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         {
             Culture = culture;
             SetCulture();
-            setCalendar = true;
         }
 
         if (parameters.TryGetValue<Calendar>(nameof(Calendar), out var calendar)
             && calendar != Calendar)
         {
             SetCalendar(calendar);
-            setDate = true;
         }
 
         if (parameters.TryGetValue<TimeZoneInfo>(nameof(TimeZone), out var timeZone)
@@ -683,7 +680,9 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         }
 
         if (parameters.TryGetValue<TValue>(nameof(Value), out var value)
-            && value?.Equals(Value) != true)
+            && value?.Equals(Value) != true
+            && (value is not null
+            || Value is not null))
         {
             if (value is null)
             {
@@ -705,8 +704,15 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
             else if (value is DateTimeOffset dto)
             {
                 DateTimeOffset = dto;
-                TimeZone = TimeZones.FirstOrDefault(x => x.BaseUtcOffset == dto.Offset)
-                    ?? TimeZoneInfo.Local;
+                if (TimeZoneInfo.Local.BaseUtcOffset == dto.Offset)
+                {
+                    TimeZone = TimeZoneInfo.Local;
+                }
+                else
+                {
+                    TimeZone = TimeZones.FirstOrDefault(x => x.BaseUtcOffset == dto.Offset)
+                        ?? TimeZoneInfo.Local;
+                }
             }
             else if (value is DateOnly dateOnly)
             {
@@ -745,7 +751,7 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 
         FormatProvider ??= Culture;
 
-        if (!setCalendar && setDate)
+        if (setDate)
         {
             SetDateValues();
         }
@@ -794,7 +800,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 
         DateTimeOffset = DateTimeOffset.Now;
 
-        if (_nullableType is null)
+        if (_nullableType is null
+            && _baseType != typeof(string))
         {
             SetValue();
         }
@@ -1873,17 +1880,16 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
             newValue = default;
         }
 
-        if (!IsTouched
-            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
         if (!IsNested
             && !EqualityComparer<TValue>.Default.Equals(newValue, CurrentValue))
         {
             EvaluateDebounced();
+        }
+
+        if (!IsTouched
+            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
+        {
+            SetTouchedDebounced();
         }
 
         CurrentValue = newValue;

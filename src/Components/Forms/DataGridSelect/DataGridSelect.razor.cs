@@ -380,22 +380,6 @@ public partial class DataGridSelect<
 
         HasConversionError = !success;
 
-        if (!IsTouched
-            && (!EqualityComparer<TValue>.Default.Equals(result, InitialValue)
-            || HasConversionError))
-        {
-            IsTouched = true;
-            _ = IsTouchedChanged.InvokeAsync(true);
-        }
-
-        if (!IsNested
-            && (HasConversionError
-            || (Validation is not null
-            && !EqualityComparer<TValue>.Default.Equals(result, CurrentValue))))
-        {
-            EvaluateDebounced();
-        }
-
         return success;
     }
 
