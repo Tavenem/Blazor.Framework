@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9
+### Added
+- Optional `DialogOptions` for the `AddDialog` and `EditDialog` of `DataGrid`
+
 ## 1.8
 ### Changed
 - Add slight delay to setting `IsTouched` on inputs, to avoid a flash of invalid style

@@ -77,9 +77,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     [Parameter] public Func<Task<DialogParameters>>? AddDialogParameters { get; set; }
 
     /// <summary>
-    /// <para>
-    /// If provided, use for adding inline options.
-    /// </para>
+    /// If provided, these options are used to configure the <see cref="AddDialog"/>.
     /// </summary>
     [Parameter] public DialogOptions? AddDialogOptions { get; set; }
 
@@ -241,12 +239,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     [Parameter] public Func<TDataItem?, Task<DialogParameters>>? EditDialogParameters { get; set; }
 
     /// <summary>
-    /// <para>
-    /// If provided, includes inline options for dialog/>.
-    /// </para>
+    /// If provided, these options are used to configure the <see cref="EditDialog"/>.
     /// </summary>
     [Parameter] public DialogOptions? EditDialogOptions { get; set; }
-
 
     /// <summary>
     /// This optional content is displayed when a row is expanded.
@@ -1293,7 +1288,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var result = await DialogService.Show(
                 EditDialog,
                 "Edit",
-                parameters, options).Result;
+                parameters,
+                options).Result;
             if (result.Choice == DialogChoice.Ok
                 && result.Data is TDataItem item)
             {
@@ -1916,7 +1912,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             if (AddDialogOptions is not null)
             {
                 options = AddDialogOptions;
-            } else if (EditDialogOptions is not null)
+            }
+            else if (EditDialogOptions is not null)
             {
                 options = EditDialogOptions;
             }
@@ -1925,7 +1922,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var result = await DialogService.Show(
                 (AddDialog ?? EditDialog)!,
                 "Add",
-                parameters, options).Result;
+                parameters,
+                options).Result;
             if (result.Choice == DialogChoice.Ok
                 && result.Data is TDataItem item)
             {

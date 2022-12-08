@@ -939,6 +939,11 @@
 </p>
 
 <p>
+    You can also supply options for your custom edit dialog via the <code>EditDialogOptions</code>
+    parameter.
+</p>
+
+<p>
     When an edit is complete, the <code>ItemSaved</code> function is invoked (if defined). If this
     callback returns <code>false</code>, the item's edited properties are reverted to their original
     values.
@@ -1005,7 +1010,8 @@
 <p>
     You can also provide a different dialog for adding items by assigning a <code>Component</code>
     type to the <code>AddDialog</code> property. If this is set, it will be used instead of the
-    <code>EditDialog</code>. You can also supply <code>AddDialogParameters</code>.
+    <code>EditDialog</code>. You can also supply <code>AddDialogParameters</code> and/or
+    <code>AddDialogOptions</code>.
 </p>
 
 <p>
