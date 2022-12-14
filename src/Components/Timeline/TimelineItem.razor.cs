@@ -8,6 +8,11 @@ namespace Tavenem.Blazor.Framework;
 public partial class TimelineItem
 {
     /// <summary>
+    /// Raised when the timeline dot is clicked.
+    /// </summary>
+    [Parameter] public EventCallback Clicked { get; set; }
+
+    /// <summary>
     /// An optional icon which fills the dot.
     /// </summary>
     [Parameter] public string? Icon { get; set; }
@@ -33,4 +38,6 @@ public partial class TimelineItem
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
+
+    private Task OnClickAsync() => Clicked.InvokeAsync();
 }

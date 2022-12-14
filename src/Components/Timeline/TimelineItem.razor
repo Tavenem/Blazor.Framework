@@ -7,7 +7,7 @@
         @ChildContent
     </div>
     <div class="timeline-item-divider">
-        <div class="dot">
+        <div class="dot" @onclick="OnClickAsync">
             <div class="inner">
                 @if (!string.IsNullOrEmpty(Icon))
                 {
