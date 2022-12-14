@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10
+### Added
+- Add `Clicked` handler to `TimelineItem`
+
 ## 1.9
 ### Added
 - Optional `DialogOptions` for the `AddDialog` and `EditDialog` of `DataGrid`
