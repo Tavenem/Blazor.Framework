@@ -22,13 +22,13 @@
             <ChildContent>
                 @if (Item is not null)
                 {
-                    if (ElementList?.CollapsibleTemplate is null)
+                    if (ElementList?.CollapsibleTemplateValue is null)
                     {
                         <span>@(Item?.ToString())</span>
                     }
                     else
                     {
-                        @ElementList.CollapsibleTemplate(Item)
+                        @ElementList.CollapsibleTemplateValue(Item)
                     }
                 }
             </ChildContent>

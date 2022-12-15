@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11
+### Changed
+- Allow cascading `CollapsibleTemplate` from parent `ElementList` components
+
 ## 1.10
 ### Added
 - Add `Clicked` handler to `TimelineItem`

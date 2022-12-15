@@ -323,6 +323,9 @@ public partial class ElementList<TListItem> : DropTarget<TListItem>
 
     internal bool ShowSelectionIconValue => ShowSelectionIcon || ParentList?.ShowSelectionIconValue == true;
 
+    internal RenderFragment<TListItem>? CollapsibleTemplateValue
+        => CollapsibleTemplate ?? ParentList?.CollapsibleTemplateValue;
+
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
