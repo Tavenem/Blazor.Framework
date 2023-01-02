@@ -11,6 +11,7 @@
         flex-wrap: wrap;
         list-style: none;
         padding-left: 0;
+        row-gap: .25rem;
     }
 
     .step-selector {
@@ -64,9 +65,5 @@
         &:last-child .step-separator-end {
             display: none;
         }
-    }
-
-    .step {
-        grid-area: 1 / 1 / 2 / 2;
     }
 }

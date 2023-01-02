@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12
+### Changed
+- Improve Steps styles
+
 ## 1.11
 ### Changed
 - Allow cascading `CollapsibleTemplate` from parent `ElementList` components

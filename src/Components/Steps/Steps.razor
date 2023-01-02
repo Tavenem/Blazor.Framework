@@ -26,11 +26,11 @@
           Validation="Validation!"
           ValidationRequested="ValidationRequested"
           ValidationStateChanged="OnValidationStateChanged"
-          Class="d-grid mb-3 flex-grow-1">
+          Class="d-flex flex-column align-self-stretch mb-3 flex-grow-1">
         @for (var i = 0; i < _steps.Count; i++)
         {
             var index = i;
-            <div class="step" style="@GetStepCssStyle(index)">
+            <div class="@GetStepCssClass(index)">
                 @_steps[index].ChildContent
             </div>
         }

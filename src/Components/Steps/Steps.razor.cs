@@ -246,8 +246,8 @@ public partial class Steps
         .Add(CurrentThemeColor.ToCSS(), step == _steps[CurrentStep])
         .ToString();
 
-    private string? GetStepCssStyle(int index) => new CssBuilder()
-        .AddStyle("visibility", "hidden", index != CurrentStep)
+    private string? GetStepCssClass(int index) => new CssBuilder()
+        .AddStyle("d-none", index != CurrentStep)
         .ToString();
 
     private async Task OnActivateStepAsync(Step step)
