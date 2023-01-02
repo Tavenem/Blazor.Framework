@@ -16,6 +16,7 @@ public static class TavenemFrameworkDIExtensions
     /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
     public static IServiceCollection AddTavenemFramework(this IServiceCollection services)
     {
+        services.AddScoped<AppState>();
         services.AddScoped<UtilityService>();
         services.AddScoped<DragDropService>();
         services.AddScoped<PopoverService>();

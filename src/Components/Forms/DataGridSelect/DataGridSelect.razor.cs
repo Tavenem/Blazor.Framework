@@ -24,8 +24,7 @@ public partial class DataGridSelect<
     private readonly List<IColumn<TDataItem>> _columns = new();
     private readonly List<Guid> _initialSortOrder = new();
 
-    private bool _initialized;
-    private bool _valueUpdated;
+    private bool _initialized, _valueUpdated;
 
     /// <summary>
     /// The child content of this component.
@@ -450,7 +449,7 @@ public partial class DataGridSelect<
             }
             else
             {
-                CurrentValue = (TValue?)(object?)DataGrid.SelectedItem;
+                CurrentValue = (TValue)(object)DataGrid.SelectedItem;
             }
         }
         else if (DataGrid.SelectedItem is null)

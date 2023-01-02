@@ -8,6 +8,7 @@ using System.Text;
 using Tavenem.Blazor.Framework.Components.DataGrid;
 using Tavenem.Blazor.Framework.Components.DataGrid.InternalDialogs;
 using Tavenem.Blazor.Framework.InternalComponents.DataGrid;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -19,7 +20,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
     | DynamicallyAccessedMemberTypes.PublicFields
     | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>
-    : IDataGrid<TDataItem>, IAsyncDisposable
+    : TavenemComponentBase, IDataGrid<TDataItem>, IAsyncDisposable
 {
     private const string HtmlTemplate = """
         <!DOCTYPE html>
@@ -309,6 +310,14 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     [Parameter] public string? HtmlHeaderContent { get; set; }
 
     /// <summary>
+    /// The HTML id of this element.
+    /// </summary>
+    /// <remarks>
+    /// Initialized to a GUID if not set explicitly.
+    /// </remarks>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    /// <summary>
     /// Whether the table is currently loading data via <see cref="LoadItems"/>.
     /// </summary>
     public bool IsLoading { get; protected set; }
@@ -565,6 +574,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         .Add($"table-{Breakpoint.ToCSS()}", Breakpoint != Breakpoint.None)
         .ToString();
 
+    [Inject] private AppState AppState { get; set; } = default!;
+
     private List<IGrouping<object, TDataItem>>? DataGroups { get; set; }
 
     private DataPage<TDataItem>? CurrentDataPage { get; set; }
@@ -710,6 +721,82 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), field.FieldType);
             var ctor = columnType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, new[] { typeof(FieldInfo) })!;
             _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { field }));
+        }
+
+        var (rowsPerPage, offset, filters, order) = AppState.GetGridState(Id);
+        if (rowsPerPage > 0)
+        {
+            RowsPerPage = rowsPerPage;
+        }
+        if (offset > 0)
+        {
+            Offset = offset;
+        }
+        if (filters?.Length > 0)
+        {
+            foreach (var filter in filters)
+            {
+                var column = _columns.FirstOrDefault(x => x.MemberName?.Equals(filter.Property) == true);
+                if (column is null)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(filter.QuickFilter))
+                {
+                    QuickFilter = filter.QuickFilter;
+                }
+
+                var isFiltered = false;
+                if (column.IsBool)
+                {
+                    column.BoolFilter = filter.BoolFilter;
+                    isFiltered = filter.BoolFilter.HasValue;
+                }
+                else if (column.IsDateTime)
+                {
+                    column.DateTimeFilter = filter.DateTimeFilter;
+                    column.DateTimeFilterIsBefore = filter.DateTimeFilterIsBefore;
+                    isFiltered = filter.DateTimeFilter.HasValue;
+                }
+                else if (column.IsNumeric)
+                {
+                    column.NumberFilter = filter.NumberFilter;
+                    isFiltered = filter.NumberFilter.HasValue;
+                }
+                else if (column.IsString)
+                {
+                    column.TextFilter = filter.ExactMatch
+                        ? $"\"{filter.TextFilter}\""
+                        : filter.TextFilter;
+                    isFiltered = !string.IsNullOrEmpty(filter.TextFilter);
+                }
+
+                if (isFiltered && !column.GetIsShown())
+                {
+                    column.SetIsShown(true);
+                }
+            }
+        }
+        if (order?.Length > 0)
+        {
+            foreach (var (property, descending) in order)
+            {
+                var column = _columns.Find(x => x.MemberName == property);
+                if (column is null)
+                {
+                    continue;
+                }
+
+                column.SortDescending = descending;
+                _sortOrder.Remove(column.Id);
+                _sortOrder.Insert(0, column.Id);
+
+                if (!column.GetIsShown())
+                {
+                    column.SetIsShown(true);
+                }
+            }
         }
 
         RecalculatePaging();
@@ -903,6 +990,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             return LoadItemsAsync();
         }
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         return Task.CompletedTask;
     }
 
@@ -975,6 +1067,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             await LoadItemsAsync();
         }
         await CurrentPageChanged.InvokeAsync();
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
     }
 
     /// <summary>
@@ -1047,7 +1144,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         if (value is null
             || (getValue is null
-            && typeof(TValue).IsAssignableFrom(typeof(TDataItem))))
+            && !typeof(TDataItem).IsAssignableFrom(typeof(TValue))))
         {
             return;
         }
@@ -1087,6 +1184,13 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                     SelectedItems.Add(item);
                 }
             }
+        }
+
+        if (SelectedItems.Count == 0
+            && value is not null
+            && typeof(TDataItem).IsAssignableFrom(typeof(TValue)))
+        {
+            SelectedItems.Add((TDataItem)(object)value);
         }
 
         SelectedItem = SelectedItems.FirstOrDefault();
@@ -1145,7 +1249,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         if (values is null
             || (getValue is null
-            && typeof(TValue).IsAssignableFrom(typeof(TDataItem))))
+            && !typeof(TDataItem).IsAssignableFrom(typeof(TValue))))
         {
             return;
         }
@@ -1187,6 +1291,13 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             }
         }
 
+        if (SelectedItems.Count == 0
+            && values?.Count > 0
+            && typeof(TDataItem).IsAssignableFrom(typeof(TValue)))
+        {
+            SelectedItems.AddRange(values.Cast<object>().Cast<TDataItem>());
+        }
+
         SelectedItem = SelectedItems.FirstOrDefault();
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
@@ -1207,6 +1318,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             return LoadItemsAsync();
         }
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         return Task.CompletedTask;
     }
 
@@ -1970,6 +2086,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private Task OnBoolFilterChangedAsync(IColumn<TDataItem> column, bool? value)
     {
         column.BoolFilter = value;
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         if (LoadItems is null)
         {
             Regroup();
@@ -1992,6 +2113,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private Task OnChangeQuickFilterAsync(string? value)
     {
         QuickFilter = value;
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         if (LoadItems is null)
         {
             Regroup();
@@ -2059,6 +2185,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             }
         }
         await CurrentPageChanged.InvokeAsync();
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
     }
 
     private Task OnColumnSortAsync(IColumn<TDataItem> column)
@@ -2071,12 +2202,22 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             column.SortDescending = false;
         }
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         return OnColumnSortedAsync(column);
     }
 
     private Task OnDateTimeFilterChangedAsync(IColumn<TDataItem> column, DateTimeOffset? value)
     {
         column.DateTimeFilter = value;
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         if (LoadItems is null)
         {
             Regroup();
@@ -2091,6 +2232,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private Task OnFilterChangedAsync(IColumn<TDataItem> column, string? value)
     {
         column.TextFilter = value;
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         if (LoadItems is null)
         {
             Regroup();
@@ -2157,6 +2303,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private Task OnNumberFilterChangedAsync(IColumn<TDataItem> column, double? value)
     {
         column.NumberFilter = value;
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
         if (LoadItems is null)
         {
             Regroup();
@@ -2177,6 +2328,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             await LoadItemsAsync();
         }
         await CurrentPageChanged.InvokeAsync();
+        AppState.SetGridState(Id, new(
+            RowsPerPage,
+            Offset,
+            GetFilterInfo(),
+            GetSortInfo()));
     }
 
     private async Task OnSetSelectAllAsync(bool? value)

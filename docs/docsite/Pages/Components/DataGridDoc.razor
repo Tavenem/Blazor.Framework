@@ -562,6 +562,21 @@
     <code>IsQuickFilter</code> set to <code>true</code>.
 </p>
 
+<Heading Level="HeadingLevel.H3">Persistence</Heading>
+
+<p>
+    Normally all filters will be reset when navigating away from the page. If you set an explicit
+    value for the <code>Id</code> property (which sets the HTML <code>id</code> attribute), the
+    current filters will persist between <em>in-app</em> navigations. Navigating away from the
+    Blazor app, or using the browser's refresh function, will reset this internal cache.
+</p>
+
+<p>
+    If you need filters to persist even when the user navigates away from the app or refreshes the
+    browser (or in other offline scenarios, such as in a bookmark or external link), you can use
+    query parameters in combination with the initial filter properties to achieve this result.
+</p>
+
 <Heading Level="HeadingLevel.H2">Sorting</Heading>
 
 <p>
@@ -584,6 +599,21 @@
     You can set the <code>InitiallySorted</code> property to <code>true</code> to specify that a
     column should be initially sorted. Combine this with the <code>SortDescending</code> property to
     control the direction of the initial sort.
+</p>
+
+<Heading Level="HeadingLevel.H3">Persistence</Heading>
+
+<p>
+    Normally all sorting options will be reset when navigating away from the page. If you set an
+    explicit value for the <code>Id</code> property (which sets the HTML <code>id</code> attribute),
+    the current sorting will persist between <em>in-app</em> navigations. Navigating away from the
+    Blazor app, or using the browser's refresh function, will reset this internal cache.
+</p>
+
+<p>
+    If you need sort options to persist even when the user navigates away from the app or refreshes
+    the browser (or in other offline scenarios, such as in a bookmark or external link), you can use
+    query parameters in combination with the initial sort properties to achieve this result.
 </p>
 
 <Heading Level="HeadingLevel.H2">Grouping</Heading>

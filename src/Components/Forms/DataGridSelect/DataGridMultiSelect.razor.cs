@@ -24,8 +24,7 @@ public partial class DataGridMultiSelect<
     private readonly List<IColumn<TDataItem>> _columns = new();
     private readonly List<Guid> _initialSortOrder = new();
 
-    private bool _initialized;
-    private bool _valueUpdated;
+    private bool _initialized, _valueUpdated;
 
     /// <summary>
     /// The child content of this component.

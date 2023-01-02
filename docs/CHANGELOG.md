@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13
+### Added
+- `DataGrid` components with an explicit `Id` will now persist paging, filter, and sort information between in-app page navigations
+### Changed
+- Values in a `DataGrid` select component with `LoadItems` defined can now be selected even when not present in the currently loaded page
+
 ## 1.12
 ### Changed
 - Improve Steps styles
