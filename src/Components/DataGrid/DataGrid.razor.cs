@@ -723,82 +723,6 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { field }));
         }
 
-        var (rowsPerPage, offset, filters, order) = AppState.GetGridState(Id);
-        if (rowsPerPage > 0)
-        {
-            RowsPerPage = rowsPerPage;
-        }
-        if (offset > 0)
-        {
-            Offset = offset;
-        }
-        if (filters?.Length > 0)
-        {
-            foreach (var filter in filters)
-            {
-                var column = _columns.FirstOrDefault(x => x.MemberName?.Equals(filter.Property) == true);
-                if (column is null)
-                {
-                    continue;
-                }
-
-                if (!string.IsNullOrEmpty(filter.QuickFilter))
-                {
-                    QuickFilter = filter.QuickFilter;
-                }
-
-                var isFiltered = false;
-                if (column.IsBool)
-                {
-                    column.BoolFilter = filter.BoolFilter;
-                    isFiltered = filter.BoolFilter.HasValue;
-                }
-                else if (column.IsDateTime)
-                {
-                    column.DateTimeFilter = filter.DateTimeFilter;
-                    column.DateTimeFilterIsBefore = filter.DateTimeFilterIsBefore;
-                    isFiltered = filter.DateTimeFilter.HasValue;
-                }
-                else if (column.IsNumeric)
-                {
-                    column.NumberFilter = filter.NumberFilter;
-                    isFiltered = filter.NumberFilter.HasValue;
-                }
-                else if (column.IsString)
-                {
-                    column.TextFilter = filter.ExactMatch
-                        ? $"\"{filter.TextFilter}\""
-                        : filter.TextFilter;
-                    isFiltered = !string.IsNullOrEmpty(filter.TextFilter);
-                }
-
-                if (isFiltered && !column.GetIsShown())
-                {
-                    column.SetIsShown(true);
-                }
-            }
-        }
-        if (order?.Length > 0)
-        {
-            foreach (var (property, descending) in order)
-            {
-                var column = _columns.Find(x => x.MemberName == property);
-                if (column is null)
-                {
-                    continue;
-                }
-
-                column.SortDescending = descending;
-                _sortOrder.Remove(column.Id);
-                _sortOrder.Insert(0, column.Id);
-
-                if (!column.GetIsShown())
-                {
-                    column.SetIsShown(true);
-                }
-            }
-        }
-
         RecalculatePaging();
 
         if (LoadItems is null)
@@ -914,6 +838,103 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SelectedItem = SelectedItems.FirstOrDefault();
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var (rowsPerPage, offset, filters, order) = AppState.GetGridState(Id);
+        if (rowsPerPage == 0 && offset == 0)
+        {
+            return;
+        }
+
+        RowsPerPage = rowsPerPage;
+        Offset = offset;
+
+        if (filters?.Length > 0)
+        {
+            foreach (var filter in filters)
+            {
+                var column = _columns.FirstOrDefault(x => x.MemberName?.Equals(filter.Property) == true);
+                if (column is null)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(filter.QuickFilter))
+                {
+                    QuickFilter = filter.QuickFilter;
+                }
+
+                var isFiltered = false;
+                if (column.IsBool)
+                {
+                    column.BoolFilter = filter.BoolFilter;
+                    isFiltered = filter.BoolFilter.HasValue;
+                }
+                else if (column.IsDateTime)
+                {
+                    column.DateTimeFilter = filter.DateTimeFilter;
+                    column.DateTimeFilterIsBefore = filter.DateTimeFilterIsBefore;
+                    isFiltered = filter.DateTimeFilter.HasValue;
+                }
+                else if (column.IsNumeric)
+                {
+                    column.NumberFilter = filter.NumberFilter;
+                    isFiltered = filter.NumberFilter.HasValue;
+                }
+                else if (column.IsString)
+                {
+                    column.TextFilter = filter.ExactMatch
+                        ? $"\"{filter.TextFilter}\""
+                        : filter.TextFilter;
+                    isFiltered = !string.IsNullOrEmpty(filter.TextFilter);
+                }
+
+                if (isFiltered && !column.GetIsShown())
+                {
+                    column.SetIsShown(true);
+                }
+            }
+        }
+
+        if (order?.Length > 0)
+        {
+            foreach (var (property, descending) in order)
+            {
+                var column = _columns.Find(x => x.MemberName == property);
+                if (column is null)
+                {
+                    continue;
+                }
+
+                column.SortDescending = descending;
+                _sortOrder.Remove(column.Id);
+                _sortOrder.Insert(0, column.Id);
+
+                if (!column.GetIsShown())
+                {
+                    column.SetIsShown(true);
+                }
+            }
+        }
+
+        RecalculatePaging();
+
+        if (LoadItems is null)
+        {
+            Regroup();
+        }
+        else
+        {
+            await LoadItemsAsync();
+        }
     }
 
     /// <inheritdoc/>

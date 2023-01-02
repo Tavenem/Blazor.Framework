@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14
+### Fixed
+- Enable persistent `DataGrid` state when explcit columns are used
+
 ## 1.13
 ### Added
 - `DataGrid` components with an explicit `Id` will now persist paging, filter, and sort information between in-app page navigations
