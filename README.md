@@ -1,4 +1,4 @@
-![build](https://img.shields.io/github/workflow/status/Tavenem/Blazor.Framework/publish/main) [![NuGet downloads](https://img.shields.io/nuget/dt/Tavenem.Blazor.Framework)](https://www.nuget.org/packages/Tavenem.Blazor.Framework/)
+![build](https://img.shields.io/github/actions/workflow/status/Tavenem/Blazor.Framework/publish.yml?branch=main) [![NuGet downloads](https://img.shields.io/nuget/dt/Tavenem.Blazor.Framework)](https://www.nuget.org/packages/Tavenem.Blazor.Framework/)
 
 Tavenem.Blazor.Framework
 ==
