@@ -52,6 +52,36 @@ public class DataGridRequestTests
     }
 
     [TestMethod]
+    public void SqlCount_TextFilter_Mapping()
+    {
+        const string ParameterName = "FilterProp";
+        const string ColumnName = "FilterColumn";
+        const string ParameterValue = "Filter";
+
+        var request = new DataGridRequest(
+            0,
+            0,
+            new[] { new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false) },
+            null);
+        var columnMapping = new Dictionary<string, string>
+        {
+            { ParameterName, ColumnName }
+        };
+        var (command, parameters) = DataGridRequest.ToSqlCount(request, columnMapping);
+
+        Console.WriteLine(command);
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            Console.WriteLine($"Parameter @{parameters[i].name}: {parameters[i].value}");
+        }
+
+        Assert.AreEqual($"SELECT COUNT(1) FROM {{0}} WHERE [{ColumnName}] LIKE '%' + @{ColumnName} + '%' COLLATE Latin1_general_CI_AI", command);
+        Assert.AreEqual(1, parameters.Length);
+        Assert.AreEqual(ColumnName, parameters[0].name);
+        Assert.AreEqual(ParameterValue, parameters[0].value);
+    }
+
+    [TestMethod]
     public void SqlQuery_NoFilter_NoOrder()
     {
         const string PrimaryKey = "Id";

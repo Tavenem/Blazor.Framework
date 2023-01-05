@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16
+### Added
+- Column mapping support for `DataGridRequest`
+
 ## 1.15
 ### Changed
 - Improved keyboard navigation for various controls
