@@ -72,8 +72,16 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     [Parameter] public bool ReadOnly { get; set; }
 
     /// <summary>
-    /// The tabindex of the group.
+    /// The tabindex of the first item in the group.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// When this is &lt;= zero, all radios will have the same index.
+    /// </para>
+    /// <para>
+    /// When it is greater than zero, the radios will have incrementing indexes.
+    /// </para>
+    /// </remarks>
     [Parameter] public int TabIndex { get; set; }
 
     /// <summary>

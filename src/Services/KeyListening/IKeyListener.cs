@@ -35,15 +35,24 @@ public interface IKeyListener
     Task ConnectAsync(string elementId, KeyListenerOptions options);
 
     /// <summary>
-    /// Stop listening for keyboard events.
+    /// Stop listening for keyboard events on all elements.
     /// </summary>
     Task DisconnectAsync();
 
     /// <summary>
+    /// Stop listening for keyboard events.
+    /// </summary>
+    /// <param name="elementId">
+    /// The id of the element to be disconnected.
+    /// </param>
+    Task DisconnectAsync(string elementId);
+
+    /// <summary>
     /// Update the current keyboard event listener.
     /// </summary>
+    /// <param name="elementId">The id of the element to be updated.</param>
     /// <param name="options">
     /// An instance of <see cref="KeyListenerOptions"/>.
     /// </param>
-    Task UpdateKeyAsync(KeyOptions options);
+    Task UpdateKeyAsync(string elementId, KeyOptions options);
 }

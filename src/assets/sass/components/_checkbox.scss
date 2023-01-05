@@ -6,6 +6,10 @@
     flex: 0 0 auto;
     flex-direction: column;
 
+    &:has(:focus-visible):not(.disabled) {
+        background-color: var(--tavenem-color-action-hover-bg);
+    }
+
     label {
         @include ripple;
         align-items: center;

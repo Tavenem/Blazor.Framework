@@ -109,7 +109,7 @@ public partial class Select<TValue> : SelectBase<TValue, TValue>
 
         if (!_options[index].Disabled)
         {
-            await ToggleValueAsync(_options[index]);
+            await ToggleValueAsync(_options[index], false);
         }
 
         if (ShowPicker)

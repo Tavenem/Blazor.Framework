@@ -2,8 +2,7 @@
 
 @inherits FormComponentBase<byte>
 
-<fieldset tabindex="@(Disabled ? -1 : 0)"
-          @attributes="AdditionalAttributes"
+<fieldset @attributes="AdditionalAttributes"
           class="@CssClass"
           style="@CssStyle"
           aria-required="@Required"
@@ -27,23 +26,24 @@
                        readonly="@ReadOnly"
                        tabindex="-1"
                        value="1" />
-                <button class="@RatingItemCssClass" style="@RatingItemStyle" tabindex="@TabIndex">
+                <button class="@RatingItemCssClass" style="@RatingItemStyle" tabindex="@(Disabled ? -1 : TabIndex)">
                     <tf-icon>@(IndexIsActive(0) ? ActiveIcon : InactiveIcon)</tf-icon>
                 </button>
             </span>
             @for (var i = 1; i < Max; i++)
             {
                 var index = i;
+                var tabIndex = Disabled ? -1 : TabIndex + index;
                 <span @onclick="@(_ => OnRatingClick(index))"
                       @onmouseout="OnMouseOutAsync"
                       @onmouseover="@(_ => OnMouseOverAsync(index))">
                     <input type="radio"
-                   checked="@(index < Value)"
-                   disabled="@Disabled"
-                   name="@Name"
-                   readonly="@ReadOnly"
-                   tabindex="-1"
-                   value="@(index + 1)" />
+                           checked="@(index < Value)"
+                           disabled="@Disabled"
+                           name="@Name"
+                           readonly="@ReadOnly"
+                           tabindex="@tabIndex"
+                           value="@(index + 1)" />
                     <button class="@RatingItemCssClass" style="@RatingItemStyle">
                         <tf-icon>@(IndexIsActive(index) ? ActiveIcon : InactiveIcon)</tf-icon>
                     </button>

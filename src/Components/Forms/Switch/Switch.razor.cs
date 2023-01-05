@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
@@ -46,9 +47,64 @@ public partial class Switch : BoolInputComponentBase<bool>
         .Add(ThemeColor.ToCSS())
         .ToString();
 
+    private protected string ButtonId { get; set; } = Guid.NewGuid().ToHtmlId();
+
     private string? Icon => IsChecked == true
         ? CheckedIcon
         : UncheckedIcon;
 
+    [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
+
+    private protected virtual List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/ArrowLeft|ArrowRight| |Enter/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+        }
+    };
+
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await KeyListener.ConnectAsync(ButtonId, new()
+            {
+                Keys = KeyOptions,
+            });
+            KeyListener.KeyDown += OnKeyDown;
+        }
+    }
+
     private void OnChange(ChangeEventArgs e) => Toggle();
+
+    private protected void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+                if (Value)
+                {
+                    Toggle();
+                }
+                break;
+            case "ArrowRight":
+                if (!Value)
+                {
+                    Toggle();
+                }
+                break;
+            case " ":
+            case "Enter":
+                Toggle();
+                break;
+        }
+    }
 }

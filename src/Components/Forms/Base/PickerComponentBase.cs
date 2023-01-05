@@ -165,6 +165,17 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
 
+    private protected virtual List<KeyOptions> InputKeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = " ",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
+        }
+    };
+
     private protected string InputId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
@@ -173,16 +184,15 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     {
         new()
         {
-            Key = "Escape",
+            Key = "/Delete|Enter|Escape/",
             SubscribeDown = true,
             PreventDown = "key+none",
         },
         new()
         {
-            Key = "/Delete| |Enter/",
+            Key = "/ArrowDown|ArrowUp/",
             SubscribeDown = true,
-            PreventDown = "key+none",
-            TargetOnly = true,
+            PreventDown = "key+alt",
         }
     };
 
@@ -222,6 +232,10 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
             {
                 Keys = KeyOptions,
             });
+            await KeyListener.ConnectAsync(Id, new()
+            {
+                Keys = InputKeyOptions,
+            });
             KeyListener.KeyDown += OnKeyDownAsync;
         }
     }
@@ -240,6 +254,8 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         {
             CurrentValueAsString = null;
         }
+
+        StateHasChanged();
         return Task.CompletedTask;
     }
 
@@ -277,6 +293,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         else
         {
             await OnClosePopoverAsync();
+            await FocusAsync();
         }
         StateHasChanged();
     }
@@ -301,21 +318,38 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
         switch (e.Key)
         {
-            case "Escape":
-                if (PopoverOpen)
+            case " ":
+                if (!PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
+                break;
+            case "ArrowDown":
+                if (e.AltKey && !PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
+                break;
+            case "ArrowUp":
+                if (e.AltKey && PopoverOpen)
                 {
                     await TogglePopoverAsync();
                 }
                 break;
             case "Delete":
-                if (CanClear)
+                if (CanClear && !PopoverOpen)
                 {
                     await ClearAsync();
                 }
                 break;
-            case " ":
             case "Enter":
                 await TogglePopoverAsync();
+                break;
+            case "Escape":
+                if (PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
                 break;
         }
     }

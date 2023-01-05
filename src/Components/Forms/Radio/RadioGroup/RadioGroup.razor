@@ -5,8 +5,7 @@
 
 @inherits FormComponentBase<TValue>
 
-<fieldset tabindex="@(Disabled ? -1 : TabIndex)"
-          @attributes="AdditionalAttributes"
+<fieldset @attributes="AdditionalAttributes"
           class="@CssClass"
           style="@CssStyle"
           aria-required="@Required">
@@ -19,36 +18,62 @@
             <CascadingValue Value="this" IsFixed="true">
                 <CascadingValue Value="_context">
                     @ChildContent
-                    @if (Values is not null)
+                    @if (true)
                     {
-                        if (LabelTemplate is null)
+                        var tabIndex = Disabled ? -1 : TabIndex;
+                        @if (Values is not null)
                         {
-                            foreach (var value in Values)
+                            if (LabelTemplate is null)
                             {
-                                <RadioButton @key="value"
-                                             Value="value"
-                                             Label="@value?.ToString()"
+                                foreach (var value in Values)
+                                {
+                                    <RadioButton @key="value"
+                                                 Value="value"
+                                                 Label="@value?.ToString()"
+                                                 CheckedIcon="@CheckedIcon"
+                                                 UncheckedIcon="@UncheckedIcon"
+                                                 TabIndex="tabIndex" />
+                                    @if (TabIndex > 0)
+                                    {
+                                        tabIndex++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var value in Values)
+                                {
+                                    <RadioButton @key="value"
+                                                 Value="value"
+                                                 CheckedIcon="@CheckedIcon"
+                                                 UncheckedIcon="@UncheckedIcon"
+                                                 TabIndex="tabIndex">
+                                        <LabelContent>
+                                            @LabelTemplate(context)
+                                        </LabelContent>
+                                    </RadioButton>
+                                    @if (TabIndex > 0)
+                                    {
+                                        tabIndex++;
+                                    }
+                                }
+                            }
+                        }
+                        @if (ValuePairs is not null)
+                        {
+                            foreach (var (key, value) in ValuePairs)
+                            {
+                                <RadioButton @key="key"
+                                             Value="key"
+                                             Label="@value"
                                              CheckedIcon="@CheckedIcon"
-                                             UncheckedIcon="@UncheckedIcon" />
+                                             UncheckedIcon="@UncheckedIcon"
+                                             TabIndex="tabIndex" />
+                                @if (TabIndex > 0)
+                                {
+                                    tabIndex++;
+                                }
                             }
-                        }
-                        else
-                        {
-                            foreach (var value in Values)
-                            {
-                                <RadioButton @key="value" Value="value" CheckedIcon="@CheckedIcon" UncheckedIcon="@UncheckedIcon">
-                                    <LabelContent>
-                                        @LabelTemplate(context)
-                                    </LabelContent>
-                                </RadioButton>
-                            }
-                        }
-                    }
-                    @if (ValuePairs is not null)
-                    {
-                        foreach (var (key, value) in ValuePairs)
-                        {
-                            <RadioButton @key="key" Value="key" Label="@value" CheckedIcon="@CheckedIcon" UncheckedIcon="@UncheckedIcon" />
                         }
                     }
                 </CascadingValue>

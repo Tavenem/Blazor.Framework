@@ -152,20 +152,24 @@ public partial class DataGridMultiSelect<
 
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
 
+    private protected override List<KeyOptions> InputKeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/ |a/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
+        }
+    };
+
     private protected override List<KeyOptions> KeyOptions { get; set; } = new()
     {
         new()
         {
-            Key = "Escape",
+            Key = "/ArrowDown|ArrowUp|Delete|Enter|Escape/",
             SubscribeDown = true,
             PreventDown = "key+none",
-        },
-        new()
-        {
-            Key = "/ArowDown|ArrowUp|Delete| |Enter|a/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-            TargetOnly = true,
         }
     };
 
@@ -262,6 +266,8 @@ public partial class DataGridMultiSelect<
             await DataGrid.SetSelectionAsync(null);
         }
         CurrentValueAsString = null;
+
+        StateHasChanged();
     }
 
     /// <summary>
@@ -440,10 +446,30 @@ public partial class DataGridMultiSelect<
 
         switch (e.Key)
         {
-            case "Escape":
-                if (PopoverOpen)
+            case "ArrowDown":
+                if (e.AltKey)
                 {
-                    await TogglePopoverAsync();
+                    if (!PopoverOpen)
+                    {
+                        await TogglePopoverAsync();
+                    }
+                }
+                else
+                {
+                    await OnArrowDownAsync();
+                }
+                break;
+            case "ArrowUp":
+                if (e.AltKey)
+                {
+                    if (PopoverOpen)
+                    {
+                        await TogglePopoverAsync();
+                    }
+                }
+                else
+                {
+                    await OnArrowUpAsync();
                 }
                 break;
             case "Delete":
@@ -452,15 +478,15 @@ public partial class DataGridMultiSelect<
                     await ClearAsync();
                 }
                 break;
-            case "ArrowDown":
-                await OnArrowDownAsync();
-                break;
-            case "ArrowUp":
-                await OnArrowUpAsync();
-                break;
             case " ":
             case "Enter":
                 await TogglePopoverAsync();
+                break;
+            case "Escape":
+                if (PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
                 break;
             case "a":
                 if (e.CtrlKey)

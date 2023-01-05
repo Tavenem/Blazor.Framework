@@ -11,8 +11,7 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     private readonly DotNetObjectReference<KeyListener> _dotNetRef;
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
 
-    private string? _elementId;
-    private bool _isObserving;
+    private List<string>? _elementIds;
 
     /// <summary>
     /// Invoked when a configured keydown event occurs.
@@ -65,18 +64,13 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     /// </param>
     public async Task ConnectAsync(string elementId, KeyListenerOptions options)
     {
-        if (_isObserving)
-        {
-            return;
-        }
-        _elementId = elementId;
+        (_elementIds ??= new()).Add(elementId);
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
             await module
                 .InvokeVoidAsync("listenForKeyEvent", _dotNetRef, elementId, options)
                 .ConfigureAwait(false);
-            _isObserving = true;
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
@@ -85,23 +79,37 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     }
 
     /// <summary>
-    /// Stop listening for keyboard events.
+    /// Stop listening for keyboard events on all elements.
     /// </summary>
     public async Task DisconnectAsync()
     {
-        if (!_isObserving)
+        if (_elementIds is null)
         {
             return;
         }
+        foreach (var id in _elementIds)
+        {
+            await DisconnectAsync(id);
+        }
+    }
+
+    /// <summary>
+    /// Stop listening for keyboard events.
+    /// </summary>
+    /// <param name="elementId">
+    /// The id of the element to be disconnected.
+    /// </param>
+    public async Task DisconnectAsync(string elementId)
+    {
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
             await module
-                .InvokeVoidAsync("disconnectKeyEvent", _elementId)
+                .InvokeVoidAsync("disconnectKeyEvent", elementId)
                 .ConfigureAwait(false);
         }
         catch { }
-        _isObserving = false;
+        _elementIds?.Remove(elementId);
     }
 
     /// <summary>
@@ -119,18 +127,15 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     /// <summary>
     /// Update the current keyboard event listener.
     /// </summary>
+    /// <param name="elementId">The id of the element to be updated.</param>
     /// <param name="options">
     /// An instance of <see cref="KeyListenerOptions"/>.
     /// </param>
-    public async Task UpdateKeyAsync(KeyOptions options)
+    public async Task UpdateKeyAsync(string elementId, KeyOptions options)
     {
-        if (!_isObserving)
-        {
-            return;
-        }
         var module = await _moduleTask.Value.ConfigureAwait(false);
         await module
-            .InvokeVoidAsync("updateKeyEvent", _elementId, options)
+            .InvokeVoidAsync("updateKeyEvent", elementId, options)
             .ConfigureAwait(false);
     }
 }

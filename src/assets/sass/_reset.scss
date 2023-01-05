@@ -398,6 +398,10 @@ input {
         outline: 0;
     }
 
+    &:focus-visible {
+        background-color: var(--tavenem-color-action-hover-bg);
+    }
+
     &::-webkit-date-and-time-value {
         height: calc(var(--tavenem-lineheight-body) * 1rem);
     }

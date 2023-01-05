@@ -12,12 +12,8 @@
         color: var(--rating-color);
     }
 
-    &:focus-visible {
+    &:focus-visible, &:has(:focus-visible) {
         outline: none;
-
-        &:not(.disabled) {
-            background-color: var(--tavenem-color-action-hover-bg);
-        }
     }
 
     &.disabled {
@@ -104,7 +100,7 @@
         padding-right: 0;
         transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
-        &:hover, :focus-within {
+        &:hover, &:focus-within, &:focus-visible {
             transform: scale(1.2);
         }
     }

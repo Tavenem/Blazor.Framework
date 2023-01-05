@@ -261,7 +261,7 @@
                             {
                                 var month = (byte)(i + 1);
                                 <button class="@GetMonthClass(month)"
-                                disabled="@IsMonthOutOfRange(month)"
+                                        disabled="@IsMonthOutOfRange(month)"
                                         @onclick="@(_ => OnSelectMonthAsync(month))">
                                     @(new DateTime(Year, month, 1).ToString("MMM", Culture))
                                 </button>

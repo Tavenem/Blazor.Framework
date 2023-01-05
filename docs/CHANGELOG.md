@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.15
+### Changed
+- Improved keyboard navigation for various controls
+
 ## 1.14
 ### Fixed
 - Enable persistent `DataGrid` state when explcit columns are used

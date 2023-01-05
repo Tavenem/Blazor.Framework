@@ -1566,9 +1566,18 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     internal async Task SelectNext()
     {
-        if (SelectedItem is null
-            || !CurrentPageItems.Any())
+        if (!CurrentPageItems.Any())
         {
+            return;
+        }
+
+        if (SelectedItem is null)
+        {
+            var first = CurrentPageItems.FirstOrDefault();
+            if (first is not null)
+            {
+                await SetSelectionAsync(first);
+            }
             return;
         }
 
@@ -1602,9 +1611,18 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     internal async Task SelectPrevious()
     {
-        if (SelectedItem is null
-            || !CurrentPageItems.Any())
+        if (!CurrentPageItems.Any())
         {
+            return;
+        }
+
+        if (SelectedItem is null)
+        {
+            var last = CurrentPageItems.LastOrDefault();
+            if (last is not null)
+            {
+                await SetSelectionAsync(last);
+            }
             return;
         }
 

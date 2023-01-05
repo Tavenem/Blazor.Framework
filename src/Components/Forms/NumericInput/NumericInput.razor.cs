@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Components.Forms;
@@ -204,6 +205,8 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         }
     }
 
+    private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
+
     private bool DecrementDisabled => Disabled
         || ReadOnly
         || (CurrentValue is not null
@@ -217,6 +220,18 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         || (CurrentValue is not null
         && (FormExtensions.ValuesEqual(CurrentValue, Max)
         || FormExtensions.ValueIsMore(CurrentValue, Max)));
+
+    [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
+
+    private protected virtual List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/ArrowDown|ArrowUp/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+        }
+    };
 
     private protected override bool ShrinkWhen => base.ShrinkWhen
         || PrefixContent is not null
@@ -402,6 +417,19 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         SetDisplay();
     }
 
+    /// <inheritdoc/>
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await KeyListener.ConnectAsync(ContainerId, new()
+            {
+                Keys = KeyOptions,
+            });
+            KeyListener.KeyDown += OnKeyDown;
+        }
+    }
+
     /// <summary>
     /// Clears the current input text.
     /// </summary>
@@ -454,6 +482,7 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         {
             SetValue(Min);
         }
+        StateHasChanged();
     }
 
     /// <summary>
@@ -503,6 +532,7 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         {
             SetValue(Max);
         }
+        StateHasChanged();
     }
 
     /// <summary>
@@ -609,6 +639,24 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         _timer.Cancel();
         CurrentValueAsString = e.Value as string;
         SetDisplay();
+    }
+
+    private protected void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                Decrement();
+                break;
+            case "ArrowUp":
+                Increment();
+                break;
+        }
     }
 
     private void OnTimer()

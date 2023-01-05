@@ -190,6 +190,29 @@ public abstract class SelectBase<TValue, TOption>
     private protected override bool CanClear => ShowClear
         && _selectedOptions.Count > 0;
 
+    private protected override List<KeyOptions> InputKeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/^(?!ArrowDown$|ArrowUp$|Delete$|Enter$|Escape$|Tab$)/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
+        }
+    };
+
+    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/ArrowDown|ArrowUp|Delete|Enter|Escape/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+        }
+    };
+
+    private protected int MaxOptionSize { get; set; }
+
     private protected virtual string? OptionListCssClass => new CssBuilder("list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
@@ -199,25 +222,6 @@ public abstract class SelectBase<TValue, TOption>
     private protected int SelectedIndex { get; set; } = -1;
 
     private protected string? TypedValue { get; set; }
-
-    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
-    {
-        new()
-        {
-            Key = "Escape",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-        },
-        new()
-        {
-            Key = "/^(?!Tab$)/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-            TargetOnly = true,
-        }
-    };
-
-    private protected int MaxOptionSize { get; set; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="SelectBase{TValue, TOption}"/>.
@@ -363,10 +367,30 @@ public abstract class SelectBase<TValue, TOption>
 
         switch (e.Key)
         {
-            case "Escape":
-                if (PopoverOpen)
+            case "ArrowDown":
+                if (e.AltKey)
                 {
-                    await TogglePopoverAsync();
+                    if (!PopoverOpen)
+                    {
+                        await TogglePopoverAsync();
+                    }
+                }
+                else
+                {
+                    await OnArrowDownAsync(e);
+                }
+                break;
+            case "ArrowUp":
+                if (e.AltKey)
+                {
+                    if (PopoverOpen)
+                    {
+                        await TogglePopoverAsync();
+                    }
+                }
+                else
+                {
+                    await OnArrowUpAsync(e);
                 }
                 break;
             case "Delete":
@@ -375,15 +399,15 @@ public abstract class SelectBase<TValue, TOption>
                     await ClearAsync();
                 }
                 break;
-            case "ArrowDown":
-                await OnArrowDownAsync(e);
-                break;
-            case "ArrowUp":
-                await OnArrowUpAsync(e);
-                break;
             case " ":
             case "Enter":
                 await TogglePopoverAsync();
+                break;
+            case "Escape":
+                if (PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
                 break;
             case "a":
                 if (e.CtrlKey)

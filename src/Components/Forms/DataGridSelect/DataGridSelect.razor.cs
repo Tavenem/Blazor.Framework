@@ -24,7 +24,7 @@ public partial class DataGridSelect<
     private readonly List<IColumn<TDataItem>> _columns = new();
     private readonly List<Guid> _initialSortOrder = new();
 
-    private bool _initialized, _valueUpdated;
+    private bool _initialized, _keyboardNavigating, _valueUpdated;
 
     /// <summary>
     /// The child content of this component.
@@ -152,20 +152,24 @@ public partial class DataGridSelect<
 
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
 
+    private protected override List<KeyOptions> InputKeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = " ",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+            TargetOnly = true,
+        }
+    };
+
     private protected override List<KeyOptions> KeyOptions { get; set; } = new()
     {
         new()
         {
-            Key = "Escape",
+            Key = "/ArrowDown|ArrowUp|Delete|Enter|Escape/",
             SubscribeDown = true,
             PreventDown = "key+none",
-        },
-        new()
-        {
-            Key = "/ArowDown|ArrowUp|Delete| |Enter/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-            TargetOnly = true,
         }
     };
 
@@ -264,6 +268,8 @@ public partial class DataGridSelect<
             await DataGrid.SetSelectionAsync(null);
         }
         CurrentValueAsString = null;
+
+        StateHasChanged();
     }
 
     /// <summary>
@@ -391,10 +397,30 @@ public partial class DataGridSelect<
 
         switch (e.Key)
         {
-            case "Escape":
-                if (PopoverOpen)
+            case "ArrowDown":
+                if (e.AltKey)
                 {
-                    await TogglePopoverAsync();
+                    if (!PopoverOpen)
+                    {
+                        await TogglePopoverAsync();
+                    }
+                }
+                else
+                {
+                    await OnArrowDownAsync();
+                }
+                break;
+            case "ArrowUp":
+                if (e.AltKey)
+                {
+                    if (PopoverOpen)
+                    {
+                        await TogglePopoverAsync();
+                    }
+                }
+                else
+                {
+                    await OnArrowUpAsync();
                 }
                 break;
             case "Delete":
@@ -403,22 +429,40 @@ public partial class DataGridSelect<
                     await ClearAsync();
                 }
                 break;
-            case "ArrowDown":
-                await OnArrowDownAsync();
-                break;
-            case "ArrowUp":
-                await OnArrowUpAsync();
-                break;
             case " ":
             case "Enter":
                 await TogglePopoverAsync();
                 break;
+            case "Escape":
+                if (PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
+                break;
         }
     }
 
-    private Task OnArrowDownAsync() => DataGrid?.SelectNext() ?? Task.CompletedTask;
+    private async Task OnArrowDownAsync()
+    {
+        if (DataGrid is null)
+        {
+            return;
+        }
+        _keyboardNavigating = true;
+        await DataGrid.SelectNext();
+        _keyboardNavigating = false;
+    }
 
-    private Task OnArrowUpAsync() => DataGrid?.SelectPrevious() ?? Task.CompletedTask;
+    private async Task OnArrowUpAsync()
+    {
+        if (DataGrid is null)
+        {
+            return;
+        }
+        _keyboardNavigating = true;
+        await DataGrid.SelectPrevious();
+        _keyboardNavigating = false;
+    }
 
     private async Task UpdateSelectedFromValueAsync()
     {
@@ -431,7 +475,7 @@ public partial class DataGridSelect<
 
     private async Task UpdateCurrentValueAsync()
     {
-        if (PopoverOpen)
+        if (PopoverOpen && !_keyboardNavigating)
         {
             await TogglePopoverAsync();
         }

@@ -421,6 +421,8 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
             CurrentValue = default;
         }
 
+        StateHasChanged();
+
         return Task.CompletedTask;
     }
 

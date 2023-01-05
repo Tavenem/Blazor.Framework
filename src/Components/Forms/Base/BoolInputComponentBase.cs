@@ -148,6 +148,8 @@ public abstract class BoolInputComponentBase<TValue>
         {
             EvaluateDebounced();
         }
+
+        StateHasChanged();
     }
 
     /// <summary>

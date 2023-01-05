@@ -4,7 +4,7 @@
 
 @inherits InputComponentBase<TValue>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+<div @attributes="AdditionalAttributes" id="@ContainerId" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
     <div id="@InputId" class="input">
         @if (PrefixContent is not null)
         {

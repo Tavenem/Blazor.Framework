@@ -50,6 +50,7 @@
                @onchange="OnChangeAsync"
                @onfocusin="OnFocusIn"
                @onfocusout="OnFocusOut"
+               @onkeydown="OnKeyDownAsync"
                @onkeyup="OnKeyUpAsync" />
         @if (ShowClear)
         {
@@ -110,7 +111,8 @@
             }
         </div>
     }
-    <Popover Class="filled"
+    <Popover @ref="SuggestionPopover"
+             Class="filled"
              AnchorId="@InputId"
              AnchorOrigin="Origin.Bottom_Left"
              PopoverOrigin="Origin.Top_Left"
@@ -120,20 +122,29 @@
               @onclick:stopPropagation="true">
             @foreach (var suggestion in FilteredSuggestions)
             {
-                <li @key="suggestion" @onclick="@(_ => SuggestionSelectedAsync(suggestion))">@suggestion</li>
+                <li @key="suggestion"
+                    tabindex="0"
+                    @onclick="@(_ => SuggestionSelectedAsync(suggestion))"
+                    @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion))">@suggestion</li>
             }
             @if (SuggestionTemplate is null)
             {
                 @foreach (var suggestion in FilteredSuggestionValues)
                 {
-                    <li @key="suggestion.Key" @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))">@suggestion.Value.ToString()</li>
+                    <li @key="suggestion.Key"
+                        tabindex="0"
+                        @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
+                        @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">@suggestion.Value.ToString()</li>
                 }
             }
             else
             {
                 @foreach (var suggestion in FilteredSuggestionValues)
                 {
-                    <li @key="suggestion.Key" @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))">
+                    <li @key="suggestion.Key"
+                        tabindex="0"
+                        @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
+                        @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">
                         @SuggestionTemplate(suggestion.Value)
                     </li>
                 }

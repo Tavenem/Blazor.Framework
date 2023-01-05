@@ -810,6 +810,8 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
             CurrentValue = default;
         }
 
+        StateHasChanged();
+
         return Task.CompletedTask;
     }
 

@@ -302,6 +302,11 @@ public partial class Popover : IAsyncDisposable
     }
 
     /// <summary>
+    /// Gives focus to the popover element.
+    /// </summary>
+    public ValueTask FocusAsync() => ElementReference.FocusFirstAsync();
+
+    /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
     /// or resetting unmanaged resources asynchronously.
     /// </summary>

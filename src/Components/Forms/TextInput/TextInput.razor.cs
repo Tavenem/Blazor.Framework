@@ -14,7 +14,7 @@ public partial class TextInput : InputComponentBase<string?>
     private readonly AdjustableTimer _inputTimer;
     private readonly AsyncAdjustableTimer _suggestionTimer;
 
-    private bool _disposedValue;
+    private bool _disposedValue, _focusingOnSuggestions;
 
     /// <summary>
     /// <para>
@@ -398,6 +398,8 @@ public partial class TextInput : InputComponentBase<string?>
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
 
+    private Popover? SuggestionPopover { get; set; }
+
     private IEnumerable<KeyValuePair<string, object>>? LoadedSuggestions { get; set; }
 
     private bool LoadingSuggestions { get; set; }
@@ -569,6 +571,10 @@ public partial class TextInput : InputComponentBase<string?>
 
     private void OnFocusOut()
     {
+        if (_focusingOnSuggestions)
+        {
+            return;
+        }
         _suggestionTimer.Cancel();
         _focusTimer.Start();
     }
@@ -602,6 +608,24 @@ public partial class TextInput : InputComponentBase<string?>
         if (LoadSuggestions is not null)
         {
             _suggestionTimer.Start();
+        }
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs e)
+    {
+        if (e.Key is "ArrowDown" or "Tab"
+            && ShowSuggestions
+            && SuggestionPopover is not null)
+        {
+            _focusingOnSuggestions = true;
+            await SuggestionPopover.FocusAsync();
+            _focusingOnSuggestions = false;
+        }
+        else if (e.Key == "Escape"
+            && ShowSuggestions)
+        {
+            _suggestionTimer.Cancel();
+            SuggestionsClosed = true;
         }
     }
 
@@ -648,6 +672,19 @@ public partial class TextInput : InputComponentBase<string?>
         {
             await Task.Delay(1);
             DisplayString = display;
+        }
+    }
+
+    private async Task SuggestionKeyDownAsync(KeyboardEventArgs e, string? suggestion)
+    {
+        if (e.Key is " " or "Enter")
+        {
+            SuggestionsClosed = true;
+            await SetValueAsync(suggestion);
+        }
+        else if (e.Key == "Escape")
+        {
+            SuggestionsClosed = true;
         }
     }
 

@@ -73,6 +73,8 @@ public partial class MultiSelect<TValue> : SelectBase<IEnumerable<TValue>, TValu
         {
             SelectAllOption.InvokeStateChange();
         }
+
+        StateHasChanged();
     }
 
     /// <summary>
