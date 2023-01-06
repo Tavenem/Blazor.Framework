@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.17
+### Fixed
+- Added `StateHasChanged` invocation on `DataGrid` row edit/delete
+
 ## 1.16
 ### Added
 - Column mapping support for `DataGridRequest`

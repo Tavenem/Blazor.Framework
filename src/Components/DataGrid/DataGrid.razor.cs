@@ -1394,6 +1394,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             CurrentDataPage.Items.Remove(DeleteItem);
         }
+        await InvokeAsync(StateHasChanged);
     }
 
     internal async Task OnEditAsync(Row<TDataItem> row)
@@ -1451,6 +1452,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                         CurrentDataPage.Items.Remove(row.Item);
                         CurrentDataPage.Items.Add(item);
                     }
+                    await InvokeAsync(StateHasChanged);
                 }
             }
         }
