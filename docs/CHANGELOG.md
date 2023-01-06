@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.18
+### Changed
+- `DataGrid` quick search larger
+
 ## 1.17
 ### Fixed
 - Added `StateHasChanged` invocation on `DataGrid` row edit/delete
