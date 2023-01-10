@@ -508,6 +508,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     [Parameter] public EventCallback<TDataItem?> SelectedItemChanged { get; set; }
 
     /// <summary>
+    /// Raised when the <see cref="SelectedItem"/> is changing.
+    /// </summary>
+    public event EventHandler<TDataItem?>? SelectedItemChanging;
+
+    /// <summary>
     /// <para>
     /// The currently-selected items.
     /// </para>
@@ -822,6 +827,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             {
                 SelectedItem = default;
                 SelectedItems.Clear();
+                SelectedItemChanging?.Invoke(this, SelectedItem);
                 await SelectedItemChanged.InvokeAsync(SelectedItem);
                 await SelectedItemsChanged.InvokeAsync(SelectedItems);
             }
@@ -836,6 +842,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SelectedItems.Clear();
         SelectedItems.AddRange(remaining);
         SelectedItem = SelectedItems.FirstOrDefault();
+        SelectedItemChanging?.Invoke(this, SelectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
     }
@@ -1129,6 +1136,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             if (hadSelection)
             {
+                SelectedItemChanging?.Invoke(this, SelectedItem);
                 await SelectedItemChanged.InvokeAsync(SelectedItem);
                 await SelectedItemsChanged.InvokeAsync(SelectedItems);
                 StateHasChanged();
@@ -1138,6 +1146,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         SelectedItem = selectedItem;
         SelectedItems.Add(selectedItem);
+        SelectedItemChanging?.Invoke(this, SelectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -1215,6 +1224,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         SelectedItem = SelectedItems.FirstOrDefault();
+        SelectedItemChanging?.Invoke(this, SelectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -1243,6 +1253,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SelectedItems.Clear();
         SelectedItems.AddRange(selectedItems.Intersect(Items));
         SelectedItem = SelectedItems.FirstOrDefault();
+        SelectedItemChanging?.Invoke(this, SelectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -1320,6 +1331,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         SelectedItem = SelectedItems.FirstOrDefault();
+        SelectedItemChanging?.Invoke(this, SelectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -1524,6 +1536,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 SelectedItems.Clear();
                 SelectedItems.Add(row.Item);
             }
+            SelectedItemChanging?.Invoke(this, SelectedItem);
             await SelectedItemChanged.InvokeAsync(SelectedItem);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
             StateHasChanged();
@@ -1561,6 +1574,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
         if (changed)
         {
+            SelectedItemChanging?.Invoke(this, SelectedItem);
             await SelectedItemChanged.InvokeAsync(SelectedItem);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
@@ -1594,6 +1608,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             if (hasNext)
             {
                 await OnNextPageAsync();
+                StateHasChanged();
             }
             next = CurrentPageItems.FirstOrDefault();
         }
@@ -1636,6 +1651,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             if (CurrentPage > 0)
             {
                 await SetPageAsync(CurrentPage - 1);
+                StateHasChanged();
             }
             previous = CurrentPageItems.LastOrDefault();
         }
@@ -1673,6 +1689,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             SelectedItems.Add(item);
             SelectedItem = SelectedItems.FirstOrDefault();
         }
+        SelectedItemChanging?.Invoke(this, SelectedItem);
         await SelectedItemChanged.InvokeAsync(SelectedItem);
         await SelectedItemsChanged.InvokeAsync(SelectedItems);
         StateHasChanged();
@@ -2407,6 +2424,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
         if (changed)
         {
+            SelectedItemChanging?.Invoke(this, SelectedItem);
             await SelectedItemChanged.InvokeAsync(SelectedItem);
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }

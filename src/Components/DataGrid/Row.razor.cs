@@ -10,8 +10,20 @@ namespace Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 public partial class Row<[DynamicallyAccessedMembers(
     DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
     | DynamicallyAccessedMemberTypes.PublicFields
-    | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>
+    | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem> : IDisposable
 {
+    private bool _disposedValue;
+
+    /// <summary>
+    /// <para>
+    /// The id of this element.
+    /// </para>
+    /// <para>
+    /// Set to a random GUID if not provided.
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
     /// <summary>
     /// Gets whether the row is expanded.
     /// </summary>
@@ -59,7 +71,18 @@ public partial class Row<[DynamicallyAccessedMembers(
         .Add("selected", IsSelected)
         .ToString();
 
+    [Inject] private protected ScrollService ScrollService { get; set; } = default!;
+
     private ThemeColor ThemeColor => DataGrid?.ThemeColor ?? ThemeColor.None;
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && DataGrid is not null)
+        {
+            DataGrid.SelectedItemChanging += DataGrid_SelectedItemChanging;
+        }
+    }
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
@@ -67,6 +90,31 @@ public partial class Row<[DynamicallyAccessedMembers(
         if (Item is null)
         {
             throw new InvalidOperationException($"{nameof(Item)} may not be null");
+        }
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting
+    /// unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing && DataGrid is not null)
+            {
+                DataGrid.SelectedItemChanging -= DataGrid_SelectedItemChanging;
+            }
+
+            _disposedValue = true;
         }
     }
 
@@ -81,6 +129,14 @@ public partial class Row<[DynamicallyAccessedMembers(
             await DataGrid.TableEditForm.ResetAsync();
         }
         DataGrid.EditingRow = null;
+    }
+
+    private async void DataGrid_SelectedItemChanging(object? sender, TDataItem? e)
+    {
+        if (e?.Equals(Item) == true)
+        {
+            await ScrollService.ScrollToId(Id);
+        }
     }
 
     private async Task OnClickAsync()

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.19
+### Changed
+- Improved keyboard navigation in `DataGridSelect`
+- Gave auto edit dialogs for `DataGrid` a minimum width
+
 ## 1.18
 ### Changed
 - `DataGrid` quick search larger
