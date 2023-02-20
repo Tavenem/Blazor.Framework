@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.20
+### Changed
+- Adjust list drag styles
+
 ## 1.19
 ### Changed
 - Improved keyboard navigation in `DataGridSelect`

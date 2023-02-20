@@ -261,11 +261,16 @@
         }
     }
 
-    &.can-drag > *:hover:before {
+    &.can-drag > *:not(.no-drag):hover:before {
         content: '⋮⋮';
         left: 0;
         position: absolute;
-        top: .5rem;
+        top: 0;
+        transform: translateY(50%);
+    }
+
+    &.can-drag > .collapse:not(.no-drag):hover:before {
+        left: 1.5rem;
     }
 
     @each $theme in $theme-colors {
