@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.21
+### Changed
+- Adjust nested list styles
+
 ## 1.20
 ### Changed
 - Adjust list drag styles

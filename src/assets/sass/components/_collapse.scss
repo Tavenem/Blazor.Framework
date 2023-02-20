@@ -226,10 +226,13 @@
     }
 }
 
+.list>.collapse>.body>.list {
+    align-self: stretch;
+}
+
 .tree .list,
 .tree.list {
     > .collapse {
-        margin-inline-start: 0;
         padding-inline-start: 0;
 
         > .header {
