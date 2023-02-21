@@ -23,11 +23,13 @@
                 <tf-icon class="ms-2">@IconName</tf-icon>
             </div>
         }
-        else if (TitleIsToggle)
+        else if (TitleIsToggle
+            && (ElementList is null
+            || ElementList.SelectionType == SelectionType.None))
         {
             <div class="d-flex flex-column flex-grow-1 clickable"
-                    @onclick="OnToggleAsync">
-                    @TitleContent
+                 @onclick="OnToggleAsync">
+                 @TitleContent
             </div>
             <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
         }

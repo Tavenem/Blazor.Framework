@@ -17,6 +17,11 @@ public partial class ListItemCollapse<TListItem> : Collapse
 
     private DragEffect DragEffectAllowed => ListItem?.GetDragEffectAllowed() ?? DragEffect.CopyMove;
 
+    /// <summary>
+    /// The list to which this item belongs, if any.
+    /// </summary>
+    [CascadingParameter] protected ElementList<TListItem>? ElementList { get; set; }
+
     internal ElementReference ElementReference { get; set; }
 
     private string? HeaderClass => new CssBuilder("header flex-wrap")

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.24
+### Fixed
+- Enable selection of collapsible list items
+
 ## 1.23
 ### Changed
 - Adjust nested list styles
