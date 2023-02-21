@@ -44,6 +44,23 @@
     .list {
         max-height: inherit;
         overflow-y: auto;
+        padding-inline-end: 1em;
+        padding-inline-start: 1em;
+    }
+
+    .tree & .list,
+    .tree & .list.clickable {
+        > *:not(hr) {
+            margin-inline-start: 0;
+        }
+
+        .drop-placeholder {
+            margin-inline-start: 0;
+        }
+    }
+
+    .tree & .list > *:not(hr) {
+        margin-inline-start: 0;
     }
 
     &.filled {
