@@ -37,7 +37,6 @@
             flex-wrap: wrap;
             justify-content: flex-start;
             list-style: none;
-            padding: .5em 1em;
             padding-bottom: .5em;
             padding-top: .5em;
             position: relative;
@@ -174,16 +173,16 @@
     &.tree,
     &.tree.clickable {
         > *:not(hr) {
-            margin-inline-start: 1.5rem;
+            padding-inline-start: 1.5rem;
         }
 
         .drop-placeholder {
-            margin-inline-start: 1.5rem;
+            padding-inline-start: 1.5rem;
         }
     }
 
     .tree & > *:not(hr) {
-        margin-inline-start: 2.5rem;
+        padding-inline-start: 2.5rem;
     }
 
     &.disabled > {
@@ -265,14 +264,10 @@
 
     &.can-drag > *:not(.no-drag):hover:before {
         content: '⋮⋮';
-        left: 0;
+        left: 1.5rem;
         position: absolute;
         top: 0;
         transform: translateY(50%);
-    }
-
-    &.can-drag > .collapse:not(.no-drag):hover:before {
-        left: 1.5rem;
     }
 
     @each $theme in $theme-colors {

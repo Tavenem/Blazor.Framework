@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23
+### Changed
+- Adjust nested list styles
+
 ## 1.22
 ### Changed
 - Adjust nested list styles in popovers
