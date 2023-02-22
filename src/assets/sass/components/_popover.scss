@@ -51,16 +51,16 @@
     .tree & .list,
     .tree & .list.clickable {
         > *:not(hr) {
-            margin-inline-start: 0;
+            padding-inline-start: 0;
         }
 
         .drop-placeholder {
-            margin-inline-start: 0;
+            padding-inline-start: 0;
         }
     }
 
     .tree & .list > *:not(hr) {
-        margin-inline-start: 0;
+        padding-inline-start: 0;
     }
 
     &.filled {

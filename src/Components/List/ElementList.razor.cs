@@ -372,16 +372,18 @@ public partial class ElementList<TListItem> : DropTarget<TListItem>
         }
 
         var selectedItemChanged = false;
-        TListItem? newSelectedItem = default;
-        if (!parameters.TryGetValue<List<TListItem>>(nameof(SelectedItems), out var newSelectedItems)
-            && parameters.TryGetValue(nameof(SelectedItem), out newSelectedItem)
+        if (parameters.TryGetValue<TListItem>(nameof(SelectedItem), out var newSelectedItem)
             && !EqualityComparer<TListItem>.Default.Equals(newSelectedItem, SelectedItem))
         {
             selectedItemChanged = true;
         }
 
-        var selectedItemsChanged = !selectedItemChanged
-            && newSelectedItems?.SequenceEqual(SelectedItems) != true;
+        var selectedItemsChanged = false;
+        if (parameters.TryGetValue<List<TListItem>>(nameof(SelectedItems), out var newSelectedItems)
+            && !newSelectedItems.SequenceEqual(SelectedItems))
+        {
+            selectedItemsChanged = true;
+        }
 
         await base.SetParametersAsync(parameters);
 
@@ -449,13 +451,7 @@ public partial class ElementList<TListItem> : DropTarget<TListItem>
     /// Sets the currently selected item.
     /// </summary>
     /// <param name="selectedItem">
-    /// <para>
     /// The item to set as the current selection.
-    /// </para>
-    /// <para>
-    /// The currently selected item is set to the default (e.g. <see langword="null"/>) if <paramref
-    /// name="selectedItem"/> is not in the current set of <see cref="Items"/>.
-    /// </para>
     /// </param>
     public async Task SetSelectionAsync(TListItem? selectedItem)
     {
@@ -475,8 +471,7 @@ public partial class ElementList<TListItem> : DropTarget<TListItem>
         SelectedItems.Clear();
         SelectedItem = default;
 
-        if (selectedItem is null
-            || Items?.Contains(selectedItem) != true)
+        if (selectedItem is null)
         {
             if (hadSelection)
             {
@@ -498,12 +493,7 @@ public partial class ElementList<TListItem> : DropTarget<TListItem>
     /// Sets the currently selected items.
     /// </summary>
     /// <param name="selectedItems">
-    /// <para>
     /// The items to set as the current selection.
-    /// </para>
-    /// <para>
-    /// Any items not in the current set of <see cref="Items"/> is not added to the selection.
-    /// </para>
     /// </param>
     public async Task SetSelectionAsync(List<TListItem>? selectedItems)
     {
@@ -516,7 +506,7 @@ public partial class ElementList<TListItem> : DropTarget<TListItem>
         }
 
         SelectedItems.Clear();
-        SelectedItems.AddRange(selectedItems.Intersect(Items));
+        SelectedItems.AddRange(selectedItems);
         SelectedItem = SelectedItems.FirstOrDefault();
 
         await SelectedItemChanged.InvokeAsync(SelectedItem);

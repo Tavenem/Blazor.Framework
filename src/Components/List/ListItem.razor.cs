@@ -97,7 +97,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     /// <summary>
     /// The selected items of the list to which this item belongs, if any.
     /// </summary>
-    [CascadingParameter] protected IEnumerable<TListItem>? ParentSelectedItems { get; set; }
+    [CascadingParameter] protected List<TListItem>? ParentSelectedItems { get; set; }
 
     private protected string? ClassName
     {

@@ -40,7 +40,7 @@ public partial class Collapse : IDisposable
     [Parameter] public RenderFragment? FooterContent { get; set; }
 
     /// <summary>
-    /// Will be <see langword="true"/> during openingm after <see cref="OnOpening"/> is invoked and
+    /// Will be <see langword="true"/> during opening, after <see cref="OnOpening"/> is invoked and
     /// before it completes.
     /// </summary>
     public bool IsLoading { get; private set; }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.25
+### Fixed
+- Collapsible list item improvements
+### Changed
+- Adjust outlined form styles
+
 ## 1.24
 ### Fixed
 - Enable selection of collapsible list items
@@ -43,7 +49,7 @@
 
 ## 1.14
 ### Fixed
-- Enable persistent `DataGrid` state when explcit columns are used
+- Enable persistent `DataGrid` state when explicit columns are used
 
 ## 1.13
 ### Added
@@ -456,7 +462,7 @@ First stable release
 ### Fixed
 - Refresh after loading DataGrid items asynchronously.
 - Icon display priority.
-- LightDarkToggle initial state correctly reflects darkmode.
+- LightDarkToggle initial state correctly reflects dark mode.
 
 ## 0.5.1-preview
 ### Fixed
@@ -506,7 +512,7 @@ First stable release
 
 ## 0.3.1-preview
 ### Changed
-- Ensure ItemAded and ItemSaved and invoked when DataGrid.EditDialog is defined, and provide automatic item add and update on success.
+- Ensure ItemAdded and ItemSaved and invoked when DataGrid.EditDialog is defined, and provide automatic item add and update on success.
 
 ## 0.3.0-preview
 ### Changed

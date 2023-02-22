@@ -9,8 +9,7 @@
      id="@Id"
      role="group"
      class="@CssClass"
-     style="@CssStyle"
-     draggable="@(IsDraggable ? "true" : "false")">
+     style="@CssStyle">
     <div id="@HeaderId" class="@HeaderClass">
         @if (ListItem?.HasValidDrop == true)
         {
@@ -19,14 +18,30 @@
         @if (TitleContent is null)
         {
             <div class="expand" @onclick="OnToggleAsync">
-                <span>@Title</span>
-                <tf-icon class="ms-2">@IconName</tf-icon>
+                @if (!string.IsNullOrWhiteSpace(ListIconName))
+                {
+                    <tf-icon @onclick="OnClickIconAsync" class="@ListIconClassName">@ListIconName</tf-icon>
+                }
+                else if (ElementList is not null
+                    && ElementList.SelectionType != SelectionType.None
+                    && ElementList.ShowSelectionIconValue)
+                {
+                    <div class="list-icon-spacer"></div>
+                }
+                <span draggable="@(IsDraggable ? "true" : "false")"
+                      @onclick="OnClickAsync"
+                      @onclick:stopPropagation="true">
+                    <span>@Title</span>
+                    <tf-icon class="ms-2">@IconName</tf-icon>
+                </span>
             </div>
         }
-        else if (TitleIsToggle
-            && (ElementList is null
-            || ElementList.SelectionType == SelectionType.None))
+        else if (TitleIsToggle && !IsDraggable)
         {
+            @if (!string.IsNullOrWhiteSpace(ListIconName))
+            {
+                <tf-icon @onclick="OnClickIconAsync" class="@ListIconClassName">@ListIconName</tf-icon>
+            }
             <div class="d-flex flex-column flex-grow-1 clickable"
                  @onclick="OnToggleAsync">
                  @TitleContent
@@ -35,7 +50,22 @@
         }
         else
         {
-            <div class="d-flex flex-column flex-grow-1">@TitleContent</div>
+            @if (!string.IsNullOrWhiteSpace(ListIconName))
+            {
+                <tf-icon @onclick="OnClickIconAsync" class="@ListIconClassName">@ListIconName</tf-icon>
+            }
+            else if (ElementList is not null
+                && ElementList.SelectionType != SelectionType.None
+                && ElementList.ShowSelectionIconValue)
+            {
+                <div class="list-icon-spacer"></div>
+            }
+            <div class="d-flex flex-column flex-grow-1"
+                 draggable="@(IsDraggable ? "true" : "false")"
+                 @onclick="OnClickAsync"
+                 @onclick:stopPropagation="true">
+                @TitleContent
+            </div>
             <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
         }
     </div>

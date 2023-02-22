@@ -96,6 +96,62 @@
         border-radius: 0;
         color: inherit;
 
+        &.active {
+            background-color: transparent;
+            border-inline-end: none;
+            color: inherit;
+
+            > .header {
+                background-color: var(--list-active-bg);
+                border-inline-end: 1px solid var(--list-active-color);
+                color: var(--list-active-color);
+                padding-inline-end: 0;
+            }
+        }
+
+        &.clickable {
+            padding-inline-end: 0;
+
+            > .header {
+                padding-inline-end: 1px;
+            }
+
+            &.active {
+                border-inline-end: none;
+
+                > .header {
+                    border-inline-end: 1px solid var(--list-active-color);
+                    padding-inline-end: 0;
+                }
+            }
+
+            &:hover,
+            &:focus:not(.active) {
+                &:not(:disabled, .disabled) {
+                    background-color: transparent;
+
+                    &.active {
+                        background-color: transparent;
+                    }
+                }
+            }
+
+            > .header {
+                @include ripple;
+
+                &:hover,
+                &:focus:not(.active) {
+                    &:not(:disabled, .disabled) {
+                        background-color: var(--list-hover-bg);
+
+                        &.active {
+                            background-color: var(--list-active-hover-bg);
+                        }
+                    }
+                }
+            }
+        }
+
         > .header {
             min-height: 0;
             padding: 0;
@@ -103,6 +159,56 @@
 
         > .body {
             padding: 0;
+
+            > .list {
+                align-self: stretch;
+                padding-bottom: 0;
+                padding-inline-start: 1em;
+
+                > :last-child {
+                    padding-bottom: 0;
+                }
+            }
+        }
+    }
+
+    .list.clickable > & {
+        &.active {
+            border-inline-end: none;
+            padding-inline-end: 0;
+
+            > .header {
+                border-inline-end: 1px solid var(--list-active-color);
+                padding-inline-end: 0;
+            }
+        }
+
+        &:hover,
+        &:focus:not(.active) {
+            &:not(:disabled, .disabled) {
+                background-color: transparent;
+
+                &.active {
+                    background-color: transparent;
+                }
+            }
+        }
+
+        > .header {
+            @include ripple;
+
+            padding-inline-end: 1px;
+
+            &:hover,
+            &:focus:not(.active) {
+                &:not(:disabled, .disabled) {
+                    background-color: var(--list-hover-bg);
+
+                    &.active {
+                        background-color: var(--list-active-hover-bg);
+                    }
+                }
+            }
         }
     }
 
@@ -220,10 +326,6 @@
             background-color: var(--tavenem-theme-color-hover);
         }
     }
-}
-
-.list>.collapse>.body>.list {
-    align-self: stretch;
 }
 
 .tree .list,

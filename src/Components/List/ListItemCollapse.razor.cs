@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
 using Tavenem.Blazor.Framework.Services;
 
@@ -13,6 +14,11 @@ public partial class ListItemCollapse<TListItem> : Collapse
     /// </summary>
     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
+    /// <summary>
+    /// One of the built-in color themes.
+    /// </summary>
+    [Parameter] public ThemeColor ThemeColor { get; set; }
+
     [Inject] private DragDropListener DragDropListener { get; set; } = default!;
 
     private DragEffect DragEffectAllowed => ListItem?.GetDragEffectAllowed() ?? DragEffect.CopyMove;
@@ -24,6 +30,33 @@ public partial class ListItemCollapse<TListItem> : Collapse
 
     internal ElementReference ElementReference { get; set; }
 
+    /// <summary>
+    /// The final value assigned to the class attribute, including component
+    /// values and anything assigned by the user in <see
+    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
+    /// </summary>
+    protected override string? CssClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("collapse")
+        .Add("closed", !IsOpen)
+        .Add("disabled", DisabledValue || Accordion?.Disabled == true)
+        .Add("loading", IsLoading)
+        .Add(ThemeColorValue.ToCSS())
+        .Add(
+            "clickable",
+            ElementList?.OnItemClick.HasDelegate == true
+                || (ElementList?.SelectionType != SelectionType.None
+                && ElementList?.SelectionIcons != true))
+        .Add("selectable", ElementList?.SelectionIcons == true)
+        .Add("active", ListItem?.IsSelected == true)
+        .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
+        .ToString();
+
+    private protected bool DisabledValue => Disabled
+        || (ListItem is not null
+        && ListItem.Item is not null
+        && ElementList?.ItemIsDisabled?.Invoke(ListItem.Item) == true);
+
     private string? HeaderClass => new CssBuilder("header flex-wrap")
         .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
         .ToString();
@@ -34,7 +67,90 @@ public partial class ListItemCollapse<TListItem> : Collapse
 
     private bool IsDropTarget => ListItem?.GetIsDropTarget() ?? false;
 
+    private string? ListIconClassName
+    {
+        get
+        {
+            if (ElementList is null)
+            {
+                return null;
+            }
+            if (ElementList.SelectionIcons)
+            {
+                return "outlined";
+            }
+            return (ElementList.ShowSelectionIconValue
+                && ListItem?.IsSelected == true)
+                || ListItem is null
+                || ListItem.Item is null
+                || ElementList.Icon is null
+                || ElementList.IconClass is null
+                ? null
+                : ElementList.IconClass(ListItem.Item);
+        }
+    }
+
+    private string? ListIconName
+    {
+        get
+        {
+            if (ElementList?.SelectionIcons == true)
+            {
+                return ListItem?.IsSelected == true
+                    ? DefaultIcons.CheckBox_Checked
+                    : DefaultIcons.CheckBox_Unchecked;
+            }
+            if (ElementList?.ShowSelectionIconValue == true
+                && ListItem?.IsSelected == true)
+            {
+                return DefaultIcons.Selected;
+            }
+            if (ListItem is null
+                || string.IsNullOrEmpty(ListItem.Icon))
+            {
+                if (ListItem is null
+                    || ListItem.Item is null
+                    || ElementList?.Icon is null)
+                {
+                    return null;
+                }
+                return ElementList.Icon(ListItem.Item);
+            }
+            else
+            {
+                return ListItem.Icon;
+            }
+        }
+    }
+
     [CascadingParameter] private ListItem<TListItem>? ListItem { get; set; }
+
+    private ThemeColor ThemeColorValue
+    {
+        get
+        {
+            if (ListItem is null
+                || ListItem.Item is null
+                || ElementList is null)
+            {
+                return ThemeColor;
+            }
+            if (ListItem.IsSelected
+                && ElementList.ThemeColor != ThemeColor.None)
+            {
+                return ElementList.ThemeColor;
+            }
+            if (ThemeColor == ThemeColor.None)
+            {
+                return ElementList.ItemThemeColor?.Invoke(ListItem.Item)
+                    ?? ThemeColor.None;
+            }
+            else
+            {
+                return ThemeColor;
+            }
+        }
+    }
 
     /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
@@ -109,6 +225,26 @@ public partial class ListItemCollapse<TListItem> : Collapse
         }
 
         return DragEffect.All;
+    }
+
+    private async Task OnClickAsync()
+    {
+        if (ListItem is not null
+            && ElementList is not null
+            && ElementList.SelectionType != SelectionType.None)
+        {
+            await ElementList.OnToggleItemSelectionAsync(ListItem.Item);
+        }
+    }
+
+    private protected async Task OnClickIconAsync()
+    {
+        if (ListItem is not null
+            && ElementList is not null
+            && ElementList.SelectionType != SelectionType.None)
+        {
+            await ElementList.OnToggleItemSelectionAsync(ListItem.Item);
+        }
     }
 
     private async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)

@@ -98,10 +98,14 @@
             background-color: var(--list-active-bg);
             border-inline-end: 1px solid var(--list-active-color);
             color: var(--list-active-color);
-            padding-inline-end: calc(1em - 1px);
+            padding-inline-end: 0;
         }
 
-        .clickable, a {
+        .clickable {
+            padding-inline-end: 1px;
+        }
+
+        .clickable:not(.collapse), a {
             @include ripple;
         }
 
@@ -121,6 +125,11 @@
             vertical-align: middle;
             -webkit-appearance: none;
             -webkit-tap-highlight-color: transparent;
+
+            &.active {
+                border-inline-end: 1px solid var(--list-active-color);
+                padding-inline-end: 0;
+            }
 
             &:hover,
             &:focus:not(.active) {
@@ -143,18 +152,24 @@
         }
     }
 
-    &.clickable > *:not(hr) {
+    &.clickable > *:not(hr):not(.collapse) {
         @include ripple;
         border: 0;
         border-radius: 0;
         cursor: pointer;
         margin: 0;
         outline: 0;
+        padding-inline-end: 1px;
         transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
         user-select: none;
         vertical-align: middle;
         -webkit-appearance: none;
         -webkit-tap-highlight-color: transparent;
+
+        &.active {
+            border-inline-end: 1px solid var(--list-active-color);
+            padding-inline-end: 0;
+        }
 
         &:hover,
         &:focus:not(.active) {
@@ -173,16 +188,16 @@
     &.tree,
     &.tree.clickable {
         > *:not(hr) {
-            padding-inline-start: 1.5rem;
+            padding-inline-start: 2.5rem;
         }
 
         .drop-placeholder {
-            padding-inline-start: 1.5rem;
+            padding-inline-start: 2.5rem;
         }
-    }
 
-    .tree & > *:not(hr) {
-        padding-inline-start: 2.5rem;
+        &.highlight-start > .active {
+            padding-inline-start: calc(2.5rem - 1px);
+        }
     }
 
     &.disabled > {
@@ -215,11 +230,13 @@
             border-inline-start: 1px solid var(--list-active-color);
             border-inline-end: none;
             padding-inline-start: calc(1em - 1px);
-            padding-inline-end: 1em;
+            padding-inline-end: 0;
         }
 
-        .list > .active {
+        .list > .active,
+        .list & > .active {
             padding-inline-start: calc(2em - 1px);
+            padding-inline-end: 0;
         }
     }
 
@@ -262,7 +279,15 @@
         }
     }
 
-    &.can-drag > *:not(.no-drag):hover:before {
+    &.can-drag > *:not(.no-drag):not(.collapse):hover:before {
+        content: '⋮⋮';
+        left: 1.5rem;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    &.can-drag > .collapse:not(.no-drag) > .header:hover:before {
         content: '⋮⋮';
         left: 1.5rem;
         position: absolute;

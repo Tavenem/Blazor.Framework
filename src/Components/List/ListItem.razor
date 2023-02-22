@@ -15,9 +15,11 @@
                           TListItem="TListItem"
                           Id="@Id"
                           Class="@CollapseClass"
+                          Disabled="Disabled"
                           Style="@Style"
+                          ThemeColor="ThemeColor"
                           Title="@(ChildContent is null ? Item?.ToString() : null)"
-                          TitleIsToggle="true">
+                          TitleIsToggle="@(ElementList is null || ElementList.SelectionType == SelectionType.None)">
             <TitleContent>@ChildContent</TitleContent>
             <ChildContent>
                 @if (Item is not null)
@@ -44,7 +46,8 @@ else
          class="@CssClass"
          style="@CssStyle"
          draggable="@(GetIsDraggable() ? "true" : "false")"
-         @onclick="OnClickAsync">
+         @onclick="OnClickAsync"
+         @onclick:stopPropagation="true">
         @if (HasValidDrop)
         {
             <div class="@ElementList?.DropPlaceholderClass"></div>
