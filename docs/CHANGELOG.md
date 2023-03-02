@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.27
+### Fixed
+- Inline radio options
+
 ## 1.26
 ### Fixed
 - Editor dialogs update on input
