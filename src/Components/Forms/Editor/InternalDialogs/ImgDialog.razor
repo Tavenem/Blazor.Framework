@@ -3,6 +3,7 @@
         <Form @ref="ImgForm" Model="Img">
             <TextInput Label="URL"
                        @bind-Value="Img.Src"
+                       UpdateOnInput="true"
                        Validation="ValidateUri"
                        Required="true" />
             <TextInput Label="Title (optional)"

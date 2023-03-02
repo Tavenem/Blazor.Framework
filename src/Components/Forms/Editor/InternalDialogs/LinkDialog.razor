@@ -3,6 +3,7 @@
         <Form @ref="LinkForm" Model="Link">
             <TextInput Label="URL"
                        @bind-Value="Link.Url"
+                       UpdateOnInput="true"
                        Validation="ValidateUri"
                        Required="true" />
             <TextInput Label="Title (optional)"

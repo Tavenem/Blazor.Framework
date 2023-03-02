@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26
+### Fixed
+- Editor dialogs update on input
+
 ## 1.25
 ### Fixed
 - Collapsible list item improvements
