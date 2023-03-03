@@ -30,7 +30,7 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     /// <summary>
     /// Indicates whether this item has been selected.
     /// </summary>
-    public bool IsSelected => ParentSelectedItems?.Contains(Item) == true;
+    public bool IsSelected => Item is not null && ParentSelectedItems?.Contains(Item) == true;
 
     /// <summary>
     /// A unique identifier within the list.
