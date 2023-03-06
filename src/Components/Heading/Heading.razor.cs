@@ -58,6 +58,8 @@ public partial class Heading : IDisposable
 
     [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
 
+    private HeadingInfo? HeadingInfo { get; set; }
+
     internal string? IdValue => Id ?? CalculatedId;
 
     /// <inheritdoc/>
@@ -77,7 +79,7 @@ public partial class Heading : IDisposable
     /// </summary>
     protected override void OnInitialized() => CalculatedId = FrameworkLayout is null
         ? Guid.NewGuid().ToHtmlId()
-        : FrameworkLayout.Add(this);
+        : $"heading-{FrameworkLayout.GetHeadingCount() + 1}";
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note that the component does
@@ -101,7 +103,13 @@ public partial class Heading : IDisposable
         {
             Title = await _element.GetTextContentAsync();
             StateHasChanged();
-            FrameworkLayout?.RefreshContents();
+            HeadingInfo = new()
+            {
+                Id = IdValue,
+                Level = Level,
+                Title = Title,
+            };
+            FrameworkLayout?.AddHeading(HeadingInfo);
         }
     }
 
@@ -124,9 +132,9 @@ public partial class Heading : IDisposable
     {
         if (!_disposedValue)
         {
-            if (disposing && FrameworkLayout is not null)
+            if (disposing && HeadingInfo is not null && FrameworkLayout is not null)
             {
-                FrameworkLayout.Remove(this);
+                FrameworkLayout.RemoveHeading(HeadingInfo);
             }
 
             _disposedValue = true;

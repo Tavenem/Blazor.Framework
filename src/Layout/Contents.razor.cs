@@ -55,8 +55,6 @@ public partial class Contents : IDisposable
 
     [CascadingParameter] private FrameworkLayout? Framework { get; set; }
 
-    [Inject] private UtilityService JsInterop { get; set; } = default!;
-
     private int LowestLevel => Framework is null
         ? 0
         : (int)(Framework.Headings
@@ -105,7 +103,7 @@ public partial class Contents : IDisposable
 
     internal void Refresh() => StateHasChanged();
 
-    private string? HeadingStyle(Heading heading)
+    private string? HeadingStyle(HeadingInfo heading)
     {
         if (LowestLevel == 0)
         {

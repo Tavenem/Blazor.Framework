@@ -56,9 +56,9 @@ public partial class FrameworkLayout : IDisposable
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    internal Heading? ActiveHeading { get; private set; }
+    internal HeadingInfo? ActiveHeading { get; private set; }
 
-    internal List<Heading> Headings { get; } = new();
+    internal List<HeadingInfo> Headings { get; } = new();
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
@@ -179,6 +179,19 @@ public partial class FrameworkLayout : IDisposable
     }
 
     /// <summary>
+    /// Adds a heading to the layout, and all <see cref="Contents"/> components.
+    /// </summary>
+    /// <param name="heading">The heading to add.</param>
+    /// <remarks>
+    /// This method can be used to add headings without using the <see cref="Heading"/> component.
+    /// </remarks>
+    public void AddHeading(HeadingInfo heading)
+    {
+        Headings.Add(heading);
+        RefreshContents();
+    }
+
+    /// <summary>
     /// Dismisses all open dialogs.
     /// </summary>
     public void DismissAllDialogs()
@@ -197,7 +210,20 @@ public partial class FrameworkLayout : IDisposable
     {
         ActiveHeading = string.IsNullOrEmpty(id)
             ? null
-            : Headings.Find(x => x.IdValue == id);
+            : Headings.Find(x => x.Id == id);
+        RefreshContents();
+    }
+
+    /// <summary>
+    /// Removes a heading from the layout, and all <see cref="Contents"/> components.
+    /// </summary>
+    /// <param name="heading">The heading to remove.</param>
+    /// <remarks>
+    /// Does not throw an error if the given heading is not present.
+    /// </remarks>
+    public void RemoveHeading(HeadingInfo heading)
+    {
+        Headings.Remove(heading);
         RefreshContents();
     }
 
@@ -207,12 +233,6 @@ public partial class FrameworkLayout : IDisposable
     {
         drawer.DrawerToggled += OnDrawerToggled;
         _drawers.Add(drawer);
-    }
-
-    internal string Add(Heading heading)
-    {
-        Headings.Add(heading);
-        return $"heading-{Headings.Count}";
     }
 
     internal void Add(ScrollToTop scrollToTop)
@@ -244,6 +264,8 @@ public partial class FrameworkLayout : IDisposable
         await drawer.ToggleAsync();
     }
 
+    internal int GetHeadingCount() => Headings.Count;
+
     internal bool HasDrawer(Side side) => _drawers.Any(x => x.Side == side);
 
     internal void RefreshContents()
@@ -270,8 +292,6 @@ public partial class FrameworkLayout : IDisposable
             AutoScrollToTop = _scrollToTops.Count == 0;
         }
     }
-
-    internal void Remove(Heading heading) => Headings.Remove(heading);
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,

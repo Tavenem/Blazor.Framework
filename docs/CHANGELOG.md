@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.28
+### Added
+- Manual headings
+
 ## 1.27
 ### Fixed
 - Inline radio options
