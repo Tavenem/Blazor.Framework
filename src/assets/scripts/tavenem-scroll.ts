@@ -31,6 +31,13 @@ export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, class
     _spy(null as any);
 }
 
+export function scrollSpyTags(this: any, dotnetReference: DotNet.DotNetObject, tagNames: string[]) {
+    _spy = handleScrollSpyTags.bind(this, dotnetReference, tagNames);
+    document.addEventListener('scroll', _spy, true);
+    window.addEventListener('resize', _spy, true);
+    _spy(null as any);
+}
+
 export function scrollToId(elementId: string | null, block: ScrollLogicalPosition | null, setHistory?: boolean) {
     let element = elementId
         ? document.getElementById(elementId)
@@ -116,6 +123,56 @@ function handleScroll(dotnetReference: DotNet.DotNetObject, event: Event) {
 
 function handleScrollSpy(dotnetReference: DotNet.DotNetObject, className: string, event: Event) {
     const elements = document.getElementsByClassName(className);
+    if (elements.length === 0) {
+        clearLastScrolled();
+        return;
+    }
+
+    let lowest = Number.MAX_SAFE_INTEGER;
+    let lowestAboveZero = Number.MAX_SAFE_INTEGER;
+    let lowestElementId = '';
+    let lowestElementIdAboveZero = '';
+    for (let i = 0; i < elements.length; i++) {
+        const element = elements[i];
+
+        const rect = element.getBoundingClientRect();
+
+        if (rect.top < lowest) {
+            lowest = rect.top;
+            lowestElementId = element.id;
+        }
+        if (rect.top > 0
+            && rect.top < lowestAboveZero) {
+            lowestAboveZero = rect.top;
+            lowestElementIdAboveZero = element.id;
+        }
+    }
+
+    const element = document.getElementById(lowestElementIdAboveZero)
+        ?? document.getElementById(lowestElementId);
+    if (!element) {
+        clearLastScrolled();
+        return;
+    }
+
+    if (element.getBoundingClientRect().top < window.innerHeight * 0.8 === false) {
+        return;
+    }
+
+    const elementId = element.id;
+    if (elementId != _lastElement) {
+        clearLastScrolled();
+        _lastElement = elementId;
+        element.classList.add("scroll-active");
+        dotnetReference.invokeMethodAsync('RaiseOnScrollSpy', elementId);
+    }
+}
+
+function handleScrollSpyTags(dotnetReference: DotNet.DotNetObject, tagNames: string[], event: Event) {
+    const elements = [];
+    for (let i = 0; i < tagNames.length; i++) {
+        elements.push(...document.getElementsByTagName(tagNames[i]));
+    }
     if (elements.length === 0) {
         clearLastScrolled();
         return;

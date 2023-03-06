@@ -156,6 +156,7 @@ public partial class FrameworkLayout : IDisposable
             {
                 _dotNetRef = DotNetObjectReference.Create(this);
                 await ScrollService.ScrollSpy(_dotNetRef, ScrollSpyClass);
+                await ScrollService.ScrollSpyTags(_dotNetRef, "h1", "h2", "h3", "h4", "h5", "h6");
             }
 
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
