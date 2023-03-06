@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.29
+### Fixed
+- Headings
+
 ## 1.28
 ### Added
 - Manual headings

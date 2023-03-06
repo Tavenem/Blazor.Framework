@@ -182,13 +182,21 @@ public partial class FrameworkLayout : IDisposable
     /// Adds a heading to the layout, and all <see cref="Contents"/> components.
     /// </summary>
     /// <param name="heading">The heading to add.</param>
+    /// <returns>
+    /// The heading's ID. If it was <see langword="null"/> or empty, a new ID will be created.
+    /// </returns>
     /// <remarks>
     /// This method can be used to add headings without using the <see cref="Heading"/> component.
     /// </remarks>
-    public void AddHeading(HeadingInfo heading)
+    public string AddHeading(HeadingInfo heading)
     {
         Headings.Add(heading);
+        if (string.IsNullOrEmpty(heading.Id))
+        {
+            heading.Id = $"heading-{Headings.Count}";
+        }
         RefreshContents();
+        return heading.Id;
     }
 
     /// <summary>
