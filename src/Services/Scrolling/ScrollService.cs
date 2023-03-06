@@ -114,6 +114,31 @@ public class ScrollService : IAsyncDisposable
         catch (ObjectDisposedException) { }
     }
 
+    /// <summary>
+    /// Observes scrolling and resizing events to detect which of the elements
+    /// with the given tag name(s) are currently in view.
+    /// </summary>
+    /// <param name="dotNetRef">
+    /// A reference to the framework.
+    /// </param>
+    /// <param name="tagNames">
+    /// The names of tags to observe.
+    /// </param>
+    internal async ValueTask ScrollSpyTags(DotNetObjectReference<FrameworkLayout> dotNetRef, params string[] tagNames)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("scrollSpyTags", dotNetRef, tagNames)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
+    }
+
     internal async ValueTask StartScrollListener(DotNetObjectReference<ScrollListener> dotNetRef, string? selector)
     {
         try

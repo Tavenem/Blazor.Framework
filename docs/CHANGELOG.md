@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.30
+### Fixed
+- Enable scroll spy for manual headings
+
 ## 1.29
 ### Fixed
 - Headings
