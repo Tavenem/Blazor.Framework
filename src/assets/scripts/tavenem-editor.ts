@@ -1477,7 +1477,7 @@ export function setValue(elementId: string, value?: string) {
             wysiwygEditor.view.state.apply(
                 wysiwygEditor.view.state.tr.delete(
                     0,
-                    wysiwygEditor.view.state.doc.nodeSize)));
+                    wysiwygEditor.view.state.doc.content.size)));
     }
 }
 
