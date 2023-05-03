@@ -543,29 +543,6 @@ const commonNodes: { [name in string]: NodeSpec } = {
         parseDOM: [{ tag: "dl", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dl") }
     },
-    task_list_item: {
-        attrs: plusCommonAttributes({ complete: { default: false } }),
-        content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
-        defining: true,
-        parseDOM: [{
-            tag: "li",
-            getAttrs: node => {
-                let attrs: { [key: string]: any } | undefined;
-                if (node instanceof HTMLLIElement) {
-                    const child = node.firstChild;
-                    if (child instanceof HTMLInputElement
-                        && child.type == 'checkbox') {
-                        attrs = { complete: child.checked };
-                    }
-                }
-                return getCommonAttrs(node, attrs);
-            }
-        }],
-        toDOM(node) {
-            const { complete } = node.attrs;
-            return nodeToDomWithAttrs(node, "li", { class: "task-list-item" }, undefined, [["input", { type: 'checkbox', checked: complete }], ["div", 0]]);
-        }
-    },
     term: {
         attrs: commonAttrs,
         content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
@@ -579,6 +556,33 @@ const commonNodes: { [name in string]: NodeSpec } = {
         defining: true,
         parseDOM: [{ tag: "dd", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dd") }
+    },
+    task_list_item: {
+        attrs: plusCommonAttributes({ complete: { default: false } }),
+        content: "paragraph (flow | address | headerfooter | heading | sectioning)*",
+        defining: true,
+        parseDOM: [{
+            tag: "li",
+            getAttrs: node => {
+                let attrs: { [key: string]: any } | undefined;
+                if (node instanceof HTMLLIElement) {
+                    const child = node.firstChild;
+                    if (child instanceof HTMLInputElement
+                        && child.type == 'checkbox') {
+                        attrs = { complete: child.checked };
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+                return getCommonAttrs(node, attrs);
+            }
+        }],
+        toDOM(node) {
+            const { complete } = node.attrs;
+            return nodeToDomWithAttrs(node, "li", { class: "task-list-item" }, undefined, [["input", { type: 'checkbox', checked: complete }], ["div", 0]]);
+        }
     },
     list_item: {
         attrs: commonAttrs,
