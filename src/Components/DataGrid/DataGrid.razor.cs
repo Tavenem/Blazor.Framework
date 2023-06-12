@@ -20,7 +20,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
     | DynamicallyAccessedMemberTypes.PublicFields
     | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>
-    : TavenemComponentBase, IDataGrid<TDataItem>, IAsyncDisposable
+    : IDataGrid<TDataItem>, IAsyncDisposable
 {
     private const string HtmlTemplate = """
         <!DOCTYPE html>

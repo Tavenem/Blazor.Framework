@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.32
+### Fixed
+- Editor lists
+
+## 1.31
+### Fixed
+- Editor clear
+
 ## 1.30
 ### Fixed
 - Enable scroll spy for manual headings

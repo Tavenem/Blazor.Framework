@@ -15,22 +15,22 @@
                         @if (Calendars.Count > 1)
                         {
                             <Select TValue="System.Globalization.Calendar"
-                            Value="Calendar"
-                            ValueChanged="SetCalendar"
-                            Disabled="Disabled"
-                            Options="Calendars"
-                            Labels="@(c => CalendarNames[Calendars.IndexOf(c)])"
-                            AllowClear="false" />
+                                    Value="Calendar"
+                                    ValueChanged="SetCalendar"
+                                    Disabled="Disabled"
+                                    Options="Calendars"
+                                    Labels="@(c => CalendarNames[Calendars.IndexOf(c)])"
+                                    AllowClear="false" />
                         }
                         @if (HasTime && ShowTimeZone && TimeZones.Count > 1)
                         {
                             <Select TValue="TimeZoneInfo"
-                            Value="TimeZone"
-                            ValueChanged="SetTimeZone"
-                            Disabled="Disabled"
-                            Options="TimeZones"
-                            Labels="@(t => t.DisplayName.ToHumanReadable())"
-                            AllowClear="false" />
+                                    Value="TimeZone"
+                                    ValueChanged="SetTimeZone"
+                                    Disabled="Disabled"
+                                    Options="TimeZones"
+                                    Labels="@(t => t.DisplayName.ToHumanReadable())"
+                                    AllowClear="false" />
                         }
                     </div>
                 }
@@ -48,7 +48,7 @@
                             {
                                 <button class="btn btn-text current flex-grow-1"
                                         disabled="@Disabled"
-                                        @onclick="OnSelectCurentAsync">@Title</button>
+                                        @onclick="OnSelectCurrentAsync">@Title</button>
                             }
                         </div>
                     }
@@ -439,12 +439,12 @@ else
                    autofocus="@(DisplayType == PickerDisplayType.Inline ? false : AutoFocus)"
                    disabled="@Disabled"
                    placeholder="@Placeholder"
-                   readonly
                    required="@Required"
                    size="1"
                    tabindex="@(DisplayType == PickerDisplayType.Inline ? -1 : TabIndex)"
                    value="@DisplayString"
-                   @onclick="TogglePopoverAsync"
+                   @onchange="OnDisplaySet"
+                   @onclick="OnClickContainerAsync"
                    @onclick:stopPropagation="true" />
             @if (ShowClear)
             {

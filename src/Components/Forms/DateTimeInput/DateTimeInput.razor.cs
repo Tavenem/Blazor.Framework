@@ -245,6 +245,30 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         }
     }
 
+    /// <inheritdoc/>
+    protected override bool OpenOnEnter => false;
+
+    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
+    {
+        new()
+        {
+            Key = "/Delete|Escape/",
+            SubscribeDown = true,
+            PreventDown = "key+none",
+        },
+        new()
+        {
+            Key = "Enter",
+            SubscribeDown = true,
+        },
+        new()
+        {
+            Key = "/ArrowDown|ArrowUp/",
+            SubscribeDown = true,
+            PreventDown = "key+alt",
+        }
+    };
+
     private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline
         || CurrentValue is not null;
 
@@ -1091,6 +1115,36 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         }
     }
 
+    private void OnDisplaySet(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        if (value is null)
+        {
+            DateTimeOffset = DateTimeOffset.Now;
+        }
+        else if (DateTimeOffset.TryParse(value, out var dto))
+        {
+            DateTimeOffset = dto;
+        }
+        else
+        {
+            DateTimeOffset = DateTimeOffset.Now;
+            if (_nullableType is not null
+                || _baseType == typeof(string))
+            {
+                CurrentValue = default;
+            }
+        }
+
+        Year = DateTimeOffset.Year;
+        Month = (byte)DateTimeOffset.Month;
+        Hour = (byte)DateTimeOffset.Hour;
+        Minute = (byte)DateTimeOffset.Minute;
+        Second = (byte)DateTimeOffset.Second;
+        SetDateValues();
+        SetValue();
+    }
+
     private void OnMouseOverHour(byte value)
     {
         if (_clockMouseDown)
@@ -1277,7 +1331,7 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         await SetViewAsync(DatePickerView.Decade);
     }
 
-    private async Task OnSelectCurentAsync()
+    private async Task OnSelectCurrentAsync()
     {
         Year = Calendar.GetYear(DateTimeOffset.DateTime);
         Month = (byte)Calendar.GetMonth(DateTimeOffset.DateTime);

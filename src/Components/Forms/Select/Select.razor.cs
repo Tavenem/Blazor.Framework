@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -11,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The type of bound value.
 /// </typeparam>
-public partial class Select<TValue> : SelectBase<TValue, TValue>
+public partial class Select<TValue>
 {
     /// <inheritdoc />
     protected override string? InputCssStyle => new CssBuilder(base.InputCssStyle)

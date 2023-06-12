@@ -150,6 +150,11 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         .ToString();
 
     /// <summary>
+    /// Whether the popover should open when the enter key is pressed.
+    /// </summary>
+    protected virtual bool OpenOnEnter => true;
+
+    /// <summary>
     /// The popover component.
     /// </summary>
     protected Popover? Popover { get; set; }
@@ -343,7 +348,10 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
                 }
                 break;
             case "Enter":
-                await TogglePopoverAsync();
+                if (OpenOnEnter || PopoverOpen)
+                {
+                    await TogglePopoverAsync();
+                }
                 break;
             case "Escape":
                 if (PopoverOpen)
