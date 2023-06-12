@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.33
+### Changed
+- Text editing enabled for `DateTimeInput`
+
 ## 1.32
 ### Fixed
 - Editor lists
