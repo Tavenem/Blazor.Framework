@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A text input component.
 /// </summary>
-public partial class TextInput : InputComponentBase<string?>
+public partial class TextInput
 {
     private readonly AdjustableTimer _focusTimer;
     private readonly AdjustableTimer _inputTimer;

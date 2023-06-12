@@ -7,7 +7,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// An image editor component.
 /// </summary>
-public partial class ImageEditor : TavenemComponentBase, IAsyncDisposable
+public partial class ImageEditor : IAsyncDisposable
 {
     private const string BrushColorDefault = "#000000";
     private const double BrushSizeDefault = 12;

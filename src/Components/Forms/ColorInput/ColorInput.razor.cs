@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -52,7 +51,7 @@ namespace Tavenem.Blazor.Framework;
 /// component, or an rgba function for colors with an alpha component.
 /// </para>
 /// </typeparam>
-public partial class ColorInput<TValue> : PickerComponentBase<TValue>
+public partial class ColorInput<TValue>
 {
     private const int OverlayHeight = 250;
     private const int OverlayMargin = 40;

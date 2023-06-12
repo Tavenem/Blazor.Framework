@@ -11,7 +11,7 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The numeric type bound to the input value.
 /// </typeparam>
-public partial class Slider<TValue> : FormComponentBase<TValue>
+public partial class Slider<TValue>
 {
     private readonly TValue _maxDefault, _maxType, _minDefault, _minType, _zero;
     private readonly AdjustableTimer _timer;

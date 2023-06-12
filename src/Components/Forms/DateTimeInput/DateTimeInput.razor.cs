@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using System.Globalization;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -53,7 +52,7 @@ namespace Tavenem.Blazor.Framework;
 /// </list>
 /// </para>
 /// </typeparam>
-public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
+public partial class DateTimeInput<TValue>
 {
     private const int CloseDelay = 500;
     private const int ViewSwitchDelay = 200;

@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A radio input group which indicates a level.
 /// </summary>
-public partial class Rating : FormComponentBase<byte>
+public partial class Rating
 {
     /// <summary>
     /// <para>

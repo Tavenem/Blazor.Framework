@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A checkbox input component.
 /// </summary>
-public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
+public partial class Checkbox<TValue>
 {
     /// <summary>
     /// The icon to use for the checked state.

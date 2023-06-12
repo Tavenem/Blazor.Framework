@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using Tavenem.Blazor.Framework.Components.DataGrid;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -19,7 +18,7 @@ public partial class DataGridMultiSelect<
         | DynamicallyAccessedMemberTypes.PublicFields
         | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem,
     TValue>
-    : PickerComponentBase<IEnumerable<TValue>>, IDataGrid<TDataItem>
+    : IDataGrid<TDataItem>
 {
     private readonly List<IColumn<TDataItem>> _columns = new();
     private readonly List<Guid> _initialSortOrder = new();

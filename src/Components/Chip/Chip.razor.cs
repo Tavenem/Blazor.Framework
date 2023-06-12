@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Components;
-using Tavenem.Blazor.Framework.InternalComponents;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// Displays a chip, with support for simple theming and closing.
 /// </summary>
-public partial class Chip<TChip> : ListItem<TChip>
+public partial class Chip<TChip>
 {
     /// <summary>
     /// The list to which this item belongs, if any.

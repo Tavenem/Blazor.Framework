@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A boolean toggle input component.
 /// </summary>
-public partial class Switch : BoolInputComponentBase<bool>
+public partial class Switch
 {
     /// <summary>
     /// An optional icon to display in the checked state.

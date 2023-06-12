@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
-using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A textarea input component.
 /// </summary>
-public partial class TextArea : InputComponentBase<string?>
+public partial class TextArea
 {
     private readonly AdjustableTimer _timer;
 

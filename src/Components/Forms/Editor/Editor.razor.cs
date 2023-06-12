@@ -10,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A rich text editor which supports any content type.
 /// </summary>
-public partial class Editor : FormComponentBase<string?>
+public partial class Editor
 {
     private bool _disposedValue;
     private bool _initialized;

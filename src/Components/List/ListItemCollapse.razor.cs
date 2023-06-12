@@ -7,7 +7,7 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// <summary>
 /// This class is for internal use only. It will not function properly if used directly.
 /// </summary>
-public partial class ListItemCollapse<TListItem> : Collapse
+public partial class ListItemCollapse<TListItem>
 {
     /// <summary>
     /// The id of the collapse element.
@@ -52,10 +52,12 @@ public partial class ListItemCollapse<TListItem> : Collapse
         .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
         .ToString();
 
+#pragma warning disable RCS1146 // Use conditional access: TListItem cannot be made nullable
     private protected bool DisabledValue => Disabled
         || (ListItem is not null
         && ListItem.Item is not null
         && ElementList?.ItemIsDisabled?.Invoke(ListItem.Item) == true);
+#pragma warning restore RCS1146 // Use conditional access.
 
     private string? HeaderClass => new CssBuilder("header flex-wrap")
         .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)

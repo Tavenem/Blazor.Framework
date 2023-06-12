@@ -10,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// Not intended for use in any other context.
 /// </para>
 /// </summary>
-public partial class TabPanel<TTabItem> : DraggableDropTarget<TTabItem, TTabItem>, IAsyncDisposable
+public partial class TabPanel<TTabItem> : IAsyncDisposable
 {
     private bool _asyncDisposedValue;
 
