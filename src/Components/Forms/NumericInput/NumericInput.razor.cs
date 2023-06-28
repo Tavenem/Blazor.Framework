@@ -184,6 +184,12 @@ public partial class NumericInput<TValue>
         .Add("input-core")
         .ToString();
 
+    /// <inheritdoc/>
+    protected override bool ShrinkWhen => base.ShrinkWhen
+        || PrefixContent is not null
+        || !string.IsNullOrEmpty(PrefixIcon)
+        || !string.IsNullOrEmpty(PrefixText);
+
     private static string InputMode => IsFloatingPointType ? "decimal" : "numeric";
 
     private static bool IsFloatingPointType => typeof(TValue) == typeof(decimal)
@@ -232,11 +238,6 @@ public partial class NumericInput<TValue>
             PreventDown = "key+none",
         }
     };
-
-    private protected override bool ShrinkWhen => base.ShrinkWhen
-        || PrefixContent is not null
-        || !string.IsNullOrEmpty(PrefixIcon)
-        || !string.IsNullOrEmpty(PrefixText);
 
     private protected string? StepString
     {

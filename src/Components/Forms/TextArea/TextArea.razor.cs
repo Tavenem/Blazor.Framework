@@ -98,6 +98,10 @@ public partial class TextArea
         .Add("input-core")
         .ToString();
 
+    /// <inheritdoc/>
+    protected override bool ShrinkWhen => base.ShrinkWhen
+        || !string.IsNullOrEmpty(Placeholder);
+
     private string? AutocompleteValue
     {
         get
@@ -123,9 +127,6 @@ public partial class TextArea
     }
 
     private int CurrentLength { get; set; }
-
-    private protected override bool ShrinkWhen => base.ShrinkWhen
-        || !string.IsNullOrEmpty(Placeholder);
 
     private protected string? SpellcheckValue => Spellcheck == true ? "true" : "false";
 

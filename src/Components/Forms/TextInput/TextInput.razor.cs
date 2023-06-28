@@ -275,7 +275,8 @@ public partial class TextInput
         .Add("input-core")
         .ToString();
 
-    private protected override bool ShrinkWhen => base.ShrinkWhen
+    /// <inheritdoc/>
+    protected override bool ShrinkWhen => base.ShrinkWhen
         || PrefixContent is not null
         || !string.IsNullOrEmpty(Placeholder)
         || !string.IsNullOrEmpty(PrefixIcon)

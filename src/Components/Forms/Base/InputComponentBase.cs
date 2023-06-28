@@ -156,13 +156,22 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     protected virtual string? InputCssStyle => InputStyle;
 
-    private protected string? HelpersClass => new CssBuilder("field-helpers")
+    /// <summary>
+    /// The CSS class(es) for the field helpers section.
+    /// </summary>
+    protected string? HelpersClass => new CssBuilder("field-helpers")
         .Add("onfocus", DisplayHelpTextOnFocus)
         .ToString();
 
-    private protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
+    /// <summary>
+    /// The HTML <c>id</c> value for the <c>input</c> element.
+    /// </summary>
+    protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
 
-    private protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString);
+    /// <summary>
+    /// Controls when this component adds the "shrink" CSS class.
+    /// </summary>
+    protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString);
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
