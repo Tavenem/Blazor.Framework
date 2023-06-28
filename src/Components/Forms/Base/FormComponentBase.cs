@@ -307,7 +307,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     /// Gets the <see cref="Microsoft.AspNetCore.Components.Forms.FieldIdentifier"/> for the bound
     /// value.
     /// </summary>
-    protected internal FieldIdentifier FieldIdentifier { get; set; }
+    protected FieldIdentifier FieldIdentifier { get; set; }
 
     /// <summary>
     /// <para>
@@ -317,11 +317,17 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     /// Nested components are not validated.
     /// </para>
     /// </summary>
-    [CascadingParameter] private protected bool IsNested { get; set; }
+    [CascadingParameter] protected bool IsNested { get; set; }
 
-    private protected bool IsInvalidAndTouched => !IsValid && IsTouched;
+    /// <summary>
+    /// Whether this field is currently invalid and has been changed.
+    /// </summary>
+    protected bool IsInvalidAndTouched => !IsValid && IsTouched;
 
-    [CascadingParameter] private Form? Form { get; set; }
+    /// <summary>
+    /// The <see cref="Framework.Form"/> in which this component is located.
+    /// </summary>
+    [CascadingParameter] protected Form? Form { get; set; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="FormComponentBase{TValue}"/>.
@@ -608,12 +614,44 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     }
 
     /// <summary>
+    /// Starts the evaluation timer.
+    /// </summary>
+    protected void EvaluateDebounced()
+    {
+        if (!_disposedValue)
+        {
+            _timer.Start();
+        }
+    }
+
+    /// <summary>
     /// Formats the value as a string. Derived classes can override this to determine the formating
     /// used for <see cref="CurrentValueAsString"/>.
     /// </summary>
     /// <param name="value">The value to format.</param>
     /// <returns>A string representation of the value.</returns>
     protected virtual string? FormatValueAsString(TValue? value) => value?.ToString();
+
+    /// <summary>
+    /// Gets a formatted conversion validation message.
+    /// </summary>
+    /// <returns>
+    /// <see cref="ConversionValidationMessage"/>, supplied with <see cref="DisplayName"/> (or the
+    /// field name, if <see cref="DisplayName"/> is unset) as a parameter.
+    /// </returns>
+    protected string GetConversionValidationMessage()
+        => string.Format(ConversionValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
+
+    /// <summary>
+    /// Starts the touch timer.
+    /// </summary>
+    protected void SetTouchedDebounced()
+    {
+        if (!_disposedValue)
+        {
+            _touchedTimer.Start();
+        }
+    }
 
     /// <summary>
     /// Parses a string to create an instance of <typeparamref name="TValue"/>. Derived classes can
@@ -679,17 +717,6 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         return newDictionaryCreated;
     }
 
-    private protected void EvaluateDebounced()
-    {
-        if (!_disposedValue)
-        {
-            _timer.Start();
-        }
-    }
-
-    private protected string GetConversionValidationMessage()
-        => string.Format(ConversionValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
-
     private string? GetRequiredValidationMessage() => string.IsNullOrEmpty(RequiredValidationMessage)
         ? null
         : string.Format(RequiredValidationMessage, DisplayName ?? FieldIdentifier.FieldName.ToHumanReadable());
@@ -714,14 +741,6 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
     {
         IsTouched = true;
         await IsTouchedChanged.InvokeAsync(true);
-    }
-
-    private protected void SetTouchedDebounced()
-    {
-        if (!_disposedValue)
-        {
-            _touchedTimer.Start();
-        }
     }
 
     private void UpdateAdditionalValidationAttributes()
