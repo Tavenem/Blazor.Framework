@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.34-35
+### Changed
+- Class, property, and method accessibility changes
+
 ## 1.33
 ### Changed
 - Text editing enabled for `DateTimeInput`
