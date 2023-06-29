@@ -284,9 +284,7 @@ public partial class ListItem<TListItem>
 
     private protected async Task OnClickAsync()
     {
-        if (ElementList is not null
-            && ElementList.SelectionType != SelectionType.None
-            && !ElementList.SelectionIcons)
+        if (ElementList is not null)
         {
             await ElementList.OnToggleItemSelectionAsync(Item);
         }

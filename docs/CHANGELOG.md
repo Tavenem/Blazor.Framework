@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.36
+### Fixed
+- List item clicking
+
 ## 1.34-35
 ### Changed
 - Class, property, and method accessibility changes

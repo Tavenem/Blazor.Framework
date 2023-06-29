@@ -446,7 +446,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Secondary)"" />
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""OnClick"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
