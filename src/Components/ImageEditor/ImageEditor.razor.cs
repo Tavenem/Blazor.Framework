@@ -310,7 +310,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             if (!string.IsNullOrEmpty(ContainerId))
             {
-                await _module.InvokeVoidAsync("destroy", ContainerId);
+                await _module.InvokeVoidAsync("destroy", ContainerId, true);
             }
             await _module.DisposeAsync();
         }

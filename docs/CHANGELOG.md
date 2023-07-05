@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.37
+### Changed
+- Improved `ImageEditor` stream handling
+
 ## 1.36
 ### Fixed
 - List item clicking

@@ -36,6 +36,46 @@
     element should be supported.
 </p>
 
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ImageEditor @ref="_editor" />
+            <div class="row justify-content-center">
+                <InputFile @key="@_key" OnChange="OnFileChange" />
+                <button class="btn primary" @onclick="OnUploadAsync" disabled="@(_file is null)">Upload</button>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ImageEditor @ref=""_editor"" />
+<div class=""row justify-content-center"">
+    <InputFile @key=""@_key"" OnChange=""OnFileChange"" />
+    <button class=""btn primary"" @onclick=""OnUploadAsync"" disabled=""@(_file is null)"">Upload</button>
+</div>
+
+@code {
+    private ImageEditor? _editor;
+    private IBrowserFile? _file;
+    private string _key = Guid.NewGuid().ToString();
+
+    private void OnFileChange(InputFileChangeEventArgs e) => _file = e.File;
+
+    private async Task OnUploadAsync()
+    {
+        if (_editor is null
+            || _file is null)
+        {
+            return;
+        }
+        using var stream = _file.OpenReadStream(1000000000);
+        await _editor.LoadImageAsync(stream);
+        _file = null;
+        _key = Guid.NewGuid().ToString();
+    }
+}")
+    </ChildContent>
+</Collapse>
+
 <p>
     Editing can be initiated programmatically with the <code>BeginEditAsync</code> method, and
     terminated with the <code>CancelEditAsync</code> method. The <code>Editing</code> property
@@ -251,3 +291,24 @@
 <ImageEditor Src=""./images/rover.webp"" ThemeColor=""ThemeColor.Tertiary"" />")
     </ChildContent>
 </Collapse>
+
+@code {
+    private ImageEditor? _editor;
+    private IBrowserFile? _file;
+    private string _key = Guid.NewGuid().ToString();
+
+    private void OnFileChange(InputFileChangeEventArgs e) => _file = e.File;
+
+    private async Task OnUploadAsync()
+    {
+        if (_editor is null
+            || _file is null)
+        {
+            return;
+        }
+        using var stream = _file.OpenReadStream(1000000000);
+        await _editor.LoadImageAsync(stream);
+        _file = null;
+        _key = Guid.NewGuid().ToString();
+    }
+}

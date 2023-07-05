@@ -388,6 +388,15 @@ input {
         &:not(:disabled):not([readonly]) {
             cursor: pointer;
         }
+
+        &::file-selector-button {
+            background: var(--tavenem-color-default);
+            color: var(--tavenem-color-default-text);
+
+            &:hover {
+                background: var(--tavenem-color-default-darken);
+            }
+        }
     }
 
     &:focus {

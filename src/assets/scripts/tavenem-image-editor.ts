@@ -936,7 +936,7 @@ export function crop(containerId: string) {
     }
 }
 
-export function destroy(containerId: string) {
+export function destroy(containerId: string, withRevoke: boolean) {
     const editor = editors[containerId];
     if (editor) {
         editor.destroy();
@@ -948,11 +948,13 @@ export function destroy(containerId: string) {
         return;
     }
 
-    const imageElement = container.querySelector('img');
-    if (imageElement
-        && imageElement.src
-        && imageElement.src.startsWith("blob")) {
-        URL.revokeObjectURL(imageElement.src);
+    if (withRevoke) {
+        const imageElement = container.querySelector('img');
+        if (imageElement
+            && imageElement.src
+            && imageElement.src.startsWith("blob")) {
+            URL.revokeObjectURL(imageElement.src);
+        }
     }
 }
 
@@ -1084,7 +1086,7 @@ export async function loadEditor(
 export function loadImage(containerId: string, imageUrl?: string) {
     let editor = editors[containerId];
     if (editor) {
-        destroy(containerId);
+        destroy(containerId, true);
     }
     const container = document.getElementById(containerId);
     if (!(container instanceof HTMLElement)) {
@@ -1116,7 +1118,7 @@ export async function loadImageFromStream(containerId: string, imageStream?: Dot
 
     let editor = editors[containerId];
     if (editor) {
-        destroy(containerId);
+        destroy(containerId, true);
     }
     const container = document.getElementById(containerId);
     if (!(container instanceof HTMLElement)) {
