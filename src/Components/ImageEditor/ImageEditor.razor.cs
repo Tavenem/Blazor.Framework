@@ -356,7 +356,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             await EditingChanged.InvokeAsync(Editing);
         }
-        await _module.InvokeVoidAsync("loadEditor", Interop.Reference, ContainerId, CropAspectRatio);
+        await _module.InvokeVoidAsync("loadEditor", Interop.Reference, ContainerId, null, CropAspectRatio);
         if (Math.Abs(BrushSize - BrushSizeDefault) > 0.00001)
         {
             await SetBrushSizeAsync();

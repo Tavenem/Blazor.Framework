@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.38
+### Fixed
+- `BeginEditAsync` in `ImageEditor`
+
 ## 1.37
 ### Changed
 - Improved `ImageEditor` stream handling
