@@ -257,21 +257,6 @@ class ImageEditor {
         if (this._brushCanvasTexture) {
             this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
         }
-        const relativeHeight = (this.originalWidth / this.editor.view.width) * this.editor.view.height;
-        const relativeWidth = (this.originalHeight / this.editor.view.height) * this.editor.view.width;
-        if (relativeHeight > this.originalHeight) {
-            this.editor.view.style.height = `${this.originalHeight}px`;
-            this.editor.view.style.removeProperty('width');
-        } else if (relativeWidth > this.originalWidth) {
-            this.editor.view.style.width = `${this.originalWidth}px`;
-            this.editor.view.style.removeProperty('height');
-        } else if (this.editor.view.height > this.editor.view.width) {
-            this.editor.view.style.height = `${this.originalHeight}px`;
-            this.editor.view.style.removeProperty('width');
-        } else {
-            this.editor.view.style.width = `${this.originalWidth}px`;
-            this.editor.view.style.removeProperty('height');
-        }
         container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
         container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
         this.backgroundImage.setParent(container);
@@ -462,13 +447,6 @@ class ImageEditor {
             this.editor.renderer.resize(this.editor.view.height, this.editor.view.width);
             if (this._brushCanvasTexture) {
                 this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
-            }
-            if (this.editor.view.height > this.editor.view.width) {
-                this.editor.view.style.height = `${this.originalHeight}px`;
-                this.editor.view.style.removeProperty('width');
-            } else {
-                this.editor.view.style.width = `${this.originalWidth}px`;
-                this.editor.view.style.removeProperty('height');
             }
             container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
         }
