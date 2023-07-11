@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.39
+### Changed
+- Fit image in `ImageEditor`
+
 ## 1.38
 ### Fixed
 - `BeginEditAsync` in `ImageEditor`

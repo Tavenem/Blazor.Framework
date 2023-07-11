@@ -140,6 +140,9 @@ class ImageEditor {
             backgroundAlpha: 0,
         });
         this.editor.view.style.userSelect = 'none';
+        this.editor.view.style.width = '100%';
+        this.editor.view.style.height = '100%';
+        this.editor.view.style.objectFit = 'scale-down';
         this.editor.ticker.add(() => {
             this.renderPoints();
         });
@@ -307,6 +310,9 @@ class ImageEditor {
             const image = document.createElement('img');
             image.height = this.originalHeight;
             image.width = this.originalWidth;
+            image.style.width = '100%';
+            image.style.height = '100%';
+            image.style.objectFit = 'scale-down';
             if (this.originalSrc) {
                 image.src = this.originalSrc;
             }
@@ -391,7 +397,10 @@ class ImageEditor {
         type = type || "image/png";
         quality = quality || 0.92;
         this.cancelOngoingOperations();
-        const renderTexture = RenderTexture.create(this.editor.view.width, this.editor.view.height);
+        const renderTexture = RenderTexture.create({
+            width: this.editor.view.width,
+            height: this.editor.view.height
+        });
         this.editor.renderer.render(this.editor.stage, {
             renderTexture
         });
@@ -472,7 +481,10 @@ class ImageEditor {
         type = type || "image/png";
         quality = quality || 0.92;
         if (this.editor.view.parentElement) {
-            const renderTexture = RenderTexture.create(this.editor.view.width, this.editor.view.height);
+            const renderTexture = RenderTexture.create({
+                width: this.editor.view.width,
+                height: this.editor.view.height,
+            });
             this.editor.renderer.render(this.editor.stage, {
                 renderTexture
             });
@@ -874,7 +886,7 @@ class ImageEditor {
 
         return JSON.stringify(container.children, (key, value) => {
             const exclude = ['scope', 'parent'];
-            if (key.substr(0, 1) !== '_'
+            if (key.substring(0, 1) !== '_'
                 && exclude.indexOf(key) == -1) {
                 return value;
             }
@@ -973,7 +985,10 @@ export function exportImage(containerId: string, type?: string, quality?: number
     link.download = filename;
     const editor = editors[containerId];
     if (editor) {
-        const renderTexture = RenderTexture.create(editor.editor.view.width, editor.editor.view.height);
+        const renderTexture = RenderTexture.create({
+            width: editor.editor.view.width,
+            height: editor.editor.view.height
+        });
         editor.editor.renderer.render(editor.editor.stage, {
             renderTexture
         });
@@ -1102,6 +1117,9 @@ export function loadImage(containerId: string, imageUrl?: string) {
 
     if (!imageElement) {
         imageElement = document.createElement('img');
+        imageElement.style.width = '100%';
+        imageElement.style.height = '100%';
+        imageElement.style.objectFit = 'scale-down';
         container.appendChild(imageElement);
     }
 
@@ -1138,6 +1156,9 @@ export async function loadImageFromStream(containerId: string, imageStream?: Dot
 
     if (!imageElement) {
         imageElement = document.createElement('img');
+        imageElement.style.width = '100%';
+        imageElement.style.height = '100%';
+        imageElement.style.objectFit = 'scale-down';
         container.appendChild(imageElement);
     }
     if (imageUrl) {
@@ -1252,9 +1273,9 @@ export function undo(containerId: string) {
 function colorHexToNumber(color: string) {
     if (color.startsWith('#')) {
         if (color.length === 7 || color.length === 9) {
-            return parseInt(color.substr(1, 6), 16);
+            return parseInt(color.substring(1, 7), 16);
         } else if (color.length === 4) {
-            return parseInt(color.substr(1).split('').map(function (hex) {
+            return parseInt(color.substring(1).split('').map(function (hex) {
                 return hex + hex;
             }).join(''), 16);
         }
