@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.41
+### Fixed
+- Image sizing in `ImageEditor`
+
 ## 1.40
 ### Fixed
 - Canvas resizing in `ImageEditor`

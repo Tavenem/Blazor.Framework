@@ -479,17 +479,9 @@ class ImageEditor {
                 }
             }
 
-            const relativeHeight = (this.originalWidth / width) * height;
-            const relativeWidth = (this.originalHeight / height) * width;
-            if (relativeHeight > this.originalHeight) {
-                image.style.height = `${this.originalHeight}px`;
-            } else if (relativeWidth > this.originalWidth) {
-                image.style.width = `${this.originalWidth}px`;
-            } else if (height > width) {
-                image.style.height = `${this.originalHeight}px`;
-            } else {
-                image.style.width = `${this.originalWidth}px`;
-            }
+            image.style.width = '100%';
+            image.style.height = '100%';
+            image.style.objectFit = 'scale-down';
             this.editor.view.parentElement.appendChild(image);
         }
         this.editor.destroy(true, true);
