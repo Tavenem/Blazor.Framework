@@ -215,6 +215,13 @@ public partial class ImageEditor : IAsyncDisposable
         .Add("image-editor-wrapper")
         .ToString();
 
+    /// <inheritdoc />
+    protected override string? CssStyle => new CssBuilder()
+        .AddStyle("position", "relative")
+        .AddStyle(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
+        .ToString();
+
     private string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     private string? ContainerCssClass => new CssBuilder(ImageClass)
@@ -250,8 +257,18 @@ public partial class ImageEditor : IAsyncDisposable
     {
         var wasEditing = Editing;
         var aspectRatio = CropAspectRatio;
+        var src = Src;
 
         await base.SetParametersAsync(parameters);
+
+        if (_module is not null
+            && !string.Equals(Src, src, StringComparison.Ordinal))
+        {
+            await SetLoadingAsync();
+            await _module.InvokeVoidAsync("loadImage", ContainerId, Src);
+            HasImage = true;
+            await SetLoadingAsync(false);
+        }
 
         var beganEdit = false;
         if (wasEditing != Editing)

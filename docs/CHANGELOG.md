@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.42
+### Fixed
+- `Src` change in `ImageEditor`
+
 ## 1.41
 ### Fixed
 - Image sizing in `ImageEditor`

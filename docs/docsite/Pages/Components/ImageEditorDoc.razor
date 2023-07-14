@@ -21,7 +21,7 @@
 <Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <ImageEditor Src="./images/rover.webp" />
+            <ImageEditor Src="@UrlObj.Url" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -311,4 +311,14 @@
         _file = null;
         _key = Guid.NewGuid().ToString();
     }
+
+    private StrObj UrlObj { get; set; } = new();
+    protected async Task LoadAsync()
+    {
+        await Task.Delay(100);
+        UrlObj.Url = "./images/rover.webp";
+    }
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private class StrObj { public string? Url { get; set; } }
 }
