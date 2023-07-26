@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.43
+### Fixed
+- Dark theme persistence when light theme is the browser default
+
 ## 1.42
 ### Fixed
 - `Src` change in `ImageEditor`

@@ -41,11 +41,6 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
         _manualColorTheme = (theme != ThemePreference.Auto);
     } else if (_manualColorTheme) {
         return;
-    } else {
-        const local = localStorage.getItem('tavenem-theme');
-        if (local) {
-            return;
-        }
     }
     _saved_theme = theme;
 
@@ -94,6 +89,4 @@ if (window.matchMedia) {
     colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
 }
 const currentScheme = getPreferredColorScheme();
-if (currentScheme == ThemePreference.Dark) {
-    setColorScheme(currentScheme);
-}
+setColorScheme(currentScheme);
