@@ -30,7 +30,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("list contents highlight-start dense")
+    protected override string? CssClass => new CssBuilder("list contents highlight-start dense mt-3")
         .Add(ThemeColor.ToCSS())
         .Add(BreakpointClass)
         .Add(Class)
