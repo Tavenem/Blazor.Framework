@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.44
+### Changed
+- Image auto-scale for editor to prevent drastic UI scaling
+
 ## 1.43
 ### Fixed
 - Dark theme persistence when light theme is the browser default

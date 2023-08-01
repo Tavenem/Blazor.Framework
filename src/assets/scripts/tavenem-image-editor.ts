@@ -117,6 +117,7 @@ class ImageEditor {
     private _drawing = false;
     private _drawn: Sprite | undefined;
     private _editedText: Text | undefined;
+    private _heightLimit: number | undefined;
     private _isErasing = false;
     private _lastPosition: { x: number, y: number } | undefined;
     private _maxCount = 100;
@@ -127,13 +128,18 @@ class ImageEditor {
     private _textDoubleTapped: number | undefined;
     private _textTransformer: Transformer | undefined;
     private _undoStack: string[] = [];
+    private _widthLimit: number | undefined;
 
     constructor(
         private readonly dotNetObjectReference: DotNet.DotNetObject,
         width: number,
-        height: number) {
+        height: number,
+        widthLimit: number | undefined,
+        heightLimit: number | undefined) {
         this.originalHeight = height;
         this.originalWidth = width;
+        this._heightLimit = heightLimit;
+        this._widthLimit = widthLimit;
         this.editor = new Application({
             width,
             height,
@@ -512,6 +518,19 @@ class ImageEditor {
             }
             this.backgroundImage = Sprite.from(texture);
             this.backgroundImage.interactive = false;
+            let scale = 0;
+            if (this._heightLimit
+                && this.backgroundImage.height > this._heightLimit) {
+                scale = this._heightLimit / this.backgroundImage.height;
+            }
+            if (this._widthLimit
+                && this.backgroundImage.width > this._widthLimit) {
+                scale = Math.min(scale, this._widthLimit / this.backgroundImage.width);
+            }
+            if (scale != 0) {
+                this.backgroundImage.scale.x = scale;
+                this.backgroundImage.scale.y = scale;
+            }
             this.originalHeight = this.backgroundImage.height;
             this.originalWidth = this.backgroundImage.width;
             this.editor.renderer.resize(this.originalWidth, this.originalHeight);
@@ -1025,6 +1044,8 @@ export async function loadEditor(
             return;
         }
         const imageElement = container.querySelector('img');
+        const widthLimit = container.clientWidth;
+        const heightLimit = container.clientHeight;
         let width, height;
         if (imageElement) {
             if (!imageUrl) {
@@ -1033,8 +1054,8 @@ export async function loadEditor(
             width = imageElement.naturalWidth;
             height = imageElement.naturalHeight;
         } else {
-            width = container.clientWidth;
-            height = container.clientHeight;
+            width = widthLimit;
+            height = heightLimit;
         }
         if (height <= 0) {
             height = 100;
@@ -1042,7 +1063,7 @@ export async function loadEditor(
         if (width <= 0) {
             width = 100;
         }
-        editor = new ImageEditor(dotNetObjectReference, width, height);
+        editor = new ImageEditor(dotNetObjectReference, width, height, widthLimit, heightLimit);
         editors[containerId] = editor;
         container.appendChild(editor.editor.view);
         if (imageElement) {
