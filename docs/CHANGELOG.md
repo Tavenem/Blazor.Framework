@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.45
+### Fixed
+- Image crop aspect ratios
+
 ## 1.44
 ### Changed
 - Image auto-scale for editor to prevent drastic UI scaling

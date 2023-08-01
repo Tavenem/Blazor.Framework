@@ -574,14 +574,14 @@ class ImageEditor {
             let width = this._cropRect.width;
             let height;
             if (this._cropAspectRatio < 0) {
-                height = width * (this.originalWidth / this.originalHeight);
+                height = width / (this.originalWidth / this.originalHeight);
             } else {
-                height = width * this._cropAspectRatio;
+                height = width / this._cropAspectRatio;
             }
             const container = this.editor.stage.children[0] as Container;
             if (height > container.height) {
                 height = container.height;
-                width = height / this._cropAspectRatio!;
+                width = height * this._cropAspectRatio!;
             }
             this._cropRect.scale.set(width / 16, height / 16);
         }
@@ -654,11 +654,11 @@ class ImageEditor {
             || this._cropAspectRatio < 0) {
             height = this.editor.view.height / 2;
         } else {
-            height = width * this._cropAspectRatio;
+            height = width / this._cropAspectRatio;
         }
         if (height > this.editor.view.height) {
             height = this.editor.view.height;
-            width = height / this._cropAspectRatio!;
+            width = height * this._cropAspectRatio!;
         }
         this._cropRect = new Sprite(Texture.WHITE);
         this._cropRect.anchor.set(0.5, 0.5);
@@ -671,9 +671,9 @@ class ImageEditor {
             boxScalingEnabled: true,
             boundingBoxes: 'groupOnly',
             group: [this._cropRect],
-            enabledHandles: ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'],
             lockAspectRatio: this._cropAspectRatio != null && this._cropAspectRatio != 0,
         });
+        this._cropTransformer.enabledHandles = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
         this._cropTransformer.rotateEnabled = false;
         this.editor.stage.addChild(this._cropTransformer);
     }
