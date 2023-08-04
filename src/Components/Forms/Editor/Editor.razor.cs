@@ -217,7 +217,8 @@ public partial class Editor
 
     private string? EditorClass => new CssBuilder("editor")
         .Add("set-height", !string.IsNullOrEmpty(Height) || !string.IsNullOrEmpty(MaxHeight))
-        .Add("no-statusbar", !IsWysiwyg)
+        .Add("no-statusbar", ReadOnly || !IsWysiwyg)
+        .Add("no-toolbar", ReadOnly)
         .ToString();
 
     private string? EditorStyle => new CssBuilder()

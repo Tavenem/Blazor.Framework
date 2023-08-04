@@ -11,540 +11,521 @@
     {
         <label for="@Id">@Label</label>
     }
-    <div class="@ToolbarClass">
-        <div>
-            <Tooltip TooltipText="undo" Delay="750" Side="Side.Top">
-                <button class="btn btn-icon rounded small"
-                        @onclick="@(_ => CommandAsync(EditorCommandType.Undo))"
-                        disabled="@IsDisabled(EditorCommandType.Undo)">
-                    <tf-icon>@DefaultIcons.Undo</tf-icon>
-                </button>
-            </Tooltip>
-            <Tooltip TooltipText="redo" Delay="750" Side="Side.Top">
-                <button class="btn btn-icon rounded small"
-                        @onclick="@(_ => CommandAsync(EditorCommandType.Redo))"
-                        disabled="@IsDisabled(EditorCommandType.Redo)">
-                    <tf-icon>@DefaultIcons.Redo</tf-icon>
-                </button>
-            </Tooltip>
-            @if (DisplayCommands)
-            {
-                <div class="vr"></div>
-                <Dropdown Icon="@DefaultIcons.Bold"
-                            ActivationType="MouseEvent.RightClick | MouseEvent.MouseOver"
-                            Click="@(_ => CommandAsync(EditorCommandType.Strong))"
-                            Disabled="@(IsDisabled(EditorCommandType.Strong) && IsDisabled(EditorCommandType.Bold))"
-                            Delay="1000"
-                            Class="@BoldClass"
-                            Dense="true">
-                    <span class="@ActiveThemeClass(EditorCommandType.Strong)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.Strong))">Strong</span>
-                    <span class="@ActiveThemeClass(EditorCommandType.Bold)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.Bold))">Bold</span>
-                </Dropdown>
-                <Dropdown Icon="@DefaultIcons.Italic"
-                            ActivationType="MouseEvent.RightClick | MouseEvent.MouseOver"
-                            Click="@(_ => CommandAsync(EditorCommandType.Emphasis))"
-                            Disabled="@(IsDisabled(EditorCommandType.Emphasis) && IsDisabled(EditorCommandType.Italic))"
-                            Delay="1000"
-                            Class="@ItalicClass"
-                            Dense="true">
-                    <span class="@ActiveThemeClass(EditorCommandType.Emphasis)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.Emphasis))">Emphasis</span>
-                    <span class="@ActiveThemeClass(EditorCommandType.Italic)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.Italic))">Italic</span>
-                </Dropdown>
-                <div id="@AdditionalMarksGroupId" class="@AdditionalMarksClass">
-                    <Tooltip TooltipText="underline" Delay="750" Side="Side.Top">
-                        <button class="@ActiveButtonGroupClass(EditorCommandType.Underline)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.Underline))"
-                                disabled="@IsDisabled(EditorCommandType.Underline)">
-                            <tf-icon>@DefaultIcons.Underlined</tf-icon>
-                        </button>
-                    </Tooltip>
-                    <Dropdown AnchorId="@AdditionalMarksGroupId"
-                                Icon="@DefaultIcons.DropDown"
-                                Disabled="IsAdvMarkDisabled()"
-                                Class="rounded-right px-0"
-                                Style="min-width:0">
-                        <span class="@ActiveThemeClass(EditorCommandType.Strikethrough)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.Strikethrough))">
-                            <tf-icon>@DefaultIcons.Strikethrough</tf-icon>
-                        </span>
-                        <span class="@ActiveThemeClass(EditorCommandType.Subscript)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.Subscript))">
-                            <tf-icon>@DefaultIcons.Subscript</tf-icon>
-                        </span>
-                        <span class="@ActiveThemeClass(EditorCommandType.Superscript)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.Superscript))">
-                            <tf-icon>@DefaultIcons.Superscript</tf-icon>
-                        </span>
-                        <span class="@ActiveThemeClass(EditorCommandType.CodeInline)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.CodeInline))">
-                            <tf-icon>@DefaultIcons.Code</tf-icon>
-                        </span>
-                        <span class="@ActiveThemeClass(EditorCommandType.Small)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.Small))">
-                            <tf-icon>@DefaultIcons.FontSize</tf-icon>
-                        </span>
-                        <span class="@ActiveThemeClass(EditorCommandType.Inserted)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.Inserted))">
-                            <tf-icon>@DefaultIcons.Add</tf-icon>
-                        </span>
-                    </Dropdown>
-                </div>
-                <div class="vr"></div>
-                <Tooltip TooltipText="block type" Delay="750" Side="Side.Top">
-                    <Dropdown Icon="@DefaultIcons.Style"
-                                Disabled="IsBlockDisabled()"
-                                Class="rounded small"
-                                Dense="true">
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 1))">
-                            <span>Heading 1</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 2))">
-                            <span>Heading 2</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 3))">
-                            <span>Heading 3</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 4))">
-                            <span>Heading 4</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 5))">
-                            <span>Heading 5</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 6))">
-                            <span>Heading 6</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.Paragraph))">
-                            <span>Paragraph</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.BlockQuote))">
-                            <span>Block quote</span>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.CodeBlock))">
-                            <span>Code block</span>
-                        </span>
-                    </Dropdown>
-                </Tooltip>
-                <div class="vr"></div>
-                <Tooltip TooltipText="link" Delay="750" Side="Side.Top">
-                    <button class="@ActiveButtonClass(EditorCommandType.InsertLink)"
-                            @onclick="ShowLinkDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.InsertLink)">
-                        <tf-icon>@(IsActive(EditorCommandType.InsertLink) ? DefaultIcons.UnLink : DefaultIcons.Link)</tf-icon>
-                    </button>
-                </Tooltip>
-                <Tooltip TooltipText="image" Delay="750" Side="Side.Top">
-                    <button class="@ActiveButtonClass(EditorCommandType.InsertImage)"
-                            @onclick="ShowImgDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.InsertImage)">
-                        <tf-icon>@DefaultIcons.Image</tf-icon>
-                    </button>
-                </Tooltip>
-                <div class="vr"></div>
-                <div id="@ListsGroupId" class="@ListGroupClass">
-                    <Tooltip TooltipText="list" Delay="750" Side="Side.Top">
-                        <button class="@ActiveButtonGroupClass(EditorCommandType.ListBullet)"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.ListBullet))"
-                                disabled="@IsDisabled(EditorCommandType.ListBullet)">
-                            <tf-icon>@DefaultIcons.List_Bullet</tf-icon>
-                        </button>
-                    </Tooltip>
-                    <Dropdown AnchorId="@ListsGroupId"
-                                Icon="@DefaultIcons.DropDown"
-                                Disabled="@(IsDisabled(EditorCommandType.ListNumber) && IsDisabled(EditorCommandType.ListCheck))"
-                                Class="rounded-right px-0"
-                                Style="min-width:0">
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.ListNumber))">
-                            <tf-icon>@DefaultIcons.List_Number</tf-icon>
-                        </span>
-                        <span @onclick="@(_ => CommandAsync(EditorCommandType.ListCheck))">
-                            <tf-icon>@DefaultIcons.List_Check</tf-icon>
-                        </span>
-                    </Dropdown>
-                </div>
-                @if (IsWysiwyg)
-                {
-                    <Tooltip TooltipText="lift out" Delay="750" Side="Side.Top">
-                        <button class="btn btn-icon rounded small"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.UpLevel))"
-                            disabled="@IsDisabled(EditorCommandType.UpLevel)">
-                            <tf-icon>@DefaultIcons.Indent_Decrease</tf-icon>
-                        </button>
-                    </Tooltip>
-                    <Tooltip TooltipText="indent" Delay="750" Side="Side.Top">
-                        <button class="btn btn-icon rounded small"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.DownLevel))"
-                                disabled="@IsDisabled(EditorCommandType.DownLevel)">
-                            <tf-icon>@DefaultIcons.Indent_Increase</tf-icon>
-                        </button>
-                    </Tooltip>
-                }
-                <div class="vr"></div>
-                <Tooltip TooltipText="highlight" Delay="750">
-                    <button class="@ActiveButtonClass(EditorCommandType.Marked)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.Marked))"
-                            disabled="@IsDisabled(EditorCommandType.Marked)">
-                        <tf-icon>@DefaultIcons.Highlight</tf-icon>
-                    </button>
-                </Tooltip>
-                <Tooltip TooltipText="foreground color"
-                            Delay="750">
-                    <div class="position-relative"
-                            @oncontextmenu="OnForegroundContext"
-                            @oncontextmenu:preventDefault="true">
-                        <ColorInput @ref="ForegroundPicker"
-                                    TValue="string"
-                                    Value="@NewForeground"
-                                    ValueChanged="SetForegroundAsync"
-                                    DisplayType="PickerDisplayType.Button"
-                                    IconButton="true"
-                                    InputClass="rounded"
-                                    Disabled="IsDisabled(EditorCommandType.ForegroundColor)" />
-                        <Dropdown @ref="ForegroundContext"
-                                    Disabled="IsDisabled(EditorCommandType.ForegroundColor)"
-                                    OpenAtPointer="true"
-                                    HideButton="true">
-                            <span @onclick="@(_ => CommandAsync(EditorCommandType.ForegroundColor))">Clear</span>
-                        </Dropdown>
-                    </div>
-                </Tooltip>
-                <Tooltip TooltipText="background color"
-                            Delay="750">
-                    <div class="position-relative"
-                            @oncontextmenu="OnBackgroundContext"
-                            @oncontextmenu:preventDefault="true">
-                        <ColorInput @ref="BackgroundPicker"
-                                    TValue="string"
-                                    Value="@NewBackground"
-                                    ValueChanged="SetBackgroundAsync"
-                                    DisplayType="PickerDisplayType.Button"
-                                    IconButton="true"
-                                    Icon="@DefaultIcons.ColorBackgroundSelect"
-                                    InputClass="rounded"
-                                    Disabled="IsDisabled(EditorCommandType.BackgroundColor)" />
-                        <Dropdown @ref="BackgroundContext"
-                                    Disabled="IsDisabled(EditorCommandType.BackgroundColor)"
-                                    OpenAtPointer="true"
-                                    HideButton="true">
-                            <span @onclick="@(_ => CommandAsync(EditorCommandType.BackgroundColor))">Clear</span>
-                        </Dropdown>
-                    </div>
-                </Tooltip>
-                <div class="vr"></div>
-                <Tooltip TooltipText="align left" Delay="750">
-                    <button class="@ActiveButtonClass(EditorCommandType.AlignLeft)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.AlignLeft))"
-                            disabled="@IsDisabled(EditorCommandType.AlignLeft)">
-                        <tf-icon>@DefaultIcons.AlignLeft</tf-icon>
-                    </button>
-                </Tooltip>
-                <Tooltip TooltipText="align center" Delay="750">
-                    <button class="@ActiveButtonClass(EditorCommandType.AlignCenter)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.AlignCenter))"
-                            disabled="@IsDisabled(EditorCommandType.AlignCenter)">
-                        <tf-icon>@DefaultIcons.AlignCenter</tf-icon>
-                    </button>
-                </Tooltip>
-                <Tooltip TooltipText="align right" Delay="750">
-                    <button class="@ActiveButtonClass(EditorCommandType.AlignRight)"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.AlignRight))"
-                            disabled="@IsDisabled(EditorCommandType.AlignRight)">
-                        <tf-icon>@DefaultIcons.AlignRight</tf-icon>
-                    </button>
-                </Tooltip>
-                <div class="vr"></div>
-                <Tooltip TooltipText="font" Delay="750" Side="Side.Left">
-                    <Dropdown Icon="@DefaultIcons.Font"
-                                Disabled="IsDisabled(EditorCommandType.SetFontFamily)"
-                                Class="rounded small"
-                                Dense="true">
-                        <span @onclick="@(_ => SetFontFamilyAsync(null))">Reset</span>
-                        @foreach (var font in Fonts)
-                        {
-                            <span @onclick="@(_ => SetFontFamilyAsync(font))">@font</span>
-                        }
-                    </Dropdown>
-                </Tooltip>
-                <Tooltip TooltipText="font size" Delay="750">
+    @if (!ReadOnly)
+    {
+        <div class="@ToolbarClass">
+            <div>
+                <Tooltip TooltipText="undo" Delay="750" Side="Side.Top">
                     <button class="btn btn-icon rounded small"
-                            @onclick="ShowFontSizeDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.SetFontSize)">
-                        <tf-icon>@DefaultIcons.FontSize</tf-icon>
+                            @onclick="@(_ => CommandAsync(EditorCommandType.Undo))"
+                            disabled="@IsDisabled(EditorCommandType.Undo)">
+                        <tf-icon>@DefaultIcons.Undo</tf-icon>
                     </button>
                 </Tooltip>
-                <Tooltip TooltipText="line height" Delay="750">
+                <Tooltip TooltipText="redo" Delay="750" Side="Side.Top">
                     <button class="btn btn-icon rounded small"
-                            @onclick="ShowLineHeightDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.SetLineHeight)">
-                        <tf-icon>@DefaultIcons.LineHeight</tf-icon>
+                            @onclick="@(_ => CommandAsync(EditorCommandType.Redo))"
+                            disabled="@IsDisabled(EditorCommandType.Redo)">
+                        <tf-icon>@DefaultIcons.Redo</tf-icon>
                     </button>
                 </Tooltip>
-                <div class="vr"></div>
-                @if (IsWysiwyg)
-                {
-                    <div id="@TableGroupId" class="button-group-text small">
-                        <Tooltip TooltipText="insert table" Delay="750" Side="Side.Left">
-                            <button class="btn btn-icon"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.InsertTable))"
-                                disabled="@IsDisabled(EditorCommandType.InsertTable)">
-                                <tf-icon>@DefaultIcons.Table</tf-icon>
-                            </button>
-                        </Tooltip>
-                        <Dropdown AnchorId="@TableGroupId"
-                                    Icon="@DefaultIcons.DropDown"
-                                    Disabled="@IsTableDisabled()"
-                                    Dense="true"
-                                    Class="rounded-right px-0"
-                                    Style="min-width:0">
-                            @if (!IsDisabled(EditorCommandType.TableInsertColumnBefore))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertColumnBefore))">
-                                    Insert Column Before
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableInsertColumnAfter))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertColumnAfter))">
-                                    Insert Column After
-                                </span>
-                            }
-                            @if (Syntax != EditorSyntax.Markdown
-                                && !IsDisabled(EditorCommandType.TableToggleHeaderColumn))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableToggleHeaderColumn))">
-                                    Toggle Header Column
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableDeleteColumn))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDeleteColumn))">
-                                    Delete Column
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableInsertColumnBefore)
-                                || !IsDisabled(EditorCommandType.TableInsertColumnAfter)
-                                || !IsDisabled(EditorCommandType.TableToggleHeaderColumn)
-                                || !IsDisabled(EditorCommandType.TableDeleteColumn))
-                            {
-                                <hr />
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableInsertRowBefore))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertRowBefore))">
-                                    Insert Row Before
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableInsertRowAfter))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertRowAfter))">
-                                    Insert Row After
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableToggleHeaderRow))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableToggleHeaderRow))">
-                                    Toggle Header Row
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableDeleteRow))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDeleteRow))">
-                                    Delete Row
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableInsertRowBefore)
-                                || !IsDisabled(EditorCommandType.TableInsertRowAfter)
-                                || !IsDisabled(EditorCommandType.TableToggleHeaderRow)
-                                || !IsDisabled(EditorCommandType.TableDeleteRow))
-                            {
-                                <hr />
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableMergeCells))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableMergeCells))">
-                                    Merge Cells
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableSplitCell))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableSplitCell))">
-                                    Split Cell
-                                </span>
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableMergeCells)
-                                || !IsDisabled(EditorCommandType.TableSplitCell))
-                            {
-                                <hr />
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableFullWidth))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableFullWidth))">
-                                    Full Width
-                                </span>
-                                <hr />
-                            }
-                            @if (!IsDisabled(EditorCommandType.TableDelete))
-                            {
-                                <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDelete))">
-                                    Delete Table
-                            </span>
-                        }
-                    </Dropdown>
-                    </div>
-                }
-                else
-                {
-                    <Tooltip TooltipText="insert table" Delay="750" Side="Side.Left">
-                        <button class="btn btn-icon rounded small"
-                                @onclick="@(_ => CommandAsync(EditorCommandType.InsertTable))">
-                                <tf-icon>@DefaultIcons.Table</tf-icon>
-                        </button>
-                    </Tooltip>
-                }
-                <Tooltip TooltipText="horizontal rule" Delay="750">
-                    <button class="btn btn-icon rounded small"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.HorizontalRule))"
-                            disabled="@IsDisabled(EditorCommandType.HorizontalRule)">
-                        <tf-icon>@DefaultIcons.HorizontalRule</tf-icon>
-                    </button>
-                </Tooltip>
-                <Tooltip TooltipText="page break" Delay="750">
-                    <button class="btn btn-icon rounded small"
-                            @onclick="@(_ => CommandAsync(EditorCommandType.PageBreak))"
-                            disabled="@IsDisabled(EditorCommandType.PageBreak)">
-                        <tf-icon>@DefaultIcons.PageBreak</tf-icon>
-                    </button>
-                </Tooltip>
-                @if (IsWysiwyg && !IsDisabled(EditorCommandType.SetCodeSyntax))
-                {
-                    <div class="vr"></div>
-                    <Tooltip TooltipText="set code block syntax" Delay="750" Side="Side.Left">
-                        <Dropdown Icon="@DefaultIcons.Code" Class="rounded small" Dense="true">
-                            @foreach (var syntax in Enum.GetValues<EditorSyntax>())
-                            {
-                                switch (syntax)
-                                {
-                                    case EditorSyntax.None:
-                                        <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">Plain text</span>
-                                        break;
-                                    case EditorSyntax.Cpp:
-                                        <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">C++</span>
-                                        break;
-                                    case EditorSyntax.CSharp:
-                                        <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">C#</span>
-                                        break;
-                                    case EditorSyntax.LaTeX:
-                                        <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">
-                                            <span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span>
-                                        </span>
-                                        break;
-                                    case EditorSyntax.ObjectiveC:
-                                        <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">Objective-C</span>
-                                        break;
-                                    default:
-                                        <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">@syntax.ToString()</span>
-                                        break;
-                                }
-                            }
-                        </Dropdown>
-                    </Tooltip>
-                }
-            }
-            @if (!LockEditMode && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown)
-            {
                 @if (DisplayCommands)
                 {
                     <div class="vr"></div>
-                }
-                <Tooltip TooltipText="@(EditorMode == EditorMode.WYSIWYG ? "Edit source code" : "Edit in rich text mode")"
-                            Delay="750">
-                    <button class="btn btn-icon rounded small" @onclick="ToggleModeAsync">
-                        @if (EditorMode == EditorMode.WYSIWYG)
-                        {
-                            <tf-icon>@DefaultIcons.Source</tf-icon>
-                        }
-                        else
-                        {
-                            <tf-icon>@DefaultIcons.Preview</tf-icon>
-                        }
-                    </button>
-                </Tooltip>
-            }
-            @if (!LockSyntax)
-            {
-                @if (DisplayCommands
-                    || (!LockEditMode
-                    && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown))
-                {
+                    <Dropdown Icon="@DefaultIcons.Bold"
+                                ActivationType="MouseEvent.RightClick | MouseEvent.MouseOver"
+                                Click="@(_ => CommandAsync(EditorCommandType.Strong))"
+                                Disabled="@(IsDisabled(EditorCommandType.Strong) && IsDisabled(EditorCommandType.Bold))"
+                                Delay="1000"
+                                Class="@BoldClass"
+                                Dense="true">
+                        <span class="@ActiveThemeClass(EditorCommandType.Strong)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.Strong))">Strong</span>
+                        <span class="@ActiveThemeClass(EditorCommandType.Bold)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.Bold))">Bold</span>
+                    </Dropdown>
+                    <Dropdown Icon="@DefaultIcons.Italic"
+                                ActivationType="MouseEvent.RightClick | MouseEvent.MouseOver"
+                                Click="@(_ => CommandAsync(EditorCommandType.Emphasis))"
+                                Disabled="@(IsDisabled(EditorCommandType.Emphasis) && IsDisabled(EditorCommandType.Italic))"
+                                Delay="1000"
+                                Class="@ItalicClass"
+                                Dense="true">
+                        <span class="@ActiveThemeClass(EditorCommandType.Emphasis)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.Emphasis))">Emphasis</span>
+                        <span class="@ActiveThemeClass(EditorCommandType.Italic)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.Italic))">Italic</span>
+                    </Dropdown>
+                    <div id="@AdditionalMarksGroupId" class="@AdditionalMarksClass">
+                        <Tooltip TooltipText="underline" Delay="750" Side="Side.Top">
+                            <button class="@ActiveButtonGroupClass(EditorCommandType.Underline)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.Underline))"
+                                    disabled="@IsDisabled(EditorCommandType.Underline)">
+                                <tf-icon>@DefaultIcons.Underlined</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Dropdown AnchorId="@AdditionalMarksGroupId"
+                                    Icon="@DefaultIcons.DropDown"
+                                    Disabled="IsAdvMarkDisabled()"
+                                    Class="rounded-right px-0"
+                                    Style="min-width:0">
+                            <span class="@ActiveThemeClass(EditorCommandType.Strikethrough)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.Strikethrough))">
+                                <tf-icon>@DefaultIcons.Strikethrough</tf-icon>
+                            </span>
+                            <span class="@ActiveThemeClass(EditorCommandType.Subscript)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.Subscript))">
+                                <tf-icon>@DefaultIcons.Subscript</tf-icon>
+                            </span>
+                            <span class="@ActiveThemeClass(EditorCommandType.Superscript)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.Superscript))">
+                                <tf-icon>@DefaultIcons.Superscript</tf-icon>
+                            </span>
+                            <span class="@ActiveThemeClass(EditorCommandType.CodeInline)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.CodeInline))">
+                                <tf-icon>@DefaultIcons.Code</tf-icon>
+                            </span>
+                            <span class="@ActiveThemeClass(EditorCommandType.Small)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.Small))">
+                                <tf-icon>@DefaultIcons.FontSize</tf-icon>
+                            </span>
+                            <span class="@ActiveThemeClass(EditorCommandType.Inserted)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.Inserted))">
+                                <tf-icon>@DefaultIcons.Add</tf-icon>
+                            </span>
+                        </Dropdown>
+                    </div>
                     <div class="vr"></div>
-                }
-                <Select TValue="EditorSyntax"
-                        Value="Syntax"
-                        ValueChanged="@(v => SetSyntax(v))"
-                        Disabled="ReadOnly"
-                        Class="dense">
-                    @foreach (var syntax in Enum.GetValues<EditorSyntax>())
+                    <Tooltip TooltipText="block type" Delay="750" Side="Side.Top">
+                        <Dropdown Icon="@DefaultIcons.Style"
+                                    Disabled="IsBlockDisabled()"
+                                    Class="rounded small"
+                                    Dense="true">
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 1))">
+                                <span>Heading 1</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 2))">
+                                <span>Heading 2</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 3))">
+                                <span>Heading 3</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 4))">
+                                <span>Heading 4</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 5))">
+                                <span>Heading 5</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Heading, 6))">
+                                <span>Heading 6</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.Paragraph))">
+                                <span>Paragraph</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.BlockQuote))">
+                                <span>Block quote</span>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.CodeBlock))">
+                                <span>Code block</span>
+                            </span>
+                        </Dropdown>
+                    </Tooltip>
+                    <div class="vr"></div>
+                    <Tooltip TooltipText="link" Delay="750" Side="Side.Top">
+                        <button class="@ActiveButtonClass(EditorCommandType.InsertLink)"
+                                @onclick="ShowLinkDialogAsync"
+                                disabled="@IsDisabled(EditorCommandType.InsertLink)">
+                            <tf-icon>@(IsActive(EditorCommandType.InsertLink) ? DefaultIcons.UnLink : DefaultIcons.Link)</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="image" Delay="750" Side="Side.Top">
+                        <button class="@ActiveButtonClass(EditorCommandType.InsertImage)"
+                                @onclick="ShowImgDialogAsync"
+                                disabled="@IsDisabled(EditorCommandType.InsertImage)">
+                            <tf-icon>@DefaultIcons.Image</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <div class="vr"></div>
+                    <div id="@ListsGroupId" class="@ListGroupClass">
+                        <Tooltip TooltipText="list" Delay="750" Side="Side.Top">
+                            <button class="@ActiveButtonGroupClass(EditorCommandType.ListBullet)"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.ListBullet))"
+                                    disabled="@IsDisabled(EditorCommandType.ListBullet)">
+                                <tf-icon>@DefaultIcons.List_Bullet</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Dropdown AnchorId="@ListsGroupId"
+                                    Icon="@DefaultIcons.DropDown"
+                                    Disabled="@(IsDisabled(EditorCommandType.ListNumber) && IsDisabled(EditorCommandType.ListCheck))"
+                                    Class="rounded-right px-0"
+                                    Style="min-width:0">
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.ListNumber))">
+                                <tf-icon>@DefaultIcons.List_Number</tf-icon>
+                            </span>
+                            <span @onclick="@(_ => CommandAsync(EditorCommandType.ListCheck))">
+                                <tf-icon>@DefaultIcons.List_Check</tf-icon>
+                            </span>
+                        </Dropdown>
+                    </div>
+                    @if (IsWysiwyg)
                     {
-                        switch (syntax)
-                        {
-                            case EditorSyntax.None:
-                                <Option Value="syntax" Label="Plain text" />
-                                break;
-                            case EditorSyntax.Cpp:
-                                <Option Value="syntax" Label="C++" />
-                                break;
-                            case EditorSyntax.CSharp:
-                                <Option Value="syntax" Label="C#" />
-                                break;
-                            case EditorSyntax.LaTeX:
-                                <Option Value="syntax" Label="LaTeX">
-                                    <span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span>
-                                </Option>
-                                break;
-                            case EditorSyntax.ObjectiveC:
-                                <Option Value="syntax" Label="Objective-C" />
-                                break;
-                            default:
-                                <Option Value="syntax" Label="@syntax.ToString()" />
-                                break;
-                        }
+                        <Tooltip TooltipText="lift out" Delay="750" Side="Side.Top">
+                            <button class="btn btn-icon rounded small"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.UpLevel))"
+                                disabled="@IsDisabled(EditorCommandType.UpLevel)">
+                                <tf-icon>@DefaultIcons.Indent_Decrease</tf-icon>
+                            </button>
+                        </Tooltip>
+                        <Tooltip TooltipText="indent" Delay="750" Side="Side.Top">
+                            <button class="btn btn-icon rounded small"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.DownLevel))"
+                                    disabled="@IsDisabled(EditorCommandType.DownLevel)">
+                                <tf-icon>@DefaultIcons.Indent_Increase</tf-icon>
+                            </button>
+                        </Tooltip>
                     }
-                </Select>
-            }
-            @if (CustomToolbarButtons is not null)
-            {
-                foreach (var customButton in CustomToolbarButtons)
-                {
-                    if (customButton.EditMode == EditorMode.None
-                        || customButton.EditMode == EditorMode)
-                    {
-                        if (string.IsNullOrEmpty(customButton.Tooltip))
-                        {
-                            if (string.IsNullOrEmpty(customButton.Text))
+                    <div class="vr"></div>
+                    <Tooltip TooltipText="highlight" Delay="750">
+                        <button class="@ActiveButtonClass(EditorCommandType.Marked)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.Marked))"
+                                disabled="@IsDisabled(EditorCommandType.Marked)">
+                            <tf-icon>@DefaultIcons.Highlight</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="foreground color"
+                                Delay="750">
+                        <div class="position-relative"
+                                @oncontextmenu="OnForegroundContext"
+                                @oncontextmenu:preventDefault="true">
+                            <ColorInput @ref="ForegroundPicker"
+                                        TValue="string"
+                                        Value="@NewForeground"
+                                        ValueChanged="SetForegroundAsync"
+                                        DisplayType="PickerDisplayType.Button"
+                                        IconButton="true"
+                                        InputClass="rounded"
+                                        Disabled="IsDisabled(EditorCommandType.ForegroundColor)" />
+                            <Dropdown @ref="ForegroundContext"
+                                        Disabled="IsDisabled(EditorCommandType.ForegroundColor)"
+                                        OpenAtPointer="true"
+                                        HideButton="true">
+                                <span @onclick="@(_ => CommandAsync(EditorCommandType.ForegroundColor))">Clear</span>
+                            </Dropdown>
+                        </div>
+                    </Tooltip>
+                    <Tooltip TooltipText="background color"
+                                Delay="750">
+                        <div class="position-relative"
+                                @oncontextmenu="OnBackgroundContext"
+                                @oncontextmenu:preventDefault="true">
+                            <ColorInput @ref="BackgroundPicker"
+                                        TValue="string"
+                                        Value="@NewBackground"
+                                        ValueChanged="SetBackgroundAsync"
+                                        DisplayType="PickerDisplayType.Button"
+                                        IconButton="true"
+                                        Icon="@DefaultIcons.ColorBackgroundSelect"
+                                        InputClass="rounded"
+                                        Disabled="IsDisabled(EditorCommandType.BackgroundColor)" />
+                            <Dropdown @ref="BackgroundContext"
+                                        Disabled="IsDisabled(EditorCommandType.BackgroundColor)"
+                                        OpenAtPointer="true"
+                                        HideButton="true">
+                                <span @onclick="@(_ => CommandAsync(EditorCommandType.BackgroundColor))">Clear</span>
+                            </Dropdown>
+                        </div>
+                    </Tooltip>
+                    <div class="vr"></div>
+                    <Tooltip TooltipText="align left" Delay="750">
+                        <button class="@ActiveButtonClass(EditorCommandType.AlignLeft)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.AlignLeft))"
+                                disabled="@IsDisabled(EditorCommandType.AlignLeft)">
+                            <tf-icon>@DefaultIcons.AlignLeft</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="align center" Delay="750">
+                        <button class="@ActiveButtonClass(EditorCommandType.AlignCenter)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.AlignCenter))"
+                                disabled="@IsDisabled(EditorCommandType.AlignCenter)">
+                            <tf-icon>@DefaultIcons.AlignCenter</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="align right" Delay="750">
+                        <button class="@ActiveButtonClass(EditorCommandType.AlignRight)"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.AlignRight))"
+                                disabled="@IsDisabled(EditorCommandType.AlignRight)">
+                            <tf-icon>@DefaultIcons.AlignRight</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <div class="vr"></div>
+                    <Tooltip TooltipText="font" Delay="750" Side="Side.Left">
+                        <Dropdown Icon="@DefaultIcons.Font"
+                                    Disabled="IsDisabled(EditorCommandType.SetFontFamily)"
+                                    Class="rounded small"
+                                    Dense="true">
+                            <span @onclick="@(_ => SetFontFamilyAsync(null))">Reset</span>
+                            @foreach (var font in Fonts)
                             {
-                                <button class="btn btn-text rounded small" @onclick="@(_ => OnCustomButtonAsync(customButton))">
-                                    @if (!string.IsNullOrEmpty(customButton.Icon))
-                                    {
-                                        <tf-icon class="mr-1">@customButton.Icon</tf-icon>
-                                    }
-                                    <span>@customButton.Text</span>
+                                <span @onclick="@(_ => SetFontFamilyAsync(font))">@font</span>
+                            }
+                        </Dropdown>
+                    </Tooltip>
+                    <Tooltip TooltipText="font size" Delay="750">
+                        <button class="btn btn-icon rounded small"
+                                @onclick="ShowFontSizeDialogAsync"
+                                disabled="@IsDisabled(EditorCommandType.SetFontSize)">
+                            <tf-icon>@DefaultIcons.FontSize</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="line height" Delay="750">
+                        <button class="btn btn-icon rounded small"
+                                @onclick="ShowLineHeightDialogAsync"
+                                disabled="@IsDisabled(EditorCommandType.SetLineHeight)">
+                            <tf-icon>@DefaultIcons.LineHeight</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <div class="vr"></div>
+                    @if (IsWysiwyg)
+                    {
+                        <div id="@TableGroupId" class="button-group-text small">
+                            <Tooltip TooltipText="insert table" Delay="750" Side="Side.Left">
+                                <button class="btn btn-icon"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.InsertTable))"
+                                    disabled="@IsDisabled(EditorCommandType.InsertTable)">
+                                    <tf-icon>@DefaultIcons.Table</tf-icon>
                                 </button>
+                            </Tooltip>
+                            <Dropdown AnchorId="@TableGroupId"
+                                        Icon="@DefaultIcons.DropDown"
+                                        Disabled="@IsTableDisabled()"
+                                        Dense="true"
+                                        Class="rounded-right px-0"
+                                        Style="min-width:0">
+                                @if (!IsDisabled(EditorCommandType.TableInsertColumnBefore))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertColumnBefore))">
+                                        Insert Column Before
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableInsertColumnAfter))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertColumnAfter))">
+                                        Insert Column After
+                                    </span>
+                                }
+                                @if (Syntax != EditorSyntax.Markdown
+                                    && !IsDisabled(EditorCommandType.TableToggleHeaderColumn))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableToggleHeaderColumn))">
+                                        Toggle Header Column
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableDeleteColumn))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDeleteColumn))">
+                                        Delete Column
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableInsertColumnBefore)
+                                    || !IsDisabled(EditorCommandType.TableInsertColumnAfter)
+                                    || !IsDisabled(EditorCommandType.TableToggleHeaderColumn)
+                                    || !IsDisabled(EditorCommandType.TableDeleteColumn))
+                                {
+                                    <hr />
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableInsertRowBefore))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertRowBefore))">
+                                        Insert Row Before
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableInsertRowAfter))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertRowAfter))">
+                                        Insert Row After
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableToggleHeaderRow))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableToggleHeaderRow))">
+                                        Toggle Header Row
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableDeleteRow))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDeleteRow))">
+                                        Delete Row
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableInsertRowBefore)
+                                    || !IsDisabled(EditorCommandType.TableInsertRowAfter)
+                                    || !IsDisabled(EditorCommandType.TableToggleHeaderRow)
+                                    || !IsDisabled(EditorCommandType.TableDeleteRow))
+                                {
+                                    <hr />
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableMergeCells))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableMergeCells))">
+                                        Merge Cells
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableSplitCell))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableSplitCell))">
+                                        Split Cell
+                                    </span>
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableMergeCells)
+                                    || !IsDisabled(EditorCommandType.TableSplitCell))
+                                {
+                                    <hr />
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableFullWidth))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableFullWidth))">
+                                        Full Width
+                                    </span>
+                                    <hr />
+                                }
+                                @if (!IsDisabled(EditorCommandType.TableDelete))
+                                {
+                                    <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDelete))">
+                                        Delete Table
+                                </span>
+                            }
+                        </Dropdown>
+                        </div>
+                    }
+                    else
+                    {
+                        <Tooltip TooltipText="insert table" Delay="750" Side="Side.Left">
+                            <button class="btn btn-icon rounded small"
+                                    @onclick="@(_ => CommandAsync(EditorCommandType.InsertTable))">
+                                    <tf-icon>@DefaultIcons.Table</tf-icon>
+                            </button>
+                        </Tooltip>
+                    }
+                    <Tooltip TooltipText="horizontal rule" Delay="750">
+                        <button class="btn btn-icon rounded small"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.HorizontalRule))"
+                                disabled="@IsDisabled(EditorCommandType.HorizontalRule)">
+                            <tf-icon>@DefaultIcons.HorizontalRule</tf-icon>
+                        </button>
+                    </Tooltip>
+                    <Tooltip TooltipText="page break" Delay="750">
+                        <button class="btn btn-icon rounded small"
+                                @onclick="@(_ => CommandAsync(EditorCommandType.PageBreak))"
+                                disabled="@IsDisabled(EditorCommandType.PageBreak)">
+                            <tf-icon>@DefaultIcons.PageBreak</tf-icon>
+                        </button>
+                    </Tooltip>
+                    @if (IsWysiwyg && !IsDisabled(EditorCommandType.SetCodeSyntax))
+                    {
+                        <div class="vr"></div>
+                        <Tooltip TooltipText="set code block syntax" Delay="750" Side="Side.Left">
+                            <Dropdown Icon="@DefaultIcons.Code" Class="rounded small" Dense="true">
+                                @foreach (var syntax in Enum.GetValues<EditorSyntax>())
+                                {
+                                    switch (syntax)
+                                    {
+                                        case EditorSyntax.None:
+                                            <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">Plain text</span>
+                                            break;
+                                        case EditorSyntax.Cpp:
+                                            <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">C++</span>
+                                            break;
+                                        case EditorSyntax.CSharp:
+                                            <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">C#</span>
+                                            break;
+                                        case EditorSyntax.LaTeX:
+                                            <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">
+                                                <span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span>
+                                            </span>
+                                            break;
+                                        case EditorSyntax.ObjectiveC:
+                                            <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">Objective-C</span>
+                                            break;
+                                        default:
+                                            <span @onclick="@(_ => CommandAsync(EditorCommandType.SetCodeSyntax, syntax.ToString()))">@syntax.ToString()</span>
+                                            break;
+                                    }
+                                }
+                            </Dropdown>
+                        </Tooltip>
+                    }
+                }
+                @if (!LockEditMode && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown)
+                {
+                    @if (DisplayCommands)
+                    {
+                        <div class="vr"></div>
+                    }
+                    <Tooltip TooltipText="@(EditorMode == EditorMode.WYSIWYG ? "Edit source code" : "Edit in rich text mode")"
+                                Delay="750">
+                        <button class="btn btn-icon rounded small" @onclick="ToggleModeAsync">
+                            @if (EditorMode == EditorMode.WYSIWYG)
+                            {
+                                <tf-icon>@DefaultIcons.Source</tf-icon>
                             }
                             else
                             {
-                                <button class="btn btn-icon rounded small" @onclick="@(_ => OnCustomButtonAsync(customButton))">
-                                    <tf-icon>@customButton.Icon</tf-icon>
-                                </button>
+                                <tf-icon>@DefaultIcons.Preview</tf-icon>
+                            }
+                        </button>
+                    </Tooltip>
+                }
+                @if (!LockSyntax)
+                {
+                    @if (DisplayCommands
+                        || (!LockEditMode
+                        && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown))
+                    {
+                        <div class="vr"></div>
+                    }
+                    <Select TValue="EditorSyntax"
+                            Value="Syntax"
+                            ValueChanged="@(v => SetSyntax(v))"
+                            Disabled="ReadOnly"
+                            Class="dense">
+                        @foreach (var syntax in Enum.GetValues<EditorSyntax>())
+                        {
+                            switch (syntax)
+                            {
+                                case EditorSyntax.None:
+                                    <Option Value="syntax" Label="Plain text" />
+                                    break;
+                                case EditorSyntax.Cpp:
+                                    <Option Value="syntax" Label="C++" />
+                                    break;
+                                case EditorSyntax.CSharp:
+                                    <Option Value="syntax" Label="C#" />
+                                    break;
+                                case EditorSyntax.LaTeX:
+                                    <Option Value="syntax" Label="LaTeX">
+                                        <span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span>
+                                    </Option>
+                                    break;
+                                case EditorSyntax.ObjectiveC:
+                                    <Option Value="syntax" Label="Objective-C" />
+                                    break;
+                                default:
+                                    <Option Value="syntax" Label="@syntax.ToString()" />
+                                    break;
                             }
                         }
-                        else
+                    </Select>
+                }
+                @if (CustomToolbarButtons is not null)
+                {
+                    foreach (var customButton in CustomToolbarButtons)
+                    {
+                        if (customButton.EditMode == EditorMode.None
+                            || customButton.EditMode == EditorMode)
                         {
-                            <Tooltip TooltipText="@customButton.Tooltip"
-                                        Delay="750">
-                                @if (string.IsNullOrEmpty(customButton.Text))
+                            if (string.IsNullOrEmpty(customButton.Tooltip))
+                            {
+                                if (string.IsNullOrEmpty(customButton.Text))
                                 {
                                     <button class="btn btn-text rounded small" @onclick="@(_ => OnCustomButtonAsync(customButton))">
                                         @if (!string.IsNullOrEmpty(customButton.Icon))
@@ -560,44 +541,69 @@
                                         <tf-icon>@customButton.Icon</tf-icon>
                                     </button>
                                 }
-                            </Tooltip>
+                            }
+                            else
+                            {
+                                <Tooltip TooltipText="@customButton.Tooltip"
+                                            Delay="750">
+                                    @if (string.IsNullOrEmpty(customButton.Text))
+                                    {
+                                        <button class="btn btn-text rounded small" @onclick="@(_ => OnCustomButtonAsync(customButton))">
+                                            @if (!string.IsNullOrEmpty(customButton.Icon))
+                                            {
+                                                <tf-icon class="mr-1">@customButton.Icon</tf-icon>
+                                            }
+                                            <span>@customButton.Text</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-icon rounded small" @onclick="@(_ => OnCustomButtonAsync(customButton))">
+                                            <tf-icon>@customButton.Icon</tf-icon>
+                                        </button>
+                                    }
+                                </Tooltip>
+                            }
                         }
                     }
                 }
+            </div>
+            @if (DisplayShowAll)
+            {
+                <Tooltip TooltipText="@(ShowAll ? "show all controls" : "hide extra controls")"
+                         Side="Side.Top"
+                         Delay="750"
+                         Class="editor-toolbar-show-all-btn">
+                    <button class="@ShowAllClass" @onclick="@(_ => ShowAll = !ShowAll)">
+                        <tf-icon>@DefaultIcons.More</tf-icon>
+                    </button>
+                </Tooltip>
             }
         </div>
-        @if (DisplayShowAll)
-        {
-            <Tooltip TooltipText="@(ShowAll ? "show all controls" : "hide extra controls")"
-                     Side="Side.Top"
-                     Delay="750"
-                     Class="editor-toolbar-show-all-btn">
-                <button class="@ShowAllClass" @onclick="@(_ => ShowAll = !ShowAll)">
-                    <tf-icon>@DefaultIcons.More</tf-icon>
-                </button>
-            </Tooltip>
-        }
-    </div>
+    }
     <div id="@Id"
          class="@EditorClass"
          style="@EditorStyle"
          spellcheck="@SpellcheckValue"
          tabindex="@TabIndex"></div>
-    @if (IsWysiwyg)
+    @if (!ReadOnly)
     {
-        <div class="editor-statusbar">
-            <small class="text-muted font-monospace">@EditorService.CurrentNode.ToHumanReadable()</small>
-        </div>
-    }
-    @if (IsInvalidAndTouched)
-    {
-        <div class="field-helpers">
-            <ul class="mr-auto mb-0 pl-0">
-                @foreach (var message in GetValidationMessages())
-                {
-                    <li>@message</li>
-                }
-            </ul>
-        </div>
+        @if (IsWysiwyg)
+        {
+            <div class="editor-statusbar">
+                <small class="text-muted font-monospace">@EditorService.CurrentNode.ToHumanReadable()</small>
+            </div>
+        }
+        @if (IsInvalidAndTouched)
+        {
+            <div class="field-helpers">
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            </div>
+        }
     }
 </div>

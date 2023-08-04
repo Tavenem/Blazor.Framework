@@ -185,7 +185,7 @@ const codeEditorBaseTheme = EditorView.baseTheme({
     "&.cm-editor.cm-focused": {
         outline: "none",
 
-        "& .cm-selectionBackground": { backgroundColor: "var(--tavenem-color-bg-highlight)" },
+        "& .cm-selectionBackground": { backgroundColor: "var(--tavenem-color-bg-highlight-bright)" },
     },
 
     "&.set-height .cm-scroller": {
@@ -198,13 +198,13 @@ const codeEditorBaseTheme = EditorView.baseTheme({
 
     ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--tavenem-color-text)" },
 
-    ".cm-selectionBackground, .cm-content ::selection": { backgroundColor: "var(--tavenem-color-bg)" },
+    ".cm-selectionBackground, .cm-content ::selection": { backgroundColor: "var(--tavenem-color-bg-highlight-bright)" },
 
     ".cm-panels": { backgroundColor: "var(--tavenem-color-bg-surface)", color: "var(--tavenem-color-text)" },
     ".cm-panels.cm-panels-top": { borderBottom: "1px solid var(--field-border-color)" },
     ".cm-panels.cm-panels-bottom": { borderTop: "1px solid var(--field-border-color)" },
 
-    ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "var(--tavenem-color-bg-alt)" },
+    ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "transparent" },
 
     ".cm-specialChar": {
         color: "var(--tavenem-color-danger)"

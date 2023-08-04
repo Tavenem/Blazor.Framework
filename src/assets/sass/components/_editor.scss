@@ -144,6 +144,12 @@
             border-bottom-width: 1px;
         }
 
+        &.no-toolbar {
+            border-top-left-radius: var(--tavenem-border-radius);
+            border-top-right-radius: var(--tavenem-border-radius);
+            border-top-width: 1px;
+        }
+
         .cm-panel input[type=checkbox]:not(:checked):before {
             background-color: var(--tavenem-color-bg-input);
             content: "";
@@ -169,7 +175,7 @@
 
             &:focus-within, &[contenteditable="false"] {
                 ::selection {
-                    background-color: var(--tavenem-color-bg-highlight);
+                    background-color: var(--tavenem-color-bg-highlight-bright);
                 }
             }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.46
+### Changed
+- Editor selection and read-only improvements
+
 ## 1.45
 ### Fixed
 - Image crop aspect ratios
