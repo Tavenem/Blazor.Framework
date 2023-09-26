@@ -24,6 +24,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Do
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Test", "..\test\Tavenem.Blazor.Framework.Test.csproj", "{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tavenem.Blazor.Framework.Sample", "..\sample\Server\Tavenem.Blazor.Framework.Sample.csproj", "{4DD9F040-981A-418E-830A-EAFA7200FE8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tavenem.Blazor.Framework.Sample.Client", "..\sample\Client\Tavenem.Blazor.Framework.Sample.Client.csproj", "{B5511782-2A8A-405A-9CF0-1A6087301867}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +46,14 @@ Global
 		{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6F661B9-AC76-4B4D-ACAC-DBACA3409A71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DD9F040-981A-418E-830A-EAFA7200FE8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DD9F040-981A-418E-830A-EAFA7200FE8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DD9F040-981A-418E-830A-EAFA7200FE8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DD9F040-981A-418E-830A-EAFA7200FE8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5511782-2A8A-405A-9CF0-1A6087301867}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5511782-2A8A-405A-9CF0-1A6087301867}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5511782-2A8A-405A-9CF0-1A6087301867}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5511782-2A8A-405A-9CF0-1A6087301867}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

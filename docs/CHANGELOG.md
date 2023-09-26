@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.50-preview.1
+### Changed
+- Update to .NET 8 RC
+
 ## 1.49
 ### Fixed
 - `DataGridColumnAttribute.IsShown`

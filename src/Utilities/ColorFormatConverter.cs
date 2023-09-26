@@ -2928,9 +2928,9 @@ public struct ColorFormatConverter
 
             if (span.Length == 3)
             {
-                rSpan = new ReadOnlySpan<char>(new char[] { span[0], span[0] });
-                gSpan = new ReadOnlySpan<char>(new char[] { span[1], span[1] });
-                bSpan = new ReadOnlySpan<char>(new char[] { span[2], span[2] });
+                rSpan = new ReadOnlySpan<char>([span[0], span[0]]);
+                gSpan = new ReadOnlySpan<char>([span[1], span[1]]);
+                bSpan = new ReadOnlySpan<char>([span[2], span[2]]);
                 aSpan = ReadOnlySpan<char>.Empty;
             }
             else if (span.Length == 6)

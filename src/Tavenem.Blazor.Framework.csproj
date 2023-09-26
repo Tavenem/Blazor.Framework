@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -37,10 +37,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.11" Condition="'$(TargetFramework)' == 'net6.0'" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.11" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0-rc.1.23421.29" Condition="'$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 	
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="\" />
     <None Include="tavenem_128.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 	
@@ -54,7 +54,7 @@
     <ClientAssetsRestoreOutputs>$(ClientAssetsDirectory)node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
 
     <!-- Run restore only once for multi targeting builds -->
-    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net7.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
+    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net8.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
   </PropertyGroup>
 
   <ItemGroup>
