@@ -455,7 +455,6 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
                 : shortName;
             ColumnOrder = displayAttribute.GetOrder() ?? 0;
             _isShown = displayAttribute.GetAutoGenerateField() ?? true;
-            IsShown = _isShown;
             CanHide = _isShown;
             CanFilter = displayAttribute.GetAutoGenerateFilter() ?? true;
         }
@@ -499,13 +498,15 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
             }
             InitiallySorted |= dataGridColumnAttribute.InitiallySorted;
             IsQuickFilter |= dataGridColumnAttribute.IsQuickFilter;
-            IsShown &= dataGridColumnAttribute.IsShown;
+            _isShown &= dataGridColumnAttribute.IsShown;
             if (!string.IsNullOrEmpty(dataGridColumnAttribute.Label))
             {
                 Label = dataGridColumnAttribute.Label;
             }
             SortDescending |= dataGridColumnAttribute.SortDescending;
         }
+
+        IsShown = _isShown;
 
         var parameter = Expression.Parameter(typeof(TDataItem));
         Value = (Expression<Func<TDataItem, TValue?>>)Expression.Lambda(
@@ -535,7 +536,6 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
                 : shortName;
             ColumnOrder = displayAttribute.GetOrder() ?? 0;
             _isShown = displayAttribute.GetAutoGenerateField() ?? true;
-            IsShown = _isShown;
             CanHide = _isShown;
             CanFilter = displayAttribute.GetAutoGenerateFilter() ?? true;
         }
@@ -579,13 +579,15 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
             }
             InitiallySorted |= dataGridColumnAttribute.InitiallySorted;
             IsQuickFilter |= dataGridColumnAttribute.IsQuickFilter;
-            IsShown &= dataGridColumnAttribute.IsShown;
+            _isShown &= dataGridColumnAttribute.IsShown;
             if (!string.IsNullOrEmpty(dataGridColumnAttribute.Label))
             {
                 Label = dataGridColumnAttribute.Label;
             }
             SortDescending |= dataGridColumnAttribute.SortDescending;
         }
+
+        IsShown = _isShown;
 
         var parameter = Expression.Parameter(typeof(TDataItem));
         Value = (Expression<Func<TDataItem, TValue?>>)Expression.Lambda(

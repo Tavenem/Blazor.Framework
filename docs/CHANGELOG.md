@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.49
+### Fixed
+- `DataGridColumnAttribute.IsShown`
+
 ## 1.48
 ### Added
 - `ColumnOrder` to `DataGrid` columns
