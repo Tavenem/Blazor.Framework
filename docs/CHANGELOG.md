@@ -3,6 +3,7 @@
 ## 1.50-preview.1
 ### Changed
 - Update to .NET 8 RC
+- Support prerendering
 
 ## 1.49
 ### Fixed
