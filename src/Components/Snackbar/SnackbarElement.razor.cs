@@ -67,36 +67,35 @@ public partial class SnackbarElement : IDisposable
 
     [Inject] SnackbarService SnackbarService { get; set; } = default!;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
+    /// <inheritdoc/>
     protected override void OnInitialized()
     {
-        if (Snackbar is null)
+        if (Snackbar is not null)
         {
-            return;
-        }
-
-        Snackbar.OnUpdate += OnSnackbarUpdate;
-        Snackbar.Initialize();
-
-        StyleFragment = builder =>
-        {
-            var transition = Snackbar.Properties.TransitionClass;
-            if (!string.IsNullOrEmpty(transition))
+            StyleFragment = builder =>
             {
-                builder.OpenElement(1, "style");
-                builder.AddContent(2, transition);
-                builder.CloseElement();
-            }
-        };
+                var transition = Snackbar.Properties.TransitionClass;
+                if (!string.IsNullOrEmpty(transition))
+                {
+                    builder.OpenElement(1, "style");
+                    builder.AddContent(2, transition);
+                    builder.CloseElement();
+                }
+            };
+        }
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting
-    /// unmanaged resources.
-    /// </summary>
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && Snackbar is not null)
+        {
+            Snackbar.OnUpdate += OnSnackbarUpdate;
+            Snackbar.Initialize();
+        }
+    }
+
+    /// <inheritdoc/>
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

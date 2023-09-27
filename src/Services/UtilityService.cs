@@ -3,17 +3,15 @@ using Microsoft.JSInterop;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// Provides encapsulated javascript interop for <c>Tavenem.Blazor.Framework</c>
+/// Provides encapsulated JavaScript interop for <c>Tavenem.Blazor.Framework</c>
 /// </summary>
-public class UtilityService : IAsyncDisposable
+/// <remarks>
+/// Initializes a new instance of <see cref="UtilityService"/>.
+/// </remarks>
+/// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="UtilityService"/>.
-    /// </summary>
-    /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    public UtilityService(IJSRuntime jsRuntime) => _moduleTask = new(
+    private readonly Lazy<Task<IJSObjectReference>> _moduleTask = new(
         () => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-utility.js")
@@ -246,20 +244,6 @@ public class UtilityService : IAsyncDisposable
         catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
-        return Array.Empty<string>();
-    }
-
-    internal async ValueTask RegisterComponents()
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("registerComponents")
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
+        return [];
     }
 }

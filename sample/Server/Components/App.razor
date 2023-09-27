@@ -2,19 +2,35 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="Wil Stead">
+    <title>Tavenem Blazor Framework</title>
     <base href="/" />
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@@75,100..900&family=Recursive:slnt,wght,CASL,MONO@@-15..0,300..1000,0..1,0..1&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined">
+    <link rel="stylesheet" href="_content/Tavenem.Blazor.Framework/framework.css">
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="Tavenem.Blazor.Framework.Sample.styles.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <meta name="apple-mobile-web-app-title" content="Tavenem Blazor Framework">
+    <meta name="application-name" content="Tavenem Blazor Framework">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="mask-icon" href="safari-pinned-tab.svg?v=2" color="#a03dff">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="msapplication-TileColor" content="#a03dff">
+    <meta name="theme-color" content="#faf5ff">
     <HeadOutlet />
 </head>
 
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+    <script src="./_content/Tavenem.Blazor.Framework/tavenem-initialize-framework.js"></script>
 </body>
 
 </html>

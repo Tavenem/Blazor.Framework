@@ -7,6 +7,8 @@ builder.Services.AddRazorComponents()
     .AddServerComponents()
     .AddWebAssemblyComponents();
 
+builder.Services.AddTavenemFramework();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +30,6 @@ app.UseStaticFiles();
 app.MapRazorComponents<App>()
     .AddServerRenderMode()
     .AddWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Tavenem.Blazor.Framework.Sample.Client.Pages.Counter).Assembly);
+    .AddAdditionalAssemblies(typeof(Tavenem.Blazor.Framework.Sample.Client._Imports).Assembly);
 
 app.Run();

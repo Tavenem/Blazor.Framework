@@ -101,4 +101,11 @@ export default [{
         sourcemap: true,
     },
     plugins: plugins,
+}, {
+    input: "./scripts/tavenem-initialize-framework.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
 }];

@@ -298,6 +298,72 @@
     --tavenem-color-warning-text: var(--tavenem-dark-color-warning-text);
 }
 
+@media (prefers-color-scheme: dark) {
+    :root :not([data-theme="light"]) {
+        --tavenem-color-base-rgb: var(--tavenem-dark-color-base-rgb);
+        --tavenem-color-bg: var(--tavenem-dark-color-bg);
+        --tavenem-color-bg-alt: var(--tavenem-dark-color-bg-alt);
+        --tavenem-color-bg-highlight: var(--tavenem-dark-color-bg-highlight);
+        --tavenem-color-bg-highlight-bright: var(--tavenem-dark-color-bg-highlight-bright);
+        --tavenem-color-bg-surface: var(--tavenem-dark-color-bg-surface);
+        --tavenem-color-bg-surface-flat: var(--tavenem-dark-color-bg-surface-flat);
+        --tavenem-color-bg-input: var(--tavenem-dark-color-bg-input);
+        --tavenem-color-divider: var(--tavenem-dark-color-divider);
+        --tavenem-color-overlay: var(--tavenem-dark-color-overlay);
+        --tavenem-color-action: var(--tavenem-dark-color-action);
+        --tavenem-color-action-rgb: var(--tavenem-dark-color-action-rgb);
+        --tavenem-color-text: var(--tavenem-dark-color-text);
+        --tavenem-color-text-secondary: var(--tavenem-dark-color-text-secondary);
+        --tavenem-color-text-disabled: var(--tavenem-dark-color-text-disabled);
+        --tavenem-color-link: var(--tavenem-dark-color-link);
+        --tavenem-color-link-hover: var(--tavenem-dark-color-link-hover);
+        --tavenem-color-border: var(--tavenem-dark-color-border);
+        --tavenem-color-border-input: var(--tavenem-dark-color-border-input);
+        --tavenem-color-border-table: var(--tavenem-dark-color-border-table);
+        --tavenem-color-scrollbar: var(--tavenem-dark-color-scrollbar);
+        --tavenem-color-scrollbar-hover: var(--tavenem-dark-color-scrollbar-hover);
+        --tavenem-color-yellow-bg: var(--tavenem-dark-color-yellow-bg);
+        --tavenem-color-keyboard: var(--tavenem-dark-color-keyboard);
+        --tavenem-color-keyboard-bg: var(--tavenem-dark-color-keyboard-bg);
+        --tavenem-color-primary-hue: var(--tavenem-dark-color-primary-hue);
+        --tavenem-color-primary-saturation: var(--tavenem-dark-color-primary-saturation);
+        --tavenem-color-primary-lightness: var(--tavenem-dark-color-primary-lightness);
+        --tavenem-color-primary-text: var(--tavenem-dark-color-primary-text);
+        --tavenem-color-secondary-hue: var(--tavenem-dark-color-secondary-hue);
+        --tavenem-color-secondary-saturation: var(--tavenem-dark-color-secondary-saturation);
+        --tavenem-color-secondary-lightness: var(--tavenem-dark-color-secondary-lightness);
+        --tavenem-color-secondary-text: var(--tavenem-dark-color-secondary-text);
+        --tavenem-color-tertiary-hue: var(--tavenem-dark-color-tertiary-hue);
+        --tavenem-color-tertiary-saturation: var(--tavenem-dark-color-tertiary-saturation);
+        --tavenem-color-tertiary-lightness: var(--tavenem-dark-color-tertiary-lightness);
+        --tavenem-color-tertiary-text: var(--tavenem-dark-color-tertiary-text);
+        --tavenem-color-danger-hue: var(--tavenem-dark-color-danger-hue);
+        --tavenem-color-danger-saturation: var(--tavenem-dark-color-danger-saturation);
+        --tavenem-color-danger-lightness: var(--tavenem-dark-color-danger-lightness);
+        --tavenem-color-danger-text: var(--tavenem-dark-color-danger-text);
+        --tavenem-color-dark-hue: var(--tavenem-dark-color-dark-hue);
+        --tavenem-color-dark-saturation: var(--tavenem-dark-color-dark-saturation);
+        --tavenem-color-dark-lightness: var(--tavenem-dark-color-dark-lightness);
+        --tavenem-color-dark-text: var(--tavenem-dark-color-dark-text);
+        --tavenem-color-default-hue: var(--tavenem-dark-color-default-hue);
+        --tavenem-color-default-saturation: var(--tavenem-dark-color-default-saturation);
+        --tavenem-color-default-lightness: var(--tavenem-dark-color-default-lightness);
+        --tavenem-color-default-text: var(--tavenem-dark-color-default-text);
+        --tavenem-color-info-hue: var(--tavenem-dark-color-info-hue);
+        --tavenem-color-info-saturation: var(--tavenem-dark-color-info-saturation);
+        --tavenem-color-info-lightness: var(--tavenem-dark-color-info-lightness);
+        --tavenem-color-info-text: var(--tavenem-dark-color-info-text);
+        --tavenem-color-success-hue: var(--tavenem-dark-color-success-hue);
+        --tavenem-color-success-saturation: var(--tavenem-dark-color-success-saturation);
+        --tavenem-color-success-lightness: var(--tavenem-dark-color-success-lightness);
+        --tavenem-color-success-text: var(--tavenem-dark-color-success-text);
+        --tavenem-color-warning-hue: var(--tavenem-dark-color-warning-hue);
+        --tavenem-color-warning-saturation: var(--tavenem-dark-color-warning-saturation);
+        --tavenem-color-warning-lightness: var(--tavenem-dark-color-warning-lightness);
+        --tavenem-color-warning-text: var(--tavenem-dark-color-warning-text);
+    }
+}
+
 $align-content-values: (
     center,
     end,

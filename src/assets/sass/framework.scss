@@ -54,6 +54,11 @@
 [data-theme="dark"] {
     @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
 }
+@media (prefers-color-scheme: dark) {
+    :root :not([data-theme="light"]) {
+        @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
+    }
+}
 
 *[id] {
     scroll-margin-top: 4rem;
@@ -62,6 +67,11 @@
 html, body * {
     scrollbar-color: var(--tavenem-color-scrollbar) transparent;
     scrollbar-width: thin;
+}
+
+.tavenem-framework-layout {
+    height: 100vh;
+    position: relative;
 }
 
 ::-webkit-scrollbar {

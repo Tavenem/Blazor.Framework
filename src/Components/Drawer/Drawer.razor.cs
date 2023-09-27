@@ -184,10 +184,15 @@ public partial class Drawer : IDisposable
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized()
+    protected override void OnInitialized() => FrameworkLayout?.Add(this);
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
     {
-        FrameworkLayout?.Add(this);
-        NavigationManager.LocationChanged += OnLocationChanged;
+        if (firstRender)
+        {
+            NavigationManager.LocationChanged += OnLocationChanged;
+        }
     }
 
     /// <inheritdoc/>

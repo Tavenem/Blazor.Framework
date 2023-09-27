@@ -51,11 +51,15 @@ public partial class Avatar : IDisposable
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
+    /// <inheritdoc/>
     protected override void OnInitialized() => AvatarGroup?.Add(this);
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
@@ -72,16 +76,6 @@ public partial class Avatar : IDisposable
 
             _disposedValue = true;
         }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     internal void ForceRedraw() => StateHasChanged();

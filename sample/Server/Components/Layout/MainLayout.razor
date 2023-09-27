@@ -1,23 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<FrameworkLayout ThemeColor="ThemeColor.Primary">
+    <FrameworkContent>
+        <TopAppbar />
+        <LeftDrawer />
+    </FrameworkContent>
+    <ChildContent>
+        @Body
+        <footer class="d-flex flex-wrap align-self-stretch mt-auto mx-6 pt-4 px-4 pb-1 gap-3 justify-content-space-around">
+            <small>© Tavenem</small>
+            <small><a href="https://tavenem.com/privacy">Privacy</a></small>
+            <small><a href="https://tavenem.com/contact">Contact</a></small>
+        </footer>
+    </ChildContent>
+</FrameworkLayout>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
+    <a class="dismiss" onclick="document.getElementById('blazor-error-ui').style.display='none'">🗙</a>
 </div>

@@ -49,7 +49,7 @@ public static class TavenemFrameworkExtensions
     /// separates the words in <c>camelCase</c> and <c>PascalCase</c> terms.
     /// </para>
     /// </returns>
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static string? ToHumanReadable(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))

@@ -5,9 +5,17 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Allows getting and setting the preferred color scheme (light vs. dark).
 /// </summary>
-public class ThemeService : IAsyncDisposable
+/// <remarks>
+/// Initializes a new instance of <see cref="ThemeService"/>.
+/// </remarks>
+/// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+public class ThemeService(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
+    private readonly Lazy<Task<IJSObjectReference>> _moduleTask = new(
+        () => jsRuntime.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/Tavenem.Blazor.Framework/tavenem-theme.js")
+        .AsTask());
 
     private bool _disposedValue;
     private DotNetObjectReference<ThemeService>? _dotNetRef;
@@ -21,16 +29,6 @@ public class ThemeService : IAsyncDisposable
         add => Subscribe(value);
         remove => Unsubscribe(value);
     }
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="ThemeService"/>.
-    /// </summary>
-    /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    public ThemeService(IJSRuntime jsRuntime) => _moduleTask = new(
-        () => jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-theme.js")
-        .AsTask());
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
@@ -57,6 +55,25 @@ public class ThemeService : IAsyncDisposable
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
         return ThemePreference.Light;
+    }
+
+    /// <summary>
+    /// Initialize the current color scheme based on current preferences and settings.
+    /// </summary>
+    public async ValueTask<bool> InitializeColorScheme()
+    {
+        Console.WriteLine("InitializeColorScheme");
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            return await module
+                .InvokeAsync<bool>("initializeColorScheme")
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        return false;
     }
 
     /// <summary>

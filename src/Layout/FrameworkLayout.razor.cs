@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -74,7 +75,7 @@ public partial class FrameworkLayout : IDisposable
 
     private bool AutoScrollToTop { get; set; } = true;
 
-    [Inject] private DialogService DialogService { get; set; } = default!;
+    [Inject, NotNull] private DialogService? DialogService { get; set; }
 
     private Snackbar? ExtraSnackbarBottomLeft => SnackbarService.GetExtraSnackbar(Corner.Bottom_Left);
 
@@ -92,41 +93,32 @@ public partial class FrameworkLayout : IDisposable
 
     private bool HasOpenDrawer { get; set; }
 
-    [Inject] private ScrollService ScrollService { get; set; } = default!;
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
+
+    [Inject, NotNull] private ScrollService? ScrollService { get; set; }
 
     private IEnumerable<Snackbar> SnackbarsBottomLeft => SnackbarService.GetDisplayedSnackbars(Corner.Bottom_Left).Reverse();
 
     private IEnumerable<Snackbar> SnackbarsBottomRight => SnackbarService.GetDisplayedSnackbars(Corner.Bottom_Right).Reverse();
 
+    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
+
     private IEnumerable<Snackbar> SnackbarsTopLeft => SnackbarService.GetDisplayedSnackbars(Corner.Top_Left);
 
     private IEnumerable<Snackbar> SnackbarsTopRight => SnackbarService.GetDisplayedSnackbars(Corner.Top_Right);
 
-    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
-
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
-
-    [Inject] private UtilityService UtilityService { get; set; } = default!;
-
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
+    private string? Theme => ThemePreference switch
     {
-        DialogService.OnDialogAdded += OnDialogAdded;
-        DialogService.OnDialogClosed += DismissDialogInstance;
-        SnackbarService.OnSnackbarsUpdated += OnSnackbarsUpdated;
-        NavigationManager.LocationChanged += OnLocationChanged;
-    }
+        ThemePreference.Light => "light",
+        ThemePreference.Dark => "dark",
+        _ => null,
+    };
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its initial parameters
-    /// from its parent in the render tree. Override this method if you will perform an asynchronous
-    /// operation and want the component to refresh when that operation is completed.
-    /// </summary>
-    /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
-    protected override Task OnInitializedAsync() => UtilityService.RegisterComponents().AsTask();
+    private ThemePreference ThemePreference { get; set; }
+
+    [Inject, NotNull] private ThemeService? ThemeService { get; set; }
+
+    [Inject, NotNull] private UtilityService? UtilityService { get; set; }
 
     /// <summary>
     /// Method invoked after each time the component has been rendered. Note
@@ -152,6 +144,11 @@ public partial class FrameworkLayout : IDisposable
     {
         if (firstRender)
         {
+            DialogService.OnDialogAdded += OnDialogAdded;
+            DialogService.OnDialogClosed += DismissDialogInstance;
+            SnackbarService.OnSnackbarsUpdated += OnSnackbarsUpdated;
+            NavigationManager.LocationChanged += OnLocationChanged;
+
             if (!string.IsNullOrEmpty(ScrollSpyClass))
             {
                 _dotNetRef = DotNetObjectReference.Create(this);
@@ -160,12 +157,16 @@ public partial class FrameworkLayout : IDisposable
             }
 
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            if (uri.Fragment.Length == 0)
+            if (uri.Fragment.Length > 0)
             {
-                return;
+                await ScrollService.ScrollToId(uri.Fragment[1..]);
             }
 
-            await ScrollService.ScrollToId(uri.Fragment[1..]);
+            ThemePreference = await ThemeService.GetPreferredColorScheme();
+            if (ThemePreference != ThemePreference.Auto)
+            {
+                StateHasChanged();
+            }
         }
     }
 

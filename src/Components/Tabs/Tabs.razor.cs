@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Services;
 
@@ -323,11 +324,11 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    [Inject] private protected DragDropListener DragDropListener { get; set; } = default!;
+    [Inject, NotNull] private protected DragDropListener? DragDropListener { get; set; }
 
     private protected bool NoDropTargetChildren => _dropTargetElements.Count == 0;
 
-    [Inject] private IResizeObserver ResizeObserver { get; set; } = default!;
+    [Inject, NotNull] private IResizeObserver? ResizeObserver { get; set; }
 
     private string? ScrollStyle => new CssBuilder()
         .AddStyle(
@@ -432,50 +433,18 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized()
-        => DragDropListener.DropValidChanged += OnDropValidChanged;
-
-    /// <summary>
-    /// Method invoked after each time the component has been rendered.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
+            DragDropListener.DropValidChanged += OnDropValidChanged;
             DragDropListener.ElementId = ToolbarId;
             DragDropListener.GetEffect = GetDropEffectInternal;
             DragDropListener.OnDrop += OnDropAsync;
         }
     }
 
-    /// <summary>
-    /// Method invoked after each time the component has been rendered. Note that the component does
-    /// not automatically re-render after the completion of any returned <see cref="Task" />,
-    /// because that would cause an infinite render loop.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see cref="ComponentBase.OnAfterRender(bool)"
-    /// /> has been invoked on this component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are useful for performing
-    /// interop, or interacting with values received from <c>@ref</c>. Use the <paramref
-    /// name="firstRender" /> parameter to ensure that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         for (var i = 0; i < _dynamicItems.Count; i++)
@@ -510,11 +479,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         _isRendered = true;
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting
-    /// unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    /// <inheritdoc/>
     public async ValueTask DisposeAsync()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method

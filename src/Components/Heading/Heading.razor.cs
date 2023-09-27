@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// A heading component which geneates an h# element, with theme support
-/// and support for automatic page contents.
+/// A heading component which generates an h# element, with theme support and support for automatic
+/// page contents.
 /// </summary>
 public partial class Heading : IDisposable
 {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Tavenem.Blazor.Framework;
@@ -90,26 +91,22 @@ public partial class AnchorLink : IDisposable
 
     [CascadingParameter] private Collapse? Collapse { get; set; }
 
-    [Inject] private ScrollService ScrollService { get; set; } = default!;
+    [Inject, NotNull] private ScrollService? ScrollService { get; set; }
 
     private protected string? LocalLink { get; set; }
 
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
-    protected override void OnInitialized()
+    /// <inheritdoc />
+    protected override void OnInitialized() => Collapse?.Add(this);
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
     {
         NavigationManager.LocationChanged += OnLocationChanged;
-        Collapse?.Add(this);
     }
 
-    /// <summary>
-    /// Method invoked when the component has received parameters from its parent in
-    /// the render tree, and the incoming values have been assigned to properties.
-    /// </summary>
+    /// <inheritdoc />
     protected override void OnParametersSet()
     {
         string? href = null;
@@ -128,6 +125,14 @@ public partial class AnchorLink : IDisposable
             && ShouldMatch(NavigationManager.Uri);
     }
 
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
     /// or resetting unmanaged resources.
@@ -144,17 +149,6 @@ public partial class AnchorLink : IDisposable
 
             _disposedValue = true;
         }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     internal void UpdateState(LocationChangedEventArgs args)

@@ -49,10 +49,16 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
         theme = preferred;
     }
 
+    let setTheme = false;
+    const currentTheme = document.documentElement.getAttribute('data-theme');
     if (theme == ThemePreference.Dark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
+        if (currentTheme != 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            setTheme = true;
+        }
+    } else if (currentTheme != 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
+        setTheme = true;
     }
 
     if (theme == preferred) {
@@ -61,11 +67,26 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
         localStorage.setItem('tavenem-theme', theme.toString());
     }
 
-    if (_listeners.length) {
-        for (let listener of _listeners) {
-            listener.invokeMethodAsync('NotifyThemeChanged', theme);
+    if (setTheme) {
+        if (_listeners.length) {
+            for (let listener of _listeners) {
+                listener.invokeMethodAsync('NotifyThemeChanged', theme);
+            }
         }
+
+        return true;
     }
+
+    return false;
+}
+
+export function initializeColorScheme() {
+    if (window.matchMedia) {
+        const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
+    }
+    const currentScheme = getPreferredColorScheme();
+    return setColorScheme(currentScheme);
 }
 
 function getNativePreferredColorScheme(): ThemePreference {
@@ -83,10 +104,3 @@ function getNativePreferredColorScheme(): ThemePreference {
 function setPreferredColorScheme() {
     setColorScheme(getPreferredColorScheme());
 }
-
-if (window.matchMedia) {
-    const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
-}
-const currentScheme = getPreferredColorScheme();
-setColorScheme(currentScheme);

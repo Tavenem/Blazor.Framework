@@ -58,27 +58,10 @@ public partial class ScrollToTop : IDisposable
 
     [Inject] private ScrollListener ScrollListener { get; set; } = default!;
 
-    /// <summary>
-    /// Method invoked when the component is ready to start, having received its
-    /// initial parameters from its parent in the render tree.
-    /// </summary>
+    /// <inheritdoc/>
     protected override void OnInitialized() => FrameworkLayout?.Add(this);
 
-    /// <summary>
-    /// Method invoked after each time the component has been rendered.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -86,6 +69,14 @@ public partial class ScrollToTop : IDisposable
             ScrollListener.Selector = Selector;
             ScrollListener.OnScroll += OnScroll;
         }
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -104,17 +95,6 @@ public partial class ScrollToTop : IDisposable
 
             _disposedValue = true;
         }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     private async Task OnClickAsync() => await ScrollService.ScrollToTop(ScrollListener?.Selector);
