@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
 using Tavenem.Blazor.Framework.Components.DataGrid;
@@ -58,10 +59,19 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// </para>
     /// </summary>
     /// <remarks>
+    /// <para>
     /// If the data in a column cannot be edited, its cell will remain in read-only mode during
     /// inline edit operations. When performing an automatic dialog edit, the column's data will
-    /// still be displayed in case its content is important for user context during the edit
-    /// process, but it will be read-only.
+    /// still be displayed is its <see cref="IsShown"/> value is <see langword="true"/>, in case its
+    /// content is important for user context during the edit process, but it will be read-only. If
+    /// its <see cref="IsShown"/> value is <see langword="false"/> it will not appear on the
+    /// automatic edit dialog at all.
+    /// </para>
+    /// <para>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="EditableAttribute.AllowEdit"/> property of a <see cref="EditableAttribute"/> on the
+    /// property.
+    /// </para>
     /// </remarks>
     [Parameter] public bool CanEdit { get; set; } = true;
 
@@ -77,6 +87,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// type can be filtered.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayAttribute.AutoGenerateFilter"/> property of a <see cref="DisplayAttribute"/> on
+    /// the property.
+    /// </remarks>
     [Parameter] public bool CanFilter { get; set; } = true;
 
     /// <summary>
@@ -87,6 +102,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// Default is <see langword="true"/>.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayAttribute.AutoGenerateField"/> property of a <see cref="DisplayAttribute"/> on
+    /// the property.
+    /// </remarks>
     [Parameter] public bool CanHide { get; set; } = true;
 
     /// <summary>
@@ -135,6 +155,22 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     [Parameter] public string? ColumnClass { get; set; }
 
     /// <summary>
+    /// An optional display order for this column.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Can be specified for auto-generated columns with the <see cref="DisplayAttribute.Order"/>
+    /// property of a <see cref="DisplayAttribute"/> on the property.
+    /// </para>
+    /// <para>
+    /// Manually-specified columns with the default sort order (0) will appear in the order they
+    /// appear in source. Auto-generated columns without a specified display order will appear in an
+    /// arbitrary order.
+    /// </para>
+    /// </remarks>
+    [Parameter] public int ColumnOrder { get; set; }
+
+    /// <summary>
     /// <para>
     /// The current <see cref="DateTimeOffset"/> value by which this column is filtered.
     /// </para>
@@ -148,6 +184,9 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// <para>
     /// Whether the current <see cref="DateTimeFilter"/> refers to a date/time that all values
     /// should be equal to or before (rather than equal to or after).
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
     /// </para>
     /// <para>
     /// Ignored for columns that do not have date/time value types, or a non-<see langword="null"/>
@@ -193,11 +232,17 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// If the result of <see cref="Value"/> is <see cref="IFormattable"/>, this is supplied as the
     /// format parameter of <see cref="IFormattable.ToString(string?, IFormatProvider?)"/>.
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayFormatAttribute.DataFormatString"/> property of a <see
+    /// cref="DisplayFormatAttribute"/> on the property.
+    /// </remarks>
     [Parameter] public string? Format { get; set; }
 
     /// <summary>
     /// If the result of <see cref="Value"/> is <see cref="IFormattable"/>, this is supplied as the
-    /// formatProvider parameter of <see cref="IFormattable.ToString(string?, IFormatProvider?)"/>.
+    /// <c>formatProvider</c> parameter of <see cref="IFormattable.ToString(string?,
+    /// IFormatProvider?)"/>.
     /// </summary>
     [Parameter] public IFormatProvider? FormatProvider { get; set; }
 
@@ -214,6 +259,9 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// <summary>
     /// <para>
     /// Whether this column is initially sorted.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
     /// </para>
     /// <para>
     /// If more than one column is initially sorted, their order of precedence is determined by the
@@ -258,16 +306,31 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     public bool IsNumeric { get; private set; }
 
     /// <summary>
-    /// When set to <see langword="true"/> for a column whose <see cref="Value"/> is of type <see
-    /// cref="string"/>, a universal search box will appear in the data table header which includes
-    /// this column in its filter.
+    /// <para>
+    /// When set to <see langword="true"/> for a column whose value is of type <see cref="string"/>,
+    /// a universal search box will appear in the data table header which includes this column in
+    /// its filter.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
     /// </summary>
     [Parameter] public bool IsQuickFilter { get; set; }
 
     private bool _isShown = true;
     /// <summary>
+    /// <para>
     /// Whether this column is currently displayed.
+    /// </para>
+    /// <para>
+    /// Initially defaults to <see langword="true"/>.
+    /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayAttribute.AutoGenerateField"/> property of a <see cref="DisplayAttribute"/> on
+    /// the property.
+    /// </remarks>
     [Parameter] public bool IsShown { get; set; } = true;
 
     /// <summary>
@@ -289,6 +352,10 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// column filter dialog, and for input components in automatic edit dialogs.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see cref="DisplayAttribute.Name"/>
+    /// property of a <see cref="DisplayAttribute"/> on the property.
+    /// </remarks>
     [Parameter] public string? Label { get; set; }
 
     /// <summary>
@@ -329,7 +396,12 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     [Parameter] public Action<TDataItem, TValue?>? SetValue { get; set; }
 
     /// <summary>
+    /// <para>
     /// Whether this column is currently sorted in descending order.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
     /// </summary>
     [Parameter] public bool SortDescending { get; set; }
 
@@ -373,6 +445,68 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         {
             throw new ArgumentException($"{nameof(property)} was the wrong type", nameof(property));
         }
+
+        var displayAttribute = property.GetCustomAttribute<DisplayAttribute>();
+        if (displayAttribute is not null)
+        {
+            var shortName = displayAttribute.GetShortName();
+            Label = string.IsNullOrWhiteSpace(shortName)
+                ? displayAttribute.GetName()
+                : shortName;
+            ColumnOrder = displayAttribute.GetOrder() ?? 0;
+            _isShown = displayAttribute.GetAutoGenerateField() ?? true;
+            IsShown = _isShown;
+            CanHide = _isShown;
+            CanFilter = displayAttribute.GetAutoGenerateFilter() ?? true;
+        }
+
+        var displayFormatAttribute = property.GetCustomAttribute<DisplayFormatAttribute>();
+        if (displayFormatAttribute is not null)
+        {
+            Format = displayFormatAttribute.DataFormatString;
+        }
+
+        var editableAttribute = property.GetCustomAttribute<EditableAttribute>();
+        if (editableAttribute is not null)
+        {
+            CanEdit = editableAttribute.AllowEdit;
+        }
+
+        foreach (var dataGridColumnAttribute in property.GetCustomAttributes<DataGridColumnAttribute>(true))
+        {
+            Alignment = dataGridColumnAttribute.Alignment;
+            CanEdit &= dataGridColumnAttribute.CanEdit;
+            CanFilter &= dataGridColumnAttribute.CanFilter;
+            CanHide &= dataGridColumnAttribute.CanHide;
+            CanSort &= dataGridColumnAttribute.CanSort;
+            if (!string.IsNullOrEmpty(dataGridColumnAttribute.ColumnClass))
+            {
+                ColumnClass = string.IsNullOrEmpty(ColumnClass)
+                    ? dataGridColumnAttribute.ColumnClass
+                    : $"{ColumnClass} {dataGridColumnAttribute.ColumnClass}";
+            }
+            if (dataGridColumnAttribute.ColumnOrder != 0)
+            {
+                ColumnOrder = dataGridColumnAttribute.ColumnOrder;
+            }
+            DateTimeFilterIsBefore |= dataGridColumnAttribute.DateTimeFilterIsBefore;
+            ExportHidden |= dataGridColumnAttribute.ExportHidden;
+            if (!string.IsNullOrEmpty(dataGridColumnAttribute.Format)
+                || dataGridColumnAttribute.FormatProvider is not null)
+            {
+                Format = dataGridColumnAttribute.Format;
+                FormatProvider = dataGridColumnAttribute.FormatProvider;
+            }
+            InitiallySorted |= dataGridColumnAttribute.InitiallySorted;
+            IsQuickFilter |= dataGridColumnAttribute.IsQuickFilter;
+            IsShown &= dataGridColumnAttribute.IsShown;
+            if (!string.IsNullOrEmpty(dataGridColumnAttribute.Label))
+            {
+                Label = dataGridColumnAttribute.Label;
+            }
+            SortDescending |= dataGridColumnAttribute.SortDescending;
+        }
+
         var parameter = Expression.Parameter(typeof(TDataItem));
         Value = (Expression<Func<TDataItem, TValue?>>)Expression.Lambda(
             Expression.GetFuncType(typeof(TDataItem), property.PropertyType),
@@ -391,6 +525,68 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         {
             throw new ArgumentException($"{nameof(field)} was the wrong type", nameof(field));
         }
+
+        var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
+        if (displayAttribute is not null)
+        {
+            var shortName = displayAttribute.GetShortName();
+            Label = string.IsNullOrWhiteSpace(shortName)
+                ? displayAttribute.GetName()
+                : shortName;
+            ColumnOrder = displayAttribute.GetOrder() ?? 0;
+            _isShown = displayAttribute.GetAutoGenerateField() ?? true;
+            IsShown = _isShown;
+            CanHide = _isShown;
+            CanFilter = displayAttribute.GetAutoGenerateFilter() ?? true;
+        }
+
+        var displayFormatAttribute = field.GetCustomAttribute<DisplayFormatAttribute>();
+        if (displayFormatAttribute is not null)
+        {
+            Format = displayFormatAttribute.DataFormatString;
+        }
+
+        var editableAttribute = field.GetCustomAttribute<EditableAttribute>();
+        if (editableAttribute is not null)
+        {
+            CanEdit = editableAttribute.AllowEdit;
+        }
+
+        foreach (var dataGridColumnAttribute in field.GetCustomAttributes<DataGridColumnAttribute>(true))
+        {
+            Alignment = dataGridColumnAttribute.Alignment;
+            CanEdit &= dataGridColumnAttribute.CanEdit;
+            CanFilter &= dataGridColumnAttribute.CanFilter;
+            CanHide &= dataGridColumnAttribute.CanHide;
+            CanSort &= dataGridColumnAttribute.CanSort;
+            if (!string.IsNullOrEmpty(dataGridColumnAttribute.ColumnClass))
+            {
+                ColumnClass = string.IsNullOrEmpty(ColumnClass)
+                    ? dataGridColumnAttribute.ColumnClass
+                    : $"{ColumnClass} {dataGridColumnAttribute.ColumnClass}";
+            }
+            if (dataGridColumnAttribute.ColumnOrder != 0)
+            {
+                ColumnOrder = dataGridColumnAttribute.ColumnOrder;
+            }
+            DateTimeFilterIsBefore |= dataGridColumnAttribute.DateTimeFilterIsBefore;
+            ExportHidden |= dataGridColumnAttribute.ExportHidden;
+            if (!string.IsNullOrEmpty(dataGridColumnAttribute.Format)
+                || dataGridColumnAttribute.FormatProvider is not null)
+            {
+                Format = dataGridColumnAttribute.Format;
+                FormatProvider = dataGridColumnAttribute.FormatProvider;
+            }
+            InitiallySorted |= dataGridColumnAttribute.InitiallySorted;
+            IsQuickFilter |= dataGridColumnAttribute.IsQuickFilter;
+            IsShown &= dataGridColumnAttribute.IsShown;
+            if (!string.IsNullOrEmpty(dataGridColumnAttribute.Label))
+            {
+                Label = dataGridColumnAttribute.Label;
+            }
+            SortDescending |= dataGridColumnAttribute.SortDescending;
+        }
+
         var parameter = Expression.Parameter(typeof(TDataItem));
         Value = (Expression<Func<TDataItem, TValue?>>)Expression.Lambda(
             Expression.GetFuncType(typeof(TDataItem), field.FieldType),

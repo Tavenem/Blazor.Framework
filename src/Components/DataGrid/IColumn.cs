@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.ComponentModel.DataAnnotations;
 
 namespace Tavenem.Blazor.Framework.Components.DataGrid;
 
@@ -42,10 +43,19 @@ public interface IColumn : IDisposable
     /// </para>
     /// </summary>
     /// <remarks>
+    /// <para>
     /// If the data in a column cannot be edited, its cell will remain in read-only mode during
     /// inline edit operations. When performing an automatic dialog edit, the column's data will
-    /// still be displayed in case its content is important for user context during the edit
-    /// process, but it will be read-only.
+    /// still be displayed is its <see cref="IsShown"/> value is <see langword="true"/>, in case its
+    /// content is important for user context during the edit process, but it will be read-only. If
+    /// its <see cref="IsShown"/> value is <see langword="false"/> it will not appear on the
+    /// automatic edit dialog at all.
+    /// </para>
+    /// <para>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="EditableAttribute.AllowEdit"/> property of a <see cref="EditableAttribute"/> on the
+    /// property.
+    /// </para>
     /// </remarks>
     public bool CanEdit { get; set; }
 
@@ -61,6 +71,11 @@ public interface IColumn : IDisposable
     /// type can be filtered.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayAttribute.AutoGenerateFilter"/> property of a <see cref="DisplayAttribute"/> on
+    /// the property.
+    /// </remarks>
     public bool CanFilter { get; set; }
 
     /// <summary>
@@ -71,6 +86,11 @@ public interface IColumn : IDisposable
     /// Default is <see langword="true"/>.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayAttribute.AutoGenerateField"/> property of a <see cref="DisplayAttribute"/> on
+    /// the property.
+    /// </remarks>
     public bool CanHide { get; set; }
 
     /// <summary>
@@ -89,6 +109,22 @@ public interface IColumn : IDisposable
     public string? ColumnClass { get; set; }
 
     /// <summary>
+    /// An optional display order for this column.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Can be specified for auto-generated columns with the <see cref="DisplayAttribute.Order"/>
+    /// property of a <see cref="DisplayAttribute"/> on the property.
+    /// </para>
+    /// <para>
+    /// Manually-specified columns with the default sort order (0) will appear in the order they
+    /// appear in source. Auto-generated columns without a specified display order will appear in an
+    /// arbitrary order.
+    /// </para>
+    /// </remarks>
+    public int ColumnOrder { get; set; }
+
+    /// <summary>
     /// <para>
     /// The current <see cref="DateTimeOffset"/> value by which this column is filtered.
     /// </para>
@@ -102,6 +138,9 @@ public interface IColumn : IDisposable
     /// <para>
     /// Whether the current <see cref="DateTimeFilter"/> refers to a date/time that all values
     /// should be equal to or before (rather than equal to or after).
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
     /// </para>
     /// <para>
     /// Ignored for columns that do not have date/time value types, or a non-<see langword="null"/>
@@ -124,11 +163,16 @@ public interface IColumn : IDisposable
     /// If the value is <see cref="IFormattable"/>, this is supplied as the format parameter of <see
     /// cref="IFormattable.ToString(string?, IFormatProvider?)"/>.
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayFormatAttribute.DataFormatString"/> property of a <see
+    /// cref="DisplayFormatAttribute"/> on the property.
+    /// </remarks>
     public string? Format { get; set; }
 
     /// <summary>
-    /// If the value is <see cref="IFormattable"/>, this is supplied as the formatProvider parameter
-    /// of <see cref="IFormattable.ToString(string?, IFormatProvider?)"/>.
+    /// If the value is <see cref="IFormattable"/>, this is supplied as the <c>formatProvider</c>
+    /// parameter of <see cref="IFormattable.ToString(string?, IFormatProvider?)"/>.
     /// </summary>
     public IFormatProvider? FormatProvider { get; set; }
 
@@ -140,6 +184,9 @@ public interface IColumn : IDisposable
     /// <summary>
     /// <para>
     /// Whether this column is initially sorted.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
     /// </para>
     /// <para>
     /// If more than one column is initially sorted, their order of precedence is determined by the
@@ -184,15 +231,30 @@ public interface IColumn : IDisposable
     public bool IsNumeric { get; }
 
     /// <summary>
+    /// <para>
     /// When set to <see langword="true"/> for a column whose value is of type <see cref="string"/>,
     /// a universal search box will appear in the data table header which includes this column in
     /// its filter.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
     /// </summary>
     public bool IsQuickFilter { get; set; }
 
     /// <summary>
+    /// <para>
     /// Whether this column is currently displayed.
+    /// </para>
+    /// <para>
+    /// Initially defaults to <see langword="true"/>.
+    /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see
+    /// cref="DisplayAttribute.AutoGenerateField"/> property of a <see cref="DisplayAttribute"/> on
+    /// the property.
+    /// </remarks>
     public bool IsShown { get; set; }
 
     /// <summary>
@@ -215,6 +277,10 @@ public interface IColumn : IDisposable
     /// single-column layout.
     /// </para>
     /// </summary>
+    /// <remarks>
+    /// Can be specified for auto-generated columns with the <see cref="DisplayAttribute.Name"/>
+    /// property of a <see cref="DisplayAttribute"/> on the property.
+    /// </remarks>
     public string? Label { get; set; }
 
     /// <summary>
@@ -238,7 +304,12 @@ public interface IColumn : IDisposable
     public double? NumberFilter { get; set; }
 
     /// <summary>
+    /// <para>
     /// Gets whether this column is currently sorted in descending order.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
     /// </summary>
     public bool SortDescending { get; set; }
 

@@ -4,18 +4,21 @@ public partial class DataGridDoc
 {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = "Employee #")]
         public int Id { get; set; }
 
         public string? FirstName { get; set; }
 
         public string? LastName { get; set; }
 
+        [DataGridColumn(ColumnOrder = 1, Label = "Executive?")]
         public bool IsExecutive { get; set; }
 
+        [DataGridColumn(Format = "d")]
         public DateTime HireDate { get; set; }
     }
 
-    private List<DataItem> _editableItems1 = new()
+    private readonly List<DataItem> _editableItems1 = new()
     {
         new DataItem{Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263)},
         new DataItem{Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121)},
@@ -25,7 +28,7 @@ public partial class DataGridDoc
         new DataItem{Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160)},
         new DataItem{Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495)},
     };
-    private List<DataItem> _editableItems2 = new()
+    private readonly List<DataItem> _editableItems2 = new()
     {
         new DataItem{Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263)},
         new DataItem{Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121)},
@@ -35,7 +38,7 @@ public partial class DataGridDoc
         new DataItem{Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160)},
         new DataItem{Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495)},
     };
-    private List<DataItem> _editableItems3 = new()
+    private readonly List<DataItem> _editableItems3 = new()
     {
         new DataItem{Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263)},
         new DataItem{Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121)},
@@ -45,7 +48,7 @@ public partial class DataGridDoc
         new DataItem{Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160)},
         new DataItem{Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495)},
     };
-    private List<DataItem> _items = new()
+    private readonly List<DataItem> _items = new()
     {
         new DataItem{Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263)},
         new DataItem{Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121)},
@@ -55,7 +58,7 @@ public partial class DataGridDoc
         new DataItem{Id = 5, FirstName = "Jennifer", LastName = "Garcia", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160)},
         new DataItem{Id = 6, FirstName = "Michael", LastName = "Miller", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495)},
     };
-    private List<DataItem> _items2 = new()
+    private readonly List<DataItem> _items2 = new()
     {
         new DataItem{Id = 0, FirstName = "James", LastName = "Smith", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263)},
         new DataItem{Id = 1, FirstName = "Mary", LastName = "Johnson", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1121)},

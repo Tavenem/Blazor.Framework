@@ -1,16 +1,26 @@
 # Changelog
 
-## 1.46
+## 1.48
+### Added
+- `ColumnOrder` to `DataGrid` columns
+- `DataGridColumnAttribute` attribute, which can be used to configure column properties when auto-generating `DataGrid` columns
+- `System.ComponentModel.DataAnnotations` attribute support for certain column properties when auto-generating `DataGrid` columns
+
+## 1.47
 ### Changed
 - Editor selection and read-only improvements
 
-## 1.45
+## 1.46
 ### Fixed
 - Image crop aspect ratios
 
-## 1.44
+## 1.45
 ### Changed
 - Image auto-scale for editor to prevent drastic UI scaling
+
+## 1.44
+### Changed
+- Add top margin to contents to match main
 
 ## 1.43
 ### Fixed

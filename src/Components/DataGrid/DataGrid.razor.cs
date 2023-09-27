@@ -728,7 +728,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { field }));
         }
 
-        RecalculatePaging();
+        _columns.Sort((x, y) => x.ColumnOrder.CompareTo(y.ColumnOrder));
 
         if (LoadItems is null)
         {
@@ -736,6 +736,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
         else
         {
+            RecalculatePaging();
             await LoadItemsAsync();
         }
     }
@@ -962,7 +963,15 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             _columns.RemoveAll(x => x.IsDefault);
         }
-        _columns.Add(column);
+
+        var index = _columns.FindIndex(x => x.ColumnOrder > column.ColumnOrder);
+        if (index == -1)
+        {
+            index = _columns.FindLastIndex(x => x.ColumnOrder == column.ColumnOrder);
+            index++;
+        }
+        _columns.Insert(index, column);
+
         StateHasChanged();
     }
 

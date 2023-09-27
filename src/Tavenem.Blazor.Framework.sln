@@ -15,7 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\docs\CONTRIBUTING.md = ..\docs\CONTRIBUTING.md
 		..\Directory.Build.props = ..\Directory.Build.props
 		..\LICENSE = ..\LICENSE
-		NuGet.config = NuGet.config
 		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
 		..\README.md = ..\README.md
 		..\version.json = ..\version.json

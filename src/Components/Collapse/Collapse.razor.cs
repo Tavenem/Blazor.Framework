@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -134,9 +135,7 @@ public partial class Collapse : IDisposable
 
     internal bool ActiveLink { get; set; }
 
-    [CascadingParameter] private protected FrameworkLayout? FrameworkLayout { get; set; }
-
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)

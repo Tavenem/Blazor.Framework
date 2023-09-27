@@ -29,10 +29,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -66,10 +73,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -337,7 +351,18 @@
     The <code>Label</code> property sets the header for the column. If left unset, and if
     <code>Value</code> is a simple field or property accessor, a human-readable form of the property
     or field name is used automatically. The <code>LabelContent</code> property can also be set to a
-    <code>RenderFragment</code> to display custom content in the header.
+    <code>RenderFragment</code> to display custom content in the header. This property can be set
+    for auto-generated columns with the <code>DataGridColumnAttribute</code>, or the
+    <code>ShortName</code> or (if that is <code>null</code>) the <code>Name</code> property of a
+    <code>DisplayAttribute</code> applied to the property or field.
+</p>
+
+<p>
+    The <code>ColumnOrder</code> property sets the display order for the column. If left unset,
+    manually defined columns will appear in source order, and auto-generated columns appear in an
+    arbitrary order. This property can be set for auto-generated columns with the
+    <code>DataGridColumnAttribute</code>, or the <code>Order</code> property of a
+    <code>DisplayAttribute</code> applied to the property or field.
 </p>
 
 <p>
@@ -348,18 +373,24 @@
 <p>
     The <code>IsShown</code> property controls whether a given column is initially displayed. The
     user can then show or hide columns using the <code>DataGrid</code> controls. Set the
-    <code>CanHide</code> property to <code>false</code> to prevent the user from toggling a
-    column's visiblity.
+    <code>CanHide</code> property to <code>false</code> to prevent the user from toggling a column's
+    visibility. These properties can both be set for auto-generated columns with the
+    <code>DataGridColumnAttribute</code>, or the <code>AutoGenerateField</code> property of a
+    <code>DisplayAttribute</code> applied to the property or field.
 </p>
 
 <p>
-    The horizontal alignment of any column can be set with the <code>Alignment</code> property.
+    The horizontal alignment of any column can be set with the <code>Alignment</code> property. This
+    property can be set for auto-generated columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
 <p>
     The <code>Format</code> property can be set to a format string (appropriate to the data type of
     the column), and the <code>FormatProvider</code> can be set to an <code>IFormatProvider</code>
-    instance.
+    instance. These property can both be set for auto-generated columns with the
+    <code>DataGridColumnAttribute</code>, and the <code>Format</code> property can be set with the
+    <code>DataFormatString</code> property of a <code>DisplayFormatAttribute</code> applied to the
+    property or field.
 </p>
 
 <p>
@@ -456,9 +487,13 @@
 
 <p>
     Each column has filtering enabled by default, although you can disable it by setting
-    <code>CanFilter</code> to <code>false</code> on any column. However, only columns with
-    certain data types support filtering:
+    <code>CanFilter</code> to <code>false</code> on any column. This property can be set for
+    auto-generated columns with the <code>DataGridColumnAttribute</code>, or the
+    <code>AutoGenerateFilter</code> property of a <code>DisplayAttribute</code> applied to the
+    property or field.
 </p>
+    
+<p>Only columns with certain data types support filtering:</p>
 
 <ul style="list-style:circle">
     <li><code>string</code></li>
@@ -552,7 +587,8 @@
     If any column has <code>IsQuickFilter</code> set to <code>true</code> (it is <code>false</code>
     by default), the <code>DataGrid</code> will have a primary search box in the header. This search
     box will filter the rows so that only items which have each (space delimited) term in this
-    search field in at least one quick filter column.
+    search field in at least one quick filter column.  The <code>IsQuickFilter</code> property can
+    be set for auto-generated columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
 <p>
@@ -581,7 +617,8 @@
 
 <p>
     Each <code>Column</code> supports sorting by default, although you can disable it by setting
-    <code>CanSort</code> to <code>false</code> on any column.
+    <code>CanSort</code> to <code>false</code> on any column. This property can be set for
+    auto-generated columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
 <p>
@@ -598,7 +635,8 @@
 <p>
     You can set the <code>InitiallySorted</code> property to <code>true</code> to specify that a
     column should be initially sorted. Combine this with the <code>SortDescending</code> property to
-    control the direction of the initial sort.
+    control the direction of the initial sort. These properties can both be set for auto-generated
+    columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
 <Heading Level="HeadingLevel.H3">Persistence</Heading>
@@ -661,10 +699,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -713,10 +758,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -773,10 +825,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -818,10 +877,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -852,7 +918,8 @@
     href="https://www.microsoft.com/en-us/microsoft-365/excel">Excel</a>, and HTML formats is
     supported by default. The exported data will include the current set of visible columns, plus
     any columns with the <code>ExportHidden</code> property set to <code>true</code> (which allows
-    exported files to contain columns not visible in the displayed table).
+    exported files to contain columns not visible in the displayed table). This property can be set
+    for auto-generated columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
 <p>
@@ -890,8 +957,10 @@
 <p>
     To enable editing, set the <code>AllowEdit</code> property to <code>true</code>. This adds an
     edit button to each row. When clicked, an automatically-generated dialog is displayed with edit
-    controls for every column which can be edited, and a read-only display for the columns which
-    can't be edited.
+    controls for every editable column. A read-only, disabled field is displayed for columns which
+    can't be edited but for which <code>IsShown</code> is <code>true</code>, in case their
+    information might provide important context for the user during an edit operation. Hidden,
+    read-only columns are not displayed on the automatically-generated edit dialog at all.
 </p>
 
 <Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -906,10 +975,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -927,10 +1003,12 @@
 </Collapse>
 
 <p>
-    A column can normally be edited if its <code>Value</code> property is a simple property or
-    field accessor, and that property or field also has a public setter. This automatic edit support
-    can be disabled, however, by setting the <code>CanEdit</code> property of a column to
-    <code>false</code>.
+    A column can normally be edited if its <code>Value</code> property is a simple property or field
+    accessor, and that property or field also has a public setter. This automatic edit support can
+    be disabled, however, by setting the <code>CanEdit</code> property of a column to
+    <code>false</code>. This property can be set for auto-generated columns with the the
+    <code>DataGridColumnAttribute</code>, or the <code>AllowEdit</code> property of an
+    <code>EditableAttribute</code> applied to the property or field.
 </p>
 
 <p>
@@ -1008,10 +1086,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1066,10 +1151,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1109,10 +1201,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1190,10 +1289,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1228,10 +1334,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1269,10 +1382,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1305,10 +1425,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1342,10 +1469,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1380,10 +1514,17 @@
 @code {
     private class DataItem
     {
+        [DataGridColumn(CanEdit = false, CanFilter = false, Label = ""Employee #"")]
         public int Id { get; set; }
+
         public string? FirstName { get; set; }
+
         public string? LastName { get; set; }
+
+        [DataGridColumn(ColumnOrder = 1, Label = ""Executive?"")]
         public bool IsExecutive { get; set; }
+
+        [DataGridColumn(Format = ""d"")]
         public DateTime HireDate { get; set; }
     }
     private List<DataItem> _items = new()
@@ -1413,7 +1554,8 @@
     contain, and the <code>CellClass</code> property on <code>Column</code> can be assigned a
     function which retuns a CSS class for a given data item, in order to customize the style of
     individual cells, while the <code>ColumnClass</code> property on <code>Column</code> can be set
-    to customize the CSS style for an entire column.
+    to customize the CSS style for an entire column. The <code>ColumnClass</code> property can be
+    set for auto-generated columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
 <p>

@@ -4,7 +4,7 @@
     <ChildContent>
         @if (EditedItem is not null)
         {
-            <Form @ref="DialogEditForm" Class="d-flex flex-column mx-3">
+            <Form @ref="DialogEditForm" Class="d-flex flex-column mx-3 gap-3">
             @foreach (var column in Columns)
             {
                 @if (column.GetCanEdit())
@@ -461,7 +461,7 @@
                         <Field Label="@column.GetLabel()" Class="dense">
                             @if (column.ChildContent is null)
                             {
-                                column.ToString(EditedItem);
+                                @column.ToString(EditedItem)
                             }
                             else
                             {
@@ -470,12 +470,12 @@
                         </Field>
                     }
                 }
-                else
+                else if (column.GetIsShown())
                 {
-                    <Field Label="@column.GetLabel()" Class="dense">
+                    <Field Label="@column.GetLabel()" Class="dense" ReadOnly="true" Disabled="true">
                         @if (column.ChildContent is null)
                         {
-                            column.ToString(EditedItem);
+                            @column.ToString(EditedItem)
                         }
                         else
                         {
