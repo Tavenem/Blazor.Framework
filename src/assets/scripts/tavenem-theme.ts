@@ -74,10 +74,10 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
             }
         }
 
-        return true;
+        return;
     }
 
-    return false;
+    return;
 }
 
 export function initializeColorScheme() {
@@ -86,7 +86,8 @@ export function initializeColorScheme() {
         colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
     }
     const currentScheme = getPreferredColorScheme();
-    return setColorScheme(currentScheme);
+    setColorScheme(currentScheme, _manualColorTheme);
+    return currentScheme;
 }
 
 function getNativePreferredColorScheme(): ThemePreference {

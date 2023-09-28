@@ -55,7 +55,7 @@
     @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
 }
 @media (prefers-color-scheme: dark) {
-    :root :not([data-theme="light"]) {
+    :root {
         @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
     }
 }

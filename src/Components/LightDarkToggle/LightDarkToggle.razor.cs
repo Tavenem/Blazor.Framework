@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -48,7 +49,7 @@ public partial class LightDarkToggle
         ? (DarkModeIcon ?? LightModeIcon)
         : (LightModeIcon ?? DarkModeIcon);
 
-    [Inject] private ThemeService ThemeService { get; set; } = default!;
+    [Inject, NotNull] private ThemeService? ThemeService { get; set; }
 
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)

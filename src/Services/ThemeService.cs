@@ -5,9 +5,6 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Allows getting and setting the preferred color scheme (light vs. dark).
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of <see cref="ThemeService"/>.
-/// </remarks>
 /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
 public class ThemeService(IJSRuntime jsRuntime) : IAsyncDisposable
 {
@@ -20,6 +17,11 @@ public class ThemeService(IJSRuntime jsRuntime) : IAsyncDisposable
     private bool _disposedValue;
     private DotNetObjectReference<ThemeService>? _dotNetRef;
     private EventHandler<ThemePreference>? _onThemeChange;
+
+    /// <summary>
+    /// A theme color shared by the app layout (app bars, drawers, and contents lists).
+    /// </summary>
+    public ThemeColor LayoutThemeColor { get; set; }
 
     /// <summary>
     /// Raised when the theme changes, either manually or due to a user preference change.
@@ -60,24 +62,23 @@ public class ThemeService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// <summary>
     /// Initialize the current color scheme based on current preferences and settings.
     /// </summary>
-    public async ValueTask<bool> InitializeColorScheme()
+    public async ValueTask<ThemePreference> InitializeColorSchemeAsync()
     {
-        Console.WriteLine("InitializeColorScheme");
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
             return await module
-                .InvokeAsync<bool>("initializeColorScheme")
+                .InvokeAsync<ThemePreference>("initializeColorScheme")
                 .ConfigureAwait(false);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
-        return false;
+        return ThemePreference.Light;
     }
 
     /// <summary>
-    /// Invoked by javascript.
+    /// Invoked by JavaScript.
     /// </summary>
     [JSInvokable]
     public void NotifyThemeChanged(ThemePreference theme)

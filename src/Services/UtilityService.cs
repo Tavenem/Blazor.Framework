@@ -5,9 +5,6 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Provides encapsulated JavaScript interop for <c>Tavenem.Blazor.Framework</c>
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of <see cref="UtilityService"/>.
-/// </remarks>
 /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
 public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
 {

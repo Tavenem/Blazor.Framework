@@ -98,12 +98,11 @@ public partial class AnchorLink : IDisposable
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     /// <inheritdoc />
-    protected override void OnInitialized() => Collapse?.Add(this);
-
-    /// <inheritdoc />
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
+        Collapse?.Add(this);
         NavigationManager.LocationChanged += OnLocationChanged;
+        UpdateState(NavigationManager.Uri);
     }
 
     /// <inheritdoc />
@@ -151,15 +150,17 @@ public partial class AnchorLink : IDisposable
         }
     }
 
-    internal void UpdateState(LocationChangedEventArgs args)
+    internal void UpdateState(LocationChangedEventArgs args) => UpdateState(args.Location);
+
+    private void UpdateState(string location)
     {
-        if (_currentLocation == args.Location
+        if (_currentLocation == location
             || !string.IsNullOrEmpty(LocalLink))
         {
             return;
         }
-        _currentLocation = args.Location;
-        var shouldBeActiveNow = ShouldMatch(args.Location);
+        _currentLocation = location;
+        var shouldBeActiveNow = ShouldMatch(location);
         if (shouldBeActiveNow != IsActive)
         {
             IsActive = shouldBeActiveNow;
