@@ -11,12 +11,13 @@
         </main>
         @if (ContentsBreakpoint != Breakpoint.None)
         {
-            <Contents ThemeColor="ThemeColor" Breakpoint="ContentsBreakpoint" Class="d-print-none" Style="grid-area:contents" />
+            <Contents @ref="Contents"
+                      Breakpoint="ContentsBreakpoint"
+                      Class="d-print-none"
+                      Style="grid-area:contents"
+                      ThemeColor="ThemeColor" />
         }
-        @foreach (var dialogReference in _dialogs)
-        {
-            @dialogReference.RenderFragment
-        }
+        <DialogContainer @ref="DialogContainer" />
     </CascadingValue>
     @if (AutoScrollToTop)
     {

@@ -1,0 +1,8 @@
+@namespace Tavenem.Blazor.Framework
+
+<CascadingValue Value="this" IsFixed="true">
+    @foreach (var dialogReference in _dialogs)
+    {
+        @dialogReference.RenderFragment
+    }
+</CascadingValue>

@@ -79,7 +79,7 @@ internal static class InternalExtensions
         }
     }
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static StringBuilder? Replace(this StringBuilder? value, string pattern, string replacement, RegexOptions options)
     {
         if (value is null || value.Length == 0)
@@ -90,7 +90,7 @@ internal static class InternalExtensions
         return new StringBuilder(Regex.Replace(value.ToString(), pattern, replacement, options));
     }
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static string? ToJsString(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -112,7 +112,7 @@ internal static class InternalExtensions
         _ => "all",
     };
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static string? ToTrimmedString(this StringBuilder? value)
     {
         if (value is null || value.Length == 0)
@@ -136,7 +136,7 @@ internal static class InternalExtensions
         return value.ToString();
     }
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static StringBuilder? TrimEnd(this StringBuilder? value)
     {
         if (value is null || value.Length == 0)

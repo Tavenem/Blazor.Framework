@@ -1,0 +1,23 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits TavenemComponentBase
+
+@if (Headings.Count > 0)
+{
+    <nav @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
+        @if (ChildContent is null)
+        {
+            <div class="subheader sticky">Contents</div>
+        }
+        else
+        {
+            @ChildContent
+        }
+        @foreach (var heading in Headings)
+        {
+            <AnchorLink href="@($"#{heading.Id}")" Class="@(heading == ActiveHeading ? "active" : null)">
+                <span style="@HeadingStyle(heading)">@heading.Title</span>
+            </AnchorLink>
+        }
+    </nav>
+}

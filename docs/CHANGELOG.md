@@ -1,9 +1,11 @@
 # Changelog
 
-## 1.50-preview.1
+## 2.0-preview.1
 ### Changed
 - Update to .NET 8 RC
 - Support prerendering
+### Removed
+- .NET 6 and .NET 7 targets
 
 ## 1.49
 ### Fixed

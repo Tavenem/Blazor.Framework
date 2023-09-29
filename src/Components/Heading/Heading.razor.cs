@@ -69,6 +69,7 @@ public partial class Heading : IDisposable
         {
             Id = id;
         }
+        Id ??= Guid.NewGuid().ToHtmlId();
     }
 
     /// <inheritdoc/>

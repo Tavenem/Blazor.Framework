@@ -53,17 +53,18 @@
 
 <p>
     It is also possible to add headings to the table(s) of contents on a page manually. The
-    <code>FrameworkLayout</code> provides itself as a <a
+    <code>Contents</code> component has two key methods for this purpose: <code>AddHeading</code>
+    and <code>RemoveHeading</code>, both of which take a <code>HeadingInfo</code> object that
+    describes a heading. The <code>FrameworkLayout</code> also provides these same methods, in order
+    to add or remove headings from the built-in contents, and provides itself as a <a
     href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/cascading-values-and-parameters">cascading
-    value</a>, and has two key methods for this purpose: <code>AddHeading</code> and
-    <code>RemoveHeading</code>, both of which take a <code>HeadingInfo</code> object that describes
-    a heading.
+    value</a> so you can accesss these methods from any component.
 </p>
 
 <p>
-    Adding a heading will automatically add it to any displayed table of <code>Contents</code>
-    component. It is important that you also remove the heading when it is no longer relevant. For
-    instance, in the <code>Dispose</code> method of a component which adds it.
+    Adding a heading will automatically add it to the <code>Contents</code> component. It is
+    important that you also remove the heading when it is no longer relevant. For instance, in the
+    <code>Dispose</code> method of a component which adds it.
 </p>
 
 <p>
@@ -82,3 +83,17 @@
     <button class="btn primary" @onclick="AddHeading" disabled="@_added">Add Heading to Contents</button>
     <button class="btn danger" @onclick="RemoveHeading" disabled="@(!_added)">Remove Heading from Contents</button>
 </div>
+
+<Heading Level="HeadingLevel.H2">Refreshing</Heading>
+
+<p>
+    The heading list is determined when the contents component is rendered, and is not updated
+    dynamically.
+</p>
+
+<p>
+    If heading elements might be dynamically added or removed on a page, you can call the
+    <code>RefreshHeadingsAsync</code> method on the <code>Contents</code> component to refresh the
+    list. Note, however, that this will also remove any headings manually added with the
+    <code>AddHeading</code> method.
+</p>

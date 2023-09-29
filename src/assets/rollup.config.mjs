@@ -32,6 +32,13 @@ export default [{
     },
     plugins: plugins,
 }, {
+    input: "./scripts/tavenem-contents.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
     input: "./scripts/tavenem-dragdrop.ts",
     output: {
         format: 'es',

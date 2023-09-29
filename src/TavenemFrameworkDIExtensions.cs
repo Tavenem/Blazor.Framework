@@ -18,6 +18,7 @@ public static class TavenemFrameworkDIExtensions
     {
         services.AddScoped<AppState>();
         services.AddScoped<UtilityService>();
+        services.AddScoped<ContentsService>();
         services.AddScoped<DragDropService>();
         services.AddScoped<PopoverService>();
         services.AddScoped<ScrollService>();

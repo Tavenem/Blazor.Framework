@@ -238,3 +238,24 @@
     Note that the <code>IsVisible</code> property is ignored by dialogs which
     are displayed via the <code>DialogService</code>.
 </p>
+
+<Heading Level="HeadingLevel.H3">Standalone</Heading>
+
+<p>
+    The <a href="/layout/layout">FrameworkLayout</a> component has built-in support for dialogs.
+    However, if you wish to use dialogs without a <code>FrameworkLayout</code>, you must place a
+    <code>DialogContainer</code> component somewhere on the page. This component contains all the
+    presentation logic required to place dialogs.
+</p>
+
+<p>
+    It is usually convenient to place the <code>DialogContainer</code> component in your layout, but
+    if dialogs will only be displayed on a certain page, you can place the container only on that
+    page.
+</p>
+
+<p>
+    The <code>DialogContainer</code> can be placed anywhere in your page. The dialogs use fixed
+    positioning, and should display in the correct position on the page regardless of the
+    container's position within the document flow.
+</p>

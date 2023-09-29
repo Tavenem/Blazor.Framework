@@ -1,23 +1,14 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.JSInterop;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A complete layout structure for a Tavenem.Blazor.Framework app.
 /// </summary>
-public partial class FrameworkLayout : IDisposable
+public partial class FrameworkLayout
 {
-    private readonly List<Contents> _contents = new();
-    private readonly Collection<DialogReference> _dialogs = new();
     private readonly List<Drawer> _drawers = new();
     private readonly List<ScrollToTop> _scrollToTops = new();
-
-    private bool _disposedValue;
-    private DotNetObjectReference<FrameworkLayout>? _dotNetRef;
 
     /// <summary>
     /// <para>
@@ -43,23 +34,9 @@ public partial class FrameworkLayout : IDisposable
     [Parameter] public Breakpoint SideDrawerBreakpoint { get; set; } = Breakpoint.Lg;
 
     /// <summary>
-    /// <para>
-    /// The name of a CSS class of elements to observe with scroll spy.
-    /// </para>
-    /// <para>
-    /// Defaults to the CSS class name for <see cref="Heading"/> components.
-    /// </para>
-    /// </summary>
-    [Parameter] public string? ScrollSpyClass { get; set; } = Heading.HeadingClassName;
-
-    /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
-
-    internal HeadingInfo? ActiveHeading { get; private set; }
-
-    internal List<HeadingInfo> Headings { get; } = new();
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
@@ -75,7 +52,9 @@ public partial class FrameworkLayout : IDisposable
 
     private bool AutoScrollToTop { get; set; } = true;
 
-    [Inject, NotNull] private DialogService? DialogService { get; set; }
+    private Contents? Contents { get; set; }
+
+    private DialogContainer? DialogContainer { get; set; }
 
     private string DrawerContainerClass => SideDrawerBreakpoint switch
     {
@@ -84,41 +63,6 @@ public partial class FrameworkLayout : IDisposable
     };
 
     private bool HasOpenDrawer { get; set; }
-
-    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
-
-    [Inject, NotNull] private ScrollService? ScrollService { get; set; }
-
-    /// <inheritdoc />
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            DialogService.OnDialogAdded += OnDialogAdded;
-            DialogService.OnDialogClosed += DismissDialogInstance;
-            NavigationManager.LocationChanged += OnLocationChanged;
-
-            if (!string.IsNullOrEmpty(ScrollSpyClass))
-            {
-                _dotNetRef = DotNetObjectReference.Create(this);
-                await ScrollService.ScrollSpy(_dotNetRef, ScrollSpyClass);
-                await ScrollService.ScrollSpyTags(_dotNetRef, "h1", "h2", "h3", "h4", "h5", "h6");
-            }
-
-            var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-            if (uri.Fragment.Length > 0)
-            {
-                await ScrollService.ScrollToId(uri.Fragment[1..]);
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
 
     /// <summary>
     /// Adds a heading to the layout, and all <see cref="Contents"/> components.
@@ -130,39 +74,12 @@ public partial class FrameworkLayout : IDisposable
     /// <remarks>
     /// This method can be used to add headings without using the <see cref="Heading"/> component.
     /// </remarks>
-    public string AddHeading(HeadingInfo heading)
-    {
-        Headings.Add(heading);
-        if (string.IsNullOrEmpty(heading.Id))
-        {
-            heading.Id = $"heading-{Headings.Count}";
-        }
-        RefreshContents();
-        return heading.Id;
-    }
+    public string? AddHeading(HeadingInfo heading) => Contents?.AddHeading(heading);
 
     /// <summary>
     /// Dismisses all open dialogs.
     /// </summary>
-    public void DismissAllDialogs()
-    {
-        _dialogs
-            .ToList()
-            .ForEach(dialog => DismissDialogInstance(dialog, DialogResult.DefaultCancel));
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// Invoked by JavaScript interop.
-    /// </summary>
-    [JSInvokable]
-    public void RaiseOnScrollSpy(string? id)
-    {
-        ActiveHeading = string.IsNullOrEmpty(id)
-            ? null
-            : Headings.Find(x => x.Id == id);
-        RefreshContents();
-    }
+    public void DismissAllDialogs() => DialogContainer?.DismissAllDialogs();
 
     /// <summary>
     /// Removes a heading from the layout, and all <see cref="Contents"/> components.
@@ -171,13 +88,7 @@ public partial class FrameworkLayout : IDisposable
     /// <remarks>
     /// Does not throw an error if the given heading is not present.
     /// </remarks>
-    public void RemoveHeading(HeadingInfo heading)
-    {
-        Headings.Remove(heading);
-        RefreshContents();
-    }
-
-    internal void Add(Contents contents) => _contents.Add(contents);
+    public void RemoveHeading(HeadingInfo heading) => Contents?.RemoveHeading(heading);
 
     internal void Add(Drawer drawer)
     {
@@ -194,15 +105,6 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
-    internal void DismissDialogInstance(Guid id, DialogResult? result = null)
-    {
-        var reference = GetDialogReference(id);
-        if (reference is not null)
-        {
-            DismissDialogInstance(reference, result);
-        }
-    }
-
     internal async Task DrawerToggleAsync(Side side)
     {
         var drawer = _drawers.Find(x => x.Side == side);
@@ -214,19 +116,7 @@ public partial class FrameworkLayout : IDisposable
         await drawer.ToggleAsync();
     }
 
-    internal int GetHeadingCount() => Headings.Count;
-
     internal bool HasDrawer(Side side) => _drawers.Any(x => x.Side == side);
-
-    internal void RefreshContents()
-    {
-        foreach (var contents in _contents)
-        {
-            contents.Refresh();
-        }
-    }
-
-    internal void Remove(Contents contents) => _contents.Remove(contents);
 
     internal void Remove(Drawer drawer)
     {
@@ -243,34 +133,6 @@ public partial class FrameworkLayout : IDisposable
         }
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                NavigationManager.LocationChanged -= OnLocationChanged;
-                _dotNetRef?.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    private void DismissDialogInstance(DialogReference dialog, DialogResult? result = null)
-    {
-        dialog.Dismiss(result);
-        _dialogs.Remove(dialog);
-        StateHasChanged();
-    }
-
-    private DialogReference? GetDialogReference(Guid id) => _dialogs
-        .SingleOrDefault(x => x.Id == id);
-
     private protected async Task OnCloseDrawersAsync()
     {
         foreach (var drawer in _drawers)
@@ -280,31 +142,10 @@ public partial class FrameworkLayout : IDisposable
         HasOpenDrawer = false;
     }
 
-    private void OnDialogAdded(DialogReference reference)
-    {
-        _dialogs.Add(reference);
-        StateHasChanged();
-    }
-
     private void OnDrawerToggled(object? drawer, bool state)
     {
         HasOpenDrawer = state
           || _drawers.Any(x => x.IsOpen);
         StateHasChanged();
-    }
-
-    private async void OnLocationChanged(object? _, LocationChangedEventArgs args)
-    {
-        DismissAllDialogs();
-
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        if (uri.Fragment.Length == 0)
-        {
-            await ScrollService.ScrollToTop("#main-container");
-        }
-        else
-        {
-            await ScrollService.ScrollToId(uri.Fragment[1..]);
-        }
     }
 }
