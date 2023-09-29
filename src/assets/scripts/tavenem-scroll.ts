@@ -38,6 +38,64 @@ export function scrollSpyTags(this: any, dotnetReference: DotNet.DotNetObject, t
     _spy(null as any);
 }
 
+export function scrollToHeading(
+    contentsId: string,
+    level: number,
+    title: string | null,
+    block: ScrollLogicalPosition | null,
+    setHistory?: boolean) {
+    const contents = document.getElementById(contentsId);
+    if (!contents) {
+        return [];
+    }
+    const parent = contents.parentNode || document;
+
+    let matches = level <= 0
+        ? []
+        : Array
+            .from(parent.querySelectorAll(`h${level}`))
+            .filter(x => x.closest('.editor') == null);
+    if (matches.length == 0) {
+        matches = Array
+            .from(parent.querySelectorAll('.tav-heading'))
+            .filter(x => Number.parseInt(x.getAttribute('data-heading-level') || '0') == level
+                && x.closest('.editor') == null);
+    }
+    if (matches.length == 0) {
+        return;
+    }
+    let found: Element | null = null;
+    for (var match of matches) {
+        if ((title?.length || 0) == 0) {
+            if ((!match.hasAttribute('data-heading-title')
+                || match.getAttribute('data-heading-title')?.length == 0)
+                && (match.textContent?.length || 0) == 0) {
+                found = match;
+                break;
+            }
+        } else {
+            const matchTitle = match.getAttribute('data-heading-title')
+                || match.textContent;
+            if (matchTitle == title) {
+                found = match;
+                break;
+            }
+        }
+    }
+    if (found) {
+        found.scrollIntoView({
+            behavior: "smooth",
+            block: block || "start",
+            inline: "nearest"
+        });
+        if (setHistory
+            && window.location.hash
+            && window.location.hash.length) {
+            history.replaceState(null, '', window.location.pathname);
+        }
+    }
+}
+
 export function scrollToId(elementId: string | null, block: ScrollLogicalPosition | null, setHistory?: boolean) {
     let element = elementId
         ? document.getElementById(elementId)

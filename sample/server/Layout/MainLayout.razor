@@ -1,11 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="tavenem-framework-layout">
+<div class="tavenem-framework-layout drawer-container">
     <SnackbarContainer @rendermode="@RenderMode.Auto" />
     <DialogContainer @rendermode="@RenderMode.Auto" />
     <TopAppbar />
     <LeftDrawer />
-    <main id="main-container" class="container mt-3">
+    <main id="main-container">
         @Body
         <footer class="d-flex flex-wrap align-self-stretch mt-auto mx-6 pt-4 px-4 pb-1 gap-3 justify-content-space-around">
             <small>© Tavenem</small>

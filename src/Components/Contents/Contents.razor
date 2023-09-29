@@ -15,9 +15,18 @@
         }
         @foreach (var heading in Headings)
         {
-            <AnchorLink href="@($"#{heading.Id}")" Class="@(heading == ActiveHeading ? "active" : null)">
-                <span style="@HeadingStyle(heading)">@heading.Title</span>
-            </AnchorLink>
+            @if (string.IsNullOrEmpty(heading.Id))
+            {
+                <a class="@(heading == ActiveHeading ? "active" : null)" @onclick="@(_ => GoToAsync(heading))">
+                    <span style="@HeadingStyle(heading)">@heading.Title</span>
+                </a>
+            }
+            else
+            {
+                <a href="@($"#{heading.Id}")" class="@(heading == ActiveHeading ? "active" : null)">
+                    <span style="@HeadingStyle(heading)">@heading.Title</span>
+                </a>
+            }
         }
     </nav>
 }

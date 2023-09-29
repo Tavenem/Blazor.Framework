@@ -2,7 +2,7 @@
 
 <PageTitle>Light-Dark Toggle - Tavenem Blazor Framework</PageTitle>
 
-<Heading Level="HeadingLevel.H1">Light-Dark Toggle</Heading>
+<h1>Light-Dark Toggle</h1>
 
 <p>
     The Tavenem Blazor Framework provides built-in support for both light and dark themes. The
@@ -24,7 +24,13 @@
     modes.
 </p>
 
-<Heading Level="HeadingLevel.H2">Basics</Heading>
+<p>
+    If the app is being prerendered, or statically rendered, the component will not display at all
+    (since it can neither gather information from the browser about current settings, nor can it
+    provide interactivity).
+</p>
+
+<h2>Basics</h2>
 
 <p>
     The <code>IsDarkMode</code> read-only property indicates whether the app is currently set to a

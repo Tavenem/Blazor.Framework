@@ -6,7 +6,10 @@
     <div class="@HeaderClassName">
         <div class="@HeaderToolbarClassName">
             @HeaderContent
-            <tf-close class="drawer-close-small" @onclick="OnClosedAsync" />
+            @if (IsInteractive)
+            {
+                <tf-close class="drawer-close-small" @onclick="OnClosedAsync" />
+            }
         </div>
     </div>
     @ChildContent

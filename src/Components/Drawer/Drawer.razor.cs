@@ -160,6 +160,8 @@ public partial class Drawer : IDisposable
     /// </summary>
     private bool IsClosed { get; set; }
 
+    private bool IsInteractive { get; set; }
+
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
     private ThemeColor ThemeColorValue => ThemeColor ?? FrameworkLayout?.ThemeColor ?? Framework.ThemeColor.Default;
@@ -192,6 +194,8 @@ public partial class Drawer : IDisposable
         if (firstRender)
         {
             NavigationManager.LocationChanged += OnLocationChanged;
+            IsInteractive = true;
+            StateHasChanged();
         }
     }
 

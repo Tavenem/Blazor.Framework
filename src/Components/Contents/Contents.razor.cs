@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 
@@ -9,6 +10,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Contents : IDisposable
 {
+    internal const string HeadingClassName = "tav-heading";
+
     private bool _disposedValue;
     private DotNetObjectReference<Contents>? _dotNetRef;
 
@@ -43,7 +46,7 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("list contents highlight-start dense mt-3")
+    protected override string? CssClass => new CssBuilder("list contents highlight-start dense")
         .Add(ThemeColor.ToCSS())
         .Add(BreakpointClass)
         .Add(Class)
@@ -80,6 +83,8 @@ public partial class Contents : IDisposable
 
     private int HighestLevel => (int)(Headings.MaxBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
 
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
+
     [Inject, NotNull] private ScrollService? ScrollService { get; set; }
 
     /// <inheritdoc />
@@ -87,11 +92,17 @@ public partial class Contents : IDisposable
     {
         if (firstRender)
         {
-            Headings.AddRange(await ContentsService.GetHeadingsAsync(Id));
+            NavigationManager.LocationChanged += OnLocationChanged;
 
             _dotNetRef = DotNetObjectReference.Create(this);
-            await ScrollService.ScrollSpy(_dotNetRef, Heading.HeadingClassName);
+            await ScrollService.ScrollSpy(_dotNetRef, HeadingClassName);
             await ScrollService.ScrollSpyTags(_dotNetRef, "h1", "h2", "h3", "h4", "h5", "h6");
+
+            Headings.AddRange(await ContentsService.GetHeadingsAsync(Id));
+            if (Headings.Count > 0)
+            {
+                StateHasChanged();
+            }
         }
     }
 
@@ -110,7 +121,7 @@ public partial class Contents : IDisposable
     /// The heading's ID. If it was <see langword="null"/> or empty, a new ID will be created.
     /// </returns>
     /// <remarks>
-    /// This method can be used to add headings without using the <see cref="Heading"/> component.
+    /// This method can be used to add headings dynamically.
     /// </remarks>
     public string AddHeading(HeadingInfo heading)
     {
@@ -185,6 +196,9 @@ public partial class Contents : IDisposable
         }
     }
 
+    private async Task GoToAsync(HeadingInfo heading)
+        => await ScrollService.ScrollToHeading(Id, (int)heading.Level, heading.Title);
+
     private string? HeadingStyle(HeadingInfo heading)
     {
         if (LowestLevel == 0)
@@ -201,5 +215,16 @@ public partial class Contents : IDisposable
         }
 
         return $"padding-inline-start:{offset * 0.5}rem";
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        var count = Headings.Count;
+        Headings.Clear();
+        Headings.AddRange(await ContentsService.GetHeadingsAsync(Id));
+        if (Headings.Count != count)
+        {
+            StateHasChanged();
+        }
     }
 }

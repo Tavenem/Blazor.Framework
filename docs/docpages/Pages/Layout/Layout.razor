@@ -2,7 +2,7 @@
 
 <PageTitle>Layout - Tavenem Blazor Framework</PageTitle>
 
-<Heading Level="HeadingLevel.H1">Layout</Heading>
+<h1>Layout</h1>
 
 <p>This page will show you how to use the Tavenem Blazor Framework layout component.</p>
 
@@ -50,36 +50,34 @@
     side at large view sizes.
 </p>
 <p>
-    Apart from support for top and bottom <code class="primary">AppBars</code>, and <code
-    class="primary">Drawers</code> on all four sides, the <code
-    class="primary">FrameworkLayout</code> component includes a built-in <a
+    Apart from support for top and bottom <code>AppBars</code>, and <code>Drawers</code> on all four
+    sides, the <code>FrameworkLayout</code> component includes a built-in <a
     href="./components/scroll-to-top">ScrollToTop</a> component for the main document. You can
-    override the built-in <code class="primary">ScrollToTop</code> by including your own.
+    override the built-in <code>ScrollToTop</code> by including your own.
 </p>
 <p>
-    It also provides the overlays used for temporary <code class="primary">Drawers</code>, and
-    automatic support for <a href="./components/dialog">Dialogs</a> and <a
-    href="./components/snackbar">Snackbars</a>.
-</p>
-
-<p>
-    Note that is isn't strictly necessary to use a <code class="primary">FrameworkLayout</code>
-    component in your app. Most components in this library can be used stand-alone. However, the <a
-    href="./components/appbar">AppBar</a>, <a href="./components/contents">Contents</a>, and <a
-    href="./components/drawer">Drawer</a> components rely on a containing <code
-    class="primary">FrameworkLayout</code> to operate.
+    It also provides the overlays used for temporary <code>Drawers</code>, and
+    automatic support for <a href="./components/contents">Contents</a>, <a
+    href="./components/dialog">Dialogs</a> and <a href="./components/snackbar">Snackbars</a>.
 </p>
 
-<Heading Level="HeadingLevel.H2">Theme</Heading>
 <p>
-    The <code class="primary">FrameworkLayout</code> component includes a <code
-    class="primary">Theme</code> property. You can use this to coordinate the theme of all <code
-    class="primary">AppBars</code> and <code class="primary">Drawers</code>, eliminating the need to
-    specify the same value on each separately.
+    Note that is isn't strictly necessary to use a <code>FrameworkLayout</code> component in your
+    app. Most components in this library can be used stand-alone. However, the <a
+    href="./components/drawer">Drawer</a> component relies on a containing
+    <code>FrameworkLayout</code> to operate, and the <a href="./components/appbar">AppBar</a>
+    component also requires a containing <code>FrameworkLayout</code> if it controls a drawer.
+</p>
+
+<h2>Theme</h2>
+<p>
+    The <code>FrameworkLayout</code> component includes a <code>Theme</code> property. You can use
+    this to coordinate the theme of all <code>AppBars</code> and <code>Drawers</code>, eliminating
+    the need to specify the same value on each separately.
 </p>
 <p>
-    Each <code class="primary">AppBar</code> and <code class="primary">Drawer</code> can still have
-    its own <code class="primary">Theme</code> property set directly, however, which will override
+    Each <code>AppBar</code> and <code>Drawer</code> can still have
+    its own <code>Theme</code> property set directly, however, which will override
     the inherited value.
 </p>
 <p>See <a href="./getting-started/themes">Themes</a> for more information about style and color.</p>

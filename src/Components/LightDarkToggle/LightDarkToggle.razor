@@ -2,6 +2,11 @@
 
 @inherits TavenemComponentBase
 
+@if (!IsInteractive)
+{
+    return;
+}
+
 <button @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClickAsync">
     @if (!string.IsNullOrEmpty(Icon))
     {

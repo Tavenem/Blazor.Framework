@@ -2,7 +2,7 @@
 
 <PageTitle>DataGrid - Tavenem Blazor Framework</PageTitle>
 
-<Heading Level="HeadingLevel.H1">Data Grid</Heading>
+<h1>Data Grid</h1>
 
 <p>
     The <code>DataGrid</code> component is a rich table control for displaying item collections in
@@ -10,7 +10,7 @@
     other data operations built in.
 </p>
 
-<Heading Level="HeadingLevel.H2">Basics</Heading>
+<h2>Basics</h2>
 
 <p>
     The simplest <code>DataGrid</code> can be built by simply assigning any list of items to the
@@ -262,7 +262,7 @@
     no rows. If omitted, a default is used.
 </p>
 
-<Heading Level="HeadingLevel.H2">Columns</Heading>
+<h2>Columns</h2>
 
 <p>
     By default the <code>DataGrid</code> uses reflection to find the public, readable properties and
@@ -402,7 +402,7 @@
     entire column.
 </p>
 
-<Heading Level="HeadingLevel.H2">Expanded content</Heading>
+<h2>Expanded content</h2>
 
 <p>
     Each row can act as a <code>Collapse</code> component, expanding to display additional content.
@@ -477,13 +477,13 @@
     a function to <code>HasExpandedContent</code> it is assumed that all rows can expand.
 </p>
 
-<Heading Level="HeadingLevel.H2">Filtering</Heading>
+<h2>Filtering</h2>
 
 <p>
     A <code>DataGrid</code> supports two kinds of filtering: per-column, and quick filters.
 </p>
 
-<Heading Level="HeadingLevel.H3">Column filtering</Heading>
+<h3>Column filtering</h3>
 
 <p>
     Each column has filtering enabled by default, although you can disable it by setting
@@ -581,7 +581,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Quick filtering</Heading>
+<h3>Quick filtering</h3>
 
 <p>
     If any column has <code>IsQuickFilter</code> set to <code>true</code> (it is <code>false</code>
@@ -598,7 +598,7 @@
     <code>IsQuickFilter</code> set to <code>true</code>.
 </p>
 
-<Heading Level="HeadingLevel.H3">Persistence</Heading>
+<h3>Persistence</h3>
 
 <p>
     Normally all filters will be reset when navigating away from the page. If you set an explicit
@@ -613,7 +613,7 @@
     query parameters in combination with the initial filter properties to achieve this result.
 </p>
 
-<Heading Level="HeadingLevel.H2">Sorting</Heading>
+<h2>Sorting</h2>
 
 <p>
     Each <code>Column</code> supports sorting by default, although you can disable it by setting
@@ -639,7 +639,7 @@
     columns with the <code>DataGridColumnAttribute</code>.
 </p>
 
-<Heading Level="HeadingLevel.H3">Persistence</Heading>
+<h3>Persistence</h3>
 
 <p>
     Normally all sorting options will be reset when navigating away from the page. If you set an
@@ -654,7 +654,7 @@
     query parameters in combination with the initial sort properties to achieve this result.
 </p>
 
-<Heading Level="HeadingLevel.H2">Grouping</Heading>
+<h2>Grouping</h2>
 
 <p>
     Set the <code>GroupBy</code> property to a function which accepts a data item and returns any
@@ -736,7 +736,7 @@
     It receives the group key as its context parameter.
 </p>
 
-<Heading Level="HeadingLevel.H2">Pagination</Heading>
+<h2>Pagination</h2>
 
 <p>
     The <code>DataGrid</code> contains a built-in <a href="./components/pagination">Pagination</a>
@@ -797,14 +797,14 @@
     controls are not displayed.
 </p>
 
-<Heading Level="HeadingLevel.H2">Selection</Heading>
+<h2>Selection</h2>
 
 <p>
     The <code>SelectionType</code> property can be set to either <code>Single</code> or
     <code>Multiple</code> to enable row selection.
 </p>
 
-<Heading Level="HeadingLevel.H3">Single selection</Heading>
+<h3>Single selection</h3>
 
 <p>
     With <code>SelectionType</code> set to <code>Single</code>, clicking on a row will select it.
@@ -853,7 +853,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Multiple selection</Heading>
+<h3>Multiple selection</h3>
 
 <p>
     With <code>SelectionType</code> set to <code>Multiple</code>, each row gains a checkbox which
@@ -905,7 +905,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H2">Exporting</Heading>
+<h2>Exporting</h2>
 
 <p>
     The <code>DataGrid</code> component has built-in support for exporting to multiple file types
@@ -947,7 +947,7 @@
     implementer to generate an appropriate PDF based on the filter and sort criteria.
 </p>
 
-<Heading Level="HeadingLevel.H2">Editing</Heading>
+<h2>Editing</h2>
 
 <p>
     The <code>DataGrid</code> component has built-in support for both editing existing data, as well
@@ -1057,7 +1057,7 @@
     values.
 </p>
 
-<Heading Level="HeadingLevel.H3">Inline editing</Heading>
+<h3>Inline editing</h3>
 
 <p>
     You can also enable inline editing by setting the <code>AllowInlineEdit</code> property to
@@ -1113,7 +1113,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Adding items</Heading>
+<h3>Adding items</h3>
 
 <p>
     You can enable adding new items by setting the <code>AllowAdd</code> property to
@@ -1178,7 +1178,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Deleting items</Heading>
+<h3>Deleting items</h3>
 
 <p>
     You can enable adding new items by setting the <code>AllowDelete</code> property to
@@ -1228,7 +1228,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Validation</Heading>
+<h3>Validation</h3>
 
 <p>
     When editing or adding new items, the values in each cell (i.e. each property of the item) can
@@ -1257,7 +1257,7 @@
     original values.
 </p>
 
-<Heading Level="HeadingLevel.H2">Customization</Heading>
+<h2>Customization</h2>
 
 <p>
     The <code>Title</code> property can be used to display a title in the header of the

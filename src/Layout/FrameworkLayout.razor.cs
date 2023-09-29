@@ -72,7 +72,7 @@ public partial class FrameworkLayout
     /// The heading's ID. If it was <see langword="null"/> or empty, a new ID will be created.
     /// </returns>
     /// <remarks>
-    /// This method can be used to add headings without using the <see cref="Heading"/> component.
+    /// This method can be used to add headings dynamically.
     /// </remarks>
     public string? AddHeading(HeadingInfo heading) => Contents?.AddHeading(heading);
 

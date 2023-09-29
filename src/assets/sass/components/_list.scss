@@ -321,9 +321,15 @@
 
 .contents {
     color: var(--tavenem-color-text-secondary);
+    margin-top: 1rem;
 
     > .active {
         border-left: 1px solid var(--list-active-color);
         border-right: none;
+    }
+
+    .appbar.top ~ & {
+        margin-top: 0;
+        padding-top: 0;
     }
 }

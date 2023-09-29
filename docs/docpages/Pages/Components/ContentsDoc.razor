@@ -2,27 +2,47 @@
 
 <PageTitle>Contents - Tavenem Blazor Framework</PageTitle>
 
-<Heading Level="HeadingLevel.H1">Contents</Heading>
+<h1>Contents</h1>
 
 <p>
     The contents component displays a list of headings on the current page, with
     links to each of them.
 </p>
 
-<Heading Level="HeadingLevel.H2">Basics</Heading>
+<h2>Basics</h2>
 
 <p>
-    Use the <code>Contents</code> component to create a table of contents for the current page. The
-    list is built automatically by examining the current page for <a
-    href="./components/heading">Heading</a> components. The list is rebuilt on page navigation, and
-    responds to dynamic adding and removing of <code>Heading</code> components.
+    Use the <code>Contents</code> component to create a table of contents for the component's
+    container. The list is built automatically by examining the container for heading elements, as
+    well as any element with the <code>tav-heading</code> class. Elements with the
+    <code>tav-heading</code> class can specify their effective level with the
+    <code>data-heading-level</code> attribute, which should be a value between 1 and 6.
 </p>
 
 <p>
-    You can make a <code>Contents</code> component responsive by setting the
-    <code>Breakpoint</code> parameter to the breakpoint at which the list should
-    be visible. When set to <code>None</code> (the default) the list is visible
-    at all breakpoints.
+    The contents list is rebuilt on page navigation, but does not respond to dynamic adding or
+    removing of headings. If heading elements might be dynamically added or removed on a page, you
+    can call the <code>RefreshHeadingsAsync</code> method on the <code>Contents</code> component to
+    refresh the list. Note, however, that this will also remove any headings manually added with the
+    <code>AddHeading</code> method (see below).
+</p>
+
+<p>
+    Each item in the contents list will display the text content of the heading element, but you can
+    override this by assigning a value to the <code>data-heading-title</code> attribute.
+</p>
+
+<p>
+    Note that if a heading has no HTML <code>id</code>, clicking its listing in the contents will
+    scroll to the nearest heading with its title. If two headings in scope both have the same title,
+    this may cause undesired behavior. In that case it is recommended that each heading be given a
+    unique <code>id</code>.
+</p>
+
+<p>
+    You can make a <code>Contents</code> component responsive by setting the <code>Breakpoint</code>
+    parameter to the breakpoint at which the list should be visible. When set to <code>None</code>
+    (the default) the list is visible at all breakpoints.
 </p>
 
 <p>
@@ -30,26 +50,23 @@
     of the list.
 </p>
 
-<Heading Level="HeadingLevel.H2">Layout</Heading>
+<h2>Layout</h2>
 
 <p>
-    The <code>FrameworkLayout</code> component has a built-in
-    <code>Contents</code> component. It is positioned after the main content
-    (typically on the right-hand side of a page), and will automatically share
-    the <code>ThemeColor</code> of the parent <code>FrameworkLayout</code>.
+    The <code>FrameworkLayout</code> component has a built-in <code>Contents</code> component. It is
+    positioned after the main content (typically on the right-hand side of a page), and will
+    automatically share the <code>ThemeColor</code> of the parent <code>FrameworkLayout</code>.
 </p>
 
 <p>
-    The <code>Breakpoint</code> parameter of the built-in <code>Contents</code>
-    component can be set with the <code>ContentsBreakpoint</code> parameter of
-    <code>FrameworkLayout</code> (it defaults to <code>Lg</code>). There is one
-    key difference, however: when set to <code>None</code> the table of contents
-    is hidden completely, rather than displayed at all breakpoints. This allows
-    you to suppress the built-in list (possibly in order to use it differently
-    in your own layout).
+    The <code>Breakpoint</code> parameter of the built-in <code>Contents</code> component can be set
+    with the <code>ContentsBreakpoint</code> parameter of <code>FrameworkLayout</code> (it defaults
+    to <code>Lg</code>). There is one key difference, however: when set to <code>None</code> the
+    table of contents is hidden completely, rather than displayed at all breakpoints. This allows
+    you to suppress the built-in list (possibly in order to use it differently in your own layout).
 </p>
 
-<Heading Level="HeadingLevel.H2">Manual Headings</Heading>
+<h2>Manual Headings</h2>
 
 <p>
     It is also possible to add headings to the table(s) of contents on a page manually. The
@@ -68,12 +85,6 @@
 </p>
 
 <p>
-    This manual method of adding and removing headings can be used when your contents cannot be
-    directly controlled with <a href="./components/heading">Heading</a> components. For example,
-    when you need to build a table of contents dynamically.
-</p>
-
-<p>
     You can try this yourself by clicking the following buttons, which will add or remove the
     heading below to this page's table of contents:
 </p>
@@ -83,17 +94,3 @@
     <button class="btn primary" @onclick="AddHeading" disabled="@_added">Add Heading to Contents</button>
     <button class="btn danger" @onclick="RemoveHeading" disabled="@(!_added)">Remove Heading from Contents</button>
 </div>
-
-<Heading Level="HeadingLevel.H2">Refreshing</Heading>
-
-<p>
-    The heading list is determined when the contents component is rendered, and is not updated
-    dynamically.
-</p>
-
-<p>
-    If heading elements might be dynamically added or removed on a page, you can call the
-    <code>RefreshHeadingsAsync</code> method on the <code>Contents</code> component to refresh the
-    list. Note, however, that this will also remove any headings manually added with the
-    <code>AddHeading</code> method.
-</p>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System.Text.Json;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -36,9 +37,11 @@ public class ContentsService(IJSRuntime jsRuntime) : IAsyncDisposable
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
-            return await module
-                .InvokeAsync<HeadingInfo[]>("getheadings")
+            var results = await module
+                .InvokeAsync<HeadingInfo[]>("getHeadings", id)
                 .ConfigureAwait(false);
+            Console.WriteLine(JsonSerializer.Serialize(results));
+            return results;
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }

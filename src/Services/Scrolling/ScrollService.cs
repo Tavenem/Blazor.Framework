@@ -35,6 +35,39 @@ public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
     }
 
     /// <summary>
+    /// Scroll to the given position.
+    /// </summary>
+    /// <param name="contentsId">The HTML id of the <see cref="Contents"/> element.</param>
+    /// <param name="level">The level of the heading.</param>
+    /// <param name="title">The title of the heading.</param>
+    /// <param name="position">The position to which scrolling should occur.</param>
+    /// <param name="setHistory">Whether to clear any fragment from the current URL and history.</param>
+    public async ValueTask ScrollToHeading(
+        string contentsId,
+        int level,
+        string? title,
+        ScrollLogicalPosition position = ScrollLogicalPosition.Start,
+        bool setHistory = true)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync(
+                    "scrollToHeading",
+                    contentsId,
+                    level,
+                    title,
+                    position.ToString().ToLowerInvariant(),
+                    setHistory)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
     /// Scroll to the HTML element with the given id.
     /// </summary>
     /// <param name="elementId">The id of an HTML element.</param>

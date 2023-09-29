@@ -4,21 +4,21 @@
 
 <div class="@CssClass" style="@Style">
     <SnackbarContainer />
+    <DialogContainer @ref="DialogContainer" />
     <CascadingValue Value="this" IsFixed="true">
         @FrameworkContent
-        <main id="main-container" class="container mt-3">
+        <main id="main-container">
             @ChildContent
         </main>
-        @if (ContentsBreakpoint != Breakpoint.None)
-        {
-            <Contents @ref="Contents"
-                      Breakpoint="ContentsBreakpoint"
-                      Class="d-print-none"
-                      Style="grid-area:contents"
-                      ThemeColor="ThemeColor" />
-        }
-        <DialogContainer @ref="DialogContainer" />
     </CascadingValue>
+    @if (ContentsBreakpoint != Breakpoint.None)
+    {
+        <Contents @ref="Contents"
+                  Breakpoint="ContentsBreakpoint"
+                  Class="d-print-none"
+                  Style="grid-area:contents"
+                  ThemeColor="ThemeColor" />
+    }
     @if (AutoScrollToTop)
     {
         <ScrollToTop Selector="#main-container">

@@ -2,10 +2,8 @@
 
 namespace Tavenem.Blazor.Framework.Services;
 
-internal class ScrollListener : IDisposable
+internal class ScrollListener(ScrollService scrollService) : IDisposable
 {
-    private readonly ScrollService _scrollService;
-
     private bool _disposedValue;
     private DotNetObjectReference<ScrollListener>? _dotNetRef;
     private EventHandler<ScrollEventArgs>? _onScroll;
@@ -24,9 +22,6 @@ internal class ScrollListener : IDisposable
         remove => Unsubscribe(value);
     }
 
-    public ScrollListener(ScrollService scrollService)
-        => _scrollService = scrollService;
-
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -38,10 +33,10 @@ internal class ScrollListener : IDisposable
     /// Unsubscribe to scroll events.
     /// </summary>
     private ValueTask Cancel()
-        => _scrollService.CancelScrollListener(Selector);
+        => scrollService.CancelScrollListener(Selector);
 
     /// <summary>
-    /// Invoked by javascript interop.
+    /// Invoked by JavaScript interop.
     /// </summary>
     [JSInvokable] public void RaiseOnScroll(ScrollEventArgs e) => _onScroll?.Invoke(this, e);
 
@@ -64,7 +59,7 @@ internal class ScrollListener : IDisposable
     private ValueTask Start()
     {
         _dotNetRef = DotNetObjectReference.Create(this);
-        return _scrollService.StartScrollListener(_dotNetRef, Selector);
+        return scrollService.StartScrollListener(_dotNetRef, Selector);
     }
 
     private async void Subscribe(EventHandler<ScrollEventArgs> value)

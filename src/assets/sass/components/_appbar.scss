@@ -3,11 +3,6 @@
     background-color: var(--tavenem-color-bg);
     box-sizing: border-box;
     color: var(--tavenem-color-text);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    min-height: 3.5rem;
-    position: relative;
     width: 100%;
     z-index: var(--tavenem-zindex-appbar);
 

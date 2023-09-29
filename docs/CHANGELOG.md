@@ -1,11 +1,15 @@
 # Changelog
 
 ## 2.0-preview.1
+### Added
+- `DialogContainer` to support use of dialogs without the `FrameworkLayout`
+- `SnackbarContainer` to support use of snackbars without the `FrameworkLayout`
 ### Changed
 - Update to .NET 8 RC
-- Support prerendering
+- Some support for prerendering and static render mode
 ### Removed
 - .NET 6 and .NET 7 targets
+- Heading component (`Contents` now works with standard HTML headings, and any element with the `tav-heading` CSS class)
 
 ## 1.49
 ### Fixed

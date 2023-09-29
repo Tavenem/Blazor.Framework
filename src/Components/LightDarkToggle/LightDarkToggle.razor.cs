@@ -33,11 +33,7 @@ public partial class LightDarkToggle
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
+    /// <inheritdoc />
     protected override string? CssClass => new CssBuilder("btn d-print-none")
         .Add("btn-icon", string.IsNullOrWhiteSpace(Text))
         .Add(ThemeColor.ToCSS())
@@ -49,6 +45,8 @@ public partial class LightDarkToggle
         ? (DarkModeIcon ?? LightModeIcon)
         : (LightModeIcon ?? DarkModeIcon);
 
+    private bool IsInteractive { get; set; }
+
     [Inject, NotNull] private ThemeService? ThemeService { get; set; }
 
     /// <inheritdoc/>
@@ -58,10 +56,8 @@ public partial class LightDarkToggle
         {
             var mode = await ThemeService.GetPreferredColorScheme();
             IsDarkMode = mode == ThemePreference.Dark;
-            if (IsDarkMode)
-            {
-                StateHasChanged();
-            }
+            IsInteractive = true;
+            StateHasChanged();
         }
     }
 

@@ -6,13 +6,13 @@
 
 <p>This page will show you how to install and get started using the Tavenem Blazor Framework.</p>
 
-<Heading Level="HeadingLevel.H2" Title="Install">1. Install</Heading>
+<h2 data-heading-title="Install">1. Install</h2>
 <p>The <code>Tavenem.Blazor.Framework</code> NuGet package is available through the package manager, or the CLI:</p>
 <pre class="codeblock pre-razor-code">
     <pre class="user-select-all">dotnet add package Tavenem.Blazor.Framework</pre>
 </pre>
 
-<Heading Level="HeadingLevel.H2" Title="Import namespace">2. Import namespace</Heading>
+<h2 data-heading-title="Import namespace">2. Import namespace</h2>
 <p>Add the package namespace to your <code>_Imports.razor</code> file.</p>
 <pre class="codeblock pre-razor-code">
     <pre class="user-select-all">
@@ -20,7 +20,7 @@
     </pre>
 </pre>
 
-<Heading Level="HeadingLevel.H2" Title="Add font links">3. Add font links</Heading>
+<h2 data-heading-title="Add font links">3. Add font links</h2>
 <p>Add the following links to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>_Host.cshtml</code> (Blazor Server).</p>
 <pre class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap"" rel=""stylesheet"">
@@ -49,7 +49,7 @@
     See the <a href="./components/icon">Icon</a> component documentation for details.
 </p>
 
-<Heading Level="HeadingLevel.H2" Title="Add CSS link">4. Add CSS link</Heading>
+<h2 data-heading-title="Add CSS link">4. Add CSS link</h2>
 <p>Add the following link to your HTML head in either <code>index.html</code> (Blazor WebAssembly) or <code>App.razor</code> (Web App).</p>
 <pre class="codeblock pre-razor-code">
     @CodeFormatter.CodeToMarkup(@"<link href=""_content/Tavenem.Blazor.Framework/framework.css"" rel=""stylesheet"">", true)
@@ -71,7 +71,7 @@
     your project, as there are likely to be conflicts leading to difficult styling issues.
 </p>
 
-<Heading Level="HeadingLevel.H2" Title="Add script link">5. Add script link</Heading>
+<h2 data-heading-title="Add script link">5. Add script link</h2>
 <p>
     Add the following link at the end of your HTML body (after the Blazor script) in either
     <code>index.html</code> (Blazor WebAssembly) or <code>App.razor</code> (Web App).
@@ -96,7 +96,7 @@
     your project, as there are likely to be conflicts leading to difficult styling issues.
 </p>
 
-<Heading Level="HeadingLevel.H2" Title="Register services with dependency injection">6. Register services with dependency injection</Heading>
+<h2 data-heading-title="Register services with dependency injection">6. Register services with dependency injection</h2>
 <p>Add the following to your <code>Program.cs</code>:</p>
 <pre class="codeblock pre-razor-code">
     <pre class="user-select-all">
@@ -109,6 +109,6 @@
     project (for prerendering support) in Web Apps.
 </p>
 
-<Heading Level="HeadingLevel.H2" Title="Set up the Framework">7. Set up the Framework (optional, but strongly recommended)</Heading>
+<h2 data-heading-title="Set up the Framework">7. Set up the Framework (optional, but strongly recommended)</h2>
 <p>Add a <code class="primary">FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>
 <p>See <a href="./layout/layout">Layout</a> for details.</p>

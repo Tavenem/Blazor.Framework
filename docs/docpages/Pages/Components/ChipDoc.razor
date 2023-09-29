@@ -2,13 +2,13 @@
 
 <PageTitle>Chip - Tavenem Blazor Framework</PageTitle>
 
-<Heading Level="HeadingLevel.H1">Chip</Heading>
+<h1>Chip</h1>
 
 <p>
     Chips are simple elements, usually displayed in groups.
 </p>
 
-<Heading Level="HeadingLevel.H2">Basics</Heading>
+<h2>Basics</h2>
 
 <p>
     To create a chip, add the <code>chip</code> class to an element (usually a <code>span</code>,
@@ -42,7 +42,7 @@
 <span class=""chip clickable success"">Success<tf-icon>check_circle</tf-icon></span>
 <span class=""chip clickable warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
 
-<Heading Level="HeadingLevel.H2">Disabled</Heading>
+<h2>Disabled</h2>
 
 <p>
     A chip can be disabled by by using the <code>disabled</code> attribute for a button, or the
@@ -61,7 +61,7 @@
 <span class=""chip disabled success"">Success<tf-icon>check_circle</tf-icon></span>
 <span class=""chip disabled warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
 
-<Heading Level="HeadingLevel.H2">Variants</Heading>
+<h2>Variants</h2>
 
 <p>
     The size of a chip can be adjusted with the <code>small</code> and <code>large</code> classes.
@@ -110,7 +110,7 @@
 <CodeExample IsOpen="false" Code="@(@"<span class=""chip square primary"">Primary</span>
 <span class=""chip rounded secondary"">Secondary</span>")" />
 
-<Heading Level="HeadingLevel.H2">Component</Heading>
+<h2>Component</h2>
 
 <p>
     You can also display data-bound sets of chips with the <code>ChipSet&lt;T></code> component.
@@ -147,7 +147,7 @@
     <code>SetSelectionAsync</code> method.
 </p>
 
-<Heading Level="HeadingLevel.H3">Multiselect</Heading>
+<h3>Multiselect</h3>
 
 <p>
     The <code>SelectionType</code> property determines how selection is handled. If it is set to
@@ -177,7 +177,7 @@
     <code>SetSelectionAsync</code> method.
 </p>
 
-<Heading Level="HeadingLevel.H3">Required</Heading>
+<h3>Required</h3>
 
 <p>
     You can make the selection required by setting the <code>Required</code> property. Doing so
@@ -201,7 +201,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Closing</Heading>
+<h3>Closing</h3>
 
 <p>
     If you add an event callback to the <code>OnChipClosed</code> property, each chip will
@@ -229,7 +229,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Drag and Drop</Heading>
+<h3>Drag and Drop</h3>
 
 <p>
     Chips in an <code>ChipSet</code> can be draggable, both within the <code>ChipSet</code> (to
@@ -295,7 +295,7 @@
     styles applied when a set is a valid or invalid target for a drop, respectively.
 </p>
 
-<Heading Level="HeadingLevel.H3">Chips</Heading>
+<h3>Chips</h3>
 
 <p>
     An icon can be automatically displayed before the content of a chip by setting the
@@ -339,7 +339,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Customization</Heading>
+<h3>Customization</h3>
 
 <p>
     You can choose to display a special selection icon for selected chips by setting
@@ -368,7 +368,7 @@
     </ChildContent>
 </Collapse>
 
-<Heading Level="HeadingLevel.H3">Clicking</Heading>
+<h3>Clicking</h3>
 
 <p>
     If you add an event callback to the <code>OnItemClick</code> property, chips will automatically

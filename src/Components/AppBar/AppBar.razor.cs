@@ -27,11 +27,6 @@ public partial class AppBar
     [Parameter] public Side ControlsDrawerSide { get; set; }
 
     /// <summary>
-    /// Custom CSS class(es) for the toolbar.
-    /// </summary>
-    [Parameter] public string? ToolbarClass { get; set; }
-
-    /// <summary>
     /// Whether the appbar is docked at the top or bottom.
     /// </summary>
     [Parameter] public VerticalSide Side { get; set; }
@@ -48,7 +43,7 @@ public partial class AppBar
     /// </summary>
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("appbar")
+        .Add("appbar toolbar")
         .Add(ThemeColorValue.ToCSS())
         .Add(Side.ToCSS())
         .Add($"controls-{ControlsDrawerSide.ToCSS()}", ControlsDrawerSide != Framework.Side.None)
@@ -64,14 +59,6 @@ public partial class AppBar
             Framework.Breakpoint.None => null,
             _ => $"drawer-toggle-{BreakpointValue.ToCSS()}",
         }).ToString();
-
-    /// <summary>
-    /// The final value assigned to the toolbar's class attribute, including
-    /// component values.
-    /// </summary>
-    protected string? ToolbarClassName => new CssBuilder(ToolbarClass)
-        .Add("toolbar")
-        .ToString();
 
     private Breakpoint BreakpointValue
     {
@@ -92,10 +79,27 @@ public partial class AppBar
 
     [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
 
-    private bool HasDrawer => ControlsDrawerSide != Framework.Side.None
+    private bool HasDrawer => IsInteractive
+        && ControlsDrawerSide != Framework.Side.None
         && FrameworkLayout?.HasDrawer(ControlsDrawerSide) == true;
 
+    private bool IsInteractive { get; set; }
+
     private ThemeColor ThemeColorValue => ThemeColor ?? FrameworkLayout?.ThemeColor ?? Framework.ThemeColor.Default;
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            IsInteractive = true;
+            if (ControlsDrawerSide != Framework.Side.None
+                && FrameworkLayout?.HasDrawer(ControlsDrawerSide) == true)
+            {
+                StateHasChanged();
+            }
+        }
+    }
 
     private async Task OnDrawerToggleAsync()
     {

@@ -4,23 +4,25 @@ interface HeadingInfo {
     title: string;
 }
 
-export function getheadings(id: string) {
+export function getHeadings(id: string) {
     const contents = document.getElementById(id);
     if (!contents) {
         return [];
     }
+    const parent = contents.parentNode || document;
 
     return Array
-        .from(contents.querySelectorAll('h1,h2,h3,h4,h5,h6,.tav-heading'))
+        .from(parent.querySelectorAll('h1,h2,h3,h4,h5,h6,.tav-heading'))
+        .filter(x => x.closest('.editor') == null)
         .sort(documentPositionComparator)
-        .map(v => {
+        .map((v, i) => {
             return {
                 id: v.id,
-                level: Number.parseInt(v.tagName.startsWith('h')
+                level: Number.parseInt(v.tagName.startsWith('H')
                     ? v.tagName.substring(1)
                     : (v.getAttribute('data-heading-level') || '0')),
                 title: v.getAttribute('data-heading-title')
-                    || v.textContent
+                    || v.textContent,
             } as HeadingInfo;
         });
 }
