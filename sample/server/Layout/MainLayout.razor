@@ -1,19 +1,19 @@
 ﻿@inherits LayoutComponentBase
 
-<FrameworkLayout ThemeColor="ThemeColor.Primary">
-    <FrameworkContent>
-        <TopAppbar />
-        <LeftDrawer />
-    </FrameworkContent>
-    <ChildContent>
+<div class="tavenem-framework-layout">
+    <SnackbarContainer />
+    <TopAppbar />
+    <LeftDrawer />
+    <main id="main-container" class="container mt-3">
         @Body
         <footer class="d-flex flex-wrap align-self-stretch mt-auto mx-6 pt-4 px-4 pb-1 gap-3 justify-content-space-around">
             <small>© Tavenem</small>
             <small><a href="https://tavenem.com/privacy">Privacy</a></small>
             <small><a href="https://tavenem.com/contact">Contact</a></small>
         </footer>
-    </ChildContent>
-</FrameworkLayout>
+    </main>
+    <Contents Breakpoint="Breakpoint.Lg" Class="d-print-none" Style="grid-area:contents" />
+</div>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

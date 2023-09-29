@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Text;
 
-namespace Tavenem.Blazor.Framework.Docs.Utilities;
+namespace Tavenem.Blazor.Framework.DocPages.Utilities;
 
 public static class CodeFormatter
 {
@@ -876,5 +876,5 @@ public static class CodeFormatter
     }
 
     private static StringBuilder Sanitized(string input)
-        => Sanitized(input.AsSpan());
+        => Sanitized([.. input]);
 }

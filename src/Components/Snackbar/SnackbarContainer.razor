@@ -1,0 +1,42 @@
+@namespace Tavenem.Blazor.Framework
+
+<div class="snackbar-container top-left">
+    @foreach (var snackbar in SnackbarsTopLeft)
+    {
+        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
+    }
+    @if (ExtraSnackbarTopLeft is not null)
+    {
+        <SnackbarElement Snackbar="ExtraSnackbarTopLeft" IsExtra="true" />
+    }
+</div>
+<div class="snackbar-container top-right">
+    @foreach (var snackbar in SnackbarsTopRight)
+    {
+        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
+    }
+    @if (ExtraSnackbarTopRight is not null)
+    {
+        <SnackbarElement Snackbar="ExtraSnackbarTopRight" IsExtra="true" />
+    }
+</div>
+<div class="snackbar-container bottom-left">
+    @if (ExtraSnackbarBottomLeft is not null)
+    {
+        <SnackbarElement Snackbar="ExtraSnackbarBottomLeft" IsExtra="true" />
+    }
+    @foreach (var snackbar in SnackbarsBottomLeft)
+    {
+        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
+    }
+</div>
+<div class="snackbar-container bottom-right">
+    @if (ExtraSnackbarBottomRight is not null)
+    {
+        <SnackbarElement Snackbar="ExtraSnackbarBottomRight" IsExtra="true" />
+    }
+    @foreach (var snackbar in SnackbarsBottomRight)
+    {
+        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
+    }
+</div>

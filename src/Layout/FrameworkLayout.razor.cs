@@ -66,7 +66,7 @@ public partial class FrameworkLayout : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("framework")
+    protected override string? CssClass => new CssBuilder("tavenem-framework-layout")
         .Add(DrawerContainerClass)
         .Add("drawer-open", HasOpenDrawer)
         .Add(Class)
@@ -76,14 +76,6 @@ public partial class FrameworkLayout : IDisposable
     private bool AutoScrollToTop { get; set; } = true;
 
     [Inject, NotNull] private DialogService? DialogService { get; set; }
-
-    private Snackbar? ExtraSnackbarBottomLeft => SnackbarService.GetExtraSnackbar(Corner.Bottom_Left);
-
-    private Snackbar? ExtraSnackbarBottomRight => SnackbarService.GetExtraSnackbar(Corner.Bottom_Right);
-
-    private Snackbar? ExtraSnackbarTopLeft => SnackbarService.GetExtraSnackbar(Corner.Top_Left);
-
-    private Snackbar? ExtraSnackbarTopRight => SnackbarService.GetExtraSnackbar(Corner.Top_Right);
 
     private string DrawerContainerClass => SideDrawerBreakpoint switch
     {
@@ -97,18 +89,6 @@ public partial class FrameworkLayout : IDisposable
 
     [Inject, NotNull] private ScrollService? ScrollService { get; set; }
 
-    private IEnumerable<Snackbar> SnackbarsBottomLeft => SnackbarService.GetDisplayedSnackbars(Corner.Bottom_Left).Reverse();
-
-    private IEnumerable<Snackbar> SnackbarsBottomRight => SnackbarService.GetDisplayedSnackbars(Corner.Bottom_Right).Reverse();
-
-    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
-
-    private IEnumerable<Snackbar> SnackbarsTopLeft => SnackbarService.GetDisplayedSnackbars(Corner.Top_Left);
-
-    private IEnumerable<Snackbar> SnackbarsTopRight => SnackbarService.GetDisplayedSnackbars(Corner.Top_Right);
-
-    [Inject, NotNull] private ThemeService? ThemeService { get; set; }
-
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -116,7 +96,6 @@ public partial class FrameworkLayout : IDisposable
         {
             DialogService.OnDialogAdded += OnDialogAdded;
             DialogService.OnDialogClosed += DismissDialogInstance;
-            SnackbarService.OnSnackbarsUpdated += OnSnackbarsUpdated;
             NavigationManager.LocationChanged += OnLocationChanged;
 
             if (!string.IsNullOrEmpty(ScrollSpyClass))
@@ -274,7 +253,6 @@ public partial class FrameworkLayout : IDisposable
         {
             if (disposing)
             {
-                SnackbarService.OnSnackbarsUpdated -= OnSnackbarsUpdated;
                 NavigationManager.LocationChanged -= OnLocationChanged;
                 _dotNetRef?.Dispose();
             }
@@ -329,6 +307,4 @@ public partial class FrameworkLayout : IDisposable
             await ScrollService.ScrollToId(uri.Fragment[1..]);
         }
     }
-
-    private void OnSnackbarsUpdated() => InvokeAsync(StateHasChanged);
 }

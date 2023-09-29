@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 
-namespace Tavenem.Blazor.Framework.Docs.Shared;
+namespace Tavenem.Blazor.Framework.DocPages.Shared;
 
 public partial class CodeExample
 {

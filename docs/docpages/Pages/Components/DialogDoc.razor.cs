@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Tavenem.Blazor.Framework.Docs.Shared;
+using Tavenem.Blazor.Framework.DocPages.Shared;
 
-namespace Tavenem.Blazor.Framework.Docs.Pages.Components;
+namespace Tavenem.Blazor.Framework.DocPages.Pages.Components;
 
 public partial class DialogDoc
 {

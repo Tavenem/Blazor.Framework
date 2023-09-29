@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Components;
 
-namespace Tavenem.Blazor.Framework.Docs.Pages.Components;
+namespace Tavenem.Blazor.Framework.DocPages.Pages.Components;
 
 public partial class ContentsDoc : IDisposable
 {
-    private bool _added = false;
+    private bool _added;
     private bool _disposedValue;
 
-    private HeadingInfo _heading = new()
+    private readonly HeadingInfo _heading = new()
     {
         Id = "dynamic-heading",
         Level = HeadingLevel.H3,

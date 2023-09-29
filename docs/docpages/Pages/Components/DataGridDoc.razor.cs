@@ -1,4 +1,4 @@
-namespace Tavenem.Blazor.Framework.Docs.Pages.Components;
+namespace Tavenem.Blazor.Framework.DocPages.Pages.Components;
 
 public partial class DataGridDoc
 {

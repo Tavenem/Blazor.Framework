@@ -1,29 +1,4 @@
-﻿.framework {
-    display: grid;
-    flex: 1 0;
-    grid-template-areas:
-        "header header header header"
-        "topdrawer topdrawer topdrawer topdrawer"
-        "leftdrawer main contents rightdrawer"
-        "bottomdrawer bottomdrawer bottomdrawer bottomdrawer"
-        "footer footer footer footer";
-    grid-template-columns: max-content 1fr max-content max-content;
-    grid-template-rows: max-content max-content 1fr max-content max-content;
-    height: 100%;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-
-    @media print {
-        overflow: visible;
-    }
-
-    > * {
-        grid-area: main;
-    }
-}
-
-.container,
+﻿.container,
 .container-fixed {
     align-items: flex-start;
     align-self: stretch;

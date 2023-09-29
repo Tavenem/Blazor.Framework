@@ -207,6 +207,27 @@
     </ChildContent>
 </Collapse>
 
+<Heading Level="HeadingLevel.H3">Standalone</Heading>
+
+<p>
+    The <a href="/layout/layout">FrameworkLayout</a> component has built-in support for snackbars.
+    However, if you wish to use snackbars without a <code class="primary">FrameworkLayout</code>,
+    you must place a <code class="primary">SnackbarContainer</code> component somewhere on the page.
+    This component contains all the presentation logic required to place snackbars.
+</p>
+
+<p>
+    It is usually convenient to place the <code class="primary">SnackbarContainer</code> component
+    in your layout, but if snackbars will only be displayed on a certain page, you can place the
+    container only on that page.
+</p>
+
+<p>
+    The <code class="primary">SnackbarContainer</code> can be placed anywhere in your page. The
+    snackbars use fixed positioning, and should display in the correct position on the page
+    regardless of the container's position within the document flow.
+</p>
+
 @code {
     private MarkupString _message = (MarkupString)"This is a <strong class=\"info\">snackbar</strong>";
     [Inject] private SnackbarService SnackbarService { get; set; } = default!;
