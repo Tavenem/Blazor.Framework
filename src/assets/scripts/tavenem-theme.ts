@@ -81,13 +81,29 @@ export function setColorScheme(theme: ThemePreference, manual?: boolean) {
 }
 
 export function initializeColorScheme() {
+    setPreferredColorScheme();
     if (window.matchMedia) {
         const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
         colorSchemeQuery.addEventListener('change', setPreferredColorScheme);
     }
-    const currentScheme = getPreferredColorScheme();
-    setColorScheme(currentScheme, _manualColorTheme);
-    return currentScheme;
+    window.addEventListener('load', () => {
+        const body = document.querySelector("body");
+        if (body) {
+            const observer = new MutationObserver(() => {
+                if (!document.documentElement.getAttribute('data-theme')) {
+                    setPreferredColorScheme();
+                }
+            });
+            observer.observe(body, { childList: true, subtree: true });
+        }
+    });
+    window.addEventListener('popstate', () => {
+        setTimeout(() => {
+            if (!document.documentElement.getAttribute('data-theme')) {
+                setPreferredColorScheme();
+            }
+        }, 40);
+    });
 }
 
 function getNativePreferredColorScheme(): ThemePreference {
@@ -103,5 +119,5 @@ function getNativePreferredColorScheme(): ThemePreference {
 }
 
 function setPreferredColorScheme() {
-    setColorScheme(getPreferredColorScheme());
+    setColorScheme(getPreferredColorScheme(), _manualColorTheme);
 }

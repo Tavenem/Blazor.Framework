@@ -20,6 +20,7 @@ public static class TavenemFrameworkDIExtensions
         services.AddScoped<UtilityService>();
         services.AddScoped<ContentsService>();
         services.AddScoped<DragDropService>();
+        services.AddScoped<DrawerService>();
         services.AddScoped<PopoverService>();
         services.AddScoped<ScrollService>();
         services.AddScoped<ThemeService>();

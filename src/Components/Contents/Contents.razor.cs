@@ -73,8 +73,6 @@ public partial class Contents : IDisposable
 
     [Inject, NotNull] private ContentsService? ContentsService { get; set; }
 
-    [CascadingParameter] private FrameworkLayout? Framework { get; set; }
-
     private int LowestLevel => (int)(Headings
         .Where(x => x.Level != HeadingLevel.None)
         .MinBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);

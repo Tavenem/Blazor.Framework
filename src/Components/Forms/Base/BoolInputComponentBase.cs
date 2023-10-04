@@ -81,8 +81,8 @@ public abstract class BoolInputComponentBase<TValue>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add(ThemeColor.ToCSS())
-        .Add("disabled", Disabled)
-        .Add("read-only", ReadOnly)
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
         .Add("required", Required)
         .Add("no-label", string.IsNullOrEmpty(Label))
         .ToString();
@@ -97,6 +97,29 @@ public abstract class BoolInputComponentBase<TValue>
     /// </summary>
     protected virtual string? InputCssStyle => InputStyle;
 
+    /// <summary>
+    /// Whether the control is being rendered interactively.
+    /// </summary>
+    protected bool Interactive { get; set; }
+
+    /// <summary>
+    /// Whether this control is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
+    /// cref="Interactive"/> is <see langword="false"/>.
+    /// </remarks>
+    protected bool IsDisabled => Disabled || !Interactive;
+
+    /// <summary>
+    /// Whether this control is currently read-only.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
+    /// cref="Interactive"/> is <see langword="false"/>.
+    /// </remarks>
+    protected bool IsReadOnly => ReadOnly || !Interactive;
+
     private protected bool? IsChecked => Value is null
         ? null
         : (bool)(object)Value;
@@ -110,6 +133,16 @@ public abstract class BoolInputComponentBase<TValue>
             && typeof(TValue) != typeof(bool?))
         {
             throw new InvalidOperationException("Only bool and nullable bool? are valid types for BoolInputComponentBase");
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
         }
     }
 

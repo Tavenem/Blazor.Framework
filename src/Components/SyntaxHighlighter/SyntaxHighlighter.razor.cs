@@ -16,17 +16,14 @@ public partial class SyntaxHighlighter : IAsyncDisposable
     [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     /// <inheritdoc />
-    protected override async Task OnInitializedAsync()
-    {
-        _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
-            "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-highlight.js");
-        await _module.InvokeVoidAsync("highlight", Id);
-    }
-
-    /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/Tavenem.Blazor.Framework/tavenem-highlight.js");
+        }
         if (_module is not null)
         {
             await _module.InvokeVoidAsync("highlight", Id);

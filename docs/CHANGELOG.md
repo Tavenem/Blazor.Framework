@@ -2,14 +2,22 @@
 
 ## 2.0-preview.1
 ### Added
-- `DialogContainer` to support use of dialogs without the `FrameworkLayout`
+- `Collapse.NavUrl` and `Collapse.NavLinkMatch` to enable auto-open based on `NavLink`-style logic
+- `DialogContainer` to support use of dialogs without the `FrameworkLayout`  
+- `DrawerToggle` placeable button to automatically control a drawer
+- `Drawer.ShowAtBreakpoint` and `Drawer.HideAtBreakpoint`
+- `ScrollToTop` now has default UI
 - `SnackbarContainer` to support use of snackbars without the `FrameworkLayout`
 ### Changed
 - Update to .NET 8 RC
 - Some support for prerendering and static render mode
+- `AppBar` component replaced by simple CSS class (built-in drawer functionality replaced by `DrawerToggle`)
 ### Removed
 - .NET 6 and .NET 7 targets
-- Heading component (`Contents` now works with standard HTML headings, and any element with the `tav-heading` CSS class)
+- `AnchorLink` (replaced by native fragment handling and built-in COllapse NavLink functionality)
+- `Drawer.Breakpoint` (replaced by `Drawer.ShowAtBreakpoint` and `Drawer.HideAtBreakpoint`)
+- `Heading` component (`Contents` now works with standard HTML headings, and any element with the `tav-heading` CSS class)
+- `Timeline` component (`div` with `timeline` CSS class provides all the same functionality)
 
 ## 1.49
 ### Fixed

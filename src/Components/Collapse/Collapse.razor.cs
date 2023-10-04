@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
@@ -9,9 +10,9 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Collapse : IDisposable
 {
-    private readonly List<AnchorLink> _links = new();
-
     private protected bool _disposedValue;
+    private string? _hrefAbsolute;
+    private bool _isActiveNav;
 
     /// <summary>
     /// Any CSS class(es) to be applies to the collapse body (the part that is hidden when
@@ -57,6 +58,19 @@ public partial class Collapse : IDisposable
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
 
     /// <summary>
+    /// Indicates how this collapse opens based on the current URL.
+    /// </summary>
+    /// <remarks>
+    /// Ignored unless <see cref="NavUrl"/> is set.
+    /// </remarks>
+    [Parameter] public NavLinkMatch NavLinkMatch { get; set; }
+
+    /// <summary>
+    /// If the current route matches this URL, this collapse will be initially open.
+    /// </summary>
+    [Parameter] public string? NavUrl { get; set; }
+
+    /// <summary>
     /// Invoked before opening. Can be used to load content.
     /// </summary>
     [Parameter] public EventCallback<Collapse> OnOpening { get; set; }
@@ -95,11 +109,6 @@ public partial class Collapse : IDisposable
     /// The group to which this component belongs, if any.
     /// </summary>
     [CascadingParameter] protected Accordion? Accordion { get; set; }
-
-    /// <summary>
-    /// The collapse which contains this one, if any.
-    /// </summary>
-    [CascadingParameter] protected Collapse? Parent { get; set; }
 
     /// <summary>
     /// The final value assigned to the body's class attribute.
@@ -159,16 +168,16 @@ public partial class Collapse : IDisposable
         }
     }
 
-    /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    /// <inheritdoc />
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender && !IsOpen)
+        _hrefAbsolute = NavUrl is null
+            ? null
+            : NavigationManager.ToAbsoluteUri(NavUrl).AbsoluteUri;
+        _isActiveNav = ShouldMatch(NavigationManager.Uri);
+        if (_isActiveNav)
         {
-            ActiveLink = _links.Any(x => x.IsActive);
-            if (ActiveLink)
-            {
-                await OpenCascadingAsync();
-            }
+            await SetOpenAsync(true);
         }
     }
 
@@ -214,7 +223,6 @@ public partial class Collapse : IDisposable
             StateHasChanged();
             await OnOpening.InvokeAsync(this);
             IsLoading = false;
-            StateHasChanged();
         }
         IsOpen = value;
         OnIsOpenChanged?.Invoke(this, IsOpen);
@@ -227,20 +235,7 @@ public partial class Collapse : IDisposable
     /// </summary>
     public Task ToggleAsync() => SetOpenAsync(!IsOpen);
 
-    internal void Add(AnchorLink link) => _links.Add(link);
-
     internal void ForceRedraw() => StateHasChanged();
-
-    internal async Task OpenCascadingAsync()
-    {
-        await SetOpenAsync(true);
-        if (Parent is not null)
-        {
-            await Parent.OpenCascadingAsync();
-        }
-    }
-
-    internal void Remove(AnchorLink link) => _links.Remove(link);
 
     private protected async Task OnToggleAsync()
     {
@@ -250,17 +245,87 @@ public partial class Collapse : IDisposable
         }
     }
 
+    private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
+    {
+        var prefixLength = prefix.Length;
+        if (value.Length > prefixLength)
+        {
+            return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                && (prefixLength == 0
+                || !IsUnreservedCharacter(prefix[prefixLength - 1])
+                || !IsUnreservedCharacter(value[prefixLength]));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private static bool IsUnreservedCharacter(char c)
+        // Checks whether it is an unreserved character according to 
+        // https://datatracker.ietf.org/doc/html/rfc3986#section-2.3
+        // Those are characters that are allowed in a URI but do not have a reserved
+        // purpose (e.g. they do not separate the components of the URI)
+        => char.IsLetterOrDigit(c)
+        || c == '-'
+        || c == '.'
+        || c == '_'
+        || c == '~';
+
+    private bool EqualsHrefExactlyOrIfTrailingSlashAdded(string currentUriAbsolute)
+    {
+        Debug.Assert(_hrefAbsolute is not null);
+
+        if (string.Equals(currentUriAbsolute, _hrefAbsolute, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (currentUriAbsolute.Length == _hrefAbsolute.Length - 1
+            && _hrefAbsolute[^1] == '/'
+            && _hrefAbsolute.StartsWith(currentUriAbsolute, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
         if (IsOpen)
         {
             return;
         }
-        _links.ForEach(x => x.UpdateState(args));
-        var open = _links.Any(x => x.IsActive);
-        if (open)
+        var shouldBeActiveNow = ShouldMatch(args.Location);
+        if (shouldBeActiveNow != _isActiveNav)
         {
-            await SetOpenAsync(true);
+            _isActiveNav = shouldBeActiveNow;
+            if (_isActiveNav)
+            {
+                await SetOpenAsync(true);
+            }
         }
+    }
+
+    private bool ShouldMatch(string currentUriAbsolute)
+    {
+        if (_hrefAbsolute is null)
+        {
+            return false;
+        }
+
+        if (EqualsHrefExactlyOrIfTrailingSlashAdded(currentUriAbsolute))
+        {
+            return true;
+        }
+
+        if (NavLinkMatch == NavLinkMatch.Prefix
+            && IsStrictlyPrefixWithSeparator(currentUriAbsolute, _hrefAbsolute))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,11 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="tavenem-framework-layout drawer-container">
+<div class="tavenem-framework-layout">
     <SnackbarContainer @rendermode="@RenderMode.Auto" />
     <DialogContainer @rendermode="@RenderMode.Auto" />
     <TopAppbar />
-    <LeftDrawer />
-    <main id="main-container">
+    <LeftDrawer @rendermode="@RenderMode.Auto" />
+    <main class="container">
         @Body
         <footer class="d-flex flex-wrap align-self-stretch mt-auto mx-6 pt-4 px-4 pb-1 gap-3 justify-content-space-around">
             <small>© Tavenem</small>
@@ -14,10 +14,11 @@
         </footer>
     </main>
     <Contents Breakpoint="Breakpoint.Lg" Class="d-print-none" Style="grid-area:contents" />
+    <ScrollToTop Selector=".tavenem-framework-layout > .container" @rendermode="@RenderMode.Auto" />
 </div>
 
-<div id="blazor-error-ui">
+<div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss" onclick="document.getElementById('blazor-error-ui').style.display='none'">🗙</a>
+    <a href="#" class="reload" rel="nofollow">Reload</a>
+    <a href="#" class="dismiss" rel="nofollow" onclick="document.getElementById('blazor-error-ui').style.display='none'">🗙</a>
 </div>

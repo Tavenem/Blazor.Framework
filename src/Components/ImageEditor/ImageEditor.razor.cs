@@ -232,6 +232,8 @@ public partial class ImageEditor : IAsyncDisposable
 
     private bool HasImage { get; set; }
 
+    private bool Interactive { get; set; }
+
     private bool IsCropping { get; set; }
 
     private bool IsErasing { get; set; }
@@ -291,8 +293,13 @@ public partial class ImageEditor : IAsyncDisposable
     }
 
     /// <inheritdoc />
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender)
+        {
+            return;
+        }
+
         _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-image-editor.js");
@@ -305,7 +312,13 @@ public partial class ImageEditor : IAsyncDisposable
             await SetLoadingAsync();
             await _module.InvokeVoidAsync("loadImage", ContainerId, Src);
             HasImage = true;
+            Interactive = true;
             await SetLoadingAsync(false);
+        }
+        else
+        {
+            Interactive = true;
+            StateHasChanged();
         }
     }
 

@@ -9,7 +9,7 @@
             <tf-progress-circle class="primary"></tf-progress-circle>
         </div>
     }
-    @if (!Editing && ShowEditButton && (AllowEditNoImage || HasImage))
+    @if (Interactive && !Editing && ShowEditButton && (AllowEditNoImage || HasImage))
     {
         <button class="btn btn-icon image-edit-button @ThemeClass" @onclick="BeginEditAsync">
             <tf-icon>@EditIcon</tf-icon>

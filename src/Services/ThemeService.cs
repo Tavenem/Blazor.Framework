@@ -60,24 +60,6 @@ public class ThemeService(IJSRuntime jsRuntime) : IAsyncDisposable
     }
 
     /// <summary>
-    /// Initialize the current color scheme based on current preferences and settings.
-    /// </summary>
-    public async ValueTask<ThemePreference> InitializeColorSchemeAsync()
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            return await module
-                .InvokeAsync<ThemePreference>("initializeColorScheme")
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        return ThemePreference.Light;
-    }
-
-    /// <summary>
     /// Invoked by JavaScript.
     /// </summary>
     [JSInvokable]

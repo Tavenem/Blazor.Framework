@@ -5,67 +5,30 @@
 <h1>AppBar</h1>
 
 <p>
-    The <code>AppBar</code> component is a toolbar docked to the top or bottom of a Tavenem Blazor
-    Framework app. You can see one at the top of this site.
+    The appbar component is a special <a href="/components/toolbar">toolbar</a> docked to the top or
+    bottom of the Tavenem Blazor Framework's default layout. You can see one at the top of this
+    site.
+</p>
+
+<h2>Layout</h2>
+
+<p>
+    An appbar will only function if your layout includes the Tavenem Blazor Framework <a
+    href="/layout/layout">layout</a> component. See the <a href="/layout/layout">layout doc page</a>
+    for details.
 </p>
 
 <h2>Placement</h2>
 
 <p>
-    Set the <code>Side</code> property of an <code>AppBar</code> to either <code>Side.Top</code> or
-    <code>Side.Bottom</code> to dock the <code>AppBar</code>. You can have one <code>AppBar</code>
+    You can add either the <code>top</code> or <code>bottom</code> CSS class to dock the appbar. If
+    you supply neither, <code>top</code> is assumed. You can have at most two appbars at a time: one
     docked to the top, and one docked to the bottom of your layout.
 </p>
 
-<h2>Theme</h2>
+<h2>Customization</h2>
 
 <p>
-    The <code>ThemeColor</code> property can be set to any of the theme colors to control the color
-    scheme of the <code>AppBar</code>. By default this is inherited from the
-    <code>FrameworkLayout</code> to help coordinate your design theme among all <code>AppBar</code>
-    and <code>Drawer</code> components, but you can override the value for individual bars, as
-    neeeded.
-</p>
-
-<p>
-    You can also use the <code>bg-alt</code> class to set the bar apart with a darker background, or
-    use the <code>filled</code> class in combination with a theme to assign a solid background
-    color.
-</p>
-
-<h2>Content</h2>
-
-<p>
-    An <code>AppBar</code> functions as a <a href="./components/toolbar">Toolbar</a> component,
-    whose contents are set via the <code>ChildContent</code> property of the <code>AppBar</code>.
-</p>
-
-<h2>Drawer control</h2>
-
-<p>
-    You can set the <code>ControlsDrawerSide</code> property to one of the following values to
-    indicate which drawer the appbar controls:
-</p>
-
-<ul>
-    <li><code>Side.None</code></li>
-    <li><code>Side.Top</code></li>
-    <li><code>Side.Bottom</code></li>
-    <li><code>Side.Left</code></li>
-    <li><code>Side.Right</code></li>
-</ul>
-
-<p>
-    If you do so, the <code>AppBar</code> will automatically include a toggle button which controls
-    the visibility of the indicated drawer. The toggle button will only appear if there is actually
-    a drawer docked on that side.
-</p>
-
-<p>
-    You can also set the <code>Breakpoint</code> propety to any of the <code>Breakpoint</code>
-    values to indicate the breakpoint at which the drawer should be permanently visible (and the
-    toggle button will be hidden). By default this is inherited from the
-    <code>FrameworkLayout</code> for left and right drawers, to more easily coordinate between the
-    <code>AppBar</code> and the associated <code>Drawer</code> (which has a <code>Breakpoint</code>
-    property of its own), but you may explicitly override the value if you wish.
+    You can use the <code>filled</code> class to set the bar apart with a darker background,
+    optionally in combination with a theme color.
 </p>

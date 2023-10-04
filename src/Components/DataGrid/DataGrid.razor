@@ -22,30 +22,33 @@
             }
             @HeaderContent
         </div>
-        <div>
-            @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
-            {
-                <TextInput Value="@QuickFilter"
-                           ValueChanged="OnChangeQuickFilterAsync"
-                           PostfixIcon="@DefaultIcons.Search"
-                           UpdateOnInput="true"
-                           UpdateOnInputDebounce="500"
-                           Class="ms-3 flex-grow-1" />
-            }
-            @if (AllowAdd)
-            {
-                <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
-            }
-            @if (AllowExport)
-            {
-                <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
-                    <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+        @if (Interactive)
+        {
+            <div>
+                @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
+                {
+                    <TextInput Value="@QuickFilter"
+                               ValueChanged="OnChangeQuickFilterAsync"
+                               PostfixIcon="@DefaultIcons.Search"
+                               UpdateOnInput="true"
+                               UpdateOnInputDebounce="500"
+                               Class="ms-3 flex-grow-1" />
+                }
+                @if (AllowAdd)
+                {
+                    <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
+                }
+                @if (AllowExport)
+                {
+                    <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
+                        <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+                    </button>
+                }
+                <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
+                    <tf-icon>@DefaultIcons.Filter</tf-icon>
                 </button>
-            }
-            <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
-                <tf-icon>@DefaultIcons.Filter</tf-icon>
-            </button>
-        </div>
+            </div>
+        }
     </div>
     <Form @ref="TableEditForm" Style="@FormStyle">
         <table class="@TableCssClass">
@@ -101,41 +104,41 @@
                                 {
                                     @column.LabelContent
                                 }
-                                @if (column.GetIsSortable())
+                                @if (Interactive && column.GetIsSortable())
                                 {
                                     <tf-icon class="@GetColumnHeaderIconClass(column)">
                                         @DefaultIcons.Sort_Ascending
                                     </tf-icon>
                                 }
                             </div>
-                            @if (column.CanFilter)
+                            @if (Interactive && column.CanFilter)
                             {
                                 <div>
                                     @if (column.IsString)
                                     {
                                         <TextInput Value="@column.TextFilter"
-                                                    ValueChanged="@(v => OnFilterChangedAsync(column, v))"
-                                                    PostfixIcon="@DefaultIcons.Search"
-                                                    UpdateOnInput="true"
-                                                    UpdateOnInputDebounce="Debounce"
-                                                    Class="dense" />
+                                                   ValueChanged="@(v => OnFilterChangedAsync(column, v))"
+                                                   PostfixIcon="@DefaultIcons.Search"
+                                                   UpdateOnInput="true"
+                                                   UpdateOnInputDebounce="Debounce"
+                                                   Class="dense" />
                                     }
                                     else if (column.IsBool)
                                     {
                                         <Checkbox TValue="bool?"
-                                                    Value="@column.BoolFilter"
-                                                    ValueChanged="@(v => OnBoolFilterChangedAsync(column, v))"
-                                                    AllowNull="true"
-                                                    Class="dense" />
+                                                  Value="@column.BoolFilter"
+                                                  ValueChanged="@(v => OnBoolFilterChangedAsync(column, v))"
+                                                  AllowNull="true"
+                                                  Class="dense" />
                                     }
                                     else if (column.IsNumeric)
                                     {
                                         <NumericInput TValue="double?"
-                                                        Value="@column.NumberFilter"
-                                                        ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))"
-                                                        UpdateOnInput="true"
-                                                        UpdateOnInputDebounce="Debounce"
-                                                        Class="dense" />
+                                                      Value="@column.NumberFilter"
+                                                      ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))"
+                                                      UpdateOnInput="true"
+                                                      UpdateOnInputDebounce="Debounce"
+                                                      Class="dense" />
                                     }
                                     else if (column.IsDateTime)
                                     {
@@ -144,11 +147,11 @@
                                                 Label="Before"
                                                 Class="dense" />
                                         <DateTimeInput TValue="DateTimeOffset?"
-                                                        Value="@column.DateTimeFilter"
-                                                        ValueChanged="@(v => OnDateTimeFilterChangedAsync(column, v))"
-                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
-                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
-                                                        Class="dense" />
+                                                       Value="@column.DateTimeFilter"
+                                                       ValueChanged="@(v => OnDateTimeFilterChangedAsync(column, v))"
+                                                       DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
+                                                       ShowTime="@(column is not Column<TDataItem, DateOnly>)"
+                                                       Class="dense" />
                                     }
                                 </div>
                             }
@@ -201,9 +204,12 @@
                             <td colspan="1000" style="text-align:center;vertical-align:middle">
                                 <div class="d-flex align-items-center my-3 gap-2">
                                     <span>No columns displayed</span>
-                                    <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
-                                        <tf-icon>@DefaultIcons.Filter</tf-icon>
-                                    </button>
+                                    @if (Interactive)
+                                    {
+                                        <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
+                                            <tf-icon>@DefaultIcons.Filter</tf-icon>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -248,7 +254,9 @@
                         <tr @key="group">
                             <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
                                 <span class="d-inline-flex align-items-center gap-2">
-                                    <button class="btn btn-icon small" @onclick="@(_ => OnToggleGroupExpansion(group))">
+                                    <button class="btn btn-icon small"
+                                            disabled="@(!Interactive)"
+                                            @onclick="@(_ => OnToggleGroupExpansion(group))">
                                         <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
                                     </button>
                                     @if (GroupContent is null)
@@ -342,7 +350,7 @@
         </table>
     </Form>
     @if ((LoadItems is null
-    && ItemCount > RowsPerPage)
+        && ItemCount > RowsPerPage)
         || CurrentDataPage?.TotalCount > RowsPerPage)
     {
         <div class="datagrid-pagination">

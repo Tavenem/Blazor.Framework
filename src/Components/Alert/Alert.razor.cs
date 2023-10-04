@@ -69,6 +69,18 @@ public partial class Alert
 
     private bool IsClosed { get; set; }
 
+    private bool Interactive { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
+        }
+    }
+
     private async Task OnClosedAsync()
     {
         if (OnClosed.HasDelegate)

@@ -138,8 +138,8 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add(ThemeColor.ToCSS())
-        .Add("disabled", Disabled)
-        .Add("read-only", ReadOnly)
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
         .Add("field")
         .Add("shrink", ShrinkWhen)
         .Add("required", Required)
@@ -169,6 +169,29 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
+    /// Whether the control is being rendered interactively.
+    /// </summary>
+    protected bool Interactive { get; set; }
+
+    /// <summary>
+    /// Whether this control is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
+    /// cref="Interactive"/> is <see langword="false"/>.
+    /// </remarks>
+    protected bool IsDisabled => Disabled || !Interactive;
+
+    /// <summary>
+    /// Whether this control is currently read-only.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
+    /// cref="Interactive"/> is <see langword="false"/>.
+    /// </remarks>
+    protected bool IsReadOnly => ReadOnly || !Interactive;
+
+    /// <summary>
     /// Controls when this component adds the "shrink" CSS class.
     /// </summary>
     protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString);
@@ -188,6 +211,16 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
             {
                 Converter.FormatProvider = FormatProvider;
             }
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
         }
     }
 

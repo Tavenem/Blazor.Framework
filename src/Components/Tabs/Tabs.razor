@@ -13,7 +13,9 @@
                 @PreTabContent
                 @if (ShowScrollButtons)
                 {
-                    <button @onclick="ScrollBack" class="tab-scroll-btn btn btn-icon" disabled="@_backButtonDisabled">
+                    <button @onclick="ScrollBack"
+                            class="tab-scroll-btn btn btn-icon"
+                            disabled="@(!Interactive || _backButtonDisabled)">
                         <tf-icon>@BackIcon</tf-icon>
                     </button>
                 }
@@ -48,8 +50,9 @@
                                 {
                                     @_panels[index].Title
                                 }
-                                @if (_panels[index].OnClose.HasDelegate
-                                    || OnClose.HasDelegate)
+                                @if (Interactive
+                                    && (_panels[index].OnClose.HasDelegate
+                                    || OnClose.HasDelegate))
                                 {
                                     <tf-close @onclick="@(_ => OnCloseTabAsync(index))" />
                                 }
@@ -91,7 +94,7 @@
                                         {
                                             @TabTitle(Items[index + _panels.Count])
                                         }
-                                        @if (CanCloseTabs || OnClose.HasDelegate)
+                                        @if (Interactive && (CanCloseTabs || OnClose.HasDelegate))
                                         {
                                             <tf-close @onclick="@(_ => OnCloseTabAsync(index))" @onclick:stopPropagation="true" />
                                         }
@@ -105,7 +108,9 @@
                         }
                         @if (OnAdd is not null)
                         {
-                            <button @onclick="OnAddTabAsync" class="btn btn-icon add-btn">
+                            <button @onclick="OnAddTabAsync"
+                                    class="btn btn-icon add-btn"
+                                    disabled="@(!Interactive)">
                                 <tf-icon>@AddIcon</tf-icon>
                             </button>
                         }
@@ -114,7 +119,9 @@
                 </div>
                 @if (ShowScrollButtons)
                 {
-                    <button @onclick="ScrollForward" class="tab-scroll-btn btn btn-icon" disabled="@_forwardButtonDisabled">
+                    <button @onclick="ScrollForward"
+                            class="tab-scroll-btn btn btn-icon"
+                            disabled="@(!Interactive || _forwardButtonDisabled)">
                         <tf-icon>@ForwardIcon</tf-icon>
                     </button>
                 }

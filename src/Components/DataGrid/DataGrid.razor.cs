@@ -562,6 +562,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     internal Row<TDataItem>? EditingRow { get; set; }
 
+    internal bool Interactive { get; set; }
+
     internal Form? TableEditForm { get; set; }
 
     /// <inheritdoc />
@@ -934,6 +936,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         RecalculatePaging();
+
+        Interactive = true;
 
         if (LoadItems is null)
         {

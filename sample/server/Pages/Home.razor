@@ -4,27 +4,36 @@
 
 <div class="d-flex flex-column">
     <div class="background-gradient"></div>
-    <div class="d-flex flex-column align-self-start mt-6 mx-auto">
-        <img src="./images/tavenemlogo.svg" alt="" width="200" height="200" class="d-inline-block me-1 align-self-center" />
-        <div class="card align-self-start flex-grow-0">
-            <div class="body flex-row gap-3" style="width:max-content">
-                <a href="./getting-started/installation" class="btn primary">Get Started</a>
-                <a href="https://github.com/Tavenem/Blazor.Framework" class="btn outlined" style="border-color: currentColor">
-                    <svg focusable="false" viewBox="0 0 24 24" aria-hidden="true" class="svg-icon">
-                        <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3"></path>
-                    </svg>
-                    <span class="ms-1">GitHub</span>
-                </a>
+    <div class="d-flex flex-wrap">
+        <div class="d-flex flex-column align-self-start mt-6 mx-auto">
+            <img src="./images/tavenemlogo.svg" alt="" width="200" height="200" class="d-inline-block me-1 align-self-center" />
+            <div class="card align-self-start flex-grow-0">
+                <div class="body flex-row gap-3" style="width:max-content">
+                    <a href="./getting-started/installation" class="btn primary">Get Started</a>
+                    <a href="https://github.com/Tavenem/Blazor.Framework" class="btn outlined" style="border-color: currentColor">
+                        <svg focusable="false" viewBox="0 0 24 24" aria-hidden="true" class="svg-icon">
+                            <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3"></path>
+                        </svg>
+                        <span class="ms-1">GitHub</span>
+                    </a>
+                </div>
             </div>
+        </div>
+        <div class="ms-auto" style="max-width:46rem;width:calc(100vw - 2rem)">
+            <Editor Value="@_editorValue" Syntax="EditorSyntax.HTML" LockSyntax="false" MaxHeight="50vh" />
         </div>
     </div>
     <div class="d-flex flex-wrap">
         <div class="card primary" style="max-width:46rem;width:calc(100vw - 4rem)">
             <div class="body">
                 <DataGrid Title="Employees"
-                          Items="_items"
-                          MaxHeight="50vh"
-                          TableClass="hover">
+                            Items="_items"
+                            AllowAdd="true"
+                            AllowDelete="true"
+                            AllowEdit="true"
+                            AllowInlineEdit="true"
+                            MaxHeight="50vh"
+                            TableClass="hover">
                     <Column Label="Name" Value="@(x => x.Name)" IsQuickFilter="true" />
                     <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
                     <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false">
@@ -44,11 +53,16 @@
             <div class="body">
                 <div class="d-flex flex-column align-items-center">
                     <span>On a scale of Awesome to AWSESOME:</span>
-                    <Rating Value="3" />
-                    <span>Super Awesome</span>
+                    <Rating @bind-Value="_ratingValue"
+                            @bind-HoveredValue="_hoverRating" />
+                    <span>@GetRating(_hoverRating ?? _ratingValue)</span>
                 </div>
                 <div class="row mt-3">
-                    <Meter Value="3"
+                    <Slider @bind-Value="_sliderValue" Label="On a sliding scale of awesome:" Max="4" />
+                    <strong>@GetRating(_sliderValue)</strong>
+                </div>
+                <div class="row mt-3">
+                    <Meter Value="(_ratingValue + _sliderValue)"
                            Label="Total level of awesome:"
                            Low="3"
                            High="8"
@@ -62,13 +76,14 @@
 
 <div class="card">
     <div class="header">
-        <Heading Level="HeadingLevel.H1">What is it?</Heading>
+        <h2>What is it?</h2>
     </div>
     <div class="body">
         <div class="row cols-lg-2">
             <div>
                 <p>
-                    The <a href="https://tavenem.com">Tavenem</a> Blazor Framework is a CSS framework and <a href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor">Blazor</a> component
+                    The <a href="https://tavenem.com">Tavenem</a> Blazor Framework is a CSS framework and <a
+                    href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor">Blazor</a> component
                     library designed to help build responsive sites and apps with appealing design and layout
                     features quickly and easily.
                 </p>
@@ -99,7 +114,7 @@
     </div>
 </div>
 
-<Heading Level="HeadingLevel.H1">Getting Started</Heading>
+<h2>Getting Started</h2>
 
 <p>
     Ready to get started with the Tavenem Blazor Framework?
@@ -111,7 +126,8 @@
 </p>
 
 <p>
-    Read through the <span class="primary">Layout</span> section of the navigation <a href="./components/drawer">Drawer</a> to learn how the framework helps you structure your
+    Read through the <span class="primary">Layout</span> section of the navigation <a
+    href="./components/drawer">Drawer</a> to learn how the framework helps you structure your
     content.
 </p>
 
@@ -134,6 +150,11 @@
         public bool IsExecutive { get; set; }
         public DateTime HireDate { get; set; }
     }
+    private string _editorValue =
+@"<h2>Welcome to the Tavenem Blazor Framework!</h2>
+<p>It includes dozens of components to help you build your website or app using clean, standards-based markup and code.</p>
+<p>That includes <em>this</em> rich text <a href=""./components/editor"">editor</a>, the <a href=""./components/datagrid"">DataGrid</a> below, and the collection of components in the ""awesome"" card.</p>
+<p>Feel free to play with the text in this editor, and the data in the grid. They are both live, functional components, using only default features from the Tavenem Blazor Framework&mdash;no custom code. If you include them in your own project you will have all the functionality you see here with no extra effort.</p>";
     private List<DataItem> _items = new()
     {
         new DataItem { Id = 0, Name = "Smith, James", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1263) },
@@ -151,4 +172,17 @@
         new DataItem { Id = 12, Name = "Gonzales, Richard", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(2007) },
         new DataItem { Id = 13, Name = "Wilson, Susan", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1847) },
     };
+    private byte _ratingValue = 3;
+    private byte? _hoverRating;
+    private double _sliderValue = 1.5;
+    private string GetRating(byte? value) => value switch
+    {
+        1 => "Awesome",
+        2 => "Very Awesome",
+        3 => "Super Awesome",
+        4 => "Incredibly Awesome",
+        5 => "AWESOME!!!",
+        _ => "Unknown level of awesome",
+    };
+    private string GetRating(double? value) => GetRating((byte)Math.Floor((value ?? 0) + 1));
 }

@@ -132,13 +132,16 @@ public partial class Steps
     private ThemeColor CurrentThemeColor
         => ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor;
 
-    private bool IsFinishButtonDisabled => FinishButtonDisabled
+    private bool IsFinishButtonDisabled => !Interactive
+        || FinishButtonDisabled
         || !IsFormValid;
 
     private string? FinishButtonCssClass => new CssBuilder("btn ms-auto")
         .Add("btn-text", FinishButtonDisabled)
         .Add(CurrentThemeColor.ToCSS(), !FinishButtonDisabled)
         .ToString();
+
+    private bool Interactive { get; set; }
 
     private bool IsFormValid { get; set; } = true;
 
@@ -147,32 +150,22 @@ public partial class Steps
         .Add(CurrentThemeColor.ToCSS(), !NextDisabled)
         .ToString();
 
-    private bool NextDisabled
-    {
-        get
-        {
-            var next = _steps
-                .Skip(CurrentStep + 1)
-                .FirstOrDefault(x => x.IsVisible);
-            return next is null || next.Disabled;
-        }
-    }
+    private bool NextDisabled => !Interactive
+        || _steps
+            .Skip(CurrentStep + 1)
+            .FirstOrDefault(x => x.IsVisible)?
+            .Disabled != false;
 
     private string? PreviousButtonCssClass => new CssBuilder("btn")
         .Add("btn-text", PreviousDisabled)
         .Add("outlined", !PreviousDisabled)
         .ToString();
 
-    private bool PreviousDisabled
-    {
-        get
-        {
-            var previous = _steps
-                .Take(CurrentStep)
-                .LastOrDefault(x => x.IsVisible);
-            return previous is null || previous.Disabled;
-        }
-    }
+    private bool PreviousDisabled => !Interactive
+        || _steps
+            .Take(CurrentStep)
+            .LastOrDefault(x => x.IsVisible)?
+            .Disabled != false;
 
     private bool ShowFinishButton => (Finish.HasDelegate
         || Form?.OnSubmit.HasDelegate == true
@@ -192,17 +185,24 @@ public partial class Steps
     /// <inheritdoc />
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && _steps.Count > 0)
+        if (firstRender)
         {
-            while (CurrentStep < _steps.Count
-                && !_steps[CurrentStep].IsVisible)
+            Interactive = true;
+
+            if (_steps.Count > 0)
             {
-                CurrentStep++;
+                while (CurrentStep < _steps.Count
+                    && !_steps[CurrentStep].IsVisible)
+                {
+                    CurrentStep++;
+                }
+                if (!_steps[CurrentStep].IsVisible)
+                {
+                    CurrentStep = 0;
+                }
             }
-            if (!_steps[CurrentStep].IsVisible)
-            {
-                CurrentStep = 0;
-            }
+
+            StateHasChanged();
         }
     }
 
@@ -242,7 +242,7 @@ public partial class Steps
     }
 
     private string? GetStepActivatorCssClass(Step step) => new CssBuilder("step-activator")
-        .Add("disabled", step.Disabled)
+        .Add("disabled", step != _steps[CurrentStep] && (!Interactive || step.Disabled))
         .Add(CurrentThemeColor.ToCSS(), step == _steps[CurrentStep])
         .ToString();
 
@@ -273,7 +273,7 @@ public partial class Steps
         var next = _steps
             .Skip(CurrentStep + 1)
             .FirstOrDefault(x => x.IsVisible);
-        if (next is null || next.Disabled)
+        if (next?.Disabled != false)
         {
             return;
         }
@@ -288,7 +288,7 @@ public partial class Steps
         var previous = _steps
             .Take(CurrentStep)
             .LastOrDefault(x => x.IsVisible);
-        if (previous is null || previous.Disabled)
+        if (previous?.Disabled != false)
         {
             return;
         }

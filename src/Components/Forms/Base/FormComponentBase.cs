@@ -698,7 +698,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         var newDictionaryCreated = true;
         if (source is null)
         {
-            result = new Dictionary<string, object>();
+            result = [];
         }
         else if (source is Dictionary<string, object> currentDictionary)
         {
@@ -707,7 +707,7 @@ public abstract class FormComponentBase<TValue> : ComponentBase, IDisposable, IF
         }
         else
         {
-            result = new Dictionary<string, object>();
+            result = [];
             foreach (var item in source)
             {
                 result.Add(item.Key, item.Value);

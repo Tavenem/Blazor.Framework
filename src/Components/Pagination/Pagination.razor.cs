@@ -166,7 +166,7 @@ public partial class Pagination
     protected override string? CssClass => new CssBuilder("pagination")
         .Add(Class)
         .Add(ThemeColor.ToCSS())
-        .Add("disabled", Disabled)
+        .Add("disabled", IsDisabled)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
@@ -200,6 +200,10 @@ public partial class Pagination
     private int FocusSkipFirst => CurrentPage == 0 ? 0 : 1;
 
     private int FocusSkipFirstPrev => CurrentPage == 0 ? 0 : 2;
+
+    private bool Interactive { get; set; }
+
+    private bool IsDisabled => Disabled || !Interactive;
 
     private ulong LastPage
     {
@@ -258,6 +262,16 @@ public partial class Pagination
         if (currentChanged)
         {
             await CurrentPageChanged.InvokeAsync(CurrentPage);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
         }
     }
 

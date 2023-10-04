@@ -52,14 +52,9 @@ public partial class ScrollToTop : IDisposable
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
-
     [Inject] private ScrollService ScrollService { get; set; } = default!;
 
     [Inject] private ScrollListener ScrollListener { get; set; } = default!;
-
-    /// <inheritdoc/>
-    protected override void OnInitialized() => FrameworkLayout?.Add(this);
 
     /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
@@ -89,7 +84,6 @@ public partial class ScrollToTop : IDisposable
         {
             if (disposing)
             {
-                FrameworkLayout?.Remove(this);
                 ScrollListener.OnScroll -= OnScroll;
             }
 

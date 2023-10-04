@@ -18,7 +18,7 @@
                       ThemeColor="ThemeColor" />
         </td>
     }
-    @if (DataGrid.AllowEdit)
+    @if (DataGrid.AllowEdit && DataGrid.Interactive)
     {
         <td style="width:calc(2.75rem + 10px)">
             <span class="d-inline-flex gap-1 align-items-center justify-content-space-around">
@@ -54,7 +54,7 @@
             </span>
         </td>
     }
-    else if (DataGrid.AllowDelete)
+    else if (DataGrid.AllowDelete && DataGrid.Interactive)
     {
         <td>
             <Tooltip TooltipText="Delete" Delay="750">
@@ -69,7 +69,9 @@
         <td>
             @if (DataGrid.HasExpandedContent?.Invoke(Item!) != false)
             {
-                <button class="btn btn-icon small" @onclick="OnToggleExpansionAsync">
+                <button class="btn btn-icon small"
+                        disabled="@(!DataGrid.Interactive)"
+                        @onclick="OnToggleExpansionAsync">
                     <tf-icon class="@ExpandClass">@DefaultIcons.Expand</tf-icon>
                 </button>
             }

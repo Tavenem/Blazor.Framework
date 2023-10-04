@@ -21,13 +21,14 @@
     A more complete example, however, will look something like this:
 </p>
 <pre class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(@"<FrameworkLayout ThemeColor=""ThemeColor.Primary"">
+    @CodeFormatter.CodeToMarkup(@"<FrameworkLayout>
     <FrameworkContent>
-        <AppBar Side=""VerticalSide.Top"" ControlsDrawerSide=""Side.Left"">
+        <div class=""appbar"">
+            <DrawerToggle Side=""Side.Left"" />
             <span class=""primary text-close"" style=""font-size:2em"">Main Title</span>
             <LightDarkToggle class=""ms-auto"" />
-        </AppBar>
-        <Drawer Side=""Side.Left"">
+        </div>
+        <Drawer Side=""Side.Left"" ShowAtBreakpoint=""Breakpoint.Lg"">
             <div class=""list"" role=""navigation"">
                 <NavLink href="""" Match=""NavLinkMatch.All""><tf-icon>home</tf-icon> Home</NavLink>
                 <NavLink href=""./counter""><tf-icon>pin</tf-icon> Counter</NavLink>
@@ -42,42 +43,33 @@
 </pre>
 
 <p>
-    The example above includes an <a href="./components/appbar">AppBar</a> at the top of the page,
-    including a button which toggles between light and dark modes, a <a
-    href="./components/drawer">Drawer</a> on the left side which can be opened and closed at small
-    screen sizes, and becomes a permanent part of the left side of the page at larger sizes, and a
-    dynamic <a href="./components/contents">table of contents</a> which is displayed on the right
-    side at large view sizes.
+    The example above includes an <a href="./components/appbar">appbar</a> at the top of the page, a
+    button which toggles between light and dark modes, a <a href="./components/drawer">Drawer</a> on
+    the left side which can be opened and closed at small screen sizes, and becomes a permanent part
+    of the left side of the page at larger sizes, and a dynamic <a
+    href="./components/contents">table of contents</a> which is displayed on the right side at large
+    view sizes.
 </p>
 <p>
-    Apart from support for top and bottom <code>AppBars</code>, and <code>Drawers</code> on all four
-    sides, the <code>FrameworkLayout</code> component includes a built-in <a
+    The <code>FrameworkLayout</code> component includes a built-in <a
     href="./components/scroll-to-top">ScrollToTop</a> component for the main document. You can
-    override the built-in <code>ScrollToTop</code> by including your own.
+    override this by setting the <code>AutoScrollToTop</code> property to <code>false</code>.
 </p>
 <p>
-    It also provides the overlays used for temporary <code>Drawers</code>, and
-    automatic support for <a href="./components/contents">Contents</a>, <a
-    href="./components/dialog">Dialogs</a> and <a href="./components/snackbar">Snackbars</a>.
+    It also provides a default <a href="./components/contents">Contents</a> component, and support
+    for <a href="./components/dialog">Dialogs</a> and <a href="./components/snackbar">Snackbars</a>.
 </p>
 
 <p>
     Note that is isn't strictly necessary to use a <code>FrameworkLayout</code> component in your
-    app. Most components in this library can be used stand-alone. However, the <a
-    href="./components/drawer">Drawer</a> component relies on a containing
-    <code>FrameworkLayout</code> to operate, and the <a href="./components/appbar">AppBar</a>
-    component also requires a containing <code>FrameworkLayout</code> if it controls a drawer.
+    app. Most components in this library can be used stand-alone. However, <a
+    href="./components/drawer">Drawers</a> and <a href="./components/appbar">apppars</a> require a
+    containing <code>FrameworkLayout</code> for placement.
 </p>
 
-<h2>Theme</h2>
 <p>
-    The <code>FrameworkLayout</code> component includes a <code>Theme</code> property. You can use
-    this to coordinate the theme of all <code>AppBars</code> and <code>Drawers</code>, eliminating
-    the need to specify the same value on each separately.
+    To support drawers and appbars without a <code>FrameworkLayout</code> component, it is possible
+    to add a <code>div</code> or other container element to your layout with the
+    <code>tavenem-framework-layout</code> CSS class, which will provide the necessary layout without
+    the automatic inclusion of the other framework services.
 </p>
-<p>
-    Each <code>AppBar</code> and <code>Drawer</code> can still have
-    its own <code>Theme</code> property set directly, however, which will override
-    the inherited value.
-</p>
-<p>See <a href="./getting-started/themes">Themes</a> for more information about style and color.</p>

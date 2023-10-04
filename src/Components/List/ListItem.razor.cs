@@ -169,6 +169,8 @@ public partial class ListItem<TListItem>
         }
     }
 
+    private protected bool Interactive { get; set; }
+
     private protected bool IsCollapsibleValue => IsCollapsible
         || (Item is not null
         && ElementList?.ItemIsCollapsible?.Invoke(Item) == true);
@@ -213,6 +215,16 @@ public partial class ListItem<TListItem>
 
     [Inject] private ScrollService ScrollService { get; set; } = default!;
 
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
+        }
+    }
+
     /// <summary>
     /// Focuses on this list item, and scrolls to it.
     /// </summary>
@@ -251,7 +263,8 @@ public partial class ListItem<TListItem>
     internal override DragEffect GetDragEffectAllowed()
         => ElementList?.DragEffectAllowedValue ?? DragEffectAllowed;
 
-    internal override bool GetIsDraggable() => IsDraggable
+    internal override bool GetIsDraggable() => Interactive
+        && IsDraggable
         && Item is not null
         && IsListDraggable
         && ElementList?.ItemIsDraggable?.Invoke(Item) != false;

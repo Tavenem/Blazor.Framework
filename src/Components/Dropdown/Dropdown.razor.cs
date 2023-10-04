@@ -207,9 +207,11 @@ public partial class Dropdown : IAsyncDisposable
 
     private Origin DefaultAnchorOrigin => HideButton ? Origin.Top_Left : Origin.Bottom_Left;
 
-    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+    private bool Interactive { get; set; }
 
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    private bool IsDisabled => Disabled || !Interactive;
+
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     private double? PopoverPositionX { get; set; }
 
@@ -255,32 +257,37 @@ public partial class Dropdown : IAsyncDisposable
         Justification = "Parameter type MouseEventArgs specified as a DynamicDependency")]
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender)
         {
-            _dotNetRef ??= DotNetObjectReference.Create(this);
-            if (!HideButton)
-            {
-                _buttonMouseEnterListenerId = await Button.AddEventListenerAsync(
-                    _dotNetRef,
-                    "mouseenter",
-                    nameof(OnButtonMouseEnter));
-                _buttonMouseLeaveListenerId = await Button.AddEventListenerAsync(
-                    _dotNetRef,
-                    "mouseleave",
-                    nameof(OnButtonMouseLeaveAsync));
-            }
-            if (Popover is not null)
-            {
-                _popoverMouseEnterListenerId = await Popover.ElementReference.AddEventListenerAsync(
-                    _dotNetRef,
-                    "mouseenter",
-                    nameof(OnPopoverMouseEnter));
-                _popoverMouseLeaveListenerId = await Popover.ElementReference.AddEventListenerAsync(
-                    _dotNetRef,
-                    "mouseleave",
-                    nameof(OnPopoverMouseLeave));
-            }
+            return;
         }
+
+        _dotNetRef ??= DotNetObjectReference.Create(this);
+        if (!HideButton)
+        {
+            _buttonMouseEnterListenerId = await Button.AddEventListenerAsync(
+                _dotNetRef,
+                "mouseenter",
+                nameof(OnButtonMouseEnter));
+            _buttonMouseLeaveListenerId = await Button.AddEventListenerAsync(
+                _dotNetRef,
+                "mouseleave",
+                nameof(OnButtonMouseLeaveAsync));
+        }
+        if (Popover is not null)
+        {
+            _popoverMouseEnterListenerId = await Popover.ElementReference.AddEventListenerAsync(
+                _dotNetRef,
+                "mouseenter",
+                nameof(OnPopoverMouseEnter));
+            _popoverMouseLeaveListenerId = await Popover.ElementReference.AddEventListenerAsync(
+                _dotNetRef,
+                "mouseleave",
+                nameof(OnPopoverMouseLeave));
+        }
+
+        Interactive = true;
+        StateHasChanged();
     }
 
     /// <inheritdoc/>

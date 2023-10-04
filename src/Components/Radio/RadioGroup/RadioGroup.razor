@@ -1,0 +1,96 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@attribute [CascadingTypeParameter(nameof(TValue))]
+@typeparam TValue
+
+@inherits FormComponentBase<TValue>
+
+<fieldset @attributes="AdditionalAttributes"
+          class="@CssClass"
+          style="@CssStyle"
+          aria-required="@Required">
+    <div class="content">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <legend>@Label</legend>
+        }
+        <div class="options">
+            <CascadingValue Value="this" IsFixed="true">
+                <CascadingValue Value="_context">
+                    @ChildContent
+                    @if (true)
+                    {
+                        var tabIndex = IsDisabled ? -1 : TabIndex;
+                        @if (Values is not null)
+                        {
+                            if (LabelTemplate is null)
+                            {
+                                foreach (var value in Values)
+                                {
+                                    <RadioButton @key="value"
+                                                 Value="value"
+                                                 Label="@value?.ToString()"
+                                                 CheckedIcon="@CheckedIcon"
+                                                 UncheckedIcon="@UncheckedIcon"
+                                                 TabIndex="tabIndex" />
+                                    @if (TabIndex > 0)
+                                    {
+                                        tabIndex++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var value in Values)
+                                {
+                                    <RadioButton @key="value"
+                                                 Value="value"
+                                                 CheckedIcon="@CheckedIcon"
+                                                 UncheckedIcon="@UncheckedIcon"
+                                                 TabIndex="tabIndex">
+                                        <LabelContent>
+                                            @LabelTemplate(context)
+                                        </LabelContent>
+                                    </RadioButton>
+                                    @if (TabIndex > 0)
+                                    {
+                                        tabIndex++;
+                                    }
+                                }
+                            }
+                        }
+                        @if (ValuePairs is not null)
+                        {
+                            foreach (var (key, value) in ValuePairs)
+                            {
+                                <RadioButton @key="key"
+                                             Value="key"
+                                             Label="@value"
+                                             CheckedIcon="@CheckedIcon"
+                                             UncheckedIcon="@UncheckedIcon"
+                                             TabIndex="tabIndex" />
+                                @if (TabIndex > 0)
+                                {
+                                    tabIndex++;
+                                }
+                            }
+                        }
+                    }
+                </CascadingValue>
+            </CascadingValue>
+        </div>
+    </div>
+    @if (IsInvalidAndTouched)
+    {
+        <div class="field-helpers">
+            <ul class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </div>
+    }
+</fieldset>
+
+

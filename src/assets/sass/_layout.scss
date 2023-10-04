@@ -1,4 +1,24 @@
-﻿#main-container,
+﻿.tavenem-framework-layout {
+    display: grid;
+    flex: 1 0;
+    grid-template-areas:
+        "header header header header" "topdrawer topdrawer topdrawer topdrawer" "leftdrawer main contents rightdrawer" "bottomdrawer bottomdrawer bottomdrawer bottomdrawer" "footer footer footer footer";
+    grid-template-columns: max-content 1fr max-content max-content;
+    grid-template-rows: max-content max-content 1fr max-content max-content;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+
+    @media print {
+        overflow: visible;
+    }
+
+    > * {
+        grid-area: main;
+    }
+}
+
 .container,
 .container-fixed {
     align-items: flex-start;
@@ -16,7 +36,7 @@
     width: 100%;
 }
 
-#main-container {
+.tavenem-framework-layout > .container {
     overflow-x: auto;
     margin-top: 1rem;
     padding-bottom: 6rem;

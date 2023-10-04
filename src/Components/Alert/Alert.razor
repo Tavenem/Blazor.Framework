@@ -8,7 +8,7 @@
         <tf-icon class="@IconClass">@Icon</tf-icon>
     }
     @ChildContent
-    @if (AutoClose || OnClosed.HasDelegate || Closed is not null)
+    @if (Interactive && (AutoClose || OnClosed.HasDelegate || Closed is not null))
     {
         <tf-close @onclick="OnClosedAsync" />
     }

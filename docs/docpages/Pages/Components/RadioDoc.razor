@@ -1,0 +1,577 @@
+﻿@page "/components/radio"
+
+<PageTitle>Radio - Tavenem Blazor Framework</PageTitle>
+
+<h1>Radio</h1>
+
+<p>
+    Radio buttons are handled in the Tavenem Blazor Framework by two components: the
+    <code>RadioGroup</code> and the <code>RadioButton</code>. A <code>RadioButton</code> is a rich
+    wrapper for an input element with the radio type. It <em>must</em> be nested within a
+    <code>RadioGroup</code> component, which provides a shared context that coordinates the
+    selected value among its radio buttons.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    A simple radio group has a <code>RadioGroup</code> wrapper with a set of
+    <code>RadioButton</code> children.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value1">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can add the <code>inline</code> class to place the radio buttons horizontally.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value2" Class="inline">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can add the <code>dense</code> class to reduce the space around the icon, and between radio buttons.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value3" Class="dense">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <RadioGroup @bind-Value="_value4" Class="inline dense">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Class=""dense"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<RadioGroup @bind-Value=""_value2"" Class=""inline dense"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value1, _value2;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can add a label to the group as a whole with the <code>Label</code> property.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value5" Label="Label">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <RadioGroup @bind-Value="_value6" Label="Label" Class="inline">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Label=""Label"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<RadioGroup @bind-Value=""_value2"" Label=""Label"" Class=""inline"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value1, _value2;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    A <code>RadioGroup</code>'s <code>Value</code> property can be bound to a single expression,
+    which will have the value of the selected radio button. Most native data types are
+    supported by default, but custom data types may require a converter. This can take the form of a
+    <code>TypeConverter</code> attribute directly on the data type to support conversion to and from
+    a <code>string</code> directly, or a special converter class assigned to the
+    <code>Converter</code> property of the select component which can perform bespoke conversions
+    for that particular component.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value7" Class="inline">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <span>Bound value: @_value7</span>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<span>Bound value: @_value</span>
+
+@code {
+    private int _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that prior to selecting a button, the bound value contains a default value when the bound
+    type is non-nullable. Bind to a nullable type instead to accurately reflect the case when the
+    user has not yet selected a button:
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value8" Class="inline">
+                <RadioButton TValue="int?" Value="1" Label="One" />
+                <RadioButton TValue="int?" Value="2" Label="Two" />
+                <RadioButton TValue="int?" Value="3" Label="Three" />
+            </RadioGroup>
+            <span>Bound value: @(_value8.HasValue ? _value8.ToString() : "null")</span>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
+    <RadioButton TValue=""int?"" Value=""1"" Label=""One"" />
+    <RadioButton TValue=""int?"" Value=""2"" Label=""Two"" />
+    <RadioButton TValue=""int?"" Value=""3"" Label=""Three"" />
+</RadioGroup>
+<span>Bound value: @(_value.HasValue ? _value.ToString() : ""null"")</span>
+
+@code {
+    private int? _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>CheckedIcon</code> and <code>UncheckedIcon</code> properties can be used to customize
+    the icons used for each state.
+</p>
+
+<p>
+    These properties can be set on the <code>RadioGroup</code> itself, or on individual
+    <code>RadioButton</code>s.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value9" Class="inline" CheckedIcon="done" UncheckedIcon="highlight_off">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" CheckedIcon="thumb_up" UncheckedIcon="thumb_down" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"" CheckedIcon=""done"" UncheckedIcon=""highlight_off"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" CheckedIcon=""thumb_up"" UncheckedIcon=""thumb_down"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<h2>Dynamic radio buttons</h2>
+
+<p>
+    Instead of (or in addition to) manually listing each radio button option, you can assign an
+    enumeration of values to the <code>Values</code> property of a <code>RadioGroup</code>. Each
+    item in the set will produce a dynamic radio button with its value set to that item.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value10" Values="_values1" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Values=""_values"" />
+
+@code {
+    private int _value;
+    private int[] _values = new[] { 1, 2, 3 };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    If you provide a <code>RenderFragment</code> for the <code>LabelTemplate</code> property, you
+    can control the label generated for each item.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value11" Values="_values1">
+                <LabelTemplate>
+                    Option @context
+                </LabelTemplate>
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Values=""_values"">
+    <LabelTemplate>
+        Option @context
+    </LabelTemplate>
+</RadioGroup>
+
+@code {
+    private int _value;
+    private int[] _values = new[] { 1, 2, 3 };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also assign a collection of <code>KeyValuePair&lt;TValue, string?></code> objects to the
+    <code>ValuePairs</code> property. The keys will be used as the values of the dynamic radio
+    buttons, and the values will be used as their labels.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value12" ValuePairs="_values2" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" ValuePairs=""_values"" />
+
+@code {
+    private int _value;
+    private List<KeyValuePair<int, string?>> _values = new() { new(1, ""One""), new(2, ""Two""), new(3, ""Three"") };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that all three options can be used in combination: explicit <code>RadioButton</code>
+    children, the <code>Values</code> property, and the <code>ValuePairs</code> property will all
+    work together (and will appear in that order).
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value13" Values="_values1" ValuePairs="_values3">
+                <RadioButton Value="0" Label="Zero" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Values=""_values1"" ValuePairs=""_values2"">
+    <RadioButton Value=""0"" Label=""Zero"" />
+</RadioGroup>
+
+@code {
+    private int _value;
+    private int[] _values1 = new[] { 1, 2, 3 };
+    private List<KeyValuePair<int, string?>> _values2 = new() { new(4, ""Four""), new(5, ""Five""), new(6, ""Six"") };
+}")
+    </ChildContent>
+</Collapse>
+
+<h2>Name</h2>
+
+<p>
+    The <code>Name</code> property of both the <code>RadioGroup</code> and <code>RadioButton</code>
+    components can be used to specify the name attribute used by all the radio input in the group.
+    If it is not supplied, a random string will be generated.
+</p>
+
+<p>
+    It is possible to nest radio groups within one another. The <code>RadioButton</code> components
+    inside will automatically inherit the <code>Name</code> from their nearest ancestor
+    <code>RadioGroup</code>. To override this behavior, it is possible to specify an explicit
+    <code>Name</code> on a <code>RadioButton</code>, but that name must match the <code>Name</code>
+    of an ancestor <code>RadioGroup</code>, even if it isn't the direct parent of the
+    <code>RadioButton</code>.
+</p>
+
+<h2>Disabled & read-only</h2>
+
+<p>
+    The group can be set as disabled or read-only by setting the properties of the same names.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_disabled" Label="Disabled" Disabled="true">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <RadioGroup @bind-Value="_disabled" Label="Read-only" ReadOnly="true">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_disabled"" Disabled=""true"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<RadioGroup @bind-Value=""_disabled"" ReadOnly=""true"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _disabled = 2;
+}")
+    </ChildContent>
+</Collapse>
+
+<h2>Required</h2>
+
+<p>
+    Set the <code>Required</code> property to specify whether a value is required for the group.
+    This adds an indicator to the label, and automatic verification rules which warn the user when
+    the input is <code>null</code>. The warning will only appear after the user has interacted with
+    the input for the first time.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value14" Label="Required" Required="true">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Label=""Label"" Required=""true"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value;
+}")
+    </ChildContent>
+</Collapse>
+
+<h2>Tab index</h2>
+
+<p>
+    The <code>TabIndex</code> property of both the <code>RadioGroup</code> and
+    <code>RadioButton</code> components can be used to specify the value of their
+    <code>tabindex</code> attributes.
+</p>
+
+<h2>Name</h2>
+
+<p>
+    The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
+<h2>Auto-focus</h2>
+
+<p>
+    Set the <code>AutoFocus</code> property of a <code>RadioButton</code> to <code>true</code> to
+    automatically focus that radio button on page load. Setting this on more than one component will
+    cause the first one in the DOM layout order to receive focus.
+</p>
+
+<p>
+    Be cautious when using this property. It can be unfriendly to users who use screen-reading
+    technology.
+</p>
+
+<h2>Methods</h2>
+
+<p>
+    The <code>FocusAsync</code> method will give a <code>RadioButton</code> focus.
+</p>
+
+<h2>Customization</h2>
+
+<p>
+    You can set the color scheme to any theme color with the <code>ThemeColor</code> property. A
+    <code>RadioGroup</code> as a whole can be given a theme, and individual
+    <code>RadioButton</code>s can also be assigned an overriding theme.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value15" Class="inline" ThemeColor="ThemeColor.Primary">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" ThemeColor="ThemeColor.Secondary" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <RadioGroup @bind-Value="_value16" Class="inline" ThemeColor="ThemeColor.Tertiary">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" ThemeColor="ThemeColor.Success" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Class=""inline"" ThemeColor=""ThemeColor.Primary"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" ThemeColor=""ThemeColor.Secondary"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<RadioGroup @bind-Value=""_value2"" Class=""inline"" ThemeColor=""ThemeColor.Tertiary"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" ThemeColor=""ThemeColor.Success"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value1, _value2;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Use the <code>small</code> or <code>large</code> classes to change the size of the icons.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <RadioGroup @bind-Value="_value17" Label="Small" Class="inline small">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <RadioGroup @bind-Value="_value18" Label="Normal" Class="inline">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+            <RadioGroup @bind-Value="_value19" Label="Large" Class="inline large">
+                <RadioButton Value="1" Label="One" />
+                <RadioButton Value="2" Label="Two" />
+                <RadioButton Value="3" Label="Three" />
+            </RadioGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Label=""Small"" Class=""inline small"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<RadioGroup @bind-Value=""_value2"" Label=""Normal"" Class=""inline"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+<RadioGroup @bind-Value=""_value3"" Label=""Large"" Class=""inline large"">
+    <RadioButton Value=""1"" Label=""One"" />
+    <RadioButton Value=""2"" Label=""Two"" />
+    <RadioButton Value=""3"" Label=""Three"" />
+</RadioGroup>
+
+@code {
+    private int _value1, _value2, _value3;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>InputClass</code> and <code>InputStyle</code> properties of <code>RadioButton</code>
+    can be used to control the CSS attributes of the input itself, while its
+    <code>InputAttributes</code> property can be used to assign arbitrary attributes to it.
+</p>
+
+<h3>Validation</h3>
+
+<p>
+    See <a href="./components/form#validation">Validation</a> for information about validating Tavenem
+    Blazor Framework form components.
+</p>
+
+@code {
+    private int _disabled = 2;
+    private int _value1, _value2, _value3, _value4, _value5, _value6, _value7, _value9, _value10;
+    private int _value11, _value12, _value13, _value14, _value15, _value16, _value17, _value18, _value19;
+    private int? _value8;
+    private int[] _values1 = new[] { 1, 2, 3 };
+    private List<KeyValuePair<int, string?>> _values2 = new() { new(1, "One"), new(2, "Two"), new(3, "Three") };
+    private List<KeyValuePair<int, string?>> _values3 = new() { new(4, "Four"), new(5, "Five"), new(6, "Six") };
+}

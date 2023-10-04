@@ -3,5 +3,14 @@
 @inherits TavenemComponentBase
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClickAsync">
-    @ChildContent
+    @if (ChildContent is null)
+    {
+        <span class="btn btn-icon primary filled">
+            <tf-icon>expand_less</tf-icon>
+        </span>
+    }
+    else
+    {
+        @ChildContent
+    }
 </div>

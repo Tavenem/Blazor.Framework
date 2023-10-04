@@ -1,0 +1,107 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@inherits InputComponentBase<TValue>
+
+<div @attributes="AdditionalAttributes" id="@ContainerId" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+    <div id="@InputId" class="input">
+        @if (PrefixContent is not null)
+        {
+            @PrefixContent(Value)
+        }
+        else if (!string.IsNullOrEmpty(PrefixIcon) || !string.IsNullOrEmpty(PrefixText))
+        {
+            @if (!string.IsNullOrEmpty(PrefixIcon))
+            {
+                <tf-icon>@PrefixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PrefixText))
+            {
+                <span>@PrefixText</span>
+            }
+        }
+        <input type="number"
+               disabled="@IsDisabled"
+               hidden
+               inputmode="@InputMode"
+               name="@Name"
+               readonly="@IsReadOnly"
+               step="@StepString"
+               tabindex="@TabIndex"
+               value="@CurrentValueAsString" />
+        <input @ref="ElementReference"
+               @attributes="InputAttributes"
+               id="@Id"
+               class="@InputCssClass"
+               style="@InputCssStyle"
+               autocomplete="@AutocompleteValue"
+               autofocus="@AutoFocus"
+               disabled="@IsDisabled"
+               inputmode="@InputMode"
+               readonly="@IsReadOnly"
+               required="@Required"
+               size="@EffectiveSize"
+               step="@StepString"
+               tabindex="@TabIndex"
+               value="@DisplayString"
+               @oninput="OnInput"
+               @onchange="OnChange" />
+        @if (PostfixContent is not null)
+        {
+            @PostfixContent(Value)
+        }
+        else if (!string.IsNullOrEmpty(PostfixIcon) || !string.IsNullOrEmpty(PostfixText))
+        {
+            @if (!string.IsNullOrEmpty(PostfixIcon))
+            {
+                <tf-icon>@PostfixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PostfixText))
+            {
+                <span>@PostfixText</span>
+            }
+        }
+        @if (ShowStepButtons && !ReadOnly && Interactive)
+        {
+            <div class="numeric-spin">
+                <button @onclick="Increment" class="btn btn-text" disabled="@IncrementDisabled" tabindex="-1">
+                    <tf-icon class="@ThemeColor.ToCSS()">@StepUpIcon</tf-icon>
+                </button>
+                <button @onclick="Decrement" class="btn btn-text" disabled="@DecrementDisabled" tabindex="-1">
+                    <tf-icon class="@ThemeColor.ToCSS()">@StepDownIcon</tf-icon>
+                </button>
+            </div>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if (!string.IsNullOrEmpty(HelpText)
+        || HelpTextContent.HasValue
+        || IsInvalidAndTouched)
+    {
+        <div class="@HelpersClass">
+            @if (IsInvalidAndTouched)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (HelpTextContent.HasValue)
+            {
+                <div class="mr-auto">@HelpTextContent.Value</div>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+        </div>
+    }
+</div>
+
+

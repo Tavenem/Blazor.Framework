@@ -4,21 +4,18 @@
 
 <aside @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="@HeaderClassName">
-        <div class="@HeaderToolbarClassName">
-            @HeaderContent
-            @if (IsInteractive)
-            {
-                <tf-close class="drawer-close-small" @onclick="OnClosedAsync" />
-            }
-        </div>
+        @HeaderContent
+        @if (IsInteractive)
+        {
+            <tf-close class="drawer-close-small" @onclick="OnClosedAsync" />
+        }
     </div>
     @ChildContent
     @if (FooterContent is not null)
     {
-        <div class="footer appbar">
-            <div class="@FooterToolbarClassName">
-                @FooterContent
-            </div>
+        <div class="@FooterClassName">
+            @FooterContent
         </div>
     }
 </aside>
+<div class="overlay drawer-overlay" @onclick="OnClosedAsync" @onclick:stopPropagation="true"></div>

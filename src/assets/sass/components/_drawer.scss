@@ -12,6 +12,10 @@
     }
 }
 
+.overlay.drawer-overlay {
+    display: none;
+}
+
 .drawer {
     background-color: var(--tavenem-color-bg);
     border-radius: 0;
@@ -41,7 +45,7 @@
                 margin-bottom: 0;
                 min-height: 0;
 
-                .toolbar {
+                &.toolbar {
                     min-height: 0;
                 }
             }
@@ -68,6 +72,14 @@
 
     &.open {
         overflow-y: auto;
+
+        + .overlay.drawer-overlay {
+            display: flex;
+
+            @media print {
+                display: none;
+            }
+        }
     }
 
     &.left,
@@ -209,13 +221,6 @@
             }
         }
 
-        .controls-left + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
-            }
-        }
-
         @media (max-width: 767px) {
             grid-area: main;
         }
@@ -238,13 +243,6 @@
 
             @media (prefers-reduced-motion) {
                 animation: none;
-            }
-        }
-
-        .controls-right + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
             }
         }
 
@@ -296,13 +294,6 @@
                 animation: none;
             }
         }
-
-        .controls-bottom + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
-            }
-        }
     }
 
     &.top {
@@ -324,13 +315,6 @@
                 animation: none;
             }
         }
-
-        .controls-top + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
-            }
-        }
     }
 
     .appbar.top ~ & {
@@ -340,22 +324,6 @@
 
 .drawer-close-small {
     margin-inline-end: -1.5rem;
-}
-
-.drawer-container {
-    > .overlay.drawer-overlay {
-        display: none;
-    }
-
-    &.drawer-open {
-        .overlay.drawer-overlay {
-            display: flex;
-
-            @media print {
-                display: none;
-            }
-        }
-    }
 }
 
 .drawer-breakpoint-none.icon-drawer:not(.open, :hover) {
@@ -435,18 +403,26 @@
                     animation: none;
                 }
             }
+
+            &.open .overlay.drawer-overlay {
+                display: none;
+            }
         }
 
         .drawer-toggle-#{$breakpoint} {
             display: none;
         }
+    }
+}
 
-        .drawer-container-#{$breakpoint} {
-            &, &.drawer-open {
-                > .overlay.drawer-overlay {
-                    display: none;
-                }
-            }
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .drawer-hidden-#{$breakpoint} {
+            display: none;
+        }
+
+        .drawer-toggle-hidden-#{$breakpoint} {
+            display: none;
         }
     }
 }

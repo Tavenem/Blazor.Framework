@@ -30,6 +30,8 @@ app.UseStaticFiles();
 app.MapRazorComponents<App>()
     .AddServerRenderMode()
     .AddWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Tavenem.Blazor.Framework.Sample.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(
+        typeof(Tavenem.Blazor.Framework.DocPages.Utilities.CodeFormatter).Assembly,
+        typeof(Tavenem.Blazor.Framework.Sample.Client._Imports).Assembly);
 
 app.Run();

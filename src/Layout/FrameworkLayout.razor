@@ -5,27 +5,19 @@
 <div class="@CssClass" style="@Style">
     <SnackbarContainer />
     <DialogContainer @ref="DialogContainer" />
-    <CascadingValue Value="this" IsFixed="true">
-        @FrameworkContent
-        <main id="main-container">
-            @ChildContent
-        </main>
-    </CascadingValue>
+    @FrameworkContent
+    <main class="container">
+        @ChildContent
+    </main>
     @if (ContentsBreakpoint != Breakpoint.None)
     {
         <Contents @ref="Contents"
                   Breakpoint="ContentsBreakpoint"
                   Class="d-print-none"
-                  Style="grid-area:contents"
-                  ThemeColor="ThemeColor" />
+                  Style="grid-area:contents" />
     }
     @if (AutoScrollToTop)
     {
-        <ScrollToTop Selector="#main-container">
-            <span class="btn btn-icon primary filled">
-                <tf-icon>expand_less</tf-icon>
-            </span>
-        </ScrollToTop>
+        <ScrollToTop Selector=".tavenem-framework-layout > .container" />
     }
-    <div class="overlay drawer-overlay" @onclick="OnCloseDrawersAsync" @onclick:stopPropagation="true"></div>
 </div>

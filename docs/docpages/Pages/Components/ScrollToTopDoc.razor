@@ -17,17 +17,15 @@
 <p>
     The <code>ScrollToTop</code> component included in the layout by default uses an icon button
     filled with the primary theme color, and has a simple upward caret as its content. If you define
-    your own componment, you can include any <code>ChildContent</code> within it that you like. The
-    component itself has no specific appearance, allowing complete customization.
+    your own componment, you can include any <code>ChildContent</code> within it that you like. If
+    you do not include anything, the default appearance is used.
 </p>
 
 <p>
     The <code>Selector</code> property can be set to a CSS selector, which will be used to find the
     element to which the scroll event will be attached. If left <code>null</code> the main document
     will be the target. To add a <code>ScrollToTop</code> to a subsection of a document, simply give
-    that section an id and use that id (preceded by a '#' character) as the <code>Selector</code>. A
-    <code>ScrollToTop</code> with a non-<code>null Selector</code> does not replace the default
-    <code>ScrollToTop</code> that targets the full page.
+    that section an id and use that id (preceded by a '#' character) as the <code>Selector</code>.
 </p>
 
 <p>

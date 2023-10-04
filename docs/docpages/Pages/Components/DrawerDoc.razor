@@ -28,36 +28,63 @@
     of a drawer.
 </p>
 
+<h2>Layout</h2>
+
+<p>
+    A drawer will only function if your layout includes the Tavenem Blazor Framework <a
+    href="/layout/layout">layout</a> component. See the <a href="/layout/layout">layout doc page</a>
+    for details.
+</p>
+
 <h2>Size</h2>
 
 <p>
-    The <code>Breakpoint</code> property controls the viewport size at which the
-    drawer will be permanently visible. Below that breakpoint the drawer will
-    only be displayed when toggled. Above that breakpoint, the drawer will
-    always be displayed, regardless of its open/closed state.
+    The <code>ShowAtBreakpoint</code> property controls the viewport size at which the drawer will be
+    permanently visible. Below that breakpoint the drawer will only be displayed when toggled. Above
+    that breakpoint, the drawer will always be displayed, regardless of its open/closed state.
 </p>
 
 <p>
-    To automatically hide the <code>Appbar</code> toggles for drawers when above
-    the breakpoint, set the <code>Breakpoint</code> property on the
-    <code>Appbar</code> as well. To more easily coordinate these properties, the
-    <code>SideDrawerBreakpoint</code> property on <code>FrameworkContent</code>
-    itself may be set, which keeps both <code>Breakpoint</code> properties of a
-    linked <code>Drawer</code> and <code>AppBar</code> in sync.
-</p>
-
-<p>
-    Below the medium breakpoint, a left or right drawer will cover the entire
-    width of the screen. Above the medium breakpoint but below the configured
-    <code>Breakpoint</code> parameter, the drawer will partially cover the
-    viewport and an overlay will cover the remainder (excluing any
-    <code>AppBar</code>s). Interacting with the overlay will dismiss the drawer.
+    Below the medium breakpoint, a left or right drawer will cover the entire width of the screen.
+    Above the medium breakpoint but below the configured <code>ShowAtBreakpoint</code> parameter,
+    the drawer will partially cover the viewport and an overlay will cover the remainder (excluing
+    any <code>AppBar</code>s). Interacting with the overlay will dismiss the drawer.
 </p>
 
 <p>
     Top and bottom drawers always cover only part of the view. Below their
-    <code>Breakpoint</code> parameter, the rest of the view will be covered by
-    an overlay. Interacting with the overlay will dismiss the drawer.
+    <code>ShowAtBreakpoint</code> parameter, the rest of the view will be covered by an overlay.
+    Interacting with the overlay will dismiss the drawer.
+</p>
+
+<p>
+    The <code>HideAtBreakpoint</code> property controls the viewport size at which the drawer will
+    be permanently hidden. Above that breakpoint the drawer will never be displayed, regardless of
+    its open/closed state.
+</p>
+
+<h2>Control</h2>
+
+<p>
+    The <code>DrawerToggle</code> component can be placed anywhere in your app to provide a toggle
+    button that shows and hides a drawer.
+</p>
+
+<p>
+    You can set the <code>Side</code> property of the toggle to one of the following values to
+    indicate which drawer the button controls:
+</p>
+
+<ul>
+    <li><code>Side.Top</code></li>
+    <li><code>Side.Bottom</code></li>
+    <li><code>Side.Left</code></li>
+    <li><code>Side.Right</code></li>
+</ul>
+
+<p>
+    The toggle button will only appear if there is actually a drawer docked on that side, and its
+    breakpoint settings allow toggling at the current viewport size.
 </p>
 
 <h3>Icon mode</h3>

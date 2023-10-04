@@ -133,6 +133,8 @@ public partial class Tooltip : IDisposable
         _ => Origin.Center_Center,
     };
 
+    private bool Interactive { get; set; }
+
     private Origin PopoverOrigin => Side switch
     {
         Side.Top => Origin.Bottom_Center,
@@ -149,6 +151,16 @@ public partial class Tooltip : IDisposable
     {
         _hideTimer = new(Hide, 200);
         _showTimer = new(Show, 200);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
+        }
     }
 
     /// <inheritdoc/>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// An item displayed on a <see cref="Timeline"/>.
+/// An item displayed on a timeline.
 /// </summary>
 public partial class TimelineItem
 {

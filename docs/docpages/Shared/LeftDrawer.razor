@@ -1,101 +1,96 @@
-﻿<Drawer Side="Side.Left" Breakpoint="Breakpoint.Md">
+﻿<Drawer Side="Side.Left" ShowAtBreakpoint="Breakpoint.Lg">
     <div class="list" role="navigation">
         <NavLink href="" Match="NavLinkMatch.All"><tf-icon>home</tf-icon> Home</NavLink>
-        <Collapse Title="Getting Started">
+        <Collapse Title="Getting Started" NavUrl="./getting-started/">
             <div class="list dense">
-                <AnchorLink href="./getting-started/installation">Installation</AnchorLink>
-                <AnchorLink href="./getting-started/themes">Themes</AnchorLink>
+                <NavLink href="./getting-started/installation">Installation</NavLink>
+                <NavLink href="./getting-started/themes">Themes</NavLink>
             </div>
         </Collapse>
-        <Collapse Title="Layout">
+        <Collapse Title="Layout" NavUrl="./layout/">
             <div class="list dense">
-                <AnchorLink href="./layout/layout">Layout</AnchorLink>
-                <AnchorLink href="./layout/breakpoints">Breakpoints</AnchorLink>
-                <AnchorLink href="./layout/containers">Containers</AnchorLink>
-                <AnchorLink href="./layout/rows-columns">Rows and Columns</AnchorLink>
+                <NavLink href="./layout/layout">Layout</NavLink>
+                <NavLink href="./layout/breakpoints">Breakpoints</NavLink>
+                <NavLink href="./layout/containers">Containers</NavLink>
+                <NavLink href="./layout/rows-columns">Rows and Columns</NavLink>
             </div>
         </Collapse>
-        <Collapse Title="Components">
+        <Collapse Title="Components" NavUrl="./components/">
             <div class="list dense">
-                <AnchorLink href="./components/accordion">Accordion</AnchorLink>
-                <AnchorLink href="./components/alert">Alert</AnchorLink>
-                <AnchorLink href="./components/anchor-link">Anchor Link</AnchorLink>
-                <AnchorLink href="./components/appbar">AppBar</AnchorLink>
-                <AnchorLink href="./components/avatar">Avatar</AnchorLink>
-                <AnchorLink href="./components/badge">Badge</AnchorLink>
-                <AnchorLink href="./components/breadcrumbs">Breadcrumbs</AnchorLink>
-                <AnchorLink href="./components/button">Button</AnchorLink>
-                <AnchorLink href="./components/card">Card</AnchorLink>
-                <AnchorLink href="./components/chip">Chip</AnchorLink>
-                <AnchorLink href="./components/close-button">Close Button</AnchorLink>
-                <AnchorLink href="./components/collapse">Collapse</AnchorLink>
-                <AnchorLink href="./components/contents">Contents</AnchorLink>
-                <AnchorLink href="./components/datagrid">DataGrid</AnchorLink>
-                <AnchorLink href="./components/dialog">Dialog</AnchorLink>
-                <AnchorLink href="./components/drag-drop">Drag-Drop</AnchorLink>
-                <AnchorLink href="./components/drawer">Drawer</AnchorLink>
-                <AnchorLink href="./components/dropdown">Dropdown</AnchorLink>
-                <Collapse Title="Forms">
-                    <div class="list dense">
-                        <AnchorLink href="./components/checkbox">Checkbox</AnchorLink>
-                        <AnchorLink href="./components/color-input">Color Input</AnchorLink>
-                        <AnchorLink href="./components/datetime-input">DateTime Input</AnchorLink>
-                        <AnchorLink href="./components/editor">Editor</AnchorLink>
-                        <AnchorLink href="./components/field">Field</AnchorLink>
-                        <AnchorLink href="./components/form">Form</AnchorLink>
-                        <AnchorLink href="./components/numeric-input">Numeric Input</AnchorLink>
-                        <AnchorLink href="./components/radio">Radio</AnchorLink>
-                        <AnchorLink href="./components/rating">Rating</AnchorLink>
-                        <AnchorLink href="./components/select">Select</AnchorLink>
-                        <AnchorLink href="./components/slider">Slider</AnchorLink>
-                        <AnchorLink href="./components/switch">Switch</AnchorLink>
-                        <AnchorLink href="./components/text-input">Text Input</AnchorLink>
-                        <AnchorLink href="./components/text-area">Text Area</AnchorLink>
-                        <AnchorLink href="./components/validation">Validation</AnchorLink>
-                    </div>
-                </Collapse>
-                <AnchorLink href="./components/highlighter">Highlighter</AnchorLink>
-                <AnchorLink href="./components/icon">Icon</AnchorLink>
-                <AnchorLink href="./components/image-editor">Image Editor</AnchorLink>
-                <AnchorLink href="./components/light-dark-toggle">Light-Dark Toggle</AnchorLink>
-                <AnchorLink href="./components/list">List</AnchorLink>
-                <AnchorLink href="./components/meter">Meter</AnchorLink>
-                <AnchorLink href="./components/overlay">Overlay</AnchorLink>
-                <AnchorLink href="./components/pagination">Pagination</AnchorLink>
-                <AnchorLink href="./components/popover">Popover</AnchorLink>
-                <AnchorLink href="./components/progress">Progress</AnchorLink>
-                <AnchorLink href="./components/scroll-to-top">Scroll to Top</AnchorLink>
-                <AnchorLink href="./components/skeleton">Skeleton</AnchorLink>
-                <AnchorLink href="./components/snackbar">Snackbar</AnchorLink>
-                <AnchorLink href="./components/steps">Steps</AnchorLink>
-                <AnchorLink href="./components/swipe-target">Swipe Target</AnchorLink>
-                <AnchorLink href="./components/syntax-highlighter">Syntax Highlighter</AnchorLink>
-                <AnchorLink href="./components/table">Table</AnchorLink>
-                <AnchorLink href="./components/tabs">Tabs</AnchorLink>
-                <AnchorLink href="./components/timeline">Timeline</AnchorLink>
-                <AnchorLink href="./components/toolbar">Toolbar</AnchorLink>
-                <AnchorLink href="./components/tooltip">Tooltip</AnchorLink>
+                <NavLink href="./components/accordion">Accordion</NavLink>
+                <NavLink href="./components/alert">Alert</NavLink>
+                <NavLink href="./components/anchor-link">Anchor Link</NavLink>
+                <NavLink href="./components/appbar">AppBar</NavLink>
+                <NavLink href="./components/avatar">Avatar</NavLink>
+                <NavLink href="./components/badge">Badge</NavLink>
+                <NavLink href="./components/breadcrumbs">Breadcrumbs</NavLink>
+                <NavLink href="./components/button">Button</NavLink>
+                <NavLink href="./components/card">Card</NavLink>
+                <NavLink href="./components/checkbox">Checkbox</NavLink>
+                <NavLink href="./components/chip">Chip</NavLink>
+                <NavLink href="./components/close-button">Close Button</NavLink>
+                <NavLink href="./components/collapse">Collapse</NavLink>
+                <NavLink href="./components/color-input">Color Input</NavLink>
+                <NavLink href="./components/contents">Contents</NavLink>
+                <NavLink href="./components/datagrid">DataGrid</NavLink>
+                <NavLink href="./components/datetime-input">DateTime Input</NavLink>
+                <NavLink href="./components/dialog">Dialog</NavLink>
+                <NavLink href="./components/drag-drop">Drag-Drop</NavLink>
+                <NavLink href="./components/drawer">Drawer</NavLink>
+                <NavLink href="./components/dropdown">Dropdown</NavLink>
+                <NavLink href="./components/editor">Editor</NavLink>
+                <NavLink href="./components/field">Field</NavLink>
+                <NavLink href="./components/form">Form</NavLink>
+                <NavLink href="./components/highlighter">Highlighter</NavLink>
+                <NavLink href="./components/icon">Icon</NavLink>
+                <NavLink href="./components/image-editor">Image Editor</NavLink>
+                <NavLink href="./components/light-dark-toggle">Light-Dark Toggle</NavLink>
+                <NavLink href="./components/list">List</NavLink>
+                <NavLink href="./components/meter">Meter</NavLink>
+                <NavLink href="./components/numeric-input">Numeric Input</NavLink>
+                <NavLink href="./components/overlay">Overlay</NavLink>
+                <NavLink href="./components/pagination">Pagination</NavLink>
+                <NavLink href="./components/popover">Popover</NavLink>
+                <NavLink href="./components/progress">Progress</NavLink>
+                <NavLink href="./components/radio">Radio</NavLink>
+                <NavLink href="./components/rating">Rating</NavLink>
+                <NavLink href="./components/scroll-to-top">Scroll to Top</NavLink>
+                <NavLink href="./components/select">Select</NavLink>
+                <NavLink href="./components/skeleton">Skeleton</NavLink>
+                <NavLink href="./components/slider">Slider</NavLink>
+                <NavLink href="./components/snackbar">Snackbar</NavLink>
+                <NavLink href="./components/steps">Steps</NavLink>
+                <NavLink href="./components/switch">Switch</NavLink>
+                <NavLink href="./components/syntax-highlighter">Syntax Highlighter</NavLink>
+                <NavLink href="./components/table">Table</NavLink>
+                <NavLink href="./components/tabs">Tabs</NavLink>
+                <NavLink href="./components/text-area">Text Area</NavLink>
+                <NavLink href="./components/text-input">Text Input</NavLink>
+                <NavLink href="./components/timeline">Timeline</NavLink>
+                <NavLink href="./components/toolbar">Toolbar</NavLink>
+                <NavLink href="./components/tooltip">Tooltip</NavLink>
+                <NavLink href="./components/touch-target">Touch Target</NavLink>
             </div>
         </Collapse>
-        <Collapse Title="Utilities">
+        <Collapse Title="Utilities" NavUrl="./utilities/">
             <div class="list dense">
-                <AnchorLink href="./utilities/borders">Borders</AnchorLink>
-                <AnchorLink href="./utilities/bullets">Bullets</AnchorLink>
-                <AnchorLink href="./utilities/color">Color</AnchorLink>
-                <AnchorLink href="./utilities/display">Display</AnchorLink>
-                <AnchorLink href="./utilities/flexbox">Flexbox</AnchorLink>
-                <AnchorLink href="./utilities/float">Float</AnchorLink>
-                <AnchorLink href="./utilities/images">Images</AnchorLink>
-                <AnchorLink href="./utilities/interaction">Interaction</AnchorLink>
-                <AnchorLink href="./utilities/overflow">Overflow</AnchorLink>
-                <AnchorLink href="./utilities/position">Position</AnchorLink>
-                <AnchorLink href="./utilities/shadows">Shadows</AnchorLink>
-                <AnchorLink href="./utilities/shake">Shake</AnchorLink>
-                <AnchorLink href="./utilities/sizing">Sizing</AnchorLink>
-                <AnchorLink href="./utilities/spacing">Spacing</AnchorLink>
-                <AnchorLink href="./utilities/stretched-link">Stretched Link</AnchorLink>
-                <AnchorLink href="./utilities/text">Text</AnchorLink>
-                <AnchorLink href="./utilities/vertical-rule">Vertical Rule</AnchorLink>
+                <NavLink href="./utilities/borders">Borders</NavLink>
+                <NavLink href="./utilities/bullets">Bullets</NavLink>
+                <NavLink href="./utilities/color">Color</NavLink>
+                <NavLink href="./utilities/display">Display</NavLink>
+                <NavLink href="./utilities/flexbox">Flexbox</NavLink>
+                <NavLink href="./utilities/float">Float</NavLink>
+                <NavLink href="./utilities/images">Images</NavLink>
+                <NavLink href="./utilities/interaction">Interaction</NavLink>
+                <NavLink href="./utilities/overflow">Overflow</NavLink>
+                <NavLink href="./utilities/position">Position</NavLink>
+                <NavLink href="./utilities/shadows">Shadows</NavLink>
+                <NavLink href="./utilities/shake">Shake</NavLink>
+                <NavLink href="./utilities/sizing">Sizing</NavLink>
+                <NavLink href="./utilities/spacing">Spacing</NavLink>
+                <NavLink href="./utilities/stretched-link">Stretched Link</NavLink>
+                <NavLink href="./utilities/text">Text</NavLink>
+                <NavLink href="./utilities/vertical-rule">Vertical Rule</NavLink>
             </div>
         </Collapse>
     </div>

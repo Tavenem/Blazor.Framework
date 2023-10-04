@@ -89,6 +89,7 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
 
     internal override bool GetIsDraggable() => IsDraggable
         && Item is not null
+        && Parent?.Interactive == true
         && Parent?.EnableDragDrop == true;
 
     internal override bool GetIsDropTarget() => Parent?.EnableDragDrop == true;

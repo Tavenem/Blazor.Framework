@@ -15,7 +15,6 @@
 @import "components/overlay";
 @import "components/closebutton";
 @import "components/alert";
-@import "components/appbar";
 @import "components/avatar";
 @import "components/badge";
 @import "components/breadcrumb";
@@ -54,11 +53,6 @@
 [data-theme="dark"] {
     @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
 }
-@media (prefers-color-scheme: dark) {
-    :root {
-        @include meta.load-css("../node_modules/highlight.js/scss/stackoverflow-dark.scss");
-    }
-}
 
 *[id] {
     scroll-margin-top: 4rem;
@@ -67,27 +61,6 @@
 html, body * {
     scrollbar-color: var(--tavenem-color-scrollbar) transparent;
     scrollbar-width: thin;
-}
-
-.tavenem-framework-layout {
-    display: grid;
-    flex: 1 0;
-    grid-template-areas:
-        "header header header header" "topdrawer topdrawer topdrawer topdrawer" "leftdrawer main contents rightdrawer" "bottomdrawer bottomdrawer bottomdrawer bottomdrawer" "footer footer footer footer";
-    grid-template-columns: max-content 1fr max-content max-content;
-    grid-template-rows: max-content max-content 1fr max-content max-content;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-
-    @media print {
-        overflow: visible;
-    }
-
-    > * {
-        grid-area: main;
-    }
 }
 
 ::-webkit-scrollbar {

@@ -193,7 +193,7 @@ export function popoverDispose() {
 }
 
 export function popoverInitialize() {
-    const mainContent = document.getElementById('main-container') as IPopoverElement;
+    const mainContent = document.body as IPopoverElement;
     if (!mainContent) {
         return;
     }

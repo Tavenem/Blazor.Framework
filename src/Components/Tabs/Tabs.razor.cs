@@ -328,6 +328,8 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
     private protected bool NoDropTargetChildren => _dropTargetElements.Count == 0;
 
+    internal bool Interactive { get; set; }
+
     [Inject, NotNull] private IResizeObserver? ResizeObserver { get; set; }
 
     private string? ScrollStyle => new CssBuilder()
@@ -833,8 +835,8 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
     private string? GetTabClass(int index) => new CssBuilder("tab")
         .Add("active", index == ActivePanelIndex)
-        .Add("disabled", index < _panels.Count && _panels[index].Disabled)
-        .Add("no-drag", EnableDragDrop && !_panels[index].GetIsDraggable())
+        .Add("disabled", index != ActivePanelIndex && (!Interactive || (index < _panels.Count && _panels[index].Disabled)))
+        .Add("no-drag", EnableDragDrop && index < _panels.Count && !_panels[index].GetIsDraggable())
         .ToString();
 
     private async Task OnAddTabAsync()

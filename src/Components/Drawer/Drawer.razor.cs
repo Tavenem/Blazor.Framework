@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -19,22 +20,6 @@ public partial class Drawer : IDisposable
     /// </para>
     /// </summary>
     public event Func<Drawer, bool>? BeforeClosing;
-
-    /// <summary>
-    /// <para>
-    /// The breakpoint at which the drawer should be permanently visible.
-    /// </para>
-    /// <para>
-    /// Defaults to the value of <see cref="FrameworkLayout.SideDrawerBreakpoint"/>, if <see
-    /// cref="Side"/> is set to left or right.
-    /// </para>
-    /// </summary>
-    [Parameter] public Breakpoint? Breakpoint { get; set; }
-
-    /// <summary>
-    /// Invoked when the drawer open state changes.
-    /// </summary>
-    public event EventHandler<bool>? DrawerToggled;
 
     /// <summary>
     /// The child content of the footer.
@@ -57,6 +42,11 @@ public partial class Drawer : IDisposable
     [Parameter] public string? HeaderClass { get; set; }
 
     /// <summary>
+    /// The breakpoint at which the drawer should be permanently hidden.
+    /// </summary>
+    [Parameter] public Breakpoint HideAtBreakpoint { get; set; }
+
+    /// <summary>
     /// Whether the drawer is currently open.
     /// </summary>
     [Parameter] public bool IsOpen { get; set; }
@@ -72,6 +62,11 @@ public partial class Drawer : IDisposable
     [Parameter] public string? OverlayClass { get; set; }
 
     /// <summary>
+    /// The breakpoint at which the drawer should be permanently visible.
+    /// </summary>
+    [Parameter] public Breakpoint ShowAtBreakpoint { get; set; }
+
+    /// <summary>
     /// The side on which the drawer is docked.
     /// </summary>
     [Parameter] public Side Side { get; set; }
@@ -79,7 +74,7 @@ public partial class Drawer : IDisposable
     /// <summary>
     /// One of the built-in color themes.
     /// </summary>
-    [Parameter] public ThemeColor? ThemeColor { get; set; }
+    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
@@ -89,7 +84,8 @@ public partial class Drawer : IDisposable
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("card drawer")
-        .Add(BreakpointClass)
+        .Add(ShowAtBreakpointClass)
+        .Add(HideAtBreakpointClass)
         .Add(Side.ToCSS())
         .Add("closed", IsClosed)
         .Add("open", IsOpen)
@@ -99,61 +95,30 @@ public partial class Drawer : IDisposable
     /// The final value assigned to the footer's class attribute, including
     /// component values.
     /// </summary>
-    protected string? FooterToolbarClassName => new CssBuilder("toolbar filled")
-        .Add(ThemeColorValue.ToCSS())
-        .Add(FooterClass)
+    protected string? FooterClassName => new CssBuilder(FooterClass)
+        .Add("footer toolbar")
+        .Add(ThemeColor.ToCSS())
         .ToString();
 
     /// <summary>
     /// The final value assigned to the header's class attribute, including
     /// component values.
     /// </summary>
-    protected string? HeaderClassName => new CssBuilder("header appbar")
+    protected string? HeaderClassName => new CssBuilder(HeaderClass)
+        .Add("header toolbar")
         .Add("drawer-control", HeaderContent is null)
+        .Add(ThemeColor.ToCSS())
         .ToString();
 
-    /// <summary>
-    /// The final value assigned to the header toolbar's class attribute, including
-    /// component values.
-    /// </summary>
-    protected string? HeaderToolbarClassName => new CssBuilder(HeaderClass)
-        .Add("toolbar")
-        .Add(ThemeColorValue.ToCSS())
-        .ToString();
-
-    /// <summary>
-    /// The final value assigned to the overlay's class attribute, including
-    /// component values.
-    /// </summary>
-    protected string? OverlayClassName => new CssBuilder(OverlayClass)
-        .Add("overlay")
-        .ToString();
-
-    private string? BreakpointClass => BreakpointValue switch
+    private string? HideAtBreakpointClass => HideAtBreakpoint switch
     {
-        Framework.Breakpoint.None => "drawer-breakpoint-none",
-        _ => $"drawer-{BreakpointValue.ToCSS()}",
+        Breakpoint.None => null,
+        _ => $"drawer-hidden-{HideAtBreakpoint.ToCSS()}",
     };
-
-    private Breakpoint BreakpointValue
-    {
-        get
-        {
-            if (Breakpoint.HasValue)
-            {
-                return Breakpoint.Value;
-            }
-            if (Side is Side.Left or Side.Right)
-            {
-                return FrameworkLayout?.SideDrawerBreakpoint ?? Framework.Breakpoint.None;
-            }
-            return Framework.Breakpoint.None;
-        }
-    }
 
     private bool DisplayOverlay { get; set; }
 
-    [CascadingParameter] private FrameworkLayout? FrameworkLayout { get; set; }
+    [Inject, NotNull] private DrawerService? DrawerService { get; set; }
 
     /// <summary>
     /// Whether the drawer is currently closed.
@@ -164,29 +129,26 @@ public partial class Drawer : IDisposable
 
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
-    private ThemeColor ThemeColorValue => ThemeColor ?? FrameworkLayout?.ThemeColor ?? Framework.ThemeColor.Default;
+    private string? ShowAtBreakpointClass => ShowAtBreakpoint switch
+    {
+        Breakpoint.None => "drawer-breakpoint-none",
+        _ => $"drawer-{ShowAtBreakpoint.ToCSS()}",
+    };
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var isOpenChanged = false;
         if (parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
             && isOpen != IsOpen)
         {
-            isOpenChanged = true;
             IsClosed = !isOpen;
         }
 
         await base.SetParametersAsync(parameters);
-
-        if (isOpenChanged)
-        {
-            DrawerToggled?.Invoke(this, IsOpen);
-        }
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized() => FrameworkLayout?.Add(this);
+    protected override void OnInitialized() => DrawerService.Add(this);
 
     /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
@@ -207,24 +169,6 @@ public partial class Drawer : IDisposable
     }
 
     /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                FrameworkLayout?.Remove(this);
-                NavigationManager.LocationChanged -= OnLocationChanged;
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    /// <summary>
     /// Close this drawer if it is open.
     /// </summary>
     public async Task CloseAsync()
@@ -234,7 +178,6 @@ public partial class Drawer : IDisposable
             IsOpen = false;
             IsClosed = true;
             await IsOpenChanged.InvokeAsync(IsOpen);
-            DrawerToggled?.Invoke(this, IsOpen);
             StateHasChanged();
         }
     }
@@ -252,7 +195,6 @@ public partial class Drawer : IDisposable
                 IsOpen = false;
                 IsClosed = true;
                 await IsOpenChanged.InvokeAsync(IsOpen);
-                DrawerToggled?.Invoke(this, IsOpen);
                 StateHasChanged();
             }
         }
@@ -261,8 +203,25 @@ public partial class Drawer : IDisposable
             IsOpen = true;
             IsClosed = false;
             await IsOpenChanged.InvokeAsync(IsOpen);
-            DrawerToggled?.Invoke(this, IsOpen);
             StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing,
+    /// or resetting unmanaged resources.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                DrawerService.Remove(this);
+                NavigationManager.LocationChanged -= OnLocationChanged;
+            }
+
+            _disposedValue = true;
         }
     }
 
@@ -274,7 +233,6 @@ public partial class Drawer : IDisposable
             IsOpen = false;
             IsClosed = true;
             await IsOpenChanged.InvokeAsync(IsOpen);
-            DrawerToggled?.Invoke(this, IsOpen);
         }
     }
 
