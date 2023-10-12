@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -8,7 +9,7 @@ namespace Tavenem.Blazor.Framework;
 public partial class FrameworkLayout
 {
     /// <summary>
-    /// Whether to include a <see cref="ScrollToTop"/> component.
+    /// Whether to include a <c>tf-scroll-top</c> element.
     /// </summary>
     [Parameter] public bool AutoScrollToTop { get; set; } = true;
 
@@ -29,6 +30,21 @@ public partial class FrameworkLayout
     /// Any toolbars and drawers.
     /// </summary>
     [Parameter] public RenderFragment? FrameworkContent { get; set; }
+
+    /// <summary>
+    /// The render mode to use for the built-in <see cref="SnackbarContainer"/> and <see
+    /// cref="Framework.DialogContainer"/> components.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Defaults to <see cref="RenderMode.InteractiveAuto"/>.
+    /// </para>
+    /// <para>
+    /// To disable the built-in <see cref="SnackbarContainer"/> and <see
+    /// cref="Framework.DialogContainer"/> components completely, set to <see langword="null"/>.
+    /// </para>
+    /// </remarks>
+    [Parameter] public IComponentRenderMode? InteractiveRenderMode { get; set; } = RenderMode.InteractiveAuto;
 
     /// <summary>
     /// The final value assigned to the class attribute, including component

@@ -16,8 +16,8 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 public abstract class SelectBase<TValue, TOption>
     : PickerComponentBase<TValue>, ISelect<TOption>
 {
-    private protected readonly List<Option<TOption>> _options = new();
-    private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = new();
+    private protected readonly List<Option<TOption>> _options = [];
+    private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = [];
     private readonly AdjustableTimer _typeTimer;
 
     private protected bool _valueUpdated;
@@ -190,8 +190,8 @@ public abstract class SelectBase<TValue, TOption>
     private protected override bool CanClear => ShowClear
         && _selectedOptions.Count > 0;
 
-    private protected override List<KeyOptions> InputKeyOptions { get; set; } = new()
-    {
+    private protected override List<KeyOptions> InputKeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/^(?!ArrowDown$|ArrowUp$|Delete$|Enter$|Escape$|Tab$)/",
@@ -199,17 +199,17 @@ public abstract class SelectBase<TValue, TOption>
             PreventDown = "key+none",
             TargetOnly = true,
         }
-    };
+    ];
 
-    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
-    {
+    private protected override List<KeyOptions> KeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/ArrowDown|ArrowUp|Delete|Enter|Escape/",
             SubscribeDown = true,
             PreventDown = "key+none",
         }
-    };
+    ];
 
     private protected int MaxOptionSize { get; set; }
 

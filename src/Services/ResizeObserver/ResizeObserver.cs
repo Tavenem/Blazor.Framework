@@ -8,8 +8,8 @@ namespace Tavenem.Blazor.Framework.Services;
 /// </summary>
 internal class ResizeObserver : IResizeObserver
 {
-    private readonly Dictionary<Guid, ElementReference> _cachedValueIds = new();
-    private readonly Dictionary<ElementReference, BoundingClientRect> _cachedValues = new();
+    private readonly Dictionary<Guid, ElementReference> _cachedValueIds = [];
+    private readonly Dictionary<ElementReference, BoundingClientRect> _cachedValues = [];
     private readonly DotNetObjectReference<ResizeObserver> _dotNetRef;
     private readonly Guid _id = Guid.NewGuid();
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
@@ -91,7 +91,7 @@ internal class ResizeObserver : IResizeObserver
             return Enumerable.Empty<BoundingClientRect>();
         }
 
-        List<string> elementIds = new();
+        List<string> elementIds = [];
         foreach (var item in filteredElements)
         {
             var id = Guid.NewGuid();
@@ -139,7 +139,7 @@ internal class ResizeObserver : IResizeObserver
     [JSInvokable]
     public void OnSizeChanged(IEnumerable<SizeChangeUpdateInfo> changes)
     {
-        Dictionary<ElementReference, BoundingClientRect> parsedChanges = new();
+        Dictionary<ElementReference, BoundingClientRect> parsedChanges = [];
         foreach (var item in changes)
         {
             if (!Guid.TryParse(item.Id, out var id)

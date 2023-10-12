@@ -5,10 +5,7 @@
 <aside @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="@HeaderClassName">
         @HeaderContent
-        @if (IsInteractive)
-        {
-            <tf-close class="drawer-close-small" @onclick="OnClosedAsync" />
-        }
+        <tf-drawer-close data-side="@Side.ToString().ToLowerInvariant()" />
     </div>
     @ChildContent
     @if (FooterContent is not null)
@@ -18,4 +15,4 @@
         </div>
     }
 </aside>
-<div class="overlay drawer-overlay" @onclick="OnClosedAsync" @onclick:stopPropagation="true"></div>
+<tf-drawer-overlay data-side="@Side.ToString().ToLowerInvariant()" />

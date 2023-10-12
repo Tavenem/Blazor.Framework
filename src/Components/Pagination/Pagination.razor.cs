@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -7,6 +8,9 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Pagination
 {
+    private const string CurrentPageQueryParamName = "tfpg_cp";
+    private const string PageCountQueryParamName = "tfpg_pc";
+
     /// <summary>
     /// <para>
     /// The zero-based index of the current page.
@@ -17,6 +21,12 @@ public partial class Pagination
     /// </para>
     /// </summary>
     [Parameter] public ulong CurrentPage { get; set; }
+
+    /// <summary>
+    /// Any current page currently set for pagination controls.
+    /// </summary>
+    [SupplyParameterFromQuery(Name = CurrentPageQueryParamName), Parameter]
+    public string[]? CurrentPageQuery { get; set; }
 
     /// <summary>
     /// Invoked when <see cref="CurrentPage"/> has changed.
@@ -37,6 +47,16 @@ public partial class Pagination
     /// </para>
     /// </summary>
     [Parameter] public string FirstPageIcon { get; set; } = DefaultIcons.Page_First;
+
+    /// <summary>
+    /// <para>
+    /// The id of the HTML element.
+    /// </para>
+    /// <para>
+    /// A generated id will be assigned if none is supplied (including through splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// <para>
@@ -139,6 +159,12 @@ public partial class Pagination
     [Parameter] public ulong? PageCount { get; set; }
 
     /// <summary>
+    /// Any page count currently set for pagination controls.
+    /// </summary>
+    [SupplyParameterFromQuery(Name = PageCountQueryParamName), Parameter]
+    public string[]? PageCountQuery { get; set; }
+
+    /// <summary>
     /// <para>
     /// The name of the icon displayed for the "previous page" control.
     /// </para>
@@ -227,6 +253,8 @@ public partial class Pagination
 
     private ElementReference LastPageElement { get; set; }
 
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
+
     private string? PageCssClass => new CssBuilder("btn btn-text")
         .Add(PageClass)
         .ToString();
@@ -266,6 +294,31 @@ public partial class Pagination
     }
 
     /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+
+        if (ulong.TryParse(CurrentPageQuery?
+            .FirstOrDefault(x => x.StartsWith(Id) && x.Length > Id.Length && x[Id.Length] == ':')?
+            [(Id.Length + 1)..], out var currentPage))
+        {
+            CurrentPage = currentPage;
+        }
+
+        if (ulong.TryParse(PageCountQuery?
+            .FirstOrDefault(x => x.StartsWith(Id) && x.Length > Id.Length && x[Id.Length] == ':')?
+            [(Id.Length + 1)..], out var pageCount))
+        {
+            PageCount = pageCount;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -275,6 +328,125 @@ public partial class Pagination
         }
     }
 
+    private string GetFirstPageUrl()
+    {
+        var currentPageQueries = CurrentPageQuery?.ToList();
+        currentPageQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        var pageCountQueries = PageCountQuery?.ToList();
+        pageCountQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (PageCount.HasValue)
+        {
+            (pageCountQueries ??= []).Add($"{Id}:{PageCount.Value}");
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?>
+            {
+                [CurrentPageQueryParamName] = currentPageQueries,
+                [PageCountQueryParamName] = pageCountQueries,
+            });
+    }
+
+    private string GetLastPageUrl()
+    {
+        var currentPageQueries = CurrentPageQuery?.ToList();
+        currentPageQueries?.RemoveAll(x => x.StartsWith(Id));
+        (currentPageQueries ??= []).Add($"{Id}:{(PageCount.HasValue ? PageCount.Value - 1 : CurrentPage + 1)}");
+
+        var pageCountQueries = PageCountQuery?.ToList();
+        pageCountQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (PageCount.HasValue)
+        {
+            (pageCountQueries ??= []).Add($"{Id}:{PageCount.Value}");
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?>
+            {
+                [CurrentPageQueryParamName] = currentPageQueries,
+                [PageCountQueryParamName] = pageCountQueries,
+            });
+    }
+
+    private string GetNextPageUrl()
+    {
+        var currentPageQueries = CurrentPageQuery?.ToList();
+        currentPageQueries?.RemoveAll(x => x.StartsWith(Id));
+        (currentPageQueries ??= []).Add($"{Id}:{CurrentPage + 1}");
+
+        var pageCountQueries = PageCountQuery?.ToList();
+        pageCountQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (PageCount.HasValue)
+        {
+            (pageCountQueries ??= []).Add($"{Id}:{PageCount.Value}");
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?>
+            {
+                [CurrentPageQueryParamName] = currentPageQueries,
+                [PageCountQueryParamName] = pageCountQueries,
+            });
+    }
+
+    private string GetPageUrl(ulong value)
+    {
+        var currentPageQueries = CurrentPageQuery?.ToList();
+        currentPageQueries?.RemoveAll(x => x.StartsWith(Id));
+        if (value > 0)
+        {
+            (currentPageQueries ??= []).Add($"{Id}:{value}");
+        }
+
+        var pageCountQueries = PageCountQuery?.ToList();
+        pageCountQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (PageCount.HasValue)
+        {
+            (pageCountQueries ??= []).Add($"{Id}:{PageCount.Value}");
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?>
+            {
+                [CurrentPageQueryParamName] = currentPageQueries,
+                [PageCountQueryParamName] = pageCountQueries,
+            });
+    }
+
+    private string GetPreviousPageUrl()
+    {
+        var currentPageQueries = CurrentPageQuery?.ToList();
+        currentPageQueries?.RemoveAll(x => x.StartsWith(Id));
+        if (CurrentPage > 0)
+        {
+            var page = CurrentPage - 1;
+            if (page > 0)
+            {
+                (currentPageQueries ??= []).Add($"{Id}:{page}");
+            }
+        }
+
+        var pageCountQueries = PageCountQuery?.ToList();
+        pageCountQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (PageCount.HasValue)
+        {
+            (pageCountQueries ??= []).Add($"{Id}:{PageCount.Value}");
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?>
+            {
+                [CurrentPageQueryParamName] = currentPageQueries,
+                [PageCountQueryParamName] = pageCountQueries,
+            });
+    }
+
     private async Task OnFirstAsync()
     {
         if (CurrentPage > 0)
@@ -282,6 +454,7 @@ public partial class Pagination
             CurrentPage = 0;
             await ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
             await CurrentPageChanged.InvokeAsync(CurrentPage);
+            SetCurrentPage();
         }
     }
 
@@ -300,6 +473,7 @@ public partial class Pagination
         {
             await ElementReference.FocusFirstAsync(1);
         }
+        SetCurrentPage();
     }
 
     private async Task OnLastAsync()
@@ -317,6 +491,7 @@ public partial class Pagination
         {
             await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
+        SetCurrentPage();
     }
 
     private async Task OnPreviousAsync()
@@ -331,6 +506,7 @@ public partial class Pagination
             await ElementReference.FocusLastAsync(1);
         }
         await CurrentPageChanged.InvokeAsync(CurrentPage);
+        SetCurrentPage();
     }
 
     private async Task OnSetPageAsync(ulong value)
@@ -338,5 +514,33 @@ public partial class Pagination
         CurrentPage = value;
         await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage));
         await CurrentPageChanged.InvokeAsync(CurrentPage);
+        SetCurrentPage();
+    }
+
+    private void SetCurrentPage()
+    {
+        var currentPageQueries = CurrentPageQuery?.ToList();
+        currentPageQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (CurrentPage > 0)
+        {
+            (currentPageQueries ??= []).Add($"{Id}:{CurrentPage}");
+        }
+
+        var pageCountQueries = PageCountQuery?.ToList();
+        pageCountQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (PageCount.HasValue)
+        {
+            (pageCountQueries ??= []).Add($"{Id}:{PageCount.Value}");
+        }
+
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameters(
+                new Dictionary<string, object?>
+                {
+                    [CurrentPageQueryParamName] = currentPageQueries,
+                    [PageCountQueryParamName] = pageCountQueries,
+                }));
     }
 }

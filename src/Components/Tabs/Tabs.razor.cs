@@ -11,9 +11,11 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Tabs<TTabItem> : IAsyncDisposable
 {
-    private readonly HashSet<string> _dropTargetElements = new();
-    private readonly List<DynamicTabInfo<TTabItem>> _dynamicItems = new();
-    private readonly List<TabPanel<TTabItem>> _panels = new();
+    private const string ActivePanelQueryParamName = "tft_ap";
+
+    private readonly HashSet<string> _dropTargetElements = [];
+    private readonly List<DynamicTabInfo<TTabItem>> _dynamicItems = [];
+    private readonly List<TabPanel<TTabItem>> _panels = [];
 
     private double _allTabsSize;
     private bool _backButtonDisabled;
@@ -51,6 +53,12 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// Raised when <see cref="ActivePanelIndex"/> changes.
     /// </summary>
     [Parameter] public EventCallback<int?> ActivePanelIndexChanged { get; set; }
+
+    /// <summary>
+    /// Any active panel currently set for tab controls.
+    /// </summary>
+    [SupplyParameterFromQuery(Name = ActivePanelQueryParamName), Parameter]
+    public string[]? ActivePanelQuery { get; set; }
 
     /// <summary>
     /// The icon to use for the "new tab" button.
@@ -176,6 +184,16 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public RenderFragment<TTabItem?>? HeaderContent { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The id of the HTML element.
+    /// </para>
+    /// <para>
+    /// A generated id will be assigned if none is supplied (including through splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// <para>
@@ -330,6 +348,8 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
     internal bool Interactive { get; set; }
 
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
+
     [Inject, NotNull] private IResizeObserver? ResizeObserver { get; set; }
 
     private string? ScrollStyle => new CssBuilder()
@@ -418,7 +438,24 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     }
 
     /// <inheritdoc/>
-    protected override void OnParametersSet() => Rerender();
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+
+        if (int.TryParse(ActivePanelQuery?
+            .FirstOrDefault(x => x.StartsWith(Id) && x.Length > Id.Length && x[Id.Length] == ':')?
+            [(Id.Length + 1)..], out var activePanel))
+        {
+            ActivePanelIndex = activePanel;
+        }
+
+        Rerender();
+    }
 
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
@@ -603,12 +640,12 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     {
         if (index.HasValue)
         {
-            (Items ??= new()).Insert(index.Value, item);
+            (Items ??= []).Insert(index.Value, item);
             _dynamicItems.Insert(index.Value, new());
         }
         else
         {
-            (Items ??= new()).Add(item);
+            (Items ??= []).Add(item);
             _dynamicItems.Add(new());
         }
         await ItemsChanged.InvokeAsync(Items);
@@ -735,6 +772,18 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         SetSliderState();
         SetScrollabilityStates();
         StateHasChanged();
+
+        var activePanelQueries = ActivePanelQuery?.ToList();
+        activePanelQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (ActivePanelIndex > 0)
+        {
+            (activePanelQueries ??= []).Add($"{Id}:{ActivePanelIndex}");
+        }
+
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameters(
+                new Dictionary<string, object?> { [ActivePanelQueryParamName] = activePanelQueries }));
     }
 
     private void CenterScrollPositionAroundSelectedItem()
@@ -827,6 +876,20 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
     }
 
+    private string GetPanelUrl(int index)
+    {
+        var activePanelQueries = ActivePanelQuery?.ToList();
+        activePanelQueries?.RemoveAll(x => x.StartsWith(Id));
+
+        if (index > 0)
+        {
+            (activePanelQueries ??= []).Add($"{Id}:{index}");
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?> { [ActivePanelQueryParamName] = activePanelQueries });
+    }
+
     private double GetReferenceSize(ElementReference reference) => TabSide switch
     {
         Side.Top or Side.Bottom => ResizeObserver.GetSizeInfo(reference)?.Width ?? 0,
@@ -835,7 +898,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
     private string? GetTabClass(int index) => new CssBuilder("tab")
         .Add("active", index == ActivePanelIndex)
-        .Add("disabled", index != ActivePanelIndex && (!Interactive || (index < _panels.Count && _panels[index].Disabled)))
+        .Add("disabled", index != ActivePanelIndex && index < _panels.Count && _panels[index].Disabled)
         .Add("no-drag", EnableDragDrop && index < _panels.Count && !_panels[index].GetIsDraggable())
         .ToString();
 
@@ -847,7 +910,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
 
         var item = OnAdd.Invoke();
-        (Items ??= new()).Add(item);
+        (Items ??= []).Add(item);
         _dynamicItems.Add(new());
         await ItemsChanged.InvokeAsync(Items);
         Rerender();
@@ -907,7 +970,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         var item = DragDropService.TryGetData<TTabItem>(e);
         if (item is not null)
         {
-            (Items ??= new()).Add(item);
+            (Items ??= []).Add(item);
             await ItemsChanged.InvokeAsync(Items);
             await ActivatePanelAsync(Items.Count - 1 + _panels.Count, true);
         }

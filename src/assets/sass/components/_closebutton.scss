@@ -1,4 +1,4 @@
-﻿tf-close {
+﻿tf-close, tf-drawer-close {
     @include ripple;
     align-self: flex-start;
     border: 0;
@@ -6,37 +6,24 @@
     box-sizing: content-box;
     color: var(--tavenem-color-text);
     cursor: pointer;
-    direction: ltr;
     display: inline-block;
     fill: currentColor;
     flex: 0 0 auto;
-    font-family: 'Material Icons';
-    font-size: 1rem;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    height: 1rem;
+    height: 1.5rem;
     justify-self: end;
-    letter-spacing: normal;
-    line-height: 1;
     margin-inline-start: auto;
     opacity: .5;
     order: 9999;
     padding: .25rem;
     position: relative;
-    text-rendering: optimizeLegibility;
-    text-transform: none;
+    stroke: currentColor;
+    stroke-width: 1px;
     transition: fill 200ms cubic-bezier(.4,0,.2,1) 0ms;
     user-select: none;
-    white-space: nowrap;
-    width: 1rem;
-    word-wrap: normal;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    width: 1.5rem;
 
     &:hover {
         opacity: .75;
-        text-decoration: none;
     }
 
     &:focus {

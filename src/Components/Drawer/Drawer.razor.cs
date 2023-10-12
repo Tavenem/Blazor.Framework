@@ -12,16 +12,6 @@ public partial class Drawer : IDisposable
     private bool _disposedValue;
 
     /// <summary>
-    /// <para>
-    /// Invoked before the drawer is closed.
-    /// </para>
-    /// <para>
-    /// If it returns <see langword="false"/> the drawer will remain open.
-    /// </para>
-    /// </summary>
-    public event Func<Drawer, bool>? BeforeClosing;
-
-    /// <summary>
     /// The child content of the footer.
     /// </summary>
     [Parameter] public RenderFragment? FooterContent { get; set; }
@@ -45,21 +35,6 @@ public partial class Drawer : IDisposable
     /// The breakpoint at which the drawer should be permanently hidden.
     /// </summary>
     [Parameter] public Breakpoint HideAtBreakpoint { get; set; }
-
-    /// <summary>
-    /// Whether the drawer is currently open.
-    /// </summary>
-    [Parameter] public bool IsOpen { get; set; }
-
-    /// <summary>
-    /// Raised when the drawer's current open status changes.
-    /// </summary>
-    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
-
-    /// <summary>
-    /// Custom CSS class(es) for the overlay (only displayed for temporary drawers).
-    /// </summary>
-    [Parameter] public string? OverlayClass { get; set; }
 
     /// <summary>
     /// The breakpoint at which the drawer should be permanently visible.
@@ -87,8 +62,6 @@ public partial class Drawer : IDisposable
         .Add(ShowAtBreakpointClass)
         .Add(HideAtBreakpointClass)
         .Add(Side.ToCSS())
-        .Add("closed", IsClosed)
-        .Add("open", IsOpen)
         .ToString();
 
     /// <summary>
@@ -116,18 +89,9 @@ public partial class Drawer : IDisposable
         _ => $"drawer-hidden-{HideAtBreakpoint.ToCSS()}",
     };
 
-    private bool DisplayOverlay { get; set; }
-
     [Inject, NotNull] private DrawerService? DrawerService { get; set; }
 
-    /// <summary>
-    /// Whether the drawer is currently closed.
-    /// </summary>
-    private bool IsClosed { get; set; }
-
-    private bool IsInteractive { get; set; }
-
-    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     private string? ShowAtBreakpointClass => ShowAtBreakpoint switch
     {
@@ -136,30 +100,8 @@ public partial class Drawer : IDisposable
     };
 
     /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        if (parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
-            && isOpen != IsOpen)
-        {
-            IsClosed = !isOpen;
-        }
-
-        await base.SetParametersAsync(parameters);
-    }
-
-    /// <inheritdoc/>
-    protected override void OnInitialized() => DrawerService.Add(this);
-
-    /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            NavigationManager.LocationChanged += OnLocationChanged;
-            IsInteractive = true;
-            StateHasChanged();
-        }
-    }
+    protected override void OnInitialized()
+        => NavigationManager.LocationChanged += OnLocationChanged;
 
     /// <inheritdoc/>
     public void Dispose()
@@ -169,43 +111,22 @@ public partial class Drawer : IDisposable
     }
 
     /// <summary>
-    /// Close this drawer if it is open.
+    /// Close this drawer if it is open, and not always shown by breakpoint settings.
     /// </summary>
-    public async Task CloseAsync()
-    {
-        if (IsOpen)
-        {
-            IsOpen = false;
-            IsClosed = true;
-            await IsOpenChanged.InvokeAsync(IsOpen);
-            StateHasChanged();
-        }
-    }
+    public Task CloseAsync() => DrawerService.CloseAsync(Side);
+
+    /// <summary>
+    /// Open this drawer if it is closed, and not hidden by breakpoint settings.
+    /// </summary>
+    public Task OpenAsync() => DrawerService.OpenAsync(Side);
 
     /// <summary>
     /// Toggle this drawer's open state.
     /// </summary>
-    public async Task ToggleAsync()
-    {
-        if (IsOpen)
-        {
-            var canClose = BeforeClosing?.Invoke(this) ?? true;
-            if (canClose)
-            {
-                IsOpen = false;
-                IsClosed = true;
-                await IsOpenChanged.InvokeAsync(IsOpen);
-                StateHasChanged();
-            }
-        }
-        else
-        {
-            IsOpen = true;
-            IsClosed = false;
-            await IsOpenChanged.InvokeAsync(IsOpen);
-            StateHasChanged();
-        }
-    }
+    /// <remarks>
+    /// May have no effect if the drawer's state is currently fixed by breakpoint settings.
+    /// </remarks>
+    public Task ToggleAsync() => DrawerService.ToggleAsync(Side);
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing,
@@ -217,22 +138,10 @@ public partial class Drawer : IDisposable
         {
             if (disposing)
             {
-                DrawerService.Remove(this);
                 NavigationManager.LocationChanged -= OnLocationChanged;
             }
 
             _disposedValue = true;
-        }
-    }
-
-    private async Task OnClosedAsync()
-    {
-        var canClose = BeforeClosing?.Invoke(this) ?? true;
-        if (canClose)
-        {
-            IsOpen = false;
-            IsClosed = true;
-            await IsOpenChanged.InvokeAsync(IsOpen);
         }
     }
 

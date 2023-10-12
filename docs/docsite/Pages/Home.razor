@@ -27,13 +27,13 @@
         <div class="card primary" style="max-width:46rem;width:calc(100vw - 4rem)">
             <div class="body">
                 <DataGrid Title="Employees"
-                            Items="_items"
-                            AllowAdd="true"
-                            AllowDelete="true"
-                            AllowEdit="true"
-                            AllowInlineEdit="true"
-                            MaxHeight="50vh"
-                            TableClass="hover">
+                          Items="_items"
+                          AllowAdd="true"
+                          AllowDelete="true"
+                          AllowEdit="true"
+                          AllowInlineEdit="true"
+                          MaxHeight="50vh"
+                          TableClass="hover">
                     <Column Label="Name" Value="@(x => x.Name)" IsQuickFilter="true" />
                     <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
                     <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false">

@@ -102,7 +102,6 @@ import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } fr
 import { cellMinWidth, columnResizing, fixTables, goToNextCell, tableEditing, TableView } from './_tables';
 
 enum ThemePreference {
-    Auto = 0,
     Light = 1,
     Dark = 2,
 }
@@ -120,7 +119,6 @@ interface EditorOptions {
     placeholder?: string;
     readOnly: boolean;
     syntax: string;
-    theme: ThemePreference;
     updateOnInput: boolean;
 }
 
@@ -426,7 +424,7 @@ const exitCodeUp: PMCommand = (state, dispatch) => {
 }
 
 let codeEditorThemeExtension: Extension | undefined;
-let themePreference = ThemePreference.Auto;
+let themePreference = getPreferredColorScheme();
 
 class TavenemCodeEditor {
     _editors: Record<string, CodeEditorInfo> = {};
@@ -461,9 +459,9 @@ class TavenemCodeEditor {
 
         const readOnlyCompartment = new Compartment;
 
-        themePreference = options.theme;
+        themePreference = getPreferredColorScheme();
         if (!codeEditorThemeExtension) {
-            codeEditorThemeExtension = codeEditorThemeCompartment.of(options.theme == ThemePreference.Dark
+            codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
                 ? codeEditorDarkExtension
                 : codeEditorLightTheme);
         }
@@ -665,7 +663,7 @@ class CodeBlockView {
     constructor(
         public node: ProsemirrorNode,
         public view: PMEditorView,
-        public getPos: () => number) {
+        public getPos: () => number | undefined) {
         if (!codeEditorThemeExtension) {
             codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
                 ? codeEditorDarkExtension
@@ -707,7 +705,7 @@ class CodeBlockView {
     }
 
     asProseMirrorSelection(view: EditorView, doc: ProsemirrorNode) {
-        const offset = this.getPos() + 1;
+        const offset = (this.getPos() || 0) + 1;
         const anchor = view.state.selection.main.anchor + offset;
         const head = view.state.selection.main.head + offset;
         return TextSelection.create(doc, anchor, head);
@@ -794,7 +792,7 @@ class CodeBlockView {
                 return false;
             }
             this.view.focus();
-            const targetPos = this.getPos() + (dir < 0 ? 0 : this.node.nodeSize);
+            const targetPos = (this.getPos() || 0) + (dir < 0 ? 0 : this.node.nodeSize);
             const selection = Selection.near(this.view.state.doc.resolve(targetPos), dir);
             this.view.dispatch(this.view.state.tr.setSelection(selection).scrollIntoView());
             this.view.focus();
@@ -851,7 +849,7 @@ class CodeBlockView {
     valueChanged(view: EditorView) {
         const change = computeChange(this.node.textContent, view.state.doc.toString());
         if (change) {
-            const start = this.getPos() + 1;
+            const start = (this.getPos() || 0) + 1;
             this.view.dispatch(this.view.state.tr.replaceWith(
                 start + change.from,
                 start + change.to,
@@ -868,7 +866,7 @@ class HeadView {
     constructor(
         public node: ProsemirrorNode,
         public view: PMEditorView,
-        public getPos: () => number) {
+        public getPos: () => number | undefined) {
         this.dom = this.createContent(node);
     }
 
@@ -904,7 +902,7 @@ class ForbiddenView {
     constructor(
         public node: ProsemirrorNode,
         public view: PMEditorView,
-        public getPos: () => number) {
+        public getPos: () => number | undefined) {
         this.dom = this.createContent(node);
     }
 
@@ -986,9 +984,9 @@ class TavenemWysiwygEditor {
             delete this._editors[elementId];
         }
 
-        themePreference = options.theme;
+        themePreference = getPreferredColorScheme();
         if (!codeEditorThemeExtension) {
-            codeEditorThemeExtension = codeEditorThemeCompartment.of(options.theme == ThemePreference.Dark
+            codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
                 ? codeEditorDarkExtension
                 : codeEditorLightTheme);
         }
@@ -1177,6 +1175,25 @@ class TavenemWysiwygEditor {
 }
 const tavenemWysiwygEditor = new TavenemWysiwygEditor();
 
+const themeObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.type === 'attributes'
+            && mutation.target instanceof HTMLElement) {
+            const theme = mutation.target.getAttribute('data-theme');
+            if (theme) {
+                const effect = codeEditorThemeCompartment.reconfigure(theme === 'dark'
+                    ? codeEditorDarkExtension
+                    : codeEditorLightTheme);
+                for (const elementId in tavenemCodeEditor._editors) {
+                    const editor = tavenemCodeEditor._editors[elementId];
+                    editor.view.dispatch({ effects: effect });
+                }
+            }
+        }
+    });
+});
+themeObserver.observe(document.documentElement, { attributes: true });
+
 export function activateCommand(elementId: string, type: CommandType, params?: any[]) {
     const codeEditor = tavenemCodeEditor._editors[elementId];
     if (codeEditor) {
@@ -1264,17 +1281,6 @@ export function initializeEditor(
     }
 }
 
-export function setCodeEditorTheme(value: ThemePreference) {
-    themePreference = value;
-    const effect = codeEditorThemeCompartment.reconfigure(value == ThemePreference.Dark
-        ? codeEditorDarkExtension
-        : codeEditorLightTheme);
-    for (const elementId in tavenemCodeEditor._editors) {
-        const editor = tavenemCodeEditor._editors[elementId];
-        editor.view.dispatch({ effects: effect });
-    }
-}
-
 export function setEditorMode(elementId: string, value: EditorMode) {
     if (value == EditorMode.WYSIWYG) {
         const existingEditor = tavenemWysiwygEditor._editors[elementId];
@@ -1314,7 +1320,6 @@ export function setEditorMode(elementId: string, value: EditorMode) {
         options.autoFocus = true;
         options.initialValue = tavenemWysiwygEditor.getContent(editor);
         options.mode = value;
-        options.theme = themePreference;
 
         tavenemWysiwygEditor.dispose(elementId);
 
@@ -1429,7 +1434,6 @@ export async function setSyntax(elementId: string, value: string) {
             options);
     } else {
         options.mode = EditorMode.Text;
-        options.theme = themePreference;
 
         tavenemCodeEditor.initializeEditor(
             elementId,
@@ -1541,4 +1545,25 @@ function defaultBlockAt(match: ContentMatch) {
         }
     }
     return null;
+}
+
+function getPreferredColorScheme(): ThemePreference {
+    const local = localStorage.getItem('tavenem-theme');
+    if (local) {
+        const theme = parseInt(local);
+        if (theme == ThemePreference.Light
+            || theme == ThemePreference.Dark) {
+            return theme;
+        }
+    }
+
+    if (window.matchMedia) {
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return ThemePreference.Dark;
+        } else {
+            return ThemePreference.Light;
+        }
+    }
+
+    return ThemePreference.Light;
 }

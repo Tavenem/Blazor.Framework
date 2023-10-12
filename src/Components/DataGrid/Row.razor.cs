@@ -139,6 +139,9 @@ public partial class Row<[DynamicallyAccessedMembers(
         }
     }
 
+    [return: NotNullIfNotNull(nameof(DataGrid))]
+    private string? GetRowExpansionToggleUrl() => DataGrid?.GetRowExpansionToggleUrl(this);
+
     private async Task OnClickAsync()
     {
         if (IsEditing || DataGrid is null)

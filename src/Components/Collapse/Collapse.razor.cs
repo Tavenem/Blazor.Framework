@@ -10,6 +10,8 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Collapse : IDisposable
 {
+    private const string ExpansionQueryParamName = "tfc_ex";
+
     private protected bool _disposedValue;
     private string? _hrefAbsolute;
     private bool _isActiveNav;
@@ -31,6 +33,12 @@ public partial class Collapse : IDisposable
     [Parameter] public bool Disabled { get; set; }
 
     /// <summary>
+    /// Any collapse expansions currently set.
+    /// </summary>
+    [SupplyParameterFromQuery(Name = ExpansionQueryParamName), Parameter]
+    public string[]? ExpansionQuery { get; set; }
+
+    /// <summary>
     /// Any CSS class(es) to be applies to the collapse footer (the part that is not hidden when
     /// collapsed).
     /// </summary>
@@ -40,6 +48,16 @@ public partial class Collapse : IDisposable
     /// The footer content of this component.
     /// </summary>
     [Parameter] public RenderFragment? FooterContent { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The id of the HTML element.
+    /// </para>
+    /// <para>
+    /// A generated id will be assigned if none is supplied (including through splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// Will be <see langword="true"/> during opening, after <see cref="OnOpening"/> is invoked and
@@ -144,6 +162,8 @@ public partial class Collapse : IDisposable
 
     internal bool ActiveLink { get; set; }
 
+    private bool Interactive { get; set; }
+
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     /// <inheritdoc/>
@@ -166,18 +186,40 @@ public partial class Collapse : IDisposable
         {
             await Accordion.AddAsync(this);
         }
+
+        Interactive = true;
+        StateHasChanged();
     }
 
     /// <inheritdoc />
     protected override async Task OnParametersSetAsync()
     {
-        _hrefAbsolute = NavUrl is null
-            ? null
-            : NavigationManager.ToAbsoluteUri(NavUrl).AbsoluteUri;
-        _isActiveNav = ShouldMatch(NavigationManager.Uri);
-        if (_isActiveNav)
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+
+        var key = Accordion is null
+            ? Id
+            : $"{Accordion.Id}:{Id}";
+        if (ExpansionQuery?
+            .Any(x => x.Equals(key, StringComparison.Ordinal))
+            == true)
         {
             await SetOpenAsync(true);
+        }
+        else
+        {
+            _hrefAbsolute = NavUrl is null
+                ? null
+                : NavigationManager.ToAbsoluteUri(NavUrl).AbsoluteUri;
+            _isActiveNav = ShouldMatch(NavigationManager.Uri);
+            if (_isActiveNav)
+            {
+                await SetOpenAsync(true);
+            }
         }
     }
 
@@ -228,6 +270,26 @@ public partial class Collapse : IDisposable
         OnIsOpenChanged?.Invoke(this, IsOpen);
         await IsOpenChanged.InvokeAsync(IsOpen);
         StateHasChanged();
+
+        var expansionQueries = ExpansionQuery?.ToList();
+        var key = Accordion is null
+            ? Id
+            : Accordion.Id;
+        expansionQueries?.RemoveAll(x => x.StartsWith(key));
+        if (IsOpen)
+        {
+            if (Accordion is not null)
+            {
+                key = $"{Accordion.Id}:{Id}";
+            }
+            (expansionQueries ??= [])?.Add(key);
+        }
+
+        NavigationManager.NavigateTo(
+            NavigationManager.GetUriWithQueryParameters(
+                new Dictionary<string, object?> { [ExpansionQueryParamName] = expansionQueries }),
+            false,
+            true);
     }
 
     /// <summary>
@@ -243,6 +305,28 @@ public partial class Collapse : IDisposable
         {
             await SetOpenAsync(!IsOpen);
         }
+    }
+
+    private string GetToggleUrl()
+    {
+        var value = !IsOpen;
+
+        var expansionQueries = ExpansionQuery?.ToList();
+        var key = Accordion is null
+            ? Id
+            : Accordion.Id;
+        expansionQueries?.RemoveAll(x => x.StartsWith(key));
+        if (value)
+        {
+            if (Accordion is not null)
+            {
+                key = $"{Accordion.Id}:{Id}";
+            }
+            (expansionQueries ??= [])?.Add(key);
+        }
+
+        return NavigationManager.GetUriWithQueryParameters(
+            new Dictionary<string, object?> { [ExpansionQueryParamName] = expansionQueries });
     }
 
     private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)

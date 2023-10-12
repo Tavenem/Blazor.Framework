@@ -20,8 +20,8 @@ public partial class DataGridSelect<
     TValue>
     : IDataGrid<TDataItem>
 {
-    private readonly List<IColumn<TDataItem>> _columns = new();
-    private readonly List<Guid> _initialSortOrder = new();
+    private readonly List<IColumn<TDataItem>> _columns = [];
+    private readonly List<Guid> _initialSortOrder = [];
 
     private bool _initialized, _keyboardNavigating, _valueUpdated;
 
@@ -60,7 +60,7 @@ public partial class DataGridSelect<
     /// cref="LoadItems"/>.
     /// </para>
     /// </summary>
-    [Parameter] public List<TDataItem> Items { get; set; } = new();
+    [Parameter] public List<TDataItem> Items { get; set; } = [];
 
     /// <summary>
     /// A function to load data items asynchronously.
@@ -152,8 +152,8 @@ public partial class DataGridSelect<
 
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
 
-    private protected override List<KeyOptions> InputKeyOptions { get; set; } = new()
-    {
+    private protected override List<KeyOptions> InputKeyOptions { get; set; } =
+    [
         new()
         {
             Key = " ",
@@ -161,17 +161,17 @@ public partial class DataGridSelect<
             PreventDown = "key+none",
             TargetOnly = true,
         }
-    };
+    ];
 
-    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
-    {
+    private protected override List<KeyOptions> KeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/ArrowDown|ArrowUp|Delete|Enter|Escape/",
             SubscribeDown = true,
             PreventDown = "key+none",
         }
-    };
+    ];
 
     /// <summary>
     /// Constructs a new instance of <see cref="DataGridSelect{TDataItem, TValue}"/>.
@@ -236,7 +236,7 @@ public partial class DataGridSelect<
             {
                 foreach (var id in _initialSortOrder)
                 {
-                    await DataGrid.OnColumnSortedAsync(id);
+                    DataGrid.OnColumnSorted(id);
                 }
             }
         }
@@ -296,7 +296,7 @@ public partial class DataGridSelect<
     /// <summary>
     /// Called internally.
     /// </summary>
-    public async Task OnColumnSortedAsync(IColumn<TDataItem> column)
+    public void OnColumnSorted(IColumn<TDataItem> column)
     {
         if (!_initialized)
         {
@@ -306,7 +306,7 @@ public partial class DataGridSelect<
         }
         if (DataGrid is not null)
         {
-            await DataGrid.OnColumnSortedAsync(column);
+            DataGrid.OnColumnSorted(column);
         }
     }
 

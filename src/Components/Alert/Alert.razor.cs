@@ -50,7 +50,6 @@ public partial class Alert
         .Add(ThemeColor.ToCSS())
         .Add("alert")
         .Add("clickable", OnClick.HasDelegate)
-        .Add("d-none", IsClosed)
         .ToString();
 
     private string Icon => ThemeColor switch
@@ -66,8 +65,6 @@ public partial class Alert
         ThemeColor.Danger or ThemeColor.Success or ThemeColor.Warning => null,
         _ => "outlined",
     };
-
-    private bool IsClosed { get; set; }
 
     private bool Interactive { get; set; }
 
@@ -88,9 +85,5 @@ public partial class Alert
             await OnClosed.InvokeAsync(this);
         }
         Closed?.Invoke(this, EventArgs.Empty);
-        if (!OnClosed.HasDelegate && Closed is null)
-        {
-            IsClosed = true;
-        }
     }
 }

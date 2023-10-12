@@ -10,7 +10,7 @@ public partial class EditDialog<TDataItem>
     /// <summary>
     /// The list of columns.
     /// </summary>
-    [Parameter] public List<IColumn<TDataItem>> Columns { get; set; } = new();
+    [Parameter] public List<IColumn<TDataItem>> Columns { get; set; } = [];
 
     /// <summary>
     /// The edited item.

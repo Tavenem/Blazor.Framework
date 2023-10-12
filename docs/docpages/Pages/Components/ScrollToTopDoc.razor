@@ -5,32 +5,28 @@
 <h1>Scroll to Top</h1>
 
 <p>
-    The scroll to top component does just what the name implies: clicking on it smoothly scrolls the
-    document to the top of the page (or another element). It is hidden by default until the user
-    scrolls past a certain point, and the <code>FrameworkLayout</code> element includes a built-in
-    version, so you don't need to do anything at all to include one in your Tavenem Blazor Framework
-    app, unless you'd like to customize its behavior or appearance.
+    The Tavenem Blazor Framework includes a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a> to easily
+    display a button which will smoothly scroll its nearest relatively positioned container (or the
+    entire document, if it has none) to the top-left. It is hidden by default until the user scrolls
+    past a certain point. The <code>FrameworkLayout</code> element includes a built-in version, so
+    you don't need to do anything at all to include one in your Tavenem Blazor Framework app, unless
+    you'd like to customize its behavior or appearance. The button functions normally when your app
+    is rendered statically, or prerendered by the server.
 </p>
 
 <h2>Basics</h2>
 
 <p>
-    The <code>ScrollToTop</code> component included in the layout by default uses an icon button
-    filled with the primary theme color, and has a simple upward caret as its content. If you define
-    your own componment, you can include any <code>ChildContent</code> within it that you like. If
-    you do not include anything, the default appearance is used.
+    To insert your own scroll-to-top button (for instance, in a nested, scrollable container),
+    simply use the <code>tf-scroll-top</code> custom element. The element uses an icon button filled
+    with the primary theme color and a simple upward caret by default. You can replace that default
+    content by adding any HTML content you like to the named slot <code>content</code>. You will
+    always need to do this if you choose to use an icon library other than <a
+    href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a> (see
+    <a href="./getting-started/installation">Installation</a> for more information).
 </p>
 
-<p>
-    The <code>Selector</code> property can be set to a CSS selector, which will be used to find the
-    element to which the scroll event will be attached. If left <code>null</code> the main document
-    will be the target. To add a <code>ScrollToTop</code> to a subsection of a document, simply give
-    that section an id and use that id (preceded by a '#' character) as the <code>Selector</code>.
-</p>
-
-<p>
-    The <code>TopOffset</code> property indicates the distance in pixels from the top of the
-    selected element at which the component becomes visible. The default is 300. To make the
-    component visible at all times, you should set this to zero and also set the
-    <code>Visible</code> property to <code>true</code>.
-</p>
+<CodeExample RowClass="align-items-center" Code="@(@"<tf-scroll-top>
+    <span class=""btn btn-icon info"" slot=""content""><tf-icon>arrow_upward</tf-icon></span>
+</tf-scroll-top>")" />

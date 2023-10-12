@@ -11,6 +11,7 @@
 <div id="@Id"
      role="listitem"
      class="@CssClass"
+     data-can-close
      style="@CssStyle"
      draggable="@(GetIsDraggable() ? "true" : "false")"
      @onclick="OnClickAsync">
@@ -26,9 +27,13 @@
     {
         @ChildContent
     }
-    @if (Interactive && (ChipSet?.AutoClose == true || ChipSet?.OnChipClosed.HasDelegate == true))
+    @if (ChipSet?.OnChipClosed.HasDelegate == true)
     {
-        <tf-close @onclick="OnClosedAsync" />
+        <tf-close disabled="@(!Interactive)" @onclick="OnClosedAsync" />
+    }
+    else if (ChipSet?.AutoClose == true)
+    {
+        <tf-close auto />
     }
 </div>
 @if (SeparatorAfterValue)

@@ -657,16 +657,16 @@
 <h2>Grouping</h2>
 
 <p>
-    Set the <code>GroupBy</code> property to a function which accepts a data item and returns any
-    object, to group items by the equality of that key.
+    Set the <code>GroupBy</code> property to a function which accepts a data item and returns a
+    string to group items by the equality of that key.
 </p>
 
 <Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" GroupBy="@(x => x.IsExecutive)">
+            <DataGrid Items="_items" GroupBy="@(x => x.IsExecutive.ToString())">
                 <GroupContent>
-                    @if (context is bool b && b)
+                    @if (bool.TryParse(context, out var value) && value)
                     {
                         <span>Executives</span>
                         <tf-icon>admin_panel_settings</tf-icon>
@@ -681,9 +681,9 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" GroupBy=""@(x => x.IsExecutive)"">
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" GroupBy=""@(x => x.IsExecutive.ToString())"">
     <GroupContent>
-        @if (context is bool b && b)
+        @if (bool.TryParse(context, out var value) && value)
         {
             <span>Executives</span>
             <tf-icon>admin_panel_settings</tf-icon>
@@ -727,13 +727,12 @@
 </Collapse>
 
 <p>
-    The <code>GroupLabel</code> property can be set to a function which returns a label for each
-    group, based on the value of the key.
+    The <code>GroupBy</code> key will also be used as the label for each group.
 </p>
 
 <p>
-    Or, the <code>GroupContent RenderFragment</code> can display custom content in the group header.
-    It receives the group key as its context parameter.
+    Alternatively, the <code>GroupContent RenderFragment</code> can display custom content in the
+    group header. It receives the group key as its context parameter.
 </p>
 
 <h2>Pagination</h2>

@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.Sample.Client", "..\sample\client\Tavenem.Blazor.Framework.Sample.Client.csproj", "{B5511782-2A8A-405A-9CF0-1A6087301867}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tavenem.Blazor.Framework.DocPages", "..\docs\docpages\Tavenem.Blazor.Framework.DocPages.csproj", "{ECB419F8-3317-41D6-9C84-E55B53C25D3E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tavenem.Blazor.Framework.DocPages", "..\docs\docpages\Tavenem.Blazor.Framework.DocPages.csproj", "{ECB419F8-3317-41D6-9C84-E55B53C25D3E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

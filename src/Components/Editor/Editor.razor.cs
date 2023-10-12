@@ -228,7 +228,7 @@ public partial class Editor
 
     [Inject] private EditorService EditorService { get; set; } = default!;
 
-    private List<string> Fonts { get; } = new() { "sans-serif", "serif", "monospace", "cursive" };
+    private List<string> Fonts { get; } = ["sans-serif", "serif", "monospace", "cursive"];
 
     private Dropdown? ForegroundContext { get; set; }
 

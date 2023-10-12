@@ -26,7 +26,7 @@
         <div class=""appbar"">
             <DrawerToggle Side=""Side.Left"" />
             <span class=""primary text-close"" style=""font-size:2em"">Main Title</span>
-            <LightDarkToggle class=""ms-auto"" />
+            <tf-darkmode-toggle class=""ms-auto"" />
         </div>
         <Drawer Side=""Side.Left"" ShowAtBreakpoint=""Breakpoint.Lg"">
             <div class=""list"" role=""navigation"">
@@ -50,11 +50,15 @@
     href="./components/contents">table of contents</a> which is displayed on the right side at large
     view sizes.
 </p>
+
+<h2>Basics</h2>
+
 <p>
     The <code>FrameworkLayout</code> component includes a built-in <a
-    href="./components/scroll-to-top">ScrollToTop</a> component for the main document. You can
+    href="./components/scroll-to-top">tf-scroll-top</a> element for the main document. You can
     override this by setting the <code>AutoScrollToTop</code> property to <code>false</code>.
 </p>
+
 <p>
     It also provides a default <a href="./components/contents">Contents</a> component, and support
     for <a href="./components/dialog">Dialogs</a> and <a href="./components/snackbar">Snackbars</a>.
@@ -72,4 +76,23 @@
     to add a <code>div</code> or other container element to your layout with the
     <code>tavenem-framework-layout</code> CSS class, which will provide the necessary layout without
     the automatic inclusion of the other framework services.
+</p>
+
+<h2>Interactivity</h2>
+
+<p>
+    The <code>FrameworkLayout</code> component includes a <a
+    href="./components/dialog">DialogContainer</a> and <a
+    href="./components/snackbar">SnackbarContainer</a>, each of which is required to use those
+    features. However, these utility components only function in an interactive render mode. In
+    order to specify the render mode for the default support components, you may assign a value to
+    the <code>InteractiveRenderMode</code> property of your <code>FrameworkLayout</code>. The
+    default value is <code>RenderMode.InteractiveAuto</code>.
+</p>
+
+<p>
+    You can set the <code>InteractiveRenderMode</code> property to <code>null</code>, which causes
+    the two support components to be omitted entirely. This doesn't prevent you from placing them
+    manually (with an appropriate render mode) anywhere within your app. Such a scenario might be
+    useful if these features are not used in your app, or only used on select pages.
 </p>

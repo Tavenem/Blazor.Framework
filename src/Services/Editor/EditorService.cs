@@ -7,10 +7,9 @@ namespace Tavenem.Blazor.Framework.Services;
 internal class EditorService : IAsyncDisposable
 {
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
-    private readonly ThemeService _themeService;
 
-    private readonly Dictionary<EditorCommandType, bool> _commandsActive = new();
-    private readonly Dictionary<EditorCommandType, bool> _commandsEnabled = new();
+    private readonly Dictionary<EditorCommandType, bool> _commandsActive = [];
+    private readonly Dictionary<EditorCommandType, bool> _commandsEnabled = [];
     private bool _disposedValue;
     private DotNetObjectReference<EditorService>? _dotNetRef;
     private EventHandler<string?>? _onInput;
@@ -55,8 +54,7 @@ internal class EditorService : IAsyncDisposable
     /// Initializes a new instance of <see cref="EditorService"/>.
     /// </summary>
     /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    /// <param name="themeService">An instance of <see cref="ThemeService"/>.</param>
-    public EditorService(IJSRuntime jsRuntime, ThemeService themeService)
+    public EditorService(IJSRuntime jsRuntime)
     {
         CommandsActive = new ReadOnlyDictionary<EditorCommandType, bool>(_commandsActive);
         CommandsEnabled = new ReadOnlyDictionary<EditorCommandType, bool>(_commandsEnabled);
@@ -65,8 +63,6 @@ internal class EditorService : IAsyncDisposable
                 "import",
                 "./_content/Tavenem.Blazor.Framework/tavenem-editor.js")
             .AsTask());
-        _themeService = themeService;
-        _themeService.OnThemeChange += SetCodeEditorTheme;
     }
 
     public async ValueTask ActivateCommandAsync(EditorCommandType type, params object?[] parameters)
@@ -270,7 +266,6 @@ internal class EditorService : IAsyncDisposable
         {
             if (disposing)
             {
-                _themeService.OnThemeChange -= SetCodeEditorTheme;
                 if (_moduleTask.IsValueCreated)
                 {
                     try
@@ -306,24 +301,6 @@ internal class EditorService : IAsyncDisposable
         catch { }
     }
 
-    private async void SetCodeEditorTheme(object? sender, ThemePreference value)
-    {
-        if (_onInput is null)
-        {
-            return;
-        }
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("setCodeEditorTheme", value)
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-    }
-
     private async void SubscribeInput(EventHandler<string?> value)
     {
         if (string.IsNullOrEmpty(ElementId))
@@ -349,7 +326,6 @@ internal class EditorService : IAsyncDisposable
                         Placeholder,
                         ReadOnly,
                         Syntax = Syntax.ToString(),
-                        Theme = await _themeService.GetPreferredColorScheme(),
                         UpdateOnInput,
                     });
             }

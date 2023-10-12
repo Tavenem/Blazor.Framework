@@ -10,7 +10,7 @@ public class SnackbarService : IDisposable
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private readonly NavigationManager _navigationManager;
-    private readonly Dictionary<Corner, List<Snackbar>> _snackbars = new();
+    private readonly Dictionary<Corner, List<Snackbar>> _snackbars = [];
 
     private bool _disposedValue;
 
@@ -129,7 +129,7 @@ public class SnackbarService : IDisposable
             }
             else
             {
-                _snackbars[options.Position] = new List<Snackbar> { snackbar };
+                _snackbars[options.Position] = [snackbar];
             }
         }
         finally

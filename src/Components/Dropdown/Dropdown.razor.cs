@@ -85,8 +85,7 @@ public partial class Dropdown : IAsyncDisposable
     [Parameter] public bool Disabled { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/> no trigger button will appear. Instead, the container itself will
-    /// respond to interaction events.
+    /// If <see langword="true"/> no trigger button will appear.
     /// </summary>
     [Parameter] public bool HideButton { get; set; }
 

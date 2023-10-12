@@ -130,7 +130,7 @@ public readonly record struct DataGridRequest(
         DataGridRequest request,
         Dictionary<string, string> columnMapping)
     {
-        var properties = request.Filters?.Select(x => x.Property).ToList() ?? new();
+        var properties = request.Filters?.Select(x => x.Property).ToList() ?? [];
         var columns = new List<string>();
         foreach (var property in properties)
         {
@@ -367,8 +367,8 @@ public readonly record struct DataGridRequest(
         Dictionary<string, string> columnMapping,
         ulong? limit = null)
     {
-        var filterProperties = request.Filters?.Select(x => x.Property).ToList() ?? new();
-        var orderProperties = request.Order?.Select(x => x.Property).ToList() ?? new();
+        var filterProperties = request.Filters?.Select(x => x.Property).ToList() ?? [];
+        var orderProperties = request.Order?.Select(x => x.Property).ToList() ?? [];
         var filterColumns = new List<string>();
         foreach (var property in filterProperties)
         {

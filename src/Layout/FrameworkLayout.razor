@@ -3,21 +3,21 @@
 @inherits TavenemComponentBase
 
 <div class="@CssClass" style="@Style">
-    <SnackbarContainer />
-    <DialogContainer @ref="DialogContainer" />
+    @if (InteractiveRenderMode is not null)
+    {
+        <SnackbarContainer @rendermode="InteractiveRenderMode" />
+        <DialogContainer @ref="DialogContainer" @rendermode="InteractiveRenderMode" />
+    }
     @FrameworkContent
     <main class="container">
         @ChildContent
+        @if (AutoScrollToTop)
+        {
+            <tf-scroll-top />
+        }
     </main>
     @if (ContentsBreakpoint != Breakpoint.None)
     {
-        <Contents @ref="Contents"
-                  Breakpoint="ContentsBreakpoint"
-                  Class="d-print-none"
-                  Style="grid-area:contents" />
-    }
-    @if (AutoScrollToTop)
-    {
-        <ScrollToTop Selector=".tavenem-framework-layout > .container" />
+        <Contents @ref="Contents" Breakpoint="ContentsBreakpoint" />
     }
 </div>

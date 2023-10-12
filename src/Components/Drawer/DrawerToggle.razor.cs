@@ -1,14 +1,21 @@
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A toggle button for a <see cref="Drawer"/> component.
 /// </summary>
-public partial class DrawerToggle : IDisposable
+public partial class DrawerToggle
 {
-    private bool _disposedValue;
+    /// <summary>
+    /// The breakpoint at which the corresponding drawer is permanently hidden.
+    /// </summary>
+    [Parameter] public Breakpoint HideAtBreakpoint { get; set; }
+
+    /// <summary>
+    /// The breakpoint at which the corresponding drawer is permanently visible.
+    /// </summary>
+    [Parameter] public Breakpoint ShowAtBreakpoint { get; set; }
 
     /// <summary>
     /// The drawer side controlled by this toggle.
@@ -22,82 +29,19 @@ public partial class DrawerToggle : IDisposable
     /// </summary>
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("btn btn-icon d-print-none")
-        .Add(DrawerService.GetShowAtBreakpoint(Side) switch
-        {
-            Breakpoint.None => null,
-            var v => $"drawer-toggle-{v.ToCSS()}",
-        })
-        .Add(DrawerService.GetHideAtBreakpoint(Side) switch
-        {
-            Breakpoint.None => null,
-            var v => $"drawer-toggle-hidden-{v.ToCSS()}",
-        })
+        .Add(HideAtBreakpointClass)
+        .Add(ShowAtBreakpointClass)
         .ToString();
 
-    [Inject, NotNull] private DrawerService? DrawerService { get; set; }
-
-    private bool HasDrawer => IsInteractive && DrawerService.HasDrawer(Side);
-
-    private bool IsInteractive { get; set; }
-
-    /// <inheritdoc />
-    protected override void OnInitialized()
+    private string? HideAtBreakpointClass => HideAtBreakpoint switch
     {
-        DrawerService.AddedDrawer += AddedDrawer;
-        DrawerService.RemovedDrawer += RemovedDrawer;
-    }
+        Breakpoint.None => null,
+        _ => $"hidden-{HideAtBreakpoint.ToCSS()}",
+    };
 
-    /// <inheritdoc />
-    protected override void OnAfterRender(bool firstRender)
+    private string? ShowAtBreakpointClass => ShowAtBreakpoint switch
     {
-        if (firstRender)
-        {
-            IsInteractive = true;
-            StateHasChanged();
-        }
-    }
-
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                DrawerService.AddedDrawer -= AddedDrawer;
-                DrawerService.RemovedDrawer -= RemovedDrawer;
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    private void AddedDrawer(object? sender, Side e)
-    {
-        if (e == Side)
-        {
-            StateHasChanged();
-        }
-    }
-
-    private Task OnDrawerToggleAsync() => DrawerService.ToggleAsync(Side);
-
-    private void RemovedDrawer(object? sender, Side e)
-    {
-        if (e == Side)
-        {
-            StateHasChanged();
-        }
-    }
+        Breakpoint.None => null,
+        _ => $"visible-{ShowAtBreakpoint.ToCSS()}",
+    };
 }

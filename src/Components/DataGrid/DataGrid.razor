@@ -28,7 +28,7 @@
                 @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
                 {
                     <TextInput Value="@QuickFilter"
-                               ValueChanged="OnChangeQuickFilterAsync"
+                               ValueChanged="OnChangeQuickFilter"
                                PostfixIcon="@DefaultIcons.Search"
                                UpdateOnInput="true"
                                UpdateOnInputDebounce="500"
@@ -93,31 +93,46 @@
                     @foreach (var column in _columns.Where(x => x.GetIsShown()))
                     {
                         <th @key="column" class="@GetColumnHeaderClass(column)">
-                            <div @onclick="@(_ => OnColumnSortAsync(column))">
-                                @if (column.LabelContent is null)
-                                {
-                                    <span style="white-space:nowrap">
-                                        @column.GetLabel()
-                                    </span>
-                                }
-                                else
-                                {
-                                    @column.LabelContent
-                                }
-                                @if (Interactive && column.GetIsSortable())
-                                {
+                            @if (column.GetIsSortable())
+                            {
+                                <a href="@GetColumnSortUrl(column)">
+                                    @if (column.LabelContent is null)
+                                    {
+                                        <span style="white-space:nowrap">
+                                            @column.GetLabel()
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @column.LabelContent
+                                    }
                                     <tf-icon class="@GetColumnHeaderIconClass(column)">
                                         @DefaultIcons.Sort_Ascending
                                     </tf-icon>
-                                }
-                            </div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div>
+                                    @if (column.LabelContent is null)
+                                    {
+                                        <span style="white-space:nowrap">
+                                            @column.GetLabel()
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @column.LabelContent
+                                    }
+                                </div>
+                            }
                             @if (Interactive && column.CanFilter)
                             {
                                 <div>
                                     @if (column.IsString)
                                     {
                                         <TextInput Value="@column.TextFilter"
-                                                   ValueChanged="@(v => OnFilterChangedAsync(column, v))"
+                                                   ValueChanged="@(v => OnFilterChanged(column, v))"
                                                    PostfixIcon="@DefaultIcons.Search"
                                                    UpdateOnInput="true"
                                                    UpdateOnInputDebounce="Debounce"
@@ -127,7 +142,7 @@
                                     {
                                         <Checkbox TValue="bool?"
                                                   Value="@column.BoolFilter"
-                                                  ValueChanged="@(v => OnBoolFilterChangedAsync(column, v))"
+                                                  ValueChanged="@(v => OnBoolFilterChanged(column, v))"
                                                   AllowNull="true"
                                                   Class="dense" />
                                     }
@@ -135,7 +150,7 @@
                                     {
                                         <NumericInput TValue="double?"
                                                       Value="@column.NumberFilter"
-                                                      ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))"
+                                                      ValueChanged="@(v => OnNumberFilterChanged(column, v))"
                                                       UpdateOnInput="true"
                                                       UpdateOnInputDebounce="Debounce"
                                                       Class="dense" />
@@ -148,7 +163,7 @@
                                                 Class="dense" />
                                         <DateTimeInput TValue="DateTimeOffset?"
                                                        Value="@column.DateTimeFilter"
-                                                       ValueChanged="@(v => OnDateTimeFilterChangedAsync(column, v))"
+                                                       ValueChanged="@(v => OnDateTimeFilterChanged(column, v))"
                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
                                                        Class="dense" />
@@ -254,21 +269,23 @@
                         <tr @key="group">
                             <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
                                 <span class="d-inline-flex align-items-center gap-2">
-                                    <button class="btn btn-icon small"
-                                            disabled="@(!Interactive)"
-                                            @onclick="@(_ => OnToggleGroupExpansion(group))">
-                                        <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
-                                    </button>
+                                    @if (Interactive)
+                                    {
+                                        <button class="btn btn-icon small"
+                                                @onclick="@(_ => OnToggleGroupExpansion(group))">
+                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-icon small"
+                                           href="@GetGroupExpansionQuery(group)">
+                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                        </a>
+                                    }
                                     @if (GroupContent is null)
                                     {
-                                        if (GroupLabel is null)
-                                        {
-                                            <span><strong>@group.Key?.ToString()</strong></span>
-                                        }
-                                        else
-                                        {
-                                            <span><strong>@GroupLabel(group.Key)</strong></span>
-                                        }
+                                        <span><strong>@group.Key</strong></span>
                                     }
                                     else
                                     {

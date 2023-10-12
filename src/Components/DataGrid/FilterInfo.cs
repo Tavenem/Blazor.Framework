@@ -101,11 +101,11 @@
 /// </param>
 public record FilterInfo(
 string Property,
-string? TextFilter,
-bool ExactMatch,
-string? QuickFilter,
-bool? BoolFilter,
-double? NumberFilter,
-DateTimeOffset? DateTimeFilter,
-string? DateFormat,
-bool DateTimeFilterIsBefore);
+string? TextFilter = null,
+bool ExactMatch = false,
+string? QuickFilter = null,
+bool? BoolFilter = null,
+double? NumberFilter = null,
+DateTimeOffset? DateTimeFilter = null,
+string? DateFormat = null,
+bool DateTimeFilterIsBefore = false);

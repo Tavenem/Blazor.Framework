@@ -12,7 +12,7 @@ public partial class LineHeightDialog
 
     private TextInput? LineHeightInput { get; set; }
 
-    private List<string> LineHeights { get; } = new() { "Reset", "normal", "1", "1.2", "1.5", "2" };
+    private List<string> LineHeights { get; } = ["Reset", "normal", "1", "1.2", "1.5", "2"];
 
     private string? NewLineHeight { get; set; } = "normal";
 

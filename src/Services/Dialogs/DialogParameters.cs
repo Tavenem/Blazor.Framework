@@ -8,7 +8,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public class DialogParameters : IEnumerable<KeyValuePair<string, object>>
 {
-    internal Dictionary<string, object?> _parameters = new();
+    internal Dictionary<string, object?> _parameters = [];
 
     /// <summary>
     /// Accesses the elements of the parameter set by name.

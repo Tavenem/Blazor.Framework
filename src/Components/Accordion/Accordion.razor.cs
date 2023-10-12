@@ -7,7 +7,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Accordion
 {
-    private readonly List<Collapse> _collapses = new();
+    private readonly List<Collapse> _collapses = [];
 
     private bool _childrenNeedUpdates = false;
 
@@ -20,6 +20,16 @@ public partial class Accordion
     /// </para>
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The id of the HTML element.
+    /// </para>
+    /// <para>
+    /// A generated id will be assigned if none is supplied (including through splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// The final value assigned to the class attribute, including component
@@ -37,7 +47,12 @@ public partial class Accordion
     /// </summary>
     protected override void OnParametersSet()
     {
-        base.OnParametersSet();
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
 
         if (_childrenNeedUpdates)
         {

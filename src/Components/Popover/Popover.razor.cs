@@ -1,18 +1,12 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A popover component which displays above other elements.
 /// </summary>
-public partial class Popover : IAsyncDisposable
+public partial class Popover
 {
-    private bool _disposedValue;
-    private PopoverHandler? _handler;
-    private bool _initialized;
-
     /// <summary>
     /// <para>
     /// The id of an HTML element which should be used as the anchor for this popover (optional).
@@ -73,9 +67,14 @@ public partial class Popover : IAsyncDisposable
     [Parameter] public EventCallback FocusOut { get; set; }
 
     /// <summary>
-    /// The id of the element.
+    /// <para>
+    /// The id of the HTML element.
+    /// </para>
+    /// <para>
+    /// A generated id will be assigned if none is supplied (including through splatted attributes).
+    /// </para>
     /// </summary>
-    public string Id => $"popover-{_handler?.Id}";
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// Whether the popover is currently visible.
@@ -188,149 +187,26 @@ public partial class Popover : IAsyncDisposable
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected override string? CssStyle => new CssBuilder(Style)
+        .AddStyleFromDictionary(AdditionalAttributes)
         .AddStyle("transition-delay", $"{Delay}ms")
         .AddStyle("max-height", MaxHeight)
         .AddStyle("max-width", MaxWidth)
         .AddStyle("overflow-y", "auto", !string.IsNullOrEmpty(MaxHeight))
-        .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
-    [Inject] private PopoverService PopoverService { get; set; } = default!;
-
-    /// <summary>
-    /// Sets parameters supplied by the component's parent in the render tree.
-    /// </summary>
-    /// <param name="parameters">The parameters.</param>
-    /// <returns>
-    /// A <see cref="Task" /> that completes when the component has finished updating and rendering
-    /// itself.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    /// Parameters are passed when <see cref="ComponentBase.SetParametersAsync(ParameterView)" /> is
-    /// called. It is not required that the caller supply a parameter value for all of the
-    /// parameters that are logically understood by the component.
-    /// </para>
-    /// <para>
-    /// The default implementation of <see cref="ComponentBase.SetParametersAsync(ParameterView)" />
-    /// will set the value of each property decorated with <c>Parameter</c> or
-    /// <c>CascadingParameter</c> that has a corresponding value in the <see cref="ParameterView"
-    /// />. Parameters that do not have a corresponding value will be unchanged.
-    /// </para>
-    /// </remarks>
-    public override async Task SetParametersAsync(ParameterView parameters)
+    /// <inheritdoc />
+    protected override void OnParametersSet()
     {
-        var initialOffsetX = OffsetX;
-        var initialOffsetY = OffsetY;
-        var initialPositionX = PositionX;
-        var initialPositionY = PositionY;
-
-        await base.SetParametersAsync(parameters);
-
-        if (_handler is not null
-            && _initialized)
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
         {
-            if (OffsetX != initialOffsetX
-                || OffsetY != initialOffsetY)
-            {
-                await _handler.SetOffsetAsync(OffsetX, OffsetY);
-            }
-            if (PositionX != initialPositionX
-                || PositionY != initialPositionY)
-            {
-                await _handler.SetPositionAsync(PositionX, PositionY);
-            }
+            Id = id;
         }
-    }
-
-    /// <summary>
-    /// Method invoked after each time the component has been rendered. Note
-    /// that the component does not automatically re-render after the completion
-    /// of any returned <see cref="Task" />, because that would cause an
-    /// infinite render loop.
-    /// </summary>
-    /// <param name="firstRender">
-    /// Set to <c>true</c> if this is the first time <see
-    /// cref="ComponentBase.OnAfterRender(bool)" /> has been invoked on this
-    /// component instance; otherwise <c>false</c>.
-    /// </param>
-    /// <returns>
-    /// A <see cref="Task" /> representing any asynchronous operation.
-    /// </returns>
-    /// <remarks>
-    /// The <see cref="ComponentBase.OnAfterRender(bool)" /> and <see
-    /// cref="ComponentBase.OnAfterRenderAsync(bool)" /> lifecycle methods are
-    /// useful for performing interop, or interacting with values received from
-    /// <c>@ref</c>. Use the <paramref name="firstRender" /> parameter to ensure
-    /// that initialization work is only performed once.
-    /// </remarks>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await PopoverService.InitializePopoversAsync();
-            _handler = await PopoverService.RegisterPopoverAsync(AnchorId, FocusId);
-            StateHasChanged();
-        }
-        else if (_handler is not null)
-        {
-            if (!_initialized)
-            {
-                await _handler.Initialize();
-                _handler.FocusLeft += OnFocusOut;
-                _initialized = true;
-            }
-            else
-            {
-                await _handler.RepositionPopoverAsync();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous dispose operation.
-    /// </returns>
-    public async ValueTask DisposeAsync()
-    {
-        // Do not change this code. Put cleanup code in 'DisposeAsync(bool disposing)' method
-        await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     /// Gives focus to the popover element.
     /// </summary>
     public ValueTask FocusAsync() => ElementReference.FocusFirstAsync();
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous dispose operation.
-    /// </returns>
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing && _handler is not null)
-            {
-                _handler.FocusLeft -= OnFocusOut;
-                try
-                {
-                    await PopoverService.UnregisterPopoverHandler(_handler);
-                }
-                catch (JSDisconnectedException) { }
-                catch (TaskCanceledException) { }
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    private async void OnFocusOut(object? sender, EventArgs e) => await FocusOut.InvokeAsync();
 }

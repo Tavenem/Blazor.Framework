@@ -247,8 +247,8 @@ public partial class DateTimeInput<TValue>
     /// <inheritdoc/>
     protected override bool OpenOnEnter => false;
 
-    private protected override List<KeyOptions> KeyOptions { get; set; } = new()
-    {
+    private protected override List<KeyOptions> KeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/Delete|Escape/",
@@ -266,7 +266,7 @@ public partial class DateTimeInput<TValue>
             SubscribeDown = true,
             PreventDown = "key+alt",
         }
-    };
+    ];
 
     private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline
         || CurrentValue is not null;
@@ -313,9 +313,9 @@ public partial class DateTimeInput<TValue>
         .AddStyle("color", "var(--tavenem-color-text-disabled)", IsDisabled)
         .ToString();
 
-    private List<Calendar> Calendars { get; } = new();
+    private List<Calendar> Calendars { get; } = [];
 
-    private List<string> CalendarNames { get; } = new();
+    private List<string> CalendarNames { get; } = [];
 
     private string? CalendarStyle => new CssBuilder()
         .AddStyle("--date-picker-calendar-columns", (DateType == DateType.Week ? 8 : 7).ToString(CultureInfo.InvariantCulture))
@@ -569,9 +569,9 @@ public partial class DateTimeInput<TValue>
 
     private DatePickerView View { get; set; } = DatePickerView.Date;
 
-    private List<string> WeekdayNames { get; } = new();
+    private List<string> WeekdayNames { get; } = [];
 
-    private List<DateTime?[]> Weeks { get; } = new();
+    private List<DateTime?[]> Weeks { get; } = [];
 
     private byte WeeksInMonth { get; set; }
 

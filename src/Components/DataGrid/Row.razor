@@ -69,11 +69,20 @@
         <td>
             @if (DataGrid.HasExpandedContent?.Invoke(Item!) != false)
             {
-                <button class="btn btn-icon small"
-                        disabled="@(!DataGrid.Interactive)"
-                        @onclick="OnToggleExpansionAsync">
-                    <tf-icon class="@ExpandClass">@DefaultIcons.Expand</tf-icon>
-                </button>
+                if (DataGrid.Interactive)
+                {
+                    <button class="btn btn-icon small"
+                            @onclick="OnToggleExpansionAsync">
+                        <tf-icon class="@ExpandClass">@DefaultIcons.Expand</tf-icon>
+                    </button>
+                }
+                else
+                {
+                    <a class="btn btn-icon small"
+                       href="GetRowExpansionToggleUrl()">
+                        <tf-icon class="@ExpandClass">@DefaultIcons.Expand</tf-icon>
+                    </a>
+                }
             }
         </td>
     }

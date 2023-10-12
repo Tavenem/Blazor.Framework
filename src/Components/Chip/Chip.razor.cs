@@ -30,21 +30,14 @@ public partial class Chip<TChip>
                 || ElementList?.SelectionType != SelectionType.None)
         .Add("selected", IsSelected)
         .Add("no-drag", !GetIsDraggable())
-        .Add("d-none", IsClosed)
         .Add(ClassName)
         .ToString();
-
-    private bool IsClosed { get; set; }
 
     private async Task OnClosedAsync()
     {
         if (ChipSet?.OnChipClosed.HasDelegate == true)
         {
             await ChipSet.OnChipClosed.InvokeAsync(Item);
-        }
-        else
-        {
-            IsClosed = true;
         }
     }
 }

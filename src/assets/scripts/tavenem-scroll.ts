@@ -1,28 +1,5 @@
 ﻿let _lastElement: string;
 let _spy: (event: Event) => void;
-let _throttleScrollHandlerId: number;
-
-export function cancelScrollListener(selector: string | null) {
-    const element = selector
-        ? document.querySelector(selector)
-        : document.documentElement;
-    if (element instanceof HTMLElement) {
-        element.removeEventListener('scroll', throttleScrollHandler as any);
-    }
-}
-
-export function listenForScroll(this: any, dotnetReference: DotNet.DotNetObject, selector: string | null) {
-    const element = selector
-        ? document.querySelector(selector)
-        : document;
-    if (!element) {
-        return;
-    }
-
-    element.addEventListener(
-        'scroll',
-        throttleScrollHandler.bind(this, dotnetReference));
-}
 
 export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, className: string) {
     _spy = handleScrollSpy.bind(this, dotnetReference, className);
@@ -148,37 +125,6 @@ function clearLastScrolled() {
     }
 }
 
-function handleScroll(dotnetReference: DotNet.DotNetObject, event: Event) {
-    try {
-        const element = event.target;
-        if (!(element instanceof HTMLElement)) {
-            return;
-        }
-        const firstChild = element.firstElementChild;
-        if (!firstChild) {
-            return;
-        }
-
-        const firstChildBoundingClientRect = firstChild.getBoundingClientRect();
-        const scrollLeft = element.scrollLeft;
-        const scrollTop = element.scrollTop;
-        const scrollHeight = element.scrollHeight;
-        const scrollWidth = element.scrollWidth;
-        const nodeName = element.nodeName;
-
-        dotnetReference.invokeMethodAsync('RaiseOnScroll', {
-            firstChildBoundingClientRect,
-            scrollLeft,
-            scrollTop,
-            scrollHeight,
-            scrollWidth,
-            nodeName,
-        });
-    } catch (error) {
-        console.error('Error in handleScroll: ', { error });
-    }
-}
-
 function handleScrollSpy(dotnetReference: DotNet.DotNetObject, className: string, event: Event) {
     const elements = document.getElementsByClassName(className);
     if (elements.length === 0) {
@@ -274,13 +220,4 @@ function handleScrollSpyTags(dotnetReference: DotNet.DotNetObject, tagNames: str
         element.classList.add("scroll-active");
         dotnetReference.invokeMethodAsync('RaiseOnScrollSpy', elementId);
     }
-}
-
-function throttleScrollHandler(this: any, dotnetReference: DotNet.DotNetObject, event: Event) {
-    clearTimeout(_throttleScrollHandlerId);
-
-    _throttleScrollHandlerId = window.setTimeout(
-        handleScroll.bind(this, dotnetReference, event),
-        100
-    );
 }

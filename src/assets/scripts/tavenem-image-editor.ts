@@ -1,33 +1,28 @@
 ﻿import {
-    AbstractRenderer,
     ALPHA_MODES,
     Application,
+    Assets,
     BLEND_MODES,
+    BlurFilter,
     Container,
     DisplayObject,
-    filters,
+    FederatedPointerEvent,
     Graphics,
-    InteractionEvent,
-    InteractionManager,
+    ICanvas,
+    IRenderer,
     Point,
     Rectangle,
-    Renderer,
     RenderTexture,
+    settings,
     Sprite,
     Text,
     Texture,
-    utils,
 } from 'pixi.js';
-import { Assets } from '@pixi/assets';
 import { Sprite as PictureSprite } from '@pixi/picture';
 import { Transformer, TransformerHandle } from '@pixi-essentials/transformer';
 
 interface DotNetStreamReference {
     arrayBuffer(): Promise<ArrayBuffer>;
-}
-
-interface FederatedPointerEvent extends PointerEvent {
-    global: Point;
 }
 
 const enum DrawingMode {
@@ -39,13 +34,13 @@ class BrushGenerator {
     private readonly graphicsTexture: Texture;
     private readonly sprite: Sprite;
 
-    constructor(private readonly renderer: Renderer | AbstractRenderer) {
+    constructor(private readonly renderer: IRenderer<ICanvas>) {
         const g = new Graphics();
         g.beginFill(0xFFFFFF);
         g.drawCircle(0, 0, 100);
         this.graphicsTexture = this.renderer.generateTexture(g);
 
-        const filter = new filters.BlurFilter(2);
+        const filter = new BlurFilter(2);
         filter.padding = 2;
 
         this.sprite = new Sprite(this.graphicsTexture);
@@ -145,19 +140,24 @@ class ImageEditor {
             height,
             backgroundAlpha: 0,
         });
-        this.editor.view.style.userSelect = 'none';
-        this.editor.view.style.width = '100%';
-        this.editor.view.style.height = '100%';
-        this.editor.view.style.objectFit = 'scale-down';
+        if (this.editor.view instanceof HTMLCanvasElement) {
+            this.editor.view.style.userSelect = 'none';
+            this.editor.view.style.width = '100%';
+            this.editor.view.style.height = '100%';
+            this.editor.view.style.objectFit = 'scale-down';
+        }
         this.editor.ticker.add(() => {
             this.renderPoints();
         });
         this._brushGenerator = new BrushGenerator(this.editor.renderer);
-        (this.editor.renderer.plugins.interaction as InteractionManager).cursorStyles.crosshair = "crosshair";
-        (this.editor.renderer.plugins.interaction as InteractionManager).on('pointerdown', this.onPointerDown, this);
-        (this.editor.renderer.plugins.interaction as InteractionManager).on('pointermove', this.onPointerMove, this);
-        (this.editor.renderer.plugins.interaction as InteractionManager).on('pointerup', this.onPointerUp, this);
-        (this.editor.renderer.plugins.interaction as InteractionManager).on('pointerupoutside', this.onPointerUp, this);
+        this.editor.stage.interactive = true;
+        this.editor.stage.interactiveChildren = false;
+        this.editor.stage.hitArea = this.editor.screen;
+        this.editor.stage.cursor = 'crosshair';
+        this.editor.stage.on('pointerdown', this.onPointerDown, this);
+        this.editor.stage.on('pointermove', this.onPointerMove, this);
+        this.editor.stage.on('pointerup', this.onPointerUp, this);
+        this.editor.stage.on('pointerupoutside', this.onPointerUp, this);
     }
 
     addText(text: string) {
@@ -254,7 +254,7 @@ class ImageEditor {
                 this._cropRect.width,
                 this._cropRect.height),
         });
-        const canvas = this.editor.renderer.plugins.extract.canvas(texture) as HTMLCanvasElement;
+        const canvas = this.editor.renderer.extract.canvas(texture) as HTMLCanvasElement;
         this.clear();
         const container = this.editor.stage.children[0] as Container;
         this.backgroundImage = Sprite.from(canvas);
@@ -297,7 +297,8 @@ class ImageEditor {
 
     destroy() {
         this.cancelOngoingOperations(true);
-        if (this.editor.view.parentElement) {
+        if (this.editor.view instanceof HTMLCanvasElement
+            && this.editor.view.parentElement) {
             const image = document.createElement('img');
             image.height = this.originalHeight;
             image.width = this.originalWidth;
@@ -395,7 +396,7 @@ class ImageEditor {
         this.editor.renderer.render(this.editor.stage, {
             renderTexture
         });
-        const canvas = this.editor.renderer.plugins.extract.canvas(renderTexture) as HTMLCanvasElement;
+        const canvas = this.editor.renderer.extract.canvas(renderTexture) as HTMLCanvasElement;
         renderTexture.destroy(true);
         return await new Promise(resolve => canvas.toBlob(resolve, type, quality));
     }
@@ -460,11 +461,12 @@ class ImageEditor {
         this.saveState();
     }
 
-    save(type?: string, quality?: number) {
+    async save(type?: string, quality?: number) {
         this.cancelOngoingOperations(true);
         type = type || "image/png";
         quality = quality || 0.92;
-        if (this.editor.view.parentElement) {
+        if (this.editor.view instanceof HTMLCanvasElement
+            && this.editor.view.parentElement) {
             const renderTexture = RenderTexture.create({
                 width: this.editor.view.width,
                 height: this.editor.view.height,
@@ -472,7 +474,7 @@ class ImageEditor {
             this.editor.renderer.render(this.editor.stage, {
                 renderTexture
             });
-            const image = this.editor.renderer.plugins.extract.image(renderTexture) as HTMLCanvasElement;
+            const image = await this.editor.renderer.extract.image(renderTexture);
             renderTexture.destroy(true);
             let height = image.height;
             let width = image.width;
@@ -600,7 +602,7 @@ class ImageEditor {
                 g.drawCircle(0, 0, 100);
                 const tex = this.editor.renderer.generateTexture(g);
                 this._brushCursor = new Sprite(tex);
-                const filter = new filters.BlurFilter(2);
+                const filter = new BlurFilter(2);
                 filter.padding = 2;
                 this._brushCursor.filters = [filter];
                 this._brushCursor.tint = this._isErasing
@@ -739,39 +741,38 @@ class ImageEditor {
         }
     }
 
-    private onPointerDown(e: InteractionEvent) {
-        if (!e.data.isPrimary
-            || !e.data.global) {
+    private onPointerDown(e: FederatedPointerEvent) {
+        if (!e.isPrimary
+            || !e.global) {
             return;
         }
 
         if (!(e.target instanceof Transformer)
             && !(e.target instanceof TransformerHandle)
             && this._textTransformer) {
-            console.log(e.target);
             this.cancelOngoingOperations();
         }
 
         if (this.drawingMode == DrawingMode.Brush
             && this._drawn) {
-            this._lastPosition = e.data.getLocalPosition(this._drawn);
+            this._lastPosition = e.getLocalPosition(this._drawn);
             this._drawing = true;
         }
     }
 
-    private onPointerMove(e: InteractionEvent) {
-        if (!e.data.isPrimary || !e.data.global) {
+    private onPointerMove(e: FederatedPointerEvent) {
+        if (!e.isPrimary || !e.global) {
             return;
         }
 
         if (this._brushCursor) {
-            this._brushCursor.position.copyFrom(e.data.global);
+            this._brushCursor.position.copyFrom(e.global);
         }
 
         if (this._drawing
             && this.drawingMode == DrawingMode.Brush
             && this._drawn) {
-            const position = e.data.getLocalPosition(this._drawn);
+            const position = e.getLocalPosition(this._drawn);
             if (this._lastPosition) {
                 this.drawPointLine(this._lastPosition, position)
             }
@@ -808,7 +809,6 @@ class ImageEditor {
         }
 
         if (text && this._textTapped) {
-            console.log(text);
             this._textTapped = false;
             clearTimeout(this._textDoubleTapped);
             this.cancelOngoingOperations();
@@ -826,12 +826,12 @@ class ImageEditor {
         }
     }
 
-    private onPointerUp(e: InteractionEvent) {
-        if (e.data.isPrimary
+    private onPointerUp(e: FederatedPointerEvent) {
+        if (e.isPrimary
             && this.drawingMode == DrawingMode.Brush) {
             if (this._drawing
                 && this._drawn) {
-                const position = e.data.getLocalPosition(this._drawn);
+                const position = e.getLocalPosition(this._drawn);
                 if (this._lastPosition) {
                     this.drawPointLine(this._lastPosition, position)
                 }
@@ -905,7 +905,7 @@ class ImageEditor {
     }
 }
 
-utils.skipHello();
+settings.RENDER_OPTIONS!.hello = false;
 
 const editors: Record<string, ImageEditor> = {};
 
@@ -981,7 +981,7 @@ export function exportImage(containerId: string, type?: string, quality?: number
         editor.editor.renderer.render(editor.editor.stage, {
             renderTexture
         });
-        const canvas = editor.editor.renderer.plugins.extract.canvas(renderTexture) as HTMLCanvasElement;
+        const canvas = editor.editor.renderer.extract.canvas(renderTexture) as HTMLCanvasElement;
         renderTexture.destroy(true);
         link.href = canvas.toDataURL(type, quality).replace(type, 'image/octet-stream');
         link.click();
@@ -1064,6 +1064,9 @@ export async function loadEditor(
             width = 100;
         }
         editor = new ImageEditor(dotNetObjectReference, width, height, widthLimit, heightLimit);
+        if (!(editor.editor.view instanceof HTMLCanvasElement)) {
+            return;
+        }
         editors[containerId] = editor;
         container.appendChild(editor.editor.view);
         if (imageElement) {

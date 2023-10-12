@@ -17,7 +17,8 @@ let plugins = [
             '@codemirror/view',
             '@lezer/common',
             '@lezer/lr',
-        ]
+        ],
+        preferBuiltins: true,
     }),
 ];
 if (process.env.build === 'Release') {
@@ -40,6 +41,13 @@ export default [{
     plugins: plugins,
 }, {
     input: "./scripts/tavenem-dragdrop.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
+    input: "./scripts/tavenem-drawer.ts",
     output: {
         format: 'es',
         sourcemap: true,
@@ -81,13 +89,6 @@ export default [{
     },
     plugins: plugins,
 }, {
-    input: "./scripts/tavenem-popover.ts",
-    output: {
-        format: 'es',
-        sourcemap: true,
-    },
-    plugins: plugins,
-}, {
     input: "./scripts/tavenem-resize.ts",
     output: {
         format: 'es',
@@ -102,14 +103,7 @@ export default [{
     },
     plugins: plugins,
 }, {
-    input: "./scripts/tavenem-theme.ts",
-    output: {
-        format: 'es',
-        sourcemap: true,
-    },
-    plugins: plugins,
-}, {
-    input: "./scripts/tavenem-initialize-framework.ts",
+    input: "./scripts/Tavenem.Blazor.Framework.lib.module.ts",
     output: {
         format: 'es',
         sourcemap: true,

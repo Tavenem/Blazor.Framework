@@ -2,19 +2,32 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+<div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
     <ol class="step-list">
         @foreach (var step in VisibleSteps)
         {
             <li class="step-selector">
                 <span class="step-separator step-separator-begin"></span>
-                <span class="@GetStepActivatorCssClass(step)" @onclick="@(_ => OnActivateStepAsync(step))">
-                    <span class="step-number"></span>
-                    @if (!string.IsNullOrEmpty(step.Title))
-                    {
-                        <span style="margin-inline-start:.5rem">@step.Title</span>
-                    }
-                </span>
+                @if (Interactive)
+                {
+                    <span class="@GetStepActivatorCssClass(step)" @onclick="@(_ => OnActivateStepAsync(step))">
+                        <span class="step-number"></span>
+                        @if (!string.IsNullOrEmpty(step.Title))
+                        {
+                            <span style="margin-inline-start:.5rem">@step.Title</span>
+                        }
+                    </span>
+                }
+                else
+                {
+                    <a href="GetStepUrl(step)" class="@GetStepActivatorCssClass(step)">
+                        <span class="step-number"></span>
+                        @if (!string.IsNullOrEmpty(step.Title))
+                        {
+                            <span style="margin-inline-start:.5rem">@step.Title</span>
+                        }
+                    </a>
+                }
                 <span class="step-separator step-separator-end"></span>
             </li>
         }
@@ -36,23 +49,43 @@
         }
     </Form>
     <div class="d-flex">
-        @if (ShowPreviousButton)
+        @if (ShowPrevious)
         {
-            <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
-                <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
-                <span>Back</span>
-            </button>
+            @if (Interactive || PreviousDisabled)
+            {
+                <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
+                    <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                    <span>Back</span>
+                </button>
+            }
+            else
+            {
+                <a href="GetPreviousStepUrl" class="@PreviousButtonCssClass">
+                    <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                    <span>Back</span>
+                </a>
+            }
         }
         @if (ShowFinishButton)
         {
             <button @onclick="OnFinishAsync" class="@FinishButtonCssClass" disabled="@IsFinishButtonDisabled">@FinishButtonText</button>
         }
-        else if (ShowNextButton)
+        else if (ShowNext)
         {
-            <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
-                <span>Next</span>
-                <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
-            </button>
+            @if (Interactive || NextDisabled)
+            {
+                <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
+                    <span>Next</span>
+                    <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                </button>
+            }
+            else
+            {
+                <a href="GetNextStepUrl" class="@NextButtonCssClass">
+                    <span>Next</span>
+                    <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                </a>
+            }
         }
     </div>
 </div>

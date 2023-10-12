@@ -5,7 +5,7 @@
 <h1>Close Button</h1>
 
 <p>
-    The Tavenem Blazor Framework provides a generic close button component. By itself it simply
+    The Tavenem Blazor Framework provides a generic close button component. By default it simply
     provides a set of styles, without any functionality. It is integrated into a number of other
     framework components, but is also available for your own use.
 </p>
@@ -36,4 +36,17 @@
 </div>
 <div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
     <tf-close disabled />
+</div>")" />
+
+<h2>Auto-closing</h2>
+
+<p>
+    If you give the close button the <code>auto</code> attribute, it will automatically assign a CSS
+    style of <code>display: none</code> to its nearest parent with the <code>data-can-close</code>
+    attribute when clicked. This will work even if the parent and close button were rendered
+    statically, or prerendered by the server.
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<div data-can-close class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <tf-close auto />
 </div>")" />

@@ -6,7 +6,7 @@ namespace Tavenem.Blazor.Framework.Services;
 
 internal class JSEventListener : IJSEventListener, IAsyncDisposable
 {
-    private readonly Dictionary<Guid, (Type eventType, Func<object?, Task> callback)> _callbackResolver = new();
+    private readonly Dictionary<Guid, (Type eventType, Func<object?, Task> callback)> _callbackResolver = [];
     private readonly DotNetObjectReference<JSEventListener> _dotNetRef;
     private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
 

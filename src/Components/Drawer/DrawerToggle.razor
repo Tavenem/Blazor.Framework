@@ -2,9 +2,4 @@
 
 @inherits TavenemComponentBase
 
-@if (HasDrawer)
-{
-    <button @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnDrawerToggleAsync">
-        <tf-icon>menu</tf-icon>
-    </button>
-}
+<tf-drawer-toggle @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" />

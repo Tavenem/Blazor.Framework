@@ -70,15 +70,6 @@
     same (or similar) components. Consider carefully before keeping references to Bootstrap's CSS in
     your project, as there are likely to be conflicts leading to difficult styling issues.
 </p>
-
-<h2 data-heading-title="Add script link">5. Add script link</h2>
-<p>
-    Add the following link at the end of your HTML body (after the Blazor script) in either
-    <code>index.html</code> (Blazor WebAssembly) or <code>App.razor</code> (Web App).
-</p>
-<pre class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(@"<script src=""./_content/Tavenem.Blazor.Framework/tavenem-initialize-framework.js""></script>", true)
-</pre>
 <p>
     If you started your project with the default Blazor template, delete the
     references to Bootstrap, and all the pregenerated content in the
@@ -96,7 +87,7 @@
     your project, as there are likely to be conflicts leading to difficult styling issues.
 </p>
 
-<h2 data-heading-title="Register services with dependency injection">6. Register services with dependency injection</h2>
+<h2 data-heading-title="Register services with dependency injection">5. Register services with dependency injection</h2>
 <p>Add the following to your <code>Program.cs</code>:</p>
 <pre class="codeblock pre-razor-code">
     <pre class="user-select-all">
@@ -109,6 +100,6 @@
     project (for prerendering support) in Web Apps.
 </p>
 
-<h2 data-heading-title="Set up the Framework">7. Set up the Framework (optional, but strongly recommended)</h2>
+<h2 data-heading-title="Set up the Framework">6. Set up the Framework (optional, but strongly recommended)</h2>
 <p>Add a <code class="primary">FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>
 <p>See <a href="./layout/layout">Layout</a> for details.</p>

@@ -1,0 +1,25 @@
+﻿tf-darkmode-toggle {
+    appearance: none;
+    cursor: pointer;
+    display: none;
+
+    &:where(:defined) {
+        display: block;
+
+        @media print {
+            display: none;
+        }
+    }
+
+    &::slotted([slot="dark"]) {
+        display: none;
+
+        [data-theme="dark"] & {
+            display: initial;
+        }
+    }
+
+    [data-theme="dark"] &::slotted([slot="light"]) {
+        display: none;
+    }
+}

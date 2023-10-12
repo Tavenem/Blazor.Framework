@@ -613,33 +613,13 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
             ParseValue(value);
         }
 
-        var resort = false;
-        var reload = false;
         var stateChange = false;
-        if (DataGrid is not null)
+        if (DataGrid is not null
+            && parameters.TryGetValue<bool>(nameof(IsShown), out var isShown)
+            && isShown != IsShown)
         {
-            if (parameters.TryGetValue<bool>(nameof(SortDescending), out var sortDescending)
-                && sortDescending != SortDescending)
-            {
-                resort = true;
-            }
-            else if ((parameters.TryGetValue<bool?>(nameof(BoolFilter), out var boolFilter)
-                && boolFilter != BoolFilter)
-                || (parameters.TryGetValue<DateTimeOffset?>(nameof(DateTimeFilter), out var dateTimeFilter)
-                && dateTimeFilter != DateTimeFilter)
-                || (parameters.TryGetValue<double?>(nameof(NumberFilter), out var numberFilter)
-                && numberFilter != NumberFilter)
-                || (parameters.TryGetValue<string?>(nameof(TextFilter), out var textFilter)
-                && textFilter != TextFilter))
-            {
-                reload = true;
-            }
-            else if (parameters.TryGetValue<bool>(nameof(IsShown), out var isShown)
-                && isShown != IsShown)
-            {
-                _isShown = isShown;
-                stateChange = true;
-            }
+            _isShown = isShown;
+            stateChange = true;
         }
 
         await base.SetParametersAsync(parameters);
@@ -648,15 +628,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         {
             return;
         }
-        if (resort)
-        {
-            await DataGrid.OnColumnSortedAsync(this);
-        }
-        else if (reload)
-        {
-            await DataGrid.LoadItemsAsync();
-        }
-        else if (stateChange)
+        if (stateChange)
         {
             DataGrid.InvokeStateChange();
         }
@@ -665,8 +637,8 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
-        DataGrid?.AddColumn(this);
         _isShown = IsShown;
+        DataGrid?.AddColumn(this);
         if (IsBool)
         {
             if (IsNullable)
@@ -807,11 +779,11 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     }
 
     /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender && InitiallySorted && DataGrid is not null)
         {
-            await DataGrid.OnColumnSortedAsync(this);
+            DataGrid.OnColumnSorted(this);
         }
     }
 

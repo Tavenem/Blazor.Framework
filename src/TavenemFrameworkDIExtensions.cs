@@ -16,14 +16,11 @@ public static class TavenemFrameworkDIExtensions
     /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
     public static IServiceCollection AddTavenemFramework(this IServiceCollection services)
     {
-        services.AddScoped<AppState>();
         services.AddScoped<UtilityService>();
         services.AddScoped<ContentsService>();
         services.AddScoped<DragDropService>();
         services.AddScoped<DrawerService>();
-        services.AddScoped<PopoverService>();
         services.AddScoped<ScrollService>();
-        services.AddScoped<ThemeService>();
         services.AddScoped<DialogService>();
         services.AddScoped<SnackbarService>();
         services.AddTransient<DragDropListener>();
@@ -31,7 +28,6 @@ public static class TavenemFrameworkDIExtensions
         services.AddTransient<IJSEventListener, JSEventListener>();
         services.AddTransient<IKeyListener, KeyListener>();
         services.AddTransient<IResizeObserver, ResizeObserver>();
-        services.AddTransient<ScrollListener>();
         return services;
     }
 }

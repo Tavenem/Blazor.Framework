@@ -12,7 +12,7 @@ public partial class FontSizeDialog
 
     private TextInput? FontSizeInput { get; set; }
 
-    private List<string> FontSizes { get; } = new() { "Reset", ".75em", ".875em", "1em", "1.25em", "1.5em", "1.75em", "2em", "2.5em", "3em" };
+    private List<string> FontSizes { get; } = ["Reset", ".75em", ".875em", "1em", "1.25em", "1.5em", "1.75em", "2em", "2.5em", "3em"];
 
     private string? NewFontSize { get; set; } = "1em";
 

@@ -2,14 +2,18 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClick">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" data-can-close @onclick="OnClick">
     @if (AutoIcon)
     {
         <tf-icon class="@IconClass">@Icon</tf-icon>
     }
     @ChildContent
-    @if (Interactive && (AutoClose || OnClosed.HasDelegate || Closed is not null))
+    @if (OnClosed.HasDelegate || Closed is not null)
     {
-        <tf-close @onclick="OnClosedAsync" />
+        <tf-close disabled="@(!Interactive)" @onclick="OnClosedAsync" />
+    }
+    else if (AutoClose)
+    {
+        <tf-close auto />
     }
 </div>

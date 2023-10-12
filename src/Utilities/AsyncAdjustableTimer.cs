@@ -3,7 +3,7 @@
 internal class AsyncAdjustableTimer : IDisposable
 {
     private readonly Func<Task> _action;
-    private readonly List<CancellationTokenSource> _cancelTokenSources = new();
+    private readonly List<CancellationTokenSource> _cancelTokenSources = [];
     private readonly object _lock = new();
 
     private bool _disposedValue;

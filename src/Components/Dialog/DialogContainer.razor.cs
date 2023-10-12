@@ -11,7 +11,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class DialogContainer : IDisposable
 {
-    private readonly Collection<DialogReference> _dialogs = new();
+    private readonly Collection<DialogReference> _dialogs = [];
 
     private bool _disposedValue;
 

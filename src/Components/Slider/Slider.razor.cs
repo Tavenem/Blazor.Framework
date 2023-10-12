@@ -64,7 +64,7 @@ public partial class Slider<TValue>
     /// <summary>
     /// Custom HTML attributes for the input element.
     /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = new();
+    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
 
     /// <summary>
     /// Custom CSS class(es) for the input element.

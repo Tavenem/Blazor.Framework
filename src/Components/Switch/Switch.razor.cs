@@ -54,15 +54,15 @@ public partial class Switch
 
     [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
 
-    private protected virtual List<KeyOptions> KeyOptions { get; set; } = new()
-    {
+    private protected virtual List<KeyOptions> KeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/ArrowLeft|ArrowRight| |Enter/",
             SubscribeDown = true,
             PreventDown = "key+none",
         }
-    };
+    ];
 
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)

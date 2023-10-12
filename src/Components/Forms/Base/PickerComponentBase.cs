@@ -80,7 +80,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// <summary>
     /// Custom HTML attributes for the select element.
     /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = new();
+    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
 
     /// <summary>
     /// Custom CSS class(es) for the select element.
@@ -193,8 +193,8 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
 
-    private protected virtual List<KeyOptions> InputKeyOptions { get; set; } = new()
-    {
+    private protected virtual List<KeyOptions> InputKeyOptions { get; set; } =
+    [
         new()
         {
             Key = " ",
@@ -202,14 +202,14 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
             PreventDown = "key+none",
             TargetOnly = true,
         }
-    };
+    ];
 
     private protected string InputId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
 
-    private protected virtual List<KeyOptions> KeyOptions { get; set; } = new()
-    {
+    private protected virtual List<KeyOptions> KeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/Delete|Enter|Escape/",
@@ -222,7 +222,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
             SubscribeDown = true,
             PreventDown = "key+alt",
         }
-    };
+    ];
 
     private protected bool PopoverOpen { get; set; }
 

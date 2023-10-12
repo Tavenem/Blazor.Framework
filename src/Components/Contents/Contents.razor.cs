@@ -77,13 +77,24 @@ public partial class Contents : IDisposable
         .Where(x => x.Level != HeadingLevel.None)
         .MinBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
 
-    private List<HeadingInfo> Headings { get; } = new();
+    private List<HeadingInfo> Headings { get; } = [];
 
     private int HighestLevel => (int)(Headings.MaxBy(x => (int)x.Level)?.Level ?? HeadingLevel.None);
 
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     [Inject, NotNull] private ScrollService? ScrollService { get; set; }
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+    }
 
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)

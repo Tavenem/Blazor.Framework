@@ -231,15 +231,15 @@ public partial class NumericInput<TValue>
 
     [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
 
-    private protected virtual List<KeyOptions> KeyOptions { get; set; } = new()
-    {
+    private protected virtual List<KeyOptions> KeyOptions { get; set; } =
+    [
         new()
         {
             Key = "/ArrowDown|ArrowUp/",
             SubscribeDown = true,
             PreventDown = "key+none",
         }
-    };
+    ];
 
     private protected string? StepString
     {

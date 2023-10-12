@@ -12,7 +12,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public class Form : EditForm, IDisposable
 {
-    private readonly List<IFormComponent> _fields = new();
+    private readonly List<IFormComponent> _fields = [];
     private readonly Func<Task> _handleSubmitDelegate;
     private readonly AsyncAdjustableTimer _timer;
 

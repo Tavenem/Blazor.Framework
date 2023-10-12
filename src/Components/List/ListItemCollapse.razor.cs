@@ -10,11 +10,6 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 public partial class ListItemCollapse<TListItem>
 {
     /// <summary>
-    /// The id of the collapse element.
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }

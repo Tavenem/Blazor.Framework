@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -105,18 +104,6 @@ public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
         catch (TaskCanceledException) { }
     }
 
-    internal async ValueTask CancelScrollListener(string? selector)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("cancelScrollListener", selector);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-    }
-
     /// <summary>
     /// Observes scrolling and resizing events to detect which of the elements
     /// with the given class is currently in view.
@@ -160,19 +147,6 @@ public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
             await module
                 .InvokeVoidAsync("scrollSpyTags", dotNetRef, tagNames)
                 .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        catch (ObjectDisposedException) { }
-    }
-
-    internal async ValueTask StartScrollListener(DotNetObjectReference<ScrollListener> dotNetRef, string? selector)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("listenForScroll", dotNetRef, selector);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }

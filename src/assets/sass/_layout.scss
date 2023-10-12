@@ -17,6 +17,28 @@
     > * {
         grid-area: main;
     }
+
+    > .container {
+        overflow-x: auto;
+        margin-top: 1rem;
+        padding-bottom: 6rem;
+
+        @media print {
+            overflow: visible;
+        }
+
+        .appbar.top ~ & {
+            margin-top: 0;
+        }
+    }
+
+    > .contents {
+        grid-area: contents;
+
+        @media print {
+            display: none;
+        }
+    }
 }
 
 .container,
@@ -34,20 +56,6 @@
     position: relative;
     row-gap: 0;
     width: 100%;
-}
-
-.tavenem-framework-layout > .container {
-    overflow-x: auto;
-    margin-top: 1rem;
-    padding-bottom: 6rem;
-
-    @media print {
-        overflow: visible;
-    }
-
-    .appbar.top ~ & {
-        margin-top: 0;
-    }
 }
 
 @each $breakpoint, $min-width in $breakpoints {
