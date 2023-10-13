@@ -1,4 +1,13 @@
-﻿interface IPopover extends Element {
+﻿enum MouseEventType {
+    None = 0,
+    LeftClick = 1 << 0,
+    RightClick = 1 << 1,
+    Click = LeftClick | RightClick,
+    MouseOver = 1 << 2,
+    Any = Click | MouseOver,
+}
+
+interface IPopover extends Element {
     focusTimer?: number;
 }
 
@@ -53,7 +62,6 @@ export namespace TavenemPopover {
         },
     };
     const focusLostEvent = new Event('focuslost', { bubbles: true });
-    //const map: Record<string, IPopoverMapItem> = {};
     const resizeObserver = new ResizeObserver(function () {
         placePopovers();
     });
@@ -442,13 +450,23 @@ export namespace TavenemPopover {
     }
 }
 
-export class TavenemHTMLPopoverElement extends HTMLElement {
-    _mutationObserver: MutationObserver;
-    _parentResizeObserver: ResizeObserver;
-    _resizeObserver: ResizeObserver;
+export class TavenemPopoverHTMLElement extends HTMLElement {
+    private _mouseOver: boolean;
+    private _mutationObserver: MutationObserver;
+    private _parentResizeObserver: ResizeObserver;
+    private _resizeObserver: ResizeObserver;
+
+    static get observedAttributes() {
+        return ['offset-x', 'offset-y', 'position-x', 'position-y'];
+    }
+
+    get mouseOver() { return this._mouseOver; }
+    set mouseOver(value: boolean) { this._mouseOver = value; }
 
     constructor() {
         super();
+
+        this._mouseOver = false;
 
         this._mutationObserver = new MutationObserver(mutations => {
             for (const mutation of mutations) {
@@ -490,10 +508,6 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
         });
     }
 
-    static get observedAttributes() {
-        return ['offset-x', 'offset-y', 'position-x', 'position-y'];
-    }
-
     connectedCallback() {
         const containingParent = TavenemPopover.getPopoverParent(this);
         if (!containingParent) {
@@ -501,8 +515,10 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
         }
 
         this.addEventListener('click', this.cancelFocusLoss.bind(this));
-        this.addEventListener('touchstart', this.cancelFocusLoss.bind(this));
         this.addEventListener('contextmenu', this.cancelFocusLoss.bind(this));
+        this.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+        this.addEventListener('mouseover', this.onMouseOver.bind(this));
+        this.addEventListener('touchstart', this.cancelFocusLoss.bind(this));
 
         TavenemPopover.placePopover(this);
 
@@ -533,8 +549,10 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
 
     disconnectedCallback() {
         this.removeEventListener('click', this.cancelFocusLoss.bind(this));
-        this.removeEventListener('touchstart', this.cancelFocusLoss.bind(this));
         this.removeEventListener('contextmenu', this.cancelFocusLoss.bind(this));
+        this.removeEventListener('mouseleave', this.onMouseLeave.bind(this));
+        this.removeEventListener('mouseover', this.onMouseOver.bind(this));
+        this.removeEventListener('touchstart', this.cancelFocusLoss.bind(this));
         this._mutationObserver.disconnect();
         this._parentResizeObserver.disconnect();
         this._resizeObserver.disconnect();
@@ -552,7 +570,7 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
         }
     }
 
-    cancelFocusLoss(e: Event) {
+    private cancelFocusLoss(e: Event) {
         const popovers: IPopover[] = [];
         if (e.target instanceof Element) {
             let popover: Element | null | undefined = e.target.closest('tf-popover');
@@ -573,7 +591,7 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
         }
     }
 
-    changeOffsetX(oldValue: string | null | undefined, newValue: string | null | undefined) {
+    private changeOffsetX(oldValue: string | null | undefined, newValue: string | null | undefined) {
         const offsetX = newValue ? parseFloat(newValue) : undefined;
         const prevX = oldValue ? parseFloat(oldValue) : undefined;
 
@@ -592,7 +610,7 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
         }
     }
 
-    changeOffsetY(oldValue: string | null | undefined, newValue: string | null | undefined) {
+    private changeOffsetY(oldValue: string | null | undefined, newValue: string | null | undefined) {
         const offsetY = newValue ? parseFloat(newValue) : undefined;
         const prevY = oldValue ? parseFloat(oldValue) : undefined;
 
@@ -611,17 +629,455 @@ export class TavenemHTMLPopoverElement extends HTMLElement {
         }
     }
 
-    changePositionX(newValue: string | null | undefined) {
+    private changePositionX(newValue: string | null | undefined) {
         const positionX = newValue ? parseFloat(newValue) : undefined;
         if (positionX) {
             this.style.left = positionX.toFixed(2) + 'px';
         }
     }
 
-    changePositionY(newValue: string | null | undefined) {
+    private changePositionY(newValue: string | null | undefined) {
         const positionY = newValue ? parseFloat(newValue) : undefined;
         if (positionY) {
             this.style.top = positionY.toFixed(2) + 'px';
         }
+    }
+
+    private onMouseLeave() {
+        if (this.previousSibling
+            && this.previousSibling instanceof TavenemDropdownHTMLElement) {
+            this.previousSibling.onPopoverMouseLeave();
+        }
+    }
+
+    private onMouseOver() { this._mouseOver = true; }
+}
+
+export class TavenemTooltipHTMLElement extends HTMLElement {
+    private _dismissed: boolean;
+    private _hideTimer: number;
+    private _showTimer: number;
+
+    constructor() {
+        super();
+
+        this._dismissed = false;
+        this._hideTimer = -1;
+        this._showTimer = -1;
+    }
+
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+
+        const button = document.createElement('button');
+        button.classList.add('btn', 'btn-icon', 'info', 'tooltip-trigger');
+        button.tabIndex = -1;
+        button.addEventListener('click', this.toggle.bind(this));
+        button.addEventListener('focusin', this.stopPropagation.bind(this));
+        button.addEventListener('mouseover', this.stopPropagation.bind(this));
+        shadow.appendChild(button);
+
+        const icon = document.createElement('svg');
+        icon.outerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="1rem" viewBox="0 0 24 24" width="1rem" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>';
+        button.appendChild(icon);
+
+        this.addEventListener('click', this.dismiss.bind(this));
+        this.addEventListener('focusin', this.onAttentionOn.bind(this));
+        this.addEventListener('focusout', this.onAttentionOut.bind(this));
+        this.addEventListener('mouseover', this.onAttentionOn.bind(this));
+        this.addEventListener('mouseleave', this.onAttentionOut.bind(this));
+    }
+
+    disconnectedCallback() {
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+        this.removeEventListener('click', this.dismiss.bind(this));
+        this.removeEventListener('focusin', this.onAttentionOn.bind(this));
+        this.removeEventListener('focusout', this.onAttentionOut.bind(this));
+        this.removeEventListener('mouseover', this.onAttentionOn.bind(this));
+        this.removeEventListener('mouseleave', this.onAttentionOut.bind(this));
+
+        const button = this.querySelector('button.tooltip-trigger');
+        if (button) {
+            button.removeEventListener('click', this.toggle.bind(this));
+            button.removeEventListener('focusin', this.stopPropagation.bind(this));
+            button.removeEventListener('mouseover', this.stopPropagation.bind(this));
+        }
+    }
+
+    setVisibility(value: boolean) {
+        if (value) {
+            this.setAttribute('visible', '');
+        } else {
+            this.removeAttribute('visible');
+        }
+        this._dismissed = false;
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+    }
+
+    toggleVisibility() {
+        if (this.getAttribute('visible')) {
+            this.removeAttribute('visible');
+        } else {
+            this.setAttribute('visible', '');
+        }
+        this._dismissed = false;
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+    }
+
+    private dismiss(event: Event) {
+        if (event.target !== this
+            && event.target instanceof Element
+            && !this.getAttribute('dismiss-on-tap')) {
+            const popover = event.target.closest('tf-popover');
+            if (popover && this.contains(popover)) {
+                return;
+            }
+        }
+
+        this._dismissed = true;
+        clearTimeout(this._showTimer);
+        this._hideTimer = setTimeout(this.hide.bind(this), 200);
+    }
+
+    private hide() {
+        this.removeAttribute('visible');
+        clearTimeout(this._showTimer);
+    }
+
+    private onAttentionOut() {
+        this._dismissed = false;
+        clearTimeout(this._showTimer);
+        this._hideTimer = setTimeout(this.hide.bind(this), 200);
+    }
+
+    private onAttentionOn() {
+        if (this._dismissed) {
+            return;
+        }
+        clearTimeout(this._hideTimer);
+        const delayStr = this.getAttribute('delay');
+        const delay = delayStr ? parseInt(delayStr) : 0;
+        if (delay > 0) {
+            clearTimeout(this._showTimer);
+            this._showTimer = setTimeout(this.show.bind(this), delay);
+        } else {
+            this.setAttribute('visible', '');
+        }
+    }
+
+    private show() { this.setAttribute('visible', ''); }
+
+    private stopPropagation(event: Event) { event.stopPropagation(); }
+
+    private toggle(event: Event) {
+        event.stopPropagation();
+        this.toggleVisibility();
+    }
+}
+
+export class TavenemDropdownHTMLElement extends HTMLElement {
+    _activation: MouseEventType;
+    _hideTimer: number;
+    _showTimer: number;
+
+    static get observedAttributes() {
+        return ['disabled'];
+    }
+
+    constructor() {
+        super();
+
+        this._activation = MouseEventType.None;
+        this._hideTimer = -1;
+        this._showTimer = -1;
+    }
+
+    static getDropdownToggleEventArgs(event: Event) {
+        return {
+            value: event instanceof CustomEvent
+                && event.detail
+                && event.detail.value
+        }
+    }
+
+    private static newDropdownToggleEvent(value: boolean) {
+        return new CustomEvent('dropdowntoggle', { bubbles: true, detail: { value: value } });
+    }
+
+    connectedCallback() {
+        this.addEventListener('click', this.onClick.bind(this));
+        this.addEventListener('contextmenu', this.onContext.bind(this));
+        this.addEventListener('focuslost', this.onPopoverFocusLost.bind(this));
+        this.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.addEventListener('mouseenter', this.onTriggerMouseEnter.bind(this));
+        this.addEventListener('mouseleave', this.onTriggerMouseLeave.bind(this));
+        this.addEventListener('mouseup', this.toggle.bind(this));
+    }
+
+    disconnectedCallback() {
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+        this.removeEventListener('click', this.onClick.bind(this));
+        this.removeEventListener('contextmenu', this.onContext.bind(this));
+        this.removeEventListener('focuslost', this.onPopoverFocusLost.bind(this));
+        this.removeEventListener('mousedown', this.onMouseDown.bind(this));
+        this.removeEventListener('mouseenter', this.onTriggerMouseEnter.bind(this));
+        this.removeEventListener('mouseleave', this.onTriggerMouseLeave.bind(this));
+        this.removeEventListener('mouseup', this.toggle.bind(this));
+    }
+
+    attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (name === 'disabled' && newValue) {
+            this.close();
+        }
+    }
+
+    onPopoverMouseLeave() {
+        if (this._activation == MouseEventType.MouseOver
+            && this.getAttribute('open')) {
+            this.close();
+        }
+    }
+
+    setOpen(value: boolean) {
+        if (value) {
+            this.openInner();
+        } else {
+            this.closeInner();
+        }
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+    }
+
+    toggleOpen() {
+        if (this.getAttribute('open')) {
+            this.closeInner();
+        } else {
+            this.openInner();
+        }
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+    }
+
+    private close() {
+        this._activation = MouseEventType.None;
+        this.closeInner();
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+        const popover = this.querySelector('tf-popover.dropdown-popover');
+        if (popover && popover instanceof TavenemPopoverHTMLElement) {
+            popover.mouseOver = false;
+        }
+    }
+
+    private closeInner() {
+        this.removeAttribute('open');
+        this.dispatchEvent(TavenemDropdownHTMLElement.newDropdownToggleEvent(false));
+    }
+
+    private getMouseEvent(event?: MouseEvent) {
+        if (!event) {
+            return MouseEventType.None;
+        } else if (event?.type === 'mouseenter') {
+            return MouseEventType.MouseOver;
+        } else if (event.button === 0) {
+            return MouseEventType.LeftClick;
+        } else if (event.button === 2) {
+            return MouseEventType.RightClick;
+        } else {
+            return MouseEventType.None;
+        }
+    }
+
+    private onClick(event: MouseEvent) {
+        if (event.target
+            && event.target !== this
+            && event.target instanceof HTMLElement) {
+            const popover = event.target.closest('tf-popover.dropdown-popover');
+            if (popover && this.contains(popover)) {
+                event.stopPropagation();
+                this.close();
+            }
+        }
+    }
+
+    private onContext(event: MouseEvent) {
+        const activationStr = this.getAttribute('activation');
+        const activation = activationStr ? parseInt(activationStr) : 0;
+        if ((activation & MouseEventType.RightClick) !== MouseEventType.None) {
+            event.preventDefault();
+        }
+    }
+
+    private onMouseDown() { clearTimeout(this._hideTimer); }
+
+    private open(event?: MouseEvent) {
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+
+        if (this.getAttribute('disabled')) {
+            return;
+        }
+
+        if (this.getAttribute('open-at-pointer')) {
+            const popover = this.querySelector('tf-popover.dropdown-popover');
+            if (popover && popover instanceof TavenemPopoverHTMLElement) {
+                const clientX = event?.clientX;
+                if (clientX) {
+                    popover.setAttribute('position-x', clientX.toString());
+                } else {
+                    popover.removeAttribute('position-x');
+                }
+                const clientY = event?.clientY;
+                if (clientY) {
+                    popover.setAttribute('position-y', clientY.toString());
+                } else {
+                    popover.removeAttribute('position-y');
+                }
+            }
+        }
+
+        this._activation = this.getMouseEvent(event);
+
+        this.openInner();
+    }
+
+    private openAfterDelay() {
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+        if (this.getAttribute('disabled')) {
+            return;
+        }
+
+        this._activation = MouseEventType.MouseOver;
+
+        this.openInner();
+    }
+
+    private openDelayed(delay: number, event?: MouseEvent) {
+        clearTimeout(this._showTimer);
+        if (this.getAttribute('disabled')) {
+            return;
+        }
+
+        if (this.getAttribute('open-at-pointer')) {
+            const popover = this.querySelector('tf-popover.dropdown-popover');
+            if (popover && popover instanceof TavenemPopoverHTMLElement) {
+                const clientX = event?.clientX;
+                if (clientX) {
+                    popover.setAttribute('position-x', clientX.toString());
+                } else {
+                    popover.removeAttribute('position-x');
+                }
+                const clientY = event?.clientY;
+                if (clientY) {
+                    popover.setAttribute('position-y', clientY.toString());
+                } else {
+                    popover.removeAttribute('position-y');
+                }
+            }
+        }
+
+        setTimeout(this.openAfterDelay.bind(this), delay);
+    }
+
+    private openInner() {
+        this.setAttribute('open', '');
+        this.dispatchEvent(TavenemDropdownHTMLElement.newDropdownToggleEvent(true));
+    }
+
+    private onPopoverFocusLost(event: Event) {
+        if (event.target
+            && event.target instanceof TavenemPopoverHTMLElement
+            && event.target.parentElement === this) {
+            setTimeout(this.close.bind(this), 100);
+        }
+    }
+
+    private onTriggerMouseEnter(event: MouseEvent) {
+        if (this.getAttribute('open')) {
+            return;
+        }
+        const activationStr = this.getAttribute('activation');
+        const activation = activationStr ? parseInt(activationStr) : 0;
+        if ((activation & MouseEventType.MouseOver) != MouseEventType.None) {
+            const delayStr = this.getAttribute('delay');
+            const delay = delayStr ? parseInt(delayStr) : 0;
+            if (delay <= 0) {
+                this.open(event);
+            } else {
+                this.openDelayed(delay, event);
+            }
+        }
+    }
+
+    private onTriggerMouseLeave() {
+        clearTimeout(this._showTimer);
+        if (!this.getAttribute('open')) {
+            return;
+        }
+
+        setTimeout(() => {
+            if (this._activation !== MouseEventType.MouseOver) {
+                return;
+            }
+
+            const popover = this.querySelector('tf-popover.dropdown-popover');
+            if (!popover
+                || !(popover instanceof TavenemPopoverHTMLElement)
+                || !popover.mouseOver) {
+                this.close();
+            }
+        }, 100);
+    }
+
+    private toggle(event?: MouseEvent) {
+        const mouseEventType = this.getMouseEvent(event);
+
+        const activationStr = this.getAttribute('activation');
+        const activation = activationStr ? parseInt(activationStr) : 0;
+        const correctButton = (activation & mouseEventType) != MouseEventType.None;
+
+        if (this.getAttribute('open')) {
+            this.close();
+            if (correctButton
+                && this.getAttribute('open-at-pointer')) {
+                this.open(event);
+            }
+        }
+        else if (!this.getAttribute('disabled') && correctButton) {
+            this.open(event);
+        }
+    }
+}
+
+export function setDropdownOpen(id: string, value: boolean) {
+    const dropdown = document.getElementById(id);
+    if (dropdown && dropdown instanceof TavenemDropdownHTMLElement) {
+        dropdown.setOpen(value);
+    }
+}
+
+export function setTooltipVisibility(id: string, value: boolean) {
+    const tooltip = document.getElementById(id);
+    if (tooltip && tooltip instanceof TavenemTooltipHTMLElement) {
+        tooltip.setVisibility(value);
+    }
+}
+
+export function toggleDropdown(id: string) {
+    const dropdown = document.getElementById(id);
+    if (dropdown && dropdown instanceof TavenemDropdownHTMLElement) {
+        dropdown.toggleOpen();
+    }
+}
+
+export function toggleTooltip(id: string) {
+    const tooltip = document.getElementById(id);
+    if (tooltip && tooltip instanceof TavenemTooltipHTMLElement) {
+        tooltip.toggleVisibility();
     }
 }

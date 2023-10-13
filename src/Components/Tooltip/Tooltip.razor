@@ -2,37 +2,21 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes"
-     class="@CssClass"
-     style="@CssStyle"
-     @onclick="OnDismiss"
-     @onfocusin="OnMouseOver"
-     @onfocusout="OnMouseOut"
-     @onmouseover="OnMouseOver"
-     @onmouseleave="OnMouseOut">
-    @if (Interactive)
-    {
-        <button class="btn btn-icon info tooltip-trigger"
-                @onclick="Toggle"
-                @onclick:stopPropagation="true"
-                @onfocusin:stopPropagation="true"
-                @onmouseover:stopPropagation="true"
-                tabindex="-1">
-            <tf-icon>@DefaultIcons.Help</tf-icon>
-        </button>
-    }
+<tf-tooltip @attributes="AdditionalAttributes"
+            id="@Id"
+            class="@CssClass"
+            delay="@(Delay == 0 ? null : Delay)"
+            style="@CssStyle">
     @ChildContent
     @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
     {
         <Popover AnchorOrigin="AnchorOrigin"
                  Class="@TooltipCssClass"
                  FlipBehavior="FlipBehavior.Flip_Always"
-                 IsOpen="_visible"
                  MaxHeight="@MaxHeight"
                  PopoverOrigin="PopoverOrigin"
                  Style="@TooltipStyle"
-                 ThemeColor="ThemeColor"
-                 @onclick:stopPropagation="@(!DismissOnTap)">
+                 ThemeColor="ThemeColor">
             @if (TooltipContent is not null)
             {
                 @TooltipContent
@@ -47,4 +31,4 @@
             }
         </Popover>
     }
-</div>
+</tf-tooltip>

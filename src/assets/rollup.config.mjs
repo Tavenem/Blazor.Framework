@@ -89,6 +89,13 @@ export default [{
     },
     plugins: plugins,
 }, {
+    input: "./scripts/tavenem-popover.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
     input: "./scripts/tavenem-resize.ts",
     output: {
         format: 'es',

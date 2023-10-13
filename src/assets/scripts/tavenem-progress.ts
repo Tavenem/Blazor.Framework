@@ -1,5 +1,5 @@
 export class TavenemProgressCircleHTMLElement extends HTMLElement {
-    _circumference: number;
+    private _circumference: number;
 
     static get observedAttributes() {
         return ['progress'];
@@ -139,7 +139,7 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
         }
     }
 
-    setIndeterminate(value: boolean) {
+    private setIndeterminate(value: boolean) {
         if (!this.shadowRoot) {
             return;
         }
@@ -154,7 +154,7 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
         }
     }
 
-    setProgress(percent: number) {
+    private setProgress(percent: number) {
         if (!this.shadowRoot) {
             return;
         }
@@ -183,7 +183,7 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
 }
 
 export class TavenemProgressLinearHTMLElement extends HTMLElement {
-    _vertical: boolean;
+    private _vertical: boolean;
 
     static get observedAttributes() {
         return ['progress'];
@@ -409,7 +409,7 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         }
     }
 
-    setIndeterminate(value: boolean) {
+    private setIndeterminate(value: boolean) {
         if (!this.shadowRoot) {
             return;
         }
@@ -425,7 +425,7 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         }
     }
 
-    setProgress(percent: number) {
+    private setProgress(percent: number) {
         if (!this.shadowRoot) {
             return;
         }

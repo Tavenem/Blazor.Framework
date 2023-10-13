@@ -1,4 +1,4 @@
-import { TavenemHTMLPopoverElement, TavenemPopover } from './tavenem-popover';
+import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
 import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
 import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
 
@@ -142,7 +142,7 @@ namespace Tavenem {
                 this.removeEventListener('change', this.change.bind(this));
             }
 
-            change() {
+            private change() {
                 const side = this.getAttribute('data-side');
                 if (!side) {
                     return;
@@ -195,7 +195,7 @@ namespace Tavenem {
                 this.removeEventListener('change', this.change.bind(this));
             }
 
-            change() {
+            private change() {
                 const preferred = getNativeTavenemPreferredColorScheme();
 
                 let newTheme: ThemePreference;
@@ -242,7 +242,7 @@ namespace Tavenem {
                 this.removeEventListener('click', this.closeDrawer.bind(this));
             }
 
-            closeDrawer(event: Event) {
+            private closeDrawer(event: Event) {
                 event.stopPropagation();
 
                 const side = this.getAttribute('data-side');
@@ -265,7 +265,7 @@ namespace Tavenem {
                 this.removeEventListener('click', this.closeDrawer.bind(this));
             }
 
-            closeDrawer(event: Event) {
+            private closeDrawer(event: Event) {
                 event.stopPropagation();
 
                 const side = this.getAttribute('data-side');
@@ -277,7 +277,11 @@ namespace Tavenem {
             }
         });
 
-        customElements.define('tf-popover', TavenemHTMLPopoverElement);
+        customElements.define('tf-popover', TavenemPopoverHTMLElement);
+
+        customElements.define('tf-dropdown', TavenemDropdownHTMLElement);
+
+        customElements.define('tf-tooltip', TavenemTooltipHTMLElement);
     }
 
     function getNativeTavenemPreferredColorScheme(): ThemePreference {
@@ -332,4 +336,7 @@ export function beforeStart() {
 
 export function afterStarted(blazor: BlazorInstance) {
     blazor.registerCustomEventType('focuslost');
+    blazor.registerCustomEventType('dropdowntoggle', {
+        createEventArgs: TavenemDropdownHTMLElement.getDropdownToggleEventArgs
+    });
 }

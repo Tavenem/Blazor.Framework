@@ -2,42 +2,38 @@
 
 @inherits TavenemComponentBase
 
-@if (!HideButton)
-{
-    <button @ref="Button"
-            @attributes="AdditionalAttributes"
-            id="@Id"
-            class="@CssClass"
-            style="@CssStyle"
-            disabled="@IsDisabled"
-            @onmousedown="OnMouseDown"
-            @onmouseup="ToggleAsync"
-            @oncontextmenu="OnContext"
-            @oncontextmenu:preventDefault="@ActivationType.HasFlag(MouseEvent.RightClick)">
-        @if (!string.IsNullOrEmpty(Icon))
-        {
-            <tf-icon>@Icon</tf-icon>
-        }
-        @Text
-    </button>
-}
-<Popover @ref="Popover"
-         AnchorOrigin="AnchorOriginValue"
-         Class="@PopoverCssClass"
-         AnchorId="@(string.IsNullOrEmpty(AnchorId) ? (HideButton ? null : Id) : AnchorId)"
-         FocusOut="StartClosing"
-         IsOpen="_isOpen"
-         MatchWidth="@(!OpenAtPointer && !HideButton)"
-         MaxHeight="@MaxHeight"
-         PositionX="PopoverPositionX"
-         PositionY="PopoverPositionY"
-         PopoverOrigin="PopoverOriginValue"
-         Style="@PopoverStyle"
-         ThemeColor="ThemeColor"
-         oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)">
-    <div class="@ListCssClass"
-         @onclick="Close"
-         @onclick:stopPropagation="true">
-        @ChildContent
-    </div>
-</Popover>
+<tf-dropdown @attributes="AdditionalAttributes"
+             id="@Id"
+             class="@CssClass"
+             style="@CssStyle"
+             activation="@((int)ActivationType)"
+             delay="@(Delay == 0 ? null : Delay)"
+             disabled="@Disabled"
+             open-at-pointer="@OpenAtPointer"
+             @dropdowntoggle="OnOpenChangedAsync">
+    @if (!HideButton)
+    {
+        <button class="@ButtonCssClass" disabled="@Disabled">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <tf-icon>@Icon</tf-icon>
+            }
+            @Text
+        </button>
+    }
+    <Popover AnchorOrigin="AnchorOriginValue"
+             Class="@PopoverCssClass"
+             AnchorId="@(string.IsNullOrEmpty(AnchorId) ? (HideButton ? null : Id) : AnchorId)"
+             MatchWidth="@(!OpenAtPointer && !HideButton)"
+             MaxHeight="@MaxHeight"
+             PositionX="PopoverPositionX"
+             PositionY="PopoverPositionY"
+             PopoverOrigin="PopoverOriginValue"
+             Style="@PopoverStyle"
+             ThemeColor="ThemeColor"
+             oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)">
+        <div class="@ListCssClass">
+            @ChildContent
+        </div>
+    </Popover>
+</tf-dropdown>

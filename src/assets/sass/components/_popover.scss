@@ -28,13 +28,15 @@
         z-index: var(--tavenem-zindex-tooltip);
     }
 
-    &.open {
+    &.open,
+    tf-tooltip[visible] > &.tooltip,
+    tf-dropdown[open] > &.dropdown-popover {
         display: block;
         opacity: 1;
         transition: opacity;
     }
 
-    &:not(.open) {
+    &:not(.open, tf-tooltip[visible] > .popover.tooltip, tf-dropdown[open] > .popover.dropdown-popover) {
         pointer-events: none;
         transition-duration: 0ms;
         transition-delay: 0ms !important;

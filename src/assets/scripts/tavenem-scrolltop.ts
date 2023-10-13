@@ -1,5 +1,5 @@
 export class TavenemScrollTopHTMLElement extends HTMLElement {
-    _throttleScrollHandlerId: number;
+    private _throttleScrollHandlerId: number;
 
     constructor() {
         super();
@@ -41,7 +41,7 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
         }
     }
 
-    handleScroll(event: Event) {
+    private handleScroll(event: Event) {
         const element = event.target;
         if (!element) {
             return;
@@ -66,7 +66,7 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
         }
     }
 
-    scrollToTop() {
+    private scrollToTop() {
         const container = this.parentElement || document;
         if (container instanceof Document) {
             window.scroll({
@@ -83,7 +83,7 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
         }
     }
 
-    throttleScrollHandler(event: Event) {
+    private throttleScrollHandler(event: Event) {
         clearTimeout(this._throttleScrollHandlerId);
 
         this._throttleScrollHandlerId = window.setTimeout(
