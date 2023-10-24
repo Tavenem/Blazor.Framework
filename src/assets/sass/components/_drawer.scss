@@ -12,37 +12,6 @@
     }
 }
 
-tf-drawer-overlay {
-    display: none;
-}
-
-tf-drawer-toggle {
-    appearance: none;
-    cursor: pointer;
-    display: none;
-
-    &:where(:defined) {
-        display: block;
-
-        @media print {
-            display: none;
-        }
-    }
-}
-
-tf-drawer-close {
-    display: none;
-    margin-inline-end: -1.5rem;
-
-    &:where(:defined) {
-        display: block;
-
-        @media print {
-            display: none;
-        }
-    }
-}
-
 .drawer {
     background-color: var(--tavenem-color-bg);
     border-radius: 0;

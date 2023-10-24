@@ -1179,7 +1179,7 @@ const themeObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
         if (mutation.type === 'attributes'
             && mutation.target instanceof HTMLElement) {
-            const theme = mutation.target.getAttribute('data-theme');
+            const theme = mutation.target.dataset.theme;
             if (theme) {
                 const effect = codeEditorThemeCompartment.reconfigure(theme === 'dark'
                     ? codeEditorDarkExtension

@@ -14,9 +14,8 @@
                     <div class="d-flex flex-column align-self-stretch">
                         @if (Calendars.Count > 1)
                         {
-                            <Select TValue="System.Globalization.Calendar"
-                                    Value="Calendar"
-                                    ValueChanged="SetCalendar"
+                            <Select @bind-Value:get="Calendar"
+                                    @bind-Value:set="SetCalendar"
                                     Disabled="Disabled"
                                     Options="Calendars"
                                     Labels="@(c => CalendarNames[Calendars.IndexOf(c)])"
@@ -24,9 +23,8 @@
                         }
                         @if (HasTime && ShowTimeZone && TimeZones.Count > 1)
                         {
-                            <Select TValue="TimeZoneInfo"
-                                    Value="TimeZone"
-                                    ValueChanged="SetTimeZone"
+                            <Select @bind-Value="TimeZone"
+                                    @bind-Value:after="SetTimeZone"
                                     Disabled="Disabled"
                                     Options="TimeZones"
                                     Labels="@(t => t.DisplayName.ToHumanReadable())"
@@ -397,7 +395,7 @@
         </button>
         <input disabled="@IsDisabled"
                type="@InputType"
-               name="@Name"
+               name="@NameValue"
                hidden
                readonly
                step="@(ShowSeconds ? "any" : null)"
@@ -426,7 +424,7 @@ else
              style="@(DisplayType == PickerDisplayType.Inline ? "display:none" : null)">
             <input disabled="@IsDisabled"
                    type="@InputType"
-                   name="@Name"
+                   name="@NameValue"
                    hidden
                    readonly
                    step="@(ShowSeconds ? "any" : null)"

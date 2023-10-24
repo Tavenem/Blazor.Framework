@@ -2,6 +2,7 @@
 
 ## 2.0-preview.1
 ### Added
+- Trimming and AOT compatibility
 - Close button `auto` attribute, which allows automatically closing a parent element with the `data-can-close` attribute
 - `Collapse.NavUrl` and `Collapse.NavLinkMatch` to enable auto-open based on `NavLink`-style logic
 - `DialogContainer` to support use of dialogs without the `FrameworkLayout`  
@@ -11,13 +12,22 @@
 - `SnackbarContainer` to support use of snackbars without the `FrameworkLayout`
 ### Changed
 - Update to .NET 8 RC
+- Use Material Symbols instead of Material Icons
 - Some support for prerendering and static render mode
 - `AppBar` component replaced by simple CSS class (built-in drawer functionality replaced by `DrawerToggle`)
+- `Tooltip` component drastically changed
+   - No longer wraps an anchor component
+   - The anchor/trigger element's HTML `id` must be specified with the `Anchor` property
+   - A tooltip with no `Anchor` displays a button which acts as the trigger (the same button as displayed for no-hover devices)
+   - All properties for specifying the content of the tooltip have been dropped
+   - The `ChildContent` specifies the content of the tooltip popover
+   - Removed no-hover icons
 ### Removed
 - .NET 6 and .NET 7 targets
 - `AnchorLink` (replaced by native fragment handling and built-in Collapse NavLink functionality)
 - `Drawer.BeforeClosing`, `IsOpen`, `IsOpenChanged`. These were never reliable due to breakpoint and navigation automatic behavior.
 - `Drawer.Breakpoint` (replaced by `Drawer.ShowAtBreakpoint` and `Drawer.HideAtBreakpoint`)
+- `Dropdown.TriggerContent`
 - `Heading` component (`Contents` now works with standard HTML headings, and any element with the `tav-heading` CSS class)
 - `LightDarkToggle` component (replaced by `tf-darkmode-toggle` custom HTML element)
 - `ScrollToTop` (replaced by `tf-scroll-top` custom element)

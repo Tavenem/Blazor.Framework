@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Components.Forms;
@@ -32,7 +33,7 @@ public partial class Slider<TValue>
     /// <summary>
     /// <para>
     /// The validation message displayed when this field's <see
-    /// cref="FormComponentBase{TValue}.Value"/> cannot be converted to or from its string
+    /// cref="InputBase{TValue}.Value"/> cannot be converted to or from its string
     /// representation.
     /// </para>
     /// <para>
@@ -128,7 +129,7 @@ public partial class Slider<TValue>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
-    /// Whether the bound <see cref="FormComponentBase{TValue}.Value"/> should update whenever the
+    /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the
     /// value changes (rather than on blur or when the enter key is pressed).
     /// </summary>
     [Parameter] public bool UpdateOnInput { get; set; }
@@ -137,7 +138,7 @@ public partial class Slider<TValue>
     /// <para>
     /// When <see cref="UpdateOnInput"/> is true, this can be set to a number of milliseconds that
     /// the component will wait before updating the bound <see
-    /// cref="FormComponentBase{TValue}.Value"/>.
+    /// cref="InputBase{TValue}.Value"/>.
     /// </para>
     /// <para>
     /// Even when a debounce is used, the component will always update immediately on blur and when

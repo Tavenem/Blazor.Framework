@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="ms-auto" style="max-width:46rem;width:calc(100vw - 2rem)">
-            <Editor Value="@_editorValue" Syntax="EditorSyntax.HTML" LockSyntax="false" MaxHeight="50vh" />
+            <Editor @bind-Value="@_editorValue" Syntax="EditorSyntax.HTML" LockSyntax="false" MaxHeight="50vh" />
         </div>
     </div>
     <div class="d-flex flex-wrap">

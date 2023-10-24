@@ -68,7 +68,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter] public Type? AddDialog { get; set; }
+    [Parameter]
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    public Type? AddDialog { get; set; }
 
     /// <summary>
     /// <para>
@@ -149,7 +151,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// Exporting to CSV, Excel, and HTML formats is supported by default. These formats include the
     /// current set of visible columns, plus any columns with <see cref="IColumn.ExportHidden"/> set
     /// to <see langword="true"/>. All data which matches the current set of filters is included, in
-    /// the curent sort order. If <see cref="LoadItems"/> is not <see langword="null"/> a new call
+    /// the current sort order. If <see cref="LoadItems"/> is not <see langword="null"/> a new call
     /// is made which attempts to fetch all matching items, rather than just the items for the
     /// current page.
     /// </para>
@@ -235,7 +237,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// this component as a dialog.
     /// </para>
     /// </summary>
-    [Parameter] public Type? EditDialog { get; set; }
+    [Parameter]
+    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+    public Type? EditDialog { get; set; }
 
     /// <summary>
     /// <para>
@@ -316,7 +320,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// Optional content to include as a header in HTML-format exports.
     /// </para>
     /// <para>
-    /// Can include HTML markupm, but take care to sanitize any user-provided content.
+    /// Can include HTML markup, but take care to sanitize any user-provided content.
     /// </para>
     /// </summary>
     [Parameter] public string? HtmlHeaderContent { get; set; }
@@ -738,9 +742,14 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     [Inject] private UtilityService UtilityService { get; set; } = default!;
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Dynamic code not reachable with AOT")]
     protected override async void OnInitialized()
     {
-        if (_columns.Count != 0)
+        if (_columns.Count != 0
+            || !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)
         {
             return;
         }
@@ -1303,7 +1312,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// The zero-based index of the page to view.
     /// </para>
     /// <para>
-    /// If the given index is greater than or equal to the total number of pages, nagivates to the
+    /// If the given index is greater than or equal to the total number of pages, navigates to the
     /// last page instead.
     /// </para>
     /// <para>
@@ -1629,7 +1638,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
             {
-                await OnCancelEditAsync();
+                OnCancelEdit();
             }
         }
 
@@ -1679,7 +1688,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
             {
-                await OnCancelEditAsync();
+                OnCancelEdit();
             }
         }
 
@@ -1796,7 +1805,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
             {
-                await OnCancelEditAsync();
+                OnCancelEdit();
             }
         }
 
@@ -1830,7 +1839,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
             {
-                await OnCancelEditAsync();
+                OnCancelEdit();
             }
         }
 
@@ -2429,7 +2438,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             var couldSave = await TrySaveEditAsync();
             if (!couldSave)
             {
-                await OnCancelEditAsync();
+                OnCancelEdit();
             }
         }
 
@@ -2512,19 +2521,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SetFilterQuery();
     }
 
-    private async Task OnCancelEditAsync()
-    {
-        if (EditingRow is not null)
-        {
-            await EditingRow.CancelEditAsync();
-        }
-    }
-
-    private void OnChangeQuickFilter(string? value)
-    {
-        QuickFilter = value;
-        SetFilterQuery();
-    }
+    private void OnCancelEdit() => EditingRow?.CancelEdit();
 
     private async Task OnChangeRowsPerPageAsync(ushort value)
     {
@@ -3134,7 +3131,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 var success = await ItemSaved.Invoke(EditingRow.Item);
                 if (!success && TableEditForm is not null)
                 {
-                    await TableEditForm.ResetAsync();
+                    TableEditForm.Reset();
                 }
             }
             EditingRow = null;

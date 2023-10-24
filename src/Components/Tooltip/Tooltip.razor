@@ -2,33 +2,24 @@
 
 @inherits TavenemComponentBase
 
-<tf-tooltip @attributes="AdditionalAttributes"
-            id="@Id"
-            class="@CssClass"
-            delay="@(Delay == 0 ? null : Delay)"
-            style="@CssStyle">
-    @ChildContent
-    @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
-    {
-        <Popover AnchorOrigin="AnchorOrigin"
-                 Class="@TooltipCssClass"
-                 FlipBehavior="FlipBehavior.Flip_Always"
-                 MaxHeight="@MaxHeight"
-                 PopoverOrigin="PopoverOrigin"
-                 Style="@TooltipStyle"
-                 ThemeColor="ThemeColor">
-            @if (TooltipContent is not null)
-            {
-                @TooltipContent
-            }
-            else if (TooltipMarkup.HasValue)
-            {
-                @TooltipMarkup.Value
-            }
-            else
-            {
-                @TooltipText
-            }
-        </Popover>
-    }
+@if (ChildContent is null)
+{
+    return;
+}
+
+<tf-tooltip id="@Id"
+            data-anchor="@Anchor"
+            data-delay="@(Delay == 0 ? null : Delay)"
+            data-dismiss-on-tap="@DismissOnTap">
+    <Popover AdditionalAttributes="AdditionalAttributes"
+             AnchorId="@Anchor"
+             AnchorOrigin="AnchorOrigin"
+             Class="@CssClass"
+             FlipBehavior="FlipBehavior.Flip_Always"
+             MaxHeight="@MaxHeight"
+             PopoverOrigin="PopoverOrigin"
+             Style="@CssStyle"
+             ThemeColor="ThemeColor">
+        @ChildContent
+    </Popover>
 </tf-tooltip>

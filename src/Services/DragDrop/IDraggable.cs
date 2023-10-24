@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -9,6 +10,20 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public interface IDraggable
 {
+    /// <summary>
+    /// Provides JSON serialization metadata about the type.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Used by the default interface implementation of <see cref="ToDraggedJson"/> if provided.
+    /// </para>
+    /// <para>
+    /// If left <see langword="null"/> reflection-based JSON serialization is used, which is not
+    /// trim safe or AOT compatible.
+    /// </para>
+    /// </remarks>
+    public JsonTypeInfo? JsonTypeInfo { get; }
+
     /// <summary>
     /// <para>
     /// Gets a string representation of this item in JSON format, for dragging operations.
@@ -36,8 +51,17 @@ public interface IDraggable
     /// complete object.
     /// </para>
     /// </remarks>
-    [RequiresUnreferencedCode("This method uses System.Text.Json.JsonSerializer.Serialize(object?, Type) to produce JSON. It is safe to suppress this warning if you indicate to the trimmer that all members of the type require dynamic access.")]
-    public string? ToDraggedJson() => JsonSerializer.Serialize(this, GetType());
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Warning and workaround provided in JsonTypeInfo property.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Warning and workaround provided in JsonTypeInfo property.")]
+    public string? ToDraggedJson() => JsonTypeInfo is null
+        ? JsonSerializer.Serialize(this, GetType())
+        : JsonSerializer.Serialize(this, JsonTypeInfo);
 
     /// <summary>
     /// <para>

@@ -32,10 +32,8 @@ namespace Tavenem.Blazor.Framework.Services;
 /// </returns>
 internal delegate DragEffect GetDropEffectDelegateInternal(string[] types);
 
-internal class DragDropListener : IDisposable
+internal class DragDropListener(DragDropService dragDropService) : IDisposable
 {
-    private readonly DragDropService _dragDropService;
-
     private bool _disposedValue;
     private DotNetObjectReference<DragDropListener>? _dotNetRef;
     private EventHandler<IEnumerable<KeyValuePair<string, string>>>? _onDrop;
@@ -163,9 +161,6 @@ internal class DragDropListener : IDisposable
         remove => UnsubscribeDropped(value);
     }
 
-    public DragDropListener(DragDropService dragDropService)
-        => _dragDropService = dragDropService;
-
     public void Dispose()
     {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
@@ -174,13 +169,17 @@ internal class DragDropListener : IDisposable
     }
 
     /// <summary>
-    /// Invoked by javascript interop.
+    /// Invoked by JavaScript interop.
     /// </summary>
     [JSInvokable]
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = "The potential breakage is accepted; it is up to implementers to enure that types participating in drag-drop are preserved.")]
+        Justification = "The potential breakage is accepted; it is up to implementers to ensure that types participating in drag-drop are preserved.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "The potential breakage is accepted; it is up to implementers to ensure that types participating in drag-drop implement IDraggable appropriately.")]
     public DragStartData? GetDragData()
     {
         if (GetData is null)
@@ -249,7 +248,7 @@ internal class DragDropListener : IDisposable
     }
 
     /// <summary>
-    /// Invoked by javascript interop.
+    /// Invoked by JavaScript interop.
     /// </summary>
     [JSInvokable]
     public string? GetDropEffect(string[] types)
@@ -271,7 +270,7 @@ internal class DragDropListener : IDisposable
     }
 
     /// <summary>
-    /// Invoked by javascript interop.
+    /// Invoked by JavaScript interop.
     /// </summary>
     [JSInvokable]
     public void DropHandled(IEnumerable<KeyValuePair<string, string>> e)
@@ -282,13 +281,13 @@ internal class DragDropListener : IDisposable
     }
 
     /// <summary>
-    /// Invoked by javascript interop.
+    /// Invoked by JavaScript interop.
     /// </summary>
     [JSInvokable]
     public void DroppedHandled(DragEffect e) => _onDropped?.Invoke(this, e);
 
     /// <summary>
-    /// Invoked by javascript interop.
+    /// Invoked by JavaScript interop.
     /// </summary>
     [JSInvokable]
     public void SetDropValid(bool? value)
@@ -311,21 +310,21 @@ internal class DragDropListener : IDisposable
     }
 
     private ValueTask CancelDragListener()
-        => _dragDropService.CancelDragListener(ElementId);
+        => dragDropService.CancelDragListener(ElementId);
 
     private ValueTask CancelDropListener()
-        => _dragDropService.CancelDropListener(ElementId);
+        => dragDropService.CancelDropListener(ElementId);
 
     private ValueTask StartDragListener()
     {
         _dotNetRef ??= DotNetObjectReference.Create(this);
-        return _dragDropService.StartDragListener(_dotNetRef, ElementId, DragElementId);
+        return dragDropService.StartDragListener(_dotNetRef, ElementId, DragElementId);
     }
 
     private ValueTask StartDropListener()
     {
         _dotNetRef ??= DotNetObjectReference.Create(this);
-        return _dragDropService.StartDropListener(
+        return dragDropService.StartDropListener(
             _dotNetRef,
             ElementId,
             DropEffect == DragEffect.All

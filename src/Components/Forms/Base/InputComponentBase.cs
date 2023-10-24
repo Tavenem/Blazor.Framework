@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
@@ -117,16 +118,15 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
-    /// Whether the bound <see cref="FormComponentBase{TValue}.Value"/> should update whenever the
-    /// value changes (rather than on blur or when the enter key is pressed).
+    /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the value
+    /// changes (rather than on blur or when the enter key is pressed).
     /// </summary>
     [Parameter] public bool UpdateOnInput { get; set; }
 
     /// <summary>
     /// <para>
     /// When <see cref="UpdateOnInput"/> is true, this can be set to a number of milliseconds that
-    /// the component will wait before updating the bound <see
-    /// cref="FormComponentBase{TValue}.Value"/>.
+    /// the component will wait before updating the bound <see cref="InputBase{TValue}.Value"/>.
     /// </para>
     /// <para>
     /// Even when a debounce is used, the component will always update immediately on blur and when

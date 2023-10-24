@@ -175,52 +175,91 @@
 </Collapse>
 
 <p>
-    The <code>OpenAtPointer</code> property, if set to <code>true</code>, will cause the popover to
-    open at the position of the activation event, rather than in the position normally defined by
-    its anchor properties. This can be used to create a typical context menu. In combination with
-    <code>HideButton</code> it can provide a context menu for an area.
+    The <code>TriggerContent</code> <code>RenderFragment</code> property can be set to any content
+    you wish to use instead of the default button. If provided the <code>Icon</code>,
+    <code>Text</code>, and <code>ThemeColor</code> properties are ignored (these are used only to
+    define the appearance of the default button).
+</p>
+
+<p>
+    Note that manually wiring up events on your custom content is not necessary to trigger the
+    <code>Dropdown</code>. Even when using custom <code>TriggerContent</code> the
+    <code>Dropdown</code> should open and close in response to the interactions appropriate for the
+    configured <code>ActivationType</code>, provided you do not stop propagation for the relevant
+    events on your custom content.
 </p>
 
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <div @oncontextmenu="Open"
-                 @oncontextmenu:preventDefault="true"
-                 class="dark filled p-3 position-relative d-flex center-items"
-                 style="height:10rem;width:10rem">
-                <div>Right-click anywhere in this box</div>
-                <Dropdown @ref="_dropdown2" HideButton="true" OpenAtPointer="true">
+            <Dropdown>
+                <TriggerContent>
+                    <div class="dark filled p-3 d-flex center-items"
+                         style="height:10rem;width:10rem">Click anywhere in this box</div>
+                </TriggerContent>
+                <ChildContent>
                     <span>First choice</span>
                     <span>Second choice</span>
                     <span>Third choice</span>
-                </Dropdown>
-            </div>
+                </ChildContent>
+            </Dropdown>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div @oncontextmenu=""Open""
-     @oncontextmenu:preventDefault=""true""
-     class=""dark filled p-3 position-relative d-flex center-items""
-     style=""height:10rem;width:10rem"">
-    <div>Right-click anywhere in this box</div>
-    <Dropdown @ref=""_dropdown"" HideButton=""true"" OpenAtPointer=""true"">
+        @CodeFormatter.CodeToMarkup(@"<Dropdown>
+    <TriggerContent>
+        <div class=""dark filled p-3 d-flex center-items""
+             style=""height:10rem;width:10rem"">Click anywhere in this box</div>
+    </TriggerContent>
+    <ChildContent>
         <span>First choice</span>
         <span>Second choice</span>
         <span>Third choice</span>
-    </Dropdown>
-</div>
+    </ChildContent>
+</Dropdown>")
+    </ChildContent>
+</Collapse>
 
-@code {
-    private Dropdown? _dropdown;
+<p>
+    The <code>OpenAtPointer</code> property, if set to <code>true</code>, will cause the popover to
+    open at the position of the activation event, rather than in the position normally defined by
+    its anchor properties. This can be used to create a typical context menu. In combination with
+    <code>TriggerContent</code> and <code>ActivationType</code> set to <code>RightClick</code> this
+    can be used to provide a rich context menu for any content.
+</p>
 
-    private void Open(MouseEventArgs e)
-    {
-        if (_dropdown is not null)
-        {
-            _dropdown.Open(e);
-        }
-    }
-}")
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Dropdown ActivationType="MouseEvent.RightClick"
+                      HideButton="true"
+                      OpenAtPointer="true">
+                <TriggerContent>
+                    <div class="dark filled p-3 d-flex center-items"
+                            style="height:10rem;width:10rem">Right-click anywhere in this box</div>
+                </TriggerContent>
+                <ChildContent>
+                    <span>First choice</span>
+                    <span>Second choice</span>
+                    <span>Third choice</span>
+                </ChildContent>
+            </Dropdown>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Dropdown ActivationType=""MouseEvent.RightClick""
+            HideButton=""true""
+            OpenAtPointer=""true"">
+    <TriggerContent>
+        <div class=""dark filled p-3 d-flex center-items""
+             style=""height:10rem;width:10rem"">Right-click anywhere in this box</div>
+    </TriggerContent>
+    <ChildContent>
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </ChildContent>
+</Dropdown>")
     </ChildContent>
 </Collapse>
 
@@ -249,21 +288,13 @@
 </p>
 
 @code {
-    private Dropdown? _dropdown, _dropdown2;
-
-    private void Open(MouseEventArgs e)
-    {
-        if (_dropdown2 is not null)
-        {
-            _dropdown2.Open(e);
-        }
-    }
+    private Dropdown? _dropdown;
 
     private async Task Toggle(MouseEventArgs e)
     {
         if (_dropdown is not null)
         {
-            await _dropdown.ToggleAsync(e);
+            await _dropdown.ToggleAsync();
         }
     }
 }

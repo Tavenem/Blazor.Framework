@@ -12,14 +12,14 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const stroke = this.getAttribute('stroke') || '5';
+        const stroke = this.dataset.stroke || '5';
         let strokeValue = stroke ? Number.parseFloat(stroke) : Number.NaN;
         if (!Number.isFinite(strokeValue)) {
             strokeValue = 3;
         }
         strokeValue = Math.max(1, Math.min(30, strokeValue));
 
-        const progress = this.getAttribute('progress');
+        const progress = this.dataset.progress;
         let progressValue = progress ? Number.parseFloat(progress) : Number.NaN;
         if (!Number.isFinite(progressValue)) {
             progressValue = Number.NaN;
@@ -36,96 +36,118 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
 
         const style = document.createElement('style');
         style.textContent = `
-    @keyframes tf-progress-rotate {
-        to {
-            transform: rotate(360deg);
-        }
+@keyframes tf-progress-rotate {
+    to {
+        transform: rotate(360deg);
     }
+}
 
-    @keyframes tf-progress-dash {
-        0% {
-            stroke-dasharray: 1px, 200px;
-            stroke-dashoffset: 0px;
-        }
-
-        50% {
-            stroke-dasharray: 100px, 200px;
-            stroke-dashoffset: -15px;
-        }
-
-        100% {
-            stroke-dasharray: 100px, 200px;
-            stroke-dashoffset: -${this._circumference - 1}px;
-        }
-    }
-
-    .progress-container {
-        height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-    }
-
-    .progress-container:not([indeterminate]) {
-        transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    }
-
-    .progress-container[indeterminate] {
-        animation: tf-progress-rotate 1.4s linear infinite;
-        animation-delay: -${delay}s;
-    }
-
-    svg:first-child {
-        height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-    }
-
-    svg:first-child circle {
-        transform-origin: 50% 50%;
-    }
-
-    .progress-container:not([indeterminate]) svg:first-child circle {
-        transform: rotate(-90deg);
-        transition: stroke-dashoffset 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    }
-
-    .progress-container[indeterminate] svg:first-child circle {
-        animation: tf-progress-dash 1.4s ease-in-out infinite;
-        animation-delay: -${delay}s;
-        stroke-dasharray: 80px, 200px;
+@keyframes tf-progress-dash {
+    0% {
+        stroke-dasharray: 1px, 200px;
         stroke-dashoffset: 0px;
     }
 
-    ::slotted(*) {
-        z-index: 1;
+    50% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -15px;
     }
-    `;
+
+    100% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -${this._circumference - 1}px;
+    }
+}
+    
+:host {
+    --progress-color: var(--tavenem-color-action);
+    align-items: center;
+    display: inline-flex;
+    height: 2.5rem;
+    justify-content: center;
+    position: relative;
+    width: 2.5rem;
+}
+
+:host.small {
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+:host.large {
+    height: 3.5rem;
+    width: 3.5rem;
+}
+
+.progress-container {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.progress-container:not([data-indeterminate]) {
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.progress-container[data-indeterminate] {
+    animation: tf-progress-rotate 1.4s linear infinite;
+    animation-delay: -${delay}s;
+}
+
+svg:first-child {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+svg:first-child circle {
+    transform-origin: 50% 50%;
+}
+
+.progress-container:not([data-indeterminate]) svg:first-child circle {
+    transform: rotate(-90deg);
+    transition: stroke-dashoffset 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.progress-container[data-indeterminate] svg:first-child circle {
+    animation: tf-progress-dash 1.4s ease-in-out infinite;
+    animation-delay: -${delay}s;
+    stroke-dasharray: 80px, 200px;
+    stroke-dashoffset: 0px;
+}
+
+::slotted(*) {
+    z-index: 1;
+}`;
         shadow.appendChild(style);
 
         const div = document.createElement('div');
-        div.outerHTML = `<div class="progress-container"${indeterminate ? ' indeterminate' : ''}
-     role="progressbar"
-     aria-valuemin="0"
-     aria-valuemax="100"
-     ${indeterminate ? '' : 'aria-valuenow="' + progressValue + '"'}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
-        <circle cx="20"
-                cy="20"
-                r="${radius}"
-                fill="none"
-                stroke="var(--progress-color)"
-                stroke-width="${stroke}"
-                style="stroke-dasharray:${this._circumference} ${this._circumference};stroke-dashoffset:${this._circumference}" />
-    </svg>
-</div>`;
+        div.classList.add('progress-container');
+        div.role = "progressbar";
+        div.ariaValueMin = '0';
+        div.ariaValueMax = '100';
+        if (indeterminate) {
+            div.dataset.indeterminate = '';
+        } else {
+            div.ariaValueNow = progressValue.toString();
+        }
+        div.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+    <circle cx="20"
+            cy="20"
+            r="${radius}"
+            fill="none"
+            stroke="var(--progress-color)"
+            stroke-width="${stroke}"
+            style="stroke-dasharray:${this._circumference} ${this._circumference};stroke-dashoffset:${this._circumference}" />
+</svg>`;
         shadow.appendChild(div);
 
         const slot = document.createElement('slot');
-        slot.outerHTML = '<slot name="label"></slot>';
+        slot.name = "label";
         shadow.appendChild(slot);
     }
 
@@ -146,10 +168,10 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
         const div = this.shadowRoot.querySelector('.progress-container');
         if (div) {
             if (value) {
-                div.setAttribute('indeterminate', 'true');
+                div.setAttribute('data-indeterminate', 'true');
                 div.removeAttribute('aria-valuenow');
             } else {
-                div.removeAttribute('indeterminate');
+                div.removeAttribute('data-indeterminate');
             }
         }
     }
@@ -183,20 +205,12 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
 }
 
 export class TavenemProgressLinearHTMLElement extends HTMLElement {
-    private _vertical: boolean;
-
     static get observedAttributes() {
         return ['progress'];
     }
 
-    constructor() {
-        super();
-
-        this._vertical = false;
-    }
-
     connectedCallback() {
-        const progress = this.getAttribute('progress');
+        const progress = this.dataset.progress;
         let progressValue = progress ? Number.parseFloat(progress) : Number.NaN;
         if (!Number.isFinite(progressValue)) {
             progressValue = Number.NaN;
@@ -205,8 +219,7 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         const indeterminate = !Number.isFinite(progressValue);
         progressValue = Math.max(0, Math.min(100, progressValue));
 
-        const vertical = this.getAttribute('vertical');
-        this._vertical = vertical != null && vertical !== "false";
+        const vertical = 'vertial' in this.dataset;
 
         const delay = Math.random() * 2.1;
 
@@ -302,6 +315,38 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         }
     }
 
+    :host {
+        --progress-background-color: var(--tavenem-color-action-hover-bg);
+        --progress-color: var(--tavenem-color-action);
+        align-items: center;
+        display: inline-flex;
+        height: .5rem;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+    }
+
+    :host.small:not([data-vertical]) {
+        height: .25rem;
+    }
+
+    :host.large:not([data-vertical]) {
+        height: .75rem;
+    }
+
+    :host[data-vertical] {
+        height: 100%;
+        width: .5rem;
+    }
+
+    :host[data-vertical].small {
+        width: .25rem;
+    }
+
+    :host[data-vertical].large {
+        width: .75rem;
+    }
+
     .progress-bar {
         background-color: var(--progress-background-color);
         height: 100%;
@@ -328,22 +373,22 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         background-color: var(--progress-color);
     }
 
-    .progress-bar[indeterminate]:before {
+    .progress-bar[data-indeterminate]:before {
         animation: tf-progress-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
         animation-delay: -${delay}s;
     }
 
-    .progress-bar:not([indeterminate]):before, .progress-bar:not([indeterminate]):after {
+    .progress-bar:not([data-indeterminate]):before, .progress-bar:not([data-indeterminate]):after {
         width: calc(1% * var(--progress-percent));
     }
 
-    .progress-bar[indeterminate]:after {
+    .progress-bar[data-indeterminate]:after {
         animation: tf-progress-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
         animation-delay: -${delay}s;
         background-color: var(--progress-color);
     }
 
-    .progress-bar:not([indeterminate]):after {
+    .progress-bar:not([data-indeterminate]):after {
         animation: tf-progress-gradient 1s linear infinite;
         animation-delay: -${delay}s;
         background: linear-gradient(to left, #ffffff05, #00000050 50%, #ffffff05 100%) repeat;
@@ -355,22 +400,22 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         width: 100%;
     }
 
-    .progress-bar[indeterminate].vertical:before {
+    .progress-bar[data-indeterminate].vertical:before {
         animation: tf-progress-vertical-indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
         animation-delay: -${delay}s;
     }
 
-    .progress-bar[indeterminate].vertical:after {
+    .progress-bar[data-indeterminate].vertical:after {
         animation: tf-progress-vertical-indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
         animation-delay: -${delay}s;
     }
 
-    .progress-bar:not([indeterminate]).vertical:before, .progress-bar:not([indeterminate]).vertical:after {
+    .progress-bar:not([data-indeterminate]).vertical:before, .progress-bar:not([data-indeterminate]).vertical:after {
         height: 100%;
         transform: translateY(calc(1% * (100 - var(--progress-percent))));
     }
 
-    .progress-bar:not([indeterminate]).vertical:after {
+    .progress-bar:not([data-indeterminate]).vertical:after {
         animation: tf-progress-gradient-vertical 1s linear infinite;
         animation-delay: -${delay}s;
         background: linear-gradient(to top, #ffffff05, #00000050 50%, #ffffff05 100%) repeat;
@@ -384,16 +429,22 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         shadow.appendChild(style);
 
         const div = document.createElement('div');
-        div.outerHTML = `<div class="progress-bar${this._vertical ? ' vertical' : ''}"${indeterminate ? ' indeterminate' : ''}
-     role="progressbar"
-     aria-valuemin="0"
-     aria-valuemax="100"
-     ${indeterminate ? '' : 'aria-valuenow="' + progressValue + '"'}>
-</div>`;
+        div.classList.add('progress-bar');
+        if (vertical) {
+            div.classList.add('vertical');
+        }
+        div.role = "progressbar";
+        div.ariaValueMin = '0';
+        div.ariaValueMax = '0';
+        if (indeterminate) {
+            div.dataset.indeterminate = '';
+        } else {
+            div.ariaValueNow = progressValue.toString();
+        }
         shadow.appendChild(div);
 
         const slot = document.createElement('slot');
-        slot.outerHTML = '<slot name="label"></slot>';
+        slot.name = "label";
         shadow.appendChild(slot);
 
         this.setProgress(progressValue);
@@ -417,10 +468,10 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         const div = this.shadowRoot.querySelector('div');
         if (div) {
             if (value) {
-                div.setAttribute('indeterminate', 'true');
+                div.dataset.indeterminate = 'true';
                 div.removeAttribute('aria-valuenow');
             } else {
-                div.removeAttribute('indeterminate');
+                delete div.dataset.indeterminate;
             }
         }
     }

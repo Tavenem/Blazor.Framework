@@ -118,16 +118,13 @@ public partial class Row<[DynamicallyAccessedMembers(
         }
     }
 
-    internal async Task CancelEditAsync()
+    internal void CancelEdit()
     {
         if (DataGrid is null)
         {
             return;
         }
-        if (DataGrid.TableEditForm is not null)
-        {
-            await DataGrid.TableEditForm.ResetAsync();
-        }
+        DataGrid.TableEditForm?.Reset();
         DataGrid.EditingRow = null;
     }
 

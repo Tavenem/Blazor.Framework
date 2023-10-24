@@ -59,6 +59,16 @@ public class EditorButton
     public string? Icon { get; set; }
 
     /// <summary>
+    /// <para>
+    /// The id of the button element.
+    /// </para>
+    /// <para>
+    /// A random id will be assigned if none is supplied.
+    /// </para>
+    /// </summary>
+    public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    /// <summary>
     /// The text to display on the button.
     /// </summary>
     public string? Text { get; set; }

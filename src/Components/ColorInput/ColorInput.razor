@@ -43,21 +43,19 @@
                     </div>
                     <div class="color-sliders">
                         <Slider @ref="HueSlider"
-                                TValue="ushort"
-                                Value="Hue"
-                                ValueChanged="OnHueChanged"
+                                @bind-Value="Hue"
+                                @bind-Value:after="OnHSLChanged"
                                 AutoFocus="@(DisplayType == PickerDisplayType.Inline ? AutoFocus : false)"
                                 Class="hue"
                                 Disabled="Disabled"
-                                Max="359"
+                                Max="(ushort)359"
                                 ReadOnly="ReadOnly"
                                 TabIndex="@(DisplayType == PickerDisplayType.Inline ? TabIndex : 0)"
                                 UpdateOnInput="true" />
                         @if (ShowAlpha)
                         {
-                            <Slider TValue="float"
-                                    Value="Alpha"
-                                    ValueChanged="OnAlphaSliderChanged"
+                            <Slider @bind-Value:get="Alpha"
+                                    @bind-Value:set="OnAlphaSliderChanged"
                                     Max="1f"
                                     Disabled="Disabled"
                                     ReadOnly="ReadOnly"
@@ -71,8 +69,8 @@
                     @switch (ColorMode)
                     {
                         case ColorMode.Hex:
-                            <TextInput Value="@HexInput"
-                                       ValueChanged="OnHexChanged"
+                            <TextInput @bind-Value="@HexInput"
+                                       @bind-Value:after="OnHexChanged"
                                        HelpText="HEX"
                                        InputClass="text-center"
                                        Clearable="false"
@@ -82,30 +80,27 @@
                                        Class="outlined dense flex-grow-1" />
                             break;
                         case ColorMode.HSL:
-                            <NumericInput TValue="ushort"
-                                          Value="Hue"
-                                          ValueChanged="OnHueChanged"
-                                          Max="359"
+                            <NumericInput @bind-Value="Hue"
+                                          @bind-Value:after="OnHSLChanged"
+                                          Max="(ushort)359"
                                           HelpText="H"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
                                           Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
-                            <NumericInput TValue="byte"
-                                          Value="Saturation"
-                                          ValueChanged="OnSaturationChanged"
-                                          Max="100"
+                            <NumericInput @bind-Value="Saturation"
+                                          @bind-Value:after="OnHSLChanged"
+                                          Max="(byte)100"
                                           HelpText="S"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
                                           Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
-                            <NumericInput TValue="byte"
-                                          Value="Lightness"
-                                          ValueChanged="OnLightnessChanged"
-                                          Max="100"
+                            <NumericInput @bind-Value="Lightness"
+                                          @bind-Value:after="OnHSLChanged"
+                                          Max="(byte)100"
                                           HelpText="L"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
@@ -114,27 +109,24 @@
                                           ThemeColor="ThemeColor" />
                             break;
                         case ColorMode.RGB:
-                            <NumericInput TValue="byte"
-                                          Value="Red"
-                                          ValueChanged="OnRedChanged"
+                            <NumericInput @bind-Value="Red"
+                                          @bind-Value:after="OnRGBChanged"
                                           HelpText="R"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
                                           Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
-                            <NumericInput TValue="byte"
-                                          Value="Green"
-                                          ValueChanged="OnGreenChanged"
+                            <NumericInput @bind-Value="Green"
+                                          @bind-Value:after="OnRGBChanged"
                                           HelpText="G"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
                                           Class="outlined dense flex-grow-1"
                                           ShowStepButtons="false"
                                           ThemeColor="ThemeColor" />
-                            <NumericInput TValue="byte"
-                                          Value="Blue"
-                                          ValueChanged="OnBlueChanged"
+                            <NumericInput @bind-Value="Blue"
+                                          @bind-Value:after="OnRGBChanged"
                                           HelpText="B"
                                           Disabled="Disabled"
                                           ReadOnly="ReadOnly"
@@ -145,11 +137,10 @@
                     }
                     @if (ShowAlpha && ColorMode != ColorMode.Hex)
                     {
-                        <NumericInput TValue="float"
-                                      Value="Alpha"
-                                      ValueChanged="OnAlphaValueChanged"
-                                      Min="0"
-                                      Max="1"
+                        <NumericInput @bind-Value:get="Alpha"
+                                      @bind-Value:set="OnAlphaValueChanged"
+                                      Min="0f"
+                                      Max="1f"
                                       Step="0.01f"
                                       HelpText="A"
                                       Disabled="Disabled"
@@ -166,6 +157,10 @@
             @if (DisplayType == PickerDisplayType.Button)
             {
                 <div class="d-flex justify-content-end">
+                    @if (CanClear)
+                    {
+                        <button class="btn btn-text me-2" @onclick="ClearAndCloseAsync">Clear</button>
+                    }
                     <button class="btn btn-text" @onclick="ClosePopoverAsync">Ok</button>
                 </div>
             }
@@ -197,7 +192,7 @@
             }
         </button>
         <input disabled="@IsDisabled"
-               name="@Name"
+               name="@NameValue"
                hidden
                readonly
                value="@CurrentValueAsString" />
@@ -230,7 +225,7 @@ else
                 </div>
             }
             <input disabled="@IsDisabled"
-                   name="@Name"
+                   name="@NameValue"
                    hidden
                    readonly
                    value="@CurrentValueAsString" />

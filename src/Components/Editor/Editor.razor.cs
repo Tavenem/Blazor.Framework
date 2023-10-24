@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Editor.InternalDialogs;
-using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -161,8 +160,8 @@ public partial class Editor
 
     /// <summary>
     /// <para>
-    /// Whether the bound <see cref="FormComponentBase{TValue}.Value"/> should update whenever the
-    /// value changes (rather than on blur).
+    /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the value
+    /// changes (rather than on blur).
     /// </para>
     /// <para>
     /// When set to <see langword="true"/> a short debounce interval is applied to prevent excessive
@@ -193,8 +192,6 @@ public partial class Editor
         .ToString();
 
     private string AdditionalMarksGroupId { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    private Dropdown? BackgroundContext { get; set; }
 
     private ColorInput<string>? BackgroundPicker { get; set; }
 
@@ -229,8 +226,6 @@ public partial class Editor
     [Inject] private EditorService EditorService { get; set; } = default!;
 
     private List<string> Fonts { get; } = ["sans-serif", "serif", "monospace", "cursive"];
-
-    private Dropdown? ForegroundContext { get; set; }
 
     private ColorInput<string>? ForegroundPicker { get; set; }
 
@@ -272,7 +267,7 @@ public partial class Editor
 
     private bool ShowAll { get; set; }
 
-    private string? ShowAllClass => new CssBuilder("btn btn-icon rounded small")
+    private string? ShowAllClass => new CssBuilder("btn btn-icon rounded small editor-toolbar-show-all-btn")
         .Add("filled", ShowAll)
         .ToString();
 
@@ -559,8 +554,6 @@ public partial class Editor
             .TryGetValue(EditorCommandType.TableToggleHeaderRow, out var t10)
         || !t10));
 
-    private void OnBackgroundContext(MouseEventArgs e) => BackgroundContext?.Open(e);
-
     private async Task OnCustomButtonAsync(EditorButton button)
     {
         if (button.Action is null
@@ -583,8 +576,6 @@ public partial class Editor
         await EditorService.UpdateSelectedText(value);
     }
 
-    private void OnForegroundContext(MouseEventArgs e) => ForegroundContext?.Open(e);
-
     private void OnInput(object? sender, string? value)
     {
         CurrentLength = value?.Length ?? 0;
@@ -595,22 +586,10 @@ public partial class Editor
         }
     }
 
-    private Task SetBackgroundAsync(string? value)
-    {
-        NewBackground = value;
-        return CommandAsync(EditorCommandType.BackgroundColor, value);
-    }
-
     private Task SetFontFamilyAsync(string? value)
     {
         NewFontFamily = value;
         return CommandAsync(EditorCommandType.SetFontFamily, value);
-    }
-
-    private Task SetForegroundAsync(string? value)
-    {
-        NewForeground = value;
-        return CommandAsync(EditorCommandType.ForegroundColor, value);
     }
 
     private async Task SetReadOnly(bool value)

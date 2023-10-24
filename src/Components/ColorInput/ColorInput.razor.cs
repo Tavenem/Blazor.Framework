@@ -506,6 +506,12 @@ public partial class ColorInput<TValue>
             });
     }
 
+    private async Task ClearAndCloseAsync()
+    {
+        await ClearAsync();
+        await ClosePopoverAsync();
+    }
+
     private void OnAlphaSliderChanged(float alpha)
     {
         if (Alpha == 0 && alpha > 0)
@@ -528,12 +534,6 @@ public partial class ColorInput<TValue>
         {
             OnHSLChanged();
         }
-    }
-
-    private void OnBlueChanged(byte blue)
-    {
-        Blue = blue;
-        OnRGBChanged();
     }
 
     private void OnColorOverlayClick(MouseEventArgs e)
@@ -571,12 +571,6 @@ public partial class ColorInput<TValue>
         };
     }
 
-    private void OnGreenChanged(byte green)
-    {
-        Green = green;
-        OnRGBChanged();
-    }
-
     private void OnHSLChanged()
     {
         try
@@ -597,9 +591,8 @@ public partial class ColorInput<TValue>
         catch { }
     }
 
-    private void OnHexChanged(string? hex)
+    private void OnHexChanged()
     {
-        HexInput = hex;
         if (string.IsNullOrWhiteSpace(HexInput))
         {
             return;
@@ -626,24 +619,6 @@ public partial class ColorInput<TValue>
         catch { }
     }
 
-    private void OnHueChanged(ushort hue)
-    {
-        Hue = hue;
-        OnHSLChanged();
-    }
-
-    private void OnLightnessChanged(byte lightness)
-    {
-        Lightness = lightness;
-        OnHSLChanged();
-    }
-
-    private void OnRedChanged(byte red)
-    {
-        Red = red;
-        OnRGBChanged();
-    }
-
     private void OnRGBChanged()
     {
         try
@@ -662,12 +637,6 @@ public partial class ColorInput<TValue>
             }
         }
         catch { }
-    }
-
-    private void OnSaturationChanged(byte saturation)
-    {
-        Saturation = saturation;
-        OnHSLChanged();
     }
 
     private void OnSelectorClicked(MouseEventArgs e)
@@ -707,12 +676,6 @@ public partial class ColorInput<TValue>
             && !EqualityComparer<TValue>.Default.Equals(newValue, CurrentValue))
         {
             EvaluateDebounced();
-        }
-
-        if (!IsTouched
-            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
-        {
-            SetTouchedDebounced();
         }
 
         CurrentValue = newValue;

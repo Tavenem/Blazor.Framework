@@ -22,7 +22,7 @@
                        autofocus="@AutoFocus"
                        checked="@(0 < Value)"
                        disabled="@IsDisabled"
-                       name="@Name"
+                       name="@NameValue"
                        readonly="@IsReadOnly"
                        tabindex="-1"
                        value="1" />
@@ -40,7 +40,7 @@
                     <input type="radio"
                            checked="@(index < Value)"
                            disabled="@IsDisabled"
-                           name="@Name"
+                           name="@NameValue"
                            readonly="@IsReadOnly"
                            tabindex="@tabIndex"
                            value="@(index + 1)" />

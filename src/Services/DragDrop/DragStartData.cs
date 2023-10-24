@@ -1,18 +1,20 @@
-﻿namespace Tavenem.Blazor.Framework;
+﻿using System.Text.Json.Serialization.Metadata;
+
+namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// <para>
 /// The data to provide to a drag-drop operation.
 /// </para>
 /// <para>
-/// <see cref="DragDropService.GetDragStartData{TData}(TData, string?, DragEffect)"/> can be used to
-/// get an instance from a single data item.
+/// <see cref="DragDropService.GetDragStartData{TData}(TData, string?, DragEffect,
+/// JsonTypeInfo{TData}?)"/> can be used to get an instance from a single data item.
 /// </para>
 /// </summary>
 public class DragStartData
 {
     /// <summary>
-    /// A <see cref="DragStartData"/> instrance which contains no data and indicates no drad effect
+    /// A <see cref="DragStartData"/> instance which contains no data and indicates no drag effect
     /// is allowed.
     /// </summary>
     public static readonly DragStartData None = new() { EffectAllowed = DragEffect.None };
@@ -34,7 +36,7 @@ public class DragStartData
     /// </para>
     /// <para>
     /// The special type 'tavenem/drop-data' signals that an internal transfer of a .NET object is
-    /// occurring. The data will not be serialized to JSON or sent through the javascript interop
+    /// occurring. The data will not be serialized to JSON or sent through the JavaScript interop
     /// layer, and will be transferred by reference if it is a reference type. This can improve
     /// performance for large or complex objects which cannot be serialized.
     /// </para>

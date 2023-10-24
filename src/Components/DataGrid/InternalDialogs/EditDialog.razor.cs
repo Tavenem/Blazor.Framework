@@ -21,12 +21,9 @@ public partial class EditDialog<TDataItem>
 
     private Form? DialogEditForm { get; set; }
 
-    private async Task OnCancelAsync()
+    private void OnCancel()
     {
-        if (DialogEditForm is not null)
-        {
-            await DialogEditForm.ResetAsync();
-        }
+        DialogEditForm?.Reset();
         Dialog?.Close();
     }
 

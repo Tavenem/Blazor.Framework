@@ -44,6 +44,15 @@ public partial class Dropdown
     [Parameter] public Origin? AnchorOrigin { get; set; }
 
     /// <summary>
+    /// Raised when the button is clicked, if <see cref="HideButton"/> is <see langword="false"/>
+    /// and <see cref="ActivationType"/> does not include <see cref="MouseEvent.LeftClick"/>.
+    /// </summary>
+    /// <remarks>
+    /// Only functions when the component is rendered in an interactive mode.
+    /// </remarks>
+    [Parameter] public EventCallback Click { get; set; }
+
+    /// <summary>
     /// <para>
     /// When <see cref="ActivationType"/> includes <see cref="MouseEvent.MouseOver"/>, this is the
     /// delay in milliseconds between the mouseover and the dropdown opening.
@@ -141,6 +150,15 @@ public partial class Dropdown
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
+    /// The trigger for the dropdown.
+    /// </summary>
+    /// <remarks>
+    /// When omitted, a button is displayed using the <see cref="Icon"/>, <see cref="Text"/>, and
+    /// <see cref="ThemeColor"/> properties to define its appearance.
+    /// </remarks>
+    [Parameter] public RenderFragment? TriggerContent { get; set; }
+
+    /// <summary>
     /// The CSS class assigned to the popover's list, including component values.
     /// </summary>
     protected string? ListCssClass => new CssBuilder("list clickable filled solid")
@@ -202,6 +220,14 @@ public partial class Dropdown
     /// Toggles the open state of the dropdown.
     /// </summary>
     public Task ToggleAsync() => PopoverService.ToggleDropdownAsync(Id);
+
+    private async Task OnButtonClickAsync()
+    {
+        if (!ActivationType.HasFlag(MouseEvent.LeftClick))
+        {
+            await Click.InvokeAsync();
+        }
+    }
 
     private Task OnOpenChangedAsync(DropdownToggleEventArgs e)
         => IsOpenChanged.InvokeAsync(e.Value);

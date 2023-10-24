@@ -164,7 +164,7 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
             _context = new RadioContext<TValue>(CascadingContext, callback);
         }
 
-        _context.GroupName = !string.IsNullOrEmpty(Name) ? Name : _defaultGroupName;
+        _context.GroupName = string.IsNullOrEmpty(NameValue) ? _defaultGroupName : NameValue;
         _context.CurrentValue = CurrentValue;
 
         base.OnParametersSet();

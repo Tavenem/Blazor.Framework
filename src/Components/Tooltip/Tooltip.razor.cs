@@ -4,10 +4,22 @@ using System.Diagnostics.CodeAnalysis;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// Wraps content with a <see cref="Popover"/> displayed on hover.
+/// Attaches a <see cref="Popover"/> to an element and displays it when the anchor element is
+/// hovered.
 /// </summary>
 public partial class Tooltip
 {
+    /// <summary>
+    /// The HTML <c>id</c> of an element to which this tooltip should be attached. The tooltip will
+    /// be displayed when the use hovers over the anchor.
+    /// </summary>
+    /// <remarks>
+    /// If no anchor is assigned, a button will be displayed which can be used to display the
+    /// tooltip. This button will also be visible even for anchored tooltips on non-hover devices
+    /// (usually devices which do not use a mouse).
+    /// </remarks>
+    [Parameter] public string? Anchor { get; set; }
+
     /// <summary>
     /// <para>
     /// Whether the tooltip should have an arrow pointing towards its anchor element.
@@ -45,16 +57,6 @@ public partial class Tooltip
 
     /// <summary>
     /// <para>
-    /// Whether the container should be an inline element.
-    /// </para>
-    /// <para>
-    /// Default is <see langword="false"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public bool Inline { get; set; }
-
-    /// <summary>
-    /// <para>
     /// Sets the max-height CSS style for the tooltip.
     /// </para>
     /// <para>
@@ -73,57 +75,10 @@ public partial class Tooltip
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    /// <summary>
-    /// Custom CSS class(es) for the tooltip.
-    /// </summary>
-    [Parameter] public string? TooltipClass { get; set; }
-
-    /// <summary>
-    /// The content of the tooltip.
-    /// </summary>
-    [Parameter] public RenderFragment? TooltipContent { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// HTML to display as a tooltip.
-    /// </para>
-    /// <para>
-    /// Ignored if <see cref="TooltipContent"/> is non-<see langword="null"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public MarkupString? TooltipMarkup { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the tooltip.
-    /// </summary>
-    [Parameter] public string? TooltipStyle { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The text to display as a tooltip.
-    /// </para>
-    /// <para>
-    /// Ignored if <see cref="TooltipMarkup"/> or <see cref="TooltipContent"/> is non-<see
-    /// langword="null"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public string? TooltipText { get; set; }
-
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
+    /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("inline", Inline)
-        .ToString();
-
-    /// <summary>
-    /// The final value assigned to the tooltip's class attribute, including component values.
-    /// </summary>
-    protected string? TooltipCssClass => new CssBuilder("tooltip")
-        .Add(TooltipClass)
+        .Add("tooltip")
         .Add("arrow", Arrow)
         .ToString();
 

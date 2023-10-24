@@ -1,6 +1,8 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Tavenem.Blazor.Framework.Services;
 
@@ -53,27 +55,26 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
     }
 
     /// <summary>
-    /// Invoked by javascript.
+    /// Invoked by JavaScript.
     /// </summary>
     [JSInvokable]
-    [UnconditionalSuppressMessage(
-        "Trimming",
-        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = "Only used for MouseEventArgs, which is preserved by caller of SubscribeAsync")]
     public async Task OnEventOccur(Guid key, string @eventData)
     {
-        if (!_callbackResolver.ContainsKey(key))
+        if (!_callbackResolver.TryGetValue(key, out var value))
         {
             return;
         }
 
-        var (eventType, callback) = _callbackResolver[key];
+        var (eventType, callback) = value;
 
-        var @event = JsonSerializer.Deserialize(eventData, eventType, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true,
-        });
+        var @event = JsonSerializer.Deserialize(
+            eventData,
+            eventType,
+            new MouseEventArgsContext(new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNameCaseInsensitive = true,
+            }));
 
         if (callback is not null)
         {
@@ -82,7 +83,7 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
     }
 
     /// <summary>
-    /// Begin listening to the given javascript event for the given element.
+    /// Begin listening to the given JavaScript event for the given element.
     /// </summary>
     /// <typeparam name="T">The type of event args expected.</typeparam>
     /// <param name="eventName">The name of the event to listen to.</param>
@@ -145,7 +146,7 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
     }
 
     /// <summary>
-    /// Stop listening for javascript events.
+    /// Stop listening for JavaScript events.
     /// </summary>
     /// <param name="id">
     /// An id returned by <see cref="SubscribeAsync{T}(string, string, bool, int, Func{object, Task})"/>.
@@ -167,3 +168,9 @@ internal class JSEventListener : IJSEventListener, IAsyncDisposable
         catch { }
     }
 }
+
+/// <summary>
+/// A <see cref="JsonSerializerContext"/> for <see cref="MouseEventArgs"/>, which is (de)serialized internally.
+/// </summary>
+[JsonSerializable(typeof(MouseEventArgs))]
+public partial class MouseEventArgsContext : JsonSerializerContext { }

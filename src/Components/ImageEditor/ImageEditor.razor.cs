@@ -108,6 +108,17 @@ public partial class ImageEditor : IAsyncDisposable
     [Parameter] public string Format { get; set; } = "image/png";
 
     /// <summary>
+    /// <para>
+    /// The id of the editor element.
+    /// </para>
+    /// <para>
+    /// A random id will be assigned if none is supplied (including through
+    /// splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    /// <summary>
     /// CSS class(es) to apply to the inner image container (which may contain an HTML <c>img</c> or
     /// <c>canvas</c> element, depending on whether the image is currently being edited).
     /// </summary>
@@ -289,6 +300,17 @@ public partial class ImageEditor : IAsyncDisposable
         if (!beganEdit && CropAspectRatio != aspectRatio)
         {
             await SetCropAspectRatioAsync(CropAspectRatio);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
         }
     }
 

@@ -60,34 +60,14 @@
             row-gap: .75rem;
 
             > .btn:not(:disabled),
-            > .tooltip-root > .btn:not(:disabled),
             > .button-group,
             > .button-group-text {
                 border: 1px solid transparent;
-            }
-
-            > .button-group,
-            > .button-group-text {
-                > .tooltip-root {
-                    align-self: stretch;
-                    height: auto;
-
-                    > .btn {
-                        align-self: stretch;
-                    }
-                }
             }
         }
 
         &.editor-toolbar-extended > div:first-child {
             height: auto;
-        }
-
-        .tooltip-root {
-            align-items: baseline;
-            align-self: center;
-            display: inline-flex;
-            height: fit-content;
         }
 
         .field {

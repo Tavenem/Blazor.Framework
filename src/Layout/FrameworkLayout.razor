@@ -3,11 +3,8 @@
 @inherits TavenemComponentBase
 
 <div class="@CssClass" style="@Style">
-    @if (InteractiveRenderMode is not null)
-    {
-        <SnackbarContainer @rendermode="InteractiveRenderMode" />
-        <DialogContainer @ref="DialogContainer" @rendermode="InteractiveRenderMode" />
-    }
+    <SnackbarContainer />
+    <DialogContainer @ref="DialogContainer" />
     @FrameworkContent
     <main class="container">
         @ChildContent

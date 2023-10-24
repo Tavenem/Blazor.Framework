@@ -6,14 +6,17 @@
              id="@Id"
              class="@CssClass"
              style="@CssStyle"
-             activation="@((int)ActivationType)"
-             delay="@(Delay == 0 ? null : Delay)"
+             data-activation="@((int)ActivationType)"
+             data-delay="@(Delay == 0 ? null : Delay)"
+             data-open-at-pointer="@OpenAtPointer"
              disabled="@Disabled"
-             open-at-pointer="@OpenAtPointer"
              @dropdowntoggle="OnOpenChangedAsync">
-    @if (!HideButton)
+    @if (TriggerContent is null && !HideButton)
     {
-        <button class="@ButtonCssClass" disabled="@Disabled">
+        <button class="@ButtonCssClass"
+                disabled="@Disabled"
+                @onclick="OnButtonClickAsync"
+                @onclick:stopPropagation="@(!ActivationType.HasFlag(MouseEvent.LeftClick))">
             @if (!string.IsNullOrEmpty(Icon))
             {
                 <tf-icon>@Icon</tf-icon>
@@ -21,10 +24,14 @@
             @Text
         </button>
     }
+    else
+    {
+        @TriggerContent
+    }
     <Popover AnchorOrigin="AnchorOriginValue"
              Class="@PopoverCssClass"
-             AnchorId="@(string.IsNullOrEmpty(AnchorId) ? (HideButton ? null : Id) : AnchorId)"
-             MatchWidth="@(!OpenAtPointer && !HideButton)"
+             AnchorId="@(string.IsNullOrEmpty(AnchorId) ? Id : AnchorId)"
+             MatchWidth="@(!OpenAtPointer && TriggerContent is null && !HideButton)"
              MaxHeight="@MaxHeight"
              PositionX="PopoverPositionX"
              PositionY="PopoverPositionY"

@@ -110,7 +110,7 @@ export default [{
     },
     plugins: plugins,
 }, {
-    input: "./scripts/Tavenem.Blazor.Framework.lib.module.ts",
+    input: "./scripts/tavenem-framework.ts",
     output: {
         format: 'es',
         sourcemap: true,

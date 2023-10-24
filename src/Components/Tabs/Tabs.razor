@@ -137,10 +137,10 @@
                                 else
                                 {
                                     <a href="@GetPanelUrl(index + _panels.Count)"
-                                        class="@GetTabClass(index + _panels.Count)"
-                                        role="tab"
-                                        aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")"
-                                        aria-controls="@_dynamicItems[index].PanelId">
+                                       class="@GetTabClass(index + _panels.Count)"
+                                       role="tab"
+                                       aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")"
+                                       aria-controls="@_dynamicItems[index].PanelId">
                                         @if (TabTemplate is not null)
                                         {
                                             @TabTemplate(Items[index + _panels.Count])

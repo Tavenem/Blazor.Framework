@@ -202,7 +202,7 @@ public partial class ListItemCollapse<TListItem>
         }
         else
         {
-            data = DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed);
+            data = DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed, jsonTypeInfo: ListItem.JsonTypeInfo);
         }
 
         return data;

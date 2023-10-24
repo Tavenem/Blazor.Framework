@@ -11,89 +11,79 @@
 <h2>Basics</h2>
 
 <p>
-    Wrap any content with a <code>Tooltip</code> component and set the <code>TooltipText</code>
-    property to the tooltip to create a simple tooltip.
+    Place a <code>Tooltip</code> component next to any element and set the <code>Anchor</code>
+    property to its HTML <code>id</code> to create a tooltip. Tooltips appear when their anchor is
+    hovered.
 </p>
 
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Tooltip TooltipText="Delete">
-                <button class="btn btn-icon"><tf-icon>delete</tf-icon></button>
-            </Tooltip>
+            <button id="tooltipped-button-1" class="btn btn-icon"><tf-icon>delete</tf-icon></button>
+            <Tooltip Anchor="tooltipped-button-1">Delete</Tooltip>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tooltip TooltipText=""Delete"">
-    <button class=""btn btn-icon""><tf-icon>delete</tf-icon></button>
-</Tooltip>")
+        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button"" class=""btn btn-icon""><tf-icon>delete</tf-icon></button>
+<Tooltip Anchor=""tooltipped-button"">Delete</Tooltip>")
     </ChildContent>
 </Collapse>
-
-<p>
-    You can provide HTML content as a <code>MarkupString</code> with the <code>TooltipMarkup</code>
-    instead.
-</p>
-
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tooltip TooltipMarkup="@((MarkupString)"A <strong><em>strong</em></strong> tooltip")">
-                <button class="btn btn-icon"><tf-icon>event</tf-icon></button>
-            </Tooltip>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tooltip TooltipMarkup=""@((MarkupString)""A <strong><em>strong</em></strong> tooltip"")"">
-    <button class=""btn btn-icon""><tf-icon>event</tf-icon></button>
-</Tooltip>")
-    </ChildContent>
-</Collapse>
-
-<p>
-    For full control, use the <code>TooltipContent RenderFragment</code>.
-</p>
-
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tooltip>
-                <ChildContent>
-                    <button class="btn btn-icon"><tf-icon>help</tf-icon></button>
-                </ChildContent>
-                <TooltipContent>
-                    <h6>Tooltip title</h6>
-                    <p>Tooltip content</p>
-                    <p><tf-icon class="success">thumb_up</tf-icon></p>
-                </TooltipContent>
-            </Tooltip>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tooltip>
-    <ChildContent>
-        <button class=""btn btn-icon""><tf-icon>help</tf-icon></button>
-    </ChildContent>
-    <TooltipContent>
-        <h6>Tooltip title</h6>
-        <p>Tooltip content</p>
-        <p><tf-icon class=""success"">thumb_up</tf-icon></p>
-    </TooltipContent>
-</Tooltip>")
-    </ChildContent>
-</Collapse>
-
-<p>
-    Tooltips normally appear when the element either receives focus, or when the mouse pointer
-    enters the element, and disappear whent he element loses focus, or is tapped with the pointer.
-    On devices where hovering is not supported by the default input method, a small help icon will
-    appear near the element. The tooltip will appear when this icon is tapped. You can hide the icon
-    by adding the <code>no-help</code> class to the tooltip, if you intend to provide alternate
-    means to present the tooltip's information to touch device users.
-</p>
 
 <p>
     Tooltips' visibility can also be toggled programmatically with the <code>Toggle</code> method.
+</p>
+
+<p>
+    You can provide any content in a tooltip.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button id="tooltipped-button-2" class="btn btn-icon"><tf-icon>help</tf-icon></button>
+            <Tooltip Anchor="tooltipped-button-2">
+                <h6>Tooltip title</h6>
+                <p>Tooltip content</p>
+                <p><tf-icon class="success">thumb_up</tf-icon></p>
+            </Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button"" class=""btn btn-icon""><tf-icon>help</tf-icon></button>
+<Tooltip Anchor=""tooltipped-button"">
+    <h6>Tooltip title</h6>
+    <p>Tooltip content</p>
+    <p><tf-icon class=""success"">thumb_up</tf-icon></p>
+</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also place a <code>Tooltip</code> with no <code>Anchor</code>. In this case, the tooltip
+    element itself will render as a "help" icon that acts as the trigger for the popover.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Tooltip>This is a tooltip with no anchor</Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Tooltip>This is a tooltip with no anchor</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<h2>Anchors and placement</h2>
+
+<p>
+    Tooltips normally appear when the anchor element either receives focus, or when the mouse
+    pointer enters the element, and disappear when the element loses focus, or is tapped with the
+    pointer.
+</p>
+<p>
+    In theory, the tooltip component can be placed anywhere on the page, and should still render
+    correctly at its anchor.
 </p>
 
 <h2>Customization</h2>
@@ -123,14 +113,26 @@
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Tooltip TooltipText="Add" ThemeColor="ThemeColor.Secondary" Side="Side.Right" Arrow="false" Delay="600">
-                <button class="btn btn-icon success"><tf-icon>add</tf-icon></button>
+            <button id="tooltipped-button-3" class="btn btn-icon success"><tf-icon>add</tf-icon></button>
+            <Tooltip Anchor="tooltipped-button-3"
+                     Arrow="false"
+                     Delay="600"
+                     DismissOnTap="true"
+                     Side="Side.Right"
+                     ThemeColor="ThemeColor.Secondary">
+                Add
             </Tooltip>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tooltip TooltipText=""Add"" ThemeColor=""ThemeColor.Secondary"" Side=""Side.Right"" Arrow=""false"" Delay=""600"">
-    <button class=""btn btn-icon success""><tf-icon>add</tf-icon></button>
-</Tooltip>")
+        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button-3"" class=""btn btn-icon success""><tf-icon>add</tf-icon></button>
+            <Tooltip Anchor=""tooltipped-button-3""
+                     Arrow=""false""
+                     Delay=""600""
+                     DismissOnTap=""true""
+                     Side=""Side.Right""
+                     ThemeColor=""ThemeColor.Secondary"">
+                Add
+            </Tooltip>")
     </ChildContent>
 </Collapse>

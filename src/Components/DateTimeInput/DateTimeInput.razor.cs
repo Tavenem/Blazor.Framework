@@ -689,7 +689,8 @@ public partial class DateTimeInput<TValue>
         if (parameters.TryGetValue<TimeZoneInfo>(nameof(TimeZone), out var timeZone)
             && timeZone != TimeZone)
         {
-            SetTimeZone(timeZone);
+            TimeZone = timeZone;
+            SetTimeZone();
         }
 
         if (parameters.TryGetValue<bool>(nameof(ShowTime), out var showTime)
@@ -1889,10 +1890,9 @@ public partial class DateTimeInput<TValue>
         SettingSeconds = true;
     }
 
-    private void SetTimeZone(TimeZoneInfo timeZone)
+    private void SetTimeZone()
     {
-        TimeZone = timeZone;
-        DateTimeOffset = DateTimeOffset.ToOffset(timeZone.GetUtcOffset(DateTimeOffset));
+        DateTimeOffset = DateTimeOffset.ToOffset(TimeZone.GetUtcOffset(DateTimeOffset));
         if (_baseType == typeof(DateTimeOffset) && DisplayType != PickerDisplayType.Button)
         {
             SetValue();
@@ -1944,12 +1944,6 @@ public partial class DateTimeInput<TValue>
             && !EqualityComparer<TValue>.Default.Equals(newValue, CurrentValue))
         {
             EvaluateDebounced();
-        }
-
-        if (!IsTouched
-            && !EqualityComparer<TValue>.Default.Equals(newValue, InitialValue))
-        {
-            SetTouchedDebounced();
         }
 
         CurrentValue = newValue;

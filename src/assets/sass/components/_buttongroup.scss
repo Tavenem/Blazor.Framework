@@ -24,16 +24,16 @@
     }
 
     &:not(.vertical) > {
-        .btn, .tooltip-root, .tooltip-root > .btn:not(.tooltip-trigger) {
+        .btn {
             border-bottom-left-radius: inherit;
             border-top-left-radius: inherit;
 
-            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-bottom-left-radius: 0;
                 border-top-left-radius: 0;
             }
 
-            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-left-style: solid;
                 margin-left: -1px;
             }
@@ -53,17 +53,17 @@
     &.vertical {
         flex-direction: column;
 
-        > .btn, > .tooltip-root, > .tooltip-root > .btn:not(.tooltip-trigger) {
+        > .btn {
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
             width: 100%;
 
-            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
             }
 
-            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-top-style: solid;
                 margin-top: -1px;
             }
@@ -176,13 +176,13 @@
     --button-inherited-shadow: none;
 
     &:not(.vertical) > {
-        .btn, .tooltip-root, .tooltip-root > .btn:not(.tooltip-trigger) {
-            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
+        .btn {
+            + .btn {
                 border-bottom-left-radius: 0;
                 border-top-left-radius: 0;
             }
 
-            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-left-style: solid;
                 margin-left: -1px;
             }
@@ -192,25 +192,20 @@
                 border-bottom-right-radius: 0;
             }
         }
-
-        .tooltip-root:not(:last-of-type) > .btn:not(.tooltip-trigger) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
     }
 
     &.vertical {
         flex-direction: column;
 
-        > .btn, > .tooltip-root, > .tooltip-root > .btn:not(.tooltip-trigger) {
+        > .btn {
             width: 100%;
 
-            + .btn, + .tooltip-root, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
             }
 
-            + .btn, + .tooltip-root > .btn:not(.tooltip-trigger) {
+            + .btn {
                 border-top-style: solid;
                 margin-top: -1px;
             }
@@ -220,12 +215,6 @@
                 border-bottom-right-radius: 0;
                 border-bottom-style: solid;
             }
-        }
-
-        > .tooltip-root:not(:last-of-type) > .btn:not(.tooltip-trigger) {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-            border-bottom-style: solid;
         }
     }
 

@@ -31,17 +31,17 @@
 <tf-progress-circle class=""info"" style=""height:5rem;width:5rem""></tf-progress-circle>")" />
 
 <p>
-    The thickness of the circle can be controlled with the <code>stroke</code> attribute, which can
-    be set to any number from 1 to 30. Values outside this range are clamped, and values that aren't
-    numbers result in the default value of 5. Values above 20 create a double-circle effect, seen in
-    the final example below.
+    The thickness of the circle can be controlled with the <code>data-stroke</code> attribute, which
+    can be set to any number from 1 to 30. Values outside this range are clamped, and values that
+    aren't numbers result in the default value of 5. Values above 20 create a double-circle effect,
+    seen in the final example below.
 </p>
 
 <CodeExample Code="@(@"<tf-progress-circle class=""dark""></tf-progress-circle>
-<tf-progress-circle class=""success"" stroke=""1""></tf-progress-circle>
-<tf-progress-circle class=""default"" stroke=""10""></tf-progress-circle>
-<tf-progress-circle class=""warning"" stroke=""20""></tf-progress-circle>
-<tf-progress-circle class=""danger"" stroke=""30""></tf-progress-circle>")" />
+<tf-progress-circle class=""success"" data-stroke=""1""></tf-progress-circle>
+<tf-progress-circle class=""default"" data-stroke=""10""></tf-progress-circle>
+<tf-progress-circle class=""warning"" data-stroke=""20""></tf-progress-circle>
+<tf-progress-circle class=""danger"" data-stroke=""30""></tf-progress-circle>")" />
 
 <h2>Linear</h2>
 
@@ -62,36 +62,37 @@
 <tf-progress-linear class=""info large""></tf-progress-linear>")" />
 
 <p>
-    You can also create vertical linear progress bars by adding the <code>vertical</code> attribute.
+    You can also create vertical linear progress bars by adding the <code>data-vertical</code>
+    attribute.
 </p>
 
 <CodeExample Code="@(@"<div class=""d-flex w-100 justify-content-space-around"" style=""height:10rem"">
-    <tf-progress-linear class=""primary"" vertical></tf-progress-linear>
-    <tf-progress-linear class=""secondary"" vertical></tf-progress-linear>
-    <tf-progress-linear class=""tertiary small"" vertical></tf-progress-linear>
-    <tf-progress-linear class=""info large"" vertical></tf-progress-linear>
+    <tf-progress-linear class=""primary"" data-vertical></tf-progress-linear>
+    <tf-progress-linear class=""secondary"" data-vertical></tf-progress-linear>
+    <tf-progress-linear class=""tertiary small"" data-vertical></tf-progress-linear>
+    <tf-progress-linear class=""info large"" data-vertical></tf-progress-linear>
 </div>")" />
 
 <h2>Determinate</h2>
 
 <p>
-    To set a specific progress value, assign a number to the <code>progress</code> attribute of
+    To set a specific progress value, assign a number to the <code>data-progress</code> attribute of
     either type of progress component. This value should be a percentage of completion, as a value
     between 0 and 100.
 </p>
 
-<CodeExample RowClass="flex-column align-items-center" Code="@(@"<tf-progress-circle class=""warning"" progress=""25""></tf-progress-circle>
-<tf-progress-linear class=""danger"" progress=""75""></tf-progress-linear>")" />
+<CodeExample RowClass="flex-column align-items-center" Code="@(@"<tf-progress-circle class=""warning"" data-progress=""25""></tf-progress-circle>
+<tf-progress-linear class=""danger"" data-progress=""75""></tf-progress-linear>")" />
 
 <p>
-    Values for <code>progress</code> below zero will be treated as zero, and values above 100 will
-    be treated as 100. If you set <code>progress</code> to a value which is infinite, or not a
+    Values for <code>data-progress</code> below zero will be treated as zero, and values above 100 will
+    be treated as 100. If you set <code>data-progress</code> to a value which is infinite, or not a
     number, the progress indicator will become indeterminate.
 </p>
 
 <p>
     The <code>tf-progress-circle</code> and <code>tf-progress-linear</code> elements will respond
-    dynamically to changes to the <code>progress</code> attribute.
+    dynamically to changes to the <code>data-progress</code> attribute.
 </p>
 
 <p>
@@ -103,10 +104,10 @@
     <tf-progress-circle class=""info"">
         <span slot=""label"" class=""text-color-reset""><strong>Loading&hellip;</strong></span>
     </tf-progress-circle>
-    <tf-progress-linear class=""danger"" progress=""75"" vertical>
+    <tf-progress-linear class=""danger"" data-progress=""75"" vertical>
         <span slot=""label"" class=""warning text-center""><strong>Danger level</strong></span>
     </tf-progress-linear>
 </div>
-<tf-progress-linear class=""warning"" progress=""25"">
+<tf-progress-linear class=""warning"" data-progress=""25"">
     <span slot=""label"" class=""text-color-reset"">25%</span>
 </tf-progress-linear>")" />

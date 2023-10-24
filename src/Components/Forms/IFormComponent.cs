@@ -53,6 +53,11 @@ public interface IFormComponent
     IEnumerable<string> GetValidationMessages();
 
     /// <summary>
+    /// Clears the modification flag for this form component.
+    /// </summary>
+    void MarkAsUnmodified();
+
+    /// <summary>
     /// <para>
     /// Resets this field to its initial state.
     /// </para>

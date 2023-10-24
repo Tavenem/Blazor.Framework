@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Components.DataGrid;
 
 namespace Tavenem.Blazor.Framework;
@@ -61,6 +62,27 @@ public partial class DataGridMultiSelect<
     /// </para>
     /// </summary>
     [Parameter] public List<TDataItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// JSON serialization metadata about the bound value type.
+    /// </summary>
+    /// <remarks>
+    /// This is used to (de)serialize the bound value to and from a string for the <c>value</c>
+    /// attribute of the underlying HTML <c>input</c> element. If omitted, the reflection-based JSON
+    /// serializer will be used, which is not trim safe or AOT-compilation compatible.
+    /// </remarks>
+    [Parameter] public JsonTypeInfo<TValue>? JsonTypeInfo { get; set; }
+
+    /// <summary>
+    /// JSON serialization metadata about the bound value type.
+    /// </summary>
+    /// <remarks>
+    /// This is used to (de)serialize a collection of bound values to and from a string for the
+    /// <c>value</c> attribute of the underlying HTML <c>input</c> element. If omitted, the
+    /// reflection-based JSON serializer will be used, which is not trim safe or AOT-compilation
+    /// compatible.
+    /// </remarks>
+    [Parameter] public JsonTypeInfo<IEnumerable<TValue>>? ListJsonTypeInfo { get; set; }
 
     /// <summary>
     /// A function to load data items asynchronously.
@@ -302,10 +324,7 @@ public partial class DataGridMultiSelect<
             _initialSortOrder.Add(column.Id);
             return;
         }
-        if (DataGrid is not null)
-        {
-            DataGrid.OnColumnSorted(column);
-        }
+        DataGrid?.OnColumnSorted(column);
     }
 
     /// <summary>
@@ -339,7 +358,11 @@ public partial class DataGridMultiSelect<
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = "The potential breakage is accepted; it is up to implementers to enure that the selected value type is preserved.")]
+        Justification = "Warning and workaround provided on JsonTypeInfo property.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Warning and workaround provided on JsonTypeInfo property.")]
     protected override string? FormatValueAsString(IEnumerable<TValue>? value)
     {
         if (Converter is not null)
@@ -376,14 +399,25 @@ public partial class DataGridMultiSelect<
             sb.Append(']');
             return sb.ToString();
         }
-        return JsonSerializer.Serialize(value);
+        if (JsonTypeInfo is null)
+        {
+            return JsonSerializer.Serialize(value);
+        }
+        else
+        {
+            return JsonSerializer.Serialize(value, JsonTypeInfo);
+        }
     }
 
     /// <inheritdoc/>
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = "The potential breakage is accepted; it is up to implementers to enure that the selected data type is preserved.")]
+        Justification = "Warning and workaround provided on ListJsonTypeInfo property.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Warning and workaround provided on ListJsonTypeInfo property.")]
     protected override bool TryParseValueFromString(
         string? value,
         [MaybeNullWhen(false)] out IEnumerable<TValue> result,
@@ -419,11 +453,23 @@ public partial class DataGridMultiSelect<
                 success = true;
             }
         }
-        else
+        else if (ListJsonTypeInfo is null)
         {
             try
             {
                 result = (IEnumerable<TValue>?)JsonSerializer.Deserialize(value, typeof(IEnumerable<TValue>));
+                success = true;
+            }
+            catch
+            {
+                validationErrorMessage = GetConversionValidationMessage();
+            }
+        }
+        else
+        {
+            try
+            {
+                result = JsonSerializer.Deserialize(value, ListJsonTypeInfo);
                 success = true;
             }
             catch

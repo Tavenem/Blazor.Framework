@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -37,7 +38,7 @@ public partial class NumericInput<TValue>
     /// <summary>
     /// <para>
     /// The validation message displayed when this field's <see
-    /// cref="FormComponentBase{TValue}.Value"/> cannot be converted to or from its string
+    /// cref="InputBase{TValue}.Value"/> cannot be converted to or from its string
     /// representation.
     /// </para>
     /// <para>

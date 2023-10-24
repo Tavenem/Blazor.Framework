@@ -266,11 +266,13 @@
 
 <p>
     By default the <code>DataGrid</code> uses reflection to find the public, readable properties and
-    fields of its item type, and displays each in a column with an appropriate format.
+    fields of its item type, and displays each in a column with an appropriate format. Note that
+    this will not work if you use AOT compilation.
 </p>
 
 <p>
-    You can control which properties are included by setting the columns explicitly.
+    You can control which properties are included by setting the columns explicitly. This works even
+    with AOT compilation.
 </p>
 
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

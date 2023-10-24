@@ -112,7 +112,7 @@ internal static class ColumnExtensions
     }
 
     public static IEnumerable<KeyValuePair<object, string>> GetEnumOptions<TDataItem>(this IColumn<TDataItem> column)
-        => Enum.GetValues(column.GetBaseDataType())
+        => Enum.GetValuesAsUnderlyingType(column.GetBaseDataType())
         .Cast<object>()
         .Select((x, i) => new KeyValuePair<object, string>(
             x,

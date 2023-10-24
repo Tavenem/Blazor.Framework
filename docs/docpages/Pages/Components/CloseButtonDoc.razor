@@ -41,12 +41,12 @@
 <h2>Auto-closing</h2>
 
 <p>
-    If you give the close button the <code>auto</code> attribute, it will automatically assign a CSS
-    style of <code>display: none</code> to its nearest parent with the <code>data-can-close</code>
-    attribute when clicked. This will work even if the parent and close button were rendered
-    statically, or prerendered by the server.
+    If you give the close button the <code>data-close-auto</code> attribute, it will automatically
+    assign a CSS style of <code>display: none</code> to its nearest parent with the
+    <code>data-can-close</code> attribute when clicked. This will work even if the parent and close
+    button were rendered statically, or prerendered by the server.
 </p>
 
 <CodeExample RowClass="p-2" Code="@(@"<div data-can-close class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
-    <tf-close auto />
+    <tf-close data-close-auto />
 </div>")" />

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -73,6 +74,17 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// </para>
     /// </summary>
     [Parameter] public TDragItem? Item { get; set; }
+
+    /// <summary>
+    /// JSON serialization metadata about the item type.
+    /// </summary>
+    /// <remarks>
+    /// This is used to (de)serialize the value to and from a JSON string for the underlying
+    /// drag-drop APIs. If omitted, the reflection-based JSON serializer will be used (unless
+    /// <typeparamref name="TDragItem"/> implements <see cref="IDraggable"/>), which is not trim
+    /// safe or AOT-compilation compatible.
+    /// </remarks>
+    [Parameter] public JsonTypeInfo<TDragItem>? JsonTypeInfo { get; set; }
 
     /// <summary>
     /// <para>
@@ -162,7 +174,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
         }
         else
         {
-            data = DragDropService.GetDragStartData(Item, effectAllowed: GetDragEffectAllowed());
+            data = DragDropService.GetDragStartData(Item, effectAllowed: GetDragEffectAllowed(), jsonTypeInfo: JsonTypeInfo);
         }
 
         return data;
