@@ -18,7 +18,7 @@ let plugins = [
             '@lezer/common',
             '@lezer/lr',
         ],
-        preferBuiltins: true,
+        preferBuiltins: false,
     }),
 ];
 if (process.env.build === 'Release') {

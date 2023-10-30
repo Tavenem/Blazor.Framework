@@ -8,7 +8,7 @@
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
-    font-variation-settings: 'FILL' 1;
+    font-variation-settings: 'FILL' var(--tavenem-fill), 'GRAD' var(--tavenem-grad);
     letter-spacing: normal;
     line-height: 1;
     position: relative;
@@ -22,12 +22,12 @@
     -moz-osx-font-smoothing: grayscale;
 
     &.outlined {
+        --tavenem-fill: 0;
         border: none;
-        font-variation-settings: 'FILL' 0;
     }
 
     [data-theme="dark"] & {
-        font-variation-settings: 'GRAD' -25;
+        --tavenem-grad: -25;
     }
 
     &:focus {

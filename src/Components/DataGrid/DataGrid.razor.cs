@@ -331,7 +331,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// <remarks>
     /// Initialized to a GUID if not set explicitly.
     /// </remarks>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+    [Parameter] public string Id { get; set; } = IdService.GenerateId("DataGrid");
 
     /// <summary>
     /// Whether the table is currently loading data via <see cref="LoadItems"/>.
@@ -1618,7 +1618,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [RowExpansionQueryParamName] = rowExpansionQueries });
+            new Dictionary<string, object?> { [RowExpansionQueryParamName] = rowExpansionQueries?.ToArray() });
     }
 
     internal bool GetRowWasExpanded(TDataItem item) => item is not null
@@ -1791,7 +1791,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [RowExpansionQueryParamName] = rowExpansionQueries }),
+                new Dictionary<string, object?> { [RowExpansionQueryParamName] = rowExpansionQueries?.ToArray() }),
             false,
             true);
     }
@@ -2381,7 +2381,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         return NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [GroupExpansionQueryParamName] = groupExpansionQueries });
+                new Dictionary<string, object?> { [GroupExpansionQueryParamName] = groupExpansionQueries?.ToArray() });
     }
 
     private bool GetGroupIsExpanded(string key) => string.IsNullOrEmpty(key)
@@ -2750,7 +2750,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [GroupExpansionQueryParamName] = groupExpansionQueries }),
+                new Dictionary<string, object?> { [GroupExpansionQueryParamName] = groupExpansionQueries?.ToArray() }),
             false,
             true);
     }
@@ -2886,7 +2886,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [FilterQueryParamName] = filterQueries }),
+                new Dictionary<string, object?> { [FilterQueryParamName] = filterQueries?.ToArray() }),
             false,
             true);
     }
@@ -2903,7 +2903,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [RowsPerPageQueryParamName] = offsetQueries }));
+                new Dictionary<string, object?> { [RowsPerPageQueryParamName] = offsetQueries?.ToArray() }));
     }
 
     private void SetRowsPerPageQuery()
@@ -2914,7 +2914,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [RowsPerPageQueryParamName] = rowsQueries }),
+                new Dictionary<string, object?> { [RowsPerPageQueryParamName] = rowsQueries?.ToArray() }),
             false,
             true);
     }
@@ -2947,7 +2947,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [SortQueryParamName] = sortQueries }),
+                new Dictionary<string, object?> { [SortQueryParamName] = sortQueries?.ToArray() }),
             false,
             true);
     }

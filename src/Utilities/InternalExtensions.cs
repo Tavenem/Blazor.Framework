@@ -113,21 +113,25 @@ internal static class InternalExtensions
     };
 
     [return: NotNullIfNotNull(nameof(value))]
-    public static string? ToTrimmedString(this StringBuilder? value)
+    public static string? ToTrimmedString(this StringBuilder? value, params char[] trimChars)
     {
         if (value is null || value.Length == 0)
         {
             return value?.ToString();
         }
 
-        value = value.TrimEnd();
+        value = value.TrimEnd(trimChars);
 
         if (value.Length > 0
-            && char.IsWhiteSpace(value[0]))
+            && trimChars.Length == 0
+            ? char.IsWhiteSpace(value[0])
+            : trimChars.Contains(value[0]))
         {
             for (var i = 0; i < value.Length; i++)
             {
-                if (!char.IsWhiteSpace(value[i]))
+                if (trimChars.Length == 0
+                    ? !char.IsWhiteSpace(value[i])
+                    : !trimChars.Contains(value[i]))
                 {
                     return value.ToString(i, value.Length - i);
                 }
@@ -137,7 +141,7 @@ internal static class InternalExtensions
     }
 
     [return: NotNullIfNotNull(nameof(value))]
-    public static StringBuilder? TrimEnd(this StringBuilder? value)
+    public static StringBuilder? TrimEnd(this StringBuilder? value, params char[] trimChars)
     {
         if (value is null || value.Length == 0)
         {
@@ -147,7 +151,9 @@ internal static class InternalExtensions
         var index = value.Length - 1;
         for (; index >= 0; index--)
         {
-            if (!char.IsWhiteSpace(value[index]))
+            if (trimChars.Length == 0
+                ? !char.IsWhiteSpace(value[index])
+                : !trimChars.Contains(value[index]))
             {
                 break;
             }

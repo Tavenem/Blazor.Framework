@@ -98,7 +98,7 @@ public partial class Steps
     /// A generated id will be assigned if none is supplied (including through splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+    [Parameter] public string Id { get; set; } = IdService.GenerateId(nameof(Collapse));
 
     /// <summary>
     /// Specifies the top-level model object for the <see cref="Form"/>. An edit context will be
@@ -303,7 +303,7 @@ public partial class Steps
         }
 
         return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries });
+            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() });
     }
 
     private string GetPreviousStepUrl()
@@ -326,7 +326,7 @@ public partial class Steps
         }
 
         return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries });
+            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() });
     }
 
     private string? GetStepActivatorCssClass(Step step) => new CssBuilder("step-activator")
@@ -355,7 +355,7 @@ public partial class Steps
         }
 
         return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries });
+            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() });
     }
 
     private async Task OnActivateStepAsync(Step step)
@@ -430,6 +430,6 @@ public partial class Steps
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries }));
+                new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() }));
     }
 }

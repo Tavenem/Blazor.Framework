@@ -193,7 +193,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
     /// A generated id will be assigned if none is supplied (including through splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+    [Parameter] public string Id { get; set; } = IdService.GenerateId(nameof(Collapse));
 
     /// <summary>
     /// <para>
@@ -783,7 +783,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
 
         NavigationManager.NavigateTo(
             NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [ActivePanelQueryParamName] = activePanelQueries }));
+                new Dictionary<string, object?> { [ActivePanelQueryParamName] = activePanelQueries?.ToArray() }));
     }
 
     private void CenterScrollPositionAroundSelectedItem()
@@ -887,7 +887,7 @@ public partial class Tabs<TTabItem> : IAsyncDisposable
         }
 
         return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [ActivePanelQueryParamName] = activePanelQueries });
+            new Dictionary<string, object?> { [ActivePanelQueryParamName] = activePanelQueries?.ToArray() });
     }
 
     private double GetReferenceSize(ElementReference reference) => TabSide switch

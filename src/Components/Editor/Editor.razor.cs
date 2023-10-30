@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Editor.InternalDialogs;
+using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -9,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A rich text editor which supports any content type.
 /// </summary>
-public partial class Editor
+public partial class Editor : FormComponentBase<string>
 {
     private bool _disposedValue;
     private bool _initialized;
@@ -202,7 +203,7 @@ public partial class Editor
 
     private int CurrentLength { get; set; }
 
-    [Inject] DialogService DialogService { get; set; } = default!;
+    [Inject, NotNull] DialogService? DialogService { get; set; }
 
     private bool DisplayCommands => IsWysiwyg
         || Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
@@ -223,7 +224,7 @@ public partial class Editor
         .AddStyle("max-height", MaxHeight)
         .ToString();
 
-    [Inject] private EditorService EditorService { get; set; } = default!;
+    [Inject, NotNull] private EditorService? EditorService { get; set; }
 
     private List<string> Fonts { get; } = ["sans-serif", "serif", "monospace", "cursive"];
 
@@ -247,6 +248,16 @@ public partial class Editor
         .Add("filled", IsActive(EditorCommandType.Italic))
         .Add("outlined", IsActive(EditorCommandType.Italic))
         .ToString();
+
+    private string? Language => Syntax switch
+    {
+        EditorSyntax.None => null,
+        EditorSyntax.Cpp => "language-cpp",
+        EditorSyntax.CSharp => "language-csharp",
+        EditorSyntax.HTML => "language-xml",
+        EditorSyntax.ObjectiveC => "language-objectivec",
+        _ => $"language-{Syntax.ToString().ToLowerInvariant()}",
+    };
 
     private string? ListGroupClass => new CssBuilder("small")
         .Add("button-group", IsActive(EditorCommandType.ListBullet))
@@ -289,7 +300,7 @@ public partial class Editor
         .Add("editor-toolbar-extended", ShowAll)
         .ToString();
 
-    [Inject] private UtilityService UtilityService { get; set; } = default!;
+    [Inject, NotNull] private UtilityService? UtilityService { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -343,28 +354,42 @@ public partial class Editor
     }
 
     /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
+        if (Interactive)
         {
-            return;
+            if (!_initialized)
+            {
+                EditorService.AutoFocus = AutoFocus;
+                EditorService.EditMode = EditorMode;
+                EditorService.ElementId = Id;
+                EditorService.InitialValue = Value;
+                EditorService.Placeholder = Placeholder;
+                EditorService.ReadOnly = ReadOnly;
+                EditorService.Syntax = Syntax;
+                EditorService.UpdateOnInput = UpdateOnInput;
+                EditorService.OnInput += OnInput;
+                EditorService.CommandsUpdated += CommandsUpdated;
+                _initialized = true;
+            }
         }
-
-        Fonts.AddRange(await UtilityService.GetFontsAsync());
-
-        EditorService.AutoFocus = AutoFocus;
-        EditorService.EditMode = EditorMode;
-        EditorService.ElementId = Id;
-        EditorService.InitialValue = Value;
-        EditorService.Placeholder = Placeholder;
-        EditorService.ReadOnly = ReadOnly;
-        EditorService.Syntax = Syntax;
-        EditorService.UpdateOnInput = UpdateOnInput;
-        EditorService.OnInput += OnInput;
-        EditorService.CommandsUpdated += CommandsUpdated;
-        _initialized = true;
-        Interactive = true;
-        StateHasChanged();
+        else if (firstRender)
+        {
+            Fonts.AddRange(await UtilityService.GetFontsAsync());
+            Interactive = true;
+            StateHasChanged();
+        }
     }
 
     /// <summary>
@@ -393,10 +418,10 @@ public partial class Editor
     /// <inheritdoc/>
     protected override bool TryParseValueFromString(
         string? value,
-        [MaybeNullWhen(false)] out string? result,
+        [MaybeNullWhen(false)] out string result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        result = value;
+        result = value!;
         validationErrorMessage = null;
         HasConversionError = false;
         return true;

@@ -23,6 +23,7 @@ public static class TavenemFrameworkDIExtensions
         services.AddScoped<ScrollService>();
         services.AddScoped<DialogService>();
         services.AddScoped<PopoverService>();
+        services.AddScoped<QueryStateService>();
         services.AddScoped<SnackbarService>();
         services.AddTransient<DragDropListener>();
         services.AddTransient<EditorService>();

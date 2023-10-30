@@ -56,7 +56,7 @@ public partial class Pagination
     /// A generated id will be assigned if none is supplied (including through splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+    [Parameter] public string Id { get; set; } = IdService.GenerateId(nameof(Pagination));
 
     /// <summary>
     /// <para>
@@ -344,8 +344,8 @@ public partial class Pagination
         return NavigationManager.GetUriWithQueryParameters(
             new Dictionary<string, object?>
             {
-                [CurrentPageQueryParamName] = currentPageQueries,
-                [PageCountQueryParamName] = pageCountQueries,
+                [CurrentPageQueryParamName] = currentPageQueries?.ToArray(),
+                [PageCountQueryParamName] = pageCountQueries?.ToArray(),
             });
     }
 
@@ -366,8 +366,8 @@ public partial class Pagination
         return NavigationManager.GetUriWithQueryParameters(
             new Dictionary<string, object?>
             {
-                [CurrentPageQueryParamName] = currentPageQueries,
-                [PageCountQueryParamName] = pageCountQueries,
+                [CurrentPageQueryParamName] = currentPageQueries?.ToArray(),
+                [PageCountQueryParamName] = pageCountQueries?.ToArray(),
             });
     }
 
@@ -388,8 +388,8 @@ public partial class Pagination
         return NavigationManager.GetUriWithQueryParameters(
             new Dictionary<string, object?>
             {
-                [CurrentPageQueryParamName] = currentPageQueries,
-                [PageCountQueryParamName] = pageCountQueries,
+                [CurrentPageQueryParamName] = currentPageQueries?.ToArray(),
+                [PageCountQueryParamName] = pageCountQueries?.ToArray(),
             });
     }
 
@@ -413,8 +413,8 @@ public partial class Pagination
         return NavigationManager.GetUriWithQueryParameters(
             new Dictionary<string, object?>
             {
-                [CurrentPageQueryParamName] = currentPageQueries,
-                [PageCountQueryParamName] = pageCountQueries,
+                [CurrentPageQueryParamName] = currentPageQueries?.ToArray(),
+                [PageCountQueryParamName] = pageCountQueries?.ToArray(),
             });
     }
 
@@ -442,8 +442,8 @@ public partial class Pagination
         return NavigationManager.GetUriWithQueryParameters(
             new Dictionary<string, object?>
             {
-                [CurrentPageQueryParamName] = currentPageQueries,
-                [PageCountQueryParamName] = pageCountQueries,
+                [CurrentPageQueryParamName] = currentPageQueries?.ToArray(),
+                [PageCountQueryParamName] = pageCountQueries?.ToArray(),
             });
     }
 
@@ -539,8 +539,8 @@ public partial class Pagination
             NavigationManager.GetUriWithQueryParameters(
                 new Dictionary<string, object?>
                 {
-                    [CurrentPageQueryParamName] = currentPageQueries,
-                    [PageCountQueryParamName] = pageCountQueries,
+                    [CurrentPageQueryParamName] = currentPageQueries?.ToArray(),
+                    [PageCountQueryParamName] = pageCountQueries?.ToArray(),
                 }));
     }
 }

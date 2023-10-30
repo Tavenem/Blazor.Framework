@@ -10,7 +10,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class Collapse : IDisposable
 {
-    private const string ExpansionQueryParamName = "tfc_ex";
+    private const string ExpansionQueryParamName = "o";
 
     private protected bool _disposedValue;
     private string? _hrefAbsolute;
@@ -33,12 +33,6 @@ public partial class Collapse : IDisposable
     [Parameter] public bool Disabled { get; set; }
 
     /// <summary>
-    /// Any collapse expansions currently set.
-    /// </summary>
-    [SupplyParameterFromQuery(Name = ExpansionQueryParamName), Parameter]
-    public string[]? ExpansionQuery { get; set; }
-
-    /// <summary>
     /// Any CSS class(es) to be applies to the collapse footer (the part that is not hidden when
     /// collapsed).
     /// </summary>
@@ -57,7 +51,7 @@ public partial class Collapse : IDisposable
     /// A generated id will be assigned if none is supplied (including through splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+    [Parameter] public string Id { get; set; } = IdService.GenerateId(nameof(Collapse));
 
     /// <summary>
     /// Will be <see langword="true"/> during opening, after <see cref="OnOpening"/> is invoked and
@@ -143,7 +137,7 @@ public partial class Collapse : IDisposable
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("collapse")
-        .Add("closed", !IsOpen)
+        .Add("closed", IsClosed || !IsOpen)
         .Add("disabled", Disabled || Accordion?.Disabled == true)
         .Add("loading", IsLoading)
         .ToString();
@@ -154,6 +148,11 @@ public partial class Collapse : IDisposable
     protected string IconName => IsLoading ? DefaultIcons.Loading : DefaultIcons.Expand;
 
     /// <summary>
+    /// Whether the collapse has been explicitly closed.
+    /// </summary>
+    protected bool IsClosed { get; set; }
+
+    /// <summary>
     /// The final value assigned to the footer's class attribute.
     /// </summary>
     protected string? FooterCssClass => new CssBuilder("footer")
@@ -162,9 +161,15 @@ public partial class Collapse : IDisposable
 
     internal bool ActiveLink { get; set; }
 
+    internal bool IsExpanded => IsOpen && !IsClosed;
+
+    private bool DefaultIsExpanded { get; set; }
+
     private bool Interactive { get; set; }
 
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
+
+    [Inject, NotNull] private QueryStateService? QueryStateService { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -187,28 +192,17 @@ public partial class Collapse : IDisposable
             await Accordion.AddAsync(this);
         }
 
-        Interactive = true;
-        StateHasChanged();
-    }
+        DefaultIsExpanded = IsExpanded;
 
-    /// <inheritdoc />
-    protected override async Task OnParametersSetAsync()
-    {
-        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
-            && value is string id
-            && !string.IsNullOrWhiteSpace(id))
+        var currentOpenStates = QueryStateService.RegisterProperty(
+            Id,
+            ExpansionQueryParamName,
+            OnQueryChangedAsync,
+            DefaultIsExpanded);
+        if (currentOpenStates?.Count > 0
+            && bool.TryParse(currentOpenStates[0], out var isOpen))
         {
-            Id = id;
-        }
-
-        var key = Accordion is null
-            ? Id
-            : $"{Accordion.Id}:{Id}";
-        if (ExpansionQuery?
-            .Any(x => x.Equals(key, StringComparison.Ordinal))
-            == true)
-        {
-            await SetOpenAsync(true);
+            await SetOpenAsync(isOpen);
         }
         else
         {
@@ -220,6 +214,20 @@ public partial class Collapse : IDisposable
             {
                 await SetOpenAsync(true);
             }
+        }
+
+        Interactive = true;
+        StateHasChanged();
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
         }
     }
 
@@ -252,50 +260,12 @@ public partial class Collapse : IDisposable
     /// Set the open state of this collapse.
     /// </summary>
     /// <param name="value">The open state.</param>
-    public async Task SetOpenAsync(bool value)
-    {
-        if (IsOpen == value)
-        {
-            return;
-        }
-
-        if (value && OnOpening.HasDelegate)
-        {
-            IsLoading = true;
-            StateHasChanged();
-            await OnOpening.InvokeAsync(this);
-            IsLoading = false;
-        }
-        IsOpen = value;
-        OnIsOpenChanged?.Invoke(this, IsOpen);
-        await IsOpenChanged.InvokeAsync(IsOpen);
-        StateHasChanged();
-
-        var expansionQueries = ExpansionQuery?.ToList();
-        var key = Accordion is null
-            ? Id
-            : Accordion.Id;
-        expansionQueries?.RemoveAll(x => x.StartsWith(key));
-        if (IsOpen)
-        {
-            if (Accordion is not null)
-            {
-                key = $"{Accordion.Id}:{Id}";
-            }
-            (expansionQueries ??= [])?.Add(key);
-        }
-
-        NavigationManager.NavigateTo(
-            NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [ExpansionQueryParamName] = expansionQueries }),
-            false,
-            true);
-    }
+    public Task SetOpenAsync(bool value) => SetOpenAsync(value, false);
 
     /// <summary>
     /// Toggle the open state of this collapse.
     /// </summary>
-    public Task ToggleAsync() => SetOpenAsync(!IsOpen);
+    public Task ToggleAsync() => SetOpenAsync(IsClosed || !IsOpen, true);
 
     internal void ForceRedraw() => StateHasChanged();
 
@@ -303,31 +273,15 @@ public partial class Collapse : IDisposable
     {
         if (!Disabled && Accordion?.Disabled != true)
         {
-            await SetOpenAsync(!IsOpen);
+            await SetOpenAsync(IsClosed || !IsOpen, true);
         }
     }
 
-    private string GetToggleUrl()
-    {
-        var value = !IsOpen;
-
-        var expansionQueries = ExpansionQuery?.ToList();
-        var key = Accordion is null
-            ? Id
-            : Accordion.Id;
-        expansionQueries?.RemoveAll(x => x.StartsWith(key));
-        if (value)
-        {
-            if (Accordion is not null)
-            {
-                key = $"{Accordion.Id}:{Id}";
-            }
-            (expansionQueries ??= [])?.Add(key);
-        }
-
-        return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [ExpansionQueryParamName] = expansionQueries });
-    }
+    private string GetToggleUrl() => QueryStateService
+        .GetUriWithPropertyValue(
+        Id,
+        ExpansionQueryParamName,
+        IsClosed || !IsOpen ? true : null);
 
     private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
     {
@@ -377,19 +331,64 @@ public partial class Collapse : IDisposable
 
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
-        if (IsOpen)
+        if (!IsOpen)
+        {
+            var shouldBeActiveNow = ShouldMatch(args.Location);
+            if (shouldBeActiveNow != _isActiveNav)
+            {
+                _isActiveNav = shouldBeActiveNow;
+                if (_isActiveNav)
+                {
+                    await SetOpenAsync(true);
+                }
+            }
+        }
+    }
+
+    private async Task OnQueryChangedAsync(QueryChangeEventArgs args)
+    {
+        if (bool.TryParse(args.Value, out var value))
+        {
+            await SetOpenAsync(value);
+        }
+    }
+
+    private async Task SetOpenAsync(bool value, bool manual)
+    {
+        if (IsOpen == value
+            && (!manual
+            || IsClosed == !value))
         {
             return;
         }
-        var shouldBeActiveNow = ShouldMatch(args.Location);
-        if (shouldBeActiveNow != _isActiveNav)
+
+        if (manual)
         {
-            _isActiveNav = shouldBeActiveNow;
-            if (_isActiveNav)
-            {
-                await SetOpenAsync(true);
-            }
+            IsClosed = !value;
         }
+        if (IsOpen != value)
+        {
+            if (value && !IsClosed && OnOpening.HasDelegate)
+            {
+                IsLoading = true;
+                StateHasChanged();
+                await OnOpening.InvokeAsync(this);
+                IsLoading = false;
+            }
+            IsOpen = value;
+            if (!value || !IsClosed)
+            {
+                OnIsOpenChanged?.Invoke(this, IsOpen);
+                await IsOpenChanged.InvokeAsync(IsOpen);
+            }
+            StateHasChanged();
+        }
+
+        QueryStateService.SetPropertyValue(
+            Id,
+            ExpansionQueryParamName,
+            IsOpen && !IsClosed,
+            defaultValue: _isActiveNav || DefaultIsExpanded);
     }
 
     private bool ShouldMatch(string currentUriAbsolute)

@@ -51,14 +51,14 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
 }
 
 slot button {
-    background-color: var(--tavenem-theme-color);
-    border-color: var(--tavenem-theme-color-text);
+    background-color: var(--tavenem-color-primary);
+    border-color: var(--tavenem-color-primary-text);
     border-radius: 9999px;
     border-style: none;
     border-width: 1px;
     box-shadow: none;
     box-sizing: border-box;
-    color: var(--tavenem-theme-color-text);
+    color: var(--tavenem-color-primary-text);
     cursor: pointer;
     display: inline-flex;
     fill: currentColor;
@@ -108,8 +108,8 @@ slot button {
 
     slot button:hover,
     slot button:focus-visible {
-        background-color: var(--tavenem-theme-color-darken);
-        color: var(--tavenem-theme-color-text);
+        background-color: var(--tavenem-color-primary-darken);
+        color: var(--tavenem-color-primary-text);
     }`;
         shadow.appendChild(style);
 

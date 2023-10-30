@@ -56,14 +56,9 @@ internal class ResizeObserver : IResizeObserver
     /// given element is not currently being observed.
     /// </returns>
     public BoundingClientRect? GetSizeInfo(ElementReference reference)
-    {
-        if (!_cachedValues.ContainsKey(reference))
-        {
-            return null;
-        }
-
-        return _cachedValues[reference];
-    }
+        => !_cachedValues.TryGetValue(reference, out var value)
+        ? null
+        : value;
 
     /// <summary>
     /// Determine whether a given element is already being observed for resize events.

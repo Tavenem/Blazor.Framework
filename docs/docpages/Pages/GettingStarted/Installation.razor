@@ -20,11 +20,10 @@
     </pre>
 </pre>
 
-<h2 data-heading-title="Add font links">3. Add font links</h2>
-<p>Add the following links to your HTML head in either <code>index.html</code> (WebAssembly standalone) or <code>App.razor</code> (Web app).</p>
+<h2 data-heading-title="Add font link">3. Add font link</h2>
+<p>Add the following link to your HTML head in either <code>index.html</code> (WebAssembly standalone) or <code>App.razor</code> (Web app).</p>
 <pre class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap"" rel=""stylesheet"">
- <link href=""https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0"" rel=""stylesheet"" />", true)
+    @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=swap"" rel=""stylesheet"">", true)
 </pre>
 <p>
     You may use different fonts if you prefer, but a <a

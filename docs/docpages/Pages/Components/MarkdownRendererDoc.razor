@@ -1,0 +1,64 @@
+﻿@page "/components/markdown-renderer"
+
+<PageTitle>Markdown Renderer - Tavenem Blazor Framework</PageTitle>
+
+<h1>Markdown Renderer</h1>
+
+<p>
+    The <code>MarkdownRenderer</code> component can be used to render markdown-formatted text as HTML.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    The <code>MarkdownRenderer</code> component is a simple <code>div</code> element, and may
+    contain any <code>ChildContent</code>. You can configure its behavior with the
+    <code>Class</code> and <code>Style</code> properties, as well as attribute splatting. Its real
+    function lies in the automatic translation of its <code>Value</code> parameter from markdown to
+    HTML, which it then displays (after its <code>ChildContent</code>, if any). The HTML the
+    component renders is sanitized, which should make it (reasonably) safe for use with
+    user-supplied content.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <MarkdownRenderer Value="This is *markdown*-formatted text, translated to **HTML**." />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<MarkdownRenderer Value=""This is *markdown*-formatted text, translated to **HTML**."" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The renderer uses the excellent <a href="https://github.com/xoofx/markdig">Markdig</a> library
+    under the hood, and incorporates the following syntax entensions:
+</p>
+<ul>
+    <li>Abbreviations</li>
+    <li>Auto-identifiers</li>
+    <li>Citation text</li>
+    <li>Custom containers</li>
+    <li>Definition lists</li>
+    <li>Extra emphasis</li>
+    <li>Figures</li>
+    <li>Footers</li>
+    <li>Footnotes</li>
+    <li>Grid tables</li>
+    <li>Mathematics</li>
+    <li>Pipe tables</li>
+    <li>Extra bullet lists</li>
+    <li>Task Lists</li>
+    <li>Auto-links</li>
+    <li>Special attributes</li>
+    <li>SmartyPants</li>
+</ul>
+
+<h2>Manual rendering</h2>
+
+<p>
+    The <code>MarkdownRenderer</code> also includes a static <code>RenderHtml</code> method which
+    accepts a markdown-formatted string as a parameter, and returns the rendered HTML using the same
+    pipeline as would be used to render it for display in the component.
+</p>

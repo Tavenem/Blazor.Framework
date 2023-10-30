@@ -313,7 +313,7 @@ internal class EditorService : IAsyncDisposable
             _dotNetRef ??= DotNetObjectReference.Create(this);
             try
             {
-                var module = await _moduleTask.Value.ConfigureAwait(false);
+                var module = await _moduleTask.Value;
                 await module.InvokeVoidAsync(
                     "initializeEditor",
                     ElementId,

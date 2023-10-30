@@ -8,8 +8,9 @@
 - `DialogContainer` to support use of dialogs without the `FrameworkLayout`  
 - `DrawerToggle` placeable button to automatically control a drawer
 - `Drawer.ShowAtBreakpoint` and `Drawer.HideAtBreakpoint`
-- `tf-scroll-top` custom element (replacement for `ScrollToTop` component)
+- `MarkdownRenderer` component
 - `SnackbarContainer` to support use of snackbars without the `FrameworkLayout`
+- `tf-scroll-top` custom element (replacement for `ScrollToTop` component)
 ### Changed
 - Update to .NET 8 RC
 - Use Material Symbols instead of Material Icons

@@ -554,17 +554,58 @@
             }
         </div>
     }
-    <div id="@Id"
-         class="@EditorClass"
-         style="@EditorStyle"
-         spellcheck="@SpellcheckValue"
-         tabindex="@TabIndex"></div>
+    @if (!Interactive)
+    {
+        <div id="@Id"
+             class="@EditorClass"
+             style="@EditorStyle"
+             tabindex="@TabIndex">
+            @if (IsWysiwyg)
+            {
+                @if (Syntax == EditorSyntax.HTML)
+                {
+                    @(new MarkupString(Value ?? string.Empty))
+                }
+                else if (Syntax == EditorSyntax.Markdown)
+                {
+                    <MarkdownRenderer Value="@Value" />
+                }
+            }
+            else
+            {
+                <SyntaxHighlighter>
+                    <pre class="codeblock">
+                        <code class="@Language">
+                            @Value
+                        </code>
+                    </pre>
+                </SyntaxHighlighter>
+            }
+        </div>
+    }
+    else
+    {
+        <div id="@Id"
+             class="@EditorClass"
+             style="@EditorStyle"
+             spellcheck="@SpellcheckValue"
+             tabindex="@TabIndex"></div>
+    }
     @if (!IsReadOnly)
     {
         @if (IsWysiwyg)
         {
             <div class="editor-statusbar">
-                <small class="text-muted font-monospace">@EditorService.CurrentNode.ToHumanReadable()</small>
+                <small class="text-muted font-monospace">
+                    @if (string.IsNullOrEmpty(EditorService.CurrentNode))
+                    {
+                        <span>&nbsp;</span>
+                    }
+                    else
+                    {
+                        @EditorService.CurrentNode.ToHumanReadable()
+                    }
+                </small>
             </div>
         }
         @if (IsInvalidAndTouched)

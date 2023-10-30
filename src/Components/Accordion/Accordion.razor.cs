@@ -67,7 +67,7 @@ public partial class Accordion
 
     internal async ValueTask AddAsync(Collapse collapse)
     {
-        if (_collapses.Any(x => x.IsOpen))
+        if (collapse.IsOpen && _collapses.Any(x => x.IsExpanded))
         {
             await collapse.SetOpenAsync(false);
         }
