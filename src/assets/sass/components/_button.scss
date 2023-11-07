@@ -153,6 +153,10 @@
                 --button-hover-bg: var(--tavenem-theme-color-hover);
                 --button-hover-color: var(--tavenem-theme-color);
             }
+
+            &.border {
+                --button-border-color: var(--tavenem-theme-color-darken-2);
+            }
         }
     }
 }
@@ -302,6 +306,10 @@ a.btn-text:not(.disabled, :disabled) {
 
                 &:disabled, &.disabled {
                     --button-bg: var(--tavenem-color-action-disabled-bg);
+                }
+
+                &.border {
+                    --button-border-color: var(--tavenem-theme-color-darken-2);
                 }
             }
         }

@@ -275,6 +275,34 @@
     </ChildContent>
 </Collapse>
 
+<h2>Persistent State</h2>
+
+<p>
+    If the <code>PersistState</code> property is set to <code>true</code>, the component will
+    automatically keep track of the current tab in the URL's query string. This allows the component
+    to preserve its state through page refreshes, and also to include the selected tab in a
+    bookmark or shared URL.
+</p>
+
+<p>
+    When turning on this feature, it is strongly recommended that the component be assigned a unique,
+    stable value in its <code>Id</code> parameter (or via a splatted <code>id</code> attribute).
+    This <code>Id</code> will be used in the generated query string to identify the component.
+    Although an <code>Id</code> is generated automatically when one is not provided, the automatic
+    value cannot be guaranteed to remain the same.
+</p>
+
+<p>
+    Note that even when a component has <code>PersistState</code> set to <code>false</code>, its
+    initial state can still be controlled via query string. The property only controls whether the
+    query string is dynamically updated to reflect changing states.
+</p>
+
+<p>
+    Also note that the component will not switch to a tab specified in the query string which is
+    disabled.
+</p>
+
 <h2>Customization</h2>
 
 <p>

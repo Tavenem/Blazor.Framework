@@ -263,7 +263,7 @@ public abstract class SelectBase<TValue, TOption>
     }
 
     /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if ((firstRender || _valueUpdated)
             && _options.Count > 0)
@@ -271,6 +271,7 @@ public abstract class SelectBase<TValue, TOption>
             _valueUpdated = false;
             UpdateSelectedFromValue();
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     /// <summary>
@@ -360,7 +361,7 @@ public abstract class SelectBase<TValue, TOption>
 
     private protected override async void OnKeyDownAsync(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }

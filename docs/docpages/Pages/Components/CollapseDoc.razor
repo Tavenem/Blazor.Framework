@@ -151,6 +151,46 @@
     should show their nested links when one is active.
 </p>
 
+<h2>Persistent State</h2>
+
+<p>
+    Set the <code>PersistState</code> property to <code>true</code> to automatically keep track of
+    the collapse's open/closed state in the URL's query string. This allows the collapse to preserve
+    its state through page refreshes, and also to include the state of the component in a bookmark
+    or shared URL. To see this at work, open the following collapse then refresh the page. Note
+    that any other collapses you may have opened on this page will revert to their default state,
+    but this one will stay open.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Id="cpd1" Title="Persistent" PersistState="true">
+                This is the body
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Id=""cpd1"" Title=""Persistent"" PersistState=""true"">
+    This is the body
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    When turning on this feature, it is strongly recommended that the collapse be assigned a unique,
+    stable value in its <code>Id</code> parameter (or via a splatted <code>id</code> attribute).
+    This <code>Id</code> will be used in the generated query string to identify the component.
+    Although an <code>Id</code> is generated automatically when one is not provided, the automatic
+    value cannot be guaranteed to remain the same.
+</p>
+
+<p>
+    Note that even when a collapse has <code>PersistState</code> set to <code>false</code>, its
+    initial state can still be controlled via query string. The property only controls whether the
+    query string is dynamically updated to reflect changing states.
+</p>
+
 <h2>Customization</h2>
 
 <p>

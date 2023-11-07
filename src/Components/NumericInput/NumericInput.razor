@@ -62,7 +62,7 @@
                 <span>@PostfixText</span>
             }
         }
-        @if (ShowStepButtons && !ReadOnly && Interactive)
+        @if (ShowStepButtons && !ReadOnly && IsInteractive)
         {
             <div class="numeric-spin">
                 <button @onclick="Increment" class="btn btn-text" disabled="@IncrementDisabled" tabindex="-1">

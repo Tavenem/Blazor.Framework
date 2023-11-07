@@ -36,10 +36,9 @@ public class ContentsService(IJSRuntime jsRuntime) : IAsyncDisposable
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
-            var results = await module
+            return await module
                 .InvokeAsync<HeadingInfo[]>("getHeadings", id)
                 .ConfigureAwait(false);
-            return results;
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }

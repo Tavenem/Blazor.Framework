@@ -50,7 +50,13 @@ public partial class Alert
         .Add(ThemeColor.ToCSS())
         .Add("alert")
         .Add("clickable", OnClick.HasDelegate)
+        .Add("d-none", IsClosed)
         .ToString();
+
+    /// <summary>
+    /// Whether this alert was closed.
+    /// </summary>
+    protected bool IsClosed { get; set; }
 
     private string Icon => ThemeColor switch
     {
@@ -85,5 +91,9 @@ public partial class Alert
             await OnClosed.InvokeAsync(this);
         }
         Closed?.Invoke(this, EventArgs.Empty);
+        if (AutoClose)
+        {
+            IsClosed = true;
+        }
     }
 }

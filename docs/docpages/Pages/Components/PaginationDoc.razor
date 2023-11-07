@@ -145,6 +145,46 @@
     navigation will reflect the now-known number of total pages.
 </p>
 
+<h3>Persistent State</h3>
+
+<p>
+    If the <code>PersistState</code> property is set to <code>true</code>, the component will
+    automatically keep track of the current page (and total page count, if that number varies) in
+    the URL's query string. This allows the pagination component to preserve its state through page
+    refreshes, and also to include the selected page in a bookmark or shared URL.
+</p>
+
+<p>
+    To see this at work, navigate the following pagination to a page other than 1, then refresh the
+    page. Note that any other pagination controls you may have used on this page will revert to
+    their default state, but this one will stay open.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Pagination Id="pd1" CurrentPage="3" PageCount="5" PersistState="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Pagination Id=""pd1"" CurrentPage=""3"" PageCount=""5"" PersistState=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    When turning on this feature, it is strongly recommended that the component be assigned a unique,
+    stable value in its <code>Id</code> parameter (or via a splatted <code>id</code> attribute).
+    This <code>Id</code> will be used in the generated query string to identify the component.
+    Although an <code>Id</code> is generated automatically when one is not provided, the automatic
+    value cannot be guaranteed to remain the same.
+</p>
+
+<p>
+    Note that even when a component has <code>PersistState</code> set to <code>false</code>, its
+    initial state can still be controlled via query string. The property only controls whether the
+    query string is dynamically updated to reflect changing states.
+</p>
+
 <h3>Customization</h3>
 
 <p>

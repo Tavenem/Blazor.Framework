@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A textarea input component.
 /// </summary>
-public partial class TextArea
+public partial class TextArea : InputComponentBase<string>
 {
     private readonly AdjustableTimer _timer;
 
@@ -40,11 +41,6 @@ public partial class TextArea
     /// </para>
     /// </summary>
     [Parameter] public bool? Autocorrect { get; set; }
-
-    /// <summary>
-    /// A reference to the input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
 
     /// <summary>
     /// The maximum length of the input string.
@@ -157,11 +153,6 @@ public partial class TextArea
     }
 
     /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public async Task FocusAsync() => await ElementReference.FocusAsync();
-
-    /// <summary>
     /// Selects all text in this input.
     /// </summary>
     public ValueTask SelectAsync() => ElementReference.SelectAsync();
@@ -211,7 +202,7 @@ public partial class TextArea
     /// <inheritdoc/>
     protected override bool TryParseValueFromString(
         string? value,
-        [MaybeNullWhen(false)] out string? result,
+        [MaybeNullWhen(false)] out string result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
         validationErrorMessage = null;
@@ -223,7 +214,7 @@ public partial class TextArea
         }
         else
         {
-            result = value;
+            result = value!;
         }
 
         return true;

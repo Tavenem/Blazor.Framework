@@ -48,17 +48,29 @@ internal class ResizeObserver : IResizeObserver
     }
 
     /// <summary>
-    /// Gets current size information about an observed element.
+    /// Gets current size information about an element.
     /// </summary>
     /// <param name="reference">The element to retrieve.</param>
+    /// <param name="forceRefresh">
+    /// Whether to get updated information, even if the observer has a cached value.
+    /// </param>
     /// <returns>
-    /// The last observed bounding area for the given element; or <see langword="null"/> if the
-    /// given element is not currently being observed.
+    /// The bounding area for the given element.
     /// </returns>
-    public BoundingClientRect? GetSizeInfo(ElementReference reference)
-        => !_cachedValues.TryGetValue(reference, out var value)
-        ? null
-        : value;
+    public async Task<BoundingClientRect?> GetSizeInfoAsync(ElementReference reference, bool forceRefresh = false)
+    {
+        if (!forceRefresh
+            && _cachedValues.TryGetValue(reference, out var value))
+        {
+            return value;
+        }
+
+        var update = await reference.GetBoundingClientRectAsync();
+
+        _cachedValues[reference] = update;
+
+        return update;
+    }
 
     /// <summary>
     /// Determine whether a given element is already being observed for resize events.
@@ -75,16 +87,12 @@ internal class ResizeObserver : IResizeObserver
     /// </summary>
     /// <param name="elements">A list of element references.</param>
     /// <returns>An enumeration of current bounding areas.</returns>
-    public async Task<IEnumerable<BoundingClientRect>> Observe(IEnumerable<ElementReference> elements)
+    public async Task<IEnumerable<BoundingClientRect>> ObserveAsync(IList<ElementReference> elements)
     {
         var filteredElements = elements
             .Where(x => x.Context is not null
-                && !_cachedValues.ContainsKey(x))
+                && !_cachedValueIds.ContainsValue(x))
             .ToList();
-        if (filteredElements.Count == 0)
-        {
-            return Enumerable.Empty<BoundingClientRect>();
-        }
 
         List<string> elementIds = [];
         foreach (var item in filteredElements)
@@ -94,27 +102,36 @@ internal class ResizeObserver : IResizeObserver
             _cachedValueIds.Add(id, item);
         }
 
-        var results = Enumerable.Empty<BoundingClientRect>();
+        var newResults = new List<BoundingClientRect>();
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            results = await module.InvokeAsync<IEnumerable<BoundingClientRect>>(
+            var module = await _moduleTask.Value;
+            newResults = (await module.InvokeAsync<IEnumerable<BoundingClientRect>>(
                 "connect",
                 _id.ToString(),
                 _dotNetRef,
                 filteredElements,
-                elementIds);
+                elementIds))
+                .ToList();
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
         catch (ObjectDisposedException) { }
 
-        var counter = 0;
-        foreach (var item in results)
+        for (var i = 0; i < newResults.Count; i++)
         {
-            _cachedValues.Add(filteredElements.ElementAt(counter), item);
-            counter++;
+            _cachedValues[filteredElements[i]] = newResults[i];
+        }
+
+        var results = new List<BoundingClientRect>();
+        for (var i = 0; i < elements.Count; i++)
+        {
+            if (elements[i].Context is not null
+                && _cachedValues.TryGetValue(elements[i], out var value))
+            {
+                results.Add(value);
+            }
         }
 
         return results;
@@ -125,8 +142,8 @@ internal class ResizeObserver : IResizeObserver
     /// </summary>
     /// <param name="element">An element reference.</param>
     /// <returns>The current bounding area.</returns>
-    public async Task<BoundingClientRect?> Observe(ElementReference element)
-        => (await Observe(new[] { element })).FirstOrDefault();
+    public async Task<BoundingClientRect?> ObserveAsync(ElementReference element)
+        => (await ObserveAsync([element])).FirstOrDefault();
 
     /// <summary>
     /// Invoked by JS interop.
@@ -155,7 +172,7 @@ internal class ResizeObserver : IResizeObserver
     /// Stop observing an element for resize events.
     /// </summary>
     /// <param name="element">The element to stop observing.</param>
-    public async Task Unobserve(ElementReference element)
+    public async Task UnobserveAsync(ElementReference element)
     {
         var elementId = _cachedValueIds.FirstOrDefault(x => x.Value.Id == element.Id).Key;
         if (elementId == default)
@@ -165,7 +182,7 @@ internal class ResizeObserver : IResizeObserver
 
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
+            var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("disconnect", _id.ToString(), elementId.ToString());
         }
         catch { }

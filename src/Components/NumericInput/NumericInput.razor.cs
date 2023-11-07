@@ -8,14 +8,16 @@ using Tavenem.Blazor.Framework.Components.Forms;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// A numeric input component
+/// A numeric input component.
 /// </summary>
 /// <typeparam name="TValue">
 /// The numeric type bound to the input value.
 /// </typeparam>
-public partial class NumericInput<TValue>
+public partial class NumericInput<TValue> : InputComponentBase<TValue>
 {
-    private readonly TValue _maxDefault, _minDefault, _one, _zero;
+    private static readonly bool _isFloatingPoint;
+    private static readonly TValue _maxDefault, _minDefault, _one, _zero;
+
     private readonly AdjustableTimer _timer;
 
     private bool _disposedValue;
@@ -46,11 +48,6 @@ public partial class NumericInput<TValue>
     /// </para>
     /// </summary>
     [Parameter] public override string ConversionValidationMessage { get; set; } = "{0} must be a number";
-
-    /// <summary>
-    /// A reference to the input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
 
     /// <summary>
     /// <para>
@@ -163,8 +160,8 @@ public partial class NumericInput<TValue>
     /// The step value for this input.
     /// </para>
     /// <para>
-    /// Assign <see langword="null"/> (the default) to use a step value of "1" for integral types,
-    /// and a step value of "any" for floating-point types.
+    /// Assign <see langword="null"/> (the default) to use a step value of "any" for floating-point
+    /// types, or "1" for integral types.
     /// </para>
     /// </summary>
     [Parameter] public TValue? Step { get; set; }
@@ -177,7 +174,7 @@ public partial class NumericInput<TValue>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("number-field")
-        .Add("show-steppers", ShowStepButtons && !ReadOnly && Interactive)
+        .Add("show-steppers", ShowStepButtons && !ReadOnly && IsInteractive)
         .ToString();
 
     /// <inheritdoc/>
@@ -191,14 +188,7 @@ public partial class NumericInput<TValue>
         || !string.IsNullOrEmpty(PrefixIcon)
         || !string.IsNullOrEmpty(PrefixText);
 
-    private static string InputMode => IsFloatingPointType ? "decimal" : "numeric";
-
-    private static bool IsFloatingPointType => typeof(TValue) == typeof(decimal)
-        || typeof(TValue) == typeof(decimal?)
-        || typeof(TValue) == typeof(double)
-        || typeof(TValue) == typeof(double?)
-        || typeof(TValue) == typeof(float)
-        || typeof(TValue) == typeof(float?);
+    private static string InputMode => _isFloatingPoint ? "decimal" : "numeric";
 
     private string? AutocompleteValue
     {
@@ -216,7 +206,7 @@ public partial class NumericInput<TValue>
 
     private bool DecrementDisabled => Disabled
         || ReadOnly
-        || !Interactive
+        || !IsInteractive
         || (CurrentValue is not null
         && (FormExtensions.ValuesEqual(CurrentValue, Min)
         || FormExtensions.ValueIsLess(CurrentValue, Min)));
@@ -225,7 +215,7 @@ public partial class NumericInput<TValue>
 
     private bool IncrementDisabled => Disabled
         || ReadOnly
-        || !Interactive
+        || !IsInteractive
         || (CurrentValue is not null
         && (FormExtensions.ValuesEqual(CurrentValue, Max)
         || FormExtensions.ValueIsMore(CurrentValue, Max)));
@@ -252,9 +242,7 @@ public partial class NumericInput<TValue>
                 return FormExtensions.SuppressScientificFormat(Step);
             }
 
-            return IsFloatingPointType
-                ? "any"
-                : "1";
+            return _isFloatingPoint ? "any" : "1";
         }
     }
 
@@ -263,12 +251,14 @@ public partial class NumericInput<TValue>
         ? Step
         : _one;
 
-    /// <summary>
-    /// Constructs a new instance of <see cref="NumericInput{TValue}"/>.
-    /// </summary>
-    public NumericInput()
+    static NumericInput()
     {
-        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+        _isFloatingPoint = typeof(TValue) == typeof(decimal)
+            || typeof(TValue) == typeof(decimal?)
+            || typeof(TValue) == typeof(double)
+            || typeof(TValue) == typeof(double?)
+            || typeof(TValue) == typeof(float)
+            || typeof(TValue) == typeof(float?);
 
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
@@ -366,9 +356,17 @@ public partial class NumericInput<TValue>
         {
             throw new InvalidOperationException($"Type {targetType.Name} is not supported");
         }
+    }
 
-        Max = _maxDefault!;
-        Min = _minDefault!;
+    /// <summary>
+    /// Constructs a new instance of <see cref="NumericInput{TValue}"/>.
+    /// </summary>
+    public NumericInput()
+    {
+        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+
+        Max = _maxDefault;
+        Min = _minDefault;
     }
 
     /// <inheritdoc/>
@@ -405,17 +403,19 @@ public partial class NumericInput<TValue>
             }
         }
 
-        if (string.IsNullOrEmpty(Format)
-            && IsFloatingPointType
-            && Step is not null
-            && !FormExtensions.ValuesEqual(Step, _zero))
+        if (string.IsNullOrEmpty(Format))
         {
-            var stepLength = Step?
-                .ToString()?
-                .TrimStart('0')
-                .TrimStart('.')
-                .Length ?? 0;
-            Format = $"F{stepLength}";
+            var count = 0;
+            var step = FormExtensions.SuppressScientificFormat(Step);
+            if (step is not null)
+            {
+                var separator = step.IndexOf(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+                if (separator > -1)
+                {
+                    count = step[(separator + 1)..].Length;
+                }
+            }
+            Format = $"F{count}";
         }
 
         SetDisplay();
@@ -488,11 +488,6 @@ public partial class NumericInput<TValue>
         }
         StateHasChanged();
     }
-
-    /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public async Task FocusAsync() => await ElementReference.FocusAsync();
 
     /// <summary>
     /// <para>
@@ -647,7 +642,7 @@ public partial class NumericInput<TValue>
 
     private protected void OnKeyDown(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }
@@ -690,7 +685,7 @@ public partial class NumericInput<TValue>
 
     private void SetValue(TValue? value)
     {
-        if (EqualityComparer<TValue>.Default.Equals(value, CurrentValue))
+        if (EqualityComparer<TValue?>.Default.Equals(value, CurrentValue))
         {
             return;
         }
@@ -705,7 +700,7 @@ public partial class NumericInput<TValue>
         }
 
         if (!IsTouched
-            && !EqualityComparer<TValue>.Default.Equals(value, InitialValue))
+            && !EqualityComparer<TValue?>.Default.Equals(value, InitialValue))
         {
             SetTouchedDebounced();
         }

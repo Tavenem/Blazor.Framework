@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" data-can-close @onclick="OnClick">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="OnClick">
     @if (AutoIcon)
     {
         <tf-icon class="@IconClass">@Icon</tf-icon>
@@ -14,6 +14,6 @@
     }
     else if (AutoClose)
     {
-        <tf-close auto />
+        <tf-close @onclick="OnClosedAsync" />
     }
 </div>

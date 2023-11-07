@@ -5,14 +5,16 @@
 <div class="@CssClass" style="@Style">
     <SnackbarContainer />
     <DialogContainer @ref="DialogContainer" />
-    @FrameworkContent
-    <main class="container">
-        @ChildContent
-        @if (AutoScrollToTop)
-        {
-            <tf-scroll-top />
-        }
-    </main>
+    <CascadingValue Value="this" IsFixed="true">
+        @FrameworkContent
+        <main class="container">
+            @ChildContent
+            @if (AutoScrollToTop)
+            {
+                <tf-scroll-top />
+            }
+        </main>
+    </CascadingValue>
     @if (ContentsBreakpoint != Breakpoint.None)
     {
         <Contents @ref="Contents" Breakpoint="ContentsBreakpoint" />

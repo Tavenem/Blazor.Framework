@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -51,7 +52,7 @@ namespace Tavenem.Blazor.Framework;
 /// component, or an rgba function for colors with an alpha component.
 /// </para>
 /// </typeparam>
-public partial class ColorInput<TValue>
+public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 {
     private const int OverlayHeight = 250;
     private const int OverlayMargin = 40;
@@ -199,7 +200,7 @@ public partial class ColorInput<TValue>
 
     private string? ButtonContainerClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("form-field picker")
+        .Add("field picker")
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
         .Add("invalid", IsInvalidAndTouched)
@@ -350,12 +351,12 @@ public partial class ColorInput<TValue>
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnAfterRenderAsync(firstRender);
         if ((firstRender && DisplayType == PickerDisplayType.Inline)
             || _addMouseOverEvent)
         {
             await AddMouseOverEventAsync();
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     /// <inheritdoc/>
@@ -384,7 +385,7 @@ public partial class ColorInput<TValue>
     /// </summary>
     public override Task ClearAsync()
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return Task.CompletedTask;
         }
@@ -538,7 +539,7 @@ public partial class ColorInput<TValue>
 
     private void OnColorOverlayClick(MouseEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }
@@ -558,7 +559,7 @@ public partial class ColorInput<TValue>
 
     private void OnCycleMode()
     {
-        if (Disabled || !Interactive)
+        if (Disabled || !IsInteractive)
         {
             return;
         }

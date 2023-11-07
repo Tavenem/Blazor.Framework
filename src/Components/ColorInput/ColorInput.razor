@@ -11,7 +11,7 @@
             <div class="color-picker">
                 <div style="@OverlayStyle">
                     <div id="@_overlayIdString" @onclick="OnColorOverlayClick">
-                        @if (!Disabled && !ReadOnly && Interactive)
+                        @if (!Disabled && !ReadOnly && IsInteractive)
                         {
                             <div>
                                 <svg class="color-selector"
@@ -180,7 +180,7 @@
                 id="@Id"
                 class="@ButtonClass"
                 style="@InputCssStyle"
-                disabled="@(Disabled || ReadOnly || !Interactive)"
+                disabled="@(Disabled || ReadOnly || !IsInteractive)"
                 @onclick="OnClickContainerAsync">
             @if (IconButton)
             {
@@ -247,7 +247,7 @@ else
             @if (ShowClear)
             {
                 <button class="@ClearButtonCssClass"
-                        disabled="@(Disabled || ReadOnly || !Interactive)"
+                        disabled="@(Disabled || ReadOnly || !IsInteractive)"
                         tabindex="-1"
                         @onclick="ClearAsync"
                         @onclick:stopPropagation="true">

@@ -1,15 +1,8 @@
 ﻿let _lastElement: string;
 let _spy: (event: Event) => void;
 
-export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, className: string) {
-    _spy = handleScrollSpy.bind(this, dotnetReference, className);
-    document.addEventListener('scroll', _spy, true);
-    window.addEventListener('resize', _spy, true);
-    _spy(null as any);
-}
-
-export function scrollSpyTags(this: any, dotnetReference: DotNet.DotNetObject, tagNames: string[]) {
-    _spy = handleScrollSpyTags.bind(this, dotnetReference, tagNames);
+export function scrollSpy(this: any, dotnetReference: DotNet.DotNetObject, selector: string) {
+    _spy = handleScrollSpy.bind(this, dotnetReference, selector);
     document.addEventListener('scroll', _spy, true);
     window.addEventListener('resize', _spy, true);
     _spy(null as any);
@@ -125,58 +118,8 @@ function clearLastScrolled() {
     }
 }
 
-function handleScrollSpy(dotnetReference: DotNet.DotNetObject, className: string, event: Event) {
-    const elements = document.getElementsByClassName(className);
-    if (elements.length === 0) {
-        clearLastScrolled();
-        return;
-    }
-
-    let lowest = Number.MAX_SAFE_INTEGER;
-    let lowestAboveZero = Number.MAX_SAFE_INTEGER;
-    let lowestElementId = '';
-    let lowestElementIdAboveZero = '';
-    for (let i = 0; i < elements.length; i++) {
-        const element = elements[i];
-
-        const rect = element.getBoundingClientRect();
-
-        if (rect.top < lowest) {
-            lowest = rect.top;
-            lowestElementId = element.id;
-        }
-        if (rect.top > 0
-            && rect.top < lowestAboveZero) {
-            lowestAboveZero = rect.top;
-            lowestElementIdAboveZero = element.id;
-        }
-    }
-
-    const element = document.getElementById(lowestElementIdAboveZero)
-        ?? document.getElementById(lowestElementId);
-    if (!element) {
-        clearLastScrolled();
-        return;
-    }
-
-    if (element.getBoundingClientRect().top < window.innerHeight * 0.8 === false) {
-        return;
-    }
-
-    const elementId = element.id;
-    if (elementId != _lastElement) {
-        clearLastScrolled();
-        _lastElement = elementId;
-        element.classList.add("scroll-active");
-        dotnetReference.invokeMethodAsync('RaiseOnScrollSpy', elementId);
-    }
-}
-
-function handleScrollSpyTags(dotnetReference: DotNet.DotNetObject, tagNames: string[], event: Event) {
-    const elements = [];
-    for (let i = 0; i < tagNames.length; i++) {
-        elements.push(...document.getElementsByTagName(tagNames[i]));
-    }
+function handleScrollSpy(dotnetReference: DotNet.DotNetObject, selector: string, event: Event) {
+    const elements = document.querySelectorAll(selector);
     if (elements.length === 0) {
         clearLastScrolled();
         return;

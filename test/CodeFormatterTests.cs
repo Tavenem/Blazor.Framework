@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Tavenem.Blazor.Framework.Docs.Utilities;
+using Tavenem.Blazor.Framework.DocPages.Utilities;
 
 namespace Tavenem.Blazor.Framework.Test;
 

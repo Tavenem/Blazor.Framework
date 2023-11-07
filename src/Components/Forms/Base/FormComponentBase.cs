@@ -9,18 +9,34 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// </summary>
 public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormComponent
 {
+    /// <summary>
+    /// The model to which unbound form components are bound.
+    /// </summary>
+    private protected class FormComponentBaseDefaultModelClass<T>
+    {
+        /// <summary>
+        /// A field to which the form component will bind.
+        /// </summary>
+        public T? This_field { get; set; }
+    }
+
     private readonly AsyncAdjustableTimer _timer;
     private readonly AsyncAdjustableTimer _touchedTimer;
 
+    private protected FormComponentBaseDefaultModelClass<TValue>? _dummyModel;
     private List<string>? _customValidationMessages;
     private bool _disposedValue;
     private string? _incomingValueBeforeParsing;
     private bool _initialParametersSet;
-    private Type? _nullableUnderlyingType;
     private bool _parsingFailed;
     private ValidationMessageStore? _parsingValidationMessages;
     private bool _previousParsingAttemptFailed;
     private ValidationMessageStore? _requiredValidationMessages;
+
+    /// <summary>
+    /// Whether this input should receive focus on page load.
+    /// </summary>
+    [Parameter] public bool AutoFocus { get; set; }
 
     /// <summary>
     /// Custom CSS class(es) for the component.
@@ -28,9 +44,35 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     [Parameter] public string? Class { get; set; }
 
     /// <summary>
+    /// Whether the input is disabled.
+    /// </summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// A reference to the input element.
+    /// </summary>
+    public virtual ElementReference ElementReference { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The id of the input element.
+    /// </para>
+    /// <para>
+    /// A random id will be assigned if none is supplied (including through
+    /// splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    /// <summary>
     /// The name of the input element.
     /// </summary>
     [Parameter] public virtual string? Name { get; set; }
+
+    /// <summary>
+    /// Whether the input is read-only.
+    /// </summary>
+    [Parameter] public bool ReadOnly { get; set; }
 
     /// <summary>
     /// Custom CSS style(s) for the component.
@@ -65,6 +107,21 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     public TValue? InitialValue { get; private set; }
 
     /// <summary>
+    /// Custom HTML attributes for the input element.
+    /// </summary>
+    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
+
+    /// <summary>
+    /// Custom CSS class(es) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputClass { get; set; }
+
+    /// <summary>
+    /// Custom CSS style(s) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputStyle { get; set; }
+
+    /// <summary>
     /// Whether this field's value has been changed.
     /// </summary>
     [Parameter] public bool IsTouched { get; set; }
@@ -90,6 +147,11 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     [Parameter] public EventCallback<bool> IsValidChanged { get; set; }
 
     /// <summary>
+    /// A label which describes the field.
+    /// </summary>
+    [Parameter] public string? Label { get; set; }
+
+    /// <summary>
     /// Whether this field is required.
     /// </summary>
     [Parameter] public bool Required { get; set; }
@@ -107,8 +169,17 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// "required" message.
     /// </para>
     /// </summary>
-    [Parameter]
-    public string? RequiredValidationMessage { get; set; } = "{0} is required";
+    [Parameter] public string? RequiredValidationMessage { get; set; } = "{0} is required";
+
+    /// <summary>
+    /// The tabindex of the input element.
+    /// </summary>
+    [Parameter] public int TabIndex { get; set; }
+
+    /// <summary>
+    /// One of the built-in color themes.
+    /// </summary>
+    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
     /// <para>
@@ -129,10 +200,15 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// </summary>
     protected new virtual string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("form-field")
+        .Add("field")
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
+        .Add("required", Required)
+        .Add("no-label", string.IsNullOrEmpty(Label))
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
         .Add("invalid", IsInvalidAndTouched)
+        .Add(EffectiveThemeColor.ToCSS())
         .ToString();
 
     /// <summary>
@@ -207,7 +283,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
 
             var previousValue = CurrentValue;
 
-            if (_nullableUnderlyingType != null && string.IsNullOrEmpty(value))
+            if (NullableUnderlyingType != null && string.IsNullOrEmpty(value))
             {
                 // Assume if it's a nullable type, null/empty inputs should correspond to default(T)
                 // Then all subclasses get nullable support almost automatically (they just have to
@@ -262,9 +338,38 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     }
 
     /// <summary>
+    /// The final <see cref="Framework.ThemeColor"/> for this element.
+    /// </summary>
+    protected virtual ThemeColor EffectiveThemeColor => ThemeColor;
+
+    /// <summary>
     /// The <see cref="Framework.Form"/> in which this component is located.
     /// </summary>
     [CascadingParameter] protected Form? Form { get; set; }
+
+    /// <summary>
+    /// The final value assigned to the input element's class attribute, including component values.
+    /// </summary>
+    protected virtual string? InputCssClass => new CssBuilder(InputClass)
+        .AddClassFromDictionary(InputAttributes)
+        .Add("input-core")
+        .ToString();
+
+    /// <summary>
+    /// The final value assigned to the input element's style attribute.
+    /// </summary>
+    protected virtual string? InputCssStyle => new CssBuilder(InputStyle)
+        .AddStyleFromDictionary(InputAttributes)
+        .ToString();
+
+    /// <summary>
+    /// Whether this control is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
+    /// cref="IsInteractive"/> is <see langword="false"/>.
+    /// </remarks>
+    protected virtual bool IsDisabled => Disabled || !IsInteractive;
 
     /// <summary>
     /// <para>
@@ -277,14 +382,33 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     [CascadingParameter] protected bool IsNested { get; set; }
 
     /// <summary>
+    /// Whether the control is being rendered interactively.
+    /// </summary>
+    protected bool IsInteractive { get; set; }
+
+    /// <summary>
     /// Whether this field is currently invalid and has been changed.
     /// </summary>
     protected bool IsInvalidAndTouched => !IsValid && IsTouched;
 
     /// <summary>
+    /// Whether this control is currently read-only.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
+    /// cref="IsInteractive"/> is <see langword="false"/>.
+    /// </remarks>
+    protected virtual bool IsReadOnly => ReadOnly || !IsInteractive;
+
+    /// <summary>
     /// The final value to be assigned to the HTML input element's <c>name</c> attribute.
     /// </summary>
     protected string NameValue => Name ?? NameAttributeValue;
+
+    /// <summary>
+    /// The underlying type of this input, if <typeparamref name="TValue"/> is a nullable type.
+    /// </summary>
+    protected Type? NullableUnderlyingType { get; private set; }
 
     /// <summary>
     /// Constructs a new instance of <see cref="FormComponentBase{TValue}"/>.
@@ -300,6 +424,12 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     {
         var wasRequired = Required;
 
+        if (ValueExpression is null)
+        {
+            _dummyModel = new();
+            ValueExpression = () => _dummyModel.This_field!;
+        }
+
         await base.SetParametersAsync(parameters);
 
         if (!_initialParametersSet)
@@ -307,7 +437,7 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
             InitialValue = Value;
             _initialParametersSet = true;
 
-            _nullableUnderlyingType = Nullable.GetUnderlyingType(typeof(TValue));
+            NullableUnderlyingType = Nullable.GetUnderlyingType(typeof(TValue));
 
             // Set initial required validation
             if (EditContext is not null)
@@ -362,6 +492,17 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     }
 
     /// <inheritdoc/>
+    protected override void OnParametersSet()
+    {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void OnInitialized()
     {
         if (!IsNested)
@@ -369,6 +510,21 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
             Form?.Add(this);
         }
     }
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            IsInteractive = true;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>
+    /// Focuses this input.
+    /// </summary>
+    public virtual async Task FocusAsync() => await ElementReference.FocusAsync();
 
     /// <summary>
     /// <para>

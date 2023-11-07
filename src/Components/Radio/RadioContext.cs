@@ -5,28 +5,21 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A context for radio input groups.
 /// </summary>
-internal sealed class RadioContext<TValue>
+/// <param name="parentContext">The parent context, if any.</param>
+/// <param name="changeEventCallback">
+/// The event callback to be invoked when the selected value is changed.
+/// </param>
+internal sealed class RadioContext<TValue>(
+    RadioContext<TValue>? parentContext,
+    EventCallback<ChangeEventArgs> changeEventCallback)
 {
-    public EventCallback<ChangeEventArgs> ChangeEventCallback { get; }
+    public EventCallback<ChangeEventArgs> ChangeEventCallback { get; } = changeEventCallback;
 
     public TValue? CurrentValue { get; set; }
 
     public string? GroupName { get; set; }
 
-    public RadioContext<TValue>? ParentContext { get; }
-
-    /// <summary>
-    /// Instantiates a new <see cref="RadioContext{TValue}" />.
-    /// </summary>
-    /// <param name="parentContext">The parent context, if any.</param>
-    /// <param name="changeEventCallback">
-    /// The event callback to be invoked when the selected value is changed.
-    /// </param>
-    public RadioContext(RadioContext<TValue>? parentContext, EventCallback<ChangeEventArgs> changeEventCallback)
-    {
-        ParentContext = parentContext;
-        ChangeEventCallback = changeEventCallback;
-    }
+    public RadioContext<TValue>? ParentContext { get; } = parentContext;
 
     /// <summary>
     /// Finds a <see cref="RadioContext{TValue}"/> in the context's ancestors with the matching

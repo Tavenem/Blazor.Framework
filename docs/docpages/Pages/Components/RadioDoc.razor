@@ -7,9 +7,9 @@
 <p>
     Radio buttons are handled in the Tavenem Blazor Framework by two components: the
     <code>RadioGroup</code> and the <code>RadioButton</code>. A <code>RadioButton</code> is a rich
-    wrapper for an input element with the radio type. It <em>must</em> be nested within a
-    <code>RadioGroup</code> component, which provides a shared context that coordinates the
-    selected value among its radio buttons.
+    wrapper for an input element with the radio type. It is expected to be nested within a
+    <code>RadioGroup</code> component, which provides a shared context that coordinates the selected
+    value among its radio buttons. However, a <code>RadioButton</code> can also be used standalone.
 </p>
 
 <h2>Basics</h2>
@@ -455,6 +455,14 @@
 </p>
 
 <p>
+    You can also set the <code>AutoFocus</code> property of a <code>RadioGroup</code> to
+    <code>true</code> in order to make the first auto-generated <code>RadioButton</code> receive
+    that property value. However, note that this will produce undesired behavior if any
+    manually-added <code>RadioButton</code> components are assigned to the group (since those are
+    placed before auto-generated ones).
+</p>
+
+<p>
     Be cautious when using this property. It can be unfriendly to users who use screen-reading
     technology.
 </p>
@@ -462,7 +470,10 @@
 <h2>Methods</h2>
 
 <p>
-    The <code>FocusAsync</code> method will give a <code>RadioButton</code> focus.
+    The <code>FocusAsync</code> method will give a <code>RadioButton</code> focus. When used on a
+    <code>RadioGroup</code> it assigns focus to the first auto-generated <code>RadioButton</code>,
+    if one exists, or to the group as a whole if there are no auto-generated
+    <code>RadioButton</code> components.
 </p>
 
 <h2>Customization</h2>

@@ -249,9 +249,10 @@
 }
 
 @code {
-    private IEnumerable<KeyValuePair<Origin, string?>> _origins = Enum
+    private List<KeyValuePair<Origin, string?>> _origins = Enum
         .GetValues<Origin>()
         .ToList()
         .Where(x => x != Origin.None)
-        .Select(x => new KeyValuePair<Origin, string?>(x, x.ToHumanReadable()));
+        .Select(x => new KeyValuePair<Origin, string?>(x, x.ToHumanReadable()))
+        .ToList();
 }

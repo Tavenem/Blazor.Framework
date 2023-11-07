@@ -21,6 +21,18 @@ public class QueryStateService
     private readonly NavigationManager _navigationManager;
 
     /// <summary>
+    /// Whether the service has finished parsing the current query string and set the initial values
+    /// of all tracked components.
+    /// </summary>
+    /// <remarks>
+    /// This operation is performed lazily the first time any of the public methods of the service
+    /// are called. Therefore the value of this property will normally be <see langword="false"/>
+    /// before any component has registered a callback or value, and <see langword="true"/> after at
+    /// least one component has done so.
+    /// </remarks>
+    public bool IsInitialized { get; private set; }
+
+    /// <summary>
     /// Constructs a new instance of <see cref="QueryStateService"/>.
     /// </summary>
     /// <param name="navigationManager">
@@ -91,6 +103,8 @@ public class QueryStateService
         bool replace = true,
         object? defaultValue = null)
     {
+        InitializeFromQuery();
+
         if (callback is not null)
         {
             if (!_callbacks.TryGetValue(id, out var componentCallbacks))
@@ -181,6 +195,8 @@ public class QueryStateService
         Func<QueryChangeEventArgs, Task>? callback = null,
         bool replace = true)
     {
+        InitializeFromQuery();
+
         if (callback is not null)
         {
             if (!_callbacks.TryGetValue(id, out var componentCallbacks))
@@ -244,13 +260,16 @@ public class QueryStateService
         string property,
         object? value,
         bool add = false)
-        => _navigationManager
-        .GetUriWithQueryParameters(
+    {
+        InitializeFromQuery();
+
+        return _navigationManager.GetUriWithQueryParameters(
             GetQueryParameter(
                 id,
                 property,
                 value,
                 add));
+    }
 
     /// <summary>
     /// Gets the current URI if the given <see langword="property"/> for the component with the
@@ -285,13 +304,16 @@ public class QueryStateService
         string property,
         IEnumerable<object?>? values,
         bool add = false)
-        => _navigationManager
-        .GetUriWithQueryParameters(
+    {
+        InitializeFromQuery();
+
+        return _navigationManager.GetUriWithQueryParameters(
             GetQueryParameter(
                 id,
                 property,
                 values,
                 add));
+    }
 
     /// <summary>
     /// Registers a component's property with the service, without setting a current value.
@@ -335,6 +357,8 @@ public class QueryStateService
         Func<QueryChangeEventArgs, Task>? callback,
         object? defaultValue = null)
     {
+        InitializeFromQuery();
+
         if (callback is not null)
         {
             if (!_callbacks.TryGetValue(id, out var componentCallbacks))
@@ -371,6 +395,8 @@ public class QueryStateService
     /// </param>
     public void RemoveComponent(string id, bool replace = true)
     {
+        InitializeFromQuery();
+
         _callbacks.Remove(id);
         if (_componentProperties.TryGetValue(id, out var componentProperties))
         {
@@ -401,6 +427,8 @@ public class QueryStateService
         bool removeCallback = false,
         bool replace = true)
     {
+        InitializeFromQuery();
+
         if (removeCallback
             && _callbacks.TryGetValue(id, out var componentCallbacks))
         {
@@ -470,6 +498,8 @@ public class QueryStateService
         bool replace = true,
         object? defaultValue = null)
     {
+        InitializeFromQuery();
+
         if (callback is not null)
         {
             if (!_callbacks.TryGetValue(id, out var componentCallbacks))
@@ -581,6 +611,8 @@ public class QueryStateService
         bool replace = true,
         object? defaultValue = null)
     {
+        InitializeFromQuery();
+
         if (callback is not null)
         {
             if (!_callbacks.TryGetValue(id, out var componentCallbacks))
@@ -627,81 +659,6 @@ public class QueryStateService
         if (update)
         {
             UpdateQuery(replace);
-        }
-    }
-
-    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        if (!Uri.TryCreate(e.Location, UriKind.Absolute, out var uri))
-        {
-            return;
-        }
-
-        if (!QueryHelpers
-            .ParseQuery(uri.Query)
-            .TryGetValue(QueryParameterName, out var queryValues))
-        {
-            var queryParameter = GetQueryParameterString(_componentProperties);
-            if (!string.IsNullOrEmpty(queryParameter))
-            {
-                _navigationManager.NavigateTo(
-                    _navigationManager.GetUriWithQueryParameters(
-                        GetQueryParameter(queryParameter)),
-                    false,
-                    true);
-            }
-            return;
-        }
-
-        var changes = new Dictionary<string, Dictionary<string, QueryChangeEventArgs>>();
-        foreach (var queryValue in queryValues)
-        {
-            ParseQueryParameter(changes, queryValue);
-        }
-
-        foreach (var (id, propertyChanges) in changes)
-        {
-            if (!_callbacks.TryGetValue(id, out var callbacks))
-            {
-                callbacks = [];
-            }
-            if (!_componentProperties.TryGetValue(id, out var componentProperties))
-            {
-                componentProperties = [];
-            }
-            foreach (var (property, changeEventArgs) in propertyChanges)
-            {
-                if (changeEventArgs.Values is null
-                    && changeEventArgs.Value is null)
-                {
-                    componentProperties.Remove(property);
-                    if (componentProperties.Count == 0)
-                    {
-                        _componentProperties.Remove(id);
-                    }
-                }
-                else
-                {
-                    componentProperties[property] = changeEventArgs.Values ?? [changeEventArgs.Value!];
-                }
-
-                if (callbacks.TryGetValue(property, out var callback))
-                {
-                    await callback.Invoke(changeEventArgs);
-                }
-            }
-        }
-
-        var newQueryParameter = GetQueryParameterString(_componentProperties);
-
-        if (queryValues.Count > 1
-            || !string.Equals(newQueryParameter, queryValues, StringComparison.Ordinal))
-        {
-            _navigationManager.NavigateTo(
-                _navigationManager.GetUriWithQueryParameters(
-                    GetQueryParameter(newQueryParameter)),
-                false,
-                true);
         }
     }
 
@@ -820,11 +777,11 @@ public class QueryStateService
         return list;
     }
 
-    private static Dictionary<string, object?> GetQueryParameter(string? queryParamaterString) => new()
+    private static Dictionary<string, object?> GetQueryParameter(string? queryParameterString) => new()
     {
         {
             QueryParameterName,
-            queryParamaterString
+            queryParameterString
         }
     };
 
@@ -846,6 +803,46 @@ public class QueryStateService
         }
 
         return value;
+    }
+
+    private void InitializeFromQuery()
+    {
+        if (IsInitialized
+            || !Uri.TryCreate(_navigationManager.Uri, UriKind.Absolute, out var uri)
+            || !QueryHelpers
+            .ParseQuery(uri.Query)
+            .TryGetValue(QueryParameterName, out var queryValues))
+        {
+            return;
+        }
+
+        var changes = new Dictionary<string, Dictionary<string, QueryChangeEventArgs>>();
+        foreach (var queryValue in queryValues)
+        {
+            ParseQueryParameter(changes, queryValue);
+        }
+
+        foreach (var (id, propertyChanges) in changes)
+        {
+            Dictionary<string, List<string>> componentProperties = [];
+            foreach (var (property, changeEventArgs) in propertyChanges)
+            {
+                if (changeEventArgs.Values is not null)
+                {
+                    componentProperties[property] = changeEventArgs.Values;
+                }
+                else if (changeEventArgs.Value is not null)
+                {
+                    componentProperties[property] = [changeEventArgs.Value];
+                }
+            }
+            if (componentProperties.Count > 0)
+            {
+                _componentProperties[id] = componentProperties;
+            }
+        }
+
+        IsInitialized = true;
     }
 
     private void InvokeCallback(string id, string property, QueryChangeEventArgs e)
@@ -984,6 +981,81 @@ public class QueryStateService
             componentPropertyValues[property] = valueStrings;
         }
         return GetQueryParameter(GetQueryParameterString(componentProperties, true));
+    }
+
+    private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (!Uri.TryCreate(e.Location, UriKind.Absolute, out var uri))
+        {
+            return;
+        }
+
+        if (!QueryHelpers
+            .ParseQuery(uri.Query)
+            .TryGetValue(QueryParameterName, out var queryValues))
+        {
+            var queryParameter = GetQueryParameterString(_componentProperties);
+            if (!string.IsNullOrEmpty(queryParameter))
+            {
+                _navigationManager.NavigateTo(
+                    _navigationManager.GetUriWithQueryParameters(
+                        GetQueryParameter(queryParameter)),
+                    false,
+                    true);
+            }
+            return;
+        }
+
+        var changes = new Dictionary<string, Dictionary<string, QueryChangeEventArgs>>();
+        foreach (var queryValue in queryValues)
+        {
+            ParseQueryParameter(changes, queryValue);
+        }
+
+        foreach (var (id, propertyChanges) in changes)
+        {
+            if (!_callbacks.TryGetValue(id, out var callbacks))
+            {
+                callbacks = [];
+            }
+            if (!_componentProperties.TryGetValue(id, out var componentProperties))
+            {
+                componentProperties = [];
+            }
+            foreach (var (property, changeEventArgs) in propertyChanges)
+            {
+                if (changeEventArgs.Values is null
+                    && changeEventArgs.Value is null)
+                {
+                    componentProperties.Remove(property);
+                    if (componentProperties.Count == 0)
+                    {
+                        _componentProperties.Remove(id);
+                    }
+                }
+                else
+                {
+                    componentProperties[property] = changeEventArgs.Values ?? [changeEventArgs.Value!];
+                }
+
+                if (callbacks.TryGetValue(property, out var callback))
+                {
+                    await callback.Invoke(changeEventArgs);
+                }
+            }
+        }
+
+        var newQueryParameter = GetQueryParameterString(_componentProperties);
+
+        if (queryValues.Count > 1
+            || !string.Equals(newQueryParameter, queryValues, StringComparison.Ordinal))
+        {
+            _navigationManager.NavigateTo(
+                _navigationManager.GetUriWithQueryParameters(
+                    GetQueryParameter(newQueryParameter)),
+                false,
+                true);
+        }
     }
 
     private void ParseQueryParameter(Dictionary<string, Dictionary<string, QueryChangeEventArgs>> changes, string? queryParameter)

@@ -2,7 +2,7 @@
 
 @typeparam TValue
 
-@inherits ComponentBase
+@inherits BoolInputComponentBase<TValue>
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
     <label>
@@ -12,16 +12,16 @@
                    id="@Id"
                    type="radio"
                    tabindex="@TabIndex"
-                   class="@InputClass"
-                   style="@InputStyle"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
                    autofocus="@AutoFocus"
-                   checked="@IsChecked"
-                   disabled="@Group?.IsDisabled"
-                   name="@Context!.GroupName"
-                   readonly="@Group?.IsReadOnly"
+                   checked="@IsCheckedString"
+                   disabled="@IsDisabled"
+                   name="@(Context?.GroupName ?? NameValue)"
+                   readonly="@IsReadOnly"
                    value="@Value?.ToString()"
-                   @onchange="@Context.ChangeEventCallback"
-                   @onclick:preventDefault="@(Group?.IsReadOnly ?? false)" />
+                   @onchange="OnChangeAsync"
+                   @onclick:preventDefault="@(IsDisabled || IsReadOnly)" />
             <tf-icon>@Icon</tf-icon>
         </span>
         @if (LabelContent is not null)

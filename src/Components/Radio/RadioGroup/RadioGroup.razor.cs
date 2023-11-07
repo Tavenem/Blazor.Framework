@@ -9,6 +9,7 @@ namespace Tavenem.Blazor.Framework;
 /// A group for radio buttons.
 /// </summary>
 public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
+    : FormComponentBase<TValue>
 {
     private readonly string _defaultGroupName = Guid.NewGuid().ToHtmlId();
 
@@ -35,10 +36,22 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// </summary>
     [Parameter] public InputValueConverter<TValue>? Converter { get; set; }
 
-    /// <summary>
-    /// Whether the input is disabled.
-    /// </summary>
-    [Parameter] public bool Disabled { get; set; }
+    /// <inheritdoc />
+    public override ElementReference ElementReference
+    {
+        get => FirstButton?.ElementReference ?? FieldSet;
+        set
+        {
+            if (FirstButton is not null)
+            {
+                FirstButton.ElementReference = value;
+            }
+            else
+            {
+                FieldSet = value;
+            }
+        }
+    }
 
     /// <summary>
     /// The format string to use for conversion.
@@ -56,38 +69,10 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     [Parameter] public IFormatProvider? FormatProvider { get; set; }
 
     /// <summary>
-    /// A label which describes the field.
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
-
-    /// <summary>
     /// A template for the labels of dynamic radio buttons generated from the <see cref="Values"/>
     /// collection.
     /// </summary>
     [Parameter] public RenderFragment<TValue>? LabelTemplate { get; set; }
-
-    /// <summary>
-    /// Whether the input is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
-    /// The tabindex of the first item in the group.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// When this is &lt;= zero, all radios will have the same index.
-    /// </para>
-    /// <para>
-    /// When it is greater than zero, the radios will have incrementing indexes.
-    /// </para>
-    /// </remarks>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
     /// The icon to use for the unchecked state.
@@ -96,7 +81,7 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
 
     /// <summary>
     /// <para>
-    /// An optional enumeration of available values, with labels.
+    /// An optional list of available values, with labels.
     /// </para>
     /// <para>
     /// If provided, dynamic radio buttons will be generated for these values. The value of each
@@ -104,11 +89,11 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// the <see cref="KeyValuePair{TKey, TValue}.Value"/>.
     /// </para>
     /// </summary>
-    [Parameter] public IEnumerable<KeyValuePair<TValue, string?>>? ValuePairs { get; set; }
+    [Parameter] public IList<KeyValuePair<TValue, string?>>? ValuePairs { get; set; }
 
     /// <summary>
     /// <para>
-    /// An optional enumeration of available values.
+    /// An optional list of available values.
     /// </para>
     /// <para>
     /// If provided, dynamic radio buttons will be generated for these values.
@@ -119,40 +104,18 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// of calling <see cref="object.ToString"/> on the value.
     /// </para>
     /// </summary>
-    [Parameter] public IEnumerable<TValue>? Values { get; set; }
+    [Parameter] public IList<TValue>? Values { get; set; }
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("radio-group")
-        .Add(ThemeColor.ToCSS())
-        .Add("disabled", IsDisabled)
-        .Add("required", Required)
         .ToString();
-
-    /// <summary>
-    /// Whether this control is currently disabled.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    internal bool IsDisabled => Disabled || !Interactive;
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    internal bool IsReadOnly => ReadOnly || !Interactive;
 
     [CascadingParameter] private RadioContext<TValue>? CascadingContext { get; set; }
 
-    /// <summary>
-    /// Whether the control is being rendered interactively.
-    /// </summary>
-    private bool Interactive { get; set; }
+    private ElementReference FieldSet { get; set; }
+
+    private RadioButton<TValue>? FirstButton { get; set; }
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
@@ -160,7 +123,10 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
         if (_context is null
             || _context.ParentContext != CascadingContext)
         {
-            var callback = EventCallback.Factory.CreateBinder<string?>(this, v => CurrentValueAsString = v, CurrentValueAsString);
+            var callback = EventCallback.Factory.CreateBinder<string?>(
+                this,
+                v => CurrentValueAsString = v,
+                CurrentValueAsString);
             _context = new RadioContext<TValue>(CascadingContext, callback);
         }
 
@@ -179,16 +145,6 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
             {
                 Converter.FormatProvider = FormatProvider;
             }
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Interactive = true;
-            StateHasChanged();
         }
     }
 

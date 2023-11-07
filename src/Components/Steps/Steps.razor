@@ -1,6 +1,6 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
-@inherits TavenemComponentBase
+@inherits PersistentComponentBase
 
 <div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
     <ol class="step-list">
@@ -8,7 +8,7 @@
         {
             <li class="step-selector">
                 <span class="step-separator step-separator-begin"></span>
-                @if (Interactive)
+                @if (IsInteractive)
                 {
                     <span class="@GetStepActivatorCssClass(step)" @onclick="@(_ => OnActivateStepAsync(step))">
                         <span class="step-number"></span>
@@ -20,7 +20,7 @@
                 }
                 else
                 {
-                    <a href="GetStepUrl(step)" class="@GetStepActivatorCssClass(step)">
+                    <a href="@GetStepUrl(step)" class="@GetStepActivatorCssClass(step)">
                         <span class="step-number"></span>
                         @if (!string.IsNullOrEmpty(step.Title))
                         {
@@ -51,7 +51,7 @@
     <div class="d-flex">
         @if (ShowPrevious)
         {
-            @if (Interactive || PreviousDisabled)
+            @if (IsInteractive || PreviousDisabled)
             {
                 <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
                     <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
@@ -60,7 +60,7 @@
             }
             else
             {
-                <a href="GetPreviousStepUrl" class="@PreviousButtonCssClass">
+                <a href="@GetPreviousStepUrl" class="@PreviousButtonCssClass">
                     <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
                     <span>Back</span>
                 </a>
@@ -72,7 +72,7 @@
         }
         else if (ShowNext)
         {
-            @if (Interactive || NextDisabled)
+            @if (IsInteractive || NextDisabled)
             {
                 <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
                     <span>Next</span>
@@ -81,7 +81,7 @@
             }
             else
             {
-                <a href="GetNextStepUrl" class="@NextButtonCssClass">
+                <a href="@GetNextStepUrl" class="@NextButtonCssClass">
                     <span>Next</span>
                     <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
                 </a>

@@ -1,12 +1,18 @@
 ﻿.chip {
     --tavenem-chip-active-color: var(--tavenem-color-default-darken);
     --tavenem-chip-active-color-outlined: var(--tavenem-color-action-hover-bg);
+    --tavenem-chip-border-color: var(--tavenem-color-border);
+    --tavenem-chip-border-style: none;
+    --tavenem-chip-color: var(--tavenem-color-default-text);
+    --tavenem-chip-color-bg: var(--tavenem-color-default);
     align-items: center;
-    background-color: var(--tavenem-color-default);
-    border: none;
+    background-color: var(--tavenem-chip-color-bg);
+    border-color: var(--tavenem-chip-border-color);
     border-radius: 9999px;
+    border-style: var(--tavenem-chip-border-style);
+    border-width: 2px;
     box-sizing: border-box;
-    color: var(--tavenem-color-default-text);
+    color: var(--tavenem-chip-color);
     column-gap: .25rem;
     cursor: default;
     display: inline-flex;
@@ -32,10 +38,10 @@
         &:hover:not(.disabled, :disabled),
         &:focus-visible:not(.disabled, :disabled),
         &.selected {
-            background-color: var(--tavenem-chip-active-color);
+            --tavenem-chip-color-bg: var(--tavenem-chip-active-color);
 
             &.outlined {
-                background-color: var(--tavenem-chip-active-color-outlined);
+                --tavenem-chip-color-bg: var(--tavenem-chip-active-color-outlined);
             }
         }
     }
@@ -61,9 +67,9 @@
     }
 
     &.outlined {
-        background-color: transparent;
-        border: 1px solid var(--tavenem-color-border);
-        color: var(--tavenem-color-text);
+        --tavenem-chip-color-bg: transparent;
+        --tavenem-chip-border-style: solid;
+        --tavenem-chip-color: var(--tavenem-color-text);
     }
 
     tf-close {
@@ -74,8 +80,14 @@
         &.#{$theme} {
             --tavenem-chip-active-color: var(--tavenem-theme-color-darken);
             --tavenem-chip-active-color-outlined: var(--tavenem-theme-color-hover);
-            background-color: var(--tavenem-theme-color);
-            color: var(--tavenem-theme-color-text);
+            --tavenem-chip-color: var(--tavenem-theme-color-text);
+            --tavenem-chip-color-bg: var(--tavenem-theme-color);
+
+            &.outlined {
+                --tavenem-chip-border-color: var(--tavenem-theme-color);
+                --tavenem-chip-color: var(--tavenem-theme-color);
+                --tavenem-chip-color-bg: transparent;
+            }
         }
     }
 }
@@ -105,8 +117,8 @@ button.chip {
         &.#{$theme} {
             --tavenem-chip-active-color: var(--tavenem-theme-color-hover-bright);
             --tavenem-chip-active-color-outlined: var(--tavenem-theme-color-hover-bright);
-            background-color: var(--tavenem-theme-color-hover);
-            color: var(--tavenem-theme-color);
+            --tavenem-chip-color: var(--tavenem-theme-color);
+            --tavenem-chip-color-bg: var(--tavenem-theme-color-hover);
         }
     }
 }

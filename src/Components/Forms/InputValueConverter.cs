@@ -6,7 +6,17 @@ namespace Tavenem.Blazor.Framework;
 /// Converts an HTML input element's value string to and from a bound data type.
 /// </summary>
 /// <typeparam name="TValue">The bound data type.</typeparam>
-public class InputValueConverter<TValue>
+/// <param name="getter">
+/// A function to convert the input value to a bound value.
+/// </param>
+/// <param name="setter">
+/// <para>
+/// A function to convert the bound value to an input value.
+/// </para>
+/// </param>
+public class InputValueConverter<TValue>(
+    Func<string?, IFormatProvider?, TValue?> getter,
+    Func<TValue?, IFormatProvider?, string?, string?> setter)
 {
     /// <summary>
     /// An optional format string used during conversion.
@@ -32,31 +42,12 @@ public class InputValueConverter<TValue>
     /// <summary>
     /// A function to convert the input value to a bound value.
     /// </summary>
-    public Func<string?, IFormatProvider?, TValue?> Getter { get; }
+    public Func<string?, IFormatProvider?, TValue?> Getter { get; } = getter;
 
     /// <summary>
     /// A function to convert the bound value to an input value.
     /// </summary>
-    public Func<TValue?, IFormatProvider?, string?, string?> Setter { get; }
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="InputValueConverter{TValue}"/>.
-    /// </summary>
-    /// <param name="getter">
-    /// A function to convert the input value to a bound value.
-    /// </param>
-    /// <param name="setter">
-    /// <para>
-    /// A function to convert the bound value to an input value.
-    /// </para>
-    /// </param>
-    public InputValueConverter(
-        Func<string?, IFormatProvider?, TValue?> getter,
-        Func<TValue?, IFormatProvider?, string?, string?> setter)
-    {
-        Getter = getter;
-        Setter = setter;
-    }
+    public Func<TValue?, IFormatProvider?, string?, string?> Setter { get; } = setter;
 
     /// <summary>
     /// Tries to convert an input value to a bound value.

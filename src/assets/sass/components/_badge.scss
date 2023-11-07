@@ -1,4 +1,6 @@
 ﻿.badge {
+    --tavenem-badge-border-color: var(--tavenem-theme-color-darken-2, var(--tavenem-color-border));
+    --tavenem-badge-border-style: none;
     --tavenem-badge-color: inherit;
     --tavenem-badge-color-bg: var(--tavenem-color-default);
     --badge-content-inset-x: 4px;
@@ -19,8 +21,10 @@
 
     &:empty:after {
         background-color: var(--tavenem-badge-color-bg);
-        border-color: inherit;
+        border-color: var(--tavenem-badge-border-color);
         border-radius: 50%;
+        border-style: var(--tavenem-badge-border-style);
+        border-width: 2px;
         color: var(--tavenem-badge-color);
         content: '';
         height: .75em;
@@ -35,8 +39,10 @@
 
     > * {
         background-color: var(--tavenem-badge-color-bg);
-        border-color: inherit;
+        border-color: var(--tavenem-badge-border-color);
         border-radius: 9999px;
+        border-style: var(--tavenem-badge-border-style);
+        border-width: 2px;
         color: var(--tavenem-badge-color);
         inset: auto auto calc(100% - var(--badge-content-inset-y)) calc(100% - var(--badge-content-inset-x));
         letter-spacing: 0;
@@ -157,11 +163,9 @@
 
     &.border {
         border-style: none !important;
+        --tavenem-badge-border-style: solid;
 
         > * {
-            border-color: inherit;
-            border-style: solid;
-            border-width: 2px;
             padding: 3px 4px;
         }
 
@@ -170,12 +174,6 @@
             margin-inline-start: -4px;
             margin-inline-end: unset;
             margin-top: -4px;
-        }
-
-        &:empty:after {
-            border-color: inherit;
-            border-style: solid;
-            border-width: 2px;
         }
     }
 
@@ -189,17 +187,24 @@
 
     &.outlined {
         --tavenem-badge-color-bg: transparent;
-
-        > *, &:empty:after {
-            border-style: solid;
-            border-width: 1px;
-        }
+        --tavenem-badge-border-style: solid;
     }
 
     @each $theme in $theme-colors {
         &.#{$theme} {
+            --tavenem-badge-border-color: var(--tavenem-theme-color-text);
             --tavenem-badge-color: var(--tavenem-theme-color-text);
             --tavenem-badge-color-bg: var(--tavenem-theme-color);
+
+            &.outlined {
+                --tavenem-badge-border-color: var(--tavenem-theme-color);
+                --tavenem-badge-color: var(--tavenem-theme-color);
+                --tavenem-badge-color-bg: transparent;
+            }
+
+            &.border {
+                --tavenem-badge-border-color: var(--tavenem-theme-color-darken-2);
+            }
         }
     }
 }

@@ -390,7 +390,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// cref="LoadItems"/>.
     /// </para>
     /// </summary>
-    [Parameter] public List<TDataItem> Items { get; set; } = [];
+    [Parameter] public IList<TDataItem> Items { get; set; } = [];
 
     /// <summary>
     /// <para>

@@ -414,7 +414,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .border {
-    border-color: var(--tavenem-color-border);
+    border-color: var(--tavenem-theme-color-darken-2, var(--tavenem-color-border));
     border-style: solid !important;
     border-width: 1px !important;
 }
@@ -431,7 +431,7 @@ h1, h2, h3, h4, h5, h6,
 
 @each $side in $sides {
     .border-#{$side} {
-        border-#{$side}-color: var(--tavenem-color-border);
+        border-#{$side}-color: var(--tavenem-theme-color-darken-2, var(--tavenem-color-border));
         border-#{$side}-style: solid !important;
         border-#{$side}-width: 1px !important;
     }

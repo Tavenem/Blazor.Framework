@@ -200,14 +200,20 @@
     icons used for full and empty rating controls, respectively.
 </p>
 
+<p>
+    The <code>IsActiveOutlined</code> and <code>IsInactiveOutlined</code> properties can be used to
+    control whether the icons used for full and empty rating controls receive the "outlined" CSS
+    class, respectively. <code>IsInactiveOutlined</code> is <code>true</code> by default.
+</p>
+
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row flex-column center-items">
-            <Rating Value="3" ThemeColor="ThemeColor.Danger" ActiveIcon="favorite" InactiveIcon="favorite_border" />
+            <Rating Value="3" ThemeColor="ThemeColor.Danger" ActiveIcon="favorite" InactiveIcon="heart_broken" IsInactiveOutlined="false" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" ActiveIcon=""favorite"" InactiveIcon=""favorite_border"" />")
+        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" ActiveIcon=""favorite"" InactiveIcon=""heart_broken"" IsInactiveOutlined=""false"" />")
     </ChildContent>
 </Collapse>
 

@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A text input component.
 /// </summary>
-public partial class TextInput
+public partial class TextInput : InputComponentBase<string>
 {
     private readonly AdjustableTimer _focusTimer;
     private readonly AdjustableTimer _inputTimer;
@@ -62,11 +63,6 @@ public partial class TextInput
     /// </para>
     /// </summary>
     [Parameter] public string ClearIcon { get; set; } = DefaultIcons.Clear;
-
-    /// <summary>
-    /// A reference to the input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
 
     /// <summary>
     /// <para>
@@ -392,7 +388,7 @@ public partial class TextInput
     private bool ShowClear => Clearable
         && !Disabled
         && !ReadOnly
-        && Interactive
+        && IsInteractive
         && !Required;
 
     private string? SuggestionListCssClass => new CssBuilder("list clickable dense")
@@ -464,11 +460,6 @@ public partial class TextInput
     }
 
     /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public async Task FocusAsync() => await ElementReference.FocusAsync();
-
-    /// <summary>
     /// Selects all text in this input.
     /// </summary>
     public ValueTask SelectAsync() => ElementReference.SelectAsync();
@@ -520,7 +511,7 @@ public partial class TextInput
     /// <inheritdoc/>
     protected override bool TryParseValueFromString(
         string? value,
-        [MaybeNullWhen(false)] out string? result,
+        [MaybeNullWhen(false)] out string result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
         validationErrorMessage = null;
@@ -532,7 +523,7 @@ public partial class TextInput
         }
         else
         {
-            result = value;
+            result = value!;
         }
 
         return true;

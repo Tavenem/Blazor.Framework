@@ -170,7 +170,7 @@ public partial class Dropdown
     /// The CSS class assigned to the popover, including component values.
     /// </summary>
     protected string? PopoverCssClass => new CssBuilder(PopoverClass)
-        .Add("filled")
+        .Add("dropdown-popover filled")
         .ToString();
 
     private Origin? AnchorOriginOverride => OpenAtPointer ? Origin.Top_Left : null;

@@ -1,15 +1,14 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A set of <see cref="Step"/> components, one of which is visible at any time.
 /// </summary>
-public partial class Steps
+public partial class Steps : PersistentComponentBase
 {
-    private const string CurrentStepQueryParamName = "tfs_cs";
+    private const string CurrentStepQueryParamName = "s";
 
     private readonly List<Step> _steps = [];
 
@@ -32,12 +31,6 @@ public partial class Steps
     /// </para>
     /// </remarks>
     [Parameter] public bool AutoValidate { get; set; } = true;
-
-    /// <summary>
-    /// Any current step currently set for step controls.
-    /// </summary>
-    [SupplyParameterFromQuery(Name = CurrentStepQueryParamName), Parameter]
-    public string[]? CurrentStepQuery { get; set; }
 
     /// <summary>
     /// Supplies an edit context for the <see cref="Form"/> explicitly. If using this parameter, do
@@ -91,16 +84,6 @@ public partial class Steps
     public Form? Form { get; set; }
 
     /// <summary>
-    /// <para>
-    /// The id of the HTML element.
-    /// </para>
-    /// <para>
-    /// A generated id will be assigned if none is supplied (including through splatted attributes).
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = IdService.GenerateId(nameof(Collapse));
-
-    /// <summary>
     /// Specifies the top-level model object for the <see cref="Form"/>. An edit context will be
     /// constructed for this model. If using this parameter, do not also supply a value for <see
     /// cref="EditContext"/>.
@@ -137,8 +120,7 @@ public partial class Steps
     /// </summary>
     [Parameter] public EventCallback<ValidationStateChangedEventArgs> ValidationStateChanged { get; set; }
 
-    private IEnumerable<Step> VisibleSteps => _steps
-        .Where(x => x.IsVisible || x == _steps[CurrentStep]);
+    internal int InitialStep { get; private set; } = -1;
 
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(Class)
@@ -151,7 +133,7 @@ public partial class Steps
     private ThemeColor CurrentThemeColor
         => ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor;
 
-    private bool IsFinishButtonDisabled => !Interactive
+    private bool IsFinishButtonDisabled => !IsInteractive
         || FinishButtonDisabled
         || !IsFormValid;
 
@@ -160,11 +142,9 @@ public partial class Steps
         .Add(CurrentThemeColor.ToCSS(), !FinishButtonDisabled)
         .ToString();
 
-    private bool Interactive { get; set; }
+    private bool IsInteractive { get; set; }
 
     private bool IsFormValid { get; set; } = true;
-
-    [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     private string? NextButtonCssClass => new CssBuilder("btn ms-auto")
         .Add("btn-text", NextDisabled)
@@ -201,21 +181,21 @@ public partial class Steps
         .Take(CurrentStep)
         .LastOrDefault(x => x.IsVisible) is not null;
 
-    /// <inheritdoc/>
-    protected override void OnParametersSet()
-    {
-        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
-            && value is string id
-            && !string.IsNullOrWhiteSpace(id))
-        {
-            Id = id;
-        }
+    private IEnumerable<Step> VisibleSteps => _steps
+        .Where(x => x.IsVisible || x == _steps[CurrentStep]);
 
-        if (int.TryParse(CurrentStepQuery?
-            .FirstOrDefault(x => x.StartsWith(Id) && x.Length > Id.Length && x[Id.Length] == ':')?
-            [(Id.Length + 1)..], out var currentStep))
+    /// <inheritdoc/>
+    protected override void OnInitialized()
+    {
+        var currentSteps = QueryStateService.RegisterProperty(
+            Id,
+            CurrentStepQueryParamName,
+            OnQueryChangedAsync,
+            CurrentStep + 1);
+        if (currentSteps?.Count > 0
+            && int.TryParse(currentSteps[0], out var currentStep))
         {
-            CurrentStep = currentStep;
+            InitialStep = currentStep - 1;
         }
     }
 
@@ -224,7 +204,7 @@ public partial class Steps
     {
         if (firstRender)
         {
-            Interactive = true;
+            IsInteractive = true;
 
             if (_steps.Count > 0)
             {
@@ -269,10 +249,11 @@ public partial class Steps
         SetCurrentStep();
     }
 
-    internal void AddStep(Step step)
+    internal int AddStep(Step step)
     {
         _steps.Add(step);
         StateHasChanged();
+        return _steps.Count - 1;
     }
 
     internal void Refresh() => StateHasChanged();
@@ -285,9 +266,6 @@ public partial class Steps
 
     private string GetNextStepUrl()
     {
-        var currentStepQueries = CurrentStepQuery?.ToList();
-        currentStepQueries?.RemoveAll(x => x.StartsWith(Id));
-
         var step = CurrentStep;
         var next = _steps
             .Skip(CurrentStep + 1)
@@ -297,20 +275,14 @@ public partial class Steps
             step = _steps.IndexOf(next);
         }
 
-        if (step > 0)
-        {
-            (currentStepQueries ??= []).Add($"{Id}:{step}");
-        }
-
-        return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() });
+        return QueryStateService.GetUriWithPropertyValue(
+            Id,
+            CurrentStepQueryParamName,
+            step + 1);
     }
 
     private string GetPreviousStepUrl()
     {
-        var currentStepQueries = CurrentStepQuery?.ToList();
-        currentStepQueries?.RemoveAll(x => x.StartsWith(Id));
-
         var step = CurrentStep;
         var previous = _steps
             .Take(CurrentStep)
@@ -320,13 +292,10 @@ public partial class Steps
             step = _steps.IndexOf(previous);
         }
 
-        if (step > 0)
-        {
-            (currentStepQueries ??= []).Add($"{Id}:{step}");
-        }
-
-        return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() });
+        return QueryStateService.GetUriWithPropertyValue(
+            Id,
+            CurrentStepQueryParamName,
+            step + 1);
     }
 
     private string? GetStepActivatorCssClass(Step step) => new CssBuilder("step-activator")
@@ -340,22 +309,16 @@ public partial class Steps
 
     private string GetStepUrl(Step step)
     {
-        var currentStepQueries = CurrentStepQuery?.ToList();
-        currentStepQueries?.RemoveAll(x => x.StartsWith(Id));
-
         var index = _steps.IndexOf(step);
         if (index == -1)
         {
             index = CurrentStep;
         }
 
-        if (index > 0)
-        {
-            (currentStepQueries ??= []).Add($"{Id}:{index}");
-        }
-
-        return NavigationManager.GetUriWithQueryParameters(
-            new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() });
+        return QueryStateService.GetUriWithPropertyValue(
+            Id,
+            CurrentStepQueryParamName,
+            index + 1);
     }
 
     private async Task OnActivateStepAsync(Step step)
@@ -408,6 +371,18 @@ public partial class Steps
         SetCurrentStep();
     }
 
+    private Task OnQueryChangedAsync(QueryChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value, out var currentStep)
+            && _steps.Count >= currentStep
+            && _steps[currentStep - 1].IsVisible
+            && !_steps[currentStep - 1].Disabled)
+        {
+            CurrentStep = currentStep - 1;
+        }
+        return Task.CompletedTask;
+    }
+
     private async Task OnValidationStateChanged(ValidationStateChangedEventArgs e)
     {
         if (Form is null)
@@ -420,16 +395,12 @@ public partial class Steps
 
     private void SetCurrentStep()
     {
-        var currentStepQueries = CurrentStepQuery?.ToList();
-        currentStepQueries?.RemoveAll(x => x.StartsWith(Id));
-
-        if (CurrentStep > 0)
+        if (PersistState)
         {
-            (currentStepQueries ??= []).Add($"{Id}:{CurrentStep}");
+            QueryStateService.SetPropertyValue(
+                Id,
+                CurrentStepQueryParamName,
+                CurrentStep + 1);
         }
-
-        NavigationManager.NavigateTo(
-            NavigationManager.GetUriWithQueryParameters(
-                new Dictionary<string, object?> { [CurrentStepQueryParamName] = currentStepQueries?.ToArray() }));
     }
 }

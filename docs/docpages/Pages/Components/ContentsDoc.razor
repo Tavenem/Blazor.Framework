@@ -75,7 +75,7 @@
     describes a heading. The <code>FrameworkLayout</code> also provides these same methods, in order
     to add or remove headings from the built-in contents, and provides itself as a <a
     href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/cascading-values-and-parameters">cascading
-    value</a> so you can accesss these methods from any component.
+    value</a> so you can access these methods from any component.
 </p>
 
 <p>
@@ -89,7 +89,7 @@
     heading below to this page's table of contents:
 </p>
 
-<h3>Dynamic Heading</h3>
+<span class="h3">Dynamic Heading</span>
 <div class="d-flex gap-3">
     <button class="btn primary" @onclick="AddHeading" disabled="@_added">Add Heading to Contents</button>
     <button class="btn danger" @onclick="RemoveHeading" disabled="@(!_added)">Remove Heading from Contents</button>

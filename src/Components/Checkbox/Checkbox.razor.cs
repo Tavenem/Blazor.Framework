@@ -7,17 +7,12 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A checkbox input component.
 /// </summary>
-public partial class Checkbox<TValue>
+public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
 {
     /// <summary>
     /// The icon to use for the checked state.
     /// </summary>
     [Parameter] public string CheckedIcon { get; set; } = DefaultIcons.CheckBox_Checked;
-
-    /// <summary>
-    /// A reference to the input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
 
     /// <inheritdoc/>
     public override bool HasValue => RequiresTrue
@@ -45,11 +40,6 @@ public partial class Checkbox<TValue>
     /// The icon to use for the unchecked state.
     /// </summary>
     [Parameter] public string UncheckedIcon { get; set; } = DefaultIcons.CheckBox_Unchecked;
-
-    /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public ValueTask FocusAsync() => ElementReference.FocusAsync();
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)

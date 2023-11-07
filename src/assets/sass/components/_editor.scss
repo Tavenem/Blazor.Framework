@@ -256,11 +256,11 @@
         }
     }
 
-    &:not(.read-only) > .editor:hover {
+    &:not(.read-only, .disabled) > .editor:hover {
         border-color: var(--field-border-hover-color);
     }
 
-    &:focus-within:not(.read-only) {
+    &:focus-within:not(.read-only, .disabled) {
         --field-border-color: var(--field-active-border-color);
         --field-border-hover-color: var(--field-active-border-hover-color);
         --field-label-color: var(--field-active-label-color);

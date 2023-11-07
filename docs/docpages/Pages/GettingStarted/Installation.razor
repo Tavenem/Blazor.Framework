@@ -20,44 +20,15 @@
     </pre>
 </pre>
 
-<h2 data-heading-title="Add font link">3. Add font link</h2>
-<p>Add the following link to your HTML head in either <code>index.html</code> (WebAssembly standalone) or <code>App.razor</code> (Web app).</p>
-<pre class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(@"<link href=""https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=swap"" rel=""stylesheet"">", true)
-</pre>
+<h2 data-heading-title="Remove template CSS">3. Remove template CSS</h2>
 <p>
-    You may use different fonts if you prefer, but a <a
-    href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide">variable
-    font</a> is strongly recommended in order to work with the framework's styles most effectively.
-    The body font you select should support weights from 300–900, and an italic style. The title
-    font you select should support weights from 500–700.
+    If you started your project with the default Blazor template, delete the references to
+    Bootstrap, and all the pregenerated content in the <code>app.css</code> file (you can delete
+    this file completely if you don't plan to put your own content there).
 </p>
 <p>
-    One of the strengths of the <a href="https://www.recursive.design/">Recursive</a> font
-    is that it supports both a variable-width and monospace variant in the same font,
-    using a variable axis. If you select a different body font, you will also need to choose
-    a monospace font and override the <span class="pre-attribute">--tavenem-font-family-monospace</span>
-    property on <span class="pre-method">:root</span>.
-</p>
-<p>
-    If you prefer to use a different icon library, instead of <a
-    href="https://fonts.google.com/icons?icon.set=Material+Symbols">Google's Material Symbols</a>,
-    replace the link above with the appropriate process.
-</p>
-<p>
-    See the <a href="./components/icon">Icon</a> component documentation for details.
-</p>
-
-<h2 data-heading-title="Remove template CSS">4. Remove template CSS</h2>
-<p>
-    If you started your project with the default Blazor template, delete the
-    references to Bootstrap, and all the pregenerated content in the
-    <code>app.css</code> file (you can delete this file completely if you don't
-    plan to put your own content there).
-</p>
-<p>
-    Don't worry about the built-in Blazor styles in the template stylesheet. The
-    Tavenem Blazor Framework reproduces and modifies them.
+    Don't worry about the built-in Blazor styles in the template stylesheet. The Tavenem Blazor
+    Framework reproduces and modifies them.
 </p>
 <p>
     If you ordinarily use <a href="https://getbootstrap.com/">Bootstrap</a>, be aware that the
@@ -66,7 +37,7 @@
     your project, as there are likely to be conflicts leading to difficult styling issues.
 </p>
 
-<h2 data-heading-title="Register services with dependency injection">5. Register services with dependency injection</h2>
+<h2 data-heading-title="Register services with dependency injection">4. Register services with dependency injection</h2>
 <p>Add the following to your <code>Program.cs</code>:</p>
 <pre class="codeblock pre-razor-code">
     <pre class="user-select-all">
@@ -79,6 +50,6 @@
     project (for prerendering support) in Web Apps.
 </p>
 
-<h2 data-heading-title="Set up the Framework">6. Set up the Framework (optional, but strongly recommended)</h2>
-<p>Add a <code class="primary">FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>
+<h2 data-heading-title="Set up the Framework">5. Set up the Framework (optional, but strongly recommended)</h2>
+<p>Add a <code>FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>
 <p>See <a href="./layout/layout">Layout</a> for details.</p>

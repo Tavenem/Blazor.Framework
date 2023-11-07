@@ -92,9 +92,17 @@ export namespace TavenemPopover {
 
     export function placePopover(popoverNode: Element): void {
         if (!popoverNode
-            || !(popoverNode instanceof HTMLElement)
-            || !popoverNode.classList.contains('open')) {
+            || !(popoverNode instanceof HTMLElement)) {
             return;
+        }
+
+        if (!popoverNode.classList.contains('open')) {
+            const parent = popoverNode.closest('tf-dropdown');
+            if (!parent
+                || !(parent instanceof HTMLElement)
+                || !('open' in parent.dataset)) {
+                return;
+            }
         }
 
         const offsetParent = getOffsetParent(popoverNode);
@@ -453,6 +461,7 @@ export namespace TavenemPopover {
 export class TavenemPopoverHTMLElement extends HTMLElement {
     private _mouseOver: boolean;
     private _mutationObserver: MutationObserver;
+    private _parentMutationObserver: MutationObserver;
     private _parentResizeObserver: ResizeObserver;
     private _resizeObserver: ResizeObserver;
 
@@ -479,6 +488,24 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
                     }
 
                     TavenemPopover.placePopover(mutation.target);
+                }
+            }
+        });
+
+        this._parentMutationObserver = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+                if (mutation.type === 'attributes'
+                    && mutation.target instanceof HTMLElement) {
+                    const popover = mutation.target.querySelector('tf-popover');
+                    if (popover) {
+                        if (popover.classList.contains('flip-onopen') &&
+                            !('open' in mutation.target.dataset)) {
+                            delete mutation.target.dataset.popoverFlipped;
+                            delete mutation.target.dataset.popoverFlip;
+                        }
+
+                        TavenemPopover.placePopover(popover);
+                    }
                 }
             }
         });
@@ -569,6 +596,10 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
         this._mutationObserver.observe(this, { attributeFilter: ['class'] });
         this._parentResizeObserver.observe(containingParent);
         this._resizeObserver.observe(this);
+
+        if (this.parentElement instanceof TavenemDropdownHTMLElement) {
+            this._parentMutationObserver.observe(this.parentElement, { attributeFilter: ['data-open'] });
+        }
 
         let parentStyle: CSSStyleDeclaration;
         const overflowRegex = /(auto|scroll)/;
@@ -740,13 +771,13 @@ export class TavenemTooltipHTMLElement extends HTMLElement {
         const style = document.createElement('style');
         style.innerHTML = ':host {'
             + (anchor && anchor.style.position !== 'static'
-            ? `
+                ? `
     left: ${anchor.offsetLeft}px;
     position: absolute;
     top: ${anchor.offsetTop}px;
     width: 1rem;
 `
-            : 'position: relative;') + `
+                : 'position: relative;') + `
 }
 
 button {
@@ -997,8 +1028,15 @@ export class TavenemDropdownHTMLElement extends HTMLElement {
         const style = document.createElement('style');
         style.textContent = `:host {
     position: relative;
+}
+
+slot {
+    border-radius: inherit;
 }`;
         shadow.appendChild(style);
+
+        const slot = document.createElement('slot');
+        shadow.appendChild(slot);
 
         this.addEventListener('click', this.onClick.bind(this));
         this.addEventListener('contextmenu', this.onContext.bind(this));
@@ -1007,6 +1045,8 @@ export class TavenemDropdownHTMLElement extends HTMLElement {
         this.addEventListener('mouseenter', this.onTriggerMouseEnter.bind(this));
         this.addEventListener('mouseleave', this.onTriggerMouseLeave.bind(this));
         this.addEventListener('mouseup', this.toggle.bind(this));
+
+        document.addEventListener('mousedown', this.close.bind(this));
     }
 
     disconnectedCallback() {
@@ -1055,13 +1095,15 @@ export class TavenemDropdownHTMLElement extends HTMLElement {
     }
 
     private close() {
-        this._activation = MouseEventType.None;
-        this.closeInner();
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const popover = this.querySelector('tf-popover.dropdown-popover');
-        if (popover && popover instanceof TavenemPopoverHTMLElement) {
-            popover.mouseOver = false;
+        if ('open' in this.dataset) {
+            this._activation = MouseEventType.None;
+            this.closeInner();
+            const popover = this.querySelector('tf-popover.dropdown-popover');
+            if (popover && popover instanceof TavenemPopoverHTMLElement) {
+                popover.mouseOver = false;
+            }
         }
     }
 

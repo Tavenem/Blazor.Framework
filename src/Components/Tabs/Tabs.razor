@@ -1,6 +1,6 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
-@inherits TavenemComponentBase
+@inherits PersistentComponentBase
 
 @attribute [CascadingTypeParameter(nameof(TTabItem))]
 @typeparam TTabItem
@@ -15,7 +15,7 @@
                 {
                     <button @onclick="ScrollBack"
                             class="tab-scroll-btn btn btn-icon"
-                            disabled="@(!Interactive || _backButtonDisabled)">
+                            disabled="@(!IsInteractive || _backButtonDisabled)">
                         <tf-icon>@BackIcon</tf-icon>
                     </button>
                 }
@@ -28,7 +28,7 @@
                         @for (var i = 0; i < _panels.Count; i++)
                         {
                             var index = i;
-                            @if (Interactive)
+                            @if (IsInteractive)
                             {
                                 <div @ref="_panels[index].PanelReference"
                                      @key="@_panels[index].Id"
@@ -95,7 +95,7 @@
                             for (var i = 0; i < _dynamicItems.Count && i < Items.Count; i++)
                             {
                                 var index = i;
-                                @if (Interactive)
+                                @if (IsInteractive)
                                 {
                                     <DraggableDropTarget @ref="_dynamicItems[index].DragDropComponent"
                                                          @key="@_dynamicItems[index].Id"
@@ -157,7 +157,7 @@
                                 }
                             }
                         }
-                        @if (Interactive && HasValidDrop && NoDropTargetChildren)
+                        @if (IsInteractive && HasValidDrop && NoDropTargetChildren)
                         {
                             <div class="@DropPlaceholderClass"></div>
                         }
@@ -165,7 +165,7 @@
                         {
                             <button @onclick="OnAddTabAsync"
                                     class="btn btn-icon add-btn"
-                                    disabled="@(!Interactive)">
+                                    disabled="@(!IsInteractive)">
                                 <tf-icon>@AddIcon</tf-icon>
                             </button>
                         }
@@ -176,7 +176,7 @@
                 {
                     <button @onclick="ScrollForward"
                             class="tab-scroll-btn btn btn-icon"
-                            disabled="@(!Interactive || _forwardButtonDisabled)">
+                            disabled="@(!IsInteractive || _forwardButtonDisabled)">
                         <tf-icon>@ForwardIcon</tf-icon>
                     </button>
                 }

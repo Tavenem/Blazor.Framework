@@ -5,7 +5,7 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// <summary>
 /// Displays an item in a list, with support for simple theming.
 /// </summary>
-public partial class ListItem<TListItem>
+public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListItem>
 {
     /// <summary>
     /// Whether this item is disabled.
@@ -218,6 +218,7 @@ public partial class ListItem<TListItem>
     /// <inheritdoc />
     protected override void OnAfterRender(bool firstRender)
     {
+        base.OnAfterRender(firstRender);
         if (firstRender)
         {
             Interactive = true;

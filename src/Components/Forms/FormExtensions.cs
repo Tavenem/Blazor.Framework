@@ -124,6 +124,7 @@ internal static class FormExtensions
     /// Format for min, max, and step which prevents representing large or small floating point
     /// values in scientific notation.
     /// </summary>
+    [return: NotNullIfNotNull(nameof(value))]
     public static string? SuppressScientificFormat<TValue>(TValue? value) => (value as IFormattable)?.ToString(
         "0.###################################################################################################################################################################################################################################################################################################################################################",
         CultureInfo.InvariantCulture.NumberFormat);
@@ -135,14 +136,12 @@ internal static class FormExtensions
         [MaybeNullWhen(false)] out TValue result,
         IFormatProvider? formatProvider = null)
     {
-        result = default;
+        result = default!;
 
-#pragma warning disable CS8762 // Parameter must have a non-null value when exiting in some condition.
         if (string.IsNullOrEmpty(value))
         {
             return true;
         }
-#pragma warning restore CS8762 // Parameter must have a non-null value when exiting in some condition.
 
         var success = false;
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
@@ -361,9 +360,9 @@ internal static class FormExtensions
         {
             return (ushort)(object)first == (ushort)(object)second;
         }
-        else if (first is IEquatable<TValue> equatable)
+        else if (first is IEquatable<TValue> firstValue)
         {
-            return equatable.Equals(second);
+            return firstValue.Equals(second);
         }
         else
         {

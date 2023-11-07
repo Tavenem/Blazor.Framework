@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A radio input group which indicates a level.
 /// </summary>
-public partial class Rating
+public partial class Rating : FormComponentBase<byte>
 {
     /// <summary>
     /// <para>
@@ -17,22 +18,7 @@ public partial class Rating
     /// The default is "star".
     /// </para>
     /// </summary>
-    [Parameter] public string ActiveIcon { get; set; } = DefaultIcons.Star_Full;
-
-    /// <summary>
-    /// Whether this input should receive focus on page load.
-    /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
-
-    /// <summary>
-    /// Whether the input is disabled.
-    /// </summary>
-    [Parameter] public bool Disabled { get; set; }
-
-    /// <summary>
-    /// A reference to the first input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
+    [Parameter] public string ActiveIcon { get; set; } = DefaultIcons.Star;
 
     /// <summary>
     /// The value being hovered over by the user.
@@ -53,12 +39,29 @@ public partial class Rating
     /// The default is "star_border".
     /// </para>
     /// </summary>
-    [Parameter] public string InactiveIcon { get; set; } = DefaultIcons.Star_Empty;
+    [Parameter] public string InactiveIcon { get; set; } = DefaultIcons.Star;
 
     /// <summary>
-    /// A label which describes the field.
+    /// <para>
+    /// Whether to add the "outlined" class to the icon when a rating control is either hovered, or
+    /// it is less than or equal to the rating.
+    /// </para>
+    /// <para>
+    /// The default is <see langword="false"/>.
+    /// </para>
     /// </summary>
-    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool IsActiveOutlined { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether to add the "outlined" class to the icon when a rating control is not hovered, and is
+    /// greater than the rating.
+    /// </para>
+    /// <para>
+    /// The default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool IsInactiveOutlined { get; set; } = true;
 
     /// <summary>
     /// <para>
@@ -93,33 +96,9 @@ public partial class Rating
     /// </summary>
     [Parameter] public string? RatingItemStyle { get; set; }
 
-    /// <summary>
-    /// Whether the input is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
-    /// The tabindex of the input element.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
-
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("rating")
-        .Add(ThemeColor.ToCSS())
-        .Add("disabled", IsDisabled)
-        .Add("readonly", IsReadOnly)
-        .ToString();
-
-    /// <inheritdoc/>
-    protected override string? CssStyle => new CssBuilder()
-        .Add(Style)
-        .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
     /// <summary>
@@ -130,28 +109,9 @@ public partial class Rating
         .Add(RatingItemClass)
         .ToString();
 
-    /// <summary>
-    /// Whether the control is being rendered interactively.
-    /// </summary>
-    private bool Interactive { get; set; }
+    private string? ActiveIconClass => IsActiveOutlined ? "outlined" : null;
 
-    /// <summary>
-    /// Whether this control is currently disabled.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    private bool IsDisabled => Disabled || !Interactive;
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    private bool IsReadOnly => ReadOnly || !Interactive;
+    private string? InactiveIconClass => IsInactiveOutlined ? "outlined" : null;
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
@@ -164,28 +124,13 @@ public partial class Rating
         }
     }
 
-    /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Interactive = true;
-            StateHasChanged();
-        }
-    }
-
-    /// <summary>
-    /// Focuses the first input.
-    /// </summary>
-    public ValueTask FocusAsync() => ElementReference.FocusAsync();
-
     private bool IndexIsActive(int index) => HoveredValue.HasValue
         ? index < HoveredValue.Value
         : index < Value;
 
     private void OnKeyDown(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }
@@ -219,7 +164,7 @@ public partial class Rating
 
     private async Task OnMouseOutAsync()
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }
@@ -230,7 +175,7 @@ public partial class Rating
 
     private async Task OnMouseOverAsync(int index)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }
@@ -241,7 +186,7 @@ public partial class Rating
 
     private void OnRatingClick(int index)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }

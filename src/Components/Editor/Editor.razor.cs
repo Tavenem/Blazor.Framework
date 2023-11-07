@@ -16,11 +16,6 @@ public partial class Editor : FormComponentBase<string>
     private bool _initialized;
 
     /// <summary>
-    /// Whether this editor should receive focus on page load.
-    /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
-
-    /// <summary>
     /// An optional set of custom toolbar buttons.
     /// </summary>
     /// <remarks>
@@ -61,22 +56,6 @@ public partial class Editor : FormComponentBase<string>
     /// </para>
     /// </summary>
     [Parameter] public string? Height { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The id of the editor element.
-    /// </para>
-    /// <para>
-    /// A random id will be assigned if none is supplied (including through
-    /// splatted attributes).
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
-    /// A label which describes the field.
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
 
     /// <summary>
     /// Whether <see cref="EditorMode"/> can be changed by the user.
@@ -121,11 +100,6 @@ public partial class Editor : FormComponentBase<string>
     [Parameter] public string? Placeholder { get; set; }
 
     /// <summary>
-    /// Whether the editor is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
     /// <para>
     /// Whether the browser's built-in spellcheck feature should be enabled for this field.
     /// </para>
@@ -150,16 +124,6 @@ public partial class Editor : FormComponentBase<string>
     [Parameter] public EditorSyntax Syntax { get; set; }
 
     /// <summary>
-    /// The tabindex of the viewer.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
-
-    /// <summary>
     /// <para>
     /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the value
     /// changes (rather than on blur).
@@ -173,10 +137,7 @@ public partial class Editor : FormComponentBase<string>
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add(ThemeColor.ToCSS())
-        .Add("read-only", ReadOnly)
         .Add("editor-field")
-        .Add("required", Required)
         .ToString();
 
     private string? AdditionalMarksClass => new CssBuilder("small")
@@ -215,8 +176,8 @@ public partial class Editor : FormComponentBase<string>
 
     private string? EditorClass => new CssBuilder("editor")
         .Add("set-height", !string.IsNullOrEmpty(Height) || !string.IsNullOrEmpty(MaxHeight))
-        .Add("no-statusbar", IsReadOnly || !IsWysiwyg)
-        .Add("no-toolbar", IsReadOnly)
+        .Add("no-statusbar", IsReadOnly || IsDisabled || !IsWysiwyg)
+        .Add("no-toolbar", IsReadOnly || IsDisabled)
         .ToString();
 
     private string? EditorStyle => new CssBuilder()
@@ -229,17 +190,6 @@ public partial class Editor : FormComponentBase<string>
     private List<string> Fonts { get; } = ["sans-serif", "serif", "monospace", "cursive"];
 
     private ColorInput<string>? ForegroundPicker { get; set; }
-
-    private bool Interactive { get; set; }
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    private bool IsReadOnly => ReadOnly || !Interactive;
 
     private bool IsWysiwyg => EditorMode == EditorMode.WYSIWYG
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
@@ -308,6 +258,9 @@ public partial class Editor : FormComponentBase<string>
         var newReadOnly = false;
         var pendingReadOnly = false;
 
+        var newDisabled = false;
+        var pendingDisabled = false;
+
         var newSyntax = EditorSyntax.None;
         var pendingSyntax = false;
 
@@ -320,6 +273,12 @@ public partial class Editor : FormComponentBase<string>
                 && newReadOnly != ReadOnly)
             {
                 pendingReadOnly = true;
+            }
+
+            if (parameters.TryGetValue(nameof(Disabled), out newDisabled)
+                && newDisabled != Disabled)
+            {
+                pendingDisabled = true;
             }
 
             if (parameters.TryGetValue(nameof(Syntax), out newSyntax)
@@ -347,27 +306,16 @@ public partial class Editor : FormComponentBase<string>
             await SetValueAsync(newValue);
         }
 
-        if (pendingReadOnly)
+        if (pendingReadOnly || pendingDisabled)
         {
-            await SetReadOnly(newReadOnly);
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnParametersSet()
-    {
-        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
-            && value is string id
-            && !string.IsNullOrWhiteSpace(id))
-        {
-            Id = id;
+            await SetReadOnly(newReadOnly || newDisabled);
         }
     }
 
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (Interactive)
+        if (IsInteractive)
         {
             if (!_initialized)
             {
@@ -376,7 +324,7 @@ public partial class Editor : FormComponentBase<string>
                 EditorService.ElementId = Id;
                 EditorService.InitialValue = Value;
                 EditorService.Placeholder = Placeholder;
-                EditorService.ReadOnly = ReadOnly;
+                EditorService.ReadOnly = ReadOnly || Disabled;
                 EditorService.Syntax = Syntax;
                 EditorService.UpdateOnInput = UpdateOnInput;
                 EditorService.OnInput += OnInput;
@@ -387,7 +335,7 @@ public partial class Editor : FormComponentBase<string>
         else if (firstRender)
         {
             Fonts.AddRange(await UtilityService.GetFontsAsync());
-            Interactive = true;
+            IsInteractive = true;
             StateHasChanged();
         }
     }
@@ -440,7 +388,7 @@ public partial class Editor : FormComponentBase<string>
     /// <summary>
     /// Focuses the editor.
     /// </summary>
-    public async Task FocusAsync() => await EditorService.FocusEditorAsync();
+    public override async Task FocusAsync() => await EditorService.FocusEditorAsync();
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
@@ -487,13 +435,15 @@ public partial class Editor : FormComponentBase<string>
         .TryGetValue(type, out var v)
         && v;
 
-    private bool IsDisabled(EditorCommandType type) => ReadOnly
+    private bool IsCommandDisabled(EditorCommandType type) => ReadOnly
+        || Disabled
         || !EditorService
             .CommandsEnabled
             .TryGetValue(type, out var v)
         || !v;
 
     private bool IsAdvMarkDisabled() => ReadOnly
+        || Disabled
         || ((!EditorService
             .CommandsEnabled
             .TryGetValue(EditorCommandType.Strikethrough, out var st)
@@ -520,6 +470,7 @@ public partial class Editor : FormComponentBase<string>
         || !i));
 
     private bool IsBlockDisabled() => ReadOnly
+        || Disabled
         || ((!EditorService
             .CommandsEnabled
             .TryGetValue(EditorCommandType.Heading, out var h)
@@ -538,6 +489,7 @@ public partial class Editor : FormComponentBase<string>
         || !c));
 
     private bool IsTableDisabled() => ReadOnly
+        || Disabled
         || ((!EditorService
             .CommandsEnabled
             .TryGetValue(EditorCommandType.TableInsertColumnBefore, out var t1)

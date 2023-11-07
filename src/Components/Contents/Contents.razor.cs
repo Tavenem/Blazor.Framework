@@ -46,11 +46,11 @@ public partial class Contents : IDisposable
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("list contents highlight-start dense")
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("list contents highlight-start dense")
         .Add(ThemeColor.ToCSS())
         .Add(BreakpointClass)
-        .Add(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("d-none", Headings.Count == 0)
         .ToString();
 
     /// <summary>
@@ -104,8 +104,7 @@ public partial class Contents : IDisposable
             NavigationManager.LocationChanged += OnLocationChanged;
 
             _dotNetRef = DotNetObjectReference.Create(this);
-            await ScrollService.ScrollSpy(_dotNetRef, HeadingClassName);
-            await ScrollService.ScrollSpyTags(_dotNetRef, "h1", "h2", "h3", "h4", "h5", "h6");
+            await ScrollService.ScrollSpy(_dotNetRef, $"{HeadingClassName},h1,h2,h3,h4,h5,h6");
 
             Headings.AddRange(await ContentsService.GetHeadingsAsync(Id));
             if (Headings.Count > 0)

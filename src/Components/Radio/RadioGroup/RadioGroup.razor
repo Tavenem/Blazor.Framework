@@ -5,10 +5,12 @@
 
 @inherits FormComponentBase<TValue>
 
-<fieldset @attributes="AdditionalAttributes"
+<fieldset @ref="FieldSet"
+          @attributes="AdditionalAttributes"
           class="@CssClass"
           style="@CssStyle"
-          aria-required="@Required">
+          aria-required="@Required"
+          tabindex="@(IsDisabled ? -1 : TabIndex)">
     <div class="content">
         @if (!string.IsNullOrEmpty(Label))
         {
@@ -18,62 +20,109 @@
             <CascadingValue Value="this" IsFixed="true">
                 <CascadingValue Value="_context">
                     @ChildContent
-                    @if (true)
+                    @if (Values?.Count > 0)
                     {
-                        var tabIndex = IsDisabled ? -1 : TabIndex;
-                        @if (Values is not null)
+                        if (LabelTemplate is null)
                         {
-                            if (LabelTemplate is null)
+                            <RadioButton @ref="FirstButton"
+                                         @key="Values[0]"
+                                         Id="@Id"
+                                         Value="Values[0]"
+                                         Label="@Values[0]?.ToString()"
+                                         AutoFocus="AutoFocus"
+                                         CheckedIcon="@CheckedIcon"
+                                         Disabled="IsDisabled"
+                                         InputAttributes="InputAttributes"
+                                         InputClass="@InputClass"
+                                         InputStyle="@InputStyle"
+                                         ReadOnly="IsReadOnly"
+                                         UncheckedIcon="@UncheckedIcon" />
+                            for (var i = 1; i < Values.Count; i++)
                             {
-                                foreach (var value in Values)
-                                {
-                                    <RadioButton @key="value"
-                                                 Value="value"
-                                                 Label="@value?.ToString()"
-                                                 CheckedIcon="@CheckedIcon"
-                                                 UncheckedIcon="@UncheckedIcon"
-                                                 TabIndex="tabIndex" />
-                                    @if (TabIndex > 0)
-                                    {
-                                        tabIndex++;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                foreach (var value in Values)
-                                {
-                                    <RadioButton @key="value"
-                                                 Value="value"
-                                                 CheckedIcon="@CheckedIcon"
-                                                 UncheckedIcon="@UncheckedIcon"
-                                                 TabIndex="tabIndex">
-                                        <LabelContent>
-                                            @LabelTemplate(context)
-                                        </LabelContent>
-                                    </RadioButton>
-                                    @if (TabIndex > 0)
-                                    {
-                                        tabIndex++;
-                                    }
-                                }
+                                var index = i;
+                                <RadioButton @key="Values[index]"
+                                             Value="Values[index]"
+                                             Label="@Values[index]?.ToString()"
+                                             CheckedIcon="@CheckedIcon"
+                                             Disabled="IsDisabled"
+                                             InputAttributes="InputAttributes"
+                                             InputClass="@InputClass"
+                                             InputStyle="@InputStyle"
+                                             ReadOnly="IsReadOnly"
+                                             UncheckedIcon="@UncheckedIcon" />
                             }
                         }
-                        @if (ValuePairs is not null)
+                        else
                         {
-                            foreach (var (key, value) in ValuePairs)
+                            <RadioButton @ref="FirstButton"
+                                         @key="Values[0]"
+                                         Id="@Id"
+                                         Value="Values[0]"
+                                         Label="@Values[0]?.ToString()"
+                                         AutoFocus="AutoFocus"
+                                         CheckedIcon="@CheckedIcon"
+                                         Disabled="IsDisabled"
+                                         InputAttributes="InputAttributes"
+                                         InputClass="@InputClass"
+                                         InputStyle="@InputStyle"
+                                         ReadOnly="IsReadOnly"
+                                         UncheckedIcon="@UncheckedIcon">
+                                <LabelContent>
+                                    @LabelTemplate(context)
+                                </LabelContent>
+                            </RadioButton>
+                            for (var i = 1; i < Values.Count; i++)
                             {
-                                <RadioButton @key="key"
-                                             Value="key"
-                                             Label="@value"
+                                var index = i;
+                                <RadioButton @key="Values[index]"
+                                             Value="Values[index]"
+                                             Label="@Values[index]?.ToString()"
                                              CheckedIcon="@CheckedIcon"
-                                             UncheckedIcon="@UncheckedIcon"
-                                             TabIndex="tabIndex" />
-                                @if (TabIndex > 0)
-                                {
-                                    tabIndex++;
-                                }
+                                             Disabled="IsDisabled"
+                                             InputAttributes="InputAttributes"
+                                             InputClass="@InputClass"
+                                             InputStyle="@InputStyle"
+                                             ReadOnly="IsReadOnly"
+                                             UncheckedIcon="@UncheckedIcon">
+                                    <LabelContent>
+                                        @LabelTemplate(context)
+                                    </LabelContent>
+                                </RadioButton>
                             }
+                        }
+                    }
+                    @if (ValuePairs is not null)
+                    {
+                        var startIndex = Values is null || Values.Count == 0 ? 1 : 0;
+                        @if (Values is null || Values.Count == 0)
+                        {
+                            <RadioButton @ref="FirstButton"
+                                         @key="ValuePairs[0].Key"
+                                         Id="@Id"
+                                         Value="ValuePairs[0].Key"
+                                         Label="@ValuePairs[0].Value"
+                                         AutoFocus="AutoFocus"
+                                         CheckedIcon="@CheckedIcon"
+                                         Disabled="IsDisabled"
+                                         InputAttributes="InputAttributes"
+                                         InputClass="@InputClass"
+                                         InputStyle="@InputStyle"
+                                         ReadOnly="IsReadOnly"
+                                         UncheckedIcon="@UncheckedIcon" />
+                        }
+                        for (var i = startIndex; i < ValuePairs.Count; i++)
+                        {
+                            var index = i;
+                            <RadioButton @key="ValuePairs[index].Key"
+                                         Value="ValuePairs[index].Key"
+                                         Label="@ValuePairs[index].Value"
+                                         CheckedIcon="@CheckedIcon"
+                                         Disabled="IsDisabled"
+                                         InputAttributes="InputAttributes"
+                                         InputClass="@InputClass"
+                                         InputStyle="@InputStyle"
+                                         ReadOnly="IsReadOnly"
+                                         UncheckedIcon="@UncheckedIcon" />
                         }
                     }
                 </CascadingValue>

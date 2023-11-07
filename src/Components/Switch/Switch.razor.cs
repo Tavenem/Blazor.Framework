@@ -1,22 +1,18 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A boolean toggle input component.
 /// </summary>
-public partial class Switch
+public partial class Switch : BoolInputComponentBase<bool>
 {
     /// <summary>
     /// An optional icon to display in the checked state.
     /// </summary>
     [Parameter] public string? CheckedIcon { get; set; }
-
-    /// <summary>
-    /// A reference to the input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
 
     /// <inheritdoc/>
     public override bool HasValue => IsChecked == true;
@@ -30,11 +26,6 @@ public partial class Switch
     /// An optional label for the unchecked state.
     /// </summary>
     [Parameter] public string? UncheckedLabel { get; set; }
-
-    /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public ValueTask FocusAsync() => ElementReference.FocusAsync();
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
@@ -81,7 +72,7 @@ public partial class Switch
 
     private protected void OnKeyDown(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }

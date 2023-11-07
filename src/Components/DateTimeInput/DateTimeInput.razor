@@ -389,7 +389,7 @@
                 id="@Id"
                 class="@ButtonClass"
                 style="@InputCssStyle"
-                disabled="@(Disabled || ReadOnly || !Interactive)"
+                disabled="@(Disabled || ReadOnly || !IsInteractive)"
                 @onclick="OnClickContainerAsync">
             <tf-icon>@ButtonIcon</tf-icon>
         </button>
@@ -447,7 +447,7 @@ else
             @if (ShowClear)
             {
                 <button class="@ClearButtonCssClass"
-                        disabled="@(Disabled || ReadOnly || !Interactive)"
+                        disabled="@(Disabled || ReadOnly || !IsInteractive)"
                         tabindex="-1"
                         @onclick="ClearAsync"
                         @onclick:stopPropagation="true">

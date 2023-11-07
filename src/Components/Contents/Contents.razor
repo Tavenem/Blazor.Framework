@@ -2,9 +2,9 @@
 
 @inherits TavenemComponentBase
 
-@if (Headings.Count > 0)
-{
-    <nav @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
+<nav @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
+    @if (Headings.Count > 0)
+    {
         @if (ChildContent is null)
         {
             <div class="subheader sticky">Contents</div>
@@ -28,5 +28,5 @@
                 </a>
             }
         }
-    </nav>
-}
+    }
+</nav>

@@ -69,12 +69,12 @@ export class TavenemProgressCircleHTMLElement extends HTMLElement {
     width: 2.5rem;
 }
 
-:host.small {
+:host(.small) {
     height: 1.5rem;
     width: 1.5rem;
 }
 
-:host.large {
+:host(.large) {
     height: 3.5rem;
     width: 3.5rem;
 }
@@ -219,7 +219,7 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         const indeterminate = !Number.isFinite(progressValue);
         progressValue = Math.max(0, Math.min(100, progressValue));
 
-        const vertical = 'vertial' in this.dataset;
+        const vertical = 'vertical' in this.dataset;
 
         const delay = Math.random() * 2.1;
 
@@ -326,24 +326,24 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         width: 100%;
     }
 
-    :host.small:not([data-vertical]) {
+    :host(.small):not([data-vertical]) {
         height: .25rem;
     }
 
-    :host.large:not([data-vertical]) {
+    :host(.large):not([data-vertical]) {
         height: .75rem;
     }
 
-    :host[data-vertical] {
+    :host([data-vertical]) {
         height: 100%;
         width: .5rem;
     }
 
-    :host[data-vertical].small {
+    :host([data-vertical].small) {
         width: .25rem;
     }
 
-    :host[data-vertical].large {
+    :host([data-vertical].large) {
         width: .75rem;
     }
 

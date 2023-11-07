@@ -3,9 +3,12 @@
 @inherits FormComponentBase<string>
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
-    <textarea name="@NameValue"
+    <textarea @ref="ElementReference"
+              class="@InputCssClass"
+              name="@NameValue"
               hidden
               readonly
+              style="@InputCssStyle"
               value="@Value" />
     @if (!string.IsNullOrEmpty(Label))
     {
@@ -17,13 +20,13 @@
             <div>
                 <button id="@($"undo-{Id}")" class="btn btn-icon rounded small"
                         @onclick="@(_ => CommandAsync(EditorCommandType.Undo))"
-                        disabled="@IsDisabled(EditorCommandType.Undo)">
+                        disabled="@IsCommandDisabled(EditorCommandType.Undo)">
                     <tf-icon>@DefaultIcons.Undo</tf-icon>
                 </button>
                 <Tooltip Anchor="@($"undo-{Id}")" Delay="750" Side="Side.Top">undo</Tooltip>
                 <button id="@($"redo-{Id}")" class="btn btn-icon rounded small"
                         @onclick="@(_ => CommandAsync(EditorCommandType.Redo))"
-                        disabled="@IsDisabled(EditorCommandType.Redo)">
+                        disabled="@IsCommandDisabled(EditorCommandType.Redo)">
                     <tf-icon>@DefaultIcons.Redo</tf-icon>
                 </button>
                 <Tooltip Anchor="@($"redo-{Id}")" Delay="750" Side="Side.Top">redo</Tooltip>
@@ -33,7 +36,7 @@
                     <Dropdown Icon="@DefaultIcons.Bold"
                               ActivationType="MouseEvent.RightClick | MouseEvent.MouseOver"
                               Click="@(_ => CommandAsync(EditorCommandType.Strong))"
-                              Disabled="@(IsDisabled(EditorCommandType.Strong) && IsDisabled(EditorCommandType.Bold))"
+                              Disabled="@(IsCommandDisabled(EditorCommandType.Strong) && IsCommandDisabled(EditorCommandType.Bold))"
                               Delay="1000"
                               Class="@BoldClass"
                               Dense="true">
@@ -45,7 +48,7 @@
                     <Dropdown Icon="@DefaultIcons.Italic"
                               ActivationType="MouseEvent.RightClick | MouseEvent.MouseOver"
                               Click="@(_ => CommandAsync(EditorCommandType.Emphasis))"
-                              Disabled="@(IsDisabled(EditorCommandType.Emphasis) && IsDisabled(EditorCommandType.Italic))"
+                              Disabled="@(IsCommandDisabled(EditorCommandType.Emphasis) && IsCommandDisabled(EditorCommandType.Italic))"
                               Delay="1000"
                               Class="@ItalicClass"
                               Dense="true">
@@ -58,7 +61,7 @@
                         <button id="@($"underline-{Id}")"
                                 class="@ActiveButtonGroupClass(EditorCommandType.Underline)"
                                 @onclick="@(_ => CommandAsync(EditorCommandType.Underline))"
-                                disabled="@IsDisabled(EditorCommandType.Underline)">
+                                disabled="@IsCommandDisabled(EditorCommandType.Underline)">
                             <tf-icon>@DefaultIcons.Underlined</tf-icon>
                         </button>
                         <Tooltip Anchor="@($"underline-{Id}")" Delay="750" Side="Side.Top">underline</Tooltip>
@@ -132,14 +135,14 @@
                     <button id="@($"link-{Id}")"
                             class="@ActiveButtonClass(EditorCommandType.InsertLink)"
                             @onclick="ShowLinkDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.InsertLink)">
+                            disabled="@IsCommandDisabled(EditorCommandType.InsertLink)">
                         <tf-icon>@(IsActive(EditorCommandType.InsertLink) ? DefaultIcons.UnLink : DefaultIcons.Link)</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"link-{Id}")" Delay="750" Side="Side.Top">link</Tooltip>
                     <button id="@($"image-{Id}")"
                             class="@ActiveButtonClass(EditorCommandType.InsertImage)"
                             @onclick="ShowImgDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.InsertImage)">
+                            disabled="@IsCommandDisabled(EditorCommandType.InsertImage)">
                         <tf-icon>@DefaultIcons.Image</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"image-{Id}")" Delay="750" Side="Side.Top">image</Tooltip>
@@ -148,13 +151,13 @@
                         <button id="@($"list-{Id}")"
                                 class="@ActiveButtonGroupClass(EditorCommandType.ListBullet)"
                                 @onclick="@(_ => CommandAsync(EditorCommandType.ListBullet))"
-                                disabled="@IsDisabled(EditorCommandType.ListBullet)">
+                                disabled="@IsCommandDisabled(EditorCommandType.ListBullet)">
                             <tf-icon>@DefaultIcons.List_Bullet</tf-icon>
                         </button>
                         <Tooltip Anchor="@($"list-{Id}")" Delay="750" Side="Side.Top">list</Tooltip>
                         <Dropdown AnchorId="@ListsGroupId"
                                   Icon="@DefaultIcons.DropDown"
-                                  Disabled="@(IsDisabled(EditorCommandType.ListNumber) && IsDisabled(EditorCommandType.ListCheck))"
+                                  Disabled="@(IsCommandDisabled(EditorCommandType.ListNumber) && IsCommandDisabled(EditorCommandType.ListCheck))"
                                   Class="rounded-right px-0"
                                   Style="min-width:0">
                             <span @onclick="@(_ => CommandAsync(EditorCommandType.ListNumber))">
@@ -170,14 +173,14 @@
                         <button id="@($"indent-decrease-{Id}")"
                                 class="btn btn-icon rounded small"
                                 @onclick="@(_ => CommandAsync(EditorCommandType.UpLevel))"
-                                disabled="@IsDisabled(EditorCommandType.UpLevel)">
+                                disabled="@IsCommandDisabled(EditorCommandType.UpLevel)">
                             <tf-icon>@DefaultIcons.Indent_Decrease</tf-icon>
                         </button>
                         <Tooltip Anchor="@($"indent-decrease-{Id}")" Delay="750" Side="Side.Top">lift out</Tooltip>
                         <button id="@($"indent-increase-{Id}")"
                                 class="btn btn-icon rounded small"
                                 @onclick="@(_ => CommandAsync(EditorCommandType.DownLevel))"
-                                disabled="@IsDisabled(EditorCommandType.DownLevel)">
+                                disabled="@IsCommandDisabled(EditorCommandType.DownLevel)">
                             <tf-icon>@DefaultIcons.Indent_Increase</tf-icon>
                         </button>
                         <Tooltip Anchor="@($"indent-increase-{Id}")" Delay="750" Side="Side.Top">indent</Tooltip>
@@ -186,7 +189,7 @@
                     <button id="@($"highlight-{Id}")"
                             class="@ActiveButtonClass(EditorCommandType.Marked)"
                             @onclick="@(_ => CommandAsync(EditorCommandType.Marked))"
-                            disabled="@IsDisabled(EditorCommandType.Marked)">
+                            disabled="@IsCommandDisabled(EditorCommandType.Marked)">
                         <tf-icon>@DefaultIcons.Highlight</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"highlight-{Id}")" Delay="750">highlight</Tooltip>
@@ -198,7 +201,7 @@
                                 DisplayType="PickerDisplayType.Button"
                                 IconButton="true"
                                 InputClass="rounded"
-                                Disabled="IsDisabled(EditorCommandType.ForegroundColor)" />
+                                Disabled="IsCommandDisabled(EditorCommandType.ForegroundColor)" />
                     <Tooltip Anchor="@($"foreground-{Id}")" Delay="750">foreground color</Tooltip>
                     <ColorInput @ref="BackgroundPicker"
                                 Id="@($"background-{Id}")"
@@ -209,34 +212,34 @@
                                 IconButton="true"
                                 Icon="@DefaultIcons.ColorBackgroundSelect"
                                 InputClass="rounded"
-                                Disabled="IsDisabled(EditorCommandType.BackgroundColor)" />
+                                Disabled="IsCommandDisabled(EditorCommandType.BackgroundColor)" />
                     <Tooltip Anchor="@($"background-{Id}")" Delay="750">background color</Tooltip>
                     <div class="vr"></div>
                     <button id="@($"align-left-{Id}")"
                             class="@ActiveButtonClass(EditorCommandType.AlignLeft)"
                             @onclick="@(_ => CommandAsync(EditorCommandType.AlignLeft))"
-                            disabled="@IsDisabled(EditorCommandType.AlignLeft)">
+                            disabled="@IsCommandDisabled(EditorCommandType.AlignLeft)">
                         <tf-icon>@DefaultIcons.AlignLeft</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"align-left-{Id}")" Delay="750">align left</Tooltip>
                     <button id="@($"align-center-{Id}")"
                             class="@ActiveButtonClass(EditorCommandType.AlignCenter)"
                             @onclick="@(_ => CommandAsync(EditorCommandType.AlignCenter))"
-                            disabled="@IsDisabled(EditorCommandType.AlignCenter)">
+                            disabled="@IsCommandDisabled(EditorCommandType.AlignCenter)">
                         <tf-icon>@DefaultIcons.AlignCenter</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"align-center-{Id}")" Delay="750">align center</Tooltip>
                     <button id="@($"align-right-{Id}")"
                             class="@ActiveButtonClass(EditorCommandType.AlignRight)"
                             @onclick="@(_ => CommandAsync(EditorCommandType.AlignRight))"
-                            disabled="@IsDisabled(EditorCommandType.AlignRight)">
+                            disabled="@IsCommandDisabled(EditorCommandType.AlignRight)">
                         <tf-icon>@DefaultIcons.AlignRight</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"align-right-{Id}")" Delay="750">align right</Tooltip>
                     <div class="vr"></div>
                     <Dropdown Id="@($"font-{Id}")"
                               Icon="@DefaultIcons.Font"
-                              Disabled="IsDisabled(EditorCommandType.SetFontFamily)"
+                              Disabled="IsCommandDisabled(EditorCommandType.SetFontFamily)"
                               Class="rounded small"
                               Dense="true">
                         <span @onclick="@(_ => SetFontFamilyAsync(null))">Reset</span>
@@ -249,14 +252,14 @@
                     <button id="@($"font-size-{Id}")"
                             class="btn btn-icon rounded small"
                             @onclick="ShowFontSizeDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.SetFontSize)">
+                            disabled="@IsCommandDisabled(EditorCommandType.SetFontSize)">
                         <tf-icon>@DefaultIcons.FontSize</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"font-size-{Id}")" Delay="750">font size</Tooltip>
                     <button id="@($"line-height-{Id}")"
                             class="btn btn-icon rounded small"
                             @onclick="ShowLineHeightDialogAsync"
-                            disabled="@IsDisabled(EditorCommandType.SetLineHeight)">
+                            disabled="@IsCommandDisabled(EditorCommandType.SetLineHeight)">
                         <tf-icon>@DefaultIcons.LineHeight</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"line-height-{Id}")" Delay="750">line height</Tooltip>
@@ -267,7 +270,7 @@
                             <button id="@($"table-{Id}")"
                                     class="btn btn-icon"
                                     @onclick="@(_ => CommandAsync(EditorCommandType.InsertTable))"
-                                    disabled="@IsDisabled(EditorCommandType.InsertTable)">
+                                    disabled="@IsCommandDisabled(EditorCommandType.InsertTable)">
                                 <tf-icon>@DefaultIcons.Table</tf-icon>
                             </button>
                             <Tooltip Anchor="@($"table-{Id}")" Delay="750" Side="Side.Left">insert table</Tooltip>
@@ -277,94 +280,94 @@
                                       Dense="true"
                                       Class="rounded-right px-0"
                                       Style="min-width:0">
-                                @if (!IsDisabled(EditorCommandType.TableInsertColumnBefore))
+                                @if (!IsCommandDisabled(EditorCommandType.TableInsertColumnBefore))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertColumnBefore))">
                                         Insert Column Before
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableInsertColumnAfter))
+                                @if (!IsCommandDisabled(EditorCommandType.TableInsertColumnAfter))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertColumnAfter))">
                                         Insert Column After
                                     </span>
                                 }
                                 @if (Syntax != EditorSyntax.Markdown
-                                    && !IsDisabled(EditorCommandType.TableToggleHeaderColumn))
+                                    && !IsCommandDisabled(EditorCommandType.TableToggleHeaderColumn))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableToggleHeaderColumn))">
                                         Toggle Header Column
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableDeleteColumn))
+                                @if (!IsCommandDisabled(EditorCommandType.TableDeleteColumn))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDeleteColumn))">
                                         Delete Column
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableInsertColumnBefore)
-                                    || !IsDisabled(EditorCommandType.TableInsertColumnAfter)
-                                    || !IsDisabled(EditorCommandType.TableToggleHeaderColumn)
-                                    || !IsDisabled(EditorCommandType.TableDeleteColumn))
+                                @if (!IsCommandDisabled(EditorCommandType.TableInsertColumnBefore)
+                                    || !IsCommandDisabled(EditorCommandType.TableInsertColumnAfter)
+                                    || !IsCommandDisabled(EditorCommandType.TableToggleHeaderColumn)
+                                    || !IsCommandDisabled(EditorCommandType.TableDeleteColumn))
                                 {
                                     <hr />
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableInsertRowBefore))
+                                @if (!IsCommandDisabled(EditorCommandType.TableInsertRowBefore))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertRowBefore))">
                                         Insert Row Before
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableInsertRowAfter))
+                                @if (!IsCommandDisabled(EditorCommandType.TableInsertRowAfter))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableInsertRowAfter))">
                                         Insert Row After
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableToggleHeaderRow))
+                                @if (!IsCommandDisabled(EditorCommandType.TableToggleHeaderRow))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableToggleHeaderRow))">
                                         Toggle Header Row
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableDeleteRow))
+                                @if (!IsCommandDisabled(EditorCommandType.TableDeleteRow))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDeleteRow))">
                                         Delete Row
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableInsertRowBefore)
-                                    || !IsDisabled(EditorCommandType.TableInsertRowAfter)
-                                    || !IsDisabled(EditorCommandType.TableToggleHeaderRow)
-                                    || !IsDisabled(EditorCommandType.TableDeleteRow))
+                                @if (!IsCommandDisabled(EditorCommandType.TableInsertRowBefore)
+                                    || !IsCommandDisabled(EditorCommandType.TableInsertRowAfter)
+                                    || !IsCommandDisabled(EditorCommandType.TableToggleHeaderRow)
+                                    || !IsCommandDisabled(EditorCommandType.TableDeleteRow))
                                 {
                                     <hr />
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableMergeCells))
+                                @if (!IsCommandDisabled(EditorCommandType.TableMergeCells))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableMergeCells))">
                                         Merge Cells
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableSplitCell))
+                                @if (!IsCommandDisabled(EditorCommandType.TableSplitCell))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableSplitCell))">
                                         Split Cell
                                     </span>
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableMergeCells)
-                                    || !IsDisabled(EditorCommandType.TableSplitCell))
+                                @if (!IsCommandDisabled(EditorCommandType.TableMergeCells)
+                                    || !IsCommandDisabled(EditorCommandType.TableSplitCell))
                                 {
                                     <hr />
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableFullWidth))
+                                @if (!IsCommandDisabled(EditorCommandType.TableFullWidth))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableFullWidth))">
                                         Full Width
                                     </span>
                                     <hr />
                                 }
-                                @if (!IsDisabled(EditorCommandType.TableDelete))
+                                @if (!IsCommandDisabled(EditorCommandType.TableDelete))
                                 {
                                     <span @onclick="@(_ => CommandAsync(EditorCommandType.TableDelete))">
                                         Delete Table
@@ -385,18 +388,18 @@
                     <button id="@($"horizontal-rule-{Id}")"
                             class="btn btn-icon rounded small"
                             @onclick="@(_ => CommandAsync(EditorCommandType.HorizontalRule))"
-                            disabled="@IsDisabled(EditorCommandType.HorizontalRule)">
+                            disabled="@IsCommandDisabled(EditorCommandType.HorizontalRule)">
                         <tf-icon>@DefaultIcons.HorizontalRule</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"horizontal-rule-{Id}")" Delay="750">horizontal rule</Tooltip>
                     <button id="@($"horizontal-rule-{Id}")"
                             class="btn btn-icon rounded small"
                             @onclick="@(_ => CommandAsync(EditorCommandType.PageBreak))"
-                            disabled="@IsDisabled(EditorCommandType.PageBreak)">
+                            disabled="@IsCommandDisabled(EditorCommandType.PageBreak)">
                         <tf-icon>@DefaultIcons.PageBreak</tf-icon>
                     </button>
                     <Tooltip Anchor="@($"horizontal-rule-{Id}")" Delay="750">page break</Tooltip>
-                    @if (IsWysiwyg && !IsDisabled(EditorCommandType.SetCodeSyntax))
+                    @if (IsWysiwyg && !IsCommandDisabled(EditorCommandType.SetCodeSyntax))
                     {
                         <div class="vr"></div>
                         <Dropdown Id="@($"block-syntax-{Id}")" Icon="@DefaultIcons.Code" Class="rounded small" Dense="true">
@@ -554,7 +557,7 @@
             }
         </div>
     }
-    @if (!Interactive)
+    @if (!IsInteractive)
     {
         <div id="@Id"
              class="@EditorClass"

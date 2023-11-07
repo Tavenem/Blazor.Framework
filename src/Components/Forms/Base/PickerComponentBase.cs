@@ -17,20 +17,17 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </para>
     /// <para>
     /// This property is ignored if <typeparamref name="TValue"/> is not nullable, or if any of <see
-    /// cref="Disabled"/>, <see cref="ReadOnly"/>, or <see
+    /// cref="FormComponentBase{TValue}.Disabled"/>, <see
+    /// cref="FormComponentBase{TValue}.ReadOnly"/>, or <see
     /// cref="FormComponentBase{TValue}.Required"/> are <see langword="true"/>.
     /// </para>
     /// <para>
     /// Note that even when this property is <see langword="false"/>, a <see langword="null"/> value
-    /// can still be set programmatically. This property only affects the presence of the clear button.
+    /// can still be set programmatically. This property only affects the presence of the clear
+    /// button.
     /// </para>
     /// </summary>
     [Parameter] public bool AllowClear { get; set; } = true;
-
-    /// <summary>
-    /// Whether the select should receive focus on page load.
-    /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
 
     /// <summary>
     /// <para>
@@ -41,16 +38,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </para>
     /// </summary>
     [Parameter] public string ClearIcon { get; set; } = DefaultIcons.Clear;
-
-    /// <summary>
-    /// Whether the select is disabled.
-    /// </summary>
-    [Parameter] public bool Disabled { get; set; }
-
-    /// <summary>
-    /// A reference to the select element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
 
     /// <summary>
     /// The format string to use for conversion.
@@ -68,109 +55,20 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     [Parameter] public string? HelpText { get; set; }
 
     /// <summary>
-    /// <para>
-    /// The id of the select element.
-    /// </para>
-    /// <para>
-    /// Set to a random GUID if not provided.
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
-    /// Custom HTML attributes for the select element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
-
-    /// <summary>
-    /// Custom CSS class(es) for the select element.
-    /// </summary>
-    [Parameter] public string? InputClass { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the select element.
-    /// </summary>
-    [Parameter] public string? InputStyle { get; set; }
-
-    /// <summary>
-    /// A label which describes the field.
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
-
-    /// <summary>
     /// The placeholder value.
     /// </summary>
     [Parameter] public string? Placeholder { get; set; }
 
-    /// <summary>
-    /// Whether the select is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
-    /// The tabindex of the select element.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
-
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add(ThemeColor.ToCSS())
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
-        .Add("field")
         .Add("shrink", ShrinkWhen)
-        .Add("required", Required)
         .Add("open", ShowPicker)
-        .Add("no-label", string.IsNullOrEmpty(Label))
         .ToString();
 
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
     protected virtual string? DisplayString { get; }
-
-    /// <summary>
-    /// The final value assigned to the input element's class attribute, including component values.
-    /// </summary>
-    protected string? InputCssClass => new CssBuilder(InputClass)
-        .AddClassFromDictionary(InputAttributes)
-        .Add("input-core")
-        .ToString();
-
-    /// <summary>
-    /// The final value assigned to the input element's style attribute.
-    /// </summary>
-    protected virtual string? InputCssStyle => new CssBuilder(InputStyle)
-        .AddStyleFromDictionary(InputAttributes)
-        .ToString();
-
-    /// <summary>
-    /// Whether the control is being rendered interactively.
-    /// </summary>
-    protected bool Interactive { get; set; }
-
-    /// <summary>
-    /// Whether this control is currently disabled.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    protected bool IsDisabled => Disabled || !Interactive;
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    protected bool IsReadOnly => ReadOnly || !Interactive;
 
     /// <summary>
     /// Whether the popover should open when the enter key is pressed.
@@ -230,13 +128,13 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         && Clearable
         && !Disabled
         && !ReadOnly
-        && Interactive
+        && IsInteractive
         && !Required;
 
     private protected bool ShowPicker => PopoverOpen
         && !Disabled
         && !ReadOnly
-        && Interactive;
+        && IsInteractive;
 
     private protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString)
         || !string.IsNullOrEmpty(Placeholder);
@@ -267,10 +165,8 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
                 Keys = InputKeyOptions,
             });
             KeyListener.KeyDown += OnKeyDownAsync;
-
-            Interactive = true;
-            StateHasChanged();
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     /// <summary>
@@ -283,7 +179,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     public virtual Task ClearAsync()
     {
-        if (!Disabled && !ReadOnly && Interactive)
+        if (!Disabled && !ReadOnly && IsInteractive)
         {
             CurrentValueAsString = null;
         }
@@ -291,11 +187,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         StateHasChanged();
         return Task.CompletedTask;
     }
-
-    /// <summary>
-    /// Focuses this element.
-    /// </summary>
-    public virtual async Task FocusAsync() => await ElementReference.FocusAsync();
 
     private protected async Task ClosePopoverAsync()
     {
@@ -309,7 +200,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected async Task TogglePopoverAsync()
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }
@@ -333,7 +224,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected async Task OnClickContainerAsync()
     {
-        if (!Disabled && !ReadOnly && Interactive)
+        if (!Disabled && !ReadOnly && IsInteractive)
         {
             await ElementReference.FocusAsync();
             await TogglePopoverAsync();
@@ -344,7 +235,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected virtual async void OnKeyDownAsync(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }

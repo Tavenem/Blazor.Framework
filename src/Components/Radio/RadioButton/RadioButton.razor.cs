@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -8,17 +9,9 @@ namespace Tavenem.Blazor.Framework;
 /// A radio button input component.
 /// </summary>
 public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
+    : BoolInputComponentBase<TValue>
 {
-    /// <summary>
-    /// Custom HTML attributes for the component.
-    /// </summary>
-    [Parameter(CaptureUnmatchedValues = true)]
-    public Dictionary<string, object>? AdditionalAttributes { get; set; }
-
-    /// <summary>
-    /// Whether this input should receive focus on page load.
-    /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
+    private bool _trueValueToggle;
 
     /// <summary>
     /// The icon to use for the checked state.
@@ -26,79 +19,9 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
     [Parameter] public string? CheckedIcon { get; set; }
 
     /// <summary>
-    /// Custom CSS class(es) for the component.
-    /// </summary>
-    [Parameter] public string? Class { get; set; }
-
-    /// <summary>
-    /// A reference to the input element.
-    /// </summary>
-    public ElementReference ElementReference { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The id of the input element.
-    /// </para>
-    /// <para>
-    /// Set to a random GUID if not provided.
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
-    /// Custom HTML attributes for the input element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
-
-    /// <summary>
-    /// Custom CSS class(es) for the input element.
-    /// </summary>
-    [Parameter] public string? InputClass { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the input element.
-    /// </summary>
-    [Parameter] public string? InputStyle { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// A label which describes the field.
-    /// </para>
-    /// <para>
-    /// Ignored if <see cref="LabelContent"/> is non-<see langword="null"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
-
-    /// <summary>
     /// Content for the label of the field.
     /// </summary>
     [Parameter] public RenderFragment<TValue?>? LabelContent { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The name of the associated <see cref="RadioGroup{TValue}"/>.
-    /// </para>
-    /// <para>
-    /// May be omitted to use the nearest containing <see cref="RadioGroup{TValue}"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public string? Name { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the component.
-    /// </summary>
-    [Parameter] public string? Style { get; set; }
-
-    /// <summary>
-    /// The tabindex of the input element.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
     /// The icon to use for the unchecked state.
@@ -106,34 +29,46 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
     [Parameter] public string? UncheckedIcon { get; set; }
 
     /// <summary>
-    /// The value of this input.
-    /// </summary>
-    [Parameter] public TValue? Value { get; set; }
-
-    /// <summary>
     /// The context for this <see cref="InputRadio{TValue}"/>.
     /// </summary>
     internal RadioContext<TValue>? Context { get; private set; }
 
-    /// <summary>
-    /// The final value assigned to the class attribute, including component values and anything
-    /// assigned by the user in <see cref="InputRadio{TValue}.AdditionalAttributes"/>.
-    /// </summary>
-    protected string? CssClass => new CssBuilder(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("checkbox")
-        .Add("disabled", Group?.IsDisabled == true)
-        .Add("read-only", Group?.IsReadOnly == true)
-        .Add((ThemeColor == ThemeColor.None ? (Group?.ThemeColor ?? ThemeColor.None) : ThemeColor).ToCSS())
         .ToString();
 
-    private protected bool IsChecked => Context?.CurrentValue?.Equals(Value) ?? false;
+    /// <inheritdoc/>
+    protected override ThemeColor EffectiveThemeColor => ThemeColor == ThemeColor.None
+        ? (Group?.ThemeColor ?? ThemeColor.None)
+        : ThemeColor;
+
+    /// <inheritdoc/>
+    protected override bool? IsChecked
+    {
+        get
+        {
+            if (Context is null)
+            {
+                return base.IsChecked;
+            }
+            return Context.CurrentValue is null
+                ? Value is null
+                : Context.CurrentValue.Equals(Value);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool IsDisabled => base.IsDisabled || Group?.Disabled == true;
+
+    /// <inheritdoc/>
+    protected override bool IsReadOnly => base.IsReadOnly || Group?.ReadOnly == true;
 
     [CascadingParameter] private RadioGroup<TValue>? Group { get; set; }
 
     [CascadingParameter] private RadioContext<TValue>? CascadingContext { get; set; }
 
-    private string Icon => IsChecked
+    private string Icon => IsChecked == true
         ? (CheckedIcon ?? Group?.CheckedIcon ?? DefaultIcons.Radio_Checked)
         : (UncheckedIcon ?? Group?.UncheckedIcon ?? DefaultIcons.Radio_Unchecked);
 
@@ -141,28 +76,36 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
         .Add(ThemeColor.ToCSS())
         .ToString();
 
+    private string? IsCheckedString
+        => Context?.CurrentValue?.Equals(Value) == true
+        ? GetToggledTrueValue()
+        : IsChecked?.ToString();
+
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {
         Context = string.IsNullOrEmpty(Name)
             ? CascadingContext
-            : CascadingContext?.FindContextInAncestors(Name) ?? new(null, new());
+            : CascadingContext?.FindContextInAncestors(Name);
 
-        if (Context is null)
-        {
-            throw new InvalidOperationException($"{GetType()} must have an ancestor {typeof(RadioGroup<TValue>)} with a matching {nameof(Name)} property, if specified.");
-        }
-
-        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
-            && value is string id
-            && !string.IsNullOrWhiteSpace(id))
-        {
-            Id = id;
-        }
+        base.OnParametersSet();
     }
 
-    /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public ValueTask FocusAsync() => ElementReference.FocusAsync();
+    private string GetToggledTrueValue()
+    {
+        _trueValueToggle = !_trueValueToggle;
+        return _trueValueToggle ? "a" : "b";
+    }
+
+    private async Task OnChangeAsync(ChangeEventArgs e)
+    {
+        if (Context is null)
+        {
+            Toggle();
+        }
+        else
+        {
+            await Context.ChangeEventCallback.InvokeAsync(e);
+        }
+    }
 }

@@ -54,7 +54,9 @@ else
         }
         @if (!string.IsNullOrWhiteSpace(IconName))
         {
-            <tf-icon @onclick="OnClickIconAsync" class="@IconClassName">@IconName</tf-icon>
+            <tf-icon @onclick="OnClickIconAsync"
+                     @onclick:stopPropagation="true"
+                     class="@IconClassName">@IconName</tf-icon>
         }
         else if (ElementList is not null
             && ElementList.SelectionType != SelectionType.None

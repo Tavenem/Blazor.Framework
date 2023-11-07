@@ -24,28 +24,46 @@
     }
 
     &:not(.vertical) > {
-        .btn {
+        .btn,
+        tf-dropdown > .btn {
             border-bottom-left-radius: inherit;
             border-top-left-radius: inherit;
 
-            + .btn {
+            + .btn,
+            + tf-dropdown > .btn {
                 border-bottom-left-radius: 0;
                 border-top-left-radius: 0;
-            }
-
-            + .btn {
                 border-left-style: solid;
                 margin-left: -1px;
             }
+        }
 
-            &:not(:last-of-type) {
+        .btn {
+            &:not(:last-child) {
                 border-bottom-right-radius: 0;
                 border-top-right-radius: 0;
             }
 
-            &:last-of-type {
+            &:last-child {
                 border-bottom-right-radius: inherit;
                 border-top-right-radius: inherit;
+            }
+        }
+
+        tf-dropdown {
+            border-bottom-left-radius: inherit;
+            border-top-left-radius: inherit;
+
+            &:not(:last-child) > .btn {
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            &:last-child {
+                &, > .btn {
+                    border-bottom-right-radius: inherit;
+                    border-top-right-radius: inherit;
+                }
             }
         }
     }
@@ -53,30 +71,49 @@
     &.vertical {
         flex-direction: column;
 
-        > .btn {
+        > .btn,
+        > tf-dropdown > .btn {
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
             width: 100%;
 
-            + .btn {
+            + .btn,
+            + tf-dropdown > .btn {
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
-            }
-
-            + .btn {
                 border-top-style: solid;
                 margin-top: -1px;
             }
+        }
 
-            &:not(:last-of-type) {
+        > .btn {
+            &:not(:last-child) {
                 border-bottom-left-radius: 0;
                 border-bottom-right-radius: 0;
                 border-bottom-style: solid;
             }
 
-            &:last-of-type {
+            &:last-child {
                 border-bottom-left-radius: inherit;
                 border-bottom-right-radius: inherit;
+            }
+        }
+
+        > tf-dropdown {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+
+            &:not(:last-child) > .btn {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom-style: solid;
+            }
+
+            &:last-child {
+                &, > .btn {
+                    border-bottom-left-radius: inherit;
+                    border-bottom-right-radius: inherit;
+                }
             }
         }
     }
@@ -176,13 +213,12 @@
     --button-inherited-shadow: none;
 
     &:not(.vertical) > {
-        .btn {
-            + .btn {
+        .btn,
+        tf-dropdown > .btn {
+            + .btn,
+            + tf-dropdown > .btn {
                 border-bottom-left-radius: 0;
                 border-top-left-radius: 0;
-            }
-
-            + .btn {
                 border-left-style: solid;
                 margin-left: -1px;
             }
@@ -197,15 +233,14 @@
     &.vertical {
         flex-direction: column;
 
-        > .btn {
+        > .btn,
+        > tf-dropdown > .btn {
             width: 100%;
 
-            + .btn {
+            + .btn,
+            + tf-dropdown > .btn {
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
-            }
-
-            + .btn {
                 border-top-style: solid;
                 margin-top: -1px;
             }

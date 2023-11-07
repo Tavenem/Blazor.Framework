@@ -31,6 +31,7 @@
 - `Dropdown.TriggerContent`
 - `Heading` component (`Contents` now works with standard HTML headings, and any element with the `tav-heading` CSS class)
 - `LightDarkToggle` component (replaced by `tf-darkmode-toggle` custom HTML element)
+- `ScrollService.ScrollSpyTags` (`ScrollService.ScrollSpy` now accepts a CSS selector rather than a class name only)
 - `ScrollToTop` (replaced by `tf-scroll-top` custom element)
 - `ThemeService` (replaced by `tf-darkmode-toggle` custom HTML element and built-in features, in order to fully support static and prerendering)
 - `Timeline` component (`div` with `timeline` CSS class provides all the same functionality)

@@ -42,11 +42,20 @@
 
 <p>
     If you give the close button the <code>data-close-auto</code> attribute, it will automatically
-    assign a CSS style of <code>display: none</code> to its nearest parent with the
-    <code>data-can-close</code> attribute when clicked. This will work even if the parent and close
-    button were rendered statically, or prerendered by the server.
+    assign a CSS class of <code>auto-closed</code> to its nearest parent with the
+    <code>data-can-close</code> attribute when clicked. This class has the effect of setting
+    <code>display: none !important</code>. To re-show the element, remove the
+    <code>auto-closed</code> class.
 </p>
 
 <CodeExample RowClass="p-2" Code="@(@"<div data-can-close class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
     <tf-close data-close-auto />
 </div>")" />
+
+<p>
+    Note that if the element with <code>data-can-close</code> has its <code>class</code> attribute
+    set dynamically in razor code, the auto-close effect may be undone whenever the component
+    renders. For such elements, it is recommended that the display of the parent element be handled
+    manually (with the <code>&commat;onclick</code> handler of the <code>tf-code</code> element, for
+    instance), rather than using auto-closing.
+</p>

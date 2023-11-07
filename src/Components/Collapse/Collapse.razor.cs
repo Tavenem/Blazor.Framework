@@ -8,11 +8,10 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A collapsible panel.
 /// </summary>
-public partial class Collapse : IDisposable
+public partial class Collapse : PersistentComponentBase
 {
     private const string ExpansionQueryParamName = "o";
 
-    private protected bool _disposedValue;
     private string? _hrefAbsolute;
     private bool _isActiveNav;
 
@@ -42,16 +41,6 @@ public partial class Collapse : IDisposable
     /// The footer content of this component.
     /// </summary>
     [Parameter] public RenderFragment? FooterContent { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The id of the HTML element.
-    /// </para>
-    /// <para>
-    /// A generated id will be assigned if none is supplied (including through splatted attributes).
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = IdService.GenerateId(nameof(Collapse));
 
     /// <summary>
     /// Will be <see langword="true"/> during opening, after <see cref="OnOpening"/> is invoked and
@@ -165,16 +154,15 @@ public partial class Collapse : IDisposable
 
     private bool DefaultIsExpanded { get; set; }
 
-    private bool Interactive { get; set; }
+    private bool IsInteractive { get; set; }
 
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
-
-    [Inject, NotNull] private QueryStateService? QueryStateService { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
+        if (QueryStateService.IsInitialized
+            && parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
             && isOpen != IsOpen)
         {
             await SetOpenAsync(isOpen);
@@ -215,45 +203,27 @@ public partial class Collapse : IDisposable
                 await SetOpenAsync(true);
             }
         }
-
-        Interactive = true;
-        StateHasChanged();
     }
 
     /// <inheritdoc />
-    protected override void OnParametersSet()
+    protected override void OnAfterRender(bool firstRender)
     {
-        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
-            && value is string id
-            && !string.IsNullOrWhiteSpace(id))
+        if (firstRender)
         {
-            Id = id;
+            IsInteractive = true;
+            StateHasChanged();
         }
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
+    /// <inheritdoc />
+    protected override void Dispose(bool disposing)
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                NavigationManager.LocationChanged -= OnLocationChanged;
-                Accordion?.Remove(this);
-            }
-
-            _disposedValue = true;
+            NavigationManager.LocationChanged -= OnLocationChanged;
+            Accordion?.Remove(this);
         }
+        base.Dispose(disposing);
     }
 
     /// <summary>
@@ -384,11 +354,14 @@ public partial class Collapse : IDisposable
             StateHasChanged();
         }
 
-        QueryStateService.SetPropertyValue(
-            Id,
-            ExpansionQueryParamName,
-            IsOpen && !IsClosed,
-            defaultValue: _isActiveNav || DefaultIsExpanded);
+        if (PersistState)
+        {
+            QueryStateService.SetPropertyValue(
+                Id,
+                ExpansionQueryParamName,
+                IsOpen && !IsClosed,
+                defaultValue: _isActiveNav || DefaultIsExpanded);
+        }
     }
 
     private bool ShouldMatch(string currentUriAbsolute)

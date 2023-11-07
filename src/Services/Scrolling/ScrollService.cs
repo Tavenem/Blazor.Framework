@@ -111,41 +111,14 @@ public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// <param name="dotNetRef">
     /// A reference to a <see cref="Contents"/> component.
     /// </param>
-    /// <param name="className">
-    /// The CSS class name of the elements to observe.
-    /// </param>
-    internal async ValueTask ScrollSpy(DotNetObjectReference<Contents> dotNetRef, string className)
+    /// <param name="selector">A CSS selector.</param>
+    internal async ValueTask ScrollSpy(DotNetObjectReference<Contents> dotNetRef, string selector)
     {
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
             await module
-                .InvokeVoidAsync("scrollSpy", dotNetRef, className)
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        catch (ObjectDisposedException) { }
-    }
-
-    /// <summary>
-    /// Observes scrolling and resizing events to detect which of the elements
-    /// with the given tag name(s) are currently in view.
-    /// </summary>
-    /// <param name="dotNetRef">
-    /// A reference to a <see cref="Contents"/> component.
-    /// </param>
-    /// <param name="tagNames">
-    /// The names of tags to observe.
-    /// </param>
-    internal async ValueTask ScrollSpyTags(DotNetObjectReference<Contents> dotNetRef, params string[] tagNames)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("scrollSpyTags", dotNetRef, tagNames)
+                .InvokeVoidAsync("scrollSpy", dotNetRef, selector)
                 .ConfigureAwait(false);
         }
         catch (JSException) { }

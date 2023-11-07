@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using System.Globalization;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -52,7 +53,7 @@ namespace Tavenem.Blazor.Framework;
 /// </list>
 /// </para>
 /// </typeparam>
-public partial class DateTimeInput<TValue>
+public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
 {
     private const int CloseDelay = 500;
     private const int ViewSwitchDelay = 200;
@@ -293,7 +294,7 @@ public partial class DateTimeInput<TValue>
 
     private string? ButtonContainerClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("form-field picker")
+        .Add("field picker")
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
         .Add("invalid", IsInvalidAndTouched)
@@ -439,7 +440,7 @@ public partial class DateTimeInput<TValue>
     }
 
     private bool IsNowDisabled => Disabled
-        || !Interactive
+        || !IsInteractive
         || (Value is not null
         && DateTimeOffset.Hour == DateTimeOffset.Now.Hour
         && DateTimeOffset.Minute == DateTimeOffset.Now.Minute
@@ -450,7 +451,7 @@ public partial class DateTimeInput<TValue>
         || DateTimeOffset.Now.TimeOfDay > Max.TimeOfDay));
 
     private bool IsTodayDisabled => Disabled
-        || !Interactive
+        || !IsInteractive
         || (Value is not null
         && DateTimeOffset.Date == DateTimeOffset.Now.Date)
         || DateTimeOffset.Now.Date < Min.Date
@@ -819,7 +820,7 @@ public partial class DateTimeInput<TValue>
     /// </summary>
     public override Task ClearAsync()
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return Task.CompletedTask;
         }
@@ -961,7 +962,7 @@ public partial class DateTimeInput<TValue>
     private string? GetDayClass(int week, int day) => new CssBuilder("btn btn-text")
         .Add("text-muted", Weeks[week][day]?.Month != Month)
         .Add("active", Value is not null && Weeks[week][day] == DateTimeOffset.DateTime.Date)
-        .Add("outlined", Disabled || ReadOnly || !Interactive
+        .Add("outlined", Disabled || ReadOnly || !IsInteractive
             ? Weeks[week][day] == DateTimeOffset.DateTime.Date
             : Weeks[week][day] == DateTime.Today
                 && (Value is null
@@ -991,14 +992,14 @@ public partial class DateTimeInput<TValue>
 
     private string? GetHourClass(byte value) => new CssBuilder("number")
         .Add("active", value == Hour)
-        .Add("outlined", (Disabled || ReadOnly || !Interactive)
+        .Add("outlined", (Disabled || ReadOnly || !IsInteractive)
             && value == Hour)
         .ToString();
 
     private string? GetMinuteClass(byte value) => new CssBuilder("number")
         .Add("active", Value is not null
             && value == Minute)
-        .Add("outlined", (Disabled || ReadOnly || !Interactive)
+        .Add("outlined", (Disabled || ReadOnly || !IsInteractive)
             && value == Minute)
         .ToString();
 
@@ -1023,7 +1024,7 @@ public partial class DateTimeInput<TValue>
     private string? GetSecondClass(byte value) => new CssBuilder("number")
         .Add("active", Value is not null
             && value == Second)
-        .Add("outlined", (Disabled || ReadOnly || !Interactive)
+        .Add("outlined", (Disabled || ReadOnly || !IsInteractive)
             && value == Second)
         .ToString();
 
@@ -1051,13 +1052,13 @@ public partial class DateTimeInput<TValue>
 
     private bool IsDayOutOfRange(int week, int day) => Disabled
         || ReadOnly
-        || !Interactive
+        || !IsInteractive
         || Weeks[week][day] < Min.Date
         || Weeks[week][day] > Max.Date;
 
     private bool IsDecadeOutOfRange(byte value)
     {
-        if (Disabled || !Interactive)
+        if (Disabled || !IsInteractive)
         {
             return true;
         }
@@ -1074,7 +1075,7 @@ public partial class DateTimeInput<TValue>
     }
 
     private bool IsMonthOutOfRange(int value) => Disabled
-        || !Interactive
+        || !IsInteractive
         || (Year == Calendar.MinSupportedDateTime.Year
         && value < Calendar.MinSupportedDateTime.Month)
         || (Year == Calendar.MaxSupportedDateTime.Year
@@ -1085,7 +1086,7 @@ public partial class DateTimeInput<TValue>
         && value > Max.Month);
 
     private bool IsYearOutOfRange(int value) => Disabled
-        || !Interactive
+        || !IsInteractive
         || value < Calendar.MinSupportedDateTime.Year
         || value > Calendar.MaxSupportedDateTime.Year
         || value < Min.Year

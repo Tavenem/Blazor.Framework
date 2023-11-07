@@ -11,7 +11,6 @@
 <div id="@Id"
      role="listitem"
      class="@CssClass"
-     data-can-close
      style="@CssStyle"
      draggable="@(GetIsDraggable() ? "true" : "false")"
      @onclick="OnClickAsync">
@@ -33,7 +32,7 @@
     }
     else if (ChipSet?.AutoClose == true)
     {
-        <tf-close auto />
+        <tf-close @onclick="OnClosedAsync" />
     }
 </div>
 @if (SeparatorAfterValue)

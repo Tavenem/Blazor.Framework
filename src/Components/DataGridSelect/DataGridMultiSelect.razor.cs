@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Components.DataGrid;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -19,7 +20,7 @@ public partial class DataGridMultiSelect<
         | DynamicallyAccessedMemberTypes.PublicFields
         | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem,
     TValue>
-    : IDataGrid<TDataItem>
+    : PickerComponentBase<IEnumerable<TValue>>, IDataGrid<TDataItem>
 {
     private readonly List<IColumn<TDataItem>> _columns = [];
     private readonly List<Guid> _initialSortOrder = [];
@@ -169,7 +170,7 @@ public partial class DataGridMultiSelect<
         && !Disabled
         && !ReadOnly
         && !Required
-        && Interactive
+        && IsInteractive
         && DataGrid?.SelectedItems.Count > 0;
 
     private protected DataGrid<TDataItem>? DataGrid { get; set; }
@@ -485,7 +486,7 @@ public partial class DataGridMultiSelect<
 
     private protected override async void OnKeyDownAsync(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !Interactive)
+        if (Disabled || ReadOnly || !IsInteractive)
         {
             return;
         }

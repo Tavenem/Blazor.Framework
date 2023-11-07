@@ -24,127 +24,15 @@ public abstract class BoolInputComponentBase<TValue>
     [Parameter] public bool AllowNull { get; set; }
 
     /// <summary>
-    /// Whether this input should receive focus on page load.
+    /// The current boolean value of this input.
     /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
-
-    /// <summary>
-    /// Whether the input is disabled.
-    /// </summary>
-    [Parameter] public bool Disabled { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The id of the input element.
-    /// </para>
-    /// <para>
-    /// Set to a random GUID if not provided.
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
-    /// Custom HTML attributes for the input element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
-
-    /// <summary>
-    /// Custom CSS class(es) for the input element.
-    /// </summary>
-    [Parameter] public string? InputClass { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the input element.
-    /// </summary>
-    [Parameter] public string? InputStyle { get; set; }
-
-    /// <summary>
-    /// A label which describes the field.
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
-
-    /// <summary>
-    /// Whether the input is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
-    /// The tabindex of the input element.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
-
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add(ThemeColor.ToCSS())
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
-        .Add("required", Required)
-        .Add("no-label", string.IsNullOrEmpty(Label))
-        .ToString();
-
-    /// <summary>
-    /// The final value assigned to the input element's class attribute, including component values.
-    /// </summary>
-    protected virtual string? InputCssClass => InputClass;
-
-    /// <summary>
-    /// The final value assigned to the input element's style attribute, including component values.
-    /// </summary>
-    protected virtual string? InputCssStyle => InputStyle;
-
-    /// <summary>
-    /// Whether the control is being rendered interactively.
-    /// </summary>
-    protected bool Interactive { get; set; }
-
-    /// <summary>
-    /// Whether this control is currently disabled.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    protected bool IsDisabled => Disabled || !Interactive;
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    protected bool IsReadOnly => ReadOnly || !Interactive;
-
-    private protected bool? IsChecked => Value is null
-        ? null
-        : (bool)(object)Value;
-
-    /// <summary>
-    /// Constructs a new instance of <see cref="BoolInputComponentBase{TValue}"/>.
-    /// </summary>
-    protected BoolInputComponentBase()
+    protected virtual bool? IsChecked => Value switch
     {
-        if (typeof(TValue) != typeof(bool)
-            && typeof(TValue) != typeof(bool?))
-        {
-            throw new InvalidOperationException("Only bool and nullable bool? are valid types for BoolInputComponentBase");
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Interactive = true;
-            StateHasChanged();
-        }
-    }
+        null => null,
+        bool b => b,
+        IConvertible c => c.ToBoolean(null),
+        var x => bool.TryParse(x.ToString(), out var s) && s,
+    };
 
     /// <summary>
     /// Sets this input's value.
@@ -168,9 +56,93 @@ public abstract class BoolInputComponentBase<TValue>
             return;
         }
 
-        CurrentValue = typeof(TValue) == typeof(bool)
-            ? (TValue)(object)(value ?? false)
-            : (TValue?)(object?)value;
+        if (value is null)
+        {
+            if (NullableUnderlyingType is not null
+                || !typeof(TValue).IsValueType)
+            {
+                CurrentValue = default;
+
+                if (!IsTouched)
+                {
+                    SetTouchedDebounced();
+                }
+
+                if (!IsNested)
+                {
+                    EvaluateDebounced();
+                }
+
+                StateHasChanged();
+                return;
+            }
+            else
+            {
+                value = false;
+            }
+        }
+
+        var targetType = NullableUnderlyingType ?? typeof(TValue);
+        if (targetType == typeof(bool))
+        {
+            CurrentValue = (TValue)(object)value.Value;
+        }
+        if (targetType == typeof(byte))
+        {
+            CurrentValue = (TValue)(object)(byte)(value.Value ? 1 : 0);
+        }
+        else if (targetType == typeof(decimal))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1m : 0m);
+        }
+        else if (targetType == typeof(double))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1.0 : 0.0);
+        }
+        else if (targetType == typeof(float))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1f : 0f);
+        }
+        else if (targetType == typeof(int))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1 : 0);
+        }
+        else if (targetType == typeof(long))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1L : 0L);
+        }
+        else if (targetType == typeof(nint))
+        {
+            CurrentValue = (TValue)(object)(nint)(value.Value ? 1 : 0);
+        }
+        else if (targetType == typeof(nuint))
+        {
+            CurrentValue = (TValue)(object)(nuint)(value.Value ? 1 : 0);
+        }
+        else if (targetType == typeof(sbyte))
+        {
+            CurrentValue = (TValue)(object)(sbyte)(value.Value ? 1 : 0);
+        }
+        else if (targetType == typeof(short))
+        {
+            CurrentValue = (TValue)(object)(short)(value.Value ? 1 : 0);
+        }
+        else if (targetType == typeof(uint))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1U : 0U);
+        }
+        else if (targetType == typeof(ulong))
+        {
+            CurrentValue = (TValue)(object)(value.Value ? 1UL : 0UL);
+        }
+        else if (targetType == typeof(ushort))
+        {
+            CurrentValue = (TValue)(object)(ushort)(value.Value ? 1 : 0);
+        }
+        else
+        {
+            return;
+        }
 
         if (!IsTouched)
         {
@@ -201,8 +173,7 @@ public abstract class BoolInputComponentBase<TValue>
     /// </remarks>
     public void Toggle()
     {
-        if (AllowNull
-            && typeof(TValue) == typeof(bool?))
+        if (AllowNull)
         {
             if (Value is null)
             {

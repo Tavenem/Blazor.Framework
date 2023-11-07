@@ -19,8 +19,8 @@
                    name="@NameValue"
                    readonly="@IsReadOnly"
                    tabindex="@TabIndex"
-                   @onchange="@OnChange"
-                   @onclick:preventDefault="@IsReadOnly" />
+                   @onchange="OnChange"
+                   @onclick:preventDefault="IsReadOnly" />
             <tf-icon>@Icon</tf-icon>
         </span>
         @if (!string.IsNullOrEmpty(Label))

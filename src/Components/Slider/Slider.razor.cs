@@ -12,23 +12,15 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The numeric type bound to the input value.
 /// </typeparam>
-public partial class Slider<TValue>
+public partial class Slider<TValue> : FormComponentBase<TValue>
 {
-    private readonly TValue _maxDefault, _maxType, _minDefault, _minType, _zero;
+    private static readonly TValue _maxDefault, _maxType, _minDefault, _minType, _zero;
+    private static readonly bool _isFloatingPoint;
+
     private readonly AdjustableTimer _timer;
 
     private bool _disposedValue;
     private int _tickCount;
-
-    /// <summary>
-    /// Whether this input should receive focus on page load.
-    /// </summary>
-    [Parameter] public bool AutoFocus { get; set; }
-
-    /// <summary>
-    /// Whether the input is disabled.
-    /// </summary>
-    [Parameter] public bool Disabled { get; set; }
 
     /// <summary>
     /// <para>
@@ -43,44 +35,24 @@ public partial class Slider<TValue>
     [Parameter] public override string ConversionValidationMessage { get; set; } = "{0} must be a number";
 
     /// <summary>
-    /// A reference to the input element.
+    /// The format string to use for conversion.
     /// </summary>
-    public ElementReference ElementReference { get; set; }
+    [Parameter] public string? Format { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The <see cref="IFormatProvider"/> to use for conversion.
+    /// </para>
+    /// <para>
+    /// Default is <see cref="CultureInfo.CurrentCulture"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public IFormatProvider? FormatProvider { get; set; }
 
     /// <summary>
     /// An optional list of labels for hash marks.
     /// </summary>
     [Parameter] public List<string?>? HashLabels { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The id of the input element.
-    /// </para>
-    /// <para>
-    /// Set to a random GUID if not provided.
-    /// </para>
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
-    /// Custom HTML attributes for the input element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
-
-    /// <summary>
-    /// Custom CSS class(es) for the input element.
-    /// </summary>
-    [Parameter] public string? InputClass { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the input element.
-    /// </summary>
-    [Parameter] public string? InputStyle { get; set; }
-
-    /// <summary>
-    /// A label which describes the field.
-    /// </summary>
-    [Parameter] public string? Label { get; set; }
 
     /// <summary>
     /// <para>
@@ -103,30 +75,15 @@ public partial class Slider<TValue>
     [Parameter] public TValue Min { get; set; }
 
     /// <summary>
-    /// Whether the input is read-only.
-    /// </summary>
-    [Parameter] public bool ReadOnly { get; set; }
-
-    /// <summary>
     /// <para>
     /// The step value for this input.
     /// </para>
     /// <para>
-    /// Assign <see langword="null"/> (the default) to use a step value of "1" for integral types,
-    /// and a step value of "any" for floating-point types.
+    /// Assign <see langword="null"/> (the default) to use a step value of "any" for floating point
+    /// types, or "1" for integral types.
     /// </para>
     /// </summary>
     [Parameter] public TValue? Step { get; set; }
-
-    /// <summary>
-    /// The tabindex of the input element.
-    /// </summary>
-    [Parameter] public int TabIndex { get; set; }
-
-    /// <summary>
-    /// One of the built-in color themes.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
     /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the
@@ -150,49 +107,20 @@ public partial class Slider<TValue>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("slider")
-        .Add(ThemeColor.ToCSS())
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
-        .Add("required", Required)
+        .Add("hash-labels", HashLabels?.Count > 0)
         .ToString();
-
-    private static bool IsFloatingPointType => typeof(TValue) == typeof(decimal)
-        || typeof(TValue) == typeof(decimal?)
-        || typeof(TValue) == typeof(double)
-        || typeof(TValue) == typeof(double?)
-        || typeof(TValue) == typeof(float)
-        || typeof(TValue) == typeof(float?);
 
     private double BarWidth { get; set; }
 
     private string? InputValue { get; set; }
 
-    /// <summary>
-    /// Whether the control is being rendered interactively.
-    /// </summary>
-    private bool Interactive { get; set; }
-
-    /// <summary>
-    /// Whether this control is currently disabled.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    private bool IsDisabled => Disabled || !Interactive;
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="Interactive"/> is <see langword="false"/>.
-    /// </remarks>
-    private bool IsReadOnly => ReadOnly || !Interactive;
-
     private double MaxDouble { get; set; }
 
+    private string MaxString => FormExtensions.SuppressScientificFormat(MaxDouble);
+
     private double MinDouble { get; set; }
+
+    private string MinString => FormExtensions.SuppressScientificFormat(MinDouble);
 
     private protected string? StepString
     {
@@ -204,18 +132,18 @@ public partial class Slider<TValue>
                 return FormExtensions.SuppressScientificFormat(Step);
             }
 
-            return IsFloatingPointType
-                ? "any"
-                : "1";
+            return _isFloatingPoint ? "any" : "1";
         }
     }
 
-    /// <summary>
-    /// Constructs a new instance of <see cref="Slider{TValue}"/>.
-    /// </summary>
-    public Slider()
+    static Slider()
     {
-        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+        _isFloatingPoint = typeof(TValue) == typeof(decimal)
+            || typeof(TValue) == typeof(decimal?)
+            || typeof(TValue) == typeof(double)
+            || typeof(TValue) == typeof(double?)
+            || typeof(TValue) == typeof(float)
+            || typeof(TValue) == typeof(float?);
 
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
@@ -326,9 +254,17 @@ public partial class Slider<TValue>
         {
             throw new InvalidOperationException($"Type {targetType.Name} is not supported");
         }
+    }
 
-        Max = _maxDefault!;
-        Min = _minDefault!;
+    /// <summary>
+    /// Constructs a new instance of <see cref="Slider{TValue}"/>.
+    /// </summary>
+    public Slider()
+    {
+        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+
+        Max = _maxDefault;
+        Min = _minDefault;
     }
 
     /// <inheritdoc/>
@@ -377,21 +313,6 @@ public partial class Slider<TValue>
     }
 
     /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Interactive = true;
-            StateHasChanged();
-        }
-    }
-
-    /// <summary>
-    /// Focuses this input.
-    /// </summary>
-    public async Task FocusAsync() => await ElementReference.FocusAsync();
-
-    /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         if (!_disposedValue)
@@ -433,7 +354,7 @@ public partial class Slider<TValue>
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
         validationErrorMessage = null;
-        var success = value.TryParseValue(Min, Max, out result);
+        var success = value.TryParseValue(Min, Max, out result, FormatProvider);
 
         HasConversionError = !success;
         if (success)
@@ -490,7 +411,7 @@ public partial class Slider<TValue>
         if (CurrentValueAsString != str)
         {
             var x = CurrentValueAsString;
-            CurrentValueAsString = Equals(Value, _zero)
+            CurrentValueAsString = EqualityComparer<TValue>.Default.Equals(Value, _zero)
                 ? "1"
                 : "0";
             await Task.Delay(1);

@@ -171,16 +171,11 @@ public partial class ListItemCollapse<TListItem>
     /// </summary>
     protected override void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                DragDropListener.OnDrop -= OnDropAsync;
-            }
-            base.Dispose(disposing);
-
-            _disposedValue = true;
+            DragDropListener.OnDrop -= OnDropAsync;
         }
+        base.Dispose(disposing);
     }
 
     private DragStartData GetDragData()
