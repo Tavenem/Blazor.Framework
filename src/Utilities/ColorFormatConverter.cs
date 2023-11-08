@@ -55,7 +55,7 @@ public struct ColorFormatConverter
     /// if not, for maximum compatibility.
     /// </para>
     /// </summary>
-    public string Css => Hex6 ?? CssRGBA;
+    public readonly string Css => Hex6 ?? CssRGBA;
 
     /// <summary>
     /// <para>
@@ -65,7 +65,7 @@ public struct ColorFormatConverter
     /// Will be <see langword="null"/> if the color contains an alpha component.
     /// </para>
     /// </summary>
-    public string? CssHSL => AlphaByte < 255 ? null : $"hsl({Hue},{Saturation}%,{Lightness}%)";
+    public readonly string? CssHSL => AlphaByte < 255 ? null : $"hsl({Hue},{Saturation}%,{Lightness}%)";
 
     /// <summary>
     /// A CSS-style hsla string.
@@ -73,13 +73,13 @@ public struct ColorFormatConverter
     /// <remarks>
     /// Alpha is represented with a precision of 2 decimal places.
     /// </remarks>
-    public string CssHSLA => $"hsla({Hue},{Saturation}%,{Lightness}%,{AlphaFloat.ToCSS(2)})";
+    public readonly string CssHSLA => $"hsla({Hue},{Saturation}%,{Lightness}%,{AlphaFloat.ToCSS(2)})";
 
     /// <summary>
     /// The shortest CSS-style hsl(a) string which accurately represents the color (between hsl and
     /// hsla formats).
     /// </summary>
-    public string CssHSLCompact => CssHSL ?? CssHSLA;
+    public readonly string CssHSLCompact => CssHSL ?? CssHSLA;
 
     /// <summary>
     /// <para>
@@ -89,7 +89,7 @@ public struct ColorFormatConverter
     /// Will be <see langword="null"/> if the color contains an alpha component.
     /// </para>
     /// </summary>
-    public string? CssRGB => AlphaByte < 255 ? null : $"rgb({Red},{Green},{Blue})";
+    public readonly string? CssRGB => AlphaByte < 255 ? null : $"rgb({Red},{Green},{Blue})";
 
     /// <summary>
     /// A CSS-style rgba string.
@@ -97,13 +97,13 @@ public struct ColorFormatConverter
     /// <remarks>
     /// Alpha is represented with a precision of 2 decimal places.
     /// </remarks>
-    public string CssRGBA => $"rgba({Red},{Green},{Blue},{AlphaFloat.ToCSS(2)})";
+    public readonly string CssRGBA => $"rgba({Red},{Green},{Blue},{AlphaFloat.ToCSS(2)})";
 
     /// <summary>
     /// The shortest CSS-style rgb(a) string which accurately represents the color (between rgb and
     /// rgba formats).
     /// </summary>
-    public string CssRGBCompact => CssRGB ?? CssRGBA;
+    public readonly string CssRGBCompact => CssRGB ?? CssRGBA;
 
     /// <summary>
     /// The green component of this color, as an integral value in the range [0-255].
@@ -118,17 +118,17 @@ public struct ColorFormatConverter
     /// Will be <see langword="null"/> if the color cannot be representd with only 6 characters.
     /// </para>
     /// </summary>
-    public string? Hex6 => AlphaByte < 255 ? null : $"#{Red:x2}{Green:x2}{Blue:x2}";
+    public readonly string? Hex6 => AlphaByte < 255 ? null : $"#{Red:x2}{Green:x2}{Blue:x2}";
 
     /// <summary>
     /// An 8-character CSS-style hexadecimal string (including '#').
     /// </summary>
-    public string Hex8 => $"#{Red:x2}{Green:x2}{Blue:x2}{AlphaByte:x2}";
+    public readonly string Hex8 => $"#{Red:x2}{Green:x2}{Blue:x2}{AlphaByte:x2}";
 
     /// <summary>
     /// The shortest CSS-style hexadecimal string which accurately represents the color.
     /// </summary>
-    public string HexCompact => Hex6 ?? Hex8;
+    public readonly string HexCompact => Hex6 ?? Hex8;
 
     /// <summary>
     /// The hue of this color, as an integral degree in the range [0-360).
@@ -145,7 +145,7 @@ public struct ColorFormatConverter
     /// If this color is equivalent to a CSS color keyword, this gets that keyword. Otherwise, it is
     /// <see langword="null"/>.
     /// </summary>
-    public string? Keyword
+    public readonly string? Keyword
     {
         get
         {
@@ -2762,7 +2762,7 @@ public struct ColorFormatConverter
             if (index == -1 || index == span.Length - 1)
             {
                 bSpan = span[(index + 1)..];
-                aSpan = ReadOnlySpan<char>.Empty;
+                aSpan = [];
             }
             else
             {
@@ -2876,7 +2876,7 @@ public struct ColorFormatConverter
             if (index == -1 || index == span.Length - 1)
             {
                 lSpan = span[(index + 1)..];
-                aSpan = ReadOnlySpan<char>.Empty;
+                aSpan = [];
             }
             else
             {
@@ -2931,14 +2931,14 @@ public struct ColorFormatConverter
                 rSpan = new ReadOnlySpan<char>([span[0], span[0]]);
                 gSpan = new ReadOnlySpan<char>([span[1], span[1]]);
                 bSpan = new ReadOnlySpan<char>([span[2], span[2]]);
-                aSpan = ReadOnlySpan<char>.Empty;
+                aSpan = [];
             }
             else if (span.Length == 6)
             {
                 rSpan = span[..2];
                 gSpan = span[2..4];
                 bSpan = span[4..];
-                aSpan = ReadOnlySpan<char>.Empty;
+                aSpan = [];
             }
             else if (span.Length == 8)
             {

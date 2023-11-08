@@ -69,10 +69,7 @@ public partial class MultiSelect<TValue>
     public override async Task ClearAsync()
     {
         await base.ClearAsync();
-        if (SelectAllOption is not null)
-        {
-            SelectAllOption.InvokeStateChange();
-        }
+        SelectAllOption?.InvokeStateChange();
 
         StateHasChanged();
     }
@@ -214,7 +211,7 @@ public partial class MultiSelect<TValue>
             if (ShowPicker)
             {
                 await _options[index].ElementReference.FocusAsync();
-                await ScrollService.ScrollToId(_options[index].Id);
+                await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
             }
             return;
         }
@@ -236,7 +233,7 @@ public partial class MultiSelect<TValue>
         if (ShowPicker)
         {
             await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id);
+            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
         }
     }
 
@@ -261,7 +258,7 @@ public partial class MultiSelect<TValue>
         if (ShowPicker)
         {
             await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id);
+            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
         }
     }
 

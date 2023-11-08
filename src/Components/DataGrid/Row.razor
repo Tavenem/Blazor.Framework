@@ -17,7 +17,7 @@
                       ThemeColor="ThemeColor" />
         </td>
     }
-    @if (DataGrid.AllowEdit && DataGrid.Interactive)
+    @if (DataGrid.AllowEdit && DataGrid.IsInteractive)
     {
         <td style="width:calc(2.75rem + 10px)">
             <span class="d-inline-flex gap-1 align-items-center justify-content-space-around">
@@ -49,7 +49,7 @@
             </span>
         </td>
     }
-    else if (DataGrid.AllowDelete && DataGrid.Interactive)
+    else if (DataGrid.AllowDelete && DataGrid.IsInteractive)
     {
         <td>
             <button id="@($"delete-{Id}")" class="btn btn-icon small" @onclick="OnDeleteAsync" @onclick:stopPropagation="true">
@@ -63,7 +63,7 @@
         <td>
             @if (DataGrid.HasExpandedContent?.Invoke(Item!) != false)
             {
-                if (DataGrid.Interactive)
+                if (DataGrid.IsInteractive)
                 {
                     <button class="btn btn-icon small"
                             @onclick="OnToggleExpansionAsync">

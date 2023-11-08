@@ -1253,9 +1253,38 @@
     If inline editing is enabled, any action which would end inline edit initiates validation
     (including an explicit save operation, or starting inline editing on a different row). If
     validation fails for an explicit save, the save operation does not continue, and the user will
-    be able to see invalid cells and correct any mistakes. If validation fails due to an implit save
-    prior to editing a different row, the original edit is canceled, and all cells revert to their
-    original values.
+    be able to see invalid cells and correct any mistakes. If validation fails due to an implicit
+    save prior to editing a different row, the original edit is canceled, and all cells revert to
+    their original values.
+</p>
+
+<h2>Persistent State</h2>
+
+<p>
+    If the <code>PersistState</code> property is set to <code>true</code>, the component will
+    automatically keep track of the current page, row and group expansion state, sorting, and
+    filtering in the URL's query string. This allows the component to preserve its state through
+    page refreshes, and also to include the current state in a bookmark or shared URL.
+</p>
+
+<p>
+    When turning on this feature, it is strongly recommended that the component be assigned a unique,
+    stable value in its <code>Id</code> parameter (or via a splatted <code>id</code> attribute).
+    This <code>Id</code> will be used in the generated query string to identify the component.
+    Although an <code>Id</code> is generated automatically when one is not provided, the automatic
+    value cannot be guaranteed to remain the same.
+</p>
+
+<p>
+    Note that even when a component has <code>PersistState</code> set to <code>false</code>, its
+    initial state can still be controlled via query string. The property only controls whether the
+    query string is dynamically updated to reflect changing states.
+</p>
+
+<p>
+    Note also that item selection, even if enabled, is not persisted. This is because selected
+    values may be of any type, and so their representation in a URL query string is better handled
+    by your own code, which can optimize for your particular dataset.
 </p>
 
 <h2>Customization</h2>

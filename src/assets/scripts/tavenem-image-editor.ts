@@ -150,7 +150,7 @@ class ImageEditor {
             this.renderPoints();
         });
         this._brushGenerator = new BrushGenerator(this.editor.renderer);
-        this.editor.stage.interactive = true;
+        this.editor.stage.eventMode = 'static';
         this.editor.stage.interactiveChildren = false;
         this.editor.stage.hitArea = this.editor.screen;
         this.editor.stage.cursor = 'crosshair';
@@ -174,7 +174,7 @@ class ImageEditor {
         t.x = this.editor.view.width / 2;
         t.y = this.editor.view.height / 2;
         t.scale.set(0.3);
-        t.interactive = true;
+        t.eventMode = 'static';
         t.on('pointertap', this.onTextPointerTap, this);
         container.addChild(t);
         this.saveState();
@@ -258,7 +258,7 @@ class ImageEditor {
         this.clear();
         const container = this.editor.stage.children[0] as Container;
         this.backgroundImage = Sprite.from(canvas);
-        this.backgroundImage.interactive = false;
+        this.backgroundImage.eventMode = 'none';
         this.editor.renderer.resize(this.backgroundImage.width, this.backgroundImage.height);
         if (this._brushCanvasTexture) {
             this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
@@ -295,7 +295,7 @@ class ImageEditor {
         }
     }
 
-    destroy() {
+    async destroy() {
         this.cancelOngoingOperations(true);
         if (this.editor.view instanceof HTMLCanvasElement
             && this.editor.view.parentElement) {
@@ -309,6 +309,10 @@ class ImageEditor {
                 image.src = this.originalSrc;
             }
             this.editor.view.parentElement.appendChild(image);
+        }
+        if (this.backgroundImage
+            && this.backgroundImage.texture.baseTexture.resource.src) {
+            await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
         }
         this.editor.destroy(true, true);
         delete this.backgroundImage;
@@ -507,6 +511,9 @@ class ImageEditor {
 
         if (this.backgroundImage) {
             container.removeChild(this.backgroundImage);
+            if (this.backgroundImage.texture.baseTexture.resource.src) {
+                await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
+            }
             this.backgroundImage.destroy(true);
             this.backgroundImage = undefined;
         }
@@ -519,7 +526,7 @@ class ImageEditor {
                 texture = await Assets.load(imageUrl) as Texture;
             }
             this.backgroundImage = Sprite.from(texture);
-            this.backgroundImage.interactive = false;
+            this.backgroundImage.eventMode = 'none';
             let scale = 0;
             if (this._heightLimit
                 && this.backgroundImage.height > this._heightLimit) {
@@ -594,7 +601,7 @@ class ImageEditor {
         if (this.drawingMode == DrawingMode.Brush) {
             this.cancelOngoingOperations();
 
-            this.editor.stage.interactive = true;
+            this.editor.stage.eventMode = 'static';
             this.editor.stage.cursor = 'crosshair';
             if (!this._brushCursor) {
                 const g = new Graphics();
@@ -619,7 +626,7 @@ class ImageEditor {
             }
         } else {
             this.editor.stage.cursor = 'default';
-            this.editor.stage.interactive = false;
+            this.editor.stage.eventMode = 'none';
             if (this._brushCursor) {
                 this.editor.stage.removeChild(this._brushCursor);
             }
@@ -937,10 +944,10 @@ export function crop(containerId: string) {
     }
 }
 
-export function destroy(containerId: string, withRevoke: boolean) {
+export async function destroy(containerId: string, withRevoke: boolean) {
     const editor = editors[containerId];
     if (editor) {
-        editor.destroy();
+        await editor.destroy();
     }
     delete editors[containerId];
 

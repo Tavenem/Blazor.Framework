@@ -496,7 +496,7 @@ public abstract class SelectBase<TValue, TOption>
                 if (ShowPicker)
                 {
                     await option.ElementReference.FocusAsync();
-                    await ScrollService.ScrollToId(option.Id);
+                    await ScrollService.ScrollToId(option.Id, setHistory: false);
                     await SelectItemAsync(option);
                 }
                 else

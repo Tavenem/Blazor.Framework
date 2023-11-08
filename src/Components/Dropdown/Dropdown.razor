@@ -9,6 +9,7 @@
              data-activation="@((int)ActivationType)"
              data-delay="@(Delay == 0 ? null : Delay)"
              data-open-at-pointer="@OpenAtPointer"
+             data-popover-container
              disabled="@Disabled"
              @dropdowntoggle="OnOpenChangedAsync">
     @if (TriggerContent is null && !HideButton)

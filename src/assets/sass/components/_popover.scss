@@ -1,7 +1,6 @@
 ﻿tf-popover {
     &.open,
-    tf-dropdown[data-open] &.dropdown-popover,
-    tf-tooltip[data-visible] &.tooltip {
+    [data-popover-container][data-popover-open] &.contained-popover {
         display: block;
         opacity: 1;
         pointer-events: initial;

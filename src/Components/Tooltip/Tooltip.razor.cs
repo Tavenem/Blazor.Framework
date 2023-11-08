@@ -78,7 +78,7 @@ public partial class Tooltip
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("tooltip")
+        .Add("contained-popover tooltip")
         .Add("arrow", Arrow)
         .ToString();
 

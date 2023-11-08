@@ -132,7 +132,7 @@ public partial class Row<[DynamicallyAccessedMembers(
     {
         if (e?.Equals(Item) == true)
         {
-            await ScrollService.ScrollToId(Id);
+            await ScrollService.ScrollToId(Id, setHistory: false);
         }
     }
 

@@ -6,7 +6,7 @@
 @attribute [CascadingTypeParameter(nameof(TDataItem))]
 @typeparam TDataItem
 
-@inherits TavenemComponentBase
+@inherits PersistentComponentBase
 
 <div class="d-none">
     <CascadingValue Value="this" TValue="IDataGrid<TDataItem>" IsFixed="true">
@@ -22,7 +22,7 @@
             }
             @HeaderContent
         </div>
-        @if (Interactive)
+        @if (IsInteractive)
         {
             <div>
                 @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
@@ -125,7 +125,7 @@
                                     }
                                 </div>
                             }
-                            @if (Interactive && column.CanFilter)
+                            @if (IsInteractive && column.CanFilter)
                             {
                                 <div>
                                     @if (column.IsString)
@@ -154,15 +154,19 @@
                                     }
                                     else if (column.IsDateTime)
                                     {
-                                        <Switch @bind-Value="column.DateTimeFilterIsBefore"
-                                                UncheckedLabel="After"
-                                                Label="Before"
-                                                Class="dense" />
                                         <DateTimeInput @bind-Value:get="@column.DateTimeFilter"
                                                        @bind-Value:set="@(v => OnDateTimeFilterChanged(column, v))"
                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
+                                                       DisplayType="PickerDisplayType.Button"
                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
                                                        Class="dense" />
+                                        @if (column.DateTimeFilter.HasValue)
+                                        {
+                                            <Switch @bind-Value="column.DateTimeFilterIsBefore"
+                                                    UncheckedLabel="After"
+                                                    Label="Before"
+                                                    Class="dense" />
+                                        }
                                     }
                                 </div>
                             }
@@ -215,7 +219,7 @@
                             <td colspan="1000" style="text-align:center;vertical-align:middle">
                                 <div class="d-flex align-items-center my-3 gap-2">
                                     <span>No columns displayed</span>
-                                    @if (Interactive)
+                                    @if (IsInteractive)
                                     {
                                         <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
                                             <tf-icon>@DefaultIcons.Filter</tf-icon>
@@ -265,7 +269,7 @@
                         <tr @key="group">
                             <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
                                 <span class="d-inline-flex align-items-center gap-2">
-                                    @if (Interactive)
+                                    @if (IsInteractive)
                                     {
                                         <button class="btn btn-icon small"
                                                 @onclick="@(_ => OnToggleGroupExpansion(group))">
@@ -275,7 +279,7 @@
                                     else
                                     {
                                         <a class="btn btn-icon small"
-                                           href="@GetGroupExpansionQuery(group)">
+                                           href="@GetGroupExpansionToggleUrl(group)">
                                             <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
                                         </a>
                                     }

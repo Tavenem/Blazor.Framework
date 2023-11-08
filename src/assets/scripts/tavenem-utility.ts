@@ -15,7 +15,6 @@ interface DotNetStreamReference {
     arrayBuffer(): Promise<ArrayBuffer>;
 }
 
-const eventListeners: Record<number, EventListener> = {};
 const fonts = [
     'Arial',
     'Arial Black',
@@ -29,39 +28,6 @@ const fonts = [
     'Trebuchet MS',
     'Verdana',
 ];
-
-let listenerId = 0;
-
-export function addEventListener(
-    element: Element,
-    dotNetRef: DotNet.DotNetObject,
-    event: string,
-    callback: string,
-    spec: Record<string, any>[],
-    stopPropagation: boolean) {
-    const listener = function (e: Event) {
-        const args = Array.from(spec, x => serializeParameter(e, x));
-        dotNetRef.invokeMethodAsync(callback, ...args);
-        if (stopPropagation) {
-            e.stopPropagation();
-        }
-    };
-    element.addEventListener(event, listener);
-    eventListeners[++listenerId] = listener;
-    return listenerId;
-}
-
-export function changeCssClassName(element: Element, className: string) {
-    if (element) {
-        element.className = className;
-    }
-}
-
-export function changeCssVariable(element: HTMLElement, name: string, newValue: string) {
-    if (element) {
-        element.style.setProperty(name, newValue);
-    }
-}
 
 export async function downloadStream(fileName: string, fileType: string, streamReference: DotNetStreamReference) {
     const buffer = await streamReference.arrayBuffer();
@@ -80,15 +46,6 @@ export function downloadUrl(fileName: string, url: string, open?: boolean) {
     }
     anchor.click();
     anchor.remove();
-}
-
-export function elementHasFixedAncestors(element: Node | null) {
-    for (; element && element instanceof Element; element = element.parentNode) {
-        if (window.getComputedStyle(element).getPropertyValue("position") === "fixed") {
-            return true;
-        }
-    }
-    return false;
 }
 
 export function focusFirstElement(element: HTMLElement, skip = 0, min = 0) {
@@ -144,28 +101,6 @@ export function getBoundingClientRect(element: HTMLElement) {
     return rect;
 }
 
-export function getClientRectFromFirstChild(element: HTMLElement) {
-    if (!element) {
-        return;
-    }
-    const child = element.children && element.children[0];
-    if (!child || !(child instanceof HTMLElement)) {
-        return;
-    }
-    return getBoundingClientRect(child);
-}
-
-export function getClientRectFromParent(element: HTMLElement) {
-    if (!element) {
-        return;
-    }
-    const parent = element.parentElement;
-    if (!parent) {
-        return;
-    }
-    return getBoundingClientRect(parent);
-}
-
 export function getFonts() {
     const validFonts: string[] = [];
     for (const font of fonts) {
@@ -174,13 +109,6 @@ export function getFonts() {
         }
     }
     return validFonts;
-}
-
-export function getTextContent(element: HTMLElement) {
-    if (!element) {
-        return '';
-    }
-    return element.textContent;
 }
 
 export function open(url?: string, target?: string, features?: string) {
@@ -197,21 +125,6 @@ export async function openStream(fileName: string, fileType: string, streamRefer
         return '';
     } else {
         return url;
-    }
-}
-
-export function removeEventListener(element: Element, event: string, eventId: number) {
-    if (!element) {
-        return;
-    }
-    element.removeEventListener(event, eventListeners[eventId]);
-    delete eventListeners[eventId];
-}
-
-export function removeEventListenerById(elementId: string, event: string, eventId: number) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        removeEventListener(element, event, eventId);
     }
 }
 
@@ -279,72 +192,4 @@ function getTabbableElements(element: HTMLElement) {
         "[tabindex]:not([tabindex='-1'])," +
         "[contentEditable=true]:not([tabindex='-1']"
     );
-}
-
-function serializeParameter(data: any, spec: any) {
-    if (typeof data == "undefined" ||
-        data === null) {
-        return null;
-    }
-    if (typeof data === "number" ||
-        typeof data === "string" ||
-        typeof data == "boolean") {
-        return data;
-    }
-
-    let res: any = (Array.isArray(data)) ? [] : {};
-    if (!spec) {
-        spec = "*";
-    }
-
-    for (let i in data) {
-        let currentMember = data[i];
-
-        if (typeof currentMember === 'function' || currentMember === null) {
-            continue;
-        }
-
-        let currentMemberSpec;
-        if (spec != "*") {
-            currentMemberSpec = Array.isArray(data) ? spec : spec[i];
-            if (!currentMemberSpec) {
-                continue;
-            }
-        } else {
-            currentMemberSpec = "*"
-        }
-
-        if (typeof currentMember === 'object') {
-            if (Array.isArray(currentMember) || currentMember.length) {
-                res[i] = [];
-                for (let j = 0; j < currentMember.length; j++) {
-                    const arrayItem = currentMember[j];
-                    if (typeof arrayItem === 'object') {
-                        res[i].push(serializeParameter(arrayItem, currentMemberSpec));
-                    } else {
-                        res[i].push(arrayItem);
-                    }
-                }
-            } else {
-                //the browser provides some member (like plugins) as hash with index as key, if length == 0 we shall not convert it
-                if (currentMember.length === 0) {
-                    res[i] = [];
-                } else {
-                    res[i] = serializeParameter(currentMember, currentMemberSpec);
-                }
-            }
-
-
-        } else {
-            // string, number or boolean
-            if (currentMember === Infinity) { //inifity is not serialized by JSON.stringify
-                currentMember = "Infinity";
-            }
-            if (currentMember !== null) { //needed because the default json serializer in jsinterop serialize null values
-                res[i] = currentMember;
-            }
-        }
-    }
-
-    return res;
 }

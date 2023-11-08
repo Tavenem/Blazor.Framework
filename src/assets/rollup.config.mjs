@@ -3,11 +3,15 @@ import json from '@rollup/plugin-json';
 import typescript from '@rollup/plugin-typescript';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import { terser } from '@wwa/rollup-plugin-terser';
+import injectProcessEnv from 'rollup-plugin-inject-process-env';
 
 let plugins = [
     json(),
     commonjs(),
     typescript(),
+    injectProcessEnv({
+        NODE_ENV: process.env.NODE_ENV,
+    }),
     nodeResolve({
         mainFields: ['module', 'main'],
         extensions: ['.mjs', '.js', '.json', '.node', '.ts'],

@@ -188,12 +188,21 @@ public class QueryStateService
     /// If <see langword="true"/>, replaces the current entry in the history stack. If <see
     /// langword="false"/>, appends the new entry to the history stack.
     /// </param>
+    /// <param name="defaultValue">
+    /// <para>
+    /// A value which should be considered the default for this property.
+    /// </para>
+    /// <para>
+    /// When the current value equals this default, no query parameter will be set.
+    /// </para>
+    /// </param>
     public void AddPropertyValues(
         string id,
         string property,
         IEnumerable<object?>? values,
         Func<QueryChangeEventArgs, Task>? callback = null,
-        bool replace = true)
+        bool replace = true,
+        object? defaultValue = null)
     {
         InitializeFromQuery();
 
@@ -205,6 +214,16 @@ public class QueryStateService
                 _callbacks[id] = componentCallbacks;
             }
             componentCallbacks[property] = callback;
+        }
+
+        if (GetPropertyString(defaultValue) is string defaultStringValue)
+        {
+            if (!_componentPropertyDefaults.TryGetValue(id, out var componentPropertyDefaults))
+            {
+                componentPropertyDefaults = [];
+                _componentPropertyDefaults[id] = componentPropertyDefaults;
+            }
+            componentPropertyDefaults[property] = defaultStringValue;
         }
 
         if (GetPropertyStrings(values) is not List<string> stringValues)
@@ -229,6 +248,69 @@ public class QueryStateService
 
     /// <summary>
     /// Gets the current URI if the given <see langword="property"/> for the component with the
+    /// given <paramref name="id"/> did not have the provided <paramref name="value"/>.
+    /// </summary>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property to be persisted.</param>
+    /// <param name="value">
+    /// <para>
+    /// A value to be removed from the <see langword="property"/>, if it is currently assigned.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> the property is omitted completely.
+    /// </para>
+    /// </param>
+    /// <returns>
+    /// The current URI, with a query string modified to omit the given property value, if present.
+    /// </returns>
+    public string GetUriWithoutPropertyValue(
+        string id,
+        string property,
+        object? value)
+    {
+        InitializeFromQuery();
+
+        return _navigationManager.GetUriWithQueryParameters(
+            GetQueryWithoutParameter(
+                id,
+                property,
+                value));
+    }
+
+    /// <summary>
+    /// Gets the current URI if the given <see langword="property"/> for the component with the
+    /// given <paramref name="id"/> did not have the provided <paramref name="values"/>.
+    /// </summary>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property to be persisted.</param>
+    /// <param name="values">
+    /// <para>
+    /// A collection of values to be removed from the <see langword="property"/>, if any are
+    /// currently assigned.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> the property is omitted completely.
+    /// </para>
+    /// </param>
+    /// <returns>
+    /// The current URI, with a query string modified to omit the given property values, if present.
+    /// </returns>
+    public string GetUriWithoutPropertyValues(
+        string id,
+        string property,
+        IEnumerable<object?>? values)
+    {
+        InitializeFromQuery();
+
+        return _navigationManager.GetUriWithQueryParameters(
+            GetQueryWithoutParameter(
+                id,
+                property,
+                values));
+    }
+
+    /// <summary>
+    /// Gets the current URI if the given <see langword="property"/> for the component with the
     /// given <paramref name="id"/> had the provided <paramref name="value"/>.
     /// </summary>
     /// <param name="id">A unique ID for the component.</param>
@@ -238,7 +320,7 @@ public class QueryStateService
     /// A value to be assigned to the <see langword="property"/>.
     /// </para>
     /// <para>
-    /// If <see langword="null"/> nothing occurs.
+    /// If <see langword="null"/> the property is omitted completely.
     /// </para>
     /// <para>
     /// Only built-in numeric value types, <see cref="bool"/>, <see cref="char"/>, <see
@@ -282,7 +364,7 @@ public class QueryStateService
     /// A collection of values to assign to the <see langword="property"/>.
     /// </para>
     /// <para>
-    /// If <see langword="null"/> nothing occurs.
+    /// If <see langword="null"/> the property is omitted completely.
     /// </para>
     /// <para>
     /// Only built-in numeric value types, <see cref="bool"/>, <see cref="char"/>, <see
@@ -440,6 +522,95 @@ public class QueryStateService
         {
             componentProperties.Remove(property);
             UpdateQuery(replace);
+        }
+    }
+
+    /// <summary>
+    /// Removes a specific value for a component's property from the service.
+    /// </summary>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property.</param>
+    /// <param name="value">
+    /// <para>
+    /// A value to be removed from the current collection of values assigned to property.
+    /// </para>
+    /// <para>
+    /// If the collection of values assigned to the property does not include this one, nothing happens.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> nothing occurs.
+    /// </para>
+    /// </param>
+    /// <param name="replace">
+    /// If <see langword="true"/>, replaces the current entry in the history stack. If <see
+    /// langword="false"/>, appends the new entry to the history stack.
+    /// </param>
+    public void RemovePropertyValue(
+        string id,
+        string property,
+        object? value,
+        bool replace = true)
+    {
+        InitializeFromQuery();
+
+        if (GetPropertyString(value) is not string stringValue)
+        {
+            return;
+        }
+        if (_componentProperties.TryGetValue(id, out var componentProperties)
+            && componentProperties.TryGetValue(property, out var propertyValues)
+            && propertyValues.Remove(stringValue))
+        {
+            UpdateQuery(replace);
+        }
+    }
+
+    /// <summary>
+    /// Removes a specific set of values for a component's property from the service.
+    /// </summary>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property.</param>
+    /// <param name="values">
+    /// <para>
+    /// An enumeration of values to be removed from the current collection of values assigned to
+    /// property.
+    /// </para>
+    /// <para>
+    /// If the collection of values assigned to the property does not include any of these, nothing
+    /// happens.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> nothing occurs.
+    /// </para>
+    /// </param>
+    /// <param name="replace">
+    /// If <see langword="true"/>, replaces the current entry in the history stack. If <see
+    /// langword="false"/>, appends the new entry to the history stack.
+    /// </param>
+    public void RemovePropertyValues(
+        string id,
+        string property,
+        IEnumerable<object?>? values,
+        bool replace = true)
+    {
+        InitializeFromQuery();
+
+        if (GetPropertyStrings(values) is not List<string> stringValues)
+        {
+            return;
+        }
+        if (_componentProperties.TryGetValue(id, out var componentProperties)
+            && componentProperties.TryGetValue(property, out var propertyValues))
+        {
+            var any = false;
+            foreach (var value in stringValues)
+            {
+                any |= propertyValues.Remove(value);
+            }
+            if (any)
+            {
+                UpdateQuery(replace);
+            }
         }
     }
 
@@ -603,7 +774,7 @@ public class QueryStateService
     /// When the current value equals this default, no query parameter will be set.
     /// </para>
     /// </param>
-    public void SetPropertyValue(
+    public void SetPropertyValues(
         string id,
         string property,
         IEnumerable<object?>? values,
@@ -979,6 +1150,63 @@ public class QueryStateService
         else
         {
             componentPropertyValues[property] = valueStrings;
+        }
+        return GetQueryParameter(GetQueryParameterString(componentProperties, true));
+    }
+
+    private Dictionary<string, object?> GetQueryWithoutParameter(
+        string id,
+        string property,
+        object? value)
+    {
+        var componentProperties = _componentProperties.ToDictionary(
+            x => x.Key,
+            x => x.Value.ToDictionary(
+                y => y.Key,
+                y => y.Value.ToList()));
+        if (!componentProperties.TryGetValue(id, out var componentPropertyValues))
+        {
+            componentPropertyValues = [];
+            componentProperties[id] = componentPropertyValues;
+        }
+        var valueString = GetPropertyString(value);
+        if (string.IsNullOrEmpty(valueString))
+        {
+            componentPropertyValues.Remove(property);
+        }
+        else if (componentPropertyValues.TryGetValue(property, out var propertyValues))
+        {
+            propertyValues.Remove(valueString);
+        }
+        return GetQueryParameter(GetQueryParameterString(componentProperties, true));
+    }
+
+    private Dictionary<string, object?> GetQueryWithoutParameter(
+        string id,
+        string property,
+        IEnumerable<object?>? values)
+    {
+        var componentProperties = _componentProperties.ToDictionary(
+            x => x.Key,
+            x => x.Value.ToDictionary(
+                y => y.Key,
+                y => y.Value.ToList()));
+        if (!componentProperties.TryGetValue(id, out var componentPropertyValues))
+        {
+            componentPropertyValues = [];
+            componentProperties[id] = componentPropertyValues;
+        }
+        var valueStrings = GetPropertyStrings(values);
+        if (valueStrings is null)
+        {
+            componentPropertyValues.Remove(property);
+        }
+        else if (componentPropertyValues.TryGetValue(property, out var propertyValues))
+        {
+            foreach (var value in valueStrings)
+            {
+                propertyValues.Remove(value);
+            }
         }
         return GetQueryParameter(GetQueryParameterString(componentProperties, true));
     }

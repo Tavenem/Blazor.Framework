@@ -114,7 +114,7 @@ public partial class Select<TValue>
         if (ShowPicker)
         {
             await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id);
+            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
         }
     }
 
@@ -140,7 +140,7 @@ public partial class Select<TValue>
         if (ShowPicker)
         {
             await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id);
+            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
         }
     }
 
