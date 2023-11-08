@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\docs\docpages\Tavenem.Blazor.Framework.DocPages.csproj" />
-    <ProjectReference Include="..\Client\Tavenem.Blazor.Framework.Sample.Client.csproj" />
+    <ProjectReference Include="..\client\Tavenem.Blazor.Framework.Sample.Client.csproj" />
   </ItemGroup>
 
 </Project>
