@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Components;
+using Tavenem.Blazor.Framework.InternalComponents;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// Displays a chip, with support for simple theming and closing.
 /// </summary>
-public partial class Chip<TChip>
+public partial class Chip<TChip> : ListItem<TChip>
 {
     /// <summary>
     /// The list to which this item belongs, if any.
@@ -23,6 +24,7 @@ public partial class Chip<TChip>
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
     protected override string? CssClass => new CssBuilder("chip")
+        .Add(ClassName)
         .Add(ThemeColorValue.ToCSS())
         .Add(
             "clickable",
@@ -31,10 +33,12 @@ public partial class Chip<TChip>
         .Add("selected", IsSelected)
         .Add("no-drag", !GetIsDraggable())
         .Add("d-none", IsClosed)
-        .Add(ClassName)
         .ToString();
 
-    private bool IsClosed { get; set; }
+    /// <summary>
+    /// Whether this chip was closed.
+    /// </summary>
+    protected bool IsClosed { get; set; }
 
     private async Task OnClosedAsync()
     {
@@ -42,7 +46,7 @@ public partial class Chip<TChip>
         {
             await ChipSet.OnChipClosed.InvokeAsync(Item);
         }
-        else
+        if (ChipSet?.AutoClose == true)
         {
             IsClosed = true;
         }

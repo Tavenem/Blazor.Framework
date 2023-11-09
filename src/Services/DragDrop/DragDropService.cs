@@ -1,6 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -8,15 +9,10 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Provides drag-drop services.
 /// </summary>
-public class DragDropService : IAsyncDisposable
+/// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+public class DragDropService(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="ScrollService"/>.
-    /// </summary>
-    /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    public DragDropService(IJSRuntime jsRuntime) => _moduleTask = new(
+    private readonly Lazy<Task<IJSObjectReference>> _moduleTask = new(
         () => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-dragdrop.js")
@@ -53,12 +49,17 @@ public class DragDropService : IAsyncDisposable
     /// <para>
     /// If the item implements <see cref="IDraggable"/>, its <see cref="IDraggable.ToDraggedJson"/>
     /// and <see cref="IDraggable.ToDraggedString"/> methods will be used to get the JSON and string
-    /// representations, rather than the default JSON serialization and <see
-    /// cref="object.ToString"/> methods.
+    /// representations. If <paramref name="jsonTypeInfo"/> is provided, it will be used to generate
+    /// the JSON content. Otherwise reflection-based JSON serialization will be used. Note that
+    /// reflection-based JSON serialization is not trim safe or AOT compatible, and may cause
+    /// runtime failures.
     /// </para>
     /// </param>
     /// <param name="effectAllowed">
     /// The drag effects allowed for the drag-drop operation.
+    /// </param>
+    /// <param name="jsonTypeInfo">
+    /// JSON serialization metadata for <typeparamref name="TData"/>.
     /// </param>
     /// <returns>
     /// A configured <see cref="DragStartData"/> instance.
@@ -66,8 +67,16 @@ public class DragDropService : IAsyncDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = "The potential breakage is accepted; it is up to implementers to enure that types participating in drag-drop are preserved.")]
-    public static DragStartData GetDragStartData<TData>(TData item, string? type = null, DragEffect effectAllowed = DragEffect.All)
+        Justification = "Warning and workaround provided in comments.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Warning and workaround provided in comments.")]
+    public static DragStartData GetDragStartData<TData>(
+        TData item,
+        string? type = null,
+        DragEffect effectAllowed = DragEffect.All,
+        JsonTypeInfo<TData>? jsonTypeInfo = null)
     {
         var data = new List<KeyValuePair<string, object>>();
         if (item is null)
@@ -117,11 +126,19 @@ public class DragDropService : IAsyncDisposable
             {
                 json = draggable.ToDraggedJson();
             }
-            else
+            else if (jsonTypeInfo is null)
             {
                 try
                 {
                     json = JsonSerializer.Serialize(item);
+                }
+                catch { }
+            }
+            else
+            {
+                try
+                {
+                    json = JsonSerializer.Serialize(item, jsonTypeInfo);
                 }
                 catch { }
             }
@@ -168,7 +185,10 @@ public class DragDropService : IAsyncDisposable
     /// <para>
     /// If the <typeparamref name="TData"/> type is not <see cref="string"/>, and an item with the
     /// correct data type is found, an attempt is made to deserialize the data from JSON into the
-    /// provided type.
+    /// provided type. If <paramref name="jsonTypeInfo"/> is provided, it will be used to
+    /// deserialize the JSON content. Otherwise reflection-based JSON deserialization will be used.
+    /// Note that reflection-based JSON deserialization is not trim safe or AOT compatible, and may
+    /// cause runtime failures.
     /// </para>
     /// <para>
     /// If no <paramref name="type"/> parameter is provided, the data is checked for the special
@@ -190,6 +210,9 @@ public class DragDropService : IAsyncDisposable
     /// the <typeparamref name="TData"/> type (e.g. <see langword="null"/>) is returned.
     /// </para>
     /// </param>
+    /// <param name="jsonTypeInfo">
+    /// JSON serialization metadata for <typeparamref name="TData"/>.
+    /// </param>
     /// <returns>
     /// The requested data, if found; otherwise, the default value for the <typeparamref
     /// name="TData"/> type.
@@ -197,11 +220,18 @@ public class DragDropService : IAsyncDisposable
     [UnconditionalSuppressMessage(
         "Trimming",
         "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
-        Justification = "The potential breakage is accepted; it is up to implementers to enure that types participating in drag-drop are preserved.")]
-    public static TData? TryGetData<TData>(IEnumerable<KeyValuePair<string, string>>? e, string? type = null)
+        Justification = "Warning and workaround provided in comments.")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Warning and workaround provided in comments.")]
+    public static TData? TryGetData<TData>(
+        IEnumerable<KeyValuePair<string, string>>? e,
+        string? type = null,
+        JsonTypeInfo<TData>? jsonTypeInfo = null)
     {
         if (string.IsNullOrEmpty(type)
-            && TryGetDataOfType<TData>(e, out var jsonData))
+            && TryGetDataOfType(e, out var jsonData, jsonTypeInfo: jsonTypeInfo))
         {
             return jsonData;
         }
@@ -233,7 +263,7 @@ public class DragDropService : IAsyncDisposable
         }
 
         if (!string.IsNullOrEmpty(type)
-            && TryGetDataOfType<TData>(e, out var data, type))
+            && TryGetDataOfType(e, out var data, type, jsonTypeInfo))
         {
             return data;
         }
@@ -324,10 +354,12 @@ public class DragDropService : IAsyncDisposable
     }
 
     [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
+    [RequiresDynamicCode("Calls System.Text.Json.JsonSerializer.Deserialize<TValue>(String, JsonSerializerOptions)")]
     private static bool TryGetDataOfType<TData>(
         IEnumerable<KeyValuePair<string, string>>? e,
         [NotNullWhen(true)] out TData? data,
-        string? type = null)
+        string? type = null,
+        JsonTypeInfo<TData>? jsonTypeInfo = null)
     {
         type ??= "application/json";
 
@@ -342,13 +374,27 @@ public class DragDropService : IAsyncDisposable
         {
             if (dataType == type)
             {
-                try
+                if (jsonTypeInfo is null)
                 {
-                    data = JsonSerializer.Deserialize<TData>(item);
+                    try
+                    {
+                        data = JsonSerializer.Deserialize<TData>(item);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
-                catch
+                else
                 {
-                    continue;
+                    try
+                    {
+                        data = JsonSerializer.Deserialize(item, jsonTypeInfo);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
                 if (data is not null)
                 {

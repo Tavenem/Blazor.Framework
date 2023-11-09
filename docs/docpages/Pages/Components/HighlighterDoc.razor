@@ -1,0 +1,125 @@
+﻿@page "/components/highlighter"
+
+<PageTitle>Highlighter - Tavenem Blazor Framework</PageTitle>
+
+<h1>Highlighter</h1>
+
+<p>
+    The highlighter component can be used to highlight portions of text, such as matches of a search
+    term.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    Use the <code>Highlighter</code> component in place of normal text. Set its <code>Text</code>
+    property to the displayed text, and its <code>HighlightedText</code> property to the text that
+    should be highlighted within the text. The <code>CaseSensitive</code> property controls whether
+    the match will be case sensitive, and is <code>false</code> by default.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items">
+                <Template>
+                    <Highlighter Text="@context" HighlightedText="em" />
+                </Template>
+            </ElementList>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"">
+    <Template>
+        <Highlighter Text=""@context"" HighlightedText=""em"" />
+    </Template>
+</ElementList>
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>HighlightWholeWord</code> property indicates whether to highlight an entire word, if
+    the search text is found within it. It is <code>false</code> by default.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Highlighter Text="Highlight the entire word found" HighlightedText="ou" HighlightWholeWord="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Highlighter Text=""Highlight the entire word found"" HighlightedText=""ou"" HighlightWholeWord=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>WholeWord</code> property indicates whether to match <em>only</em> entire words. If
+    this property is <code>true</code>, <code>HighlightWholeWord</code> is ignored (since partial
+    word matches are no longer possible).
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Highlighter Text="Match the word found but not the word unfound" HighlightedText="found" WholeWord="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Highlighter Text=""Match the word found but not the word unfound"" HighlightedText=""found"" WholeWord=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>IsRegex</code> property indicates <code>HighlightedText</code> is a regular
+    expression, and can produce powerful matching behavior.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Highlighter Text="Match the words cat and bat, but not rat" HighlightedText="[cb]at" IsRegex="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Highlighter Text=""Match the words cat and bat, but not rat"" HighlightedText=""[cb]at"" IsRegex=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<h2>Customization</h2>
+
+<p>
+    The <code>Class</code> and <code>Style</code> properties can be used to style the highlighted
+    sections.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items">
+                <Template>
+                    <Highlighter Text="@context" HighlightedText="it" Class="primary" Style="background-color:transparent" />
+                </Template>
+            </ElementList>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"">
+    <Template>
+        <Highlighter Text=""@context"" HighlightedText=""it"" Class=""primary"" Style=""background-color:transparent"" />
+    </Template>
+</ElementList>
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+@code {
+    private List<string> _items = new() { "Item 1", "Item 2", "Item 3" };
+}

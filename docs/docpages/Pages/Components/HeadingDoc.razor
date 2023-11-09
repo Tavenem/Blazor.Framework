@@ -1,0 +1,35 @@
+﻿@page "/components/heading"
+
+<PageTitle>Heading - Tavenem Blazor Framework</PageTitle>
+
+<h1>Heading</h1>
+
+<p>
+    The heading component is a way of displaying one of the heading elements (<code>h1</code>,
+    <code>h2</code>, etc.). It has limited use on its own (possibly when the level of the heading
+    must be determined dynamically). Its intended purpose is to support auto-generated tables of
+    contents. See the <a href="./components/contents">Contents</a> component documentation for
+    details.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    Use the <code>Level</code> property to set the type of heading element.
+    <code>HeadingLevel.H1</code> corresponds to an <code>h1</code> element, and so on.
+    <code>HeadingLevel.None</code> will generate a <code>span</code>, and can be used when you want
+    to include inline text or some other element in a table of contents, without the styling or
+    semantic meaning associated with a heading element.
+</p>
+
+<p>
+    The <code>Title</code> property sets the text shown in the table of contents. If unset, the text
+    content of the element will be used. This property is helpful when your heading might use
+    styling or extra text that is inappropriate for the table of contents (e.g. bold, underline,
+    numbering, etc.).
+</p>
+
+<p>
+    The <code>ThemeColor</code> property can be used to assign a theme color to the heading. This
+    color will not be reflected in the table of contents, only in the heading itself.
+</p>

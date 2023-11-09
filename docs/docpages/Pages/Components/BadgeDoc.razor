@@ -1,0 +1,68 @@
+﻿@page "/components/badge"
+
+<PageTitle>Badge - Tavenem Blazor Framework</PageTitle>
+
+<h1>Badge</h1>
+
+<p>
+    The badge component is small notification display element which overlaps a corner of another
+    element.
+</p>
+
+<p>
+    To create a badge, add the <code>badge</code> class to a <code>span</code> (or other semantic
+    element).
+</p>
+
+<p>
+    The parent element (which is decorated with the badge) must have its <code>position</code>
+    property set to <code>relative</code>. To add content, you must wrap the content with an element
+    (such as a <code>span</code>). Text placed directly inside the <code>badge</code> element will
+    not display properly.
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<span class=""position-relative""><span>Updates</span><span class=""badge warning""></span></span>
+<span class=""position-relative""><tf-icon>mail</tf-icon><span class=""badge""><span>3</span></span></span>")" />
+
+<p>
+    To make the badge overlap its associated element, add the <code>overlap</code> class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""position-relative""><span>Updates</span><span class=""badge overlap info""></span></span>
+<span class=""position-relative""><tf-icon>mail</tf-icon><span class=""badge overlap primary""><span>99+</span></span></span>")" />
+
+<h1>Position</h1>
+
+<p>
+    The position of the badge relative to its associated element can be adjusted with a set of positioning classes.
+</p>
+
+<CodeExample Code="@(@"<span class=""position-relative""><span>Top-right</span><span class=""badge primary""></span></span>
+<span class=""position-relative""><span>Center-right</span><span class=""badge center-right primary""></span></span>
+<span class=""position-relative""><span>Bottom-right</span><span class=""badge bottom primary""></span></span>
+<span class=""position-relative""><span>Bottom-center</span><span class=""badge bottom-center primary""></span></span>
+<span class=""position-relative""><span>Bottom-left</span><span class=""badge bottom-left primary""></span></span>
+<span class=""position-relative""><span>Center-left</span><span class=""badge center-left primary""></span></span>
+<span class=""position-relative""><span>Top-left</span><span class=""badge left primary""></span></span>
+<span class=""position-relative""><span>Top-center</span><span class=""badge center primary""></span></span>
+<span class=""position-relative""><span>Center</span><span class=""badge center-center primary""></span></span>")" />
+
+<p>
+    Note that badges are absolutely positioned, which means that they may overlap with surrounding
+    elements, or cross the boundaries of their parent container. It is up to you either to accept
+    these possibilities, or design your layout to prevent such overlap.
+</p>
+
+<p>
+    Badges and their content are given a z-index of 1 to ensure that the badge is displayed above
+    most normal content, but below special components like tooltips and dialogs.
+</p>
+
+<h1>Variants</h1>
+
+<p>
+    Badges can also be <code>outlined</code> or be given a <code>border</code>:
+</p>
+
+<CodeExample RowClass="p-3 gap-5" Code="@(@"<span class=""position-relative""><span>Example</span><span class=""badge primary outlined""><tf-icon>star</tf-icon></span></span>
+<span class=""position-relative""><span>Example</span><span class=""badge info border""><span>Note</span></span></span>")" />

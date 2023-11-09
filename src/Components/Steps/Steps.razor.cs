@@ -6,9 +6,11 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A set of <see cref="Step"/> components, one of which is visible at any time.
 /// </summary>
-public partial class Steps
+public partial class Steps : PersistentComponentBase
 {
-    private readonly List<Step> _steps = new();
+    private const string CurrentStepQueryParamName = "s";
+
+    private readonly List<Step> _steps = [];
 
     /// <summary>
     /// <para>
@@ -118,8 +120,7 @@ public partial class Steps
     /// </summary>
     [Parameter] public EventCallback<ValidationStateChangedEventArgs> ValidationStateChanged { get; set; }
 
-    private IEnumerable<Step> VisibleSteps => _steps
-        .Where(x => x.IsVisible || x == _steps[CurrentStep]);
+    internal int InitialStep { get; private set; } = -1;
 
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(Class)
@@ -132,13 +133,16 @@ public partial class Steps
     private ThemeColor CurrentThemeColor
         => ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor;
 
-    private bool IsFinishButtonDisabled => FinishButtonDisabled
+    private bool IsFinishButtonDisabled => !IsInteractive
+        || FinishButtonDisabled
         || !IsFormValid;
 
     private string? FinishButtonCssClass => new CssBuilder("btn ms-auto")
         .Add("btn-text", FinishButtonDisabled)
         .Add(CurrentThemeColor.ToCSS(), !FinishButtonDisabled)
         .ToString();
+
+    private bool IsInteractive { get; set; }
 
     private bool IsFormValid { get; set; } = true;
 
@@ -147,32 +151,20 @@ public partial class Steps
         .Add(CurrentThemeColor.ToCSS(), !NextDisabled)
         .ToString();
 
-    private bool NextDisabled
-    {
-        get
-        {
-            var next = _steps
-                .Skip(CurrentStep + 1)
-                .FirstOrDefault(x => x.IsVisible);
-            return next is null || next.Disabled;
-        }
-    }
+    private bool NextDisabled => _steps
+        .Skip(CurrentStep + 1)
+        .FirstOrDefault(x => x.IsVisible)?
+        .Disabled != false;
 
     private string? PreviousButtonCssClass => new CssBuilder("btn")
         .Add("btn-text", PreviousDisabled)
         .Add("outlined", !PreviousDisabled)
         .ToString();
 
-    private bool PreviousDisabled
-    {
-        get
-        {
-            var previous = _steps
-                .Take(CurrentStep)
-                .LastOrDefault(x => x.IsVisible);
-            return previous is null || previous.Disabled;
-        }
-    }
+    private bool PreviousDisabled => _steps
+        .Take(CurrentStep)
+        .LastOrDefault(x => x.IsVisible)?
+        .Disabled != false;
 
     private bool ShowFinishButton => (Finish.HasDelegate
         || Form?.OnSubmit.HasDelegate == true
@@ -181,28 +173,57 @@ public partial class Steps
         .Skip(CurrentStep + 1)
         .FirstOrDefault(x => x.IsVisible) is null;
 
-    private bool ShowNextButton => _steps
+    private bool ShowNext => _steps
         .Skip(CurrentStep + 1)
         .FirstOrDefault(x => x.IsVisible) is not null;
 
-    private bool ShowPreviousButton => _steps
+    private bool ShowPrevious => _steps
         .Take(CurrentStep)
         .LastOrDefault(x => x.IsVisible) is not null;
+
+    private IEnumerable<Step> VisibleSteps => _steps
+        .Where(x => x.IsVisible || x == _steps[CurrentStep]);
+
+    /// <inheritdoc/>
+    protected override void OnInitialized()
+    {
+        var currentSteps = QueryStateService.RegisterProperty(
+            Id,
+            CurrentStepQueryParamName,
+            OnQueryChangedAsync,
+            CurrentStep + 1);
+        if (currentSteps?.Count > 0
+            && int.TryParse(currentSteps[0], out var currentStep))
+        {
+            InitialStep = currentStep - 1;
+        }
+    }
 
     /// <inheritdoc />
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender && _steps.Count > 0)
+        if (firstRender)
         {
-            while (CurrentStep < _steps.Count
-                && !_steps[CurrentStep].IsVisible)
+            IsInteractive = true;
+
+            if (_steps.Count > 0)
             {
-                CurrentStep++;
+                while (CurrentStep < _steps.Count
+                    && !_steps[CurrentStep].IsVisible)
+                {
+                    CurrentStep++;
+                }
+                if (!_steps[CurrentStep].IsVisible)
+                {
+                    CurrentStep = 0;
+                }
             }
-            if (!_steps[CurrentStep].IsVisible)
+            if (CurrentStep >= _steps.Count)
             {
                 CurrentStep = 0;
             }
+
+            StateHasChanged();
         }
     }
 
@@ -225,12 +246,14 @@ public partial class Steps
         await _steps[CurrentStep].ActivateAsync(false);
         CurrentStep = index;
         await _steps[CurrentStep].ActivateAsync(true);
+        SetCurrentStep();
     }
 
-    internal void AddStep(Step step)
+    internal int AddStep(Step step)
     {
         _steps.Add(step);
         StateHasChanged();
+        return _steps.Count - 1;
     }
 
     internal void Refresh() => StateHasChanged();
@@ -241,14 +264,62 @@ public partial class Steps
         StateHasChanged();
     }
 
+    private string GetNextStepUrl()
+    {
+        var step = CurrentStep;
+        var next = _steps
+            .Skip(CurrentStep + 1)
+            .FirstOrDefault(x => x.IsVisible);
+        if (next?.Disabled == false)
+        {
+            step = _steps.IndexOf(next);
+        }
+
+        return QueryStateService.GetUriWithPropertyValue(
+            Id,
+            CurrentStepQueryParamName,
+            step + 1);
+    }
+
+    private string GetPreviousStepUrl()
+    {
+        var step = CurrentStep;
+        var previous = _steps
+            .Take(CurrentStep)
+            .LastOrDefault(x => x.IsVisible);
+        if (previous?.Disabled == false)
+        {
+            step = _steps.IndexOf(previous);
+        }
+
+        return QueryStateService.GetUriWithPropertyValue(
+            Id,
+            CurrentStepQueryParamName,
+            step + 1);
+    }
+
     private string? GetStepActivatorCssClass(Step step) => new CssBuilder("step-activator")
-        .Add("disabled", step.Disabled)
+        .Add("disabled", step != _steps[CurrentStep] && step.Disabled)
         .Add(CurrentThemeColor.ToCSS(), step == _steps[CurrentStep])
         .ToString();
 
     private string? GetStepCssClass(int index) => new CssBuilder()
         .AddStyle("d-none", index != CurrentStep)
         .ToString();
+
+    private string GetStepUrl(Step step)
+    {
+        var index = _steps.IndexOf(step);
+        if (index == -1)
+        {
+            index = CurrentStep;
+        }
+
+        return QueryStateService.GetUriWithPropertyValue(
+            Id,
+            CurrentStepQueryParamName,
+            index + 1);
+    }
 
     private async Task OnActivateStepAsync(Step step)
     {
@@ -273,7 +344,7 @@ public partial class Steps
         var next = _steps
             .Skip(CurrentStep + 1)
             .FirstOrDefault(x => x.IsVisible);
-        if (next is null || next.Disabled)
+        if (next?.Disabled != false)
         {
             return;
         }
@@ -281,6 +352,7 @@ public partial class Steps
         await _steps[CurrentStep].ActivateAsync(false);
         CurrentStep = _steps.IndexOf(next);
         await _steps[CurrentStep].ActivateAsync(true);
+        SetCurrentStep();
     }
 
     private async Task OnPreviousAsync()
@@ -288,7 +360,7 @@ public partial class Steps
         var previous = _steps
             .Take(CurrentStep)
             .LastOrDefault(x => x.IsVisible);
-        if (previous is null || previous.Disabled)
+        if (previous?.Disabled != false)
         {
             return;
         }
@@ -296,6 +368,19 @@ public partial class Steps
         await _steps[CurrentStep].ActivateAsync(false);
         CurrentStep = _steps.IndexOf(previous);
         await _steps[CurrentStep].ActivateAsync(true);
+        SetCurrentStep();
+    }
+
+    private Task OnQueryChangedAsync(QueryChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value, out var currentStep)
+            && _steps.Count >= currentStep
+            && _steps[currentStep - 1].IsVisible
+            && !_steps[currentStep - 1].Disabled)
+        {
+            CurrentStep = currentStep - 1;
+        }
+        return Task.CompletedTask;
     }
 
     private async Task OnValidationStateChanged(ValidationStateChangedEventArgs e)
@@ -306,5 +391,16 @@ public partial class Steps
         }
         IsFormValid = await Form.ValidateAsync();
         await ValidationStateChanged.InvokeAsync(e);
+    }
+
+    private void SetCurrentStep()
+    {
+        if (PersistState)
+        {
+            QueryStateService.SetPropertyValue(
+                Id,
+                CurrentStepQueryParamName,
+                CurrentStep + 1);
+        }
     }
 }

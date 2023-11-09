@@ -340,14 +340,9 @@ public static class DefaultIcons
     public static string Source { get; set; } = "source";
 
     /// <summary>
-    /// An empty (outlined) star. Used by the <see cref="Rating"/> component.
+    /// A star. Used by the <see cref="Rating"/> component.
     /// </summary>
-    public static string Star_Empty { get; set; } = "star_border";
-
-    /// <summary>
-    /// A full (solid) star. Used by the <see cref="Rating"/> component.
-    /// </summary>
-    public static string Star_Full { get; set; } = "star";
+    public static string Star { get; set; } = "star";
 
     /// <summary>An icon to indicate strikethrough format.</summary>
     public static string Strikethrough { get; set; } = "strikethrough_s";

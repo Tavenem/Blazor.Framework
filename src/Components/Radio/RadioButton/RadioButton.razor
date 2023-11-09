@@ -1,0 +1,38 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@typeparam TValue
+
+@inherits BoolInputComponentBase<TValue>
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@Style">
+    <label>
+        <span class="@IconClass">
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   type="radio"
+                   tabindex="@TabIndex"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autofocus="@AutoFocus"
+                   checked="@IsCheckedString"
+                   disabled="@IsDisabled"
+                   name="@(Context?.GroupName ?? NameValue)"
+                   readonly="@IsReadOnly"
+                   value="@Value?.ToString()"
+                   @onchange="OnChangeAsync"
+                   @onclick:preventDefault="@(IsDisabled || IsReadOnly)" />
+            <tf-icon>@Icon</tf-icon>
+        </span>
+        @if (LabelContent is not null)
+        {
+            <span class="label">@LabelContent(Value)</span>
+        }
+        else if (!string.IsNullOrEmpty(Label))
+        {
+            <span class="label">@Label</span>
+        }
+    </label>
+</div>
+
+

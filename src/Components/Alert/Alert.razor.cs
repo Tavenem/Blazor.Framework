@@ -53,6 +53,11 @@ public partial class Alert
         .Add("d-none", IsClosed)
         .ToString();
 
+    /// <summary>
+    /// Whether this alert was closed.
+    /// </summary>
+    protected bool IsClosed { get; set; }
+
     private string Icon => ThemeColor switch
     {
         ThemeColor.Danger => "error_outline",
@@ -67,7 +72,17 @@ public partial class Alert
         _ => "outlined",
     };
 
-    private bool IsClosed { get; set; }
+    private bool Interactive { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
+        }
+    }
 
     private async Task OnClosedAsync()
     {
@@ -76,7 +91,7 @@ public partial class Alert
             await OnClosed.InvokeAsync(this);
         }
         Closed?.Invoke(this, EventArgs.Empty);
-        if (!OnClosed.HasDelegate && Closed is null)
+        if (AutoClose)
         {
             IsClosed = true;
         }

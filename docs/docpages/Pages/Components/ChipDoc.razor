@@ -1,0 +1,407 @@
+﻿@page "/components/chip"
+
+<PageTitle>Chip - Tavenem Blazor Framework</PageTitle>
+
+<h1>Chip</h1>
+
+<p>
+    Chips are simple elements, usually displayed in groups.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    To create a chip, add the <code>chip</code> class to an element (usually a <code>span</code>,
+    but possibly a <code>button</code> if the chip is interactive). You can also assign it a theme
+    class to color it.
+</p>
+
+<CodeExample Code="@(@"<span class=""chip"">Example</span>
+<span class=""chip primary"">Primary</span>
+<span class=""chip secondary"">Secondary</span>
+<span class=""chip tertiary"">Tertiary</span>
+<span class=""chip danger""><tf-icon>error_outline</tf-icon>Danger</span>
+<span class=""chip dark"">Dark</span>
+<span class=""chip default"">Default</span>
+<span class=""chip info""><tf-icon>info</tf-icon>Info</span>
+<span class=""chip success"">Success<tf-icon>check_circle</tf-icon></span>
+<span class=""chip warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
+
+<p>
+    To indicate that a non-button chip is interactive, add the <code>clickable</code> class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip clickable"">Example</span>
+<span class=""chip clickable primary"">Primary</span>
+<span class=""chip clickable secondary"">Secondary</span>
+<span class=""chip clickable tertiary"">Tertiary</span>
+<span class=""chip clickable danger""><tf-icon>error_outline</tf-icon>Danger</span>
+<span class=""chip clickable dark"">Dark</span>
+<span class=""chip clickable default"">Default</span>
+<span class=""chip clickable info""><tf-icon>info</tf-icon>Info</span>
+<span class=""chip clickable success"">Success<tf-icon>check_circle</tf-icon></span>
+<span class=""chip clickable warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
+
+<h2>Disabled</h2>
+
+<p>
+    A chip can be disabled by by using the <code>disabled</code> attribute for a button, or the
+    <code>disabled</code> class for other elements. When disabled, the opacity of a chip is lowered,
+    rather than using the usual disabled colors.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip disabled"">Example</span>
+<span class=""chip disabled primary"">Primary</span>
+<span class=""chip disabled secondary"">Secondary</span>
+<span class=""chip disabled tertiary"">Tertiary</span>
+<span class=""chip disabled danger""><tf-icon>error_outline</tf-icon>Danger</span>
+<span class=""chip disabled dark"">Dark</span>
+<span class=""chip disabled default"">Default</span>
+<span class=""chip disabled info""><tf-icon>info</tf-icon>Info</span>
+<span class=""chip disabled success"">Success<tf-icon>check_circle</tf-icon></span>
+<span class=""chip disabled warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
+
+<h2>Variants</h2>
+
+<p>
+    The size of a chip can be adjusted with the <code>small</code> and <code>large</code> classes.
+</p>
+
+<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<span class=""chip small primary"">Small</span>
+<span class=""chip primary"">Normal</span>
+<span class=""chip large primary"">Large</span>")" />
+
+<p>
+    The background can be reduced to a semitransparent tint by using the <code>chip-text</code>
+    class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip chip-text"">Example</span>
+<span class=""chip chip-text primary"">Primary</span>
+<span class=""chip chip-text secondary"">Secondary</span>
+<span class=""chip chip-text tertiary"">Tertiary</span>
+<span class=""chip chip-text danger""><tf-icon>error_outline</tf-icon>Danger</span>
+<span class=""chip chip-text dark"">Dark</span>
+<span class=""chip chip-text default"">Default</span>
+<span class=""chip chip-text info""><tf-icon>info</tf-icon>Info</span>
+<span class=""chip chip-text success"">Success<tf-icon>check_circle</tf-icon></span>
+<span class=""chip chip-text warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
+
+<p>
+    Chips can also be <code>outlined</code>.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip outlined"">Example</span>
+<span class=""chip outlined primary"">Primary</span>
+<span class=""chip outlined secondary"">Secondary</span>
+<span class=""chip outlined tertiary"">Tertiary</span>
+<span class=""chip outlined danger""><tf-icon>error_outline</tf-icon>Danger</span>
+<span class=""chip outlined dark"">Dark</span>
+<span class=""chip outlined default"">Default</span>
+<span class=""chip outlined info""><tf-icon>info</tf-icon>Info</span>
+<span class=""chip outlined success"">Success<tf-icon>check_circle</tf-icon></span>
+<span class=""chip outlined warning""><tf-icon>warning_amber</tf-icon>Warning</span>")" />
+
+<p>
+    The <code>square</code> and <code>rounded</code> utility classes can be used to change the shape
+    of a chip.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<span class=""chip square primary"">Primary</span>
+<span class=""chip rounded secondary"">Secondary</span>")" />
+
+<h2>Component</h2>
+
+<p>
+    You can also display data-bound sets of chips with the <code>ChipSet&lt;T></code> component.
+    This component allows you to display a set of chips based on any <code>List&lt;T></code> of
+    items, and bind one or more selected items from the list.
+</p>
+
+<p>
+    Each <code>ChipSet</code> and its child <code>Chip</code>s have a data type, indicated by the
+    <code>TChip</code> parameter when it can't be inferred. The items in an <code>ChipSet</code>
+    are displayed using either the <code>Template RenderFragment</code> for each item, or if no
+    template is provided, with the <code>ToString</code> method of the items.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" SelectionType="SelectionType.Single" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that the <code>SelectedItem</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
+
+<h3>Multiselect</h3>
+
+<p>
+    The <code>SelectionType</code> property determines how selection is handled. If it is set to
+    <code>None</code> then items are not selectable. If set to <code>Single</code> one item at a
+    time may be selected. If set to <code>Multiple</code> any number of items may be selected.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Multiple"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that the <code>SelectedItems</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemsChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
+
+<h3>Required</h3>
+
+<p>
+    You can make the selection required by setting the <code>Required</code> property. Doing so
+    prevents de-selecting the last selected item through user interaction. Programmatic changes
+    which result in the selection being cleared are still allowed, and no initial selection is
+    forced.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" SelectionType="SelectionType.Single" Required="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" Required=""true"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Closing</h3>
+
+<p>
+    If you add an event callback to the <code>OnChipClosed</code> property, each chip will
+    automatically get a close button which will invoke the handler.
+</p>
+
+<p>
+    You can also set the <code>AutoClose</code> property to <code>true</code> to show the close
+    button, which will simply set the <code>display</code> property to <code>none</code> when
+    pressed.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" AutoClose="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" AutoClose=""true"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Drag and Drop</h3>
+
+<p>
+    Chips in an <code>ChipSet</code> can be draggable, both within the <code>ChipSet</code> (to
+    reorder items), and between <code>ChipSet</code>s with the same item type.
+</p>
+
+<p>
+    To make the items in a <code>ChipSet</code> draggable, set the <code>IsDragStart</code>
+    property of the <code>ChipSet</code> to <code>true</code>. To make a
+    <code>ChipSet</code> a valid drop destination (including for reordering items within itself)
+    set its <code>IsDropTarget</code> property to <code>true</code>.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_dragChips" IsDragStart="true" IsDropTarget="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" IsDragStart=""true"" IsDropTarget=""true"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Individual chips can disable dragging by returning <code>false</code> from a function assigned
+    to the <code>ItemIsDraggable</code> property. You can also override the
+    <code>GetDropEffect</code> delegate to determine the drag effect for any chip dragged over the
+    set. Return <code>DragEffect.None</code> if the set will not accept the drop.
+</p>
+
+<p>
+    Ordinarily chips which are dropped on a set will be inserted into the set at the position
+    where they are dropped. If the drag operation is "move" the chip is removed from its original
+    place in the set (even if it was a different set). If it is "copy" the chip will be round-trip
+    (de)serialized via JSON, and the copy will be inserted. If the chip cannot be successfully
+    round-trip serialized and deserialized to and from JSON, an exception will be thrown. To prevent
+    this for chips which are not expected to be copied, you can set the
+    <code>DragEffectAllowed</code> property to <code>DragEffect.Move</code> (the default is
+    <code>DragEffect.CopyMove</code>).
+</p>
+
+<p>
+    You can also set a callback on the <code>OnDrop</code> property to bypass the default drop
+    process and handle the operation yourself. If you do this, you should also override the
+    <code>OnDropped</code> callback to bypass dropped chips' default behavior of removing
+    themselves from their place on their current set on a move operation.
+</p>
+
+<p>
+    A chip which is currently being dragged can have a custom class applied during the drag
+    operation, by setting the <code>ItemDraggingClass</code> property.
+</p>
+
+<p>
+    Likewise, a <code>ChipSet</code> which is the source of a drag operation can have a custom
+    class applied by setting the <code>DraggingClass</code> property. You can also override the
+    <code>DropClass</code> and <code>NoDropClass</code> properties to override the default CSS
+    styles applied when a set is a valid or invalid target for a drop, respectively.
+</p>
+
+<h3>Chips</h3>
+
+<p>
+    An icon can be automatically displayed before the content of a chip by setting the
+    <code>Icon</code> property to a function which returns the name of the icon. The
+    <code>IconClass</code> property can be used to customize the class of the icon.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can insert a separator before or after any chip by setting the <code>SeparatorBefore</code>
+    and <code>SeparatorAfter</code> properties to functions which return <code>true</code> for the
+    appropriate items.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" SeparatorBefore="@(i => i == "Chip 2")" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SeparatorBefore=""@(i => i == ""Chip 2"")"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Customization</h3>
+
+<p>
+    You can choose to display a special selection icon for selected chips by setting
+    <code>ShowSelectionIcon</code> to <code>true</code>. The selection icon takes the place of any
+    icon assigned via the <code>Icon</code> property.
+</p>
+
+<p>
+    The theme color of any chip may be set by assigning a function to the
+    <code>ItemThemeColor</code> property. Selected chips will always use the theme for the set
+    itself, rather than their own theme, to make it clear that they are currently selected.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet Items="_chips" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Clicking</h3>
+
+<p>
+    If you add an event callback to the <code>OnItemClick</code> property, chips will automatically
+    receive the <code>clickable</code> class and respond to click events, which will invoke the
+    <code>OnItemClick</code> callback.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Secondary)"" />
+
+@code {
+    private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
+    private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
+}")
+    </ChildContent>
+</Collapse>
+
+@code {
+    private List<string> _chips = new() { "Chip 1", "Chip 2", "Chip 3" };
+    private List<string> _dragChips = new() { "Chip 1", "Chip 2", "Chip 3" };
+    private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
+}

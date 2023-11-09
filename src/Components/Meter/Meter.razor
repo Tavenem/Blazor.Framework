@@ -9,23 +9,26 @@
     {
         <label for="@Id">@Label</label>
     }
-    <Tooltip Inline="true"
-             ThemeColor="ThemeColor"
-             TooltipContent="TooltipContent!"
-             TooltipMarkup="TooltipMarkup"
-             TooltipText="@TooltipTextValue">
-        <meter @ref="ElementReference"
-               @attributes="MeterAttributes"
-               id="@Id"
-               class="@MeterClass"
-               style="@MeterStyle"
-               high="@HighString"
-               low="@LowString"
-               max="@MaxString"
-               min="@MinString"
-               optimum="@OptimumString"
-               value="@ValueString" />
-    </Tooltip>
+    <meter @ref="ElementReference"
+           @attributes="MeterAttributes"
+           id="@Id"
+           class="@MeterClass"
+           style="@MeterStyle"
+           high="@HighString"
+           low="@LowString"
+           max="@MaxString"
+           min="@MinString"
+           optimum="@OptimumString"
+           value="@ValueString" />
+    @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
+    {
+        <Tooltip Anchor="@Id"
+                 ThemeColor="ThemeColor"
+                 TooltipMarkup="TooltipMarkup"
+                 TooltipText="@TooltipTextValue">
+            @TooltipContent
+        </Tooltip>
+    }
 </div>
 
 

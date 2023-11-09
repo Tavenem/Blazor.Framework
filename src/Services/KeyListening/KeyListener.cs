@@ -64,7 +64,7 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     /// </param>
     public async Task ConnectAsync(string elementId, KeyListenerOptions options)
     {
-        (_elementIds ??= new()).Add(elementId);
+        (_elementIds ??= []).Add(elementId);
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);

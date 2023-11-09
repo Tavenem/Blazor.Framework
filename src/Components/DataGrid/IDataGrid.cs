@@ -25,7 +25,7 @@ public interface IDataGrid<TDataItem>
     /// <summary>
     /// Called internally.
     /// </summary>
-    public Task OnColumnSortedAsync(IColumn<TDataItem> column);
+    public void OnColumnSorted(IColumn<TDataItem> column);
 
     /// <summary>
     /// Removes a column from this grid.

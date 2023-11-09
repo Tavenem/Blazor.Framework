@@ -10,11 +10,6 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 public partial class ListItemCollapse<TListItem>
 {
     /// <summary>
-    /// The id of the collapse element.
-    /// </summary>
-    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
@@ -176,16 +171,11 @@ public partial class ListItemCollapse<TListItem>
     /// </summary>
     protected override void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                DragDropListener.OnDrop -= OnDropAsync;
-            }
-            base.Dispose(disposing);
-
-            _disposedValue = true;
+            DragDropListener.OnDrop -= OnDropAsync;
         }
+        base.Dispose(disposing);
     }
 
     private DragStartData GetDragData()
@@ -207,7 +197,7 @@ public partial class ListItemCollapse<TListItem>
         }
         else
         {
-            data = DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed);
+            data = DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed, jsonTypeInfo: ListItem.JsonTypeInfo);
         }
 
         return data;

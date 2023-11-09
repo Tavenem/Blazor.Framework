@@ -22,11 +22,17 @@ public interface IResizeObserver : IAsyncDisposable
     /// Gets current size information about an observed element.
     /// </summary>
     /// <param name="reference">The element to retrieve.</param>
+    /// <param name="forceRefresh">
+    /// Whether to get updated information, even if the observer has a cached value.
+    /// </param>
     /// <returns>
-    /// The last observed bounding area for the given element; or <see langword="null"/> if the
-    /// given element is not currently being observed.
+    /// The bounding area for the given element.
     /// </returns>
-    BoundingClientRect? GetSizeInfo(ElementReference reference);
+    /// <remarks>
+    /// If <paramref name="forceRefresh"/> is <see langword="false"/>, observes the element if it is
+    /// not already being observed.
+    /// </remarks>
+    Task<BoundingClientRect?> GetSizeInfoAsync(ElementReference reference, bool forceRefresh = false);
 
     /// <summary>
     /// Determine whether a given element is already being observed for resize events.
@@ -43,18 +49,18 @@ public interface IResizeObserver : IAsyncDisposable
     /// </summary>
     /// <param name="element">An element reference.</param>
     /// <returns>The current bounding area.</returns>
-    Task<BoundingClientRect?> Observe(ElementReference element);
+    Task<BoundingClientRect?> ObserveAsync(ElementReference element);
 
     /// <summary>
     /// Observe the given list of elements for resize events.
     /// </summary>
     /// <param name="elements">A list of element references.</param>
     /// <returns>An enumeration of current bounding areas.</returns>
-    Task<IEnumerable<BoundingClientRect>> Observe(IEnumerable<ElementReference> elements);
+    Task<IEnumerable<BoundingClientRect>> ObserveAsync(IList<ElementReference> elements);
 
     /// <summary>
     /// Stop observing an element for resize events.
     /// </summary>
     /// <param name="element">The element to stop observing.</param>
-    Task Unobserve(ElementReference element);
+    Task UnobserveAsync(ElementReference element);
 }

@@ -1,0 +1,81 @@
+﻿@page "/utilities/borders"
+
+<PageTitle>Borders - Tavenem Blazor Framework</PageTitle>
+
+<h1>Borders</h1>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to help format borders.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    The <code>border</code> class will surround an element with a border:
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""p-3"">
+    <div class=""border"" style=""height:5em;width:5em""></div>
+</div>")" />
+
+<p>
+    The <code>border-0</code> class will remove borders from an element which would normally have one.
+</p>
+
+<p>
+    There are also border classes for each side:
+</p>
+
+<CodeExample Code="@(@"<div class=""row p-3"">
+    <div class=""border-bottom"" style=""height:5em;width:5em""></div>
+    <div class=""border-left"" style=""height:5em;width:5em""></div>
+    <div class=""border-right"" style=""height:5em;width:5em""></div>
+    <div class=""border-top"" style=""height:5em;width:5em""></div>
+    <div class=""border border-bottom-0"" style=""height:5em;width:5em""></div>
+    <div class=""border border-left-0"" style=""height:5em;width:5em""></div>
+    <div class=""border border-right-0"" style=""height:5em;width:5em""></div>
+    <div class=""border border-top-0"" style=""height:5em;width:5em""></div>
+</div>")" />
+
+<h2>Color</h2>
+
+<p>
+    The color of an element's borders can be controlled with theme classes:
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""row p-3"">
+    <div class=""border border-primary"" style=""height:5em;width:5em""></div>
+    <div class=""border border-secondary"" style=""height:5em;width:5em""></div>
+    <div class=""border border-tertiary"" style=""height:5em;width:5em""></div>
+    <div class=""border border-danger"" style=""height:5em;width:5em""></div>
+    <div class=""border border-dark"" style=""height:5em;width:5em""></div>
+    <div class=""border border-default"" style=""height:5em;width:5em""></div>
+    <div class=""border border-info"" style=""height:5em;width:5em""></div>
+    <div class=""border border-success"" style=""height:5em;width:5em""></div>
+    <div class=""border border-warning"" style=""height:5em;width:5em""></div>
+</div>")" />
+
+<h2>Radius</h2>
+
+<p>
+    The roundness of an element's borders can also be controlled:
+</p>
+
+<CodeExample Code="@(@"<div class=""row p-3"">
+    <div class=""border rounded"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-bottom"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-bottom-left"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-bottom-right"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-left"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-right"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-top"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-top-left"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-top-right"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-circle"" style=""height:5em;width:5em""></div>
+    <div class=""border rounded-pill"" style=""height:5em;width:8em""></div>
+</div>")" />
+
+<p>
+    The class <code>square</code> can also be used to set <code>border-radius</code> to 0.
+</p>
+

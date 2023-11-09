@@ -1,0 +1,61 @@
+﻿@page "/components/close-button"
+
+<PageTitle>Close Button - Tavenem Blazor Framework</PageTitle>
+
+<h1>Close Button</h1>
+
+<p>
+    The Tavenem Blazor Framework provides a generic close button component. By default it simply
+    provides a set of styles, without any functionality. It is integrated into a number of other
+    framework components, but is also available for your own use.
+</p>
+
+<p>
+    The close button is available as a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a>, with the
+    custom element tag <code>tf-close</code>. It does not expect any content.
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <tf-close />
+</div>")" />
+
+<p>
+    Close buttons contain styles to help them automatically position themselves at the top-end
+    corner of their container. These will usually work best when the container has either
+    <code>flex</code> or <code>grid</code> display.
+</p>
+
+<p>
+    A close button with the <code>disabled</code> class or attribute will have a different visual
+    appearance, and lose its hover and focus styles.
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <tf-close class=""disabled"" />
+</div>
+<div class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <tf-close disabled />
+</div>")" />
+
+<h2>Auto-closing</h2>
+
+<p>
+    If you give the close button the <code>data-close-auto</code> attribute, it will automatically
+    assign a CSS class of <code>auto-closed</code> to its nearest parent with the
+    <code>data-can-close</code> attribute when clicked. This class has the effect of setting
+    <code>display: none !important</code>. To re-show the element, remove the
+    <code>auto-closed</code> class.
+</p>
+
+<CodeExample RowClass="p-2" Code="@(@"<div data-can-close class=""d-flex primary filled"" style=""height:5rem;width:5rem"">
+    <tf-close data-close-auto />
+</div>")" />
+
+<p>
+    Note that if the element with <code>data-can-close</code> has its <code>class</code> attribute
+    set dynamically in razor code, the auto-close effect may be undone whenever the component
+    renders. For such elements, it is recommended that the display of the parent element be handled
+    manually (with the <code>&commat;onclick</code> handler of the <code>tf-code</code> element, for
+    instance), rather than using auto-closing.
+</p>

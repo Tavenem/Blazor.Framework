@@ -1,0 +1,138 @@
+﻿@page "/components/avatar"
+
+<PageTitle>Avatar - Tavenem Blazor Framework</PageTitle>
+
+<h1>Avatar</h1>
+
+<p>
+    The avatar component is a circular display element which can display an image, text, or an icon.
+</p>
+
+<p>
+    An avatar can be presented in one of two ways: using a CSS class, or with a component.
+</p>
+
+<h2>CSS</h2>
+
+<p>
+    To create an avatar using only css, add the <code>avatar</code> class to a <code>div</code> (or
+    other semantic element).
+</p>
+
+<CodeExample Code="@(@"<div class=""avatar""><img src=""./images/tavenemlogo_sq_inset.svg"" alt=""Tavenem logo"" /></div>
+<div class=""avatar primary"">P</div>
+<div class=""avatar secondary"">S</div>
+<div class=""avatar tertiary"">T</div>
+<div class=""avatar dark"">D</div>
+<div class=""avatar default"">D</div>
+<div class=""avatar danger""><tf-icon>error_outline</tf-icon></div>
+<div class=""avatar info""><tf-icon>info</tf-icon></div>
+<div class=""avatar success""><tf-icon>check_circle</tf-icon></div>
+<div class=""avatar warning""><tf-icon>warning_amber</tf-icon></div>")" />
+
+<h2>Component</h2>
+
+<p>
+    You can also use the <code>Avatar</code> component.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Avatar Image="./images/tavenemlogo_sq_inset.svg" Alt="Tavenem logo" />
+            <Avatar ThemeColor="ThemeColor.Primary">P</Avatar>
+            <Avatar ThemeColor="ThemeColor.Secondary">S</Avatar>
+            <Avatar ThemeColor="ThemeColor.Tertiary">T</Avatar>
+            <Avatar ThemeColor="ThemeColor.Dark">D</Avatar>
+            <Avatar ThemeColor="ThemeColor.Default">D</Avatar>
+            <Avatar ThemeColor="ThemeColor.Danger"><tf-icon>error_outline</tf-icon></Avatar>
+            <Avatar ThemeColor="ThemeColor.Info"><tf-icon>info</tf-icon></Avatar>
+            <Avatar ThemeColor="ThemeColor.Success"><tf-icon>check_circle</tf-icon></Avatar>
+            <Avatar ThemeColor="ThemeColor.Warning"><tf-icon>warning_amber</tf-icon></Avatar>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Avatar Image=""./images/tavenemlogo_sq_inset.svg"" Alt=""Tavenem logo"" />
+<Avatar ThemeColor=""ThemeColor.Primary"">P</Avatar>
+<Avatar ThemeColor=""ThemeColor.Secondary"">S</Avatar>
+<Avatar ThemeColor=""ThemeColor.Tertiary"">T</Avatar>
+<Avatar ThemeColor=""ThemeColor.Dark"">D</Avatar>
+<Avatar ThemeColor=""ThemeColor.Default"">D</Avatar>
+<Avatar ThemeColor=""ThemeColor.Danger""><tf-icon>error_outline</tf-icon></Avatar>
+<Avatar ThemeColor=""ThemeColor.Info""><tf-icon>info</tf-icon></Avatar>
+<Avatar ThemeColor=""ThemeColor.Success""><tf-icon>check_circle</tf-icon></Avatar>
+<Avatar ThemeColor=""ThemeColor.Warning""><tf-icon>warning_amber</tf-icon></Avatar>")
+    </ChildContent>
+</Collapse>
+
+<h3>Groups</h3>
+
+<p>
+    When using the <code>Avatar</code> component, you can also include avatars in an
+    <code>AvatarGroup</code>, which displays them as an overlapping set, optionally with a maximum
+    number. Any avatars in the group over the maximum are omitted, and in their place an extra
+    avatar with the number of hidden avatars is displayed.
+</p>
+
+<p>
+    You can use the <code>OverflowAvatarClass</code> property of an <code>AvatarGroup</code> to
+    apply a custom CSS class to the avatar displayed in place of any overflow.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <AvatarGroup Max="3" OverflowAvatarClass="danger">
+                <Avatar ThemeColor="ThemeColor.Primary">A</Avatar>
+                <Avatar ThemeColor="ThemeColor.Secondary">B</Avatar>
+                <Avatar ThemeColor="ThemeColor.Tertiary">C</Avatar>
+                <Avatar>D</Avatar>
+                <Avatar>E</Avatar>
+                <Avatar>F</Avatar>
+                <Avatar>G</Avatar>
+                <Avatar>H</Avatar>
+                <Avatar>I</Avatar>
+                <Avatar>J</Avatar>
+            </AvatarGroup>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<AvatarGroup Max=""3"" OverflowAvatarClass=""danger"">
+    <Avatar ThemeColor=""ThemeColor.Primary"">A</Avatar>
+    <Avatar ThemeColor=""ThemeColor.Secondary"">B</Avatar>
+    <Avatar ThemeColor=""ThemeColor.Tertiary"">C</Avatar>
+    <Avatar>D</Avatar>
+    <Avatar>E</Avatar>
+    <Avatar>F</Avatar>
+    <Avatar>G</Avatar>
+    <Avatar>H</Avatar>
+    <Avatar>I</Avatar>
+    <Avatar>J</Avatar>
+</AvatarGroup>")
+    </ChildContent>
+</Collapse>
+
+<h2>Variants</h2>
+
+<p>
+    The <code>outlined</code> class can be used to show avatars with an outline instead of a solid color:
+</p>
+
+<CodeExample Code="@(@"<div class=""avatar outlined""><img src=""./images/tavenemlogo_sq_inset.svg"" alt=""Tavenem logo"" /></div>
+<div class=""avatar outlined primary"">P</div>
+<div class=""avatar outlined secondary"">S</div>
+<div class=""avatar outlined tertiary"">T</div>
+<div class=""avatar outlined dark"">D</div>
+<div class=""avatar outlined default"">D</div>
+<div class=""avatar outlined danger""><tf-icon>error_outline</tf-icon></div>
+<div class=""avatar outlined info""><tf-icon>info</tf-icon></div>
+<div class=""avatar outlined success""><tf-icon>check_circle</tf-icon></div>
+<div class=""avatar outlined warning""><tf-icon>warning_amber</tf-icon></div>")" />
+
+<p>
+    The <code>square</code> and <code>rounded</code> utility classes can be used to modify the shape
+    of avatars:
+</p>
+
+<CodeExample Code="@(@"<div class=""avatar square primary"">P</div>
+<div class=""avatar rounded secondary"">S</div>")" />

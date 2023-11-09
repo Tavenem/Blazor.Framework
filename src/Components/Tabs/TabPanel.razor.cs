@@ -89,6 +89,7 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
 
     internal override bool GetIsDraggable() => IsDraggable
         && Item is not null
+        && Parent?.IsInteractive == true
         && Parent?.EnableDragDrop == true;
 
     internal override bool GetIsDropTarget() => Parent?.EnableDragDrop == true;
@@ -102,9 +103,16 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// <returns>A <see cref="Task" /> representing any asynchronous operation.</returns>
     protected override async Task OnInitializedAsync()
     {
-        if (Parent is not null)
+        if (Parent is null)
         {
-            Index = await Parent.AddPanelAsync(this);
+            return;
+        }
+
+        Index = await Parent.AddPanelAsync(this);
+        if (Index == Parent.InitialActivePanelIndex
+            && !Disabled)
+        {
+            await Parent.ActivatePanelAsync(Index);
         }
     }
 

@@ -1,38 +1,101 @@
 ﻿using Microsoft.JSInterop;
 
-namespace Tavenem.Blazor.Framework.Services;
+namespace Tavenem.Blazor.Framework;
 
-internal class PopoverService : IAsyncDisposable
+/// <summary>
+/// Manages popovers.
+/// </summary>
+/// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+public class PopoverService(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
-    private readonly List<PopoverHandler> _popoverHandlers = new();
-    private readonly SemaphoreSlim _lock = new(1, 1);
-
-    private bool _disposedValue;
-    private bool _popoversInitialized;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="PopoverService"/>.
-    /// </summary>
-    /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    public PopoverService(IJSRuntime jsRuntime) => _moduleTask = new(
+    private readonly Lazy<Task<IJSObjectReference>> _moduleTask = new(
         () => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-popover.js")
         .AsTask());
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous dispose operation.
-    /// </returns>
+    private bool _disposedValue;
+
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        // Do not change this code. Put cleanup code in 'DisposeAsync(bool disposing)' method
         await DisposeAsync(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Sets the open state of the dropdown with the given HTML <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The HTML id of the dropdown to set.</param>
+    /// <param name="value">The visibility value to assign.</param>
+    public async Task SetDropdownOpenAsync(string id, bool value)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("setDropdownOpen", id, value)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
+    /// Sets the visibility of the tooltip with the given HTML <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The HTML id of the tooltip to set.</param>
+    /// <param name="value">The visibility value to assign.</param>
+    public async Task SetTooltipVisibilityAsync(string id, bool value)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("setTooltipVisibility", id, value)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
+    /// Toggles the dropdown with the given HTML <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The HTML id of the dropdown to toggle.</param>
+    public async Task ToggleDropdownAsync(string id)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("toggleDropdown", id)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
+    /// Toggles the tooltip with the given HTML <paramref name="id"/>.
+    /// </summary>
+    /// <param name="id">The HTML id of the tooltip to toggle.</param>
+    public async Task ToggleTooltipAsync(string id)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync("toggleTooltip", id)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -46,76 +109,20 @@ internal class PopoverService : IAsyncDisposable
     {
         if (!_disposedValue)
         {
-            if (disposing && _moduleTask.IsValueCreated)
+            if (disposing)
             {
-                try
+                if (_moduleTask.IsValueCreated)
                 {
-                    var module = await _moduleTask.Value.ConfigureAwait(false);
-                    if (_popoversInitialized)
+                    try
                     {
-                        await module.InvokeVoidAsync("popoverDispose");
+                        var module = await _moduleTask.Value;
+                        await module.DisposeAsync();
                     }
-                    await module.DisposeAsync().ConfigureAwait(false);
+                    catch { }
                 }
-                catch { }
             }
 
             _disposedValue = true;
         }
-    }
-
-    internal async Task InitializePopoversAsync()
-    {
-        if (_popoversInitialized)
-        {
-            return;
-        }
-
-        try
-        {
-            await _lock.WaitAsync();
-            if (_popoversInitialized)
-            {
-                return;
-            }
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("popoverInitialize");
-            _popoversInitialized = true;
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
-    internal async Task<PopoverHandler?> RegisterPopoverAsync(string? anchorId = null, string? focusId = null)
-    {
-        PopoverHandler? handler = null;
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            handler = new PopoverHandler(module, anchorId, focusId);
-            _popoverHandlers.Add(handler);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        return handler;
-    }
-
-    internal async Task<bool> UnregisterPopoverHandler(PopoverHandler handler)
-    {
-        if (!_popoverHandlers.Contains(handler)
-            || !handler.IsConnected)
-        {
-            return false;
-        }
-
-        await handler.DetachAsync();
-        _popoverHandlers.Remove(handler);
-        return true;
     }
 }

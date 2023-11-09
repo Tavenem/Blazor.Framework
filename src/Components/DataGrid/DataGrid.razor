@@ -6,7 +6,7 @@
 @attribute [CascadingTypeParameter(nameof(TDataItem))]
 @typeparam TDataItem
 
-@inherits TavenemComponentBase
+@inherits PersistentComponentBase
 
 <div class="d-none">
     <CascadingValue Value="this" TValue="IDataGrid<TDataItem>" IsFixed="true">
@@ -22,30 +22,33 @@
             }
             @HeaderContent
         </div>
-        <div>
-            @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
-            {
-                <TextInput Value="@QuickFilter"
-                           ValueChanged="OnChangeQuickFilterAsync"
-                           PostfixIcon="@DefaultIcons.Search"
-                           UpdateOnInput="true"
-                           UpdateOnInputDebounce="500"
-                           Class="ms-3 flex-grow-1" />
-            }
-            @if (AllowAdd)
-            {
-                <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
-            }
-            @if (AllowExport)
-            {
-                <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
-                    <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+        @if (IsInteractive)
+        {
+            <div>
+                @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
+                {
+                    <TextInput @bind-Value="@QuickFilter"
+                               @bind-Value:after="SetFilterQuery"
+                               PostfixIcon="@DefaultIcons.Search"
+                               UpdateOnInput="true"
+                               UpdateOnInputDebounce="500"
+                               Class="ms-3 flex-grow-1" />
+                }
+                @if (AllowAdd)
+                {
+                    <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
+                }
+                @if (AllowExport)
+                {
+                    <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
+                        <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+                    </button>
+                }
+                <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
+                    <tf-icon>@DefaultIcons.Filter</tf-icon>
                 </button>
-            }
-            <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
-                <tf-icon>@DefaultIcons.Filter</tf-icon>
-            </button>
-        </div>
+            </div>
+        }
     </div>
     <Form @ref="TableEditForm" Style="@FormStyle">
         <table class="@TableCssClass">
@@ -72,9 +75,8 @@
                     @if (SelectionType == SelectionType.Multiple)
                     {
                         <th class="input">
-                            <Checkbox TValue="bool?"
-                                      Value="SelectAllValue"
-                                      ValueChanged="OnSetSelectAllAsync"
+                            <Checkbox @bind-Value:get="SelectAllValue"
+                                      @bind-Value:set="OnSetSelectAllAsync"
                                       ThemeColor="ThemeColor"
                                       Class="dense" />
                         </th>
@@ -90,65 +92,81 @@
                     @foreach (var column in _columns.Where(x => x.GetIsShown()))
                     {
                         <th @key="column" class="@GetColumnHeaderClass(column)">
-                            <div @onclick="@(_ => OnColumnSortAsync(column))">
-                                @if (column.LabelContent is null)
-                                {
-                                    <span style="white-space:nowrap">
-                                        @column.GetLabel()
-                                    </span>
-                                }
-                                else
-                                {
-                                    @column.LabelContent
-                                }
-                                @if (column.GetIsSortable())
-                                {
+                            @if (column.GetIsSortable())
+                            {
+                                <a href="@GetColumnSortUrl(column)">
+                                    @if (column.LabelContent is null)
+                                    {
+                                        <span style="white-space:nowrap">
+                                            @column.GetLabel()
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @column.LabelContent
+                                    }
                                     <tf-icon class="@GetColumnHeaderIconClass(column)">
                                         @DefaultIcons.Sort_Ascending
                                     </tf-icon>
-                                }
-                            </div>
-                            @if (column.CanFilter)
+                                </a>
+                            }
+                            else
+                            {
+                                <div>
+                                    @if (column.LabelContent is null)
+                                    {
+                                        <span style="white-space:nowrap">
+                                            @column.GetLabel()
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @column.LabelContent
+                                    }
+                                </div>
+                            }
+                            @if (IsInteractive && column.CanFilter)
                             {
                                 <div>
                                     @if (column.IsString)
                                     {
-                                        <TextInput Value="@column.TextFilter"
-                                                    ValueChanged="@(v => OnFilterChangedAsync(column, v))"
-                                                    PostfixIcon="@DefaultIcons.Search"
-                                                    UpdateOnInput="true"
-                                                    UpdateOnInputDebounce="Debounce"
-                                                    Class="dense" />
+                                        <TextInput @bind-Value:get="@column.TextFilter"
+                                                   @bind-Value:set="@(v => OnFilterChanged(column, v))"
+                                                   PostfixIcon="@DefaultIcons.Search"
+                                                   UpdateOnInput="true"
+                                                   UpdateOnInputDebounce="Debounce"
+                                                   Class="dense" />
                                     }
                                     else if (column.IsBool)
                                     {
-                                        <Checkbox TValue="bool?"
-                                                    Value="@column.BoolFilter"
-                                                    ValueChanged="@(v => OnBoolFilterChangedAsync(column, v))"
-                                                    AllowNull="true"
-                                                    Class="dense" />
+                                        <Checkbox @bind-Value:get="@column.BoolFilter"
+                                                  @bind-Value:set="@(v => OnBoolFilterChanged(column, v))"
+                                                  AllowNull="true"
+                                                  Class="dense" />
                                     }
                                     else if (column.IsNumeric)
                                     {
-                                        <NumericInput TValue="double?"
-                                                        Value="@column.NumberFilter"
-                                                        ValueChanged="@(v => OnNumberFilterChangedAsync(column, v))"
-                                                        UpdateOnInput="true"
-                                                        UpdateOnInputDebounce="Debounce"
-                                                        Class="dense" />
+                                        <NumericInput @bind-Value:get="@column.NumberFilter"
+                                                      @bind-Value:set="@(v => OnNumberFilterChanged(column, v))"
+                                                      UpdateOnInput="true"
+                                                      UpdateOnInputDebounce="Debounce"
+                                                      Class="dense" />
                                     }
                                     else if (column.IsDateTime)
                                     {
-                                        <Switch @bind-Value="column.DateTimeFilterIsBefore"
-                                                UncheckedLabel="After"
-                                                Label="Before"
-                                                Class="dense" />
-                                        <DateTimeInput TValue="DateTimeOffset?"
-                                                        Value="@column.DateTimeFilter"
-                                                        ValueChanged="@(v => OnDateTimeFilterChangedAsync(column, v))"
-                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
-                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
-                                                        Class="dense" />
+                                        <DateTimeInput @bind-Value:get="@column.DateTimeFilter"
+                                                       @bind-Value:set="@(v => OnDateTimeFilterChanged(column, v))"
+                                                       DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
+                                                       DisplayType="PickerDisplayType.Button"
+                                                       ShowTime="@(column is not Column<TDataItem, DateOnly>)"
+                                                       Class="dense" />
+                                        @if (column.DateTimeFilter.HasValue)
+                                        {
+                                            <Switch @bind-Value="column.DateTimeFilterIsBefore"
+                                                    UncheckedLabel="After"
+                                                    Label="Before"
+                                                    Class="dense" />
+                                        }
                                     }
                                 </div>
                             }
@@ -201,9 +219,12 @@
                             <td colspan="1000" style="text-align:center;vertical-align:middle">
                                 <div class="d-flex align-items-center my-3 gap-2">
                                     <span>No columns displayed</span>
-                                    <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
-                                        <tf-icon>@DefaultIcons.Filter</tf-icon>
-                                    </button>
+                                    @if (IsInteractive)
+                                    {
+                                        <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
+                                            <tf-icon>@DefaultIcons.Filter</tf-icon>
+                                        </button>
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -248,19 +269,23 @@
                         <tr @key="group">
                             <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
                                 <span class="d-inline-flex align-items-center gap-2">
-                                    <button class="btn btn-icon small" @onclick="@(_ => OnToggleGroupExpansion(group))">
-                                        <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
-                                    </button>
+                                    @if (IsInteractive)
+                                    {
+                                        <button class="btn btn-icon small"
+                                                @onclick="@(_ => OnToggleGroupExpansion(group))">
+                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-icon small"
+                                           href="@GetGroupExpansionToggleUrl(group)">
+                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                        </a>
+                                    }
                                     @if (GroupContent is null)
                                     {
-                                        if (GroupLabel is null)
-                                        {
-                                            <span><strong>@group.Key?.ToString()</strong></span>
-                                        }
-                                        else
-                                        {
-                                            <span><strong>@GroupLabel(group.Key)</strong></span>
-                                        }
+                                        <span><strong>@group.Key</strong></span>
                                     }
                                     else
                                     {
@@ -342,16 +367,15 @@
         </table>
     </Form>
     @if ((LoadItems is null
-    && ItemCount > RowsPerPage)
+        && ItemCount > RowsPerPage)
         || CurrentDataPage?.TotalCount > RowsPerPage)
     {
         <div class="datagrid-pagination">
             @if (ShowRowsPerPage)
             {
                 <span>Items per page:</span>
-                <Select TValue="ushort"
-                        Value="RowsPerPage"
-                        ValueChanged="OnChangeRowsPerPageAsync"
+                <Select @bind-Value:get="RowsPerPage"
+                        @bind-Value:set="OnChangeRowsPerPageAsync"
                         Options="RowsPerPageOptions"
                         InputClass="text-center" />
             }

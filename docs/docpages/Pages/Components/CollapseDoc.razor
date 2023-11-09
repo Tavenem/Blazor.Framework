@@ -1,0 +1,341 @@
+﻿@page "/components/collapse"
+
+<PageTitle>Collapse - Tavenem Blazor Framework</PageTitle>
+
+<h1>Collapse</h1>
+
+<p>
+    The collapse component is a panel with a header and a body that supports user interaction which
+    can toggle the visibility of the body by interacting with the header.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    Use the <code>Collapse</code> component to create a collapsible element. The <code>ChildContent
+    RenderFragment</code> is used to set the body, and the <code>Title</code> property or
+    <code>TitleContent RenderFragment</code> is used to set the header.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Click here">This is the body</Collapse>
+            <Collapse>
+                <TitleContent>
+                    <div class="d-flex align-items-center">
+                        <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    This is the body
+                </ChildContent>
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"">This is the body</Collapse>
+<Collapse>
+    <TitleContent>
+        <div class=""d-flex align-items-center"">
+            <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        This is the body
+    </ChildContent>
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    When you use a simple <code>Title</code>, the entire header can be interacted with to toggle the
+    visibility of the body panel. If you use a <code>TitleContent RenderFragment</code>, however,
+    users can interact with your custom <code>TitleContent</code> normally. Only the expansion arrow
+    toggles the body visibility. If you wish to make your entire header a toggle for the collapse
+    even when you use custom <code>TitleContent</code>, set the <code></code> property to
+    <code>true</code>.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse TitleIsToggle="true">
+                <TitleContent>
+                    <div class="d-flex align-items-center">
+                        <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    This is the body
+                </ChildContent>
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse TitleIsToggle=""true"">
+    <TitleContent>
+        <div class=""d-flex align-items-center"">
+            <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        This is the body
+    </ChildContent>
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<h2>Footer</h2>
+
+<p>
+    You can add content to the bottom of a collapse which does not disappear in the collapsed state
+    by adding it to the <code>FooterContent RenderFragment</code>.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Click here">
+                <ChildContent>
+                    This is the body
+                </ChildContent>
+                <FooterContent>
+                    This is a footer
+                </FooterContent>
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"">
+    <ChildContent>
+        This is the body
+    </ChildContent>
+    <FooterContent>
+        This is a footer
+    </FooterContent>
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<h2>Disabled</h2>
+
+<p>
+    You can disable a collapse by setting the <code>Disabled</code> property to <code>true</code>.
+    This changes the header's appearance and prevents toggling the collapsed state by user
+    interaction. Note that it does not prevent toggling the state programmatically, and it does not
+    close a collapse which is already open.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Disabled" Disabled="true">
+                This is the body
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Disabled=""true"">
+    This is the body
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<h2>Navigation</h2>
+
+<p>
+    You can add a URL to the <code>NavUrl</code> property, and set the <code>NavLinkMatch</code>
+    property, in order to cause a collapse to automatically open when the current location matches
+    the given URL. This may be useful, for instance, for collapses within navigation lists which
+    should show their nested links when one is active.
+</p>
+
+<h2>Persistent State</h2>
+
+<p>
+    Set the <code>PersistState</code> property to <code>true</code> to automatically keep track of
+    the collapse's open/closed state in the URL's query string. This allows the collapse to preserve
+    its state through page refreshes, and also to include the state of the component in a bookmark
+    or shared URL. To see this at work, open the following collapse then refresh the page. Note
+    that any other collapses you may have opened on this page will revert to their default state,
+    but this one will stay open.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Id="cpd1" Title="Persistent" PersistState="true">
+                This is the body
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Id=""cpd1"" Title=""Persistent"" PersistState=""true"">
+    This is the body
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    When turning on this feature, it is strongly recommended that the collapse be assigned a unique,
+    stable value in its <code>Id</code> parameter (or via a splatted <code>id</code> attribute).
+    This <code>Id</code> will be used in the generated query string to identify the component.
+    Although an <code>Id</code> is generated automatically when one is not provided, the automatic
+    value cannot be guaranteed to remain the same.
+</p>
+
+<p>
+    Note that even when a collapse has <code>PersistState</code> set to <code>false</code>, its
+    initial state can still be controlled via query string. The property only controls whether the
+    query string is dynamically updated to reflect changing states.
+</p>
+
+<h2>Customization</h2>
+
+<p>
+    You can customize the CSS classes applied to the body and footer, if necessary, with the
+    <code>BodyClass</code> and <code>FooterClass</code> properties.
+</p>
+
+<p>
+    You can also apply the <code>dense</code> class to the collapse itself to reduce padding.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Click here" Class="dense">
+                This is the body
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""dense"">
+    This is the body
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>outlined</code> utility class not only gives the collapse an external border (as
+    usual), but also gives it internal borders between the header, body, and footer.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Click here" Class="align-self-stretch outlined">
+                <ChildContent>
+                    This is the body
+                </ChildContent>
+                <FooterContent>
+                    This is a footer
+                </FooterContent>
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""dense"">
+    <ChildContent>
+        This is the body
+    </ChildContent>
+    <FooterContent>
+        This is a footer
+    </FooterContent>
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <a href="./getting-started/themes">theme utility classes</a> can all be used to customize
+    the appearance of a collapse.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Click here" Class="align-self-stretch outlined primary">
+                <ChildContent>
+                    This is the body
+                </ChildContent>
+                <FooterContent>
+                    This is a footer
+                </FooterContent>
+            </Collapse>
+            <Collapse Title="Click here" Class="secondary filled">
+                <ChildContent>
+                    This is the body
+                </ChildContent>
+                <FooterContent>
+                    This is a footer
+                </FooterContent>
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""outlined primary"">
+    <ChildContent>
+        This is the body
+    </ChildContent>
+    <FooterContent>
+        This is a footer
+    </FooterContent>
+</Collapse>
+<Collapse Title=""Click here"" Class=""secondary filled"">
+    <ChildContent>
+        This is the body
+    </ChildContent>
+    <FooterContent>
+        This is a footer
+    </FooterContent>
+</Collapse>")
+    </ChildContent>
+</Collapse>
+
+<h2>Events</h2>
+
+<p>
+    The <code>IsOpenChanged</code> event callback and <code>OnIsOpenChanged</code> event handler are
+    both invoked when the collapse is toggled.
+</p>
+
+<p>
+    The <code>OnOpening</code> event callback is invoked <em>before</em> opening (not closing), and
+    is intended as a hook for the asynchronous loading of content. While waiting for this callback
+    to complete, the expand icon is changed to a spinning animation to indicate to the user that
+    loading is occurring.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Collapse Title="Click here" OnOpening="LoadAsync">
+                @_asyncBody
+            </Collapse>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" OnOpening=""LoadAsync"">
+    @_asyncBody
+</Collapse>
+
+@code {
+    private string _asyncBody = string.Empty;
+    private async Task LoadAsync()
+    {
+        await Task.Delay(3000);
+        _asyncBody = ""Loaded"";
+    }
+}")
+    </ChildContent>
+</Collapse>
+
+@code {
+    private string _asyncBody = string.Empty;
+    private async Task LoadAsync()
+    {
+        await Task.Delay(3000);
+        _asyncBody = "Loaded";
+    }
+}

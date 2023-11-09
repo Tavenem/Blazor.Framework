@@ -49,7 +49,7 @@ public static class TavenemFrameworkExtensions
     /// separates the words in <c>camelCase</c> and <c>PascalCase</c> terms.
     /// </para>
     /// </returns>
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static string? ToHumanReadable(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -126,7 +126,6 @@ public static class TavenemFrameworkExtensions
             .Replace('_', '-');
     }
 
-#if NET7_0_OR_GREATER
     /// <summary>
     /// Gets a string representation of the given <paramref name="value"/>, with no more than the
     /// given number of fractional digits, in its most compact form, suitable for use as a CSS
@@ -187,164 +186,4 @@ public static class TavenemFrameworkExtensions
             ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px"
             : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
     }
-#else
-    /// <summary>
-    /// Gets a string representation of the given <paramref name="value"/>, with no more than the
-    /// given number of fractional digits, in its most compact form, suitable for use as a CSS
-    /// property value.
-    /// </summary>
-    /// <param name="value">The value to convert.</param>
-    /// <param name="precision">The maximum number of fractional digits.</param>
-    /// <returns>
-    /// A string representation of <paramref name="value"/> using '.' as the decimal separator
-    /// regardless of the current culture (as required in CSS), with any leading or trailing zeros
-    /// removed, and the decimal indicator also trimmed if it becomes the final character.
-    /// </returns>
-    public static string ToCSS(this decimal value, int precision = 5)
-    {
-        if (value is < 0.00001m and > -0.00001m)
-        {
-            return "0";
-        }
-        return precision <= 0
-            ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
-    }
-
-    /// <summary>
-    /// Gets a string representation of the given <paramref name="value"/>, with no more than the
-    /// given number of fractional digits, in its most compact form, suitable for use as a CSS
-    /// property value.
-    /// </summary>
-    /// <param name="value">The value to convert.</param>
-    /// <param name="precision">The maximum number of fractional digits.</param>
-    /// <returns>
-    /// A string representation of <paramref name="value"/> using '.' as the decimal separator
-    /// regardless of the current culture (as required in CSS), with any leading or trailing zeros
-    /// removed, and the decimal indicator also trimmed if it becomes the final character.
-    /// </returns>
-    public static string ToCSS(this double value, int precision = 5)
-    {
-        if (value is < 0.00001 and > -0.00001)
-        {
-            return "0";
-        }
-        return precision <= 0
-            ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
-    }
-
-    /// <summary>
-    /// Gets a string representation of the given <paramref name="value"/>, with no more than the
-    /// given number of fractional digits, in its most compact form, suitable for use as a CSS
-    /// property value.
-    /// </summary>
-    /// <param name="value">The value to convert.</param>
-    /// <param name="precision">The maximum number of fractional digits.</param>
-    /// <returns>
-    /// A string representation of <paramref name="value"/> using '.' as the decimal separator
-    /// regardless of the current culture (as required in CSS), with any leading or trailing zeros
-    /// removed, and the decimal indicator also trimmed if it becomes the final character.
-    /// </returns>
-    public static string ToCSS(this float value, int precision = 5)
-    {
-        if (value is < 0.00001f and > -0.00001f)
-        {
-            return "0";
-        }
-        return precision <= 0
-            ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}";
-    }
-
-    /// <summary>
-    /// Gets a string representation of the given <paramref name="value"/>, with no more than the
-    /// given number of fractional digits, in its most compact form and followed by "px" for use in
-    /// a CSS property.
-    /// </summary>
-    /// <param name="value">The value to convert.</param>
-    /// <param name="precision">The maximum number of fractional digits.</param>
-    /// <returns>
-    /// <para>
-    /// A string representation of <paramref name="value"/> using '.' as the decimal separator
-    /// regardless of the current culture (as required in CSS), with any leading or trailing zeros
-    /// removed, and the decimal indicator also trimmed if it becomes the final character, followed
-    /// by "px".
-    /// </para>
-    /// <para>
-    /// Or "0px", if <paramref name="value"/> is between -0.00001 and 0.00001 (regardless of the
-    /// value of <paramref name="precision"/>).
-    /// </para>
-    /// </returns>
-    public static string ToPixels(this decimal value, int precision = 5)
-    {
-        if (value is < 0.00001m and > -0.00001m)
-        {
-            return "0px";
-        }
-        return precision <= 0
-            ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
-    }
-
-    /// <summary>
-    /// Gets a string representation of the given <paramref name="value"/>, with no more than the
-    /// given number of fractional digits, in its most compact form and followed by "px" for use in
-    /// a CSS property.
-    /// </summary>
-    /// <param name="value">The value to convert.</param>
-    /// <param name="precision">The maximum number of fractional digits.</param>
-    /// <returns>
-    /// <para>
-    /// A string representation of <paramref name="value"/> using '.' as the decimal separator
-    /// regardless of the current culture (as required in CSS), with any leading or trailing zeros
-    /// removed, and the decimal indicator also trimmed if it becomes the final character, followed
-    /// by "px".
-    /// </para>
-    /// <para>
-    /// Or "0px", if <paramref name="value"/> is between -0.00001 and 0.00001 (regardless of the
-    /// value of <paramref name="precision"/>).
-    /// </para>
-    /// </returns>
-    public static string ToPixels(this double value, int precision = 5)
-    {
-        if (value is < 0.00001 and > -0.00001)
-        {
-            return "0px";
-        }
-        return precision <= 0
-            ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
-    }
-
-    /// <summary>
-    /// Gets a string representation of the given <paramref name="value"/>, with no more than the
-    /// given number of fractional digits, in its most compact form and followed by "px" for use in
-    /// a CSS property.
-    /// </summary>
-    /// <param name="value">The value to convert.</param>
-    /// <param name="precision">The maximum number of fractional digits.</param>
-    /// <returns>
-    /// <para>
-    /// A string representation of <paramref name="value"/> using '.' as the decimal separator
-    /// regardless of the current culture (as required in CSS), with any leading or trailing zeros
-    /// removed, and the decimal indicator also trimmed if it becomes the final character, followed
-    /// by "px".
-    /// </para>
-    /// <para>
-    /// Or "0px", if <paramref name="value"/> is between -0.00001 and 0.00001 (regardless of the
-    /// value of <paramref name="precision"/>).
-    /// </para>
-    /// </returns>
-    public static string ToPixels(this float value, int precision = 5)
-    {
-        if (value is < 0.00001f and > -0.00001f)
-        {
-            return "0px";
-        }
-        return precision <= 0
-            ? $"{value.ToString("F0", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px"
-            : $"{value.ToString($"F{precision}", CultureInfo.InvariantCulture).Trim('0').TrimEnd('.')}px";
-    }
-#endif
 }

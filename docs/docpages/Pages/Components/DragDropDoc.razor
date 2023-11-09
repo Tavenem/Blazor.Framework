@@ -1,0 +1,226 @@
+﻿@page "/components/drag-drop"
+
+<PageTitle>Drag-Drop - Tavenem Blazor Framework</PageTitle>
+
+<h1>Drag-Drop</h1>
+
+<p>
+    The Tavenem Blazor Framework provides some utility components to make interop with the <a
+    href="https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API">HTML5 drag and
+    drop API</a> easier from your Blazor apps.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded" OnDrop="@(e => Drop(_items1, e))">
+                <h6>Drop Target 1</h6>
+                @foreach (var item in _items1)
+                {
+                    <Draggable Item="item" OnDropped="@(e => Drag(_items1, item, e))" DragEffectAllowed="DragEffect.CopyMove">@item</Draggable>
+                }
+            </DropTarget>
+            <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded ms-3" OnDrop="@(e => Drop(_items2, e))">
+                <h6>Drop Target 2</h6>
+                @foreach (var item in _items2)
+                {
+                    <Draggable Item="item" OnDropped="@(e => Drag(_items2, item, e))" DragEffectAllowed="DragEffect.CopyMove">@item</Draggable>
+                }
+            </DropTarget>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DropTarget TDropItem=""string"" Class=""flex-grow-1 align-self-stretch bg-alt p-2 rounded"" OnDrop=""@(e => Drop(_items1, e))"">
+    <h6>Drop Target 1</h6>
+    @foreach (var item in _items1)
+    {
+        <Draggable Item=""item"" OnDropped=""@(e => Drag(_items1, item, e))"" DragEffectAllowed=""DragEffect.CopyMove"">@item</Draggable>
+    }
+</DropTarget>
+<DropTarget TDropItem=""string"" Class=""flex-grow-1 align-self-stretch bg-alt p-2 rounded ms-3"" OnDrop=""@(e => Drop(_items2, e))"">
+    <h6>Drop Target 2</h6>
+    @foreach (var item in _items2)
+    {
+        <Draggable Item=""item"" OnDropped=""@(e => Drag(_items2, item, e))"" DragEffectAllowed=""DragEffect.CopyMove"">@item</Draggable>
+    }
+</DropTarget>
+
+@code {
+    private List<string> _items1 = new()
+    {
+        ""Drag this item"",
+        ""Or this one"",
+        ""Try dragging text into this box"",
+    };
+    private List<string> _items2 = new()
+    {
+        ""Drag this item, too"",
+        ""Try dragging these items into a text editor"",
+    };
+    private void Drag(List<string> items, string value, DragEffect e)
+    {
+        if (e == DragEffect.Move)
+        {
+            items.Remove(value);
+        }
+    }
+    private void Drop(List<string> items, DropEventArgs<string> e)
+        => items.Add(e.Data?.FirstOrDefault().Value ?? ""Error"");
+}")
+    </ChildContent>
+</Collapse>
+
+<h2>Draggable</h2>
+
+<p>
+    The <code>Draggable</code> component can be used to represent any element which can be dragged.
+    You can use it directly, with its <code>ChildContent</code> set to your actual markup, or you
+    can subclass the component if you are building a reusable, draggable component of your own.
+</p>
+
+<p>
+    The <code>Draggable</code> component has an <code>IsDraggable</code> property which determines
+    whether it can currently be dragged. It is <code>true</code> by default. The
+    <code>DragEffectAllowed</code> property controls what drag effects (copy, link and/or move) are
+    permitted when dragging the item. Copy and move operations are allowed by default.
+</p>
+
+<p>
+    The <code>Draggable</code> component is generic. Its <code>Item</code> property is expected to
+    be set to an object which represents the data that is transferred during a drag operation.
+    Alternatively, you can set the <code>GetDragData</code> property to a function which returns a
+    <code>DragStartData</code> instance that more precisely defines the data to be dragged. This
+    would allow you, for example, to explicitly set the list of fallback data types. When doing so,
+    you may need to set the <code>TDragItem</code> generic type property to <code>object</code> (or
+    some other type), to avoid compiler issues.
+</p>
+
+<p>
+    You can set the <code>OnDropped</code> callback to determine what happens to an item when a drag
+    event completes. Note that this callback will also be invoked when a drag ends by cancellation.
+    You can determine the type of drag which occurred by checking the <code>DragEffect</code>
+    parameter, which will always be one of <code>None</code>, <code>Copy</code>, <code>Link</code>,
+    or <code>Move</code> (i.e. never one of the combined flags used to indicate allowed operations).
+    Normally this is where you would remove the item from its current location if the effect was
+    <code>Move</code>.
+</p>
+
+<p>
+    If you subclass the <code>Draggable</code> component, be sure to set the <code>id</code>
+    attribute of the main, draggable element in your HTML markup to the <code>Id</code> property,
+    and set the <code>draggable</code> attribute to the <code>IsDraggable</code> property (or simply
+    to <code>true</code> if your subclass will always be draggable).
+</p>
+
+<p>
+    Dragged string data will set the "text/plain" data type on the dragged data, and will be
+    droppable into most drop targets. Dragged <code>Uri</code> objects, and strings which parse as
+    valid, absolute URIs will set "text/uri-list" data, as well as a "text/plain" fallback. Other
+    data types are serializaed as JSON and set as "application/json" data. A string representation
+    (obtained with the <code>object.ToString</code> method) will also be set as a "text/plain"
+    fallback.
+</p>
+
+<p>
+    Your dragged <code>Item</code> may implement the <code>IDraggable</code> interface to provide
+    more control over its dragged representation. <code>IDraggable</code> provides three methods:
+    <code>ToDraggedJson</code> and <code>ToDraggedString</code>. Both of these methods have default
+    implementaions, however these replicate the default behavior for items which don't implement the
+    interface at all, so it is only worthwhile to implement the interface if at least one of the
+    methods is overridden.
+</p>
+
+<h2>Drop Target</h2>
+
+<p>
+    The <code>DropTarget</code> component can be used for any element onto which data can be
+    dragged. You can use it directly, with its <code>ChildContent</code> set to your actual markup,
+    or you can subclass the component if you are building a reusable, drop target component of your
+    own.
+</p>
+
+<p>
+    The <code>DropTarget</code> component has an <code>IsDropTarget</code> property which determines
+    whether it will currently accept dropped data. It is <code>true</code> by default.
+</p>
+
+<p>
+    Controlling what data a target accepts, and what type of drag operations it allows, can be
+    complex. The <code>DropTarget</code> component is generic, and its <code>TDropItem</code> type
+    parameter indicates the type of data it expects for data transferred internally, within the same
+    Tavenem Blazor Framework app instance (typically the same browser tab). Data transferred from
+    outside the app instance will always be a string. You can set the <code>TDropItem</code>
+    type parameter to <code>string</code> to indicate that a drop target is intended for external
+    dropped data.
+</p>
+
+<p>
+    The <code>DropEffect</code> property can be set to indicate that a drop target only allows a
+    particular type of drop. It can only be set to <code>All</code>, <code>Copy</code>,
+    <code>Link</code>, or <code>Move</code> (i.e. never one of the combined flags used to indicate
+    allowed drag operations). By default this is set to allow all drag operations. Note that
+    <code>None</code> is not an option. To prevent all types of drag operations, set
+    <code>IsDropTarget</code> to false.
+</p>
+
+<p>
+    The <code>GetDropEffect</code> property can be set to a delegate which accepts the current drag
+    data types, and should return a <code>DragEffect</code> which indicates the type of drop
+    allowed. Valid return types are <code>None</code>, <code>All</code>, <code>Copy</code>,
+    <code>Link</code>, or <code>Move</code> (i.e. none of the combined flags used to indicate
+    allowed drag operations). <code>GetDropEffect</code> will not be invoked if the dragged item is
+    not of the correct type. Instead, <code>None</code> will be returned.
+</p>
+
+<p>
+    The <code>OnDrop</code> property should be set to a callback which handles a drop event for the
+    target. If this property is not set, the drop target will not accept any dragged data. This
+    callback receives a <code>DropEventArgs</code> parameter with the dropped data, and should
+    perform whatever operation is appropriate for the data being dropped.
+</p>
+
+<p>
+    Note that your <code>OnDrop</code> callback should only perform the operations relevant to the
+    drop target. Anything which may occur at the drag site should be handled by the
+    <code>OnDropped</code> callback of the dragged item, for internal transfers, or by whatever
+    logic was implemented at the callsite, for external transfers.
+</p>
+
+<p>
+    You can set the <code>DropClass</code> to a CSS class which will be set on the element when a
+    valid item is dragged over it, and cleared when the dragged item either leaves the target, or is
+    dropped. You can also set the <code>NoDropClass</code> to a CSS class which will be set on the
+    element for an <em>invalid</em> item. These classes both have defaults with appropriate visual
+    indicators.
+</p>
+
+<h2>Draggable Drop Target</h2>
+
+<p>
+    The <code>DraggableDropTarget</code> component represents a combination of
+    <code>Draggable</code> and <code>DropTarget</code>, with all the properties of both. Use it when
+    an item can both <em>be</em> dragged, and can have data dropped onto it.
+</p>
+
+@code {
+    private List<string> _items1 = new()
+    {
+        "Drag this item",
+        "Or this one",
+        "Try dragging text into this box",
+    };
+    private List<string> _items2 = new()
+    {
+        "Drag this item, too",
+        "Try dragging these items into a text editor",
+    };
+    private void Drag(List<string> items, string value, DragEffect e)
+    {
+        if (e == DragEffect.Move)
+        {
+            items.Remove(value);
+        }
+    }
+    private void Drop(List<string> items, DropEventArgs e)
+        => items.Add(e.Data?.FirstOrDefault().Value ?? "Error");
+}

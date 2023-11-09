@@ -79,7 +79,7 @@ internal static class InternalExtensions
         }
     }
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static StringBuilder? Replace(this StringBuilder? value, string pattern, string replacement, RegexOptions options)
     {
         if (value is null || value.Length == 0)
@@ -90,7 +90,7 @@ internal static class InternalExtensions
         return new StringBuilder(Regex.Replace(value.ToString(), pattern, replacement, options));
     }
 
-    [return: NotNullIfNotNull("value")]
+    [return: NotNullIfNotNull(nameof(value))]
     public static string? ToJsString(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -112,22 +112,26 @@ internal static class InternalExtensions
         _ => "all",
     };
 
-    [return: NotNullIfNotNull("value")]
-    public static string? ToTrimmedString(this StringBuilder? value)
+    [return: NotNullIfNotNull(nameof(value))]
+    public static string? ToTrimmedString(this StringBuilder? value, params char[] trimChars)
     {
         if (value is null || value.Length == 0)
         {
             return value?.ToString();
         }
 
-        value = value.TrimEnd();
+        value = value.TrimEnd(trimChars);
 
         if (value.Length > 0
-            && char.IsWhiteSpace(value[0]))
+            && trimChars.Length == 0
+            ? char.IsWhiteSpace(value[0])
+            : trimChars.Contains(value[0]))
         {
             for (var i = 0; i < value.Length; i++)
             {
-                if (!char.IsWhiteSpace(value[i]))
+                if (trimChars.Length == 0
+                    ? !char.IsWhiteSpace(value[i])
+                    : !trimChars.Contains(value[i]))
                 {
                     return value.ToString(i, value.Length - i);
                 }
@@ -136,8 +140,8 @@ internal static class InternalExtensions
         return value.ToString();
     }
 
-    [return: NotNullIfNotNull("value")]
-    public static StringBuilder? TrimEnd(this StringBuilder? value)
+    [return: NotNullIfNotNull(nameof(value))]
+    public static StringBuilder? TrimEnd(this StringBuilder? value, params char[] trimChars)
     {
         if (value is null || value.Length == 0)
         {
@@ -147,7 +151,9 @@ internal static class InternalExtensions
         var index = value.Length - 1;
         for (; index >= 0; index--)
         {
-            if (!char.IsWhiteSpace(value[index]))
+            if (trimChars.Length == 0
+                ? !char.IsWhiteSpace(value[index])
+                : !trimChars.Contains(value[index]))
             {
                 break;
             }

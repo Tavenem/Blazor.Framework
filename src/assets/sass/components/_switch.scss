@@ -4,6 +4,7 @@
     display: inline-flex;
     flex: 0 0 auto;
     flex-direction: column;
+    margin: 0;
 
     label {
         @include ripple;
@@ -11,7 +12,10 @@
         cursor: pointer;
         display: inline-flex;
         margin-right: 16px;
+        pointer-events: auto;
+        transform: none !important;
         vertical-align: middle;
+        z-index: auto;
         -webkit-tap-highlight-color: transparent;
 
         &:after {
@@ -147,9 +151,15 @@
         border: none;
     }
 
-    &.required .label:after {
-        color: var(--tavenem-color-error);
-        content: " *";
+    &.required {
+        label:after {
+            content: none;
+        }
+
+        .label:after {
+            color: var(--tavenem-color-error);
+            content: " *";
+        }
     }
 
     &.bg-alt {

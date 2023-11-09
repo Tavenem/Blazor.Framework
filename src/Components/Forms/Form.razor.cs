@@ -12,7 +12,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public class Form : EditForm, IDisposable
 {
-    private readonly List<IFormComponent> _fields = new();
+    private readonly List<IFormComponent> _fields = [];
     private readonly Func<Task> _handleSubmitDelegate;
     private readonly AsyncAdjustableTimer _timer;
 
@@ -257,7 +257,7 @@ public class Form : EditForm, IDisposable
 
         foreach (var field in _fields)
         {
-            field.IsTouched = false;
+            field.MarkAsUnmodified();
         }
     }
 
@@ -274,10 +274,10 @@ public class Form : EditForm, IDisposable
     /// Note: this has no effect on non-<see cref="IFormComponent"/> controls, such as the native
     /// Blazor input components, or components from other libraries.
     /// </remarks>
-    public async Task ResetAsync()
+    public void Reset()
     {
         _timer.Cancel();
-        await Task.WhenAll(_fields.Select(x => x.ResetAsync()));
+        _fields.ForEach(x => x.ResetAsync());
     }
 
     /// <summary>

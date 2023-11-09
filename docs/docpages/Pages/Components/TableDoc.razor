@@ -1,0 +1,532 @@
+﻿@page "/components/table"
+
+<PageTitle>Table - Tavenem Blazor Framework</PageTitle>
+
+<h1>Table</h1>
+
+<p>
+    The Tavenem Blazor Framework provides only minimal style resets for the <code>table</code>
+    element, to avoid causing display issues for third-party content. To opt-in to a table style
+    more in line with the rest of the framework, add the <code>table</code> class to any table.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    The basic <code>table</code> class provides a simple, clean style.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <table class="table">
+                <thead>
+                    <tr>
+                        @foreach (var heading in _headings)
+                        {
+                            <th>@heading</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _rows)
+                    {
+                        <tr>
+                            @foreach (var data in row)
+                            {
+                                <td>@data</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<table class=""table"">
+    <thead>
+        <tr>
+            @foreach (var heading in _headings)
+            {
+                <th>@heading</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _rows)
+        {
+            <tr>
+                @foreach (var data in row)
+                {
+                    <td>@data</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string[] _headings = { ""ID"", ""Name"", ""Title"" };
+    string[][] _rows =
+    {
+        new[] { ""0"", ""Smith, James"", ""CEO"" },
+        new[] { ""1"", ""Johnson, Mary"", ""COO"" },
+        new[] { ""2"", ""Williams, Robert"", ""CFO"" },
+        new[] { ""3"", ""Brown, Patricia"", ""CTO"" },
+        new[] { ""4"", ""Jones, John"", ""CLO"" },
+        new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
+        new[] { ""6"", ""Miller, Michael"", ""CDO"" },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can add the <code>dense</code> class to reduce padding.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <table class="table dense">
+                <thead>
+                    <tr>
+                        @foreach (var heading in _headings)
+                        {
+                            <th>@heading</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _rows)
+                    {
+                        <tr>
+                            @foreach (var data in row)
+                            {
+                                <td>@data</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<table class=""table dense"">
+    <thead>
+        <tr>
+            @foreach (var heading in _headings)
+            {
+                <th>@heading</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _rows)
+        {
+            <tr>
+                @foreach (var data in row)
+                {
+                    <td>@data</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string[] _headings = { ""ID"", ""Name"", ""Title"" };
+    string[][] _rows =
+    {
+        new[] { ""0"", ""Smith, James"", ""CEO"" },
+        new[] { ""1"", ""Johnson, Mary"", ""COO"" },
+        new[] { ""2"", ""Williams, Robert"", ""CFO"" },
+        new[] { ""3"", ""Brown, Patricia"", ""CTO"" },
+        new[] { ""4"", ""Jones, John"", ""CLO"" },
+        new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
+        new[] { ""6"", ""Miller, Michael"", ""CDO"" },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>border</code> class will add both external and internal lines.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <table class="table border">
+                <thead>
+                    <tr>
+                        @foreach (var heading in _headings)
+                        {
+                            <th>@heading</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _rows)
+                    {
+                        <tr>
+                            @foreach (var data in row)
+                            {
+                                <td>@data</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<table class=""table border"">
+    <thead>
+        <tr>
+            @foreach (var heading in _headings)
+            {
+                <th>@heading</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _rows)
+        {
+            <tr>
+                @foreach (var data in row)
+                {
+                    <td>@data</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string[] _headings = { ""ID"", ""Name"", ""Title"" };
+    string[][] _rows =
+    {
+        new[] { ""0"", ""Smith, James"", ""CEO"" },
+        new[] { ""1"", ""Johnson, Mary"", ""COO"" },
+        new[] { ""2"", ""Williams, Robert"", ""CFO"" },
+        new[] { ""3"", ""Brown, Patricia"", ""CTO"" },
+        new[] { ""4"", ""Jones, John"", ""CLO"" },
+        new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
+        new[] { ""6"", ""Miller, Michael"", ""CDO"" },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>striped</code> class will add an alternate background color to every other row, while
+    the <code>hover</code> class will change the background color of hovered rows.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <table class="table striped hover">
+                <thead>
+                    <tr>
+                        @foreach (var heading in _headings)
+                        {
+                            <th>@heading</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _rows)
+                    {
+                        <tr>
+                            @foreach (var data in row)
+                            {
+                                <td>@data</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<table class=""table striped hover"">
+    <thead>
+        <tr>
+            @foreach (var heading in _headings)
+            {
+                <th>@heading</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _rows)
+        {
+            <tr>
+                @foreach (var data in row)
+                {
+                    <td>@data</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string[] _headings = { ""ID"", ""Name"", ""Title"" };
+    string[][] _rows =
+    {
+        new[] { ""0"", ""Smith, James"", ""CEO"" },
+        new[] { ""1"", ""Johnson, Mary"", ""COO"" },
+        new[] { ""2"", ""Williams, Robert"", ""CFO"" },
+        new[] { ""3"", ""Brown, Patricia"", ""CTO"" },
+        new[] { ""4"", ""Jones, John"", ""CLO"" },
+        new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
+        new[] { ""6"", ""Miller, Michael"", ""CDO"" },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Add the <code>sticky-header</code> class to make the <code>thead</code> stay visible when
+    scrolling vertically, and the <code>sticky-footer</code> class to do the same for the
+    <code>tfoot</code>.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="w-100" style="height:300px;overflow:auto">
+                <table class="table dense sticky-header sticky-footer">
+                    <thead>
+                        <tr>
+                            @foreach (var heading in _headings)
+                            {
+                                <th>@heading</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in _rows2)
+                        {
+                            <tr>
+                                @foreach (var data in row)
+                                {
+                                    <td>@data</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            @foreach (var heading in _headings)
+                            {
+                                <th>@heading</th>
+                            }
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""w-100"" style=""height:300px;overflow:auto"">
+    <table class=""table dense sticky-header sticky-footer"">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+@code {
+    string[] _headings = { ""ID"", ""Name"", ""Title"" };
+    string[][] _rows =
+    {
+        new[] { ""0"", ""Smith, James"", ""CEO"" },
+        new[] { ""1"", ""Johnson, Mary"", ""COO"" },
+        new[] { ""2"", ""Williams, Robert"", ""CFO"" },
+        new[] { ""3"", ""Brown, Patricia"", ""CTO"" },
+        new[] { ""4"", ""Jones, John"", ""CLO"" },
+        new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
+        new[] { ""6"", ""Miller, Michael"", ""CDO"" },
+        new[] { ""7"", ""Davis, Linda"", ""CCO"" },
+        new[] { ""8"", ""Rodriguez, William"", ""CMO"" },
+        new[] { ""9"", ""Martinez, Elizabeth"", ""CSO"" },
+        new[] { ""10"", ""Hernandez, David"", ""CKO"" },
+        new[] { ""11"", ""Lopez, Barbara"", ""CPO"" },
+        new[] { ""12"", ""Gonzales, Richard"", ""CXO"" },
+        new[] { ""13"", ""Wilson, Susan"", ""CHRO"" },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+<h2>Customization</h2>
+
+<p>
+    You can add any theme color class to customize the color scheme.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <table class="table primary striped hover">
+                <thead>
+                    <tr>
+                        @foreach (var heading in _headings)
+                        {
+                            <th>@heading</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _rows)
+                    {
+                        <tr>
+                            @foreach (var data in row)
+                            {
+                                <td>@data</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <table class="table secondary striped hover">
+                <thead>
+                    <tr>
+                        @foreach (var heading in _headings)
+                        {
+                            <th>@heading</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in _rows)
+                    {
+                        <tr>
+                            @foreach (var data in row)
+                            {
+                                <td>@data</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<table class=""table primary striped hover"">
+    <thead>
+        <tr>
+            @foreach (var heading in _headings)
+            {
+                <th>@heading</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _rows)
+        {
+            <tr>
+                @foreach (var data in row)
+                {
+                    <td>@data</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<table class=""table secondary striped hover"">
+    <thead>
+        <tr>
+            @foreach (var heading in _headings)
+            {
+                <th>@heading</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in _rows)
+        {
+            <tr>
+                @foreach (var data in row)
+                {
+                    <td>@data</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    string[] _headings = { ""ID"", ""Name"", ""Title"" };
+    string[][] _rows =
+    {
+        new[] { ""0"", ""Smith, James"", ""CEO"" },
+        new[] { ""1"", ""Johnson, Mary"", ""COO"" },
+        new[] { ""2"", ""Williams, Robert"", ""CFO"" },
+        new[] { ""3"", ""Brown, Patricia"", ""CTO"" },
+        new[] { ""4"", ""Jones, John"", ""CLO"" },
+        new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
+        new[] { ""6"", ""Miller, Michael"", ""CDO"" },
+    };
+}")
+    </ChildContent>
+</Collapse>
+
+@code {
+    string[] _headings = { "ID", "Name", "Title" };
+    string[][] _rows =
+    {
+        new[] { "0", "Smith, James", "CEO" },
+        new[] { "1", "Johnson, Mary", "COO" },
+        new[] { "2", "Williams, Robert", "CFO" },
+        new[] { "3", "Brown, Patricia", "CTO" },
+        new[] { "4", "Jones, John", "CLO" },
+        new[] { "5", "Garcia, Jennifer", "CIO" },
+        new[] { "6", "Miller, Michael", "CDO" },
+    };
+    string[][] _rows2 =
+    {
+        new[] { "0", "Smith, James", "CEO" },
+        new[] { "1", "Johnson, Mary", "COO" },
+        new[] { "2", "Williams, Robert", "CFO" },
+        new[] { "3", "Brown, Patricia", "CTO" },
+        new[] { "4", "Jones, John", "CLO" },
+        new[] { "5", "Garcia, Jennifer", "CIO" },
+        new[] { "6", "Miller, Michael", "CDO" },
+        new[] { "7", "Davis, Linda", "CCO" },
+        new[] { "8", "Rodriguez, William", "CMO" },
+        new[] { "9", "Martinez, Elizabeth", "CSO" },
+        new[] { "10", "Hernandez, David", "CKO" },
+        new[] { "11", "Lopez, Barbara", "CPO" },
+        new[] { "12", "Gonzales, Richard", "CXO" },
+        new[] { "13", "Wilson, Susan", "CHRO" },
+    };
+}

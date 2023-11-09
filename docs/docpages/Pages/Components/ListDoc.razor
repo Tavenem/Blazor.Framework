@@ -1,0 +1,471 @@
+﻿@page "/components/list"
+
+<PageTitle>List - Tavenem Blazor Framework</PageTitle>
+
+<h1>List</h1>
+
+<p>
+    The Tavenem Blazor Framework has extensive support for displaying lists of
+    items.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    To create a basic list, add the <code>list</code> class to an element (usually a
+    <code>div</code> or <code>ul</code>). It may also be appropriate to add
+    <code>role="list"</code>, or <code>role="navigation"</code> for lists of links.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list"">
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<p>
+    To indicate that a non-button, non-link list item is interactive, add the <code>clickable</code>
+    class to the item. You can also add it to the list itself to apply to every item.
+</p>
+
+<p>
+    An active item can be indicated with the <code>active</code> class.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list clickable"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<p>
+    You can assign a theme class to a list to choose the color used to indicate active items.
+</p>
+
+<p>
+    You can also assign the <code>filled</code> class to tint the background of the entire list, and
+    the <code>solid</code> class in combination with the <code>filled</code> class to give the list
+    a solid color background.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list clickable secondary"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>
+<ul class=""list clickable tertiary filled"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>
+<ul class=""list clickable info filled solid"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<p>
+    Use the <code>highlight-start</code> class to modify the active indicator's position.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list highlight-start"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<p>
+    You can add subheaders to your lists at any position. Give them the <code>inset</code> class to
+    provide some initial padding, and the <code>sticky</code> class to cause them to remain at the
+    top of a list which is scrolled past the header's position.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list"">
+    <li class=""subheader"">Subheader</li>
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li class=""subheader inset"">Inset subheader</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<p>
+    Add the <code>disabled</code> class to change the style and color of the list and its items.
+    Note, however, that this does not actually disable any list items such as buttons or links.
+</p>
+
+<CodeExample Code="@(@"<ul class=""list disabled"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<p>
+    The internal padding of a list can be minimized with the <code>dense</code> class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<ul class=""list dense"">
+    <li>Item 1</li>
+    <li class=""active"">Item 2</li>
+    <li>Item 3</li>
+</ul>")" />
+
+<h2>Bound Lists</h2>
+
+<p>
+    You can also display data-bound lists with the <code>ElementList&lt;T></code> component. This
+    component allows you to display a list based on any <code>List&lt;T></code> of items, and bind
+    one or more selected items from the list.
+</p>
+
+<p>
+    Each <code>ElementList</code> and its child <code>ListItem</code>s have a data type, indicated
+    by the <code>TListItem</code> parameter when it can't be inferred. The items in an
+    <code>ElementList</code> are displayed using either the <code>Template RenderFragment</code> for
+    each item, or if no template is provided, with the <code>ToString</code> method of the items.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" SelectionType="SelectionType.Single" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Multiselect</h3>
+
+<p>
+    The <code>SelectionType</code> property determines how selection is handled. If it is set to
+    <code>None</code> then items are not selectable. If set to <code>Single</code> one item at a
+    time may be selected. If set to <code>Multiple</code> any number of items may be selected.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" SelectionType="SelectionType.Multiple" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that the <code>SelectedItems</code> property is read-only (i.e. not two-way bindable). You
+    can subscribe to the <code>SelectedItemsChanged</code> callback to be notified when it updates,
+    but to change the selected item programmatically you must call the
+    <code>SetSelectionAsync</code> method.
+</p>
+
+<h3>Required</h3>
+
+<p>
+    You can make the selection required by setting the <code>Required</code> property. Doing so
+    prevents de-selecting the last selected item through user interaction. Programmatic changes
+    which result in the selection being cleared are still allowed, and no initial selection is
+    forced.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" SelectionType="SelectionType.Single" Required="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" Required=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Tiered Lists</h3>
+
+<p>
+    List items can have child lists of their own by setting their content to another
+    <code>ElementList</code>. To create collapsible sublists, set the <code>ItemIsCollapsible</code>
+    property to a function which returns <code>true</code> for items with children, and the
+    <code>CollapsibleTemplate</code> property to a template used to generate the content of the
+    collapse.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
+                <Template>
+                    <span>@context</span>
+                </Template>
+                <CollapsibleTemplate>
+                    <ElementList Items="_items" />
+                </CollapsibleTemplate>
+            </ElementList>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
+    <Template>
+        <span>@context</span>
+    </Template>
+    <CollapsibleTemplate>
+        <ElementList Items=""_items"" />
+    </CollapsibleTemplate>
+</ElementList>
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that the <code>ItemIsCollapsible</code> and <code>CollapsibleTemplate</code> properties can
+    be used to create collapsible list items with content other than sublists, as well.
+</p>
+
+<p>
+    You can add the <code>tree</code> class to an <code>ElementList</code> to change the appearance
+    of collapsible sublists, moving the expansion icon to the beginning and rotating it.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Class="tree" Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
+                <Template>
+                    <span>@context</span>
+                </Template>
+                <CollapsibleTemplate>
+                    <ElementList Items="_items" />
+                </CollapsibleTemplate>
+            </ElementList>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Class=""tree"" Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
+    <Template>
+        <span>@context</span>
+    </Template>
+    <CollapsibleTemplate>
+        <ElementList Items=""_items"" />
+    </CollapsibleTemplate>
+</ElementList>
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Drag and Drop</h3>
+
+<p>
+    Items in an <code>ElementList</code> can be draggable, both within the <code>ElementList</code>
+    (to reorder items), and between <code>ElementList</code>s with the same item type.
+</p>
+
+<p>
+    To make the items in a <code>ElementList</code> draggable, set the <code>IsDragStart</code>
+    property of the <code>ElementList</code> to <code>true</code>. To make a
+    <code>ElementList</code> a valid drop destination (including for reordering items within itself)
+    set its <code>IsDropTarget</code> property to <code>true</code>.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_dragItems" IsDragStart="true" IsDropTarget="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" IsDragStart=""true"" IsDropTarget=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Individual items can disable dragging by returning <code>false</code> from a function assigned
+    to the <code>ItemIsDraggable</code> property. You can also override the
+    <code>GetDropEffect</code> delegate to determine the drag effect for any item dragged over the
+    list. Return <code>DragEffect.None</code> if the list will not accept the drop.
+</p>
+
+<p>
+    Ordinarily list items which are dropped on a list will be inserted into the list at the position
+    where they are dropped. If the drag operation is "move" the item is removed from its original
+    place in the list (even if it was a different list). If it is "copy" the item will be round-trip
+    (de)serialized via JSON, and the copy will be inserted. If the item cannot be successfully
+    round-trip serialized and deserialized to and from JSON, an exception will be thrown. To prevent
+    this for items which are not expected to be copied, you can set the
+    <code>DragEffectAllowed</code> property to <code>DragEffect.Move</code> (the default is
+    <code>DragEffect.CopyMove</code>).
+</p>
+
+<p>
+    You can also set a callback on the <code>OnDrop</code> and <code>OnDropIndex</code> properties
+    to bypass the default drop process and handle the operation yourself. <code>OnDrop</code> is
+    invoked when an item is dropped on the list itself, and <code>OnDropIndex</code> is invoked when
+    an item is dropped onto a list item and provides the index of that item, in addition to the
+    dropped data. If you provide these properties, you should normally also provide a callback for
+    the <code>OnDropped</code> proerty as well, to bypass dropped list items' default behavior of
+    removing themselves from their place on their current list on a move operation. You can also
+    override the <code>GetItemDragData</code> function to control the dragged data; otherwise the
+    list items themselves are used.
+</p>
+
+<p>
+    You can override the <code>DropClass</code> and <code>NoDropClass</code> properties of
+    <code>ElementList</code> to override the default CSS styles applied when a list is a valid or
+    invalid target for a drop, respectively.
+</p>
+
+<h3>List Items</h3>
+
+<p>
+    An icon can be automatically displayed before the content of a list item by setting the
+    <code>Icon</code> property to a function which returns the name of the icon. The
+    <code>IconClass</code> property can be used to customize the class of the icon.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can insert a separator before or after any item by setting the <code>SeparatorBefore</code>
+    and <code>SeparatorAfter</code> properties to functions which return <code>true</code> for the
+    appropriate items.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" SeparatorBefore="@(i => i == "Item 2")" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SeparatorBefore=""@(i => i == ""Item 2"")"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Customization</h3>
+
+<p>
+    You can choose to display a special selection icon for selected items by setting
+    <code>ShowSelectionIcon</code> to <code>true</code>. The selection icon takes the place of any
+    icon assigned via the <code>Icon</code> property.
+</p>
+
+<p>
+    The theme color of any item may be set by assigning a function to the
+    <code>ItemThemeColor</code> property. Selected items will always use the theme for the list
+    itself, rather than their own theme, to make it clear that they are currently selected.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    If you set the <code>SelectionIcons</code> property to <code>true</code>, both the selected and
+    unselected states will show an icon, and only that icon will respond to click events to change
+    the selection state. This can be helpful when you want users to be able to select the text of
+    your items, or when they require their own interactions.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList Items="_items" SelectionType="SelectionType.Single" SelectionIcons="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" SelectionIcons=""true"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Clicking</h3>
+
+<p>
+    If you add an event callback to the <code>OnItemClick</code> property, items will automatically
+    receive the <code>clickable</code> class and respond to click events, which will invoke the
+    <code>OnItemClick</code> callback.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""OnClick"" />
+
+@code {
+    private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
+    private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
+}")
+    </ChildContent>
+</Collapse>
+
+@code {
+    private List<string> _items = new() { "Item 1", "Item 2", "Item 3" };
+    private List<int> _items3 = new() { 1, 2, 3 };
+    private List<string> _dragItems = new() { "Item 1", "Item 2", "Item 3" };
+    private ThemeColor _theme = ThemeColor.None;
+
+    private void OnClick(string? _) => _theme = _theme == ThemeColor.None
+        ? ThemeColor.Secondary
+        : ThemeColor.None;
+}

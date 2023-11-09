@@ -2,68 +2,21 @@
 
 @inherits TavenemComponentBase
 
-<div class="snackbar-container top-left">
-    @foreach (var snackbar in SnackbarsTopLeft)
-    {
-        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
-    }
-    @if (ExtraSnackbarTopLeft is not null)
-    {
-        <SnackbarElement Snackbar="ExtraSnackbarTopLeft" IsExtra="true" />
-    }
-</div>
-<div class="snackbar-container top-right">
-    @foreach (var snackbar in SnackbarsTopRight)
-    {
-        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
-    }
-    @if (ExtraSnackbarTopRight is not null)
-    {
-        <SnackbarElement Snackbar="ExtraSnackbarTopRight" IsExtra="true" />
-    }
-</div>
-<div class="snackbar-container bottom-left">
-    @if (ExtraSnackbarBottomLeft is not null)
-    {
-        <SnackbarElement Snackbar="ExtraSnackbarBottomLeft" IsExtra="true" />
-    }
-    @foreach (var snackbar in SnackbarsBottomLeft)
-    {
-        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
-    }
-</div>
-<div class="snackbar-container bottom-right">
-    @if (ExtraSnackbarBottomRight is not null)
-    {
-        <SnackbarElement Snackbar="ExtraSnackbarBottomRight" IsExtra="true" />
-    }
-    @foreach (var snackbar in SnackbarsBottomRight)
-    {
-        <SnackbarElement @key="snackbar" Snackbar="snackbar" />
-    }
-</div>
 <div class="@CssClass" style="@Style">
+    <SnackbarContainer />
+    <DialogContainer @ref="DialogContainer" />
     <CascadingValue Value="this" IsFixed="true">
         @FrameworkContent
-        <main id="main-container" class="container mt-3">
+        <main class="container">
             @ChildContent
+            @if (AutoScrollToTop)
+            {
+                <tf-scroll-top />
+            }
         </main>
-        @if (ContentsBreakpoint != Breakpoint.None)
-        {
-            <Contents ThemeColor="ThemeColor" Breakpoint="ContentsBreakpoint" Class="d-print-none" Style="grid-area:contents" />
-        }
-        @foreach (var dialogReference in _dialogs)
-        {
-            @dialogReference.RenderFragment
-        }
     </CascadingValue>
-    @if (AutoScrollToTop)
+    @if (ContentsBreakpoint != Breakpoint.None)
     {
-        <ScrollToTop Selector="#main-container">
-            <span class="btn btn-icon primary filled">
-                <tf-icon>expand_less</tf-icon>
-            </span>
-        </ScrollToTop>
+        <Contents @ref="Contents" Breakpoint="ContentsBreakpoint" />
     }
-    <div class="overlay drawer-overlay" @onclick="OnCloseDrawersAsync" @onclick:stopPropagation="true"></div>
 </div>

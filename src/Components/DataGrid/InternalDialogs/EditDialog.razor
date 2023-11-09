@@ -15,8 +15,8 @@
                     }
                     else if (column is Column<TDataItem, string> stringColumn)
                     {
-                        <TextInput Value="@stringColumn.GetCellValue(EditedItem)"
-                                   ValueChanged="@(v => stringColumn.SetCellValue(EditedItem, v))"
+                        <TextInput @bind-Value:get="@stringColumn.GetCellValue(EditedItem)"
+                                   @bind-Value:set="@(v => stringColumn.SetCellValue(EditedItem, v))"
                                    Format="@column.Format"
                                    FormatProvider="column.FormatProvider"
                                    Label="@column.GetLabel()"
@@ -25,18 +25,16 @@
                     }
                     else if (column is Column<TDataItem, bool> boolColumn)
                     {
-                        <Checkbox TValue="bool"
-                                  Value="@boolColumn.GetCellValue(EditedItem)"
-                                  ValueChanged="@(v => boolColumn.SetCellValue(EditedItem, v))"
+                        <Checkbox @bind-Value:get="@boolColumn.GetCellValue(EditedItem)"
+                                  @bind-Value:set="@(v => boolColumn.SetCellValue(EditedItem, v))"
                                   Label="@column.GetLabel()"
                                   Validation="@((v, _) => boolColumn.Validate(v, EditedItem))"
                                   Class="dense" />
                     }
                     else if (column is Column<TDataItem, bool?> nullableBoolColumn)
                     {
-                        <Checkbox TValue="bool?"
-                                  Value="@nullableBoolColumn.GetCellValue(EditedItem)"
-                                  ValueChanged="@(v => nullableBoolColumn.SetCellValue(EditedItem, v))"
+                        <Checkbox @bind-Value:get="@nullableBoolColumn.GetCellValue(EditedItem)"
+                                  @bind-Value:set="@(v => nullableBoolColumn.SetCellValue(EditedItem, v))"
                                   AllowNull="true"
                                   Label="@column.GetLabel()"
                                   Validation="@((v, _) => nullableBoolColumn.Validate(v, EditedItem))"
@@ -44,9 +42,8 @@
                     }
                     else if (column is Column<TDataItem, byte> byteColumn)
                     {
-                        <NumericInput TValue="byte"
-                                      Value="@byteColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => byteColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@byteColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => byteColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -55,9 +52,8 @@
                     }
                     else if (column is Column<TDataItem, byte?> nullableByteColumn)
                     {
-                        <NumericInput TValue="byte?"
-                                      Value="@nullableByteColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableByteColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableByteColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableByteColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -66,9 +62,8 @@
                     }
                     else if (column is Column<TDataItem, decimal> decimalColumn)
                     {
-                        <NumericInput TValue="decimal"
-                                      Value="@decimalColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => decimalColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@decimalColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => decimalColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -77,9 +72,8 @@
                     }
                     else if (column is Column<TDataItem, decimal?> nullableDecimalColumn)
                     {
-                        <NumericInput TValue="decimal?"
-                                      Value="@nullableDecimalColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableDecimalColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableDecimalColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableDecimalColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -88,9 +82,8 @@
                     }
                     else if (column is Column<TDataItem, double> doubleColumn)
                     {
-                        <NumericInput TValue="double"
-                                      Value="@doubleColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => doubleColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@doubleColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => doubleColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -99,9 +92,8 @@
                     }
                     else if (column is Column<TDataItem, double?> nullableDoubleColumn)
                     {
-                        <NumericInput TValue="double?"
-                                      Value="@nullableDoubleColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableDoubleColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableDoubleColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableDoubleColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -110,9 +102,8 @@
                     }
                     else if (column is Column<TDataItem, float> floatColumn)
                     {
-                        <NumericInput TValue="float"
-                                      Value="@floatColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => floatColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@floatColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => floatColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -121,9 +112,8 @@
                     }
                     else if (column is Column<TDataItem, float?> nullableFloatColumn)
                     {
-                        <NumericInput TValue="float?"
-                                      Value="@nullableFloatColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableFloatColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableFloatColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableFloatColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -132,9 +122,8 @@
                     }
                     else if (column is Column<TDataItem, int> intColumn)
                     {
-                        <NumericInput TValue="int"
-                                      Value="@intColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => intColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@intColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => intColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -143,9 +132,8 @@
                     }
                     else if (column is Column<TDataItem, int?> nullableIntColumn)
                     {
-                        <NumericInput TValue="int?"
-                                      Value="@nullableIntColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableIntColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableIntColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableIntColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -154,9 +142,8 @@
                     }
                     else if (column is Column<TDataItem, long> longColumn)
                     {
-                        <NumericInput TValue="long"
-                                      Value="@longColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => longColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@longColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => longColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -165,9 +152,8 @@
                     }
                     else if (column is Column<TDataItem, long?> nullableLongColumn)
                     {
-                        <NumericInput TValue="long?"
-                                      Value="@nullableLongColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableLongColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableLongColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableLongColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -176,9 +162,8 @@
                     }
                     else if (column is Column<TDataItem, nint> nintColumn)
                     {
-                        <NumericInput TValue="nint"
-                                      Value="@nintColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nintColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nintColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nintColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -187,9 +172,8 @@
                     }
                     else if (column is Column<TDataItem, nint?> nullableNintColumn)
                     {
-                        <NumericInput TValue="nint?"
-                                      Value="@nullableNintColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableNintColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableNintColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableNintColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -198,9 +182,8 @@
                     }
                     else if (column is Column<TDataItem, nuint> nuintColumn)
                     {
-                        <NumericInput TValue="nuint"
-                                      Value="@nuintColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nuintColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nuintColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nuintColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -209,9 +192,8 @@
                     }
                     else if (column is Column<TDataItem, nuint?> nullableNuintColumn)
                     {
-                        <NumericInput TValue="nuint?"
-                                      Value="@nullableNuintColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableNuintColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableNuintColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableNuintColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -220,9 +202,8 @@
                     }
                     else if (column is Column<TDataItem, sbyte> sbyteColumn)
                     {
-                        <NumericInput TValue="sbyte"
-                                      Value="@sbyteColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => sbyteColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@sbyteColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => sbyteColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -231,9 +212,8 @@
                     }
                     else if (column is Column<TDataItem, sbyte?> nullableSbyteColumn)
                     {
-                        <NumericInput TValue="sbyte?"
-                                      Value="@nullableSbyteColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableSbyteColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableSbyteColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableSbyteColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -242,9 +222,8 @@
                     }
                     else if (column is Column<TDataItem, short> shortColumn)
                     {
-                        <NumericInput TValue="short"
-                                      Value="@shortColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => shortColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@shortColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => shortColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -253,9 +232,8 @@
                     }
                     else if (column is Column<TDataItem, short?> nullableShortColumn)
                     {
-                        <NumericInput TValue="short?"
-                                      Value="@nullableShortColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableShortColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableShortColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableShortColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -264,9 +242,8 @@
                     }
                     else if (column is Column<TDataItem, uint> uintColumn)
                     {
-                        <NumericInput TValue="uint"
-                                      Value="@uintColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => uintColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@uintColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => uintColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -275,9 +252,8 @@
                     }
                     else if (column is Column<TDataItem, uint?> nullableUintColumn)
                     {
-                        <NumericInput TValue="uint?"
-                                      Value="@nullableUintColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableUintColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableUintColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableUintColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -286,9 +262,8 @@
                     }
                     else if (column is Column<TDataItem, ulong> ulongColumn)
                     {
-                        <NumericInput TValue="ulong"
-                                      Value="@ulongColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => ulongColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@ulongColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => ulongColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -297,9 +272,8 @@
                     }
                     else if (column is Column<TDataItem, ulong?> nullableUlongColumn)
                     {
-                        <NumericInput TValue="ulong?"
-                                      Value="@nullableUlongColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableUlongColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableUlongColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableUlongColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -308,9 +282,8 @@
                     }
                     else if (column is Column<TDataItem, ushort> ushortColumn)
                     {
-                        <NumericInput TValue="ushort"
-                                      Value="@ushortColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => ushortColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@ushortColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => ushortColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -319,9 +292,8 @@
                     }
                     else if (column is Column<TDataItem, ushort?> nullableUshortColumn)
                     {
-                        <NumericInput TValue="ushort?"
-                                      Value="@nullableUshortColumn.GetCellValue(EditedItem)"
-                                      ValueChanged="@(v => nullableUshortColumn.SetCellValue(EditedItem, v))"
+                        <NumericInput @bind-Value:get="@nullableUshortColumn.GetCellValue(EditedItem)"
+                                      @bind-Value:set="@(v => nullableUshortColumn.SetCellValue(EditedItem, v))"
                                       Format="@column.Format"
                                       FormatProvider="column.FormatProvider"
                                       Label="@column.GetLabel()"
@@ -331,8 +303,8 @@
                     else if (column.IsEnum)
                     {
                         <Select TValue="object"
-                                Value="@column.GetCellObjectValue(EditedItem)"
-                                ValueChanged="@(v => column.SetCellObjectValue(EditedItem, v))"
+                                @bind-Value:get="@column.GetCellObjectValue(EditedItem)"
+                                @bind-Value:set="@(v => column.SetCellObjectValue(EditedItem, v))"
                                 Label="@column.GetLabel()"
                                 OptionPairs="@column.GetEnumOptions()"
                                 Validation="@((v, _) => column.ValidateObject(v, EditedItem))"
@@ -340,9 +312,8 @@
                     }
                     else if (column is Column<TDataItem, System.DateTime> dateTimeColumn)
                     {
-                        <DateTimeInput TValue="System.DateTime"
-                                       Value="@dateTimeColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => dateTimeColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@dateTimeColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => dateTimeColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        ShowTime="true"
@@ -352,9 +323,8 @@
                     }
                     else if (column is Column<TDataItem, System.DateTime?> nullableDateTimeColumn)
                     {
-                        <DateTimeInput TValue="System.DateTime?"
-                                       Value="@nullableDateTimeColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => nullableDateTimeColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@nullableDateTimeColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => nullableDateTimeColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        ShowTime="true"
@@ -364,9 +334,8 @@
                     }
                     else if (column is Column<TDataItem, System.DateTimeOffset> dateTimeOffsetColumn)
                     {
-                        <DateTimeInput TValue="System.DateTimeOffset"
-                                       Value="@dateTimeOffsetColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => dateTimeOffsetColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@dateTimeOffsetColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => dateTimeOffsetColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        ShowTime="true"
@@ -377,9 +346,8 @@
                     }
                     else if (column is Column<TDataItem, System.DateTimeOffset?> nullableDateTimeOffsetColumn)
                     {
-                        <DateTimeInput TValue="System.DateTimeOffset?"
-                                       Value="@nullableDateTimeOffsetColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => nullableDateTimeOffsetColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@nullableDateTimeOffsetColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => nullableDateTimeOffsetColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        ShowTime="true"
@@ -390,9 +358,8 @@
                     }
                     else if (column is Column<TDataItem, System.DateOnly> dateOnlyColumn)
                     {
-                        <DateTimeInput TValue="System.DateOnly"
-                                       Value="@dateOnlyColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => dateOnlyColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@dateOnlyColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => dateOnlyColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        Label="@column.GetLabel()"
@@ -401,9 +368,8 @@
                     }
                     else if (column is Column<TDataItem, System.DateOnly?> nullableDateOnlyColumn)
                     {
-                        <DateTimeInput TValue="System.DateOnly?"
-                                       Value="@nullableDateOnlyColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => nullableDateOnlyColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@nullableDateOnlyColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => nullableDateOnlyColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        Label="@column.GetLabel()"
@@ -412,9 +378,8 @@
                     }
                     else if (column is Column<TDataItem, System.TimeOnly> timeOnlyColumn)
                     {
-                        <DateTimeInput TValue="System.TimeOnly"
-                                       Value="@timeOnlyColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => timeOnlyColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@timeOnlyColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => timeOnlyColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        Label="@column.GetLabel()"
@@ -423,9 +388,8 @@
                     }
                     else if (column is Column<TDataItem, System.TimeOnly?> nullableTimeOnlyColumn)
                     {
-                        <DateTimeInput TValue="System.TimeOnly?"
-                                       Value="@nullableTimeOnlyColumn.GetCellValue(EditedItem)"
-                                       ValueChanged="@(v => nullableTimeOnlyColumn.SetCellValue(EditedItem, v))"
+                        <DateTimeInput @bind-Value:get="@nullableTimeOnlyColumn.GetCellValue(EditedItem)"
+                                       @bind-Value:set="@(v => nullableTimeOnlyColumn.SetCellValue(EditedItem, v))"
                                        Format="@column.Format"
                                        FormatProvider="column.FormatProvider"
                                        Label="@column.GetLabel()"
@@ -434,9 +398,8 @@
                     }
                     else if (column is Column<TDataItem, System.Drawing.Color> colorColumn)
                     {
-                        <ColorInput TValue="System.Drawing.Color"
-                                    Value="@colorColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => colorColumn.SetCellValue(EditedItem, v))"
+                        <ColorInput @bind-Value:get="@colorColumn.GetCellValue(EditedItem)"
+                                    @bind-Value:set="@(v => colorColumn.SetCellValue(EditedItem, v))"
                                     ColorMode="ColorMode.RGB"
                                     Format="@column.Format"
                                     FormatProvider="column.FormatProvider"
@@ -446,9 +409,8 @@
                     }
                     else if (column is Column<TDataItem, System.Drawing.Color?> nullableColorColumn)
                     {
-                        <ColorInput TValue="System.Drawing.Color?"
-                                    Value="@nullableColorColumn.GetCellValue(EditedItem)"
-                                    ValueChanged="@(v => nullableColorColumn.SetCellValue(EditedItem, v))"
+                        <ColorInput @bind-Value:get="@nullableColorColumn.GetCellValue(EditedItem)"
+                                    @bind-Value:set="@(v => nullableColorColumn.SetCellValue(EditedItem, v))"
                                     ColorMode="ColorMode.RGB"
                                     Format="@column.Format"
                                     FormatProvider="column.FormatProvider"
@@ -488,7 +450,7 @@
         }
     </ChildContent>
     <FooterContent>
-        <button class="btn btn-text" @onclick="@OnCancelAsync">Cancel</button>
+        <button class="btn btn-text" @onclick="@OnCancel">Cancel</button>
         <button class="btn btn-text primary" @onclick="@OnSaveAsync">Save</button>
     </FooterContent>
 </Dialog>

@@ -11,7 +11,7 @@ interface IDragStartData {
 }
 
 interface IDragListenElement extends HTMLElement {
-    dragstartListener: ((event: DragEvent) => Promise<void>) | null | undefined;
+    getDragDataListener: ((event: DragEvent) => Promise<void>) | null | undefined;
     dragendListener: ((event: DragEvent) => void) | null | undefined;
 }
 
@@ -33,8 +33,8 @@ export function cancelDragListener(elementId: string) {
     }
 
     if (element instanceof HTMLElement) {
-        if (element.dragstartListener) {
-            element.removeEventListener('dragstart', element.dragstartListener);
+        if (element.getDragDataListener) {
+            element.removeEventListener('dragstart', element.getDragDataListener);
         }
         if (element.dragendListener) {
             element.removeEventListener('dragend', element.dragendListener);
@@ -83,10 +83,10 @@ export function listenForDrag(
         return;
     }
 
-    element.dragstartListener = getDragData.bind(this, dotnetReference, dragElementId);
+    element.getDragDataListener = getDragData.bind(this, dotnetReference, dragElementId);
     element.dragendListener = droppedHandler.bind(this, dotnetReference);
 
-    element.addEventListener('dragstart', element.dragstartListener);
+    element.addEventListener('dragstart', element.getDragDataListener);
     element.addEventListener('dragend', element.dragendListener);
 }
 

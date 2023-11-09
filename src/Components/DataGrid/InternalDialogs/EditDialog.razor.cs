@@ -10,7 +10,7 @@ public partial class EditDialog<TDataItem>
     /// <summary>
     /// The list of columns.
     /// </summary>
-    [Parameter] public List<IColumn<TDataItem>> Columns { get; set; } = new();
+    [Parameter] public List<IColumn<TDataItem>> Columns { get; set; } = [];
 
     /// <summary>
     /// The edited item.
@@ -21,12 +21,9 @@ public partial class EditDialog<TDataItem>
 
     private Form? DialogEditForm { get; set; }
 
-    private async Task OnCancelAsync()
+    private void OnCancel()
     {
-        if (DialogEditForm is not null)
-        {
-            await DialogEditForm.ResetAsync();
-        }
+        DialogEditForm?.Reset();
         Dialog?.Close();
     }
 

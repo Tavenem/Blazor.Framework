@@ -1,18 +1,24 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// Wraps content with a <see cref="Popover"/> displayed on hover.
+/// Attaches a <see cref="Popover"/> to an element and displays it when the anchor element is
+/// hovered.
 /// </summary>
-public partial class Tooltip : IDisposable
+public partial class Tooltip
 {
-    private readonly AdjustableTimer _hideTimer;
-    private readonly AdjustableTimer _showTimer;
-
-    private bool _dismissed;
-    private bool _disposedValue;
-    private bool _visible;
+    /// <summary>
+    /// The HTML <c>id</c> of an element to which this tooltip should be attached. The tooltip will
+    /// be displayed when the use hovers over the anchor.
+    /// </summary>
+    /// <remarks>
+    /// If no anchor is assigned, a button will be displayed which can be used to display the
+    /// tooltip. This button will also be visible even for anchored tooltips on non-hover devices
+    /// (usually devices which do not use a mouse).
+    /// </remarks>
+    [Parameter] public string? Anchor { get; set; }
 
     /// <summary>
     /// <para>
@@ -41,13 +47,13 @@ public partial class Tooltip : IDisposable
 
     /// <summary>
     /// <para>
-    /// Whether the container should be an inline element.
+    /// The id of the HTML element.
     /// </para>
     /// <para>
-    /// Default is <see langword="false"/>.
+    /// A generated id will be assigned if none is supplied (including through splatted attributes).
     /// </para>
     /// </summary>
-    [Parameter] public bool Inline { get; set; }
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// <para>
@@ -69,58 +75,10 @@ public partial class Tooltip : IDisposable
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
-    /// <summary>
-    /// Custom CSS class(es) for the tooltip.
-    /// </summary>
-    [Parameter] public string? TooltipClass { get; set; }
-
-    /// <summary>
-    /// The content of the tooltip.
-    /// </summary>
-    [Parameter] public RenderFragment? TooltipContent { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// HTML to display as a tooltip.
-    /// </para>
-    /// <para>
-    /// Ignored if <see cref="TooltipContent"/> is non-<see langword="null"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public MarkupString? TooltipMarkup { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the tooltip.
-    /// </summary>
-    [Parameter] public string? TooltipStyle { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The text to display as a tooltip.
-    /// </para>
-    /// <para>
-    /// Ignored if <see cref="TooltipMarkup"/> or <see cref="TooltipContent"/> is non-<see
-    /// langword="null"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public string? TooltipText { get; set; }
-
-    /// <summary>
-    /// The final value assigned to the class attribute, including component
-    /// values and anything assigned by the user in <see
-    /// cref="TavenemComponentBase.AdditionalAttributes"/>.
-    /// </summary>
-    protected override string? CssClass => new CssBuilder("tooltip-root")
-        .Add(Class)
+    /// <inheritdoc />
+    protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("inline", Inline)
-        .ToString();
-
-    /// <summary>
-    /// The final value assigned to the tooltip's class attribute, including component values.
-    /// </summary>
-    protected string? TooltipCssClass => new CssBuilder("tooltip")
-        .Add(TooltipClass)
+        .Add("contained-popover tooltip")
         .Add("arrow", Arrow)
         .ToString();
 
@@ -142,106 +100,31 @@ public partial class Tooltip : IDisposable
         _ => Origin.Center_Center,
     };
 
-    /// <summary>
-    /// Contructs a new instance of <see cref="Tooltip"/>.
-    /// </summary>
-    public Tooltip()
+    [Inject, NotNull] private PopoverService? TooltipService { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
     {
-        _hideTimer = new(Hide, 200);
-        _showTimer = new(Show, 200);
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
+    /// <summary>
+    /// Hides this tooltip.
+    /// </summary>
+    public Task HideAsync() => TooltipService.SetTooltipVisibilityAsync(Id, false);
+
+    /// <summary>
+    /// Shows this tooltip.
+    /// </summary>
+    public Task ShowAsync() => TooltipService.SetTooltipVisibilityAsync(Id, true);
 
     /// <summary>
     /// Toggles the visibility of this tooltip.
     /// </summary>
-    public void Toggle()
-    {
-        _visible = !_visible;
-        if (!_disposedValue)
-        {
-            _dismissed = false;
-            _hideTimer.Cancel();
-            _showTimer.Cancel();
-        }
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting
-    /// unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _hideTimer.Dispose();
-                _showTimer.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-    }
-
-    private void Hide()
-    {
-        _visible = false;
-        if (!_disposedValue)
-        {
-            _showTimer.Cancel();
-        }
-        StateHasChanged();
-    }
-
-    private void OnDismiss()
-    {
-        if (!_disposedValue)
-        {
-            _dismissed = true;
-            _showTimer.Cancel();
-            _hideTimer.Start();
-        }
-    }
-
-    private void OnMouseOver()
-    {
-        if (_disposedValue || _dismissed)
-        {
-            return;
-        }
-        _hideTimer.Cancel();
-        if (Delay > 0)
-        {
-            _showTimer.Change(Delay);
-            _showTimer.Start();
-        }
-        else
-        {
-            _visible = true;
-        }
-    }
-
-    private void OnMouseOut()
-    {
-        if (!_disposedValue)
-        {
-            _dismissed = false;
-            _showTimer.Cancel();
-            _hideTimer.Start();
-        }
-    }
-
-    private void Show()
-    {
-        _visible = true;
-        StateHasChanged();
-    }
+    public Task ToggleAsync() => TooltipService.ToggleTooltipAsync(Id);
 }

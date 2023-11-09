@@ -1,0 +1,135 @@
+﻿@page "/utilities/position"
+
+<PageTitle>Position - Tavenem Blazor Framework</PageTitle>
+
+<h1>Position</h1>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to control the
+    position of elements.
+</p>
+
+<h2>Position</h2>
+
+<p>
+    The <code>position</code> property itself can be set:
+</p>
+
+<ul>
+    <li><code>position-absolute</code></li>
+    <li><code>position-fixed</code></li>
+    <li><code>position-relative</code></li>
+    <li><code>position-static</code></li>
+    <li><code>position-sticky</code></li>
+</ul>
+
+<p>
+    There are also variations of each position class with <a href="./layout/breakpoints">breakpoint
+    infixes</a> to use them only above certain viewport sizes. For example:
+</p>
+
+<ul>
+    <li><code>position-sm-absolute</code></li>
+    <li><code>position-md-absolute</code></li>
+    <li><code>position-lg-absolute</code></li>
+    <li><code>position-xl-absolute</code></li>
+    <li><code>position-xxl-absolute</code></li>
+</ul>
+
+<h2>Side</h2>
+
+<p>
+    The placement of an element relative to a side can be controlled with a set of classes for each
+    side, in the format <code>{side}-{fraction}</code>, where {side} is one of:
+</p>
+
+<ul>
+    <li><code>bottom</code></li>
+    <li><code>left</code></li>
+    <li><code>right</code></li>
+    <li><code>top</code></li>
+</ul>
+
+<p>
+    And <code>fraction</code> is one of:
+</p>
+
+<ul>
+    <li><code>0</code></li>
+    <li><code>50</code> <small class="text-muted">(50%)</small></li>
+    <li><code>100</code> <small class="text-muted">(100%)</small></li>
+</ul>
+
+<p>
+    The sides can also be used as classes on their own (e.g. <code>top</code>), which is equivalent to using
+    <code>{side}-0</code>.
+</p>
+
+<h2>Translate</h2>
+
+<p>
+    Elements are usually most easily centered using <code>grid</code> or <code>flex</code> layouts,
+    but when those are not possible, you can also use the translation utility classes
+    <code>translate-middle</code> (applies <code>translate(-50%, -50%)</code>),
+    <code>translate-middle-x</code> (applies <code>translateX(-50%)</code>), and
+    <code>translate-middle-y</code> (applies <code>translateY(-50%)</code>).
+</p>
+
+<h2>Fixed and Sticky</h2>
+
+<p>
+    The <code>fixed</code> class both sets <code>position</code> to <code>fixed</code>, and also
+    sets <code>z-index</code> to a high value, which places it above most content.
+</p>
+
+<p>
+    The <code>sticky</code> class both sets <code>position</code> to <code>sticky</code>, and also
+    sets <code>z-index</code> to a high value, which places it above most content (but below fixed
+    elements).
+</p>
+
+<p>
+    Combine either with a placement class like <code>top</code> to also position the element in your
+    layout.
+</p>
+
+<p>
+    There are breakpoint variations of both these classes. For example:
+</p>
+
+<ul>
+    <li><code>fixed-sm</code></li>
+    <li><code>fixed-md</code></li>
+    <li><code>fixed-lg</code></li>
+    <li><code>fixed-xl</code></li>
+    <li><code>fixed-xxl</code></li>
+</ul>
+
+<h2>Vertical align</h2>
+
+<p>
+    Set the vertical alignment of elements with a utility class:
+</p>
+
+<ul>
+    <li><code>align-baseline</code></li>
+    <li><code>align-bottom</code></li>
+    <li><code>align-middle</code></li>
+    <li><code>align-text-bottom</code></li>
+    <li><code>align-text-top</code></li>
+    <li><code>align-top</code></li>
+</ul>
+
+<p>
+    There are also variations of each vertical alignment class with <a
+    href="./layout/breakpoints">breakpoint infixes</a> to use them only above certain viewport sizes.
+    For example:
+</p>
+
+<ul>
+    <li><code>align-sm-baseline</code></li>
+    <li><code>align-md-baseline</code></li>
+    <li><code>align-lg-baseline</code></li>
+    <li><code>align-xl-baseline</code></li>
+    <li><code>align-xxl-baseline</code></li>
+</ul>

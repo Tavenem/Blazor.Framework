@@ -1,0 +1,237 @@
+﻿@page "/utilities/text"
+
+<PageTitle>Text - Tavenem Blazor Framework</PageTitle>
+
+<h1>Text</h1>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to help format text.
+</p>
+
+<h2>Alignment</h2>
+
+<p>
+    Text can be aligned horizontally:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-start"">Start aligned text.</p>
+    <p class=""text-left"">Left aligned text.</p>
+    <p class=""text-center"">Center aligned text.</p>
+    <p class=""text-right"">Right aligned text.</p>
+    <p class=""text-end"">End aligned text.</p>
+</div>")" />
+
+<p>
+    The alignment utilities can also be combined with <a href="./layout/breakpoints">breakpoint infixes</a> to
+    use them only above certain viewport sizes.
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-sm-center"">Center aligned text above the small breakpoint.</p>
+    <p class=""text-md-center"">Center aligned text above the medium breakpoint.</p>
+    <p class=""text-lg-center"">Center aligned text above the large breakpoint.</p>
+    <p class=""text-xl-center"">Center aligned text above the extra large breakpoint.</p>
+    <p class=""text-xxl-center"">Center aligned text above the extra extra large breakpoint.</p>
+</div>")" />
+
+<h2>Wrapping</h2>
+
+<p>
+    Text wrap can be controlled:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-wrap bg-alt filled"" style=""width:5em"">This text will wrap.</p>
+    <p class=""text-nowrap bg-alt filled"" style=""width:5em"">This text will overflow its container.</p>
+</div>")" />
+
+<p>
+    Word breaking can also be controlled:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""bg-alt filled"" style=""width:5em"">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
+    <p class=""text-break bg-alt filled"" style=""width:5em"">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
+</div>")" />
+
+<p>
+    Word breaking is disabled when text direction is set to RTL, as some right-to-left languages
+    fail to render correctly when broken mid-word:
+</p>
+
+<CodeExample Code="@(@"<div dir=""rtl"" class=""me-auto"">
+    <p class=""text-break bg-alt filled"" style=""width:5em"">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
+</div>")" />
+
+<p>
+    You can also truncate text:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-truncate bg-alt filled"" style=""width:5em"">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</p>
+</div>")" />
+
+<h2>Transform</h2>
+
+<p>
+    Text capitalization can be controlled:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-capitalize"">CapiTaliZed text.</p>
+    <p class=""text-lowercase"">Lowercased text.</p>
+    <p class=""text-uppercase"">Uppercased text.</p>
+</div>")" />
+
+<h2>Size</h2>
+
+<p>
+    Text can be made small either with the HTML semantic element, or a class:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p>Normal text.</p>
+    <p><small>Small text.</small></p>
+    <p class=""small"">Small text.</p>
+</div>")" />
+
+<p>
+    You can match the font style of any heading element by applying a class of the same name:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""h1"">Paragraph as heading</p>
+    <h2 class=""h4"">Smaller than usual</h2>
+</div>")" />
+
+<h2>Weight</h2>
+
+<p>
+    Text can be given a lighter weight with a class, or heavier weight using standard HTML semantic
+    elements:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-light"">Light text.</p>
+    <p>Normal text.</p>
+    <p><b>Bold text.</b></p>
+    <p><b><b>Bolder text.</b></b></p>
+    <p><b><span class=""text-lighter"">Lighter text (lighter than its bold parent, i.e. normal).</span></b></p>
+</div>")" />
+
+<h2>Line height</h2>
+
+<p>
+    Line height can be adjusted with a set of classes:
+</p>
+
+<ul>
+    <li><code>lh-1</code>: sets <code>line-height</code> to 1</li>
+    <li><code>lh-sm</code>: sets <code>line-height</code> to 1.2</li>
+    <li><code>lh-base</code>: sets <code>line-height</code> to the default (usually 1.5, but headings and the <code>btn</code> class use different <code>line-height</code> values by default)</li>
+    <li><code>lh-lg</code>: sets <code>line-height</code> to 2</li>
+</ul>
+
+<h2>Style</h2>
+
+<p>
+    When using the (default) <a href="https://www.recursive.design/">Recursive</a> font, text can be
+    given a "casual" appearance. This value ranges from 0&ndash;1, with 0 being normal and 1 being
+    casual.
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p style=""--tavenem-casl:1"">Casual text.</p>
+    <p>Normal text.</p>
+    <p style=""--tavenem-casl:.5"">""Half-casual"" text.</p>
+</div>")" />
+
+<p>
+    You can change the font family of a heading to the font family normally used for body text with
+    the utility class <code>body-font</code>, or give ordinary text the same font family as headings
+    with the <code>title-font</code> class.
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p>Normal text.</p>
+    <p class=""title-font"">Title-font text.</p>
+</div>")" />
+
+<h2>Color</h2>
+
+<p>
+    Muted and disabled text can be indicated:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""text-muted"">Muted text.</p>
+    <p class=""text-disabled"">Disabled text.</p>
+</div>")" />
+
+<p>
+    You can reset the color of text to the current color, when it would normally be given a different
+    color:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p>This link has been reset: <a href="""" class=""text-reset"">link</span>.</p>
+    <p>This one hasn't: <a href="""">link</a>.</p>
+    <p class=""primary text-reset"">This text is reset.</p>
+    <p class=""primary"">This text isn't.</p>
+</div>")" />
+
+<p>
+    You can also reset the color of text to the default color, when the current color has been changed:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""primary"">
+        This paragraph has a color class applied.
+        <span class=""text-color-reset"">This span has been reset.</p>
+    </p>
+</div>")" />
+
+<h2>Letter Spacing</h2>
+
+<p>
+    Text can be made monospace, or given close spacing, with utility classes:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p class=""font-monospace"">Monospace text.</p>
+    <p>Normal text.</p>
+    <p class=""text-close"">Close text.</p>
+</div>")" />
+
+<h2>Abbreviations</h2>
+
+<p>
+    Initialisms and abbreviations can be indicated with semantic elements and classes:
+</p>
+
+<CodeExample Code="@(@"<div>
+    <p>This sentence contains an <abbr class=""initialism"" title=""with a definition"">initialism</abbr> and an <abbr title=""with a definition"">abbreviation</abbr></p>
+</div>")" />
+
+<h2>Block quote</h2>
+
+<p>
+    You can display a block quote, and optional footer, with special formatting:
+</p>
+
+<CodeExample Code="@(@"<figure>
+    <blockquote class=""blockquote"">""This is a famous quote.""</blockquote>
+    <figcaption class=""blockquote-footer"">by Somebody</figcaption>
+</figure>")" />
+
+<h2>Code</h2>
+
+<p>
+    Code blocks can be wrapped with a class to provide padding, a subtle background shading for
+    improved visibility, and automatic overflow scrollbar:
+</p>
+
+<CodeExample Code="@(@"<pre class=""codeblock"">
+<code>Sample code</code>
+</pre>")" />

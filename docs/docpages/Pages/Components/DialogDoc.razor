@@ -1,0 +1,261 @@
+﻿@page "/components/dialog"
+
+<PageTitle>Dialog - Tavenem Blazor Framework</PageTitle>
+
+<h1>Dialog</h1>
+
+<p>
+    The Tavenem Blazor Framework provides support for displaying dialogs, with
+    or without return values.
+</p>
+
+<h2>Message Box</h2>
+
+<p>
+    The simplest form of dialog is the <code>MessageBox</code>, which displays a
+    message and offers up to three buttons to receive a response (or simply close
+    the dialog).
+</p>
+
+<p>
+    To show a message box, first inject an instance of the
+    <code>DialogService</code>, then call one of the two
+    <code>ShowMessageBox</code> overloads. One overload accepts a title for the
+    dialog, and both accept an instance of <code>MessageBoxOptions</code> to set
+    the properties of the dialog.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button class="btn primary" @onclick="ShowMessageBox">Open</button>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowMessageBox"">Open</button>
+
+@code {
+    [Inject] private DialogService DialogService { get; set; } = default!;
+    private void ShowMessageBox() => DialogService.ShowMessageBox(MessageBoxOptions.Ok(""Example dialog""));
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>MessageBoxOptions</code> class has the following properties:
+
+    <dl class="ml-3">
+        <dt><code>Message</code></dt>
+        <dd>The message to display. Accepts a <code>MarkupString</code> for HTML, or a simple <code>string</code>. Defaults to "OK?"</dd>
+
+        <dt><code>OkText</code></dt>
+        <dd>The text to display on the affirmative choice button. Defaults to "OK".<span class="text-muted ms-2">(returns a <code>true</code> result)</span></dd>
+
+        <dt><code>CancelText</code></dt>
+        <dd>Optional. The text to display on the negative choice button.<span class="text-muted ms-2">(returns a <code>null</code> result)</span></dd>
+
+        <dt><code>AltText</code></dt>
+        <dd>Optional. The text to display on the alternative choice button.<span class="text-muted ms-2">(returns a <code>false</code> result)</span></dd>
+    </dl>
+</p>
+
+<p>
+    <code>MessageBoxOptions</code> also inherits from
+    <code>DialogOptions</code>, and shares all of its properties (see
+    below), if you want to exercise greater control over the behavior of the
+    dialog.
+</p>
+    
+<p>
+    You can also call the following static methods to get an instance of
+    <code>MessageBoxOptions</code> with some common button settings:
+
+    <dl class="ml-3">
+        <dt><code>Ok(MarkupString message)</code></dt>
+        <dd>Gets a single-button message box with an "OK" button.</dd>
+
+        <dt><code>OkCancel(MarkupString message)</code></dt>
+        <dd>Gets a two-button message box with an "OK" and a "Cancel" button.</dd>
+
+        <dt><code>YesNo(MarkupString message)</code></dt>
+        <dd>Gets a two-button message box with a "Yes" button and a "No" button.</dd>
+
+        <dt><code>YesNoCancel(MarkupString message)</code></dt>
+        <dd>Gets a three-button message box with a "Yes" button, a "No" button, and a "Cancel" button.</dd>
+    </dl>
+</p>
+
+<p>
+    The result of the <code>ShowMessageBox</code> call will be a nullable
+    <code>bool</code> which reflects the user's choice.
+</p>
+
+<h2>Dialogs</h2>
+
+<p>
+    When you require more flexibility or richer content than a simple
+    <code>MessageBox</code>, you can display a component as a dialog by calling
+    one of the <code>Show</code> overloads on <code>DialogService</code>.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button class="btn primary" @onclick="ShowDialog">Open</button>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>
+
+@code {
+    [Inject] private DialogService DialogService { get; set; } = default!;
+    private void ShowDialog() => DialogService.Show<ExampleDialog>(""Example"");
+}")
+        <p class="mt-3 mb-1">
+            And in <code>ExampleDialog.razor</code>:
+        </p>
+        @CodeFormatter.CodeToMarkup(@"<Dialog>
+    <ChildContent>
+        Example dialog content.
+    </ChildContent>
+    <FooterContent>
+        <button class=""btn btn-text primary"" @onclick=""@(_ => Dialog?.Close(DialogResult.DefaultOk))"">OK</button>
+        <button class=""btn btn-text"" @onclick=""@(_ => Dialog?.Cancel())"">Cancel</button>
+    </FooterContent>
+</Dialog>
+
+@code {
+    [CascadingParameter] private DialogInstance? Dialog { get; set; }
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>Show</code> overloads all accept a component as a generic type
+    parameter. This component should have a single <code>Dialog</code> component
+    as its only top-level element. It accepts a <code>CascadingParameter</code>
+    of type <code>DialogInstance</code>, which provides the methods for
+    controlling the state of the dialog and its return values.
+</p>
+
+<p>
+    There are <code>Show</code> overloads which also accept an instance of
+    <code>DialogParameters</code>. This is a specialized collection of key-value
+    pairs which can be used to pass parameters to your <code>Dialog</code>
+    component. Each entry has a string key which should exactly match the name
+    of a public parameter (using the <code>nameof</code> feature is
+    recommended), and accepts an <code>object</code> which should be of the
+    correct type to assign to that parameter.
+</p>
+
+<p>
+    There are also <code>Show</code> overloads which accept an instance of
+    <code>DialogOptions</code>. This object allows you to control the behavior
+    of the dialog. The <code>DialogOptions</code> class has the following
+    properties:
+
+    <dl class="ml-3">
+        <dt><code>Breakpoint</code></dt>
+        <dd>The breakpoint which defines the maximum width of the dialog.</dd>
+
+        <dt><code>DisableCloseOnEscape</code></dt>
+        <dd>Whether to prevent the dialog from closing when the escape key is pressed.</dd>
+
+        <dt><code>DisableCloseOnOverlayClick</code></dt>
+        <dd>Whether to prevent the dialog from closing when the overlay backdrop is clicked.</dd>
+
+        <dt><code>FullScreen</code></dt>
+        <dd>Whether to show the dialog in the full viewport.</dd>
+
+        <dt><code>HideCloseButton</code></dt>
+        <dd>Whether to hide the close button in the header.</dd>
+
+        <dt><code>HideHeader</code></dt>
+        <dd>Whether to hide the header.</dd>
+
+        <dt><code>Origin</code></dt>
+        <dd>The location of the dialog. Defaults to the center of the viewport.</dd>
+
+        <dt><code>FullScreen</code></dt>
+        <dd>Whether to show the dialog in the full viewport.</dd>
+    </dl>
+</p>
+
+<h3>Inline</h3>
+
+<p>
+    If you will not need to re-use a dialog component, you can define it inline
+    by providing a <code>Dialog</code> component in the same <code>razor</code>
+    file as the page where the dialog will be displayed.
+</p>
+
+<p>
+    Inline dialogs are not controlled by the <code>DialogService</code>.
+    Instead, you should set or bind the <code>IsVisible</code> property on the
+    <code>Dialog</code> component.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button class="btn primary" @onclick="@(_ => _isVisible = true)">Open</button>
+
+            <Dialog @bind-IsVisible="_isVisible">
+                <TitleContent>
+                    <h6>Title</h6>
+                </TitleContent>
+                <ChildContent>
+                    <p>This is an inlined dialog.</p>
+                </ChildContent>
+                <FooterContent>
+                    <button class="btn btn-text" @onclick="@(_ => _isVisible = false)">Close</button>
+                </FooterContent>
+            </Dialog>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => _isVisible = true)"">Open</button>
+
+<Dialog @bind-IsVisible=""_isVisible"">
+    <TitleContent>
+        <h6>Title</h6>
+    </TitleContent>
+    <ChildContent>
+        <p>This is an inlined dialog.</p>
+    </ChildContent>
+    <FooterContent>
+        <button class=""btn btn-text"" @onclick=""@(_ => _isVisible = false)"">Close</button>
+    </FooterContent>
+</Dialog>
+
+@code {
+    private bool _isVisible;
+}")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that the <code>IsVisible</code> property is ignored by dialogs which
+    are displayed via the <code>DialogService</code>.
+</p>
+
+<h3>Standalone</h3>
+
+<p>
+    The <a href="/layout/layout">FrameworkLayout</a> component has built-in support for dialogs.
+    However, if you wish to use dialogs without a <code>FrameworkLayout</code>, you must place a
+    <code>DialogContainer</code> component somewhere on the page. This component contains all the
+    presentation logic required to place dialogs.
+</p>
+
+<p>
+    It is usually convenient to place the <code>DialogContainer</code> component in your layout, but
+    if dialogs will only be displayed on a certain page, you can place the container only on that
+    page.
+</p>
+
+<p>
+    The <code>DialogContainer</code> can be placed anywhere in your page. The dialogs use fixed
+    positioning, and should display in the correct position on the page regardless of the
+    container's position within the document flow.
+</p>

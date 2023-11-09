@@ -1,0 +1,46 @@
+﻿@page "/components/light-dark-toggle"
+
+<PageTitle>Dark Mode Toggle - Tavenem Blazor Framework</PageTitle>
+
+<h1>Dark Mode Toggle</h1>
+
+<p>
+    The Tavenem Blazor Framework provides built-in support for both light and dark themes. The
+    <code>tf-darkmode-toggle</code> can be placed anywhere <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a> to easily
+    toggle between the color schemes. It is expected that most layouts will include one in an <a
+    href="./components/appbar">AppBar</a>, to allow the user to switch modes. Both the button and
+    the framework scheme support function normally when your app is rendered statically, or
+    prerendered by the server.
+</p>
+
+<p>
+    When a Tavenem Blazor Framework app starts, the user agent's preferred color scheme is detected,
+    if possible. This might be a device setting or a browser setting. The app will respond to
+    changes to this preference while running, allowing live switching. If a
+    <code>tf-darkmode-toggle</code> is used to switch to a different mode, a value is saved in
+    <code>localStorage</code> which indicates that the user has explicitly selected a color scheme
+    for the app. The user agent preference will then be ignored in favor of this override. If the
+    toggle is used to switch back to the user's agent-configured preference, the manual override is
+    cleared. The override will <em>not</em> be cleared if the <em>agent</em> setting is changed to
+    match a manual override, however. This combination of behaviors should usually reflect a user's
+    intentions when setting modes.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    The element uses an icon button which changes appearance to reflect the current mode, by
+    default. You can replace that default content by adding any HTML content you like to the named
+    slots <code>light</code> and <code>dark</code>. You will always need to do this if you choose to
+    use an icon library other than <a
+    href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a> (see
+    <a href="./getting-started/installation">Installation</a> for more information). Each slot is
+    only visible when the current color scheme is set to the corresponding value, allowing you to
+    vary the appearance of the control based on scheme.
+</p>
+
+<CodeExample RowClass="align-items-center" Code="@(@"<tf-darkmode-toggle>
+    <span class=""btn btn-icon info"" slot=""light""><tf-icon>lightbulb_circle</tf-icon></span>
+    <span class=""btn btn-icon info"" slot=""dark""><tf-icon>nights_stay</tf-icon></span>
+</tf-scroll-top>")" />

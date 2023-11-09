@@ -1,0 +1,140 @@
+﻿@page "/layout/rows-columns"
+
+<PageTitle>Rows and Columns - Tavenem Blazor Framework</PageTitle>
+
+<h1>Rows and Columns</h1>
+
+<p>
+    Tavenem Blazor Framework provides utility CSS classes which help you build layouts for your
+    content easily.
+</p>
+
+<h2>Rows</h2>
+
+<p>
+    By itself, the <code>row</code> class will display items in an adaptable row layout, with a small
+    gap between each item (and between each row if the items wrap to another line).
+</p>
+
+<CodeExample Code="@(@"<div class=""row"">
+    <div class=""primary filled"" style=""height:5em;width:5em""></div>
+    <div class=""primary filled"" style=""height:5em;width:5em""></div>
+    <div class=""primary filled"" style=""height:5em;width:5em""></div>
+</div>")" />
+
+<p>
+    If you add the <code>fill</code> class, each child item will automatically fill all available
+    space.
+</p>
+
+<CodeExample Code="@(@"<div class=""row fill"">
+    <div class=""primary filled"" style=""height:5em""></div>
+    <div class=""primary filled"" style=""height:5em""></div>
+    <div class=""primary filled"" style=""height:5em""></div>
+</div>")" />
+
+<p>
+    You can use the <code>flex-grow-{number}</code> utility classes to control the amount of space allocated per column.
+</p>
+
+<CodeExample Code="@(@"<div class=""row fill"">
+    <div class=""primary filled"" style=""height:5em""></div>
+    <div class=""primary filled flex-grow-2"" style=""height:5em""></div>
+    <div class=""primary filled"" style=""height:5em""></div>
+</div>")" />
+
+<p>
+    A basic row and a row with <code>fill</code> applied both use <code>display: flex</code>. You
+    can use all the usual CSS properties on the row or its children to modify their behavior.
+</p>
+
+<h2>Columns</h2>
+
+<p>
+    You can use the <code>cols-{number}</code> class on a row to specify the number of equal-sized
+    columns the row should contain. Numbers 1 through 12 are supported.
+</p>
+
+<p>
+    A row with <code>cols-{number}</code> applied uses <code>display: grid</code> instead of
+    <code>flex</code>. Keep this in mind when using your own CSS to modify the behavior of the row
+    or its children.
+</p>
+
+<p>
+    When there are fewer items than the number of columns, empty space is left after the last column.
+</p>
+
+<CodeExample Code="@(@"<div class=""row cols-4"" style=""grid-auto-rows:5em"">
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+</div>")" />
+<p class="small text-muted">
+    Note: the <code>grid-auto-rows:5em</code> style in the example code sets the height of the
+    otherwise empty items for the example, and won't normally be needed in your own code.
+</p>
+
+<p>
+    When there are more items than the number of columns, they wrap to a new line.
+</p>
+
+<CodeExample Code="@(@"<div class=""row cols-4"" style=""grid-auto-rows:5em"">
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+</div>")" />
+
+<p>
+    You can also use the <a href="./layout/breakpoints">breakpoint infixes</a> to create different
+    numbers of columns for different viewport sizes. Resize your browser (or use the devtools) to
+    see this example in action.
+</p>
+
+<CodeExample Code="@(@"<div class=""row cols-2 cols-sm-4 cols-md-6"" style=""grid-auto-rows:5em"">
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+    <div class=""primary filled""></div>
+</div>")" />
+
+<p>
+    The <code>fill</code> class has no effect when used in combination with a
+    <code>col-{number}</code> class.
+</p>
+
+<p>
+    Individual children can apply a <code>col-{number}</code> class to specify the number of columns
+    they span. Numbers 1 through 12 are supported, and you can also use breakpoint infixes.
+</p>
+
+<CodeExample Code="@(@"<div class=""row cols-3 cols-md-4"" style=""grid-auto-rows:5em"">
+    <div class=""primary filled""></div>
+    <div class=""col-2 col-md-3 primary filled""></div>
+</div>")" />
+
+<p>
+    Children can also apply a <code>start-{number}</code> class to specify the column where they are
+    placed. Numbers 1 through 12 are supported. This can be used to create gaps in the layout.
+</p>
+
+<CodeExample Code="@(@"<div class=""row cols-4"" style=""grid-auto-rows:5em"">
+    <div class=""primary filled""></div>
+    <div class=""start-3 primary filled""></div>
+    <div class=""primary filled""></div>
+</div>")" />
+
+<p>
+    You can even pick a start column that is more than the number of specified columns, which will
+    automatically adjust the number of columns in the row to fit.
+</p>
+
+<CodeExample Code="@(@"<div class=""row cols-2"" style=""grid-auto-rows:5em"">
+    <div class=""primary filled""></div>
+    <div class=""start-3 primary filled""></div>
+</div>")" />

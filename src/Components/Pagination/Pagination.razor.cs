@@ -5,8 +5,11 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Displays controls to navigate between pages.
 /// </summary>
-public partial class Pagination
+public partial class Pagination : PersistentComponentBase
 {
+    private const string CurrentPageQueryParamName = "p";
+    private const string PageCountQueryParamName = "c";
+
     /// <summary>
     /// <para>
     /// The zero-based index of the current page.
@@ -166,7 +169,7 @@ public partial class Pagination
     protected override string? CssClass => new CssBuilder("pagination")
         .Add(Class)
         .Add(ThemeColor.ToCSS())
-        .Add("disabled", Disabled)
+        .Add("disabled", IsDisabled)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
@@ -200,6 +203,10 @@ public partial class Pagination
     private int FocusSkipFirst => CurrentPage == 0 ? 0 : 1;
 
     private int FocusSkipFirstPrev => CurrentPage == 0 ? 0 : 2;
+
+    private bool Interactive { get; set; }
+
+    private bool IsDisabled => Disabled || !Interactive;
 
     private ulong LastPage
     {
@@ -239,6 +246,11 @@ public partial class Pagination
 
         await base.SetParametersAsync(parameters);
 
+        if (!QueryStateService.IsInitialized)
+        {
+            return;
+        }
+
         if (MaxPagesDisplayed < 1)
         {
             MaxPagesDisplayed = 1;
@@ -261,6 +273,80 @@ public partial class Pagination
         }
     }
 
+    /// <inheritdoc/>
+    protected override void OnInitialized()
+    {
+        var pageCounts = QueryStateService.RegisterProperty(
+            Id,
+            PageCountQueryParamName,
+            OnPageCountQueryChangedAsync,
+            PageCount);
+        if (pageCounts?.Count > 0
+            && ulong.TryParse(pageCounts[0], out var pageCount))
+        {
+            PageCount = pageCount;
+        }
+
+        var currentPages = QueryStateService.RegisterProperty(
+            Id,
+            CurrentPageQueryParamName,
+            OnCurrentPageQueryChangedAsync,
+            CurrentPage + 1);
+        if (currentPages?.Count > 0
+            && ulong.TryParse(currentPages[0], out var currentPage))
+        {
+            CurrentPage = PageCount.HasValue
+                ? Math.Min(PageCount.Value - 1, Math.Max(0, currentPage - 1))
+                : Math.Max(0, currentPage - 1);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Interactive = true;
+            StateHasChanged();
+        }
+    }
+
+    private string GetFirstPageUrl()
+        => QueryStateService.GetUriWithPropertyValue(Id, CurrentPageQueryParamName, 1);
+
+    private string GetLastPageUrl() => QueryStateService.GetUriWithPropertyValue(
+        Id,
+        CurrentPageQueryParamName,
+        PageCount ?? CurrentPage + 2);
+
+    private string GetNextPageUrl() => QueryStateService.GetUriWithPropertyValue(
+        Id,
+        CurrentPageQueryParamName,
+        PageCount.HasValue
+            ? Math.Min(PageCount.Value, CurrentPage + 2)
+            : CurrentPage + 2);
+
+    private string GetPageUrl(ulong value) => QueryStateService.GetUriWithPropertyValue(
+        Id,
+        CurrentPageQueryParamName,
+        value + 1);
+
+    private string GetPreviousPageUrl() => QueryStateService.GetUriWithPropertyValue(
+        Id,
+        CurrentPageQueryParamName,
+        Math.Max(1, CurrentPage));
+
+    private Task OnCurrentPageQueryChangedAsync(QueryChangeEventArgs args)
+    {
+        if (ulong.TryParse(args.Value, out var currentPage))
+        {
+            CurrentPage = PageCount.HasValue
+                ? Math.Min(PageCount.Value - 1, Math.Max(0, currentPage - 1))
+                : Math.Max(0, currentPage - 1);
+        }
+        return Task.CompletedTask;
+    }
+
     private async Task OnFirstAsync()
     {
         if (CurrentPage > 0)
@@ -268,6 +354,7 @@ public partial class Pagination
             CurrentPage = 0;
             await ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
             await CurrentPageChanged.InvokeAsync(CurrentPage);
+            SetCurrentPage();
         }
     }
 
@@ -286,6 +373,7 @@ public partial class Pagination
         {
             await ElementReference.FocusFirstAsync(1);
         }
+        SetCurrentPage();
     }
 
     private async Task OnLastAsync()
@@ -303,6 +391,16 @@ public partial class Pagination
         {
             await CurrentPageChanged.InvokeAsync(CurrentPage);
         }
+        SetCurrentPage();
+    }
+
+    private Task OnPageCountQueryChangedAsync(QueryChangeEventArgs args)
+    {
+        if (ulong.TryParse(args.Value, out var pageCount))
+        {
+            PageCount = pageCount;
+        }
+        return Task.CompletedTask;
     }
 
     private async Task OnPreviousAsync()
@@ -317,6 +415,7 @@ public partial class Pagination
             await ElementReference.FocusLastAsync(1);
         }
         await CurrentPageChanged.InvokeAsync(CurrentPage);
+        SetCurrentPage();
     }
 
     private async Task OnSetPageAsync(ulong value)
@@ -324,5 +423,21 @@ public partial class Pagination
         CurrentPage = value;
         await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage));
         await CurrentPageChanged.InvokeAsync(CurrentPage);
+        SetCurrentPage();
+    }
+
+    private void SetCurrentPage()
+    {
+        if (PersistState)
+        {
+            QueryStateService.SetPropertyValue(
+                Id,
+                CurrentPageQueryParamName,
+                CurrentPage + 1);
+            QueryStateService.SetPropertyValue(
+                Id,
+                PageCountQueryParamName,
+                PageCount);
+        }
     }
 }

@@ -61,8 +61,20 @@ public class Step : TavenemComponentBase, IDisposable
     [CascadingParameter] protected Steps? Parent { get; set; }
 
     /// <inheritdoc />
-    protected override void OnInitialized()
-        => Parent?.AddStep(this);
+    protected override async Task OnInitializedAsync()
+    {
+        if (Parent is null)
+        {
+            return;
+        }
+        var index = Parent.AddStep(this);
+        if (Parent.InitialStep == index
+            && IsVisible
+            && !Disabled)
+        {
+            await Parent.ActivateStepAsync(this);
+        }
+    }
 
     /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)

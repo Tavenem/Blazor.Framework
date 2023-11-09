@@ -7,7 +7,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class AvatarGroup
 {
-    private readonly List<Avatar> _avatars = new();
+    private readonly List<Avatar> _avatars = [];
 
     /// <summary>
     /// <para>

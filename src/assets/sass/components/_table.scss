@@ -141,7 +141,7 @@
                         --button-inherited-padding-y-icon: 0;
                     }
 
-                    .field {
+                    .field:not(.picker) {
                         flex-grow: 1;
                         margin-bottom: 0;
                         margin-top: 2px;
@@ -179,7 +179,9 @@
                     line-height: 1.5em;
 
                     &.column-header {
-                        > div {
+                        vertical-align: top;
+
+                        > a, > div {
                             align-items: center;
                             display: flex;
                             justify-content: space-between;
@@ -202,14 +204,20 @@
                             }
                         }
 
+                        a {
+                            color: inherit;
+                        }
+
                         &.clickable {
                             cursor: pointer;
 
                             &:hover {
                                 color: var(--table-action-color);
 
-                                > div > tf-icon:not(.active) {
-                                    opacity: 0.8;
+                                > div, > a {
+                                    > tf-icon:not(.active) {
+                                        opacity: 0.8;
+                                    }
                                 }
                             }
                         }

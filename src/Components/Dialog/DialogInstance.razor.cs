@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -74,9 +75,9 @@ public partial class DialogInstance
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    [Inject] private IKeyListener KeyListener { get; set; } = default!;
+    [Inject, NotNull] private IKeyListener? KeyListener { get; set; }
 
-    [CascadingParameter] private FrameworkLayout? Parent { get; set; }
+    [CascadingParameter] private DialogContainer? Parent { get; set; }
 
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)

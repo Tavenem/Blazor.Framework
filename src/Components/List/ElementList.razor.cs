@@ -11,7 +11,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class ElementList<TListItem>
 {
-    private readonly HashSet<string> _dropTargetElements = new();
+    private readonly HashSet<string> _dropTargetElements = [];
 
     /// <summary>
     /// <para>
@@ -232,7 +232,7 @@ public partial class ElementList<TListItem>
     /// this will always contain only one item.
     /// </para>
     /// </summary>
-    [Parameter] public List<TListItem> SelectedItems { get; set; } = new();
+    [Parameter] public List<TListItem> SelectedItems { get; set; } = [];
 
     /// <summary>
     /// Invoked when <see cref="SelectedItems"/> changes.
@@ -343,7 +343,7 @@ public partial class ElementList<TListItem>
     /// <summary>
     /// The items in the list.
     /// </summary>
-    protected List<ListData<TListItem>> ListItems { get; set; } = new();
+    protected List<ListData<TListItem>> ListItems { get; set; } = [];
 
     /// <summary>
     /// The list to which this one belongs, if any.
@@ -406,7 +406,7 @@ public partial class ElementList<TListItem>
             ListItems = Items?
                 .Where(x => x is not null)
                 .Select(x => new ListData<TListItem>(x!))
-                .ToList() ?? new();
+                .ToList() ?? [];
         }
 
         if (selectedItemsChanged)
@@ -497,7 +497,7 @@ public partial class ElementList<TListItem>
     /// </param>
     public async Task SetSelectionAsync(List<TListItem>? selectedItems)
     {
-        selectedItems ??= new();
+        selectedItems ??= [];
         if (Items is null
             || (!SelectedItems.Except(selectedItems).Any()
             && !selectedItems.Except(SelectedItems).Any()))
@@ -649,13 +649,13 @@ public partial class ElementList<TListItem>
         {
             if (DropIndex.HasValue)
             {
-                (Items ??= new()).Insert(DropIndex.Value, item);
+                (Items ??= []).Insert(DropIndex.Value, item);
                 ListItems.Insert(DropIndex.Value, new(item));
                 DropIndex = null;
             }
             else
             {
-                (Items ??= new()).Add(item);
+                (Items ??= []).Add(item);
                 ListItems.Add(new(item));
             }
             await ItemsChanged.InvokeAsync(Items);

@@ -1,0 +1,106 @@
+﻿@page "/utilities/sizing"
+
+<PageTitle>Sizing - Tavenem Blazor Framework</PageTitle>
+
+<h1>Sizing</h1>
+
+<p>
+    The Tavenem Blazor Framework provides utility classes to set the height and width of elements.
+</p>
+
+<h2>Relative to the parent</h2>
+
+<CodeExample Code="@(@"<div class=""d-flex flex-column w-100 p-3"">
+    <div class=""w-25 bg-alt d-flex center-items"" style=""height:5em"">25%</div>
+    <div class=""w-33 bg-alt d-flex center-items"" style=""height:5em"">33%&nbsp;(&#x2153;)</div>
+    <div class=""w-50 bg-alt d-flex center-items"" style=""height:5em"">50%</div>
+    <div class=""w-67 bg-alt d-flex center-items"" style=""height:5em"">67%&nbsp;(&#x2154;)</div>
+    <div class=""w-75 bg-alt d-flex center-items"" style=""height:5em"">75%</div>
+    <div class=""w-100 bg-alt d-flex center-items"" style=""height:5em"">100%</div>
+    <div class=""w-auto bg-alt d-flex center-items"" style=""height:5em"">Auto</div>
+</div>")" />
+
+<CodeExample Code="@(@"<div class=""d-flex p-3"" style=""height:12em"">
+    <div class=""h-25 bg-alt d-flex center-items"" style=""width:5em"">25%</div>
+    <div class=""h-33 bg-alt d-flex center-items"" style=""width:5em"">33%&nbsp;(&#x2153;)</div>
+    <div class=""h-50 bg-alt d-flex center-items"" style=""width:5em"">50%</div>
+    <div class=""h-67 bg-alt d-flex center-items"" style=""width:5em"">67%&nbsp;(&#x2154;)</div>
+    <div class=""h-75 bg-alt d-flex center-items"" style=""width:5em"">75%</div>
+    <div class=""h-100 bg-alt d-flex center-items"" style=""width:5em"">100%</div>
+    <div class=""h-auto bg-alt d-flex center-items"" style=""width:5em"">Auto</div>
+</div>")" />
+
+<p>
+    There are also variations of each height and width class with <a
+    href="./layout/breakpoints">breakpoint infixes</a> to use them only above certain viewport sizes.
+    For example:
+</p>
+
+<ul>
+    <li><code>w-sm-25</code></li>
+    <li><code>w-md-25</code></li>
+    <li><code>w-lg-25</code></li>
+    <li><code>w-xl-25</code></li>
+    <li><code>w-xxl-25</code></li>
+</ul>
+
+<p>
+    You can also use <code>mh-100</code> and <code>mw-100</code> to set the <code>max-height</code>
+    and <code>max-width</code> to 100, respectively. These do not have breakpoint variants.
+</p>
+
+<p>
+    You can also use the utility class <code>full-width</code> to remove left and right margins and
+    padding, and set <code>width: 100%</code>, when you need an element to span its parent
+    container's full width.
+</p>
+
+<h2>Relative to the parent</h2>
+
+<p>
+    There are utility classes to set the height and width of elements relative to the viewport:
+</p>
+
+<ul>
+    <li><code>vh-100</code> sets <code>height: 100vh</code></li>
+    <li><code>vw-100</code> sets <code>width: 100vw</code></li>
+    <li><code>min-vh-100</code> sets <code>min-height: 100vh</code></li>
+    <li><code>min-vw-100</code> sets <code>min-width: 100vw</code></li>
+</ul>
+
+<h2>Ratio</h2>
+
+<p>
+    You can also control the aspect ratio of an element with one of five utility classes:
+</p>
+
+<ul>
+    <li><code>ratio-1x1</code></li>
+    <li><code>ratio-4x3</code></li>
+    <li><code>ratio-16x9</code></li>
+    <li><code>ratio-21x9</code></li>
+    <li><code>ratio-custom</code></li>
+</ul>
+
+<p>
+    This class should be applied to the direct parent of the element whose aspect ratio you wish to
+    control. For example, to set the aspect ratio of an embedded <code>iframe</code>, nest it within
+    a <code>div</code> and add a <code>ratio</code> class to the <code>div</code>.
+</p>
+
+<p>
+    The <code>ratio-custom</code> class, by default, sets as aspect ratio of 1:1. The ratio is
+    determined within this class by the custom property <code>--aspect-ratio</code>. Override this
+    with your own value to set the custom ratio.
+</p>
+<p>
+    The value should be a percentage, including the '%' character. A quick formula to determine the
+    correct percentage for any aspect ratio is: <code>X:Y = calc(Y / X * 100%)</code>. For example:
+    an aspect ratio of 2:1 would be <code>calc(1 / 2 * 100%)</code> (which evaluates to 50%).
+</p>
+
+<p>
+    The ratio classes do not have breakpoint variants, but you can use the <code>ratio-custom</code>
+    class in combination with media queries that override the <code>--aspect-ratio</code> property
+    to create a responsive aspect ratio, if needed.
+</p>

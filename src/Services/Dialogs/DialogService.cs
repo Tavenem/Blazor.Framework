@@ -38,7 +38,7 @@ public class DialogService
     /// </param>
     /// <param name="options">The options to configure the dialog.</param>
     /// <returns>A reference to the dialog.</returns>
-    public DialogReference Show<TComponent>(
+    public DialogReference Show<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TComponent>(
         string? title = null,
         DialogParameters? parameters = null,
         DialogOptions? options = null) where TComponent : ComponentBase
@@ -152,7 +152,9 @@ public class DialogService
     /// <param name="title">The title to show in the header.</param>
     /// <param name="options">The options to configure the dialog.</param>
     /// <returns>A reference to the dialog.</returns>
-    public DialogReference Show<TComponent>(string title, DialogOptions options) where TComponent : ComponentBase
+    public DialogReference Show<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TComponent>(
+        string title,
+        DialogOptions options) where TComponent : ComponentBase
         => Show<TComponent>(title, null, options);
 
     /// <summary>
@@ -166,7 +168,9 @@ public class DialogService
     /// </param>
     /// <param name="options">The options to configure the dialog.</param>
     /// <returns>A reference to the dialog.</returns>
-    public DialogReference Show<TComponent>(DialogParameters parameters, DialogOptions? options = null) where TComponent : ComponentBase
+    public DialogReference Show<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TComponent>(
+        DialogParameters parameters,
+        DialogOptions? options = null) where TComponent : ComponentBase
         => Show<TComponent>(null, parameters, options);
 
     /// <summary>
@@ -177,7 +181,8 @@ public class DialogService
     /// </typeparam>
     /// <param name="options">The options to configure the dialog.</param>
     /// <returns>A reference to the dialog.</returns>
-    public DialogReference Show<TComponent>(DialogOptions options) where TComponent : ComponentBase
+    public DialogReference Show<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TComponent>(
+        DialogOptions options) where TComponent : ComponentBase
         => Show<TComponent>(null, null, options);
 
     /// <summary>

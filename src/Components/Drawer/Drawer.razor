@@ -4,18 +4,15 @@
 
 <aside @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     <div class="@HeaderClassName">
-        <div class="@HeaderToolbarClassName">
-            @HeaderContent
-            <tf-close class="drawer-close-small" @onclick="OnClosedAsync" />
-        </div>
+        @HeaderContent
+        <tf-drawer-close data-side="@Side.ToString().ToLowerInvariant()" />
     </div>
     @ChildContent
     @if (FooterContent is not null)
     {
-        <div class="footer appbar">
-            <div class="@FooterToolbarClassName">
-                @FooterContent
-            </div>
+        <div class="@FooterClassName">
+            @FooterContent
         </div>
     }
 </aside>
+<tf-drawer-overlay data-side="@Side.ToString().ToLowerInvariant()" />

@@ -2,42 +2,46 @@
 
 @inherits TavenemComponentBase
 
-@if (!HideButton)
-{
-    <button @ref="Button"
-            @attributes="AdditionalAttributes"
-            id="@Id"
-            class="@CssClass"
-            style="@CssStyle"
-            disabled="@Disabled"
-            @onmousedown="OnMouseDown"
-            @onmouseup="ToggleAsync"
-            @oncontextmenu="OnContext"
-            @oncontextmenu:preventDefault="@ActivationType.HasFlag(MouseEvent.RightClick)">
-        @if (!string.IsNullOrEmpty(Icon))
-        {
-            <tf-icon>@Icon</tf-icon>
-        }
-        @Text
-    </button>
-}
-<Popover @ref="Popover"
-         AnchorOrigin="AnchorOriginValue"
-         Class="@PopoverCssClass"
-         AnchorId="@(string.IsNullOrEmpty(AnchorId) ? (HideButton ? null : Id) : AnchorId)"
-         FocusOut="StartClosing"
-         IsOpen="_isOpen"
-         MatchWidth="@(!OpenAtPointer && !HideButton)"
-         MaxHeight="@MaxHeight"
-         PositionX="PopoverPositionX"
-         PositionY="PopoverPositionY"
-         PopoverOrigin="PopoverOriginValue"
-         Style="@PopoverStyle"
-         ThemeColor="ThemeColor"
-         oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)">
-    <div class="@ListCssClass"
-         @onclick="Close"
-         @onclick:stopPropagation="true">
-        @ChildContent
-    </div>
-</Popover>
+<tf-dropdown @attributes="AdditionalAttributes"
+             id="@Id"
+             class="@CssClass"
+             style="@CssStyle"
+             data-activation="@((int)ActivationType)"
+             data-delay="@(Delay == 0 ? null : Delay)"
+             data-open-at-pointer="@OpenAtPointer"
+             data-popover-container
+             disabled="@Disabled"
+             @dropdowntoggle="OnOpenChangedAsync">
+    @if (TriggerContent is null && !HideButton)
+    {
+        <button class="@ButtonCssClass"
+                disabled="@Disabled"
+                @onclick="OnButtonClickAsync"
+                @onclick:stopPropagation="@(!ActivationType.HasFlag(MouseEvent.LeftClick))">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <tf-icon>@Icon</tf-icon>
+            }
+            @Text
+        </button>
+    }
+    else
+    {
+        @TriggerContent
+    }
+    <Popover AnchorOrigin="AnchorOriginValue"
+             Class="@PopoverCssClass"
+             AnchorId="@(string.IsNullOrEmpty(AnchorId) ? Id : AnchorId)"
+             MatchWidth="@(!OpenAtPointer && TriggerContent is null && !HideButton)"
+             MaxHeight="@MaxHeight"
+             PositionX="PopoverPositionX"
+             PositionY="PopoverPositionY"
+             PopoverOrigin="PopoverOriginValue"
+             Style="@PopoverStyle"
+             ThemeColor="ThemeColor"
+             oncontextmenu="@(ActivationType.HasFlag(MouseEvent.RightClick) ? "return false;" : null)">
+        <div class="@ListCssClass">
+            @ChildContent
+        </div>
+    </Popover>
+</tf-dropdown>

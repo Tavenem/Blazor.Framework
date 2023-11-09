@@ -69,11 +69,8 @@ public static class DataGridRequestExtensions
 
             foreach (var sort in request.Order)
             {
-                var property = type.GetProperty(sort.Property);
-                if (property is null)
-                {
-                    throw new ArgumentException($"Property {sort.Property} was not found on {type.FullName}");
-                }
+                var property = type.GetProperty(sort.Property)
+                    ?? throw new ArgumentException($"Property {sort.Property} was not found on {type.FullName}");
                 if (!property.CanRead)
                 {
                     throw new ArgumentException($"Property {sort.Property} could not be read on {type.FullName}");
@@ -129,11 +126,8 @@ public static class DataGridRequestExtensions
     private static bool FilterMatches<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem>(TDataItem item, FilterInfo filter)
     {
         var dataType = typeof(TDataItem);
-        var propertyInfo = dataType.GetProperty(filter.Property);
-        if (propertyInfo is null)
-        {
-            throw new ArgumentException($"Property {filter.Property} was not found on {dataType.FullName}");
-        }
+        var propertyInfo = dataType.GetProperty(filter.Property)
+            ?? throw new ArgumentException($"Property {filter.Property} was not found on {dataType.FullName}");
         if (!propertyInfo.CanRead)
         {
             throw new ArgumentException($"Property {filter.Property} could not be read on {dataType.FullName}");
@@ -299,11 +293,8 @@ public static class DataGridRequestExtensions
         }
 
         var dataType = typeof(TDataItem);
-        var propertyInfo = dataType.GetProperty(filter.Property);
-        if (propertyInfo is null)
-        {
-            throw new ArgumentException($"Property {filter.Property} was not found on {dataType.FullName}");
-        }
+        var propertyInfo = dataType.GetProperty(filter.Property)
+            ?? throw new ArgumentException($"Property {filter.Property} was not found on {dataType.FullName}");
         if (!propertyInfo.CanRead)
         {
             throw new ArgumentException($"Property {filter.Property} could not be read on {dataType.FullName}");

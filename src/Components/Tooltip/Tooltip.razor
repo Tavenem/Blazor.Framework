@@ -2,46 +2,25 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes"
-     class="@CssClass"
-     style="@CssStyle"
-     @onclick="OnDismiss"
-     @onfocusin="OnMouseOver"
-     @onfocusout="OnMouseOut"
-     @onmouseover="OnMouseOver"
-     @onmouseleave="OnMouseOut">
-    <button class="btn btn-icon info tooltip-trigger"
-            @onclick="Toggle"
-            @onclick:stopPropagation="true"
-            @onfocusin:stopPropagation="true"
-            @onmouseover:stopPropagation="true"
-            tabindex="-1">
-        <tf-icon>@DefaultIcons.Help</tf-icon>
-    </button>
-    @ChildContent
-    @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
-    {
-        <Popover AnchorOrigin="AnchorOrigin"
-                 Class="@TooltipCssClass"
-                 FlipBehavior="FlipBehavior.Flip_Always"
-                 IsOpen="_visible"
-                 MaxHeight="@MaxHeight"
-                 PopoverOrigin="PopoverOrigin"
-                 Style="@TooltipStyle"
-                 ThemeColor="ThemeColor"
-                 @onclick:stopPropagation="@(!DismissOnTap)">
-            @if (TooltipContent is not null)
-            {
-                @TooltipContent
-            }
-            else if (TooltipMarkup.HasValue)
-            {
-                @TooltipMarkup.Value
-            }
-            else
-            {
-                @TooltipText
-            }
-        </Popover>
-    }
-</div>
+@if (ChildContent is null)
+{
+    return;
+}
+
+<tf-tooltip id="@Id"
+            data-anchor="@Anchor"
+            data-delay="@(Delay == 0 ? null : Delay)"
+            data-dismiss-on-tap="@DismissOnTap"
+            data-popover-container>
+    <Popover AdditionalAttributes="AdditionalAttributes"
+             AnchorId="@Anchor"
+             AnchorOrigin="AnchorOrigin"
+             Class="@CssClass"
+             FlipBehavior="FlipBehavior.Flip_Always"
+             MaxHeight="@MaxHeight"
+             PopoverOrigin="PopoverOrigin"
+             Style="@CssStyle"
+             ThemeColor="ThemeColor">
+        @ChildContent
+    </Popover>
+</tf-tooltip>

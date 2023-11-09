@@ -1,64 +1,10 @@
-﻿tf-progress-circle {
-    --progress-color: var(--tavenem-color-action);
-    align-items: center;
-    display: inline-flex;
-    height: 2.5rem;
-    justify-content: center;
-    position: relative;
-    width: 2.5rem;
-
-    &.small {
-        height: 1.5rem;
-        width: 1.5rem;
+﻿@each $theme in $theme-colors {
+    tf-progress-circle.#{$theme} {
+        --progress-color: var(--tavenem-theme-color);
     }
 
-    &.large {
-        height: 3.5rem;
-        width: 3.5rem;
-    }
-
-    @each $theme in $theme-colors {
-        &.#{$theme} {
-            --progress-color: var(--tavenem-theme-color);
-        }
-    }
-}
-
-tf-progress-linear {
-    --progress-background-color: var(--tavenem-color-action-hover-bg);
-    --progress-color: var(--tavenem-color-action);
-    align-items: center;
-    display: inline-flex;
-    height: .5rem;
-    justify-content: center;
-    position: relative;
-    width: 100%;
-
-    &.small:not([vertical]) {
-        height: .25rem;
-    }
-
-    &.large:not([vertical]) {
-        height: .75rem;
-    }
-
-    &[vertical] {
-        height: 100%;
-        width: .5rem;
-
-        &.small {
-            width: .25rem;
-        }
-
-        &.large {
-            width: .75rem;
-        }
-    }
-
-    @each $theme in $theme-colors {
-        &.#{$theme} {
-            --progress-background-color: var(--tavenem-theme-color-hover);
-            --progress-color: var(--tavenem-theme-color);
-        }
+    tf-progress-linear.#{$theme} {
+        --progress-background-color: var(--tavenem-theme-color-hover);
+        --progress-color: var(--tavenem-theme-color);
     }
 }

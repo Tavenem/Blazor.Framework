@@ -1,0 +1,160 @@
+﻿@page "/utilities/color"
+
+<PageTitle>Color - Tavenem Blazor Framework</PageTitle>
+
+<h1>Color</h1>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to control color.
+</p>
+
+<h2>Themes</h2>
+
+<p>
+    Each theme class will assign associated theme color as the current foreground color.
+</p>
+
+<p>
+    Each theme class also has both a <code>lighten</code> and <code>darken</code> variant.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div>
+    <p class=""primary lighten"">Primary lighten text.</p>
+    <p class=""primary"">Primary text.</p>
+    <p class=""primary darken"">Primary darken text.</p>
+    <p class=""secondary lighten"">Secondary lighten text.</p>
+    <p class=""secondary"">Secondary text.</p>
+    <p class=""secondary darken"">Secondary darken text.</p>
+    <p class=""tertiary lighten"">Tertiary lighten text.</p>
+    <p class=""tertiary"">Tertiary text.</p>
+    <p class=""tertiary darken"">Tertiary darken text.</p>
+    <p class=""danger lighten"">Danger lighten text.</p>
+    <p class=""danger"">Danger text.</p>
+    <p class=""danger darken"">Danger darken text.</p>
+    <p class=""dark lighten"">Dark lighten text.</p>
+    <p class=""dark"">Dark text.</p>
+    <p class=""dark darken"">Dark darken text.</p>
+    <p class=""default lighten"">Default lighten text.</p>
+    <p class=""default"">Default text.</p>
+    <p class=""default darken"">Default darken text.</p>
+    <p class=""info lighten"">Info lighten text.</p>
+    <p class=""info"">Info text.</p>
+    <p class=""info darken"">Info darken text.</p>
+    <p class=""success lighten"">Success lighten text.</p>
+    <p class=""success"">Success text.</p>
+    <p class=""success darken"">Success darken text.</p>
+    <p class=""warning lighten"">Warning lighten text.</p>
+    <p class=""warning"">Warning text.</p>
+    <p class=""warning darken"">Warning darken text.</p>
+</div>")" />
+
+<p>
+    When applied to links, these will also apply themed hover and focus variations:
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div>
+    <p><a class=""primary lighten"">Primary lighten link.</a></p>
+    <p><a class=""primary"">Primary link.</a></p>
+    <p><a class=""primary darken"">Primary darken link.</a></p>
+    <p><a class=""secondary lighten"">Secondary lighten link.</a></p>
+    <p><a class=""secondary"">Secondary link.</a></p>
+    <p><a class=""secondary darken"">Secondary darken link.</a></p>
+    <p><a class=""tertiary lighten"">Tertiary lighten link.</a></p>
+    <p><a class=""tertiary"">Tertiary link.</a></p>
+    <p><a class=""tertiary darken"">Tertiary darken link.</a></p>
+    <p><a class=""danger lighten"">Danger lighten link.</a></p>
+    <p><a class=""danger"">Danger link.</a></p>
+    <p><a class=""danger darken"">Danger darken link.</a></p>
+    <p><a class=""dark lighten"">Dark lighten link.</a></p>
+    <p><a class=""dark"">Dark link.</a></p>
+    <p><a class=""dark darken"">Dark darken link.</a></p>
+    <p><a class=""default lighten"">Default lighten link.</a></p>
+    <p><a class=""default"">Default link.</a></p>
+    <p><a class=""default darken"">Default darken link.</a></p>
+    <p><a class=""info lighten"">Info lighten link.</a></p>
+    <p><a class=""info"">Info link.</a></p>
+    <p><a class=""info darken"">Info darken link.</a></p>
+    <p><a class=""success lighten"">Success lighten link.</a></p>
+    <p><a class=""success"">Success link.</a></p>
+    <p><a class=""success darken"">Success darken link.</a></p>
+    <p><a class=""warning lighten"">Warning lighten link.</a></p>
+    <p><a class=""warning"">Warning link.</a></p>
+    <p><a class=""warning darken"">Warning darken link.</a></p>
+</div>")" />
+
+<p>
+    Adding the <code>filled</code> class assigns the theme color to the background color instead,
+    while the foreground becomes the color assigned as the complementary text color for the theme.
+</p>
+
+<p>
+    The <code>lighten</code> and <code>darken</code> variants can also be used in combination with <code>filled</code>.
+</p>
+
+<p>
+    If you use <code>filled</code> without assigning a theme class, the default theme is used.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""row"">
+    <div class=""filled lighten p-2"">Filled lighten</div>
+    <div class=""filled p-2"">Filled</div>
+    <div class=""filled darken p-2"">Filled darken</div>
+    <div class=""primary filled lighten p-2"">Primary filled lighten</div>
+    <div class=""primary filled p-2"">Primary filled</div>
+    <div class=""primary filled darken p-2"">Primary filled darken</div>
+    <div class=""secondary filled lighten p-2"">Secondary filled lighten</div>
+    <div class=""secondary filled p-2"">Secondary filled</div>
+    <div class=""secondary filled darken p-2"">Secondary filled darken</div>
+    <div class=""tertiary filled lighten p-2"">Tertiary filled lighten</div>
+    <div class=""tertiary filled p-2"">Tertiary filled</div>
+    <div class=""tertiary filled darken p-2"">Tertiary filled darken</div>
+    <div class=""danger filled lighten p-2"">Danger filled lighten</div>
+    <div class=""danger filled p-2"">Danger filled</div>
+    <div class=""danger filled darken p-2"">Danger filled darken</div>
+    <div class=""dark filled lighten p-2"">Dark filled lighten</div>
+    <div class=""dark filled p-2"">Dark filled</div>
+    <div class=""dark filled darken p-2"">Dark filled darken</div>
+    <div class=""default filled lighten p-2"">Default filled lighten</div>
+    <div class=""default filled p-2"">Default filled</div>
+    <div class=""default filled darken p-2"">Default filled darken</div>
+    <div class=""info filled lighten p-2"">Info filled lighten</div>
+    <div class=""info filled p-2"">Info filled</div>
+    <div class=""info filled darken p-2"">Info filled darken</div>
+    <div class=""success filled lighten p-2"">Success filled lighten</div>
+    <div class=""success filled p-2"">Success filled</div>
+    <div class=""success filled darken p-2"">Success filled darken</div>
+    <div class=""warning filled lighten p-2"">Warning filled lighten</div>
+    <div class=""warning filled p-2"">Warning filled</div>
+    <div class=""warning filled darken p-2"">Warning filled darken</div>
+</div>")" />
+
+<h2>Background</h2>
+
+<p>
+    The <code>bg-alt</code> class assigns an alternate background color to an element, and can be used when adjacent or nested elements need to be distinguished visually.
+</p>
+
+<p>
+    The <code>bg-alt</code> class can be used on its own, or combined with a theme class.
+</p>
+
+<CodeExample IsOpen="false" Code="@(@"<div class=""row"">
+    <div class=""bg-alt p-2"">Alternate background</div>
+    <div class=""primary bg-alt p-2"">Primary bg-alt</div>
+    <div class=""secondary bg-alt p-2"">Secondary bg-alt</div>
+    <div class=""tertiary bg-alt p-2"">Tertiary bg-alt</div>
+    <div class=""danger bg-alt p-2"">Danger bg-alt</div>
+    <div class=""dark bg-alt p-2"">Dark bg-alt</div>
+    <div class=""default bg-alt p-2"">Default bg-alt</div>
+    <div class=""info bg-alt p-2"">Info bg-alt</div>
+    <div class=""success bg-alt p-2"">Success bg-alt</div>
+    <div class=""warning bg-alt p-2"">Warning bg-alt</div>
+</div>")" />
+
+<p>
+    The <code>bg-alt</code> class can also be combined with <code>filled</code>, and has the same effect as using <code>darken</code>.
+</p>
+
+<p>
+    The class <code>transparent</code> can also be used to remove the background color from an element which would normally have one.
+</p>

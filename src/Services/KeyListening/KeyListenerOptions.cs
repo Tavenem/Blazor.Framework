@@ -8,5 +8,5 @@ public class KeyListenerOptions
     /// <summary>
     /// Keys to be listened to.
     /// </summary>
-    public List<KeyOptions> Keys { get; set; } = new();
+    public List<KeyOptions> Keys { get; set; } = [];
 }

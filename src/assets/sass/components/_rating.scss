@@ -30,7 +30,7 @@
         }
     }
 
-    &.readonly .btn-icon {
+    &.read-only .btn-icon {
         cursor: default;
         pointer-events: none;
 
@@ -41,11 +41,13 @@
 
     &.small {
         --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-x-icon: 5px;
         --button-inherited-padding-y-icon: 5px;
     }
 
     &.large {
         --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-x-icon: 5px;
         --button-inherited-padding-y-icon: 5px;
     }
 

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
@@ -7,11 +8,12 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A collapsible panel.
 /// </summary>
-public partial class Collapse : IDisposable
+public partial class Collapse : PersistentComponentBase
 {
-    private readonly List<AnchorLink> _links = new();
+    private const string ExpansionQueryParamName = "o";
 
-    private protected bool _disposedValue;
+    private string? _hrefAbsolute;
+    private bool _isActiveNav;
 
     /// <summary>
     /// Any CSS class(es) to be applies to the collapse body (the part that is hidden when
@@ -57,6 +59,19 @@ public partial class Collapse : IDisposable
     [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
 
     /// <summary>
+    /// Indicates how this collapse opens based on the current URL.
+    /// </summary>
+    /// <remarks>
+    /// Ignored unless <see cref="NavUrl"/> is set.
+    /// </remarks>
+    [Parameter] public NavLinkMatch NavLinkMatch { get; set; }
+
+    /// <summary>
+    /// If the current route matches this URL, this collapse will be initially open.
+    /// </summary>
+    [Parameter] public string? NavUrl { get; set; }
+
+    /// <summary>
     /// Invoked before opening. Can be used to load content.
     /// </summary>
     [Parameter] public EventCallback<Collapse> OnOpening { get; set; }
@@ -97,11 +112,6 @@ public partial class Collapse : IDisposable
     [CascadingParameter] protected Accordion? Accordion { get; set; }
 
     /// <summary>
-    /// The collapse which contains this one, if any.
-    /// </summary>
-    [CascadingParameter] protected Collapse? Parent { get; set; }
-
-    /// <summary>
     /// The final value assigned to the body's class attribute.
     /// </summary>
     protected string? BodyCssClass => new CssBuilder("body")
@@ -116,7 +126,7 @@ public partial class Collapse : IDisposable
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("collapse")
-        .Add("closed", !IsOpen)
+        .Add("closed", IsClosed || !IsOpen)
         .Add("disabled", Disabled || Accordion?.Disabled == true)
         .Add("loading", IsLoading)
         .ToString();
@@ -127,6 +137,11 @@ public partial class Collapse : IDisposable
     protected string IconName => IsLoading ? DefaultIcons.Loading : DefaultIcons.Expand;
 
     /// <summary>
+    /// Whether the collapse has been explicitly closed.
+    /// </summary>
+    protected bool IsClosed { get; set; }
+
+    /// <summary>
     /// The final value assigned to the footer's class attribute.
     /// </summary>
     protected string? FooterCssClass => new CssBuilder("footer")
@@ -135,12 +150,19 @@ public partial class Collapse : IDisposable
 
     internal bool ActiveLink { get; set; }
 
+    internal bool IsExpanded => IsOpen && !IsClosed;
+
+    private bool DefaultIsExpanded { get; set; }
+
+    private bool IsInteractive { get; set; }
+
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
+        if (QueryStateService.IsInitialized
+            && parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
             && isOpen != IsOpen)
         {
             await SetOpenAsync(isOpen);
@@ -157,110 +179,209 @@ public partial class Collapse : IDisposable
         {
             await Accordion.AddAsync(this);
         }
-    }
 
-    /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && !IsOpen)
+        DefaultIsExpanded = IsExpanded;
+
+        var currentOpenStates = QueryStateService.RegisterProperty(
+            Id,
+            ExpansionQueryParamName,
+            OnQueryChangedAsync,
+            DefaultIsExpanded);
+        if (currentOpenStates?.Count > 0
+            && bool.TryParse(currentOpenStates[0], out var isOpen))
         {
-            ActiveLink = _links.Any(x => x.IsActive);
-            if (ActiveLink)
+            await SetOpenAsync(isOpen);
+        }
+        else
+        {
+            _hrefAbsolute = NavUrl is null
+                ? null
+                : NavigationManager.ToAbsoluteUri(NavUrl).AbsoluteUri;
+            _isActiveNav = ShouldMatch(NavigationManager.Uri);
+            if (_isActiveNav)
             {
-                await OpenCascadingAsync();
+                await SetOpenAsync(true);
             }
         }
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
+    /// <inheritdoc />
+    protected override void OnAfterRender(bool firstRender)
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        if (firstRender)
+        {
+            IsInteractive = true;
+            StateHasChanged();
+        }
     }
 
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing,
-    /// or resetting unmanaged resources.
-    /// </summary>
-    protected virtual void Dispose(bool disposing)
+    /// <inheritdoc />
+    protected override void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                NavigationManager.LocationChanged -= OnLocationChanged;
-                Accordion?.Remove(this);
-            }
-
-            _disposedValue = true;
+            NavigationManager.LocationChanged -= OnLocationChanged;
+            Accordion?.Remove(this);
         }
+        base.Dispose(disposing);
     }
 
     /// <summary>
     /// Set the open state of this collapse.
     /// </summary>
     /// <param name="value">The open state.</param>
-    public async Task SetOpenAsync(bool value)
-    {
-        if (IsOpen == value)
-        {
-            return;
-        }
-
-        if (value && OnOpening.HasDelegate)
-        {
-            IsLoading = true;
-            StateHasChanged();
-            await OnOpening.InvokeAsync(this);
-            IsLoading = false;
-            StateHasChanged();
-        }
-        IsOpen = value;
-        OnIsOpenChanged?.Invoke(this, IsOpen);
-        await IsOpenChanged.InvokeAsync(IsOpen);
-        StateHasChanged();
-    }
+    public Task SetOpenAsync(bool value) => SetOpenAsync(value, false);
 
     /// <summary>
     /// Toggle the open state of this collapse.
     /// </summary>
-    public Task ToggleAsync() => SetOpenAsync(!IsOpen);
-
-    internal void Add(AnchorLink link) => _links.Add(link);
+    public Task ToggleAsync() => SetOpenAsync(IsClosed || !IsOpen, true);
 
     internal void ForceRedraw() => StateHasChanged();
-
-    internal async Task OpenCascadingAsync()
-    {
-        await SetOpenAsync(true);
-        if (Parent is not null)
-        {
-            await Parent.OpenCascadingAsync();
-        }
-    }
-
-    internal void Remove(AnchorLink link) => _links.Remove(link);
 
     private protected async Task OnToggleAsync()
     {
         if (!Disabled && Accordion?.Disabled != true)
         {
-            await SetOpenAsync(!IsOpen);
+            await SetOpenAsync(IsClosed || !IsOpen, true);
         }
+    }
+
+    private string GetToggleUrl() => QueryStateService
+        .GetUriWithPropertyValue(
+        Id,
+        ExpansionQueryParamName,
+        IsClosed || !IsOpen ? true : null);
+
+    private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
+    {
+        var prefixLength = prefix.Length;
+        if (value.Length > prefixLength)
+        {
+            return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                && (prefixLength == 0
+                || !IsUnreservedCharacter(prefix[prefixLength - 1])
+                || !IsUnreservedCharacter(value[prefixLength]));
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private static bool IsUnreservedCharacter(char c)
+        // Checks whether it is an unreserved character according to 
+        // https://datatracker.ietf.org/doc/html/rfc3986#section-2.3
+        // Those are characters that are allowed in a URI but do not have a reserved
+        // purpose (e.g. they do not separate the components of the URI)
+        => char.IsLetterOrDigit(c)
+        || c == '-'
+        || c == '.'
+        || c == '_'
+        || c == '~';
+
+    private bool EqualsHrefExactlyOrIfTrailingSlashAdded(string currentUriAbsolute)
+    {
+        Debug.Assert(_hrefAbsolute is not null);
+
+        if (string.Equals(currentUriAbsolute, _hrefAbsolute, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (currentUriAbsolute.Length == _hrefAbsolute.Length - 1
+            && _hrefAbsolute[^1] == '/'
+            && _hrefAbsolute.StartsWith(currentUriAbsolute, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs args)
     {
-        if (IsOpen)
+        if (!IsOpen)
+        {
+            var shouldBeActiveNow = ShouldMatch(args.Location);
+            if (shouldBeActiveNow != _isActiveNav)
+            {
+                _isActiveNav = shouldBeActiveNow;
+                if (_isActiveNav)
+                {
+                    await SetOpenAsync(true);
+                }
+            }
+        }
+    }
+
+    private async Task OnQueryChangedAsync(QueryChangeEventArgs args)
+    {
+        if (bool.TryParse(args.Value, out var value))
+        {
+            await SetOpenAsync(value);
+        }
+    }
+
+    private async Task SetOpenAsync(bool value, bool manual)
+    {
+        if (IsOpen == value
+            && (!manual
+            || IsClosed == !value))
         {
             return;
         }
-        _links.ForEach(x => x.UpdateState(args));
-        var open = _links.Any(x => x.IsActive);
-        if (open)
+
+        if (manual)
         {
-            await SetOpenAsync(true);
+            IsClosed = !value;
         }
+        if (IsOpen != value)
+        {
+            if (value && !IsClosed && OnOpening.HasDelegate)
+            {
+                IsLoading = true;
+                StateHasChanged();
+                await OnOpening.InvokeAsync(this);
+                IsLoading = false;
+            }
+            IsOpen = value;
+            if (!value || !IsClosed)
+            {
+                OnIsOpenChanged?.Invoke(this, IsOpen);
+                await IsOpenChanged.InvokeAsync(IsOpen);
+            }
+            StateHasChanged();
+        }
+
+        if (PersistState)
+        {
+            QueryStateService.SetPropertyValue(
+                Id,
+                ExpansionQueryParamName,
+                IsOpen && !IsClosed,
+                defaultValue: _isActiveNav || DefaultIsExpanded);
+        }
+    }
+
+    private bool ShouldMatch(string currentUriAbsolute)
+    {
+        if (_hrefAbsolute is null)
+        {
+            return false;
+        }
+
+        if (EqualsHrefExactlyOrIfTrailingSlashAdded(currentUriAbsolute))
+        {
+            return true;
+        }
+
+        if (NavLinkMatch == NavLinkMatch.Prefix
+            && IsStrictlyPrefixWithSeparator(currentUriAbsolute, _hrefAbsolute))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

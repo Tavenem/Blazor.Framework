@@ -1,0 +1,21 @@
+﻿<Dialog>
+    <ChildContent>
+        <Form @ref="ImgForm" Model="Img">
+            <TextInput Label="URL"
+                       @bind-Value="Img.Src"
+                       UpdateOnInput="true"
+                       Validation="ValidateUri"
+                       Required="true" />
+            <TextInput Label="Title (optional)"
+                       @bind-Value="Img.Title" />
+            <TextInput Label="Alt (optional)"
+                       @bind-Value="Img.Alt" />
+        </Form>
+    </ChildContent>
+    <FooterContent>
+        <div class="message-box-buttons">
+            <button @onclick="@(_ => Dialog?.Cancel())" class="btn btn-text">Cancel</button>
+            <button @onclick="SubmitAsync" class="btn btn-text primary" disabled="@string.IsNullOrEmpty(Img.Src)">Ok</button>
+        </div>
+    </FooterContent>
+</Dialog>

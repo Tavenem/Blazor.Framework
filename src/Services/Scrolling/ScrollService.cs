@@ -1,5 +1,4 @@
 ﻿using Microsoft.JSInterop;
-using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -7,15 +6,10 @@ namespace Tavenem.Blazor.Framework;
 /// Provides viewport scrolling services, including <see cref="ScrollToId(string?,
 /// ScrollLogicalPosition, bool)"/> and <see cref="ScrollToTop(string?)"/>.
 /// </summary>
-public class ScrollService : IAsyncDisposable
+/// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
 {
-    private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="ScrollService"/>.
-    /// </summary>
-    /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
-    public ScrollService(IJSRuntime jsRuntime) => _moduleTask = new(
+    private readonly Lazy<Task<IJSObjectReference>> _moduleTask = new(
         () => jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-scroll.js")
@@ -37,6 +31,39 @@ public class ScrollService : IAsyncDisposable
         }
 
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Scroll to the given position.
+    /// </summary>
+    /// <param name="contentsId">The HTML id of the <see cref="Contents"/> element.</param>
+    /// <param name="level">The level of the heading.</param>
+    /// <param name="title">The title of the heading.</param>
+    /// <param name="position">The position to which scrolling should occur.</param>
+    /// <param name="setHistory">Whether to clear any fragment from the current URL and history.</param>
+    public async ValueTask ScrollToHeading(
+        string contentsId,
+        int level,
+        string? title,
+        ScrollLogicalPosition position = ScrollLogicalPosition.Start,
+        bool setHistory = true)
+    {
+        try
+        {
+            var module = await _moduleTask.Value.ConfigureAwait(false);
+            await module
+                .InvokeVoidAsync(
+                    "scrollToHeading",
+                    contentsId,
+                    level,
+                    title,
+                    position.ToString().ToLowerInvariant(),
+                    setHistory)
+                .ConfigureAwait(false);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
     }
 
     /// <summary>
@@ -77,74 +104,22 @@ public class ScrollService : IAsyncDisposable
         catch (TaskCanceledException) { }
     }
 
-    internal async ValueTask CancelScrollListener(string? selector)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("cancelScrollListener", selector);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-    }
-
     /// <summary>
     /// Observes scrolling and resizing events to detect which of the elements
     /// with the given class is currently in view.
     /// </summary>
     /// <param name="dotNetRef">
-    /// A reference to the framework.
+    /// A reference to a <see cref="Contents"/> component.
     /// </param>
-    /// <param name="className">
-    /// The CSS class name of the elements to observe.
-    /// </param>
-    internal async ValueTask ScrollSpy(DotNetObjectReference<FrameworkLayout> dotNetRef, string className)
+    /// <param name="selector">A CSS selector.</param>
+    internal async ValueTask ScrollSpy(DotNetObjectReference<Contents> dotNetRef, string selector)
     {
         try
         {
             var module = await _moduleTask.Value.ConfigureAwait(false);
             await module
-                .InvokeVoidAsync("scrollSpy", dotNetRef, className)
+                .InvokeVoidAsync("scrollSpy", dotNetRef, selector)
                 .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        catch (ObjectDisposedException) { }
-    }
-
-    /// <summary>
-    /// Observes scrolling and resizing events to detect which of the elements
-    /// with the given tag name(s) are currently in view.
-    /// </summary>
-    /// <param name="dotNetRef">
-    /// A reference to the framework.
-    /// </param>
-    /// <param name="tagNames">
-    /// The names of tags to observe.
-    /// </param>
-    internal async ValueTask ScrollSpyTags(DotNetObjectReference<FrameworkLayout> dotNetRef, params string[] tagNames)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("scrollSpyTags", dotNetRef, tagNames)
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        catch (ObjectDisposedException) { }
-    }
-
-    internal async ValueTask StartScrollListener(DotNetObjectReference<ScrollListener> dotNetRef, string? selector)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("listenForScroll", dotNetRef, selector);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }

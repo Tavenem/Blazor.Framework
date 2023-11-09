@@ -2,11 +2,18 @@
 
 @inherits TavenemComponentBase
 
-<div @ref="ElementReference"
-     id="@Id"
-     @attributes="AdditionalAttributes"
-     class="@CssClass"
-     style="@CssStyle"
-     tabindex="0">
+<tf-popover @ref="ElementReference"
+            @attributes="AdditionalAttributes"
+            id="@Id"
+            class="@CssClass"
+            style="@CssStyle"
+            tabindex="0"
+            data-anchor-id="@AnchorId"
+            data-focus-id="@FocusId"
+            data-offset-x="@OffsetX"
+            data-offset-y="@OffsetY"
+            data-position-x="@PositionX"
+            data-position-y="@PositionY"
+            @onfocuslost="FocusOut">
     @ChildContent
-</div>
+</tf-popover>

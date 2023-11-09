@@ -1,0 +1,101 @@
+﻿@page "/utilities/spacing"
+
+<PageTitle>Spacing - Tavenem Blazor Framework</PageTitle>
+
+<h1>Spacing</h1>
+
+<p>
+    The Tavenem Blazor Framework provides a number of utility classes to control the
+    spacing between elements.
+</p>
+
+<h2>Margin and Padding</h2>
+
+<p>
+    Margin and padding can be set for an element using a set of utility classes with a predictable
+    format: <code>{property}{side(s)}-{size}</code> for all viewport sizes, and
+    <code>{property}{side(s)}-{breakpoint}-{size}</code> with a <a
+    href="./layout/breakpoints">breakpoint infix</a>.
+</p>
+
+<p>
+    The <code>{property}</code> component is either <code>m</code> for <code>margin</code>, or
+    <code>p</code> for <code>padding</code>.
+</p>
+
+<p>
+    The <code>{side(s)}</code> component can be omitted to apply the spacer to all sides, or can be
+    any one of:
+</p>
+
+<ul>
+    <li><code>b</code>: -bottom</li>
+    <li><code>e</code>: -inline-end</li>
+    <li><code>l</code>: -left</li>
+    <li><code>r</code>: -right</li>
+    <li><code>s</code>: -inline-start</li>
+    <li><code>t</code>: -top</li>
+    <li><code>x</code>: both -left and -right</li>
+    <li><code>y</code>: both -bottom and -top</li>
+</ul>
+
+<p>
+    The <code>-{breakpoint}</code> component can be omitted to apply the spacer at all viewport
+    sizes, or can be any one of:
+</p>
+
+<ul>
+    <li><code>sm</code></li>
+    <li><code>md</code></li>
+    <li><code>lg</code></li>
+    <li><code>xl</code></li>
+    <li><code>xxl</code></li>
+</ul>
+
+<p>
+    The <code>{size}</code> component can be any number from 0&ndash;6, any number from 1&ndash;6
+    preceded by the letter <code>n</code> (for <i>negative</i>), or <code>auto</code> when setting
+    margins:
+</p>
+
+<ul>
+    <li><code>n6</code>: -4rem</li>
+    <li><code>n5</code>: -3rem</li>
+    <li><code>n4</code>: -1.5rem</li>
+    <li><code>n3</code>: -1rem</li>
+    <li><code>n2</code>: -.5rem</li>
+    <li><code>n1</code>: -.25rem</li>
+    <li><code>0</code>: 0</li>
+    <li><code>1</code>: .25rem</li>
+    <li><code>2</code>: .5rem</li>
+    <li><code>3</code>: 1rem</li>
+    <li><code>4</code>: 1.5rem</li>
+    <li><code>5</code>: 3rem</li>
+    <li><code>6</code>: 4rem</li>
+    <li><code>auto</code>: sets auto margins</li>
+</ul>
+
+<p>
+    Note that <code>auto</code> is not a valid option for <code>padding</code>, and in particular
+    watch out for the class <code>pe-auto</code>, which does <em>not</em> set
+    <code>padding-inline-end</code> to <code>auto</code> (an invalid CSS style), but actually sets
+    the <code>pointer-events</code> property to <code>auto</code> (see <a
+    href="./utilities/interaction">Interaction</a>).
+</p>
+
+<h2>Gap</h2>
+
+<p>
+    The <code>gap</code> property for flexbox and grid containers can be set with the following
+    classes:
+</p>
+
+<ul>
+    <li><code>gap-0</code>: 0</li>
+    <li><code>gap-1</code>: .25rem</li>
+    <li><code>gap-2</code>: .5rem</li>
+    <li><code>gap-3</code>: 1rem</li>
+    <li><code>gap-4</code>: 1.5rem</li>
+    <li><code>gap-5</code>: 3rem</li>
+    <li><code>gap-6</code>: 4rem</li>
+</ul>

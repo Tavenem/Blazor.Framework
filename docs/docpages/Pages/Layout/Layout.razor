@@ -1,0 +1,79 @@
+﻿@page "/layout/layout"
+
+<PageTitle>Layout - Tavenem Blazor Framework</PageTitle>
+
+<h1>Layout</h1>
+
+<p>This page will show you how to use the Tavenem Blazor Framework layout component.</p>
+
+<p>
+    The Tavenem Blazor Framework uses an opinionated layout system to structure your app.
+    In its most basic form, you use it in your MainLayout.razor (and any other layout files)
+    like this:
+</p>
+<pre class="codeblock pre-razor-code">
+    @CodeFormatter.CodeToMarkup(@"<FrameworkLayout>
+    @Body
+</FrameworkLayout>")
+</pre>
+
+<p>
+    A more complete example, however, will look something like this:
+</p>
+<pre class="codeblock pre-razor-code">
+    @CodeFormatter.CodeToMarkup(@"<FrameworkLayout>
+    <FrameworkContent>
+        <div class=""appbar"">
+            <DrawerToggle Side=""Side.Left"" />
+            <span class=""primary text-close"" style=""font-size:2em"">Main Title</span>
+            <tf-darkmode-toggle class=""ms-auto"" />
+        </div>
+        <Drawer Side=""Side.Left"" ShowAtBreakpoint=""Breakpoint.Lg"">
+            <div class=""list"" role=""navigation"">
+                <NavLink href="""" Match=""NavLinkMatch.All""><tf-icon>home</tf-icon> Home</NavLink>
+                <NavLink href=""./counter""><tf-icon>pin</tf-icon> Counter</NavLink>
+                <NavLink href=""./fetchdata""><tf-icon>leaderboard</tf-icon> Fetch data</NavLink>
+            </div>
+        </Drawer>
+    </FrameworkContent>
+    <ChildContent>
+        @Body
+    </ChildContent>
+</FrameworkLayout>")
+</pre>
+
+<p>
+    The example above includes an <a href="./components/appbar">appbar</a> at the top of the page, a
+    button which toggles between light and dark modes, a <a href="./components/drawer">Drawer</a> on
+    the left side which can be opened and closed at small screen sizes, and becomes a permanent part
+    of the left side of the page at larger sizes, and a dynamic <a
+    href="./components/contents">table of contents</a> which is displayed on the right side at large
+    view sizes.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    The <code>FrameworkLayout</code> component includes a built-in <a
+    href="./components/scroll-to-top">tf-scroll-top</a> element for the main document. You can
+    override this by setting the <code>AutoScrollToTop</code> property to <code>false</code>.
+</p>
+
+<p>
+    It also provides a default <a href="./components/contents">Contents</a> component, and support
+    for <a href="./components/dialog">Dialogs</a> and <a href="./components/snackbar">Snackbars</a>.
+</p>
+
+<p>
+    Note that is isn't strictly necessary to use a <code>FrameworkLayout</code> component in your
+    app. Most components in this library can be used stand-alone. However, <a
+    href="./components/drawer">Drawers</a> and <a href="./components/appbar">apppars</a> require a
+    containing <code>FrameworkLayout</code> for placement.
+</p>
+
+<p>
+    To support drawers and appbars without a <code>FrameworkLayout</code> component, it is possible
+    to add a <code>div</code> or other container element to your layout with the
+    <code>tavenem-framework-layout</code> CSS class, which will provide the necessary layout without
+    the automatic inclusion of the other framework services.
+</p>

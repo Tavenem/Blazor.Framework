@@ -1,0 +1,96 @@
+﻿@page "/components/contents"
+
+<PageTitle>Contents - Tavenem Blazor Framework</PageTitle>
+
+<h1>Contents</h1>
+
+<p>
+    The contents component displays a list of headings on the current page, with
+    links to each of them.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    Use the <code>Contents</code> component to create a table of contents for the component's
+    container. The list is built automatically by examining the container for heading elements, as
+    well as any element with the <code>tav-heading</code> class. Elements with the
+    <code>tav-heading</code> class can specify their effective level with the
+    <code>data-heading-level</code> attribute, which should be a value between 1 and 6.
+</p>
+
+<p>
+    The contents list is rebuilt on page navigation, but does not respond to dynamic adding or
+    removing of headings. If heading elements might be dynamically added or removed on a page, you
+    can call the <code>RefreshHeadingsAsync</code> method on the <code>Contents</code> component to
+    refresh the list. Note, however, that this will also remove any headings manually added with the
+    <code>AddHeading</code> method (see below).
+</p>
+
+<p>
+    Each item in the contents list will display the text content of the heading element, but you can
+    override this by assigning a value to the <code>data-heading-title</code> attribute.
+</p>
+
+<p>
+    Note that if a heading has no HTML <code>id</code>, clicking its listing in the contents will
+    scroll to the nearest heading with its title. If two headings in scope both have the same title,
+    this may cause undesired behavior. In that case it is recommended that each heading be given a
+    unique <code>id</code>.
+</p>
+
+<p>
+    You can make a <code>Contents</code> component responsive by setting the <code>Breakpoint</code>
+    parameter to the breakpoint at which the list should be visible. When set to <code>None</code>
+    (the default) the list is visible at all breakpoints.
+</p>
+
+<p>
+    The <code>ThemeColor</code> parameter can be set to control the color theme
+    of the list.
+</p>
+
+<h2>Layout</h2>
+
+<p>
+    The <code>FrameworkLayout</code> component has a built-in <code>Contents</code> component. It is
+    positioned after the main content (typically on the right-hand side of a page), and will
+    automatically share the <code>ThemeColor</code> of the parent <code>FrameworkLayout</code>.
+</p>
+
+<p>
+    The <code>Breakpoint</code> parameter of the built-in <code>Contents</code> component can be set
+    with the <code>ContentsBreakpoint</code> parameter of <code>FrameworkLayout</code> (it defaults
+    to <code>Lg</code>). There is one key difference, however: when set to <code>None</code> the
+    table of contents is hidden completely, rather than displayed at all breakpoints. This allows
+    you to suppress the built-in list (possibly in order to use it differently in your own layout).
+</p>
+
+<h2>Manual Headings</h2>
+
+<p>
+    It is also possible to add headings to the table(s) of contents on a page manually. The
+    <code>Contents</code> component has two key methods for this purpose: <code>AddHeading</code>
+    and <code>RemoveHeading</code>, both of which take a <code>HeadingInfo</code> object that
+    describes a heading. The <code>FrameworkLayout</code> also provides these same methods, in order
+    to add or remove headings from the built-in contents, and provides itself as a <a
+    href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/cascading-values-and-parameters">cascading
+    value</a> so you can access these methods from any component.
+</p>
+
+<p>
+    Adding a heading will automatically add it to the <code>Contents</code> component. It is
+    important that you also remove the heading when it is no longer relevant. For instance, in the
+    <code>Dispose</code> method of a component which adds it.
+</p>
+
+<p>
+    You can try this yourself by clicking the following buttons, which will add or remove the
+    heading below to this page's table of contents:
+</p>
+
+<span class="h3">Dynamic Heading</span>
+<div class="d-flex gap-3">
+    <button class="btn primary" @onclick="AddHeading" disabled="@_added">Add Heading to Contents</button>
+    <button class="btn danger" @onclick="RemoveHeading" disabled="@(!_added)">Remove Heading from Contents</button>
+</div>

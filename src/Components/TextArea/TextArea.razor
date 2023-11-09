@@ -1,0 +1,62 @@
+﻿@namespace Tavenem.Blazor.Framework
+
+@inherits InputComponentBase<string>
+
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+    <div id="@InputId" class="input">
+        <textarea @ref="ElementReference"
+                  class="@InputCssClass"
+                  style="@InputCssStyle"
+                  autocomplete="@AutocompleteValue"
+                  autocorrect="@AutocorrectValue"
+                  disabled="@IsDisabled"
+                  maxlength="@MaxLength"
+                  name="@NameValue"
+                  placeholder="@Placeholder"
+                  readonly="@IsReadOnly"
+                  required="@Required"
+                  rows="@Rows"
+                  spellcheck="@SpellcheckValue"
+                  tabindex="@TabIndex"
+                  value="@CurrentValue"
+                  @oninput="OnInput"
+                  @onchange="OnChange" />
+    </div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
+    @if ((ShowLength && MaxLength.HasValue)
+        || !string.IsNullOrEmpty(HelpText)
+        || HelpTextContent.HasValue
+        || IsInvalidAndTouched)
+    {
+        <div class="@HelpersClass">
+            @if (IsInvalidAndTouched)
+            {
+                <ul class="mr-auto mb-0 pl-0">
+                    @foreach (var message in GetValidationMessages())
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            }
+            else if (HelpTextContent.HasValue)
+            {
+                <div class="mr-auto">@HelpTextContent.Value</div>
+            }
+            else if (!string.IsNullOrEmpty(HelpText))
+            {
+                <div class="mr-auto">@HelpText</div>
+            }
+            @if (ShowLength && MaxLength.HasValue)
+            {
+                <div class="ml-auto">
+                    <span>@CurrentLength</span>
+                    <span>/</span>
+                    <span>@MaxLength</span>
+                </div>
+            }
+        </div>
+    }
+</div>

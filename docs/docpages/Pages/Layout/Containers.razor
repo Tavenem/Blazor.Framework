@@ -1,0 +1,29 @@
+﻿@page "/layout/containers"
+
+<PageTitle>Containers - Tavenem Blazor Framework</PageTitle>
+
+<h1>Containers</h1>
+
+<p>
+    The container is a basic building block for layout in the Tavenem Blazor Framework.
+</p>
+
+<p>
+    Containers have default CSS styles applied which will usually cause them to center themselves,
+    and fill their container. They have <code>1rem</code> of left and right padding (but no vertical
+    padding). They use flexbox layout, with the direction set to column.
+</p>
+
+<p>
+    There are three styles of container, created by applying a CSS class to any element (usually a
+    <code>div</code>):
+</p>
+<ul>
+    <li><code>container</code>: the standard container, with 100% width</li>
+    <li><code>container-fixed</code>: sets a <code>max-width</code> equal to the nearest breakpoint smaller than the current viewport size</li>
+    <li><code>container-{breakpoint}</code>: replace {breakpoint} with one of the <a href="./layout/breakpoints">breakpoint</a> infixes to create a container whose width is 100% up to that breakpoint, then remains fixed</li>
+</ul>
+
+<CodeExample Code="@(@"<div class=""d-flex"" style=""height:20em;width:100%"">
+    <div class=""container-sm primary filled""></div>
+</div>")" />

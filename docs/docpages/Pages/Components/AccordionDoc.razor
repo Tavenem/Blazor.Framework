@@ -1,0 +1,146 @@
+﻿@page "/components/accordion"
+
+<PageTitle>Accordion - Tavenem Blazor Framework</PageTitle>
+
+<h1>Accordion</h1>
+
+<p>
+    The accordion component is a collection of <a href="./components/collapse">Collapse</a>
+    components. There are two main versions of the component: one where only one collapse is
+    permitted to be open at a time, and one where any collapse can be open or closed without regard
+    for the others.
+</p>
+
+<h2>Any number open</h2>
+
+<p>
+    The version where any component can be open is the simplest. Just wrap a set of <a
+    href="./components/collapse">Collapse</a> components in a <code>div</code> (or other semantic
+    element) with the <code>accordion</code> class.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="accordion">
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""accordion"">
+    <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
+    <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
+    <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<h2>Only one open</h2>
+
+<p>
+    To enforce just one collapse being open at once, use the <code>Accordion</code> component.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Accordion>
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </Accordion>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Accordion>
+    <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
+    <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
+    <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
+</Accordion>")
+    </ChildContent>
+</Collapse>
+
+<h2>Dense</h2>
+
+<p>
+    The collapses can all be made dense (limited padding) by applying the <code>dense</code> class
+    directly to the accordion itself.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="accordion dense">
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""accordion dense"">
+    <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
+    <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
+    <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<h2>Flush</h2>
+
+<p>
+    Use the <code>flush</code> class to remove the rounded corners and the shadow.
+</p>
+
+<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="outlined">
+                <div class="accordion flush">
+                    <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                    <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+                    <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                </div>
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""outlined"">
+    <div class=""accordion flush"">
+        <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
+        <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
+        <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
+    </div>
+</div>")
+    </ChildContent>
+</Collapse>
+
+<h2>Disabled</h2>
+
+<p>
+    Set the <code>Disabled</code> property on an <code>Accordion</code> component to disable all the
+    collapses. Note that this doesn't change the collapsed state of the collapses, or prevent it
+    from being changed programmatically. It only prevents user interaction.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Accordion Disabled="true">
+                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse IsOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+            </Accordion>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Accordion Disabled=""true"">
+    <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
+    <Collapse IsOpen=""true"" Title=""Collapse #2"">Collapsed content #2</Collapse>
+    <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
+</Accordion>")
+    </ChildContent>
+</Collapse>

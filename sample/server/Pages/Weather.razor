@@ -1,0 +1,58 @@
+﻿@page "/weather"
+@using System.ComponentModel.DataAnnotations;
+@attribute [StreamRendering(true)]
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data from the server.</p>
+
+@if (forecasts == null)
+{
+    <p><tf-progress-circle class="primary"></tf-progress-circle></p>
+}
+else
+{
+    <DataGrid Items="forecasts" />
+}
+
+@code {
+    private static readonly string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
+
+    private List<WeatherForecast>? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        forecasts = Enumerable.Range(1, 5).Select(index => 
+        {
+            var c = Random.Shared.Next(-20, 55);
+            return new WeatherForecast
+            {
+                Date = startDate.AddDays(index),
+                TemperatureC = c,
+                Summary = summaries[(int)Math.Floor((c + 20) / 7.5)]
+            };
+        }).ToList();
+    }
+
+    private class WeatherForecast
+    {
+        [Display(AutoGenerateFilter = false)]
+        [DisplayFormat(DataFormatString = "d")]
+        public DateOnly Date { get; set; }
+
+        [Display(Name = "Temp. (C)", Order = 1, AutoGenerateFilter = false)]
+        public int TemperatureC { get; set; }
+
+        [Display(Order = 3, AutoGenerateFilter = false)]
+        public string? Summary { get; set; }
+
+        [Display(Name = "Temp. (F)", Order = 2, AutoGenerateFilter = false)]
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}

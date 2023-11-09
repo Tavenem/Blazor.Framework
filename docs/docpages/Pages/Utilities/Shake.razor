@@ -1,0 +1,44 @@
+﻿@page "/utilities/shake"
+
+<PageTitle>Shake - Tavenem Blazor Framework</PageTitle>
+
+<h1>Shake</h1>
+
+<h1>Class</h1>
+
+<p>
+    The Tavenem Blazor Framework includes both a CSS class and a utility method which cause an
+    element to shake side-to-side briefly.
+</p>
+
+<p>
+    Apply the class <code>shake</code> to cause any element to shake momentarily. Use
+    <code>shake-hover</code> instead to cause the element to shake on hover:
+</p>
+
+<CodeExample Code="@(@"<div class=""row"">
+    <div class=""shake bg-alt"" style=""height:5em;width:5em""></div>
+    <div class=""shake-hover bg-alt"" style=""height:5em;width:5em""></div>
+</div>")" />
+
+<h1>Method</h1>
+
+<p>
+    You can also initiate a shake programmatically: inject an instance of
+    <code>UtilityService</code> in a component, and call the <code>Shake</code> method with the
+    <code>id</code> of an element as a parameter to cause that element to shake on command.
+</p>
+<pre class="codeblock pre-razor-code">
+<span class="pre-operator">[</span><span class="pre-class">Inject</span><span class="pre-operator">]</span> <span class="pre-class">UtilityService</span> service<span class="pre-operator">;</span>
+
+<span class="pre-method">SomeMethod</span><span class="pre-operator">()</span>
+<span class="pre-operator">{</span>
+    service<span class="pre-operator">.</span><span class="pre-method">Shake</span><span class="pre-operator">(</span><span class="pre-string">"myElement"</span><span class="pre-operator">);</span>
+<span class="pre-operator">}</span>
+</pre>
+
+<p>
+    The <code>Shake</code> method can be called repeatedly, but if it's called with the same element
+    <code>id</code> within 1 second of being called previously, it will have no effect. The ongoing
+    shake animation will continue until finished.
+</p>

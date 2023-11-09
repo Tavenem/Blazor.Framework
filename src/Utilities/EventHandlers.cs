@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Tavenem.Blazor.Framework.Services.Popovers;
 
 namespace Tavenem.Blazor.Framework.Utilities;
 
-#if NET7_0_OR_GREATER
-#else
 /// <summary>
 /// Event handlers for <c>Tavenem.Blazor.Framework</c>.
 /// </summary>
-[EventHandler("onmouseleave", typeof(MouseEventArgs), true, true)]
-[EventHandler("onmouseenter", typeof(MouseEventArgs), true, true)]
+[EventHandler("onfocuslost", typeof(EventArgs))]
+[EventHandler("dropdowntoggle", typeof(DropdownToggleEventArgs))]
 public static class EventHandlers { }
-#endif

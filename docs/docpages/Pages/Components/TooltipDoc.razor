@@ -1,0 +1,138 @@
+﻿@page "/components/tooltip"
+
+<PageTitle>Tooltip - Tavenem Blazor Framework</PageTitle>
+
+<h1>Tooltip</h1>
+
+<p>
+    The Tavenem Blazor Framework includes an easy to use Tooltip component.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    Place a <code>Tooltip</code> component next to any element and set the <code>Anchor</code>
+    property to its HTML <code>id</code> to create a tooltip. Tooltips appear when their anchor is
+    hovered.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button id="tooltipped-button-1" class="btn btn-icon"><tf-icon>delete</tf-icon></button>
+            <Tooltip Anchor="tooltipped-button-1">Delete</Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button"" class=""btn btn-icon""><tf-icon>delete</tf-icon></button>
+<Tooltip Anchor=""tooltipped-button"">Delete</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Tooltips' visibility can also be toggled programmatically with the <code>Toggle</code> method.
+</p>
+
+<p>
+    You can provide any content in a tooltip.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button id="tooltipped-button-2" class="btn btn-icon"><tf-icon>help</tf-icon></button>
+            <Tooltip Anchor="tooltipped-button-2">
+                <h6>Tooltip title</h6>
+                <p>Tooltip content</p>
+                <p><tf-icon class="success">thumb_up</tf-icon></p>
+            </Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button"" class=""btn btn-icon""><tf-icon>help</tf-icon></button>
+<Tooltip Anchor=""tooltipped-button"">
+    <h6>Tooltip title</h6>
+    <p>Tooltip content</p>
+    <p><tf-icon class=""success"">thumb_up</tf-icon></p>
+</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also place a <code>Tooltip</code> with no <code>Anchor</code>. In this case, the tooltip
+    element itself will render as a "help" icon that acts as the trigger for the popover.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Tooltip>This is a tooltip with no anchor</Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Tooltip>This is a tooltip with no anchor</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<h2>Anchors and placement</h2>
+
+<p>
+    Tooltips normally appear when the anchor element either receives focus, or when the mouse
+    pointer enters the element, and disappear when the element loses focus, or is tapped with the
+    pointer.
+</p>
+<p>
+    In theory, the tooltip component can be placed anywhere on the page, and should still render
+    correctly at its anchor.
+</p>
+
+<h2>Customization</h2>
+
+<p>
+    Set the color to any theme color with the <code>ThemeColor</code> property.
+</p>
+
+<p>
+    Remove the arrow by setting the <code>Arrow</code> property to <code>false</code>.
+</p>
+
+<p>
+    Change the side of the anchor element where the tooltip appears by setting the <code>Side</code>
+    property.
+</p>
+
+<p>
+    Control the delay before the tooltip appears with the <code>Delay</code> property.
+</p>
+
+<p>
+    Cause the tooltip to be dismissed when tapped with the pointer by setting the
+    <code>DismissOnTap</code> property to <code>true</code>.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button id="tooltipped-button-3" class="btn btn-icon success"><tf-icon>add</tf-icon></button>
+            <Tooltip Anchor="tooltipped-button-3"
+                     Arrow="false"
+                     Delay="600"
+                     DismissOnTap="true"
+                     Side="Side.Right"
+                     ThemeColor="ThemeColor.Secondary">
+                Add
+            </Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button-3"" class=""btn btn-icon success""><tf-icon>add</tf-icon></button>
+            <Tooltip Anchor=""tooltipped-button-3""
+                     Arrow=""false""
+                     Delay=""600""
+                     DismissOnTap=""true""
+                     Side=""Side.Right""
+                     ThemeColor=""ThemeColor.Secondary"">
+                Add
+            </Tooltip>")
+    </ChildContent>
+</Collapse>

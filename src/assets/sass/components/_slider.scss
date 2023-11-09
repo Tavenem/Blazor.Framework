@@ -26,13 +26,20 @@
     color: var(--tavenem-color-text);
     display: inline-flex;
     flex-direction: column;
+    margin: 0;
     user-select: none;
     width: 100%;
+
+    label {
+        transform: none !important;
+        z-index: auto;
+    }
 
     .input {
         display: inline-block;
         line-height: 12px;
         min-height: 12px;
+        padding: 0;
         position: relative;
         width: 100%;
 
@@ -45,6 +52,10 @@
             top: 0;
             width: 100%;
         }
+    }
+
+    &:not(.outlined) .input:before {
+        content: none;
     }
 
     input {
@@ -97,6 +108,10 @@
         }
     }
 
+    .input-core:not(text-area) {
+        height: auto;
+    }
+
     .label {
         align-items: center;
         background-color: var(--thumb-label-color-bg);
@@ -147,9 +162,18 @@
 
             span + span {
                 left: 0;
+                padding-top: .25em;
                 position: absolute;
                 top: 0;
                 transform: translate(-50%, 50%);
+            }
+
+            &:first-child span + span {
+                transform: translate(0, 50%);
+            }
+
+            &:last-child span + span {
+                transform: translate(-100%, 50%);
             }
         }
     }
@@ -158,12 +182,16 @@
         display: flex;
     }
 
+    &.hash-labels {
+        padding-bottom: calc(.25em + 6px);
+    }
+
     .field-helpers {
         color: var(--thumb-color);
     }
 
     &.disabled {
-        input {
+        .input input {
             &, &:active, &:focus-visible {
                 --thumb-color: var(--tavenem-color-action-disabled);
                 --track-color: var(--tavenem-color-action-disabled-bg);

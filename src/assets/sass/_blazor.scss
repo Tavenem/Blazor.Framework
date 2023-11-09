@@ -1,8 +1,8 @@
-﻿.valid.modified:not(.form-field, [type=checkbox]) {
+﻿.valid.modified:not(.field, [type=checkbox]) {
     outline: 1px solid var(--tavenem-color-valid);
 }
 
-.invalid:not(.form-field) {
+.invalid:not(.field) {
     outline: 1px solid var(--tavenem-color-error);
 }
 

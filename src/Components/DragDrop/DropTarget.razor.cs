@@ -174,13 +174,11 @@ public partial class DropTarget<TDropItem> : IDisposable
     }
 
     /// <inheritdoc/>
-    protected override void OnInitialized() => DragDropListener.DropValidChanged += OnDropValidChanged;
-
-    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
+            DragDropListener.DropValidChanged += OnDropValidChanged;
             DragDropListener.ElementId = Id;
             DragDropListener.GetEffect = GetDropEffectInternal;
             DragDropListener.OnDrop += OnDropAsync;

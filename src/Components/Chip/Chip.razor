@@ -26,7 +26,11 @@
     {
         @ChildContent
     }
-    @if (ChipSet?.AutoClose == true || ChipSet?.OnChipClosed.HasDelegate == true)
+    @if (ChipSet?.OnChipClosed.HasDelegate == true)
+    {
+        <tf-close disabled="@(!Interactive)" @onclick="OnClosedAsync" />
+    }
+    else if (ChipSet?.AutoClose == true)
     {
         <tf-close @onclick="OnClosedAsync" />
     }

@@ -48,7 +48,7 @@ public partial class Meter<TValue>
     /// <summary>
     /// Custom HTML attributes for the meter element.
     /// </summary>
-    [Parameter] public Dictionary<string, object> MeterAttributes { get; set; } = new();
+    [Parameter] public Dictionary<string, object> MeterAttributes { get; set; } = [];
 
     /// <summary>
     /// Custom CSS class(es) for the meter element.

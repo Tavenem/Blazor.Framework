@@ -5,6 +5,7 @@
     display: inline-flex;
     flex: 0 0 auto;
     flex-direction: column;
+    margin: 0;
 
     &:has(:focus-visible):not(.disabled) {
         background-color: var(--tavenem-color-action-hover-bg);
@@ -16,7 +17,10 @@
         color: var(--tavenem-color-action);
         cursor: pointer;
         display: inline-flex;
+        pointer-events: auto;
+        transform: none !important;
         vertical-align: middle;
+        z-index: auto;
         -webkit-tap-highlight-color: transparent;
 
         &:after {
@@ -76,7 +80,9 @@
     }
 
     &.dense {
-        --button-inherited-padding-y-icon: 4px;
+        --button-inherited-padding-x-icon: 2px;
+        --button-inherited-padding-y-icon: 2px;
+        margin: 0;
     }
 
     &.disabled {
@@ -120,9 +126,15 @@
         border: none;
     }
 
-    &.required .label:after {
-        color: var(--tavenem-color-error);
-        content: " *";
+    &.required {
+        label:after {
+            content: none;
+        }
+
+        .label:after {
+            color: var(--tavenem-color-error);
+            content: " *";
+        }
     }
 
     &.bg-alt {
@@ -153,6 +165,7 @@
     --radio-group-text-color: var(--tavenem-color-text);
     display: inline-flex;
     flex-direction: column;
+    margin: 0;
 
     .content {
         display: inline-flex;
@@ -203,7 +216,8 @@
     }
 
     &.dense {
-        --button-inherited-padding-y-icon: 4px;
+        --button-inherited-padding-x-icon: 2px;
+        --button-inherited-padding-y-icon: 2px;
 
         .options {
             gap: 0;

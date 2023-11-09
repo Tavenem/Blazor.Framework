@@ -118,16 +118,13 @@ public partial class Row<[DynamicallyAccessedMembers(
         }
     }
 
-    internal async Task CancelEditAsync()
+    internal void CancelEdit()
     {
         if (DataGrid is null)
         {
             return;
         }
-        if (DataGrid.TableEditForm is not null)
-        {
-            await DataGrid.TableEditForm.ResetAsync();
-        }
+        DataGrid.TableEditForm?.Reset();
         DataGrid.EditingRow = null;
     }
 
@@ -135,9 +132,12 @@ public partial class Row<[DynamicallyAccessedMembers(
     {
         if (e?.Equals(Item) == true)
         {
-            await ScrollService.ScrollToId(Id);
+            await ScrollService.ScrollToId(Id, setHistory: false);
         }
     }
+
+    [return: NotNullIfNotNull(nameof(DataGrid))]
+    private string? GetRowExpansionToggleUrl() => DataGrid?.GetRowExpansionToggleUrl(this);
 
     private async Task OnClickAsync()
     {

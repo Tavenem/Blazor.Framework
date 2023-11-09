@@ -41,7 +41,7 @@
                 margin-bottom: 0;
                 min-height: 0;
 
-                .toolbar {
+                &.toolbar {
                     min-height: 0;
                 }
             }
@@ -66,10 +66,6 @@
         }
     }
 
-    &.open {
-        overflow-y: auto;
-    }
-
     &.left,
     &.right {
         flex-direction: column;
@@ -82,7 +78,7 @@
         }
 
         .drawer-control,
-        .drawer-close-small {
+        tf-drawer-close {
             @media (min-width: 768px) {
                 display: none;
             }
@@ -106,18 +102,6 @@
                 }
             }
 
-            &.open {
-                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
-
-                &:hover {
-                    animation: none;
-                }
-
-                @media (prefers-reduced-motion) {
-                    animation: none;
-                }
-            }
-
             @media (prefers-reduced-motion) {
                 transition: none;
             }
@@ -127,65 +111,17 @@
                 max-width: 0;
                 width: 0;
 
-                &.open {
-                    max-width: unset;
-                    width: 100%;
-
-                    &.left {
-                        animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
-
-                        @media (prefers-reduced-motion) {
-                            animation: none;
-                        }
-                    }
-
-                    &.right {
-                        animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
-
-                        @media (prefers-reduced-motion) {
-                            animation: none;
-                        }
-                    }
-                }
-
                 &:hover {
                     animation: none;
                     max-width: 0;
                     width: 0;
                 }
-
-                &.closed {
-                    &.left {
-                        animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
-                        transform: translateX(-100%);
-
-                        @media (prefers-reduced-motion) {
-                            animation: none;
-                        }
-                    }
-
-                    &.right {
-                        animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
-                        transform: translateX(100%);
-
-                        @media (prefers-reduced-motion) {
-                            animation: none;
-                        }
-                    }
-                }
             }
-        }
-
-        &.open {
-            max-width: 15rem;
-            transform: translateX(0);
         }
 
         @media (max-width: 767px) {
-            &, &.open {
-                max-width: unset;
-                width: 100%;
-            }
+            max-width: unset;
+            width: 100%;
         }
     }
 
@@ -193,26 +129,69 @@
         grid-area: leftdrawer;
         transform: translateX(-100%);
 
-        &.closed:not(.icon-drawer) {
-            animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
+        [data-drawer-left="true"] & {
+            max-width: 15rem;
+            overflow-y: auto;
+            transform: translateX(0);
 
-            @media (prefers-reduced-motion) {
-                animation: none;
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            &.icon-drawer {
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                &:hover {
+                    animation: none;
+                }
+
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
+                    max-width: unset;
+                    width: 100%;
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            @media (max-width: 767px) {
+                max-width: unset;
+                width: 100%;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
             }
         }
 
-        &.open:not(.icon-drawer) {
-            animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
+        [data-drawer-left="false"] & {
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
 
-            @media (prefers-reduced-motion) {
-                animation: none;
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
             }
-        }
 
-        .controls-left + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
+            &.icon-drawer {
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
+                    transform: translateX(-100%);
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
             }
         }
 
@@ -225,26 +204,69 @@
         grid-area: rightdrawer;
         transform: translateX(100%);
 
-        &.closed:not(.icon-drawer) {
-            animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
+        [data-drawer-right="true"] & {
+            max-width: 15rem;
+            overflow-y: auto;
+            transform: translateX(0);
 
-            @media (prefers-reduced-motion) {
-                animation: none;
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            &.icon-drawer {
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                &:hover {
+                    animation: none;
+                }
+
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
+                    max-width: unset;
+                    width: 100%;
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            @media (max-width: 767px) {
+                max-width: unset;
+                width: 100%;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
             }
         }
 
-        &.open:not(.icon-drawer) {
-            animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
+        [data-drawer-left="false"] & {
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
 
-            @media (prefers-reduced-motion) {
-                animation: none;
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
             }
-        }
 
-        .controls-right + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
+            &.icon-drawer {
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
+                    transform: translateX(100%);
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
             }
         }
 
@@ -268,39 +290,38 @@
         @media (prefers-reduced-motion) {
             transition: none;
         }
-
-        &.open {
-            max-height: 20rem;
-            padding-bottom: 1rem;
-            padding-top: 1rem;
-            transform: translateY(0);
-        }
     }
 
     &.bottom {
         grid-area: bottomdrawer;
         transform: translateY(100%);
 
-        &.closed {
+        [data-drawer-bottom="true"] & {
+            animation: forwards tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 20rem;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+            transform: translateY(0);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
+            }
+        }
+
+        [data-drawer-bottom="false"] & {
             animation: forwards tf-slide-out-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
-            }
-        }
-
-        &.open {
-            animation: forwards tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
-
-            @media (prefers-reduced-motion) {
-                animation: none;
-            }
-        }
-
-        .controls-bottom + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
             }
         }
     }
@@ -309,82 +330,90 @@
         grid-area: topdrawer;
         transform: translateY(-100%);
 
-        &.closed {
+        [data-drawer-top="true"] & {
+            animation: forwards tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 20rem;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+            transform: translateY(0);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
+            }
+        }
+
+        [data-drawer-bottom="false"] & {
             animation: forwards tf-slide-out-top 225ms cubic-bezier(0, 0, 0.2, 1);
 
             @media (prefers-reduced-motion) {
                 animation: none;
             }
         }
+    }
 
-        &.open {
-            animation: forwards tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
-
-            @media (prefers-reduced-motion) {
-                animation: none;
-            }
-        }
-
-        .controls-top + & {
-            .drawer-control,
-            .drawer-close-small {
-                display: none;
-            }
-        }
+    .appbar.top ~ & {
+        padding-top: 0;
     }
 }
 
-.drawer-close-small {
-    margin-inline-end: -1.5rem;
-}
+.drawer-breakpoint-none.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+    max-width: 3.5rem;
+    width: 3.5rem;
 
-.drawer-container {
-    > .overlay.drawer-overlay {
-        display: none;
+    * {
+        font-size: 0;
+        overflow-x: hidden;
     }
 
-    &.drawer-open {
-        .overlay.drawer-overlay {
-            display: flex;
+    tf-icon {
+        display: inline-block !important;
+        font-size: 1.5rem;
+        margin: auto !important;
+    }
 
-            @media print {
-                display: none;
-            }
-        }
+    .avatar {
+        display: inline-flex !important;
+        font-size: 1.25rem;
+    }
+
+    @media (max-width: 767px) {
+        max-width: 0;
+        width: 0;
     }
 }
 
-.drawer-breakpoint-none.icon-drawer:not(.open, :hover) {
-    &.left,
-    &.right {
-        max-width: 3.5rem;
-        width: 3.5rem;
+.drawer-breakpoint-none.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+    max-width: 3.5rem;
+    width: 3.5rem;
 
-        * {
-            font-size: 0;
-            overflow-x: hidden;
-        }
+    * {
+        font-size: 0;
+        overflow-x: hidden;
+    }
 
-        tf-icon {
-            display: inline-block !important;
-            font-size: 1.5rem;
-            margin: auto !important;
-        }
+    tf-icon {
+        display: inline-block !important;
+        font-size: 1.5rem;
+        margin: auto !important;
+    }
 
-        .avatar {
-            display: inline-flex !important;
-            font-size: 1.25rem;
-        }
+    .avatar {
+        display: inline-flex !important;
+        font-size: 1.25rem;
+    }
 
-        @media (max-width: 767px) {
-            max-width: 0;
-            width: 0;
-
-            &.open {
-                max-width: unset;
-                width: 100%;
-            }
-        }
+    @media (max-width: 767px) {
+        max-width: 0;
+        width: 0;
     }
 }
 
@@ -403,11 +432,6 @@
                 max-width: 15rem;
                 transform: translateX(0);
 
-                &.closed:not(.icon-drawer),
-                &.open:not(.icon-drawer) {
-                    animation: none;
-                }
-
                 &.icon-drawer {
                     max-width: 15rem;
                     transition: none;
@@ -415,10 +439,22 @@
                     &:hover {
                         animation: none;
                     }
+                }
+            }
 
-                    &.closed {
-                        animation: none;
-                    }
+            &.left {
+                [data-drawer-left="true"] &:not(.icon-drawer),
+                [data-drawer-left="false"] &:not(.icon-drawer),
+                [data-drawer-left="false"] &.icon-drawer {
+                    animation: none;
+                }
+            }
+
+            &.right {
+                [data-drawer-right="true"] &:not(.icon-drawer),
+                [data-drawer-right="false"] &:not(.icon-drawer),
+                [data-drawer-right="false"] &.icon-drawer {
+                    animation: none;
                 }
             }
 
@@ -426,57 +462,100 @@
             &.top {
                 max-height: 20rem;
                 transform: translateY(0);
-
-                &.closed {
-                    animation: none;
-                }
             }
-        }
 
-        .drawer-toggle-#{$breakpoint} {
-            display: none;
-        }
+            [data-drawer-bottom="false"] &.bottom {
+                animation: none;
+            }
 
-        .drawer-container-#{$breakpoint} {
-            &, &.drawer-open {
-                > .overlay.drawer-overlay {
+            [data-drawer-top="false"] &.top {
+                animation: none;
+            }
+
+            [data-drawer-left="true"] &,
+            [data-drawer-right="true"] &,
+            [data-drawer-bottom="true"] &,
+            [data-drawer-top="true"] & {
+                & + tf-drawer-overlay:where(:defined) {
                     display: none;
                 }
             }
+        }
+
+        tf-drawer-toggle.visible-#{$breakpoint} {
+            display: none;
+        }
+    }
+}
+
+@each $breakpoint, $min-width in $breakpoints {
+    @media (min-width: $min-width) {
+        .drawer-hidden-#{$breakpoint} {
+            display: none;
+        }
+
+        tf-drawer-toggle.hidden-#{$breakpoint} {
+            display: none;
         }
     }
 }
 
 @each $breakpoint, $max-width in $breakpoint-maxs {
     @media (max-width: $max-width) {
-        .drawer-#{$breakpoint}.icon-drawer:not(.open, :hover) {
-            &.left,
-            &.right {
-                max-width: 3.5rem;
-                width: 3.5rem;
+        .drawer-#{$breakpoint}.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+            max-width: 3.5rem;
+            width: 3.5rem;
 
-                * {
-                    font-size: 0;
-                    overflow-x: hidden;
+            * {
+                font-size: 0;
+                overflow-x: hidden;
+            }
+
+            tf-icon {
+                font-size: 1.5rem;
+                margin: auto !important;
+            }
+
+            .avatar {
+                font-size: 1.25rem;
+            }
+
+            @media (max-width: 767px) {
+                max-width: 0;
+                width: 0;
+
+                &.open {
+                    max-width: unset;
+                    width: 100%;
                 }
+            }
+        }
 
-                tf-icon {
-                    font-size: 1.5rem;
-                    margin: auto !important;
-                }
+        .drawer-#{$breakpoint}.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+            max-width: 3.5rem;
+            width: 3.5rem;
 
-                .avatar {
-                    font-size: 1.25rem;
-                }
+            * {
+                font-size: 0;
+                overflow-x: hidden;
+            }
 
-                @media (max-width: 767px) {
-                    max-width: 0;
-                    width: 0;
+            tf-icon {
+                font-size: 1.5rem;
+                margin: auto !important;
+            }
 
-                    &.open {
-                        max-width: unset;
-                        width: 100%;
-                    }
+            .avatar {
+                font-size: 1.25rem;
+            }
+
+            @media (max-width: 767px) {
+                max-width: 0;
+                width: 0;
+
+                &.open {
+                    max-width: unset;
+                    width: 100%;
                 }
             }
         }

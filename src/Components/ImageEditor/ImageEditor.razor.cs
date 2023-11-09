@@ -108,6 +108,17 @@ public partial class ImageEditor : IAsyncDisposable
     [Parameter] public string Format { get; set; } = "image/png";
 
     /// <summary>
+    /// <para>
+    /// The id of the editor element.
+    /// </para>
+    /// <para>
+    /// A random id will be assigned if none is supplied (including through
+    /// splatted attributes).
+    /// </para>
+    /// </summary>
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    /// <summary>
     /// CSS class(es) to apply to the inner image container (which may contain an HTML <c>img</c> or
     /// <c>canvas</c> element, depending on whether the image is currently being edited).
     /// </summary>
@@ -232,6 +243,8 @@ public partial class ImageEditor : IAsyncDisposable
 
     private bool HasImage { get; set; }
 
+    private bool Interactive { get; set; }
+
     private bool IsCropping { get; set; }
 
     private bool IsErasing { get; set; }
@@ -290,9 +303,25 @@ public partial class ImageEditor : IAsyncDisposable
         }
     }
 
-    /// <inheritdoc />
-    protected override async Task OnInitializedAsync()
+    /// <inheritdoc/>
+    protected override void OnParametersSet()
     {
+        if (AdditionalAttributes?.TryGetValue("id", out var value) == true
+            && value is string id
+            && !string.IsNullOrWhiteSpace(id))
+        {
+            Id = id;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
         _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/Tavenem.Blazor.Framework/tavenem-image-editor.js");
@@ -305,7 +334,13 @@ public partial class ImageEditor : IAsyncDisposable
             await SetLoadingAsync();
             await _module.InvokeVoidAsync("loadImage", ContainerId, Src);
             HasImage = true;
+            Interactive = true;
             await SetLoadingAsync(false);
+        }
+        else
+        {
+            Interactive = true;
+            StateHasChanged();
         }
     }
 
