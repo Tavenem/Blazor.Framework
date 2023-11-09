@@ -1086,7 +1086,14 @@ slot {
 
         if (!this._hasButton
             && 'tooltipContainerTrigger' in this.dataset) {
-            const tooltipElement = event.target.querySelector(':scope > tf-tooltip');
+            let tooltipElement = event.target.querySelector(':scope > tf-tooltip');
+            if (!tooltipElement
+                && event.target.parentElement) {
+                tooltipElement = event.target.parentElement.querySelector(':scope > tf-tooltip');
+                if (tooltipElement === this) {
+                    return event.target.parentElement;
+                }
+            }
             if (tooltipElement === this) {
                 return event.target;
             }

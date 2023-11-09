@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0-preview.3
+### Fixed
+- Improved `Tooltip` behavior
+
 ## 2.0-preview.2
 ### Changed
 - Added `ChildContent` outlet for most components where it was missing
