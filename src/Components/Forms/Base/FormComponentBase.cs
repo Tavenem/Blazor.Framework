@@ -39,6 +39,11 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     [Parameter] public bool AutoFocus { get; set; }
 
     /// <summary>
+    /// The child content of this component.
+    /// </summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
     /// Custom CSS class(es) for the component.
     /// </summary>
     [Parameter] public string? Class { get; set; }

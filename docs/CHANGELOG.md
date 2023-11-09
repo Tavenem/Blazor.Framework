@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0-preview.2
+### Changed
+- Added `ChildContent` outlet for most components where it was missing
+- More rework of `Tooltip` component
+   - Removed `Anchor` property introduced in 2.0-preview.1
+   - Any element can now reference a `Tooltip` by its `Id` with a `data-tooltip-id` HTML attribute
+   - A `Tooltip` nested inside an element is automatically associated with that element, unless `IsContainerTrigger` is set to `false`
+   - Added `IsButton` property to explicitly specify when to display an icon button to act as the trigger
+
 ## 2.0-preview.1
 ### Added
 - Trimming and AOT compatibility

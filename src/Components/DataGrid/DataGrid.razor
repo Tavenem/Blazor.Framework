@@ -36,16 +36,21 @@
                 }
                 @if (AllowAdd)
                 {
-                    <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
+                    <button class="btn btn-icon small" @onclick="OnAddAsync">
+                        <tf-icon>@DefaultIcons.Add</tf-icon>
+                        <Tooltip Delay="750">Add</Tooltip>
+                    </button>
                 }
                 @if (AllowExport)
                 {
                     <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
                         <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+                        <Tooltip Delay="750">Export</Tooltip>
                     </button>
                 }
                 <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
                     <tf-icon>@DefaultIcons.Filter</tf-icon>
+                    <Tooltip Delay="750">Change displayed columns</Tooltip>
                 </button>
             </div>
         }
@@ -393,4 +398,8 @@
                         ThemeColor="ThemeColor" />
         </div>
     }
+    <Tooltip Id="datagrid-cancel-tooltip" Delay="750" IsContainerTrigger="false">Cancel</Tooltip>
+    <Tooltip Id="datagrid-delete-tooltip" Delay="750" IsContainerTrigger="false">Delete</Tooltip>
+    <Tooltip Id="datagrid-edit-tooltip" Delay="750" IsContainerTrigger="false">Edit</Tooltip>
+    <Tooltip Id="datagrid-save-tooltip" Delay="750" IsContainerTrigger="false">Save</Tooltip>
 </div>

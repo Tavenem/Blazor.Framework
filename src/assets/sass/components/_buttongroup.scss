@@ -1,27 +1,11 @@
-﻿.button-group {
-    background-color: transparent !important;
-    border-radius: var(--tavenem-border-radius);
-    box-shadow: var(--tavenem-shadow-1);
-    display: inline-flex;
-    --button-inherited-active-shadow: var(--tavenem-shadow-2);
-    --button-inherited-bg: var(--tavenem-color-default);
+﻿.button-group,
+.button-group-text {
     --button-inherited-border-color: var(--tavenem-color-border);
     --button-inherited-border-style: none;
-    --button-inherited-color: var(--tavenem-color-default-text);
     --button-inherited-font-size: var(--tavenem-font-size-button);
-    --button-inherited-font-size-icon: 1.5rem;
-    --button-inherited-hover-bg: var(--tavenem-color-default-darken);
-    --button-inherited-hover-color: var(--tavenem-color-default-text);
-    --button-inherited-hover-shadow: var(--tavenem-shadow-2);
-    --button-inherited-padding-x: 16px;
-    --button-inherited-padding-y: 6px;
-    --button-inherited-padding-y-icon: 6px;
     --button-inherited-shadow: none;
-
-    &.elevation-0 {
-        --button-inherited-active-shadow: none;
-        --button-inherited-hover-shadow: none;
-    }
+    border-radius: var(--tavenem-border-radius);
+    display: inline-flex;
 
     &:not(.vertical) > {
         .btn,
@@ -118,6 +102,30 @@
         }
     }
 
+    &.border {
+        --button-inherited-border-style: solid;
+    }
+}
+
+.button-group {
+    background-color: transparent !important;
+    box-shadow: var(--tavenem-shadow-1);
+    --button-inherited-active-shadow: var(--tavenem-shadow-2);
+    --button-inherited-bg: var(--tavenem-color-default);
+    --button-inherited-color: var(--tavenem-color-default-text);
+    --button-inherited-font-size-icon: 1.5rem;
+    --button-inherited-hover-bg: var(--tavenem-color-default-darken);
+    --button-inherited-hover-color: var(--tavenem-color-default-text);
+    --button-inherited-hover-shadow: var(--tavenem-shadow-2);
+    --button-inherited-padding-x: 16px;
+    --button-inherited-padding-y: 6px;
+    --button-inherited-padding-y-icon: 6px;
+
+    &.elevation-0 {
+        --button-inherited-active-shadow: none;
+        --button-inherited-hover-shadow: none;
+    }
+
     &.small {
         --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
         --button-inherited-font-size-icon: 1.25rem;
@@ -160,10 +168,6 @@
         }
     }
 
-    &.border {
-        --button-inherited-border-style: solid;
-    }
-
     &.bg-alt {
         --button-inherited-bg: var(--tavenem-theme-color-darken);
         --button-inherited-hover-bg: var(--tavenem-theme-color-darken-2);
@@ -195,63 +199,16 @@
 
 .button-group-text {
     background-color: transparent !important;
-    border-radius: var(--tavenem-border-radius);
     box-shadow: none;
-    display: inline-flex;
     --button-inherited-active-shadow: none;
     --button-inherited-bg: transparent;
-    --button-inherited-border-color: var(--tavenem-color-border);
-    --button-inherited-border-style: none;
     --button-inherited-color: var(--tavenem-color-text);
-    --button-inherited-font-size: var(--tavenem-font-size-button);
     --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
     --button-inherited-hover-color: var(--tavenem-color-action);
     --button-inherited-hover-shadow: none;
     --button-inherited-padding-x: 8px;
     --button-inherited-padding-y: 6px;
     --button-inherited-padding-y-icon: 7px;
-    --button-inherited-shadow: none;
-
-    &:not(.vertical) > {
-        .btn,
-        tf-dropdown > .btn {
-            + .btn,
-            + tf-dropdown > .btn {
-                border-bottom-left-radius: 0;
-                border-top-left-radius: 0;
-                border-left-style: solid;
-                margin-left: -1px;
-            }
-
-            &:not(:last-of-type) {
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-        }
-    }
-
-    &.vertical {
-        flex-direction: column;
-
-        > .btn,
-        > tf-dropdown > .btn {
-            width: 100%;
-
-            + .btn,
-            + tf-dropdown > .btn {
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-                border-top-style: solid;
-                margin-top: -1px;
-            }
-
-            &:not(:last-of-type) {
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                border-bottom-style: solid;
-            }
-        }
-    }
 
     &.small {
         --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
@@ -286,10 +243,6 @@
             --button-inherited-padding-y: 7px;
             --button-inherited-padding-y-icon: 4px;
         }
-    }
-
-    &.border {
-        --button-inherited-border-style: solid;
     }
 
     &.bg-alt {

@@ -11,27 +11,78 @@
 <h2>Basics</h2>
 
 <p>
-    Place a <code>Tooltip</code> component next to any element and set the <code>Anchor</code>
-    property to its HTML <code>id</code> to create a tooltip. Tooltips appear when their anchor is
-    hovered.
+    The <code>Tooltip</code> component can be used to display a popover in response to a hover or
+    tap on any element.
+</p>
+
+<p>
+    The placement and association between a <code>Tooltip</code> and its triggering element(s) is
+    flexible. The simplest way to give an element a tooltip is to nest the <code>Tooltip</code>
+    component inside the element which is expected to trigger it.
 </p>
 
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <button id="tooltipped-button-1" class="btn btn-icon"><tf-icon>delete</tf-icon></button>
-            <Tooltip Anchor="tooltipped-button-1">Delete</Tooltip>
+            <button class="btn btn-icon">
+                <tf-icon>delete</tf-icon>
+                <Tooltip>Delete</Tooltip>
+            </button>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button"" class=""btn btn-icon""><tf-icon>delete</tf-icon></button>
-<Tooltip Anchor=""tooltipped-button"">Delete</Tooltip>")
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn btn-icon"">
+    <tf-icon>delete</tf-icon>
+    <Tooltip>Delete</Tooltip>
+</button>")
     </ChildContent>
 </Collapse>
 
 <p>
-    Tooltips' visibility can also be toggled programmatically with the <code>Toggle</code> method.
+    You can also specify a <code>Tooltip</code> by its <code>Id</code> using the
+    <code>data-tooltip-id</code> HTML attribute on any element. This method is preferred when
+    multiple elements will share the same tooltip, since it avoids duplicating the
+    <code>Tooltip</code> component unnecessarily.
 </p>
+
+<p>
+    Usually this should also be combined with setting the <code>IsContainerTrigger</code> property
+    to <code>false</code> (it defaults to <code>true</code>), which prevents the
+    <code>Tooltip</code> component's container from also acting as a trigger.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <button data-tooltip-id="tooltip-1" class="btn btn-icon"><tf-icon>add</tf-icon></button>
+            <Tooltip Id="tooltip-1" IsContainerTrigger="false">Add</Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<button data-tooltip-id=""tooltip-1"" class=""btn btn-icon""><tf-icon>add</tf-icon></button>
+<Tooltip Id=""tooltip-1"" IsContainerTrigger=""false"">Add</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also set the <code>IsButton</code> property to <code>true</code> to render the
+    <code>Tooltip</code> component itself as a "help" icon. The help icon acts as a trigger for the
+    tooltip. Tooltips rendered as buttons can still be associated with other elements by
+    <code>Id</code>, but they will not respond to interactions with their containing element.
+</p>
+
+<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row align-items-center justify-content-center">
+            <Tooltip IsButton="true">This is a tooltip for a help icon</Tooltip>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Tooltip IsButton=""true"">This is a tooltip for a help icon</Tooltip>")
+    </ChildContent>
+</Collapse>
+
+<h2>Content</h2>
 
 <p>
     You can provide any content in a tooltip.
@@ -40,99 +91,96 @@
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <button id="tooltipped-button-2" class="btn btn-icon"><tf-icon>help</tf-icon></button>
-            <Tooltip Anchor="tooltipped-button-2">
-                <h6>Tooltip title</h6>
-                <p>Tooltip content</p>
-                <p><tf-icon class="success">thumb_up</tf-icon></p>
-            </Tooltip>
+            <button class="btn btn-icon">
+                <tf-icon>help</tf-icon>
+                <Tooltip>
+                    <h6>Tooltip title</h6>
+                    <p>Tooltip content</p>
+                    <p><tf-icon class="success">thumb_up</tf-icon></p>
+                </Tooltip>
+            </button>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button"" class=""btn btn-icon""><tf-icon>help</tf-icon></button>
-<Tooltip Anchor=""tooltipped-button"">
-    <h6>Tooltip title</h6>
-    <p>Tooltip content</p>
-    <p><tf-icon class=""success"">thumb_up</tf-icon></p>
-</Tooltip>")
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn btn-icon"">
+    <tf-icon>help</tf-icon>
+    <Tooltip>
+        <h6>Tooltip title</h6>
+        <p>Tooltip content</p>
+        <p><tf-icon class=""success"">thumb_up</tf-icon></p>
+    </Tooltip>
+</button>")
     </ChildContent>
 </Collapse>
 
-<p>
-    You can also place a <code>Tooltip</code> with no <code>Anchor</code>. In this case, the tooltip
-    element itself will render as a "help" icon that acts as the trigger for the popover.
-</p>
-
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tooltip>This is a tooltip with no anchor</Tooltip>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tooltip>This is a tooltip with no anchor</Tooltip>")
-    </ChildContent>
-</Collapse>
-
-<h2>Anchors and placement</h2>
+<h2>Triggering</h2>
 
 <p>
-    Tooltips normally appear when the anchor element either receives focus, or when the mouse
-    pointer enters the element, and disappear when the element loses focus, or is tapped with the
+    Tooltips normally appear when an associated element either receives focus, or when the mouse
+    pointer enters the element, and disappear when the element loses focus, or the trigger tapped with the
     pointer.
 </p>
 <p>
-    In theory, the tooltip component can be placed anywhere on the page, and should still render
-    correctly at its anchor.
+    The tooltip can also be dismissed when it is tapped with the pointer by setting the
+    <code>DismissOnTap</code> property to <code>true</code>.
+</p>
+<p>
+    Tooltips normally appear immediately, but you can specify a delay before the tooltip appears
+    with the <code>Delay</code> property, which takes a value in milliseconds.
+</p>
+<p>
+    Tooltips' visibility can also be toggled programmatically with the <code>Toggle</code> method.
+    The tooltip will appear in its last opened position. If it was never activated by interacting
+    with a triggering element, it will appear at the top-left corner of its nearest
+    relatively-positioned parent element.
+</p>
+
+<h2>Placement</h2>
+
+<p>
+    In some situations the positioning of the tooltip might not work as expected when the
+    <code>Tooltip</code> and the trigger are in containers with different <a
+    href="https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Positioning#positioning_contexts">positioning
+    contexts</a>. In most cases this type of issue can be resolved by placing the
+    <code>Tooltip</code> component closer to the trigger in the element hierarchy.
 </p>
 
 <h2>Customization</h2>
 
-<p>
-    Set the color to any theme color with the <code>ThemeColor</code> property.
-</p>
+<p>Set the color to any theme color with the <code>ThemeColor</code> property.</p>
 
-<p>
-    Remove the arrow by setting the <code>Arrow</code> property to <code>false</code>.
-</p>
+<p>Remove the arrow by setting the <code>Arrow</code> property to <code>false</code>.</p>
 
 <p>
     Change the side of the anchor element where the tooltip appears by setting the <code>Side</code>
     property.
 </p>
 
-<p>
-    Control the delay before the tooltip appears with the <code>Delay</code> property.
-</p>
-
-<p>
-    Cause the tooltip to be dismissed when tapped with the pointer by setting the
-    <code>DismissOnTap</code> property to <code>true</code>.
-</p>
-
 <Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <button id="tooltipped-button-3" class="btn btn-icon success"><tf-icon>add</tf-icon></button>
-            <Tooltip Anchor="tooltipped-button-3"
-                     Arrow="false"
-                     Delay="600"
-                     DismissOnTap="true"
-                     Side="Side.Right"
-                     ThemeColor="ThemeColor.Secondary">
-                Add
-            </Tooltip>
+            <button class="btn btn-icon success">
+                <tf-icon>add</tf-icon>
+                <Tooltip Arrow="false"
+                         Delay="600"
+                         DismissOnTap="true"
+                         Side="Side.Right"
+                         ThemeColor="ThemeColor.Secondary">
+                    Add
+                </Tooltip>
+            </button>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button id=""tooltipped-button-3"" class=""btn btn-icon success""><tf-icon>add</tf-icon></button>
-            <Tooltip Anchor=""tooltipped-button-3""
-                     Arrow=""false""
-                     Delay=""600""
-                     DismissOnTap=""true""
-                     Side=""Side.Right""
-                     ThemeColor=""ThemeColor.Secondary"">
-                Add
-            </Tooltip>")
+        @CodeFormatter.CodeToMarkup(@"<button class=""btn btn-icon success"">
+    <tf-icon>add</tf-icon>
+    <Tooltip Arrow=""false""
+                Delay=""600""
+                DismissOnTap=""true""
+                Side=""Side.Right""
+                ThemeColor=""ThemeColor.Secondary"">
+        Add
+    </Tooltip>
+</button>")
     </ChildContent>
 </Collapse>

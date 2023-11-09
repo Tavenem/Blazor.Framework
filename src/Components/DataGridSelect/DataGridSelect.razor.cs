@@ -28,11 +28,6 @@ public partial class DataGridSelect<
     private bool _initialized, _keyboardNavigating, _valueUpdated;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// The converter used to convert bound values to option values, and vice versa.
     /// </para>

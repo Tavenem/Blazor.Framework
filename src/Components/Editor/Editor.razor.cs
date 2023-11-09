@@ -157,7 +157,7 @@ public partial class Editor : FormComponentBase<string>
 
     private ColorInput<string>? BackgroundPicker { get; set; }
 
-    private string? BoldClass => new CssBuilder("rounded small")
+    private string? BoldClass => new CssBuilder()
         .Add("filled", IsActive(EditorCommandType.Strong))
         .Add("outlined", IsActive(EditorCommandType.Bold))
         .ToString();
@@ -194,7 +194,7 @@ public partial class Editor : FormComponentBase<string>
     private bool IsWysiwyg => EditorMode == EditorMode.WYSIWYG
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
 
-    private string? ItalicClass => new CssBuilder("rounded small")
+    private string? ItalicClass => new CssBuilder()
         .Add("filled", IsActive(EditorCommandType.Italic))
         .Add("outlined", IsActive(EditorCommandType.Italic))
         .ToString();
@@ -418,8 +418,8 @@ public partial class Editor : FormComponentBase<string>
         .CommandsActive
         .TryGetValue(type, out var v)
         && v
-        ? "btn btn-icon rounded-left filled"
-        : "btn btn-icon rounded-left";
+        ? "btn btn-icon filled"
+        : "btn btn-icon";
 
     private string? ActiveThemeClass(EditorCommandType type) => IsActive(type)
         ? (ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS()

@@ -4,22 +4,19 @@ using System.Diagnostics.CodeAnalysis;
 namespace Tavenem.Blazor.Framework;
 
 /// <summary>
-/// Attaches a <see cref="Popover"/> to an element and displays it when the anchor element is
-/// hovered.
+/// Displays a <see cref="Popover"/> when an associated element is hovered.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Set the <c>data-tooltip-id</c> HTML attribute on any element to the <see cref="Id"/> value
+/// of a <c>Tooltip</c> component to associate the element with that tooltip.
+/// </para>
+/// <para>
+/// Nest a <c>Tooltip</c> inside an element to associate them automatically.
+/// </para>
+/// </remarks>
 public partial class Tooltip
 {
-    /// <summary>
-    /// The HTML <c>id</c> of an element to which this tooltip should be attached. The tooltip will
-    /// be displayed when the use hovers over the anchor.
-    /// </summary>
-    /// <remarks>
-    /// If no anchor is assigned, a button will be displayed which can be used to display the
-    /// tooltip. This button will also be visible even for anchored tooltips on non-hover devices
-    /// (usually devices which do not use a mouse).
-    /// </remarks>
-    [Parameter] public string? Anchor { get; set; }
-
     /// <summary>
     /// <para>
     /// Whether the tooltip should have an arrow pointing towards its anchor element.
@@ -54,6 +51,31 @@ public partial class Tooltip
     /// </para>
     /// </summary>
     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
+    /// <summary>
+    /// If <see langword="true"/> this component will render as a visible button, which will be
+    /// automatically associated with the tooltip.
+    /// </summary>
+    /// <remarks>
+    /// A tooltip with a visible button can still be associated with elements which reference it by
+    /// <see cref="Id"/>, but will not respond to events for its containing element.
+    /// </remarks>
+    [Parameter] public bool IsButton { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether the <c>Tooltip</c> component's containing element should act as a tooltip trigger.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// This should usually be set to <see langword="false"/> for tooltips which are intended to be
+    /// triggered by <see cref="Id"/>, unless their container is also intended to be a tooltip
+    /// trigger.
+    /// </remarks>
+    [Parameter] public bool IsContainerTrigger { get; set; } = true;
 
     /// <summary>
     /// <para>
