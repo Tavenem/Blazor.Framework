@@ -61,25 +61,25 @@ jobs:
         working-directory: ./src
 
       - name: Publish
-        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true' && steps.nbgv.outputs.PrereleaseVersion == ''
         run: dotnet publish --configuration Release -o publish -p:Version=${{ steps.nbgv.outputs.Version }} --no-build --nologo
         working-directory: ./docs/docsite
 
       # copy index.html to 404.html to fix GitHub Pages SPA navigation
       - name: copy index.html to 404.html
-        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true' && steps.nbgv.outputs.PrereleaseVersion == ''
         run: |
           cp index.html 404.html
         working-directory: ./docs/docsite/publish/wwwroot
 
       # add .nojekyll file so GitHub pages will not treat this as a Jekyll project
       - name: Add .nojekyll file
-        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true' && steps.nbgv.outputs.PrereleaseVersion == ''
         run: touch publish/wwwroot/.nojekyll
         working-directory: ./docs/docsite
 
       - name: Deploy
-        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
+        if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true' && steps.nbgv.outputs.PrereleaseVersion == ''
         uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
           branch: gh-pages
