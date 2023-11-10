@@ -21,8 +21,8 @@
     margin: 0;
     overflow: auto;
     padding-bottom: .5em;
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 1em;
+    padding-right: 1em;
     padding-top: .5em;
     position: relative;
     scrollbar-gutter: stable;
@@ -41,8 +41,6 @@
             justify-content: flex-start;
             list-style: none;
             padding-bottom: .5em;
-            padding-left: 1em;
-            padding-right: 1em;
             padding-top: .5em;
             position: relative;
             text-align: start;

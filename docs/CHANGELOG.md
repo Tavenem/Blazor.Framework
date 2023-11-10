@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0-preview.5
+### Fixed
+- List style regression
+
 ## 2.0-preview.4
 ### Added
 - Added properties to `Contents` to improve customizability:
