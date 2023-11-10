@@ -31,6 +31,52 @@ public partial class FrameworkLayout : IDisposable
     [Parameter] public Breakpoint ContentsBreakpoint { get; set; } = Breakpoint.Lg;
 
     /// <summary>
+    /// <para>
+    /// The maximum level of headings which are shown by the table of contents.
+    /// </para>
+    /// <para>
+    /// Default is zero, which indicates that headings of any level should be shown.
+    /// </para>
+    /// <para>
+    /// Ignored if <see cref="ContentsBreakpoint"/> is <see cref="Breakpoint.None"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public int ContentsMaxLevel { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The maximum level of headings which are shown by the table of contents, relative to the
+    /// highest level of any heading present (i.e. the maximum nesting depth of the list).
+    /// </para>
+    /// <para>
+    /// Default is 2.
+    /// </para>
+    /// <para>
+    /// A value of 0 would indicate only a single level should be shown (i.e. no depth).
+    /// </para>
+    /// <para>
+    /// Set to a negative number to allow headings of any relative level to be shown.
+    /// </para>
+    /// <para>
+    /// Ignored if <see cref="ContentsBreakpoint"/> is <see cref="Breakpoint.None"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public int ContentsMaxLevelOffset { get; set; } = 2;
+
+    /// <summary>
+    /// <para>
+    /// The minimum number of headings which must be present before the table of content is shown.
+    /// </para>
+    /// <para>
+    /// Default is 3.
+    /// </para>
+    /// <para>
+    /// Ignored if <see cref="ContentsBreakpoint"/> is <see cref="Breakpoint.None"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public int ContentsMinHeadings { get; set; } = 3;
+
+    /// <summary>
     /// Any toolbars and drawers.
     /// </summary>
     [Parameter] public RenderFragment? FrameworkContent { get; set; }

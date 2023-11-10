@@ -17,6 +17,10 @@
     </CascadingValue>
     @if (ContentsBreakpoint != Breakpoint.None)
     {
-        <Contents @ref="Contents" Breakpoint="ContentsBreakpoint" />
+        <Contents @ref="Contents"
+                  Breakpoint="ContentsBreakpoint"
+                  MaxLevel="ContentsMaxLevel"
+                  MaxLevelOffset="ContentsMaxLevelOffset"
+                  MinHeadings="ContentsMinHeadings" />
     }
 </div>

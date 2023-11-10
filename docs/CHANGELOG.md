@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0-preview.4
+### Added
+- Added properties to `Contents` to improve customizability:
+   - `MaxLevel`
+   - `MaxLevelOffset`
+   - `MinHeadings`
+
 ## 2.0-preview.3
 ### Fixed
 - Improved `Tooltip` behavior

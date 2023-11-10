@@ -45,11 +45,6 @@
     (the default) the list is visible at all breakpoints.
 </p>
 
-<p>
-    The <code>ThemeColor</code> parameter can be set to control the color theme
-    of the list.
-</p>
-
 <h2>Layout</h2>
 
 <p>
@@ -94,3 +89,37 @@
     <button class="btn primary" @onclick="AddHeading" disabled="@_added">Add Heading to Contents</button>
     <button class="btn danger" @onclick="RemoveHeading" disabled="@(!_added)">Remove Heading from Contents</button>
 </div>
+
+<h2>Customization</h2>
+
+<p>
+    The <code>MinHeadings</code> property can be set to a number to control the minimum number of
+    headings which must be present before the table of contents will be displayed. By default its
+    value is 3.
+</p>
+
+<p>
+    The <code>MaxLevel</code> property can be set to a number to control the highest level of
+    heading which is displayed in the table of contents. By default its value is zero, which
+    indicates that headings of any level should be shown.
+</p>
+
+<p>
+    The <code>MaxLevelOffset</code> property can be set to a number to control the highest level of
+    heading which is displayed in the table of contents relative to the highest level of any heading
+    present (i.e. the maximum nesting depth of the list). By default its value is <code>2</code>,
+    which indicates that headings of the highest level, and up to two levels greater should be
+    shown. A value of zero would indicate only a single level should be shown (i.e. no depth). Set
+    to a negative number to allow headings of any relative level to be shown.
+</p>
+
+<p>
+    The above three properties are also present on the <code>FrameworkLayout</code> component,
+    prefixed by "Contents" (e.g. "<code>ContentsMinHeadings</code>"), to enable customization of the
+    built-in table of contents.
+</p>
+
+<p>
+    The <code>ThemeColor</code> parameter can be set to control the color theme
+    of the list.
+</p>

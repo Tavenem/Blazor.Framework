@@ -37,6 +37,43 @@ public partial class Contents : IDisposable
     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
+    /// <para>
+    /// The maximum level of headings which are shown.
+    /// </para>
+    /// <para>
+    /// Default is zero, which indicates that headings of any level should be shown.
+    /// </para>
+    /// </summary>
+    [Parameter] public int MaxLevel { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// The maximum level of headings which are shown, relative to the highest level of any heading
+    /// present (i.e. the maximum nesting depth of the list).
+    /// </para>
+    /// <para>
+    /// Default is 2.
+    /// </para>
+    /// <para>
+    /// A value of 0 would indicate only a single level should be shown (i.e. no depth).
+    /// </para>
+    /// <para>
+    /// Set to a negative number to allow headings of any relative level to be shown.
+    /// </para>
+    /// </summary>
+    [Parameter] public int MaxLevelOffset { get; set; } = 2;
+
+    /// <summary>
+    /// <para>
+    /// The minimum number of headings which must be present before the table is shown.
+    /// </para>
+    /// <para>
+    /// Default is 3.
+    /// </para>
+    /// </summary>
+    [Parameter] public int MinHeadings { get; set; } = 3;
+
+    /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; } = ThemeColor.Primary;
@@ -227,12 +264,8 @@ public partial class Contents : IDisposable
 
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        var count = Headings.Count;
         Headings.Clear();
         Headings.AddRange(await ContentsService.GetHeadingsAsync(Id));
-        if (Headings.Count != count)
-        {
-            StateHasChanged();
-        }
+        StateHasChanged();
     }
 }
