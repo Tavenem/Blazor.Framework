@@ -784,37 +784,34 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
-        if (LoadItems is null)
+        if (LoadItems is not null)
         {
-            if (Items is null)
+            return;
+        }
+
+        if (Items is null)
+        {
+            if (SelectedItems.Count > 0)
             {
-                if (SelectedItems.Count > 0)
-                {
-                    SelectedItem = default;
-                    SelectedItems.Clear();
-                    SelectedItemChanging?.Invoke(this, SelectedItem);
-                    await SelectedItemChanged.InvokeAsync(SelectedItem);
-                    await SelectedItemsChanged.InvokeAsync(SelectedItems);
-                }
+                SelectedItem = default;
+                SelectedItems.Clear();
+                SelectedItemChanging?.Invoke(this, SelectedItem);
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                await SelectedItemsChanged.InvokeAsync(SelectedItems);
             }
-            else
-            {
-                var remaining = SelectedItems.Intersect(Items).ToList();
-                if (remaining.Count != SelectedItems.Count)
-                {
-                    SelectedItems.Clear();
-                    SelectedItems.AddRange(remaining);
-                    SelectedItem = SelectedItems.FirstOrDefault();
-                    SelectedItemChanging?.Invoke(this, SelectedItem);
-                    await SelectedItemChanged.InvokeAsync(SelectedItem);
-                    await SelectedItemsChanged.InvokeAsync(SelectedItems);
-                }
-            }
-            Regroup();
         }
         else
         {
-            await LoadItemsAsync();
+            var remaining = SelectedItems.Intersect(Items).ToList();
+            if (remaining.Count != SelectedItems.Count)
+            {
+                SelectedItems.Clear();
+                SelectedItems.AddRange(remaining);
+                SelectedItem = SelectedItems.FirstOrDefault();
+                SelectedItemChanging?.Invoke(this, SelectedItem);
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            }
         }
     }
 

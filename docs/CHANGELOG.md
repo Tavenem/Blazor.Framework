@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0-preview.6
+### Fixed
+- Data grid loading behavior
+
 ## 2.0-preview.5
 ### Fixed
 - List style regression

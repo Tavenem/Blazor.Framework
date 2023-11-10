@@ -537,7 +537,7 @@
     <tr>
         <td colspan="1000">
             <div class="d-flex flex-column">
-                <div style="height:.25rem;background-color:var(--table-stripe-color);width:100%">
+                <div style="display:flex;height:.25rem;overflow:hidden;width:100%">
                     @if (IsLoading && DataGrid.GetRowWasExpanded(Item))
                     {
                         <tf-progress-linear class="@LoadingClass"></tf-progress-linear>
