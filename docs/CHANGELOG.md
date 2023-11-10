@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0-preview.6
+## 2.0-preview.6-7
 ### Fixed
 - Data grid loading behavior
 

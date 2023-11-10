@@ -1118,11 +1118,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void OnColumnSorted(IColumn<TDataItem> column)
+    public async Task OnColumnSortedAsync(IColumn<TDataItem> column)
     {
         _sortOrder.Remove(column.Id);
         _sortOrder.Insert(0, column.Id);
-        SetSortQuery();
+        await SetSortOrderAsync();
     }
 
     /// <summary>
@@ -1151,6 +1151,78 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         return OnSetSelectAllAsync(true);
+    }
+
+    /// <summary>
+    /// Called internally.
+    /// </summary>
+    public async Task SetFilterAsync(bool preventReload = false)
+    {
+        if (LoadItems is not null && !preventReload)
+        {
+            await LoadItemsAsync();
+        }
+        if (PersistState)
+        {
+            List<string>? filterQueries = null;
+
+            var quickFilter = QuickFilter?.Trim('"').Trim();
+            if (!string.IsNullOrEmpty(quickFilter))
+            {
+                (filterQueries ??= []).Add(new StringBuilder(Id)
+                    .Append(";quick;'")
+                    .Append(quickFilter)
+                    .Append('\'')
+                    .ToString());
+            }
+
+            var filterInfo = GetFilterInfo();
+            if (filterInfo is not null)
+            {
+                foreach (var filter in filterInfo)
+                {
+                    var query = new StringBuilder(filter.Property);
+                    if (filter.DateTimeFilterIsBefore)
+                    {
+                        query.Append(";before");
+                    }
+                    if (filter.ExactMatch)
+                    {
+                        query.Append(";exact");
+                    }
+                    if (filter.BoolFilter.HasValue)
+                    {
+                        query.Append(";'")
+                            .Append(filter.BoolFilter.Value)
+                            .Append('\'');
+                    }
+                    else if (filter.DateTimeFilter.HasValue)
+                    {
+                        query.Append(";'")
+                            .Append(filter.DateTimeFilter.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture))
+                            .Append('\'');
+                    }
+                    else if (filter.NumberFilter.HasValue)
+                    {
+                        query.Append(";'")
+                            .Append(filter.NumberFilter.Value)
+                            .Append('\'');
+                    }
+                    else if (!string.IsNullOrEmpty(filter.TextFilter))
+                    {
+                        query.Append(";'")
+                            .Append(filter.TextFilter)
+                            .Append('\'');
+                    }
+                    (filterQueries ??= []).Add(query.ToString());
+                }
+            }
+
+            QueryStateService.SetPropertyValues(
+                Id,
+                FilterQueryParamName,
+                filterQueries);
+        }
     }
 
     /// <summary>
@@ -1458,11 +1530,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     internal bool GetRowWasExpanded(TDataItem item) => item is not null
         && _rowExpansion.Contains(item.GetHashCode());
 
-    internal void OnColumnSorted(Guid id)
+    internal async Task OnColumnSortedAsync(Guid id)
     {
         _sortOrder.Remove(id);
         _sortOrder.Insert(0, id);
-        SetSortQuery();
+        await SetSortOrderAsync();
     }
 
     internal async Task OnDeleteAsync(Row<TDataItem> row)
@@ -2516,10 +2588,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
     }
 
-    private void OnBoolFilterChanged(IColumn<TDataItem> column, bool? value)
+    private async Task OnBoolFilterChangedAsync(IColumn<TDataItem> column, bool? value)
     {
         column.BoolFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
     private void OnCancelEdit() => EditingRow?.CancelEdit();
@@ -2583,7 +2655,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SetRowsPerPageQuery();
     }
 
-    private void OnColumnSort(IColumn<TDataItem> column)
+    private async Task OnColumnSortAsync(IColumn<TDataItem> column)
     {
         if (_sortOrder.Contains(column.Id))
         {
@@ -2593,19 +2665,19 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             column.SortDescending = false;
         }
-        OnColumnSorted(column);
+        await OnColumnSortedAsync(column);
     }
 
-    private void OnDateTimeFilterChanged(IColumn<TDataItem> column, DateTimeOffset? value)
+    private async Task OnDateTimeFilterChangedAsync(IColumn<TDataItem> column, DateTimeOffset? value)
     {
         column.DateTimeFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
-    private void OnFilterChanged(IColumn<TDataItem> column, string? value)
+    private async Task OnFilterChangedAsync(IColumn<TDataItem> column, string? value)
     {
         column.TextFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
     private Task OnFilterQueryChangedAsync(QueryChangeEventArgs args)
@@ -2706,10 +2778,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SetOffsetQuery();
     }
 
-    private void OnNumberFilterChanged(IColumn<TDataItem> column, double? value)
+    private async Task OnNumberFilterChangedAsync(IColumn<TDataItem> column, double? value)
     {
         column.NumberFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
     private async Task OnOffsetQueryChangedAsync(QueryChangeEventArgs args)
@@ -2911,70 +2983,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         StateHasChanged();
     }
 
-    private void SetFilterQuery()
-    {
-        List<string>? filterQueries = null;
-
-        var quickFilter = QuickFilter?.Trim('"').Trim();
-        if (!string.IsNullOrEmpty(quickFilter))
-        {
-            (filterQueries ??= []).Add(new StringBuilder(Id)
-                .Append(";quick;'")
-                .Append(quickFilter)
-                .Append('\'')
-                .ToString());
-        }
-
-        var filterInfo = GetFilterInfo();
-        if (filterInfo is not null)
-        {
-            foreach (var filter in filterInfo)
-            {
-                var query = new StringBuilder(filter.Property);
-                if (filter.DateTimeFilterIsBefore)
-                {
-                    query.Append(";before");
-                }
-                if (filter.ExactMatch)
-                {
-                    query.Append(";exact");
-                }
-                if (filter.BoolFilter.HasValue)
-                {
-                    query.Append(";'")
-                        .Append(filter.BoolFilter.Value)
-                        .Append('\'');
-                }
-                else if (filter.DateTimeFilter.HasValue)
-                {
-                    query.Append(";'")
-                        .Append(filter.DateTimeFilter.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture))
-                        .Append('\'');
-                }
-                else if (filter.NumberFilter.HasValue)
-                {
-                    query.Append(";'")
-                        .Append(filter.NumberFilter.Value)
-                        .Append('\'');
-                }
-                else if (!string.IsNullOrEmpty(filter.TextFilter))
-                {
-                    query.Append(";'")
-                        .Append(filter.TextFilter)
-                        .Append('\'');
-                }
-                (filterQueries ??= []).Add(query.ToString());
-            }
-        }
-
-        if (PersistState)
-        {
-            QueryStateService.SetPropertyValues(
-                Id,
-                FilterQueryParamName,
-                filterQueries);
-        }
-    }
+    private Task SetFilterAsync() => SetFilterAsync(false);
 
     private void SetOffsetQuery()
     {
@@ -2998,8 +3007,12 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
     }
 
-    private void SetSortQuery()
+    private async Task SetSortOrderAsync()
     {
+        if (LoadItems is not null)
+        {
+            await LoadItemsAsync();
+        }
         if (PersistState)
         {
             QueryStateService.SetPropertyValues(

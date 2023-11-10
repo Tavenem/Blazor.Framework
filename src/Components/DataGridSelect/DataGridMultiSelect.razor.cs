@@ -252,7 +252,7 @@ public partial class DataGridMultiSelect<
             {
                 foreach (var id in _initialSortOrder)
                 {
-                    DataGrid.OnColumnSorted(id);
+                    await DataGrid.OnColumnSortedAsync(id);
                 }
             }
         }
@@ -312,7 +312,7 @@ public partial class DataGridMultiSelect<
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void OnColumnSorted(IColumn<TDataItem> column)
+    public async Task OnColumnSortedAsync(IColumn<TDataItem> column)
     {
         if (!_initialized)
         {
@@ -320,7 +320,10 @@ public partial class DataGridMultiSelect<
             _initialSortOrder.Add(column.Id);
             return;
         }
-        DataGrid?.OnColumnSorted(column);
+        if (DataGrid is not null)
+        {
+            await DataGrid.OnColumnSortedAsync(column);
+        }
     }
 
     /// <summary>
@@ -333,6 +336,17 @@ public partial class DataGridMultiSelect<
     /// Selects all options.
     /// </summary>
     public Task SelectAllAsync() => DataGrid?.SelectAllAsync() ?? Task.CompletedTask;
+
+    /// <summary>
+    /// Called internally.
+    /// </summary>
+    public async Task SetFilterAsync(bool preventReload = false)
+    {
+        if (_initialized && DataGrid is not null)
+        {
+            await DataGrid.SetFilterAsync(preventReload);
+        }
+    }
 
     /// <summary>
     /// Toggle the given item's selected state.

@@ -28,7 +28,7 @@
                 @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
                 {
                     <TextInput @bind-Value="@QuickFilter"
-                               @bind-Value:after="SetFilterQuery"
+                               @bind-Value:after="SetFilterAsync"
                                PostfixIcon="@DefaultIcons.Search"
                                UpdateOnInput="true"
                                UpdateOnInputDebounce="500"
@@ -136,7 +136,7 @@
                                     @if (column.IsString)
                                     {
                                         <TextInput @bind-Value:get="@column.TextFilter"
-                                                   @bind-Value:set="@(v => OnFilterChanged(column, v))"
+                                                   @bind-Value:set="@(v => OnFilterChangedAsync(column, v))"
                                                    PostfixIcon="@DefaultIcons.Search"
                                                    UpdateOnInput="true"
                                                    UpdateOnInputDebounce="Debounce"
@@ -145,14 +145,14 @@
                                     else if (column.IsBool)
                                     {
                                         <Checkbox @bind-Value:get="@column.BoolFilter"
-                                                  @bind-Value:set="@(v => OnBoolFilterChanged(column, v))"
+                                                  @bind-Value:set="@(v => OnBoolFilterChangedAsync(column, v))"
                                                   AllowNull="true"
                                                   Class="dense" />
                                     }
                                     else if (column.IsNumeric)
                                     {
                                         <NumericInput @bind-Value:get="@column.NumberFilter"
-                                                      @bind-Value:set="@(v => OnNumberFilterChanged(column, v))"
+                                                      @bind-Value:set="@(v => OnNumberFilterChangedAsync(column, v))"
                                                       UpdateOnInput="true"
                                                       UpdateOnInputDebounce="Debounce"
                                                       Class="dense" />
@@ -160,7 +160,7 @@
                                     else if (column.IsDateTime)
                                     {
                                         <DateTimeInput @bind-Value:get="@column.DateTimeFilter"
-                                                       @bind-Value:set="@(v => OnDateTimeFilterChanged(column, v))"
+                                                       @bind-Value:set="@(v => OnDateTimeFilterChangedAsync(column, v))"
                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
                                                        DisplayType="PickerDisplayType.Button"
                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
