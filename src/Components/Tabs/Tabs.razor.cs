@@ -861,7 +861,7 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
     private async Task<double> GetReferenceSizeAsync(ElementReference reference, bool forceRefresh = false) => TabSide switch
     {
         Side.Top or Side.Bottom => (await ResizeObserver.GetSizeInfoAsync(reference, forceRefresh))?.Width ?? 0,
-        _ => (await ResizeObserver.GetSizeInfoAsync(reference))?.Height ?? 0,
+        _ => (await ResizeObserver.GetSizeInfoAsync(reference, forceRefresh))?.Height ?? 0,
     };
 
     private string? GetTabClass(int index) => new CssBuilder("tab")
