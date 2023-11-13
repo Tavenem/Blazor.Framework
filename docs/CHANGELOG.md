@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0-preview.9
+### Fixed
+- QueryStateService initialization
+
 ## 2.0-preview.8
 ### Fixed
 - Tab scrolling

@@ -979,11 +979,16 @@ public class QueryStateService
     private void InitializeFromQuery()
     {
         if (IsInitialized
-            || !Uri.TryCreate(_navigationManager.Uri, UriKind.Absolute, out var uri)
-            || !QueryHelpers
+            || !Uri.TryCreate(_navigationManager.Uri, UriKind.Absolute, out var uri))
+        {
+            return;
+        }
+
+        if (!QueryHelpers
             .ParseQuery(uri.Query)
             .TryGetValue(QueryParameterName, out var queryValues))
         {
+            IsInitialized = true;
             return;
         }
 
