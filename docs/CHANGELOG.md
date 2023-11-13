@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0-preview.10
+### Fixed
+- Grouped paging in DataGrid
+
 ## 2.0-preview.9
 ### Fixed
 - QueryStateService initialization

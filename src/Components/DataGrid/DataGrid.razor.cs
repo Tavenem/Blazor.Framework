@@ -660,8 +660,6 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     private bool IsAdding { get; set; }
 
-    private int ItemCount => DataGroups?.Count ?? CurrentItems.Count();
-
     private string? LoadingClass => new CssBuilder("small")
         .Add(ThemeColor.ToCSS())
         .ToString();
@@ -2615,8 +2613,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         if (LoadItems is null)
         {
-            PageCount = (ulong)ItemCount / value;
-            if (ItemCount % value != 0)
+            var itemCount = CurrentItems.LongCount();
+            PageCount = (ulong)itemCount / value;
+            if (itemCount % value != 0)
             {
                 PageCount++;
             }
@@ -2957,7 +2956,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             return;
         }
 
-        var itemCount = (ulong)ItemCount;
+        var itemCount = (ulong)CurrentItems.LongCount();
         if (Offset > itemCount)
         {
             Offset = 0;
