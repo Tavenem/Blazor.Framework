@@ -660,6 +660,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     private bool IsAdding { get; set; }
 
+    private int ItemCount => CurrentItems.Count();
+
     private string? LoadingClass => new CssBuilder("small")
         .Add(ThemeColor.ToCSS())
         .ToString();

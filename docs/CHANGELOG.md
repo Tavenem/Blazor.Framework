@@ -3,6 +3,7 @@
 ## 2.0-preview.10
 ### Fixed
 - Grouped paging in DataGrid
+- Added field flex grow
 
 ## 2.0-preview.9
 ### Fixed
