@@ -72,7 +72,7 @@
             {
                 <button @onclick="OnFinishAsync" class="@FinishButtonCssClass" disabled="@IsFinishButtonDisabled">@FinishButtonText</button>
             }
-            else if (ShowNext)
+            else if (IsNextButtonVisible)
             {
                 @if (IsInteractive || NextDisabled)
                 {
