@@ -1,3 +1,4 @@
+import { TavenemContentsHTMLElement } from './tavenem-contents';
 import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
 import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
 import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
@@ -204,6 +205,8 @@ namespace Tavenem {
                 }
             }
         });
+
+        customElements.define('tf-contents', TavenemContentsHTMLElement)
 
         customElements.define('tf-drawer-toggle', class extends HTMLElement {
             _open: boolean = false;

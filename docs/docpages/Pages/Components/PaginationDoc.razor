@@ -22,7 +22,7 @@
     page to show that that item is not selectable.
 </p>
 
-<CodeExample Code="@(@"<nav class=""pagination"" role=""navigation"">
+<CodeExample Id="ce-1" Code="@(@"<nav class=""pagination"" role=""navigation"">
     <ol>
         <li><button class=""btn btn-text"">1</button></li>
         <li><button class=""btn btn-text"">2</button></li>
@@ -39,7 +39,7 @@
     removing the <code>href</code> attribute of links.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<nav class=""pagination disabled"" role=""navigation"">
+<CodeExample Id="ce-2" IsOpen="false" Code="@(@"<nav class=""pagination disabled"" role=""navigation"">
     <ol>
         <li><button class=""btn btn-text"">1</button></li>
         <li><button class=""btn btn-text"">2</button></li>
@@ -58,10 +58,10 @@
     and will update when the user changes pages by activating any of the page controls.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Pagination CurrentPage="3" PageCount="5" />
+            <Pagination Id="p-3" CurrentPage="3" PageCount="5" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -74,10 +74,10 @@
     pagination is inactive, and doing so will automatically disable the page controls.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <Pagination CurrentPage="3" PageCount="5" Disabled="true" />
+            <Pagination Id="p-4" CurrentPage="3" PageCount="5" Disabled="true" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -94,17 +94,17 @@
     hidden pages will be replaced by an ellipsis.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row flex-column align-items-center">
             <div class="justify-content-center">
-                <Pagination CurrentPage="2" PageCount="13" />
+                <Pagination Id="p-5-1" CurrentPage="2" PageCount="13" />
             </div>
             <div class="justify-content-center">
-                <Pagination CurrentPage="7" PageCount="13" />
+                <Pagination Id="p-5-2" CurrentPage="7" PageCount="13" />
             </div>
             <div class="justify-content-center">
-                <Pagination CurrentPage="11" PageCount="13" />
+                <Pagination Id="p-5-3" CurrentPage="11" PageCount="13" />
             </div>
         </div>
     </TitleContent>
@@ -160,7 +160,7 @@
     their default state, but this one will stay open.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Pagination Id="pd1" CurrentPage="3" PageCount="5" PersistState="true" />
@@ -196,17 +196,17 @@
     controls:
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row flex-column align-items-center">
             <div class="justify-content-center">
-                <Pagination Class="small" CurrentPage="3" PageCount="5" />
+                <Pagination Id="p-7-1" Class="small" CurrentPage="3" PageCount="5" />
             </div>
             <div class="justify-content-center">
-                <Pagination CurrentPage="3" PageCount="5" />
+                <Pagination Id="p-7-2" CurrentPage="3" PageCount="5" />
             </div>
             <div class="justify-content-center">
-                <Pagination Class="large" CurrentPage="3" PageCount="5" />
+                <Pagination Id="p-7-3" Class="large" CurrentPage="3" PageCount="5" />
             </div>
         </div>
     </TitleContent>

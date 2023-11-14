@@ -34,39 +34,6 @@ public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
     }
 
     /// <summary>
-    /// Scroll to the given position.
-    /// </summary>
-    /// <param name="contentsId">The HTML id of the <see cref="Contents"/> element.</param>
-    /// <param name="level">The level of the heading.</param>
-    /// <param name="title">The title of the heading.</param>
-    /// <param name="position">The position to which scrolling should occur.</param>
-    /// <param name="setHistory">Whether to clear any fragment from the current URL and history.</param>
-    public async ValueTask ScrollToHeading(
-        string contentsId,
-        int level,
-        string? title,
-        ScrollLogicalPosition position = ScrollLogicalPosition.Start,
-        bool setHistory = true)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync(
-                    "scrollToHeading",
-                    contentsId,
-                    level,
-                    title,
-                    position.ToString().ToLowerInvariant(),
-                    setHistory)
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-    }
-
-    /// <summary>
     /// Scroll to the HTML element with the given id.
     /// </summary>
     /// <param name="elementId">The id of an HTML element.</param>
@@ -102,28 +69,5 @@ public class ScrollService(IJSRuntime jsRuntime) : IAsyncDisposable
         catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
-    }
-
-    /// <summary>
-    /// Observes scrolling and resizing events to detect which of the elements
-    /// with the given class is currently in view.
-    /// </summary>
-    /// <param name="dotNetRef">
-    /// A reference to a <see cref="Contents"/> component.
-    /// </param>
-    /// <param name="selector">A CSS selector.</param>
-    internal async ValueTask ScrollSpy(DotNetObjectReference<Contents> dotNetRef, string selector)
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("scrollSpy", dotNetRef, selector)
-                .ConfigureAwait(false);
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        catch (ObjectDisposedException) { }
     }
 }

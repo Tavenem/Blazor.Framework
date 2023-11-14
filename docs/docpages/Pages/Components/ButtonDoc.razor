@@ -16,7 +16,7 @@
     <code>button</code>). You can also assign it a theme class to color it.
 </p>
 
-<CodeExample Code="@(@"<button class=""btn"">Example</button>
+<CodeExample Id="ce-1" Code="@(@"<button class=""btn"">Example</button>
 <button class=""btn"" disabled>Disabled</button>
 <a class=""btn primary"">Primary</a>
 <span class=""btn secondary"">Secondary</span>
@@ -35,7 +35,7 @@
     class to increase them.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<button class=""btn primary small"">Small</button>
+<CodeExample Id="ce-2" IsOpen="false" RowClass="align-items-center" Code="@(@"<button class=""btn primary small"">Small</button>
 <button class=""btn secondary"">Normal</button>
 <button class=""btn tertiary large"">Large</button>")" />
 
@@ -46,7 +46,7 @@
     remove the background except on hover.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<div class=""row justify-content-center mb-3"">
+<CodeExample Id="ce-3" IsOpen="false" Code="@(@"<div class=""row justify-content-center mb-3"">
     <button class=""btn outlined"">Example</button>
     <button class=""btn outlined"" disabled>Disabled</button>
     <button class=""btn outlined primary"">Primary</button>
@@ -87,7 +87,7 @@
     noticed when using a <code>filled</code> or <code>outlined</code> variant.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<button class=""btn btn-icon danger""><tf-icon>delete</tf-icon></button>
+<CodeExample Id="ce-4" IsOpen="false" RowClass="align-items-center" Code="@(@"<button class=""btn btn-icon danger""><tf-icon>delete</tf-icon></button>
 <button class=""btn btn-icon small primary""><tf-icon>verified</tf-icon></button>
 <button class=""btn btn-icon large secondary""><tf-icon>account_circle</tf-icon></button>
 <button class=""btn btn-icon filled tertiary""><tf-icon>favorite</tf-icon></button>
@@ -114,7 +114,7 @@
     to inherit that theme. Any individual button can still override that theme, however.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group primary"">
+<CodeExample Id="ce-5" IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group primary"">
     <button class=""btn"">Button 1</button>
     <button class=""btn secondary"">Button 2</button>
     <button class=""btn"">Button 3</button>
@@ -129,7 +129,7 @@
     Button groups can contain standard buttons or icon buttons, as well as a mix.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group primary"">
+<CodeExample Id="ce-6" IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group primary"">
     <button class=""btn"">Button 1</button>
     <button class=""btn"">Button 2</button>
     <button class=""btn btn-icon""><tf-icon>description</tf-icon></button>
@@ -148,7 +148,7 @@
     modifier to all the buttons in the group.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group small"">
+<CodeExample Id="ce-7" IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group small"">
     <button class=""btn"">Button 1</button>
     <button class=""btn"">Button 2</button>
     <button class=""btn"">Button 3</button>
@@ -164,7 +164,7 @@
     to create a group of text buttons.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group outlined"">
+<CodeExample Id="ce-8" IsOpen="false" RowClass="align-items-center" Code="@(@"<div class=""button-group outlined"">
     <button class=""btn"">Button 1</button>
     <button class=""btn"">Button 2</button>
     <button class=""btn"">Button 3</button>
@@ -185,7 +185,7 @@
     shape of the group.
 </p>
 
-<CodeExample Code="@(@"<div class=""button-group square"">
+<CodeExample Id="ce-9" Code="@(@"<div class=""button-group square"">
     <button class=""btn"">Button 1</button>
     <button class=""btn"">Button 2</button>
     <button class=""btn"">Button 3</button>
@@ -200,7 +200,7 @@
     You can disable the group's shadow with the <code>elevation-0</code> utility class.
 </p>
 
-<CodeExample Code="@(@"<div class=""button-group elevation-0"">
+<CodeExample Id="ce-10" Code="@(@"<div class=""button-group elevation-0"">
     <button class=""btn"">Button 1</button>
     <button class=""btn"">Button 2</button>
     <button class=""btn"">Button 3</button>
@@ -214,7 +214,7 @@
     to make the dropdown span the full width of the group.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div id="split-group" class="button-group">

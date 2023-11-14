@@ -559,7 +559,9 @@
             {
                 @if (Syntax == EditorSyntax.HTML)
                 {
-                    @(new MarkupString(Value ?? string.Empty))
+                    <div class="static-editor-html">
+                        @(new MarkupString(Value ?? string.Empty))
+                    </div>
                 }
                 else if (Syntax == EditorSyntax.Markdown)
                 {

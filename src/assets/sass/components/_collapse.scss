@@ -72,6 +72,10 @@
             }
         }
 
+        > a.expand {
+            color: inherit;
+        }
+
         > tf-icon.expand {
             margin-inline-end: -.25rem;
             margin-inline-start: auto;

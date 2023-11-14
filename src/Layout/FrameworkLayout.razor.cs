@@ -71,6 +71,9 @@ public partial class FrameworkLayout : IDisposable
     /// Default is 3.
     /// </para>
     /// <para>
+    /// A value &lt;= 0 causes the table to be displayed regardless of the number of headings.
+    /// </para>
+    /// <para>
     /// Ignored if <see cref="ContentsBreakpoint"/> is <see cref="Breakpoint.None"/>.
     /// </para>
     /// </summary>
@@ -91,7 +94,11 @@ public partial class FrameworkLayout : IDisposable
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private Contents? Contents { get; set; }
+    private string? ContentsClass => ContentsBreakpoint switch
+    {
+        Breakpoint.None => null,
+        _ => $"d-none d-{ContentsBreakpoint.ToCSS()}-flex",
+    };
 
     private DialogContainer? DialogContainer { get; set; }
 
@@ -118,30 +125,9 @@ public partial class FrameworkLayout : IDisposable
     }
 
     /// <summary>
-    /// Adds a heading to the default <see cref="Contents"/> component.
-    /// </summary>
-    /// <param name="heading">The heading to add.</param>
-    /// <returns>
-    /// The heading's ID. If it was <see langword="null"/> or empty, a new ID will be created.
-    /// </returns>
-    /// <remarks>
-    /// This method can be used to add headings dynamically.
-    /// </remarks>
-    public string? AddHeading(HeadingInfo heading) => Contents?.AddHeading(heading);
-
-    /// <summary>
     /// Dismisses all open dialogs.
     /// </summary>
     public void DismissAllDialogs() => DialogContainer?.DismissAllDialogs();
-
-    /// <summary>
-    /// Removes a heading from the default <see cref="Contents"/> component.
-    /// </summary>
-    /// <param name="heading">The heading to remove.</param>
-    /// <remarks>
-    /// Does not throw an error if the given heading is not present.
-    /// </remarks>
-    public void RemoveHeading(HeadingInfo heading) => Contents?.RemoveHeading(heading);
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting

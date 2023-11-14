@@ -14,7 +14,7 @@
     There is an alert for each of the <a href="./getting-started/themes">color themes</a>:
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert>Unthemed</Alert>
@@ -49,7 +49,7 @@
     To minimize padding, use the <code>dense</code> class:
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert Class="dense">Unthemed</Alert>
@@ -84,7 +84,7 @@
     placement.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert Class="outlined">Unthemed</Alert>
@@ -113,7 +113,7 @@
     </ChildContent>
 </Collapse>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert Class="filled">Unthemed</Alert>
@@ -153,7 +153,7 @@
     You can also include your own custom icon, in any position you wish:
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert AutoIcon="false">Icon after the text <tf-icon>lightbulb</tf-icon></Alert>
@@ -172,7 +172,7 @@
     invoke both handlers.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             @if (_show)
@@ -196,7 +196,7 @@
     pressed.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert AutoClose="true">Dismissable</Alert>
@@ -214,7 +214,7 @@
     cursor and respond to click events, which will invoke the <code>OnClick</code> callback.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Alert ThemeColor="_theme" OnClick="@(_ => _theme = ThemeColor.Primary)">Click me</Alert>

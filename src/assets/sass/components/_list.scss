@@ -101,7 +101,6 @@
             background-color: var(--list-active-bg);
             border-inline-end: 1px solid var(--list-active-color);
             color: var(--list-active-color);
-            padding-inline-end: calc(1em - 1px);
         }
 
         .clickable:not(.collapse), a {
@@ -227,7 +226,7 @@
             border-inline-start: 1px solid var(--list-active-color);
             border-inline-end: none;
             padding-inline-start: calc(1em - 1px);
-            padding-inline-end: 1em;
+            padding-inline-end: 0;
         }
 
         .list > .active,
@@ -235,7 +234,7 @@
             border-inline-start: 1px solid var(--list-active-color);
             border-inline-end: none;
             padding-inline-start: calc(1em - 1px);
-            padding-inline-end: 1em;
+            padding-inline-end: 0;
         }
     }
 
@@ -317,17 +316,7 @@
     width: 1em;
 }
 
-.contents {
-    color: var(--tavenem-color-text-secondary);
-    margin-top: 1rem;
-
-    > .active {
-        border-left: 1px solid var(--list-active-color);
-        border-right: none;
-    }
-
-    .appbar.top ~ & {
-        margin-top: 0;
-        padding-top: 0;
-    }
+.appbar:not(.bottom) ~ tf-contents {
+    margin-top: 0;
+    padding-top: 0;
 }

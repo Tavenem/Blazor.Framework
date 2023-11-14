@@ -17,10 +17,10 @@
     <code>Items</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" />
+            <DataGrid Id="d-1" Items="_items" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -61,10 +61,10 @@
     <code>LoadItems</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid LoadItems="_loadItems" />
+            <DataGrid Id="d-2" LoadItems="_loadItems" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -275,10 +275,10 @@
     with AOT compilation.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Title="Employees" Items="_items">
+            <DataGrid Id="d-3" Title="Employees" Items="_items">
                 <Column Label="Id" Value="@(x => x.Id)" IsShown="false" />
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
@@ -411,10 +411,10 @@
     Configure the additional content with the <code>ExpandedContent RenderFragment</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items">
+            <DataGrid Id="d-4" Items="_items">
                 <ChildContent>
                     <Column Label="Last" Value="@(x => x.LastName)" />
                     <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" />
@@ -517,10 +517,10 @@
     An initial filter value can be set for a column with the <code>InitialFilter</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Title="Employees" Items="_items">
+            <DataGrid Id="d-5" Title="Employees" Items="_items">
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" InitiallySorted="true" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" InitialFilter="true">
@@ -663,10 +663,10 @@
     string to group items by the equality of that key.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" GroupBy="@(x => x.IsExecutive.ToString())">
+            <DataGrid Id="d-6" Items="_items" GroupBy="@(x => x.IsExecutive.ToString())">
                 <GroupContent>
                     @if (bool.TryParse(context, out var value) && value)
                     {
@@ -747,10 +747,10 @@
     default options are 10, 25, 50, and 100).
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items2" />
+            <DataGrid Id="d-7" Items="_items2" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -812,10 +812,10 @@
     The <code>SelectedItem</code> property will reflect the currently selected item.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem" />
+            <DataGrid Id="d-8" TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Single" @bind-SelectedItem="_selectedItem" />
             <span>Selected employee: @(_selectedItem?.LastName ?? "none")</span>
         </div>
     </TitleContent>
@@ -864,10 +864,10 @@
     selected items.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
+            <DataGrid Id="d-9" TDataItem="DataItem" Items="_items" SelectionType="SelectionType.Multiple" @bind-SelectedItems="_selectedItems" />
             <span>Selected employees: @_selectedItems.Count</span>
         </div>
     </TitleContent>
@@ -964,10 +964,10 @@
     read-only columns are not displayed on the automatically-generated edit dialog at all.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_editableItems1" AllowEdit="true" />
+            <DataGrid Id="d-10" Items="_editableItems1" AllowEdit="true" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1075,10 +1075,10 @@
     edit dialog, this reset only works for <code>IFormComponent</code> inputs.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_editableItems2" AllowEdit="true" AllowInlineEdit="true" />
+            <DataGrid Id="d-11" Items="_editableItems2" AllowEdit="true" AllowInlineEdit="true" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1140,10 +1140,10 @@
     refresh.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_editableItems3" AllowEdit="true" AllowAdd="true" />
+            <DataGrid Id="d-12" Items="_editableItems3" AllowEdit="true" AllowAdd="true" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1190,10 +1190,10 @@
     from the current page (if present).
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_editableItems3" AllowEdit="true" AllowDelete="true" />
+            <DataGrid Id="d-13" Items="_editableItems3" AllowEdit="true" AllowDelete="true" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1299,10 +1299,10 @@
     header.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" Title="Example Title">
+            <DataGrid Id="d-14" Items="_items" Title="Example Title">
                 <HeaderContent>
                     <tf-icon class="info">table_rows</tf-icon>
                 </HeaderContent>
@@ -1350,11 +1350,11 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" Title="Primary" ThemeColor="ThemeColor.Primary" SelectionType="SelectionType.Single" TableClass="striped hover" />
-            <DataGrid Items="_items" Title="Secondary" ThemeColor="ThemeColor.Secondary" SelectionType="SelectionType.Single" TableClass="striped hover" />
+            <DataGrid Id="d-15-1" Items="_items" Title="Primary" ThemeColor="ThemeColor.Primary" SelectionType="SelectionType.Single" TableClass="striped hover" />
+            <DataGrid Id="d-15-2" Items="_items" Title="Secondary" ThemeColor="ThemeColor.Secondary" SelectionType="SelectionType.Single" TableClass="striped hover" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1400,10 +1400,10 @@
     You can add the <code>dense</code> class to reduce padding.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" TableClass="dense" />
+            <DataGrid Id="d-16" Items="_items" TableClass="dense" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1443,10 +1443,10 @@
     The <code>border</code> class will add both external and internal lines.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-17" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" TableClass="border" />
+            <DataGrid Id="d-17" Items="_items" TableClass="border" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1487,10 +1487,10 @@
     the <code>hover</code> class will change the background color of hovered rows.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-18" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items" TableClass="striped hover" />
+            <DataGrid Id="d-18" Items="_items" TableClass="striped hover" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -1532,10 +1532,10 @@
     property to see this in action.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-19" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Items="_items2" MaxHeight="300px" />
+            <DataGrid Id="d-19" Items="_items2" MaxHeight="300px" />
         </div>
     </TitleContent>
     <ChildContent>

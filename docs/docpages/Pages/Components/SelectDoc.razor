@@ -15,7 +15,7 @@
     class to give it a shaded background. Add the <code>outlined</code> class to use a full outline.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -47,7 +47,7 @@
     for that particular component.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -83,7 +83,7 @@
     (which receives the current value as a context parameter) to set the displayed content.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select TValue="int">
@@ -122,7 +122,7 @@
     You can disable a manual option with its <code>Disabled</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select TValue="int">
@@ -152,7 +152,7 @@
     render the values in the option list.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select Options="_options1" Labels="@(x => $"Option {x}")">
@@ -183,7 +183,7 @@
     each option, and the <code>Value</code> should contain its label.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select OptionPairs="_options2" />
@@ -234,7 +234,7 @@
     that selects a value from a data item (row).
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
@@ -288,7 +288,7 @@
     selects all other available options.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <MultiSelect Options="_options1" Labels="@(x => $"Option {x}")">
@@ -316,7 +316,7 @@
     <code>DataGrid</code>.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGridMultiSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
@@ -364,7 +364,7 @@
     The select can be set as disabled or read-only by setting the properties of the same names.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -405,7 +405,7 @@
     input like a placeholder when it is empty, and has no explicit placeholder.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -428,7 +428,7 @@
     The <code>Placeholder</code> property assigns a placeholder to the select.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -453,7 +453,7 @@
     You can supply help text for the field with the <code>HelpText</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -485,7 +485,7 @@
     time.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -554,7 +554,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -597,7 +597,7 @@
     You can add the <code>dense</code> class to any variant to reduce the margins and padding.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">

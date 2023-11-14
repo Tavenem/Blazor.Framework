@@ -17,7 +17,6 @@ public static class TavenemFrameworkDIExtensions
     public static IServiceCollection AddTavenemFramework(this IServiceCollection services)
     {
         services.AddScoped<UtilityService>();
-        services.AddScoped<ContentsService>();
         services.AddScoped<DragDropService>();
         services.AddScoped<DrawerService>();
         services.AddScoped<ScrollService>();

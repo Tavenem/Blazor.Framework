@@ -23,10 +23,10 @@
     <code>Step</code> other than the first, to ensure that the steps are completed in order.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Steps>
+            <Steps Id="s-1">
                 <Step Title="First step">
                     <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory">
                         <Option Label="Category 1" Value="1" />
@@ -90,10 +90,10 @@
     navigation away from the step will hide it again.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Steps @ref="_steps">
+            <Steps @ref="_steps" Id="s-2">
                 <Step Title="Category">
                     <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory2">
                         <Option Label="Category 1" Value="1" />
@@ -169,11 +169,11 @@
     text.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <div class="w-100">
-                <Steps Finish="OnSubmit" FinishButtonDisabled="@(string.IsNullOrEmpty(_word))">
+                <Steps Id="s-3" Finish="OnSubmit" FinishButtonDisabled="@(string.IsNullOrEmpty(_word))">
                     <Step Title="First step">
                         <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory3">
                             <Option Label="Category 1" Value="1" />
@@ -279,11 +279,11 @@
     selection list.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <div class="w-100">
-                <Steps ThemeColor="ThemeColor.Primary">
+                <Steps Id="s-4" ThemeColor="ThemeColor.Primary">
                     <Step Title="First step">
                         <p>Content</p>
                     </Step>

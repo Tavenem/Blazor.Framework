@@ -145,7 +145,8 @@
             width: calc(100% - 2px);
         }
 
-        .ProseMirror {
+        .ProseMirror,
+        .static-editor-html {
             flex-grow: 1;
             line-height: 1.2;
             outline: none;
@@ -256,8 +257,11 @@
             }
         }
 
-        &.set-height .ProseMirror {
-            overflow: auto;
+        &.set-height {
+            .ProseMirror,
+            .static-editor-html {
+                overflow: auto;
+            }
         }
     }
 

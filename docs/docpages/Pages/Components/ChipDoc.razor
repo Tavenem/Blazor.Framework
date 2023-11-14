@@ -16,7 +16,7 @@
     class to color it.
 </p>
 
-<CodeExample Code="@(@"<span class=""chip"">Example</span>
+<CodeExample Id="ce-1" Code="@(@"<span class=""chip"">Example</span>
 <span class=""chip primary"">Primary</span>
 <span class=""chip secondary"">Secondary</span>
 <span class=""chip tertiary"">Tertiary</span>
@@ -31,7 +31,7 @@
     To indicate that a non-button chip is interactive, add the <code>clickable</code> class.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<span class=""chip clickable"">Example</span>
+<CodeExample Id="ce-2" IsOpen="false" Code="@(@"<span class=""chip clickable"">Example</span>
 <span class=""chip clickable primary"">Primary</span>
 <span class=""chip clickable secondary"">Secondary</span>
 <span class=""chip clickable tertiary"">Tertiary</span>
@@ -50,7 +50,7 @@
     rather than using the usual disabled colors.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<span class=""chip disabled"">Example</span>
+<CodeExample Id="ce-3" IsOpen="false" Code="@(@"<span class=""chip disabled"">Example</span>
 <span class=""chip disabled primary"">Primary</span>
 <span class=""chip disabled secondary"">Secondary</span>
 <span class=""chip disabled tertiary"">Tertiary</span>
@@ -67,7 +67,7 @@
     The size of a chip can be adjusted with the <code>small</code> and <code>large</code> classes.
 </p>
 
-<CodeExample IsOpen="false" RowClass="align-items-center" Code="@(@"<span class=""chip small primary"">Small</span>
+<CodeExample Id="ce-4" IsOpen="false" RowClass="align-items-center" Code="@(@"<span class=""chip small primary"">Small</span>
 <span class=""chip primary"">Normal</span>
 <span class=""chip large primary"">Large</span>")" />
 
@@ -76,7 +76,7 @@
     class.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<span class=""chip chip-text"">Example</span>
+<CodeExample Id="ce-5" IsOpen="false" Code="@(@"<span class=""chip chip-text"">Example</span>
 <span class=""chip chip-text primary"">Primary</span>
 <span class=""chip chip-text secondary"">Secondary</span>
 <span class=""chip chip-text tertiary"">Tertiary</span>
@@ -91,7 +91,7 @@
     Chips can also be <code>outlined</code>.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<span class=""chip outlined"">Example</span>
+<CodeExample Id="ce-6" IsOpen="false" Code="@(@"<span class=""chip outlined"">Example</span>
 <span class=""chip outlined primary"">Primary</span>
 <span class=""chip outlined secondary"">Secondary</span>
 <span class=""chip outlined tertiary"">Tertiary</span>
@@ -107,7 +107,7 @@
     of a chip.
 </p>
 
-<CodeExample IsOpen="false" Code="@(@"<span class=""chip square primary"">Primary</span>
+<CodeExample Id="ce-7" IsOpen="false" Code="@(@"<span class=""chip square primary"">Primary</span>
 <span class=""chip rounded secondary"">Secondary</span>")" />
 
 <h2>Component</h2>
@@ -125,7 +125,7 @@
     template is provided, with the <code>ToString</code> method of the items.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Single" />
@@ -155,7 +155,7 @@
     time may be selected. If set to <code>Multiple</code> any number of items may be selected.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" />
@@ -186,7 +186,7 @@
     forced.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-10" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Single" Required="true" />
@@ -214,7 +214,7 @@
     pressed.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" AutoClose="true" />
@@ -243,7 +243,7 @@
     set its <code>IsDropTarget</code> property to <code>true</code>.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-12" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_dragChips" IsDragStart="true" IsDropTarget="true" />
@@ -303,7 +303,7 @@
     <code>IconClass</code> property can be used to customize the class of the icon.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-13" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
@@ -324,7 +324,7 @@
     appropriate items.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-14" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SeparatorBefore="@(i => i == "Chip 2")" />
@@ -353,7 +353,7 @@
     itself, rather than their own theme, to make it clear that they are currently selected.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-15" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
@@ -376,7 +376,7 @@
     <code>OnItemClick</code> callback.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
