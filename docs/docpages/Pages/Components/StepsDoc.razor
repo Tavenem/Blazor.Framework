@@ -223,6 +223,27 @@
     </ChildContent>
 </Collapse>
 
+<h2>Methods</h2>
+
+<p>
+    The <code>ActivateNextStepAsync</code>, <code>ActivatePreviousStepAsync</code>, and
+    <code>ActivateStepAsync</code> methods can be used to programmatically control the active step
+    (the last takes a <code>Step</code> instance).
+</p>
+
+<p>
+    For exclusive programmatic control, the <code>HideButtons</code> property allows hiding the
+    built-in buttons in order to prevent user navigation through the steps.
+</p>
+
+<p>
+    To support programmatic navigation, the <code>HasNextStep</code>,
+    <code>IsFinishButtonVisible</code>, <code>IsNextButtonVisible</code>, and
+    <code>IsPreviousButtonVisible</code> read-only properties provide information about the
+    navigational state of the component. These take into account the visiblity and disabled state of
+    all steps, and are set regardless of the state of the <code>HideButtons</code> property.
+</p>
+
 <h2>Persistent State</h2>
 
 <p>

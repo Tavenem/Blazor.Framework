@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0-preview.11
+### Added
+- More manual control properties and methods to `Steps`
+
 ## 2.0-preview.10
 ### Fixed
 - Grouped paging in DataGrid
