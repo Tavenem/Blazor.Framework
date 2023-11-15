@@ -33,6 +33,10 @@ hljs.registerLanguage('sql', sql);
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('xml', xml);
 
+hljs.configure({
+    ignoreUnescapedHTML: true,
+});
+
 export function highlight(elementId: string) {
     hljs.configure({
         cssSelector: `#${elementId} pre code`,
@@ -40,4 +44,31 @@ export function highlight(elementId: string) {
     });
 
     hljs.highlightAll();
+}
+
+export class TavenemHighlightHTMLElement extends HTMLElement {
+    private _mutationObserver: MutationObserver;
+
+    constructor() {
+        super();
+
+        this._mutationObserver = new MutationObserver(_ => {
+            this.applyHighlighting();
+        });
+    }
+
+    connectedCallback() {
+        this._mutationObserver.observe(this, { characterData: true });
+
+        setTimeout(() => {
+            this.applyHighlighting();
+        });
+    }
+
+    applyHighlighting() {
+        if (this.textContent
+            && this.textContent.length) {
+            hljs.highlightElement(this);
+        }
+    }
 }

@@ -17,7 +17,6 @@ public static class TavenemFrameworkDIExtensions
     public static IServiceCollection AddTavenemFramework(this IServiceCollection services)
     {
         services.AddScoped<UtilityService>();
-        services.AddScoped<ContentsService>();
         services.AddScoped<DragDropService>();
         services.AddScoped<DrawerService>();
         services.AddScoped<ScrollService>();
@@ -29,7 +28,6 @@ public static class TavenemFrameworkDIExtensions
         services.AddTransient<EditorService>();
         services.AddTransient<IJSEventListener, JSEventListener>();
         services.AddTransient<IKeyListener, KeyListener>();
-        services.AddTransient<IResizeObserver, ResizeObserver>();
         return services;
     }
 }

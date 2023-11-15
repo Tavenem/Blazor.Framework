@@ -11,17 +11,8 @@
              class="@ToolbarCssClass">
             <div class="tabs-toolbar-inner">
                 @PreTabContent
-                @if (ShowScrollButtons)
-                {
-                    <button @onclick="ScrollBack"
-                            class="tab-scroll-btn btn btn-icon"
-                            disabled="@(!IsInteractive || _backButtonDisabled)">
-                        <tf-icon>@BackIcon</tf-icon>
-                    </button>
-                }
-                <div @ref="_tabsContent" class="tabs-toolbar-content">
+                <div class="tabs-toolbar-content">
                     <div class="tabs-toolbar-wrapper"
-                         style="@ScrollStyle"
                          role="tablist"
                          tabindex="0"
                          @onkeydown="OnKeyDownAsync">
@@ -30,8 +21,7 @@
                             var index = i;
                             @if (IsInteractive)
                             {
-                                <div @ref="_panels[index].PanelReference"
-                                     @key="@_panels[index].Id"
+                                <div @key="@_panels[index].Id"
                                      id="@_panels[index].Id"
                                      @onclick="@(_ => ActivatePanelAsync(index))"
                                      draggable="@(_panels[index].GetIsDraggable() ? "true" : "false")"
@@ -81,11 +71,6 @@
                                     {
                                         @_panels[index].Title
                                     }
-                                    @if (_panels[index].OnClose.HasDelegate
-                                        || OnClose.HasDelegate)
-                                    {
-                                        <tf-close disabled />
-                                    }
                                 </a>
                             }
                         }
@@ -108,8 +93,7 @@
                                                          Item="Items[index]"
                                                          OnDrop="@(e => OnDropOnItemAsync(index, e))"
                                                          OnDropped="@(e => OnDroppedItemAsync(index, e))">
-                                        <div @ref="_dynamicItems[index].ElementReference"
-                                             @onclick="@(_ => ActivatePanelAsync(index + _panels.Count))"
+                                        <div @onclick="@(_ => ActivatePanelAsync(index + _panels.Count))"
                                              class="@GetTabClass(index + _panels.Count)"
                                              role="tab"
                                              aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")"
@@ -149,37 +133,27 @@
                                         {
                                             @TabTitle(Items[index + _panels.Count])
                                         }
-                                        @if (CanCloseTabs || OnClose.HasDelegate)
-                                        {
-                                            <tf-close disabled />
-                                        }
                                     </a>
                                 }
                             }
                         }
-                        @if (IsInteractive && HasValidDrop && NoDropTargetChildren)
+                        @if (IsInteractive)
                         {
-                            <div class="@DropPlaceholderClass"></div>
+                            if (HasValidDrop && NoDropTargetChildren)
+                            {
+                                <div class="@DropPlaceholderClass"></div>
+                            }
+                            @if (OnAdd is not null)
+                            {
+                                <button @onclick="OnAddTabAsync"
+                                        class="btn btn-icon add-btn"
+                                        disabled="@(!IsInteractive)">
+                                    <tf-icon>@AddIcon</tf-icon>
+                                </button>
+                            }
                         }
-                        @if (OnAdd is not null)
-                        {
-                            <button @onclick="OnAddTabAsync"
-                                    class="btn btn-icon add-btn"
-                                    disabled="@(!IsInteractive)">
-                                <tf-icon>@AddIcon</tf-icon>
-                            </button>
-                        }
-                        <div class="tab-slider" style="@SliderStyle"></div>
                     </div>
                 </div>
-                @if (ShowScrollButtons)
-                {
-                    <button @onclick="ScrollForward"
-                            class="tab-scroll-btn btn btn-icon"
-                            disabled="@(!IsInteractive || _forwardButtonDisabled)">
-                        <tf-icon>@ForwardIcon</tf-icon>
-                    </button>
-                }
                 @PostTabContent
             </div>
         </div>

@@ -5,26 +5,35 @@
 <h1>Contents</h1>
 
 <p>
-    The contents component displays a list of headings on the current page, with
-    links to each of them.
+    The Tavenem Blazor Framework includes a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a> to easily
+    display a list of headings on the current page, with links to each of them. The
+    <code>FrameworkLayout</code> element includes a built-in version, so you don't need to do
+    anything at all to include one in your Tavenem Blazor Framework app, unless you'd like to
+    customize its behavior or appearance. The list functions normally when your app is rendered
+    statically, or prerendered by the server.
 </p>
 
 <h2>Basics</h2>
 
 <p>
-    Use the <code>Contents</code> component to create a table of contents for the component's
+    Use the <code>tf-contents</code> custom element to create a table of contents for the element's
     container. The list is built automatically by examining the container for heading elements, as
-    well as any element with the <code>tav-heading</code> class. Elements with the
-    <code>tav-heading</code> class can specify their effective level with the
-    <code>data-heading-level</code> attribute, which should be a value between 1 and 6.
+    well as any element with the <code>tav-heading</code> class. Both standard heading elements and
+    elements with the <code>tav-heading</code> class can specify their effective level with the
+    <code>data-heading-level</code> attribute, which should be a value between 1 and 6. For standard
+    heading elements, this overrides the apparent level of the heading in the table of contents, but
+    does not alter the heading's appearance in the document flow.
 </p>
 
 <p>
-    The contents list is rebuilt on page navigation, but does not respond to dynamic adding or
-    removing of headings. If heading elements might be dynamically added or removed on a page, you
-    can call the <code>RefreshHeadingsAsync</code> method on the <code>Contents</code> component to
-    refresh the list. Note, however, that this will also remove any headings manually added with the
-    <code>AddHeading</code> method (see below).
+    To keep a heading element from appearing on the table of contents, simply add the
+    <code>data-hide-from-contents</code> attribute to that heading.
+</p>
+
+<p>
+    The contents list responds automatically as headings are added, removed, or have their relevant
+    attributes altered.
 </p>
 
 <p>
@@ -33,64 +42,51 @@
 </p>
 
 <p>
-    Note that if a heading has no HTML <code>id</code>, clicking its listing in the contents will
-    scroll to the nearest heading with its title. If two headings in scope both have the same title,
-    this may cause undesired behavior. In that case it is recommended that each heading be given a
-    unique <code>id</code>.
-</p>
-
-<p>
-    You can make a <code>Contents</code> component responsive by setting the <code>Breakpoint</code>
-    parameter to the breakpoint at which the list should be visible. When set to <code>None</code>
-    (the default) the list is visible at all breakpoints.
-</p>
-
-<p>
-    The <code>ThemeColor</code> parameter can be set to control the color theme
-    of the list.
+    If a heading has an HTML <code>id</code>, its listing in the contents will be a standard anchor
+    element with the <code>href</code> value set to a fragment with the <code>id</code>. If a
+    heading does <em>not</em> have an <code>id</code>, the listing in the contents will instead
+    cause the heading to be scrolled into view, and clear any fragment from the current URL. This is
+    typically less useful to the user, since the position of a heading with no <code>id</code>
+    cannot be bookmarked or shared.
 </p>
 
 <h2>Layout</h2>
 
 <p>
     The <code>FrameworkLayout</code> component has a built-in <code>Contents</code> component. It is
-    positioned after the main content (typically on the right-hand side of a page), and will
-    automatically share the <code>ThemeColor</code> of the parent <code>FrameworkLayout</code>.
+    positioned after the main content (typically on the right-hand side of a page).
 </p>
 
 <p>
-    The <code>Breakpoint</code> parameter of the built-in <code>Contents</code> component can be set
-    with the <code>ContentsBreakpoint</code> parameter of <code>FrameworkLayout</code> (it defaults
-    to <code>Lg</code>). There is one key difference, however: when set to <code>None</code> the
-    table of contents is hidden completely, rather than displayed at all breakpoints. This allows
-    you to suppress the built-in list (possibly in order to use it differently in your own layout).
+    The <code>ContentsBreakpoint</code> parameter of <code>FrameworkLayout</code> can be used to
+    control the view sizes at which the table of contents is displayed. It defaults to
+    <code>Lg</code>, and setting it to <code>None</code> disables the built-in table of contents
+    completely.
 </p>
 
-<h2>Manual Headings</h2>
+<h2>Customization</h2>
 
 <p>
-    It is also possible to add headings to the table(s) of contents on a page manually. The
-    <code>Contents</code> component has two key methods for this purpose: <code>AddHeading</code>
-    and <code>RemoveHeading</code>, both of which take a <code>HeadingInfo</code> object that
-    describes a heading. The <code>FrameworkLayout</code> also provides these same methods, in order
-    to add or remove headings from the built-in contents, and provides itself as a <a
-    href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/cascading-values-and-parameters">cascading
-    value</a> so you can access these methods from any component.
+    The <code>data-min-headings</code> attribute (or the <code>ContentsMinHeadings</code> property
+    on <code>FrameworkLayout</code>) can be set to a number to control the minimum number of
+    headings which must be present before the table of contents will be displayed. By default its
+    value is 3. A value &lt;= 0 causes the table to be displayed regardless of the number of
+    headings.
 </p>
 
 <p>
-    Adding a heading will automatically add it to the <code>Contents</code> component. It is
-    important that you also remove the heading when it is no longer relevant. For instance, in the
-    <code>Dispose</code> method of a component which adds it.
+    The <code>data-max-level</code> attribute (or the <code>ContentsMaxLevel</code> property on
+    <code>FrameworkLayout</code>) can be set to a number to control the highest level of heading
+    which is displayed in the table of contents. By default its value is zero, which indicates that
+    headings of any level should be shown.
 </p>
 
 <p>
-    You can try this yourself by clicking the following buttons, which will add or remove the
-    heading below to this page's table of contents:
+    The <code>data-max-level-offset</code> attribute (or the <code>ContentsMaxLevelOffset</code>
+    property on <code>FrameworkLayout</code>) can be set to a number to control the highest level of
+    heading which is displayed in the table of contents relative to the highest level of any heading
+    present (i.e. the maximum nesting depth of the list). By default its value is <code>2</code>,
+    which indicates that headings of the highest level, and up to two levels greater should be
+    shown. A value of zero would indicate only a single level should be shown (i.e. no depth). Set
+    to a negative number to allow headings of any relative level to be shown.
 </p>
-
-<span class="h3">Dynamic Heading</span>
-<div class="d-flex gap-3">
-    <button class="btn primary" @onclick="AddHeading" disabled="@_added">Add Heading to Contents</button>
-    <button class="btn danger" @onclick="RemoveHeading" disabled="@(!_added)">Remove Heading from Contents</button>
-</div>

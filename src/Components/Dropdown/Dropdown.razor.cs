@@ -44,6 +44,11 @@ public partial class Dropdown
     [Parameter] public Origin? AnchorOrigin { get; set; }
 
     /// <summary>
+    /// Custom CSS class(es) for the trigger button (if displayed).
+    /// </summary>
+    [Parameter] public string? ButtonClass { get; set; }
+
+    /// <summary>
     /// Raised when the button is clicked, if <see cref="HideButton"/> is <see langword="false"/>
     /// and <see cref="ActivationType"/> does not include <see cref="MouseEvent.LeftClick"/>.
     /// </summary>
@@ -180,7 +185,8 @@ public partial class Dropdown
     /// <summary>
     /// The CSS class assigned to the button, including component values.
     /// </summary>
-    private string? ButtonCssClass => new CssBuilder("btn")
+    private string? ButtonCssClass => new CssBuilder(ButtonClass)
+        .Add("btn")
         .Add("btn-icon", !string.IsNullOrEmpty(Icon) && string.IsNullOrEmpty(Text))
         .Add(ThemeColor.ToCSS())
         .ToString();

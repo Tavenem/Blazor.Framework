@@ -18,10 +18,6 @@ interface IPopoverPosition {
     top: number;
 }
 
-interface IPopoverScroller extends HTMLElement {
-    listeningForPopoverScroll?: boolean | undefined | null;
-}
-
 export namespace TavenemPopover {
     const flipClassReplacements: Record<string, Record<string, string>> = {
         'top': {
@@ -85,9 +81,8 @@ export namespace TavenemPopover {
         resizeObserver.observe(document.body);
         document.addEventListener('focusin', focusPopovers.bind(undefined, true));
         document.addEventListener('focusout', focusPopovers.bind(undefined, false));
-        window.addEventListener('resize', () => {
-            placePopovers();
-        });
+        document.addEventListener('scroll', placePopovers.bind(undefined), true);
+        window.addEventListener('resize', placePopovers.bind(undefined), true);
     }
 
     export function placePopover(popoverNode: Element): void {
@@ -108,10 +103,13 @@ export namespace TavenemPopover {
         const offsetParent = getOffsetParent(popoverNode);
         const offsetBoundingRect = offsetParent.getBoundingClientRect();
 
-        const anchorElementId = popoverNode.dataset.anchorId;
-        const anchorElement = anchorElementId
-            ? document.getElementById(anchorElementId)
-            : null;
+        let anchorElement: HTMLElement | null = null;
+        if (popoverNode instanceof TavenemPopoverHTMLElement
+            && popoverNode.anchor) {
+            anchorElement = popoverNode.anchor;
+        } else if (popoverNode.dataset.anchorId) {
+            anchorElement = document.getElementById(popoverNode.dataset.anchorId);
+        }
         const anchorBoundingRect = anchorElement
             ? anchorElement.getBoundingClientRect()
             : null;
@@ -459,6 +457,7 @@ export namespace TavenemPopover {
 }
 
 export class TavenemPopoverHTMLElement extends HTMLElement {
+    private _anchor: HTMLElement | null | undefined;
     private _mouseOver: boolean;
     private _mutationObserver: MutationObserver;
     private _parentMutationObserver: MutationObserver;
@@ -468,6 +467,9 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
     static get observedAttributes() {
         return ['data-offset-x', 'data-offset-y', 'data-position-x', 'data-position-y'];
     }
+
+    get anchor() { return this._anchor; }
+    set anchor(value: HTMLElement | null | undefined) { this._anchor = value; }
 
     get mouseOver() { return this._mouseOver; }
     set mouseOver(value: boolean) { this._mouseOver = value; }
@@ -601,25 +603,6 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
             && this.parentElement.hasAttribute('data-popover-container')) {
             this._parentMutationObserver.observe(this.parentElement, { attributeFilter: ['data-popover-open'] });
         }
-
-        let parentStyle: CSSStyleDeclaration;
-        const overflowRegex = /(auto|scroll)/;
-        let parent = this.parentElement as IPopoverScroller;
-        while (parent) {
-            if (parent.listeningForPopoverScroll) {
-                break;
-            }
-            parentStyle = getComputedStyle(parent);
-            if (parentStyle.position === 'static') {
-                parent = parent.parentElement as IPopoverScroller;
-                continue;
-            }
-            if (overflowRegex.test(parentStyle.overflow + parentStyle.overflowY + parentStyle.overflowX)) {
-                parent.addEventListener('scroll', TavenemPopover.placePopovers);
-                parent.listeningForPopoverScroll = true;
-            }
-            parent = parent.parentElement as IPopoverScroller;
-        }
     }
 
     disconnectedCallback() {
@@ -629,6 +612,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
         this.removeEventListener('mouseover', this.onMouseOver.bind(this));
         this.removeEventListener('touchstart', this.cancelFocusLoss.bind(this));
         this._mutationObserver.disconnect();
+        this._parentMutationObserver.disconnect();
         this._parentResizeObserver.disconnect();
         this._resizeObserver.disconnect();
     }
@@ -718,7 +702,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
         }
     }
 
-    private onMouseLeave() {
+    private onMouseLeave(event: MouseEvent) {
         this._mouseOver = false;
 
         if (this.previousSibling
@@ -730,7 +714,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
             const tooltip = this.closest('tf-tooltip');
             if (tooltip
                 && tooltip instanceof TavenemTooltipHTMLElement) {
-                tooltip.onPopoverMouseLeave();
+                tooltip.onPopoverMouseLeave(this, event);
             }
         }
     }
@@ -749,7 +733,10 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
 }
 
 export class TavenemTooltipHTMLElement extends HTMLElement {
+    private _anchor: HTMLElement | null | undefined;
+    private _button: HTMLButtonElement | undefined;
     private _dismissed: boolean;
+    private _hasButton: boolean;
     private _hideTimer: number;
     private _mouseOver: boolean;
     private _showTimer: number;
@@ -758,6 +745,7 @@ export class TavenemTooltipHTMLElement extends HTMLElement {
         super();
 
         this._dismissed = false;
+        this._hasButton = false;
         this._hideTimer = -1;
         this._mouseOver = false;
         this._showTimer = -1;
@@ -766,19 +754,13 @@ export class TavenemTooltipHTMLElement extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
 
-        const anchorId = this.dataset.anchor;
-        const anchor = anchorId ? document.getElementById(anchorId) : null;
-
         const style = document.createElement('style');
-        style.innerHTML = ':host {'
-            + (anchor && anchor.style.position !== 'static'
-                ? `
-    left: ${anchor.offsetLeft}px;
-    position: absolute;
-    top: ${anchor.offsetTop}px;
-    width: 1rem;
-`
-                : 'position: relative;') + `
+
+        if ('tooltipButton' in this.dataset) {
+            this._hasButton = true;
+
+            style.innerHTML = `:host {
+    position: relative;
 }
 
 button {
@@ -791,7 +773,7 @@ button {
     box-sizing: content-box;
     color: var(--tavenem-theme-color);
     cursor: pointer;
-    display: ${anchor ? 'none' : 'inline-flex'};
+    display: inline-flex;
     fill: currentColor;
     flex: 0 0 auto;
     height: 1rem;
@@ -799,7 +781,6 @@ button {
     outline: 0;
     overflow: hidden;
     position: absolute;
-    ${anchor ? 'right: -.375em;' : ''}
     stroke: currentColor;
     stroke-width: 1px;
     top: -.25em;
@@ -843,64 +824,88 @@ button {
         background-color: var(--tavenem-theme-color-hover);
     }
 
-    slot {
-        display: none;
-    }
+slot {
+    display: none;
+}
 
     :host([data-popover-open]) slot {
         display: block;
     }`;
-        shadow.appendChild(style);
+            shadow.appendChild(style);
 
-        const button = document.createElement('button');
-        button.tabIndex = -1;
-        button.addEventListener('click', this.toggle.bind(this));
-        shadow.appendChild(button);
+            const button = document.createElement('button');
+            button.tabIndex = -1;
+            button.addEventListener('click', this.toggle.bind(this));
+            button.addEventListener('focusin', this.onAttentionOnButton.bind(this));
+            button.addEventListener('focusout', this.onAttentionOutButton.bind(this));
+            button.addEventListener('mouseover', this.onAttentionOnButton.bind(this));
+            button.addEventListener('mouseleave', this.onAttentionOutButton.bind(this));
+            shadow.appendChild(button);
+            this._button = button;
 
-        const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-        icon.setAttributeNS(null, 'viewBox', "0 0 24 24");
-        icon.setAttributeNS(null, 'height', "1rem");
-        icon.setAttributeNS(null, 'width', "1rem");
-        icon.setAttributeNS(null, 'fill', "currentColor");
-        icon.innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>';
-        button.appendChild(icon);
+            const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            icon.setAttributeNS(null, 'viewBox', "0 0 24 24");
+            icon.setAttributeNS(null, 'height', "1rem");
+            icon.setAttributeNS(null, 'width', "1rem");
+            icon.setAttributeNS(null, 'fill', "currentColor");
+            icon.innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>';
+            button.appendChild(icon);
+        } else {
+            style.innerHTML = `:host {
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
+slot {
+    display: none;
+}
+
+    :host([data-popover-open]) slot {
+        display: block;
+    }`;
+            shadow.appendChild(style);
+        }
+
+        document.addEventListener('click', this.dismissTarget.bind(this));
+        document.addEventListener('focusin', this.onAttentionOnTarget.bind(this));
+        document.addEventListener('focusout', this.onAttentionOutTarget.bind(this));
+        document.addEventListener('mouseover', this.onAttentionOnTarget.bind(this));
+        document.addEventListener('mouseout', this.onAttentionOutTarget.bind(this));
 
         const slot = document.createElement('slot');
         shadow.appendChild(slot);
 
-        if (anchor) {
-            anchor.addEventListener('click', this.dismiss.bind(this));
-            anchor.addEventListener('focusin', this.onAttentionOn.bind(this));
-            anchor.addEventListener('focusout', this.onAttentionOut.bind(this));
-            anchor.addEventListener('mouseover', this.onAttentionOn.bind(this));
-            anchor.addEventListener('mouseleave', this.onAttentionOut.bind(this));
-        } else {
-            button.addEventListener('focusin', this.onAttentionOn.bind(this));
-            button.addEventListener('focusout', this.onAttentionOut.bind(this));
-            button.addEventListener('mouseover', this.onAttentionOn.bind(this));
-            button.addEventListener('mouseleave', this.onAttentionOut.bind(this));
-        }
         this.addEventListener('click', this.dismiss.bind(this));
     }
 
     disconnectedCallback() {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        this.removeEventListener('click', this.dismiss.bind(this));
-        this.removeEventListener('focusin', this.onAttentionOn.bind(this));
-        this.removeEventListener('focusout', this.onAttentionOut.bind(this));
-        this.removeEventListener('mouseover', this.onAttentionOn.bind(this));
-        this.removeEventListener('mouseleave', this.onAttentionOut.bind(this));
 
-        const button = this.querySelector('button.tooltip-trigger');
-        if (button) {
-            button.removeEventListener('click', this.toggle.bind(this));
-            button.removeEventListener('focusin', this.stopPropagation.bind(this));
-            button.removeEventListener('mouseover', this.stopPropagation.bind(this));
+        document.removeEventListener('click', this.dismissTarget.bind(this));
+        document.removeEventListener('focusin', this.onAttentionOnTarget.bind(this));
+        document.removeEventListener('focusout', this.onAttentionOutTarget.bind(this));
+        document.removeEventListener('mouseover', this.onAttentionOnTarget.bind(this));
+        document.removeEventListener('mouseout', this.onAttentionOutTarget.bind(this));
+
+        this.removeEventListener('click', this.dismiss.bind(this));
+        
+        if (this._button) {
+            this._button.removeEventListener('click', this.toggle.bind(this));
+            this._button.removeEventListener('focusin', this.onAttentionOnButton.bind(this));
+            this._button.removeEventListener('focusout', this.onAttentionOutButton.bind(this));
+            this._button.removeEventListener('mouseover', this.onAttentionOnButton.bind(this));
+            this._button.removeEventListener('mouseleave', this.onAttentionOutButton.bind(this));
         }
     }
 
-    onPopoverMouseLeave() {
+    onPopoverMouseLeave(popover: TavenemPopoverHTMLElement, event: MouseEvent) {
+        if (this.contains(popover)
+            && (!(event.relatedTarget instanceof Node)
+            || !this.contains(event.relatedTarget))) {
+            this._mouseOver = false;
+        }
         if ('popoverOpen' in this.dataset && !this._mouseOver) {
             this._dismissed = false;
             clearTimeout(this._showTimer);
@@ -914,44 +919,76 @@ button {
 
     setVisibility(value: boolean) {
         if (value) {
-            this.dataset.popoverOpen = '';
+            this.show();
         } else {
-            delete this.dataset.popoverOpen;
+            this.hide();
         }
         this._dismissed = false;
-        clearTimeout(this._hideTimer);
-        clearTimeout(this._showTimer);
     }
 
     toggleVisibility() {
         if ('popoverOpen' in this.dataset) {
-            delete this.dataset.popoverOpen;
+            this.hide();
         } else {
-            this.dataset.popoverOpen = '';
+            this.show();
         }
         this._dismissed = false;
-        clearTimeout(this._hideTimer);
-        clearTimeout(this._showTimer);
     }
 
-    private dismiss(event: Event) {
-        if (event.target !== this
-            && event.target instanceof Element
-            && !('dismissOnTap' in this.dataset)) {
-            const popover = event.target.closest('tf-popover');
-            if (popover && this.contains(popover)) {
-                return;
-            }
-        }
-
+    private dismiss() {
         this._dismissed = true;
         clearTimeout(this._showTimer);
         this._hideTimer = setTimeout(this.hide.bind(this), 200);
     }
 
+    private dismissTarget(event: Event) {
+        const target = this.verifyTarget(event);
+        if (!target
+            || (target === this
+            && !('dismissOnTap' in this.dataset))) {
+            return;
+        }
+
+        this.dismiss();
+    }
+
     private hide() {
+        this._mouseOver = false;
         delete this.dataset.popoverOpen;
+        clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
+        this._anchor = null;
+    }
+
+    private onAttentionOn() {
+        this._mouseOver = true;
+        if (this._dismissed) {
+            return;
+        }
+        const delayStr = this.dataset.delay;
+        const delay = delayStr ? parseInt(delayStr) : 0;
+        if (delay > 0) {
+            clearTimeout(this._showTimer);
+            clearTimeout(this._hideTimer);
+            this._showTimer = setTimeout(this.show.bind(this), delay);
+        } else {
+            this.show();
+        }
+    }
+
+    private onAttentionOnButton(event: Event) {
+        event.stopPropagation();
+        this._anchor = this._button;
+        this.onAttentionOn();
+    }
+
+    private onAttentionOnTarget(event: Event) {
+        const target = this.verifyTarget(event);
+        if (!target) {
+            return;
+        }
+        this._anchor = target;
+        this.onAttentionOn();
     }
 
     private onAttentionOut() {
@@ -967,29 +1004,79 @@ button {
         }
     }
 
-    private onAttentionOn() {
-        this._mouseOver = true;
-        if (this._dismissed) {
-            return;
-        }
-        clearTimeout(this._hideTimer);
-        const delayStr = this.dataset.delay;
-        const delay = delayStr ? parseInt(delayStr) : 0;
-        if (delay > 0) {
-            clearTimeout(this._showTimer);
-            this._showTimer = setTimeout(this.show.bind(this), delay);
-        } else {
-            this.dataset.popoverOpen = '';
-        }
+    private onAttentionOutButton(event: Event) {
+        event.stopPropagation();
+        this.onAttentionOut();
     }
 
-    private show() { this.dataset.popoverOpen = ''; }
+    private onAttentionOutTarget(event: Event) {
+        if (!this.verifyTarget(event)) {
+            return;
+        }
+        if (event.target instanceof Node) {
+            if (event instanceof MouseEvent
+                && event.target instanceof Node
+                && event.relatedTarget instanceof Node
+                && event.target.contains(event.relatedTarget)) {
+                return;
+            } else if (event instanceof FocusEvent
+                && event.target instanceof Node
+                && event.relatedTarget instanceof Node
+                && event.target.contains(event.relatedTarget)) {
+                return;
+            }
+        }
+        this.onAttentionOut();
+    }
 
-    private stopPropagation(event: Event) { event.stopPropagation(); }
+    private show() {
+        clearTimeout(this._hideTimer);
+        clearTimeout(this._showTimer);
+        const popover = this.querySelector('tf-popover');
+        if (popover instanceof TavenemPopoverHTMLElement) {
+            popover.anchor = this._anchor;
+        }
+        this.dataset.popoverOpen = '';
+    }
 
     private toggle(event: Event) {
         event.stopPropagation();
         this.toggleVisibility();
+    }
+
+    private verifyTarget(event: Event) {
+        if (event.target === this) {
+            return this;
+        }
+
+        if (!(event.target instanceof HTMLElement)) {
+            return null;
+        }
+
+        if ('tooltipId' in event.target.dataset) {
+            const tooltipId = event.target.dataset.tooltipId;
+            if (tooltipId === this.id) {
+                return event.target;
+            }
+            return null;
+        }
+
+        if (!this._hasButton
+            && 'tooltipContainerTrigger' in this.dataset) {
+            let tooltipElement = event.target.querySelector(':scope > tf-tooltip');
+            if (!tooltipElement
+                && event.target.parentElement) {
+                tooltipElement = event.target.parentElement.querySelector(':scope > tf-tooltip');
+                if (tooltipElement === this) {
+                    return event.target.parentElement;
+                }
+            }
+            if (tooltipElement === this) {
+                return event.target;
+            }
+        }
+
+        return null;
     }
 }
 
@@ -1211,6 +1298,10 @@ slot {
     }
 
     private openInner() {
+        const popover = this.querySelector('tf-popover.contained-popover');
+        if (popover) {
+            TavenemPopover.placePopover(popover);
+        }
         this.dataset.popoverOpen = '';
         this.dispatchEvent(TavenemDropdownHTMLElement.newDropdownToggleEvent(true));
     }

@@ -243,7 +243,7 @@ public partial class ImageEditor : IAsyncDisposable
 
     private bool HasImage { get; set; }
 
-    private bool Interactive { get; set; }
+    private bool IsInteractive { get; set; }
 
     private bool IsCropping { get; set; }
 
@@ -334,12 +334,12 @@ public partial class ImageEditor : IAsyncDisposable
             await SetLoadingAsync();
             await _module.InvokeVoidAsync("loadImage", ContainerId, Src);
             HasImage = true;
-            Interactive = true;
+            IsInteractive = true;
             await SetLoadingAsync(false);
         }
         else
         {
-            Interactive = true;
+            IsInteractive = true;
             StateHasChanged();
         }
     }

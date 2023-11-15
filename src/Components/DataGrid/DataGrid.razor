@@ -28,7 +28,7 @@
                 @if (AllowSearch && _columns.Any(x => x.IsString && x.IsQuickFilter))
                 {
                     <TextInput @bind-Value="@QuickFilter"
-                               @bind-Value:after="SetFilterQuery"
+                               @bind-Value:after="SetFilterAsync"
                                PostfixIcon="@DefaultIcons.Search"
                                UpdateOnInput="true"
                                UpdateOnInputDebounce="500"
@@ -36,16 +36,21 @@
                 }
                 @if (AllowAdd)
                 {
-                    <button class="btn btn-icon small" @onclick="OnAddAsync"><tf-icon>@DefaultIcons.Add</tf-icon></button>
+                    <button class="btn btn-icon small" @onclick="OnAddAsync">
+                        <tf-icon>@DefaultIcons.Add</tf-icon>
+                        <Tooltip Delay="750">Add</Tooltip>
+                    </button>
                 }
                 @if (AllowExport)
                 {
                     <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
                         <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+                        <Tooltip Delay="750">Export</Tooltip>
                     </button>
                 }
                 <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
                     <tf-icon>@DefaultIcons.Filter</tf-icon>
+                    <Tooltip Delay="750">Change displayed columns</Tooltip>
                 </button>
             </div>
         }
@@ -92,46 +97,31 @@
                     @foreach (var column in _columns.Where(x => x.GetIsShown()))
                     {
                         <th @key="column" class="@GetColumnHeaderClass(column)">
-                            @if (column.GetIsSortable())
-                            {
-                                <a href="@GetColumnSortUrl(column)">
-                                    @if (column.LabelContent is null)
-                                    {
-                                        <span style="white-space:nowrap">
-                                            @column.GetLabel()
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        @column.LabelContent
-                                    }
+                            <div @onclick="@(_ => OnColumnSortAsync(column))">
+                                @if (column.LabelContent is null)
+                                {
+                                    <span style="white-space:nowrap">
+                                        @column.GetLabel()
+                                    </span>
+                                }
+                                else
+                                {
+                                    @column.LabelContent
+                                }
+                                @if (IsInteractive && column.GetIsSortable())
+                                {
                                     <tf-icon class="@GetColumnHeaderIconClass(column)">
                                         @DefaultIcons.Sort_Ascending
                                     </tf-icon>
-                                </a>
-                            }
-                            else
-                            {
-                                <div>
-                                    @if (column.LabelContent is null)
-                                    {
-                                        <span style="white-space:nowrap">
-                                            @column.GetLabel()
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        @column.LabelContent
-                                    }
-                                </div>
-                            }
+                                }
+                            </div>
                             @if (IsInteractive && column.CanFilter)
                             {
                                 <div>
                                     @if (column.IsString)
                                     {
                                         <TextInput @bind-Value:get="@column.TextFilter"
-                                                   @bind-Value:set="@(v => OnFilterChanged(column, v))"
+                                                   @bind-Value:set="@(v => OnFilterChangedAsync(column, v))"
                                                    PostfixIcon="@DefaultIcons.Search"
                                                    UpdateOnInput="true"
                                                    UpdateOnInputDebounce="Debounce"
@@ -140,14 +130,14 @@
                                     else if (column.IsBool)
                                     {
                                         <Checkbox @bind-Value:get="@column.BoolFilter"
-                                                  @bind-Value:set="@(v => OnBoolFilterChanged(column, v))"
+                                                  @bind-Value:set="@(v => OnBoolFilterChangedAsync(column, v))"
                                                   AllowNull="true"
                                                   Class="dense" />
                                     }
                                     else if (column.IsNumeric)
                                     {
                                         <NumericInput @bind-Value:get="@column.NumberFilter"
-                                                      @bind-Value:set="@(v => OnNumberFilterChanged(column, v))"
+                                                      @bind-Value:set="@(v => OnNumberFilterChangedAsync(column, v))"
                                                       UpdateOnInput="true"
                                                       UpdateOnInputDebounce="Debounce"
                                                       Class="dense" />
@@ -155,7 +145,7 @@
                                     else if (column.IsDateTime)
                                     {
                                         <DateTimeInput @bind-Value:get="@column.DateTimeFilter"
-                                                       @bind-Value:set="@(v => OnDateTimeFilterChanged(column, v))"
+                                                       @bind-Value:set="@(v => OnDateTimeFilterChangedAsync(column, v))"
                                                        DateType="@(column is Column<TDataItem, TimeOnly> ? DateType.None : DateType.Date)"
                                                        DisplayType="PickerDisplayType.Button"
                                                        ShowTime="@(column is not Column<TDataItem, DateOnly>)"
@@ -385,7 +375,8 @@
                 <span>of</span>
                 <span>@((LoadItems is null ? (ulong)ItemCount : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
             }
-            <Pagination CurrentPage="CurrentPage"
+            <Pagination Id="@($"{Id}-pg")"
+                        CurrentPage="CurrentPage"
                         CurrentPageChanged="OnPageChangedAsync"
                         LastRequested="OnLastPageAsync"
                         NextRequested="OnNextPageAsync"
@@ -393,4 +384,8 @@
                         ThemeColor="ThemeColor" />
         </div>
     }
+    <Tooltip Id="datagrid-cancel-tooltip" Delay="750" IsContainerTrigger="false">Cancel</Tooltip>
+    <Tooltip Id="datagrid-delete-tooltip" Delay="750" IsContainerTrigger="false">Delete</Tooltip>
+    <Tooltip Id="datagrid-edit-tooltip" Delay="750" IsContainerTrigger="false">Edit</Tooltip>
+    <Tooltip Id="datagrid-save-tooltip" Delay="750" IsContainerTrigger="false">Save</Tooltip>
 </div>

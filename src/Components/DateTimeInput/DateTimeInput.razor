@@ -392,6 +392,7 @@
                 disabled="@(Disabled || ReadOnly || !IsInteractive)"
                 @onclick="OnClickContainerAsync">
             <tf-icon>@ButtonIcon</tf-icon>
+            @ChildContent
         </button>
         <input disabled="@IsDisabled"
                type="@InputType"
@@ -497,5 +498,6 @@ else
                 }
             </div>
         }
+        @ChildContent
     </div>
 }

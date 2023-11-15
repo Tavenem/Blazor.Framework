@@ -979,11 +979,16 @@ public class QueryStateService
     private void InitializeFromQuery()
     {
         if (IsInitialized
-            || !Uri.TryCreate(_navigationManager.Uri, UriKind.Absolute, out var uri)
-            || !QueryHelpers
+            || !Uri.TryCreate(_navigationManager.Uri, UriKind.Absolute, out var uri))
+        {
+            return;
+        }
+
+        if (!QueryHelpers
             .ParseQuery(uri.Query)
             .TryGetValue(QueryParameterName, out var queryValues))
         {
+            IsInitialized = true;
             return;
         }
 
@@ -1411,6 +1416,10 @@ public class QueryStateService
         static List<string>? GetCollection(string queryParameter, ref int index)
         {
             List<string>? values = null;
+            if (queryParameter[index] == '-')
+            {
+                index++;
+            }
             while (index < queryParameter.Length)
             {
                 if (queryParameter[index] == '~')
@@ -1445,8 +1454,14 @@ public class QueryStateService
     }
 
     private void UpdateQuery(bool replace = true)
-        => _navigationManager.NavigateTo(
-        _navigationManager.GetUriWithQueryParameters(GetQueryParameter()),
-        false,
-        replace);
+    {
+        try
+        {
+            _navigationManager.NavigateTo(
+                _navigationManager.GetUriWithQueryParameters(GetQueryParameter()),
+                false,
+                replace);
+        }
+        catch (NavigationException) { } // may be thrown in non-interactive scenarios; ignore
+    }
 }

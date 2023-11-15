@@ -17,6 +17,9 @@
     </CascadingValue>
     @if (ContentsBreakpoint != Breakpoint.None)
     {
-        <Contents @ref="Contents" Breakpoint="ContentsBreakpoint" />
+        <tf-contents class="@ContentsClass"
+                     data-max-level="@(ContentsMaxLevel <= 0 ? null : ContentsMaxLevel)"
+                     data-max-level-offset="@(ContentsMaxLevelOffset)"
+                     data-min-headings="@ContentsMinHeadings" />
     }
 </div>

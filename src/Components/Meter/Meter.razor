@@ -20,10 +20,10 @@
            min="@MinString"
            optimum="@OptimumString"
            value="@ValueString" />
+    @ChildContent
     @if (TooltipContent is not null || TooltipMarkup.HasValue || !string.IsNullOrWhiteSpace(TooltipText))
     {
-        <Tooltip Anchor="@Id"
-                 ThemeColor="ThemeColor"
+        <Tooltip ThemeColor="ThemeColor"
                  TooltipMarkup="TooltipMarkup"
                  TooltipText="@TooltipTextValue">
             @TooltipContent

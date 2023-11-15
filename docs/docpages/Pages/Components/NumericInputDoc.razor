@@ -9,6 +9,13 @@
     numeric type.
 </p>
 
+<p>
+    Note: like all Tavenem Framework forms components, this control cannot be used on static
+    server-side rendered pages. It will always be disabled when rendered statically. This is because
+    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
+    disabled during the prerender pass, then become enabled when interactivity becomes available.
+</p>
+
 <h2>Basics</h2>
 
 <p>
@@ -17,7 +24,7 @@
     use a full outline.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -40,7 +47,7 @@
     You can also add the <code>dense</code> class to any variant to reduce the margins and padding.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -64,7 +71,7 @@
     numeric types are valid, as well as their nullable counterparts.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -129,7 +136,7 @@
     wait before updating the bound value.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -161,7 +168,7 @@
     When unset, the type's own <code>MinValue</code> and <code>MaxValue</code> are used.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -184,7 +191,7 @@
     always change the value by 1, but floating-point types allow any degree of precision.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -227,7 +234,7 @@
     The input can be set as disabled or read-only by setting the properties of the same names.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -271,7 +278,7 @@
     Note that only nullable types allow an empty value.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -294,7 +301,7 @@
     You can supply help text for the field with the <code>HelpText</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -318,7 +325,7 @@
     property instead (which overrides <code>HelpText</code>).
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -342,7 +349,7 @@
     <code>DisplayHelpTextOnFocus</code> property to <code>true</code>.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -374,7 +381,7 @@
     time.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -459,7 +466,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -510,7 +517,7 @@
     properties to configure the icons used for the buttons.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -542,7 +549,7 @@
     format the displayed value.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -596,7 +603,7 @@
     <code>PrefixContent</code>, <code>PrefixText</code> and <code>PrefixIcon</code> are ignored.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -653,7 +660,7 @@
     <code>PostfixContent</code>, <code>PostfixText</code> and <code>PostfixIcon</code> are ignored.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-17" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -688,7 +695,7 @@
     </ChildContent>
 </Collapse>
 
-<h3>Validation</h3>
+<h2>Validation</h2>
 
 <p>
     See <a href="./components/form#validation">Validation</a> for information about validating Tavenem

@@ -19,13 +19,13 @@
     element) with the <code>accordion</code> class.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="accordion">
-                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                <Collapse Id="a-1-c1" Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Id="a-1-c2" Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Id="a-1-c3" Title="Collapse #3">Collapsed content #3</Collapse>
             </div>
         </div>
     </TitleContent>
@@ -44,13 +44,13 @@
     To enforce just one collapse being open at once, use the <code>Accordion</code> component.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Accordion>
-                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                <Collapse Id="a-2-c1" Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Id="a-2-c2" Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Id="a-2-c3" Title="Collapse #3">Collapsed content #3</Collapse>
             </Accordion>
         </div>
     </TitleContent>
@@ -70,13 +70,13 @@
     directly to the accordion itself.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="accordion dense">
-                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                <Collapse Id="a-3-c1" Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Id="a-3-c2" Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Id="a-3-c3" Title="Collapse #3">Collapsed content #3</Collapse>
             </div>
         </div>
     </TitleContent>
@@ -95,14 +95,14 @@
     Use the <code>flush</code> class to remove the rounded corners and the shadow.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="outlined">
                 <div class="accordion flush">
-                    <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-                    <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
-                    <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                    <Collapse Id="a-4-c1" Title="Collapse #1">Collapsed content #1</Collapse>
+                    <Collapse Id="a-4-c2" Title="Collapse #2">Collapsed content #2</Collapse>
+                    <Collapse Id="a-4-c3" Title="Collapse #3">Collapsed content #3</Collapse>
                 </div>
             </div>
         </div>
@@ -126,13 +126,13 @@
     from being changed programmatically. It only prevents user interaction.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Accordion Disabled="true">
-                <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse IsOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+                <Collapse Id="a-5-c1" Title="Collapse #1">Collapsed content #1</Collapse>
+                <Collapse Id="a-5-c2" IsOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
+                <Collapse Id="a-5-c3" Title="Collapse #3">Collapsed content #3</Collapse>
             </Accordion>
         </div>
     </TitleContent>

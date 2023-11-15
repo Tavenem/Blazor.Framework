@@ -6,6 +6,8 @@ public partial class CodeExample
 {
     [Parameter] public string? Code { get; set; }
 
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
+
     [Parameter] public bool IsOpen { get; set; } = true;
 
     [Parameter] public string? RowClass { get; set; }

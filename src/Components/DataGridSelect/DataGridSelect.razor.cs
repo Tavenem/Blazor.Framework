@@ -28,11 +28,6 @@ public partial class DataGridSelect<
     private bool _initialized, _keyboardNavigating, _valueUpdated;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// The converter used to convert bound values to option values, and vice versa.
     /// </para>
@@ -248,7 +243,7 @@ public partial class DataGridSelect<
             {
                 foreach (var id in _initialSortOrder)
                 {
-                    DataGrid.OnColumnSorted(id);
+                    await DataGrid.OnColumnSortedAsync(id);
                 }
             }
         }
@@ -308,7 +303,7 @@ public partial class DataGridSelect<
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void OnColumnSorted(IColumn<TDataItem> column)
+    public async Task OnColumnSortedAsync(IColumn<TDataItem> column)
     {
         if (!_initialized)
         {
@@ -316,7 +311,21 @@ public partial class DataGridSelect<
             _initialSortOrder.Add(column.Id);
             return;
         }
-        DataGrid?.OnColumnSorted(column);
+        if (DataGrid is not null)
+        {
+            await DataGrid.OnColumnSortedAsync(column);
+        }
+    }
+
+    /// <summary>
+    /// Called internally.
+    /// </summary>
+    public async Task SetFilterAsync(bool preventReload = false)
+    {
+        if (_initialized && DataGrid is not null)
+        {
+            await DataGrid.SetFilterAsync(preventReload);
+        }
     }
 
     /// <summary>

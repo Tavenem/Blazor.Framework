@@ -48,46 +48,49 @@
             </div>
         }
     </Form>
-    <div class="d-flex">
-        @if (ShowPrevious)
-        {
-            @if (IsInteractive || PreviousDisabled)
+    @if (!HideButtons)
+    {
+        <div class="d-flex">
+            @if (IsPreviousButtonVisible)
             {
-                <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
-                    <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
-                    <span>Back</span>
-                </button>
+                @if (IsInteractive || PreviousDisabled)
+                {
+                    <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
+                        <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                        <span>Back</span>
+                    </button>
+                }
+                else
+                {
+                    <a href="@GetPreviousStepUrl" class="@PreviousButtonCssClass">
+                        <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                        <span>Back</span>
+                    </a>
+                }
             }
-            else
+            @if (IsFinishButtonVisible)
             {
-                <a href="@GetPreviousStepUrl" class="@PreviousButtonCssClass">
-                    <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
-                    <span>Back</span>
-                </a>
+                <button @onclick="OnFinishAsync" class="@FinishButtonCssClass" disabled="@IsFinishButtonDisabled">@FinishButtonText</button>
             }
-        }
-        @if (ShowFinishButton)
-        {
-            <button @onclick="OnFinishAsync" class="@FinishButtonCssClass" disabled="@IsFinishButtonDisabled">@FinishButtonText</button>
-        }
-        else if (ShowNext)
-        {
-            @if (IsInteractive || NextDisabled)
+            else if (IsNextButtonVisible)
             {
-                <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
-                    <span>Next</span>
-                    <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
-                </button>
+                @if (IsInteractive || NextDisabled)
+                {
+                    <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
+                        <span>Next</span>
+                        <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                    </button>
+                }
+                else
+                {
+                    <a href="@GetNextStepUrl" class="@NextButtonCssClass">
+                        <span>Next</span>
+                        <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                    </a>
+                }
             }
-            else
-            {
-                <a href="@GetNextStepUrl" class="@NextButtonCssClass">
-                    <span>Next</span>
-                    <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
-                </a>
-            }
-        }
-    </div>
+        </div>
+    }
 </div>
 <CascadingValue Value="this">
     @ChildContent

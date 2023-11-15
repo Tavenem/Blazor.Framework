@@ -15,10 +15,10 @@
     components inside for each available tab.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Tabs TTabItem="string">
+            <Tabs Id="t-1" TTabItem="string">
                 <TabPanel Title="Tab One">
                     <div class="p-4">
                         Content for Tab One
@@ -74,15 +74,13 @@
 </p>
 
 <p>
-    If there are more tabs than will fit, scroll buttons will appear. Selecting any tab will also
-    cause the list to scroll to its position, making it easier to switch to nearby tabs without
-    scrolling.
+    If there are more tabs than will fit, a scrollbar will appear.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Tabs TTabItem="string">
+            <Tabs Id="t-2" TTabItem="string">
                 @for (var i = 0; i < 15; i++)
                 {
                     var index = i;
@@ -114,7 +112,7 @@
     The tabs can be positioned on any side of the panels using the <code>TabSide</code> property.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Select TValue="Side" @bind-Value="Side" Label="Side" Class="dense" Style="max-width:200px">
@@ -123,7 +121,7 @@
                 <Option Value="Side.Left" Label="Left" />
                 <Option Value="Side.Right" Label="Right" />
             </Select>
-            <Tabs TTabItem="string" TabSide="Side" Class="flex-grow-1">
+            <Tabs Id="t-3" TTabItem="string" TabSide="Side" Class="flex-grow-1">
                 <TabPanel Title="Tab One">
                     <div class="p-4">
                         Content for Tab One
@@ -188,10 +186,10 @@
     provides rich tab content).
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Tabs Items="_items" TabTitle="@(i => (MarkupString)i)">
+            <Tabs Id="t-4" Items="_items" TabTitle="@(i => (MarkupString)i)">
                 <PanelTemplate>
                     <div class="p-4">
                         @context
@@ -240,10 +238,11 @@
     Dynamic panels are automatically removed from the <code>Items</code> collection when closed.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Tabs Items="_items2"
+            <Tabs Id="t-5"
+                  Items="_items2"
                   TabTitle="@(i => (MarkupString)i)"
                   OnAdd="@(() => $"Tab {_items2.Count + 1}")"
                   CanCloseTabs="true"

@@ -1,5 +1,6 @@
 let afterStartedComplete = false;
 let beforeStartComplete = false;
+let tfLocation = window.location.protocol + '//' + window.location.host + window.location.pathname;
 
 function tavenemBlazorFrameworkAfterStarted(blazor, web) {
     if (afterStartedComplete) {
@@ -21,8 +22,6 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             }
         }
     });
-
-    console.log(`Tavenem.Blazor.Framework${web ? ' web app' : ''} initialized`);
 }
 
 function tavenemBlazorFrameworkBeforeStart(web) {
@@ -30,8 +29,19 @@ function tavenemBlazorFrameworkBeforeStart(web) {
         return;
     }
     beforeStartComplete = true;
-    console.log(`Initializing Tavenem.Blazor.Framework${web ? ' web app' : ''}...`);
 
+    addHeadContent();
+}
+
+export function beforeStart() { tavenemBlazorFrameworkBeforeStart(false); }
+
+export function beforeWebStart() { tavenemBlazorFrameworkBeforeStart(true); }
+
+export function afterStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor, false); }
+
+export function afterWebStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor, false); }
+
+function addHeadContent() {
     const script = document.createElement('script');
     script.type = 'module';
     script.src = './_content/Tavenem.Blazor.Framework/tavenem-framework.js';
@@ -62,10 +72,34 @@ function tavenemBlazorFrameworkBeforeStart(web) {
     document.head.appendChild(style);
 }
 
-export function beforeStart() { tavenemBlazorFrameworkBeforeStart(false); }
+function fixTablesOfContents() {
+    document
+        .querySelectorAll('tf-contents')
+        .forEach(x => x.refresh());
+}
 
-export function beforeWebStart() { tavenemBlazorFrameworkBeforeStart(true); }
+function scrollToTopOnLoad() {
+    const path = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    if (path != tfLocation)
+    {
+        tfLocation = path;
 
-export function afterStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor, false); }
+        setTimeout(() => {
+            const main = document.querySelector('main');
+            if (main) {
+                main.scroll({
+                    top: 0,
+                    left: 0,
+                });
+            }
+        }, 50);
+    }
+}
 
-export function afterWebStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor, false); }
+function onEnhancedLoad() {
+    addHeadContent();
+    fixTablesOfContents();
+    scrollToTopOnLoad();
+}
+
+Blazor.addEventListener('enhancedload', onEnhancedLoad);

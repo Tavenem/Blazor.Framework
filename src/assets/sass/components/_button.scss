@@ -51,6 +51,10 @@
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
 
+    tf-popover {
+        text-transform: initial;
+    }
+
     > *:first-child {
         border-top-left-radius: inherit;
         border-bottom-left-radius: inherit;

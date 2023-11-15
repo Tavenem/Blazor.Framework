@@ -8,12 +8,12 @@
 }
 
 <tf-tooltip id="@Id"
-            data-anchor="@Anchor"
             data-delay="@(Delay == 0 ? null : Delay)"
             data-dismiss-on-tap="@DismissOnTap"
-            data-popover-container>
+            data-popover-container
+            data-tooltip-button="@IsButton"
+            data-tooltip-container-trigger="@IsContainerTrigger">
     <Popover AdditionalAttributes="AdditionalAttributes"
-             AnchorId="@Anchor"
              AnchorOrigin="AnchorOrigin"
              Class="@CssClass"
              FlipBehavior="FlipBehavior.Flip_Always"

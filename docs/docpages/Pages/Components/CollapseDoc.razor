@@ -17,11 +17,11 @@
     <code>TitleContent RenderFragment</code> is used to set the header.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Click here">This is the body</Collapse>
-            <Collapse>
+            <Collapse Id="c-1-1" Title="Click here">This is the body</Collapse>
+            <Collapse Id="c-1-2">
                 <TitleContent>
                     <div class="d-flex align-items-center">
                         <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
@@ -57,10 +57,10 @@
     <code>true</code>.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse TitleIsToggle="true">
+            <Collapse Id="c-2" TitleIsToggle="true">
                 <TitleContent>
                     <div class="d-flex align-items-center">
                         <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
@@ -93,10 +93,10 @@
     by adding it to the <code>FooterContent RenderFragment</code>.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Click here">
+            <Collapse Id="c-3" Title="Click here">
                 <ChildContent>
                     This is the body
                 </ChildContent>
@@ -127,10 +127,10 @@
     close a collapse which is already open.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Disabled" Disabled="true">
+            <Collapse Id="c-4" Title="Disabled" Disabled="true">
                 This is the body
             </Collapse>
         </div>
@@ -162,7 +162,7 @@
     but this one will stay open.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="cpd1" Title="Persistent" PersistState="true">
@@ -202,10 +202,10 @@
     You can also apply the <code>dense</code> class to the collapse itself to reduce padding.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Click here" Class="dense">
+            <Collapse Id="c-5" Title="Click here" Class="dense">
                 This is the body
             </Collapse>
         </div>
@@ -222,10 +222,10 @@
     usual), but also gives it internal borders between the header, body, and footer.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Click here" Class="align-self-stretch outlined">
+            <Collapse Id="c-6" Title="Click here" Class="align-self-stretch outlined">
                 <ChildContent>
                     This is the body
                 </ChildContent>
@@ -252,10 +252,10 @@
     the appearance of a collapse.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Click here" Class="align-self-stretch outlined primary">
+            <Collapse Id="c-7-1" Title="Click here" Class="align-self-stretch outlined primary">
                 <ChildContent>
                     This is the body
                 </ChildContent>
@@ -263,7 +263,7 @@
                     This is a footer
                 </FooterContent>
             </Collapse>
-            <Collapse Title="Click here" Class="secondary filled">
+            <Collapse Id="c-7-2" Title="Click here" Class="secondary filled">
                 <ChildContent>
                     This is the body
                 </ChildContent>
@@ -307,10 +307,10 @@
     loading is occurring.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Title="Click here" OnOpening="LoadAsync">
+            <Collapse Id="c-8" Title="Click here" OnOpening="LoadAsync">
                 @_asyncBody
             </Collapse>
         </div>

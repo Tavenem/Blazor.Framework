@@ -779,11 +779,18 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     }
 
     /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender && InitiallySorted && DataGrid is not null)
+        if (DataGrid is not null)
         {
-            DataGrid.OnColumnSorted(this);
+            if (InitialFilter is not null)
+            {
+                await DataGrid.SetFilterAsync(InitiallySorted);
+            }
+            if (InitiallySorted)
+            {
+                await DataGrid.OnColumnSortedAsync(this);
+            }
         }
     }
 

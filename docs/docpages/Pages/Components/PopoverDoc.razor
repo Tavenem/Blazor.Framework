@@ -8,6 +8,12 @@
     The popover component is a floating element which overlays other elements.
 </p>
 
+<p>
+    Note: popovers work normally on static server-side rendered pages (for example, they are used by
+    <a href="./components/tooltip">Tooltip</a> components), although toggling them programmatically
+    normally depends on interactivity.
+</p>
+
 <h2>Basics</h2>
 
 <p>
@@ -16,7 +22,7 @@
     popover is visible, and can be controlled in any way you require.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center py-5">
             <Popover IsOpen="_isOpen" AnchorOrigin="Origin.Top_Left" PopoverOrigin="Origin.Top_Left">
@@ -111,7 +117,7 @@
     exceeding screen width.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <div class="d-flex rounded outlined center-items p-4">
@@ -160,7 +166,7 @@
     Popovers can have other popovers inside them.
 </p>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center p-5">
             <Popover IsOpen="true" AnchorOrigin="Origin.Center_Center" PopoverOrigin="Origin.Center_Center">

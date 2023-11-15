@@ -1,27 +1,28 @@
 ﻿@page "/components/syntax-highlighter"
 
-<PageTitle>Highlighter - Tavenem Blazor Framework</PageTitle>
+<PageTitle>Syntax Highlighter - Tavenem Blazor Framework</PageTitle>
 
-<h1>Highlighter</h1>
+<h1>Syntax Highlighter</h1>
 
 <p>
-    The syntax highlighter component can be used to apply syntax highlighting to preformatted code.
+    The Tavenem Blazor Framework includes a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a> to easily
+    apply syntax highlighting to preformatted code. The component functions normally when your app
+    is rendered statically, or prerendered by the server.
 </p>
 
 <h2>Basics</h2>
 
 <p>
-    The <code>SyntaxHighlighter</code> component is a simple <code>div</code> element, and may
-    contain any <code>ChildContent</code>. You can configure its behavior with the
-    <code>Class</code> and <code>Style</code> properties, as well as attribute splatting. Its real
-    function lies in the automatic syntax highlighting it performs on any nested
-    <code>&lt;pre&gt;&lt;code&gt;</code> blocks.
+    The <code>tf-syntax-highlight</code> element formats its content as if it weere wrapped in a
+    <code>&lt;pre&gt;&lt;code&gt;</code> block, and will automatically apply syntax highlighting to
+    the content.
 </p>
 
 <p>
     Syntax is autodetected when possible, but you can apply a <code>language-&lt;value&gt;</code>
-    CSS class on the <code>code</code> element to specify the language of a particular block of
-    code. The supported languages are:
+    class to the element to specify the language of a particular block of code. The supported
+    languages are:
 </p>
 <ul>
     <li>C++ <span class="text-muted">language-cpp</span></li>
@@ -42,12 +43,10 @@
     <li>TypeScript</li>
 </ul>
 
-<Collapse IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <SyntaxHighlighter>
-                <pre class="codeblock">
-                    <code class="language-csharp">
+            <tf-syntax-highlight language-csharp>
 using System.IO.Compression;
 
 #pragma warning disable 414, 3021
@@ -65,15 +64,11 @@ namespace MyApplication
         }
     }
 }
-                    </code>
-                </pre>
-            </SyntaxHighlighter>
+            </tf-syntax-highlight>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<SyntaxHighlighter>
-    <pre class=""codeblock"">
-        <code class=""language-csharp"">
+        @CodeFormatter.CodeToMarkup(@"<tf-syntax-highlight language-csharp>
 using System.IO.Compression;
 
 #pragma warning disable 414, 3021
@@ -91,13 +86,6 @@ namespace MyApplication
         }
     }
 }
-        </code>
-    </pre>
-</SyntaxHighlighter>")
+</tf-syntax-highlight>")
     </ChildContent>
 </Collapse>
-
-<p>
-    You may include multiple <code>&lt;pre&gt;&lt;code&gt;</code> blocks, with varying syntaxes, in
-    the same <code>SyntaxHighlighter</code> component, as well as any other content you wish.
-</p>

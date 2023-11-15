@@ -19,6 +19,7 @@
                    name="@NameValue"
                    readonly="@IsReadOnly"
                    tabindex="@TabIndex"
+                   value="@bool.TrueString"
                    @onchange="OnChange"
                    @onclick:preventDefault="IsReadOnly" />
             <tf-icon>@Icon</tf-icon>
@@ -39,4 +40,5 @@
             </ul>
         </div>
     }
+    @ChildContent
 </div>

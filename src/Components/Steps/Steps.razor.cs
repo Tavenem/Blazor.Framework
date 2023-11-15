@@ -84,6 +84,62 @@ public partial class Steps : PersistentComponentBase
     public Form? Form { get; set; }
 
     /// <summary>
+    /// Whether there is a visible step after the current step (disabled or not).
+    /// </summary>
+    public bool HasNextStep => _steps
+        .Skip(CurrentStep + 1)
+        .FirstOrDefault(x => x.IsVisible) is not null;
+
+    /// <summary>
+    /// If set to <see langword="true"/> the previous, next, and finish buttons will not be shown.
+    /// </summary>
+    /// <remarks>
+    /// This can be helpful if progress through steps should be controlled programmatically, rather
+    /// then through user interaction.
+    /// </remarks>
+    [Parameter] public bool HideButtons { get; set; }
+
+    /// <summary>
+    /// Whether the finish button is currently visible.
+    /// </summary>
+    /// <remarks>
+    /// Note that this property is set even if <see cref="HideButtons"/> is <see langword="true"/>.
+    /// </remarks>
+    public bool IsFinishButtonVisible => (Finish.HasDelegate
+        || Form?.OnSubmit.HasDelegate == true
+        || Form?.OnValidSubmit.HasDelegate == true)
+        && _steps
+        .Skip(CurrentStep + 1)
+        .FirstOrDefault(x => x.IsVisible) is null;
+
+    /// <summary>
+    /// Whether the next button is currently visible.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Note that this property is set even if <see cref="HideButtons"/> is <see langword="true"/>.
+    /// </para>
+    /// <para>
+    /// Note: this is never <see langword="true"/> when <see cref="IsFinishButtonVisible"/> is <see
+    /// langword="true"/>, since the finish button replaces the next button.
+    /// </para>
+    /// </remarks>
+    public bool IsNextButtonVisible => !IsFinishButtonVisible
+        && _steps
+        .Skip(CurrentStep + 1)
+        .FirstOrDefault(x => x.IsVisible) is not null;
+
+    /// <summary>
+    /// Whether the previous button is currently visible.
+    /// </summary>
+    /// <remarks>
+    /// Note that this property is set even if <see cref="HideButtons"/> is <see langword="true"/>.
+    /// </remarks>
+    public bool IsPreviousButtonVisible => _steps
+        .Take(CurrentStep)
+        .LastOrDefault(x => x.IsVisible) is not null;
+
+    /// <summary>
     /// Specifies the top-level model object for the <see cref="Form"/>. An edit context will be
     /// constructed for this model. If using this parameter, do not also supply a value for <see
     /// cref="EditContext"/>.
@@ -166,21 +222,6 @@ public partial class Steps : PersistentComponentBase
         .LastOrDefault(x => x.IsVisible)?
         .Disabled != false;
 
-    private bool ShowFinishButton => (Finish.HasDelegate
-        || Form?.OnSubmit.HasDelegate == true
-        || Form?.OnValidSubmit.HasDelegate == true)
-        && _steps
-        .Skip(CurrentStep + 1)
-        .FirstOrDefault(x => x.IsVisible) is null;
-
-    private bool ShowNext => _steps
-        .Skip(CurrentStep + 1)
-        .FirstOrDefault(x => x.IsVisible) is not null;
-
-    private bool ShowPrevious => _steps
-        .Take(CurrentStep)
-        .LastOrDefault(x => x.IsVisible) is not null;
-
     private IEnumerable<Step> VisibleSteps => _steps
         .Where(x => x.IsVisible || x == _steps[CurrentStep]);
 
@@ -225,6 +266,46 @@ public partial class Steps : PersistentComponentBase
 
             StateHasChanged();
         }
+    }
+
+    /// <summary>
+    /// Activates the next visible step, if it is not disabled.
+    /// </summary>
+    /// <remarks>
+    /// Does nothing if there is no visible step after the current step, or if the next step is
+    /// disabled.
+    /// </remarks>
+    public async Task ActivateNextStepAsync()
+    {
+        var next = _steps
+            .Skip(CurrentStep + 1)
+            .FirstOrDefault(x => x.IsVisible);
+        if (next?.Disabled != false)
+        {
+            return;
+        }
+
+        await ActivateStepAsync(next);
+    }
+
+    /// <summary>
+    /// Activates the previous visible step, if it is not disabled.
+    /// </summary>
+    /// <remarks>
+    /// Does nothing if there is no visible step before the current step, or if the previous step is
+    /// disabled.
+    /// </remarks>
+    public async Task ActivatePreviousStepAsync()
+    {
+        var previous = _steps
+            .Take(CurrentStep)
+            .LastOrDefault(x => x.IsVisible);
+        if (previous?.Disabled != false)
+        {
+            return;
+        }
+
+        await ActivateStepAsync(previous);
     }
 
     /// <summary>

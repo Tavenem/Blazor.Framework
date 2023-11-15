@@ -6,37 +6,37 @@
     <div class="header">
         @if (TitleContent is null)
         {
-            if (IsInteractive)
+            if (IsInteractive || Disabled)
             {
                 <div class="expand" @onclick="OnToggleAsync">
                     <span>@Title</span>
-                    <tf-icon class="ms-2">@IconName</tf-icon>
+                    <tf-icon>@IconName</tf-icon>
                 </div>
             }
             else
             {
                 <a href="@GetToggleUrl()" class="expand">
                     <span>@Title</span>
-                    <tf-icon class="ms-2">@IconName</tf-icon>
+                    <tf-icon>@IconName</tf-icon>
                 </a>
             }
         }
         else if (TitleIsToggle)
         {
-            @if (IsInteractive)
+            @if (IsInteractive || Disabled)
             {
-                <div class="d-flex flex-column flex-grow-1 clickable" style="min-width:0" @onclick="OnToggleAsync">
+                <div class="collapse-title" @onclick="OnToggleAsync">
                      @TitleContent
                 </div>
-                <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
+                <tf-icon class="expand" @onclick="OnToggleAsync">@IconName</tf-icon>
             }
             else
             {
-                <a href="@GetToggleUrl()" class="d-flex flex-column flex-grow-1 clickable" style="min-width:0">
+                <a href="@GetToggleUrl()" class="collapse-title">
                      @TitleContent
                 </a>
-                <a href="@GetToggleUrl()">
-                    <tf-icon class="expand ms-2">@IconName</tf-icon>
+                <a href="@GetToggleUrl()" class="expand-link">
+                    <tf-icon>@IconName</tf-icon>
                 </a>
             }
         }
@@ -45,14 +45,14 @@
             <div class="d-flex flex-column flex-grow-1" style="min-width:0">
                 @TitleContent
             </div>
-            @if (IsInteractive)
+            @if (IsInteractive || Disabled)
             {
-                <tf-icon class="expand ms-2" @onclick="OnToggleAsync">@IconName</tf-icon>
+                <tf-icon class="expand" @onclick="OnToggleAsync">@IconName</tf-icon>
             }
             else
             {
-                <a href="@GetToggleUrl()">
-                    <tf-icon class="expand ms-2">@IconName</tf-icon>
+                <a href="@GetToggleUrl()" class="expand-link">
+                    <tf-icon>@IconName</tf-icon>
                 </a>
             }
         }

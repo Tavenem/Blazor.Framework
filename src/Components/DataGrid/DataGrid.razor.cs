@@ -48,8 +48,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private const string SortQueryParamName = "s";
     private const string NullGroupKey = "NULL";
 
-    private readonly HashSet<int> _rowCurrentExpansion = [];
-    private readonly HashSet<int> _rowExpansion = [];
+    private readonly HashSet<string> _rowCurrentExpansion = [];
+    private readonly HashSet<string> _rowExpansion = [];
     private readonly HashSet<string> _groupExpansion = [];
     private readonly List<string> _objectUrls = [];
     private readonly List<Guid> _sortOrder = [];
@@ -456,6 +456,17 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     [Parameter] public EventCallback<TDataItem> RowExpanded { get; set; }
 
     /// <summary>
+    /// A function which retrieves a unique string ID for a given row.
+    /// </summary>
+    /// <remarks>
+    /// This function is optional, but if omitted row expansion will use the result of the row value
+    /// object's <see cref="object.GetHashCode"/> to uniquely identify each row (including across
+    /// page load events, when the query string contains information about row expansion states),
+    /// which may or may not always be appropriate.
+    /// </remarks>
+    [Parameter] public Func<TDataItem, string>? RowId { get; set; }
+
+    /// <summary>
     /// <para>
     /// The maximum number of items to show on each page.
     /// </para>
@@ -660,7 +671,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     private bool IsAdding { get; set; }
 
-    private int ItemCount => DataGroups?.Count ?? CurrentItems.Count();
+    private int ItemCount => CurrentItems.Count();
 
     private string? LoadingClass => new CssBuilder("small")
         .Add(ThemeColor.ToCSS())
@@ -784,37 +795,34 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
-        if (LoadItems is null)
+        if (LoadItems is not null)
         {
-            if (Items is null)
+            return;
+        }
+
+        if (Items is null)
+        {
+            if (SelectedItems.Count > 0)
             {
-                if (SelectedItems.Count > 0)
-                {
-                    SelectedItem = default;
-                    SelectedItems.Clear();
-                    SelectedItemChanging?.Invoke(this, SelectedItem);
-                    await SelectedItemChanged.InvokeAsync(SelectedItem);
-                    await SelectedItemsChanged.InvokeAsync(SelectedItems);
-                }
+                SelectedItem = default;
+                SelectedItems.Clear();
+                SelectedItemChanging?.Invoke(this, SelectedItem);
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                await SelectedItemsChanged.InvokeAsync(SelectedItems);
             }
-            else
-            {
-                var remaining = SelectedItems.Intersect(Items).ToList();
-                if (remaining.Count != SelectedItems.Count)
-                {
-                    SelectedItems.Clear();
-                    SelectedItems.AddRange(remaining);
-                    SelectedItem = SelectedItems.FirstOrDefault();
-                    SelectedItemChanging?.Invoke(this, SelectedItem);
-                    await SelectedItemChanged.InvokeAsync(SelectedItem);
-                    await SelectedItemsChanged.InvokeAsync(SelectedItems);
-                }
-            }
-            Regroup();
         }
         else
         {
-            await LoadItemsAsync();
+            var remaining = SelectedItems.Intersect(Items).ToList();
+            if (remaining.Count != SelectedItems.Count)
+            {
+                SelectedItems.Clear();
+                SelectedItems.AddRange(remaining);
+                SelectedItem = SelectedItems.FirstOrDefault();
+                SelectedItemChanging?.Invoke(this, SelectedItem);
+                await SelectedItemChanged.InvokeAsync(SelectedItem);
+                await SelectedItemsChanged.InvokeAsync(SelectedItems);
+            }
         }
     }
 
@@ -881,12 +889,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (rowExpansions?.Count > 0)
         {
             _rowCurrentExpansion.Clear();
-            foreach (var item in rowExpansions)
+            foreach (var id in rowExpansions)
             {
-                if (int.TryParse(item, out var row))
-                {
-                    _rowCurrentExpansion.Add(row);
-                }
+                _rowCurrentExpansion.Add(id);
             }
         }
 
@@ -1121,11 +1126,11 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// <summary>
     /// Called internally.
     /// </summary>
-    public void OnColumnSorted(IColumn<TDataItem> column)
+    public async Task OnColumnSortedAsync(IColumn<TDataItem> column)
     {
         _sortOrder.Remove(column.Id);
         _sortOrder.Insert(0, column.Id);
-        SetSortQuery();
+        await SetSortOrderAsync();
     }
 
     /// <summary>
@@ -1154,6 +1159,78 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
 
         return OnSetSelectAllAsync(true);
+    }
+
+    /// <summary>
+    /// Called internally.
+    /// </summary>
+    public async Task SetFilterAsync(bool preventReload = false)
+    {
+        if (LoadItems is not null && !preventReload)
+        {
+            await LoadItemsAsync();
+        }
+        if (PersistState)
+        {
+            List<string>? filterQueries = null;
+
+            var quickFilter = QuickFilter?.Trim('"').Trim();
+            if (!string.IsNullOrEmpty(quickFilter))
+            {
+                (filterQueries ??= []).Add(new StringBuilder(Id)
+                    .Append(";quick;'")
+                    .Append(quickFilter)
+                    .Append('\'')
+                    .ToString());
+            }
+
+            var filterInfo = GetFilterInfo();
+            if (filterInfo is not null)
+            {
+                foreach (var filter in filterInfo)
+                {
+                    var query = new StringBuilder(filter.Property);
+                    if (filter.DateTimeFilterIsBefore)
+                    {
+                        query.Append(";before");
+                    }
+                    if (filter.ExactMatch)
+                    {
+                        query.Append(";exact");
+                    }
+                    if (filter.BoolFilter.HasValue)
+                    {
+                        query.Append(";'")
+                            .Append(filter.BoolFilter.Value)
+                            .Append('\'');
+                    }
+                    else if (filter.DateTimeFilter.HasValue)
+                    {
+                        query.Append(";'")
+                            .Append(filter.DateTimeFilter.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture))
+                            .Append('\'');
+                    }
+                    else if (filter.NumberFilter.HasValue)
+                    {
+                        query.Append(";'")
+                            .Append(filter.NumberFilter.Value)
+                            .Append('\'');
+                    }
+                    else if (!string.IsNullOrEmpty(filter.TextFilter))
+                    {
+                        query.Append(";'")
+                            .Append(filter.TextFilter)
+                            .Append('\'');
+                    }
+                    (filterQueries ??= []).Add(query.ToString());
+                }
+            }
+
+            QueryStateService.SetPropertyValues(
+                Id,
+                FilterQueryParamName,
+                filterQueries);
+        }
     }
 
     /// <summary>
@@ -1435,8 +1512,20 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         StateHasChanged();
     }
 
-    internal bool GetRowIsExpanded(TDataItem item) => item is not null
-        && _rowCurrentExpansion.Contains(item.GetHashCode());
+    internal bool GetRowIsExpanded(TDataItem item)
+    {
+        if (item is null)
+        {
+            return false;
+        }
+        var id = RowId?.Invoke(item)
+            ?? item.GetHashCode().ToString();
+        if (id is null)
+        {
+            return false;
+        }
+        return _rowCurrentExpansion.Contains(id);
+    }
 
     internal string GetRowExpansionToggleUrl(Row<TDataItem> row)
     {
@@ -1445,27 +1534,42 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             return NavigationManager.Uri;
         }
 
-        var hash = row.Item.GetHashCode();
-        return _rowCurrentExpansion.Contains(hash)
+        var id = RowId?.Invoke(row.Item)
+            ?? row.Item.GetHashCode().ToString();
+        if (id is null)
+        {
+            return NavigationManager.Uri;
+        }
+
+        return _rowCurrentExpansion.Contains(id)
             ? QueryStateService.GetUriWithoutPropertyValue(
                 Id,
                 RowExpansionQueryParamName,
-                hash)
+                id)
             : QueryStateService.GetUriWithPropertyValue(
                 Id,
                 RowExpansionQueryParamName,
-                hash,
+                id,
                 true);
     }
 
-    internal bool GetRowWasExpanded(TDataItem item) => item is not null
-        && _rowExpansion.Contains(item.GetHashCode());
+    internal bool GetRowWasExpanded(TDataItem item)
+    {
+        if (item is null)
+        {
+            return false;
+        }
 
-    internal void OnColumnSorted(Guid id)
+        var id = RowId?.Invoke(item)
+            ?? item.GetHashCode().ToString();
+        return _rowExpansion.Contains(id);
+    }
+
+    internal async Task OnColumnSortedAsync(Guid id)
     {
         _sortOrder.Remove(id);
         _sortOrder.Insert(0, id);
-        SetSortQuery();
+        await SetSortOrderAsync();
     }
 
     internal async Task OnDeleteAsync(Row<TDataItem> row)
@@ -1595,16 +1699,22 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             return;
         }
 
-        var hash = row.Item.GetHashCode();
-        var rowIsExpanded = _rowCurrentExpansion.Contains(hash);
+        var id = RowId?.Invoke(row.Item)
+            ?? row.Item.GetHashCode().ToString();
+        if (id is null)
+        {
+            return;
+        }
+
+        var rowIsExpanded = _rowCurrentExpansion.Contains(id);
         if (rowIsExpanded)
         {
-            _rowCurrentExpansion.Remove(hash);
+            _rowCurrentExpansion.Remove(id);
         }
         else
         {
-            _rowExpansion.Add(hash);
-            _rowCurrentExpansion.Add(hash);
+            _rowExpansion.Add(id);
+            _rowCurrentExpansion.Add(id);
         }
         if (!rowIsExpanded && RowExpanded.HasDelegate)
         {
@@ -1622,14 +1732,14 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 QueryStateService.RemovePropertyValue(
                     Id,
                     RowExpansionQueryParamName,
-                    hash);
+                    id);
             }
             else
             {
                 QueryStateService.AddPropertyValue(
                     Id,
                     RowExpansionQueryParamName,
-                    hash);
+                    id);
             }
         }
     }
@@ -2519,10 +2629,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
     }
 
-    private void OnBoolFilterChanged(IColumn<TDataItem> column, bool? value)
+    private async Task OnBoolFilterChangedAsync(IColumn<TDataItem> column, bool? value)
     {
         column.BoolFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
     private void OnCancelEdit() => EditingRow?.CancelEdit();
@@ -2546,8 +2656,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         if (LoadItems is null)
         {
-            PageCount = (ulong)ItemCount / value;
-            if (ItemCount % value != 0)
+            var itemCount = CurrentItems.LongCount();
+            PageCount = (ulong)itemCount / value;
+            if (itemCount % value != 0)
             {
                 PageCount++;
             }
@@ -2586,7 +2697,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SetRowsPerPageQuery();
     }
 
-    private void OnColumnSort(IColumn<TDataItem> column)
+    private async Task OnColumnSortAsync(IColumn<TDataItem> column)
     {
         if (_sortOrder.Contains(column.Id))
         {
@@ -2596,19 +2707,19 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             column.SortDescending = false;
         }
-        OnColumnSorted(column);
+        await OnColumnSortedAsync(column);
     }
 
-    private void OnDateTimeFilterChanged(IColumn<TDataItem> column, DateTimeOffset? value)
+    private async Task OnDateTimeFilterChangedAsync(IColumn<TDataItem> column, DateTimeOffset? value)
     {
         column.DateTimeFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
-    private void OnFilterChanged(IColumn<TDataItem> column, string? value)
+    private async Task OnFilterChangedAsync(IColumn<TDataItem> column, string? value)
     {
         column.TextFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
     private Task OnFilterQueryChangedAsync(QueryChangeEventArgs args)
@@ -2709,10 +2820,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         SetOffsetQuery();
     }
 
-    private void OnNumberFilterChanged(IColumn<TDataItem> column, double? value)
+    private async Task OnNumberFilterChangedAsync(IColumn<TDataItem> column, double? value)
     {
         column.NumberFilter = value;
-        SetFilterQuery();
+        await SetFilterAsync();
     }
 
     private async Task OnOffsetQueryChangedAsync(QueryChangeEventArgs args)
@@ -2756,12 +2867,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (args.Values?.Count > 0)
         {
             _rowCurrentExpansion.Clear();
-            foreach (var item in args.Values)
+            foreach (var id in args.Values)
             {
-                if (int.TryParse(item, out var row))
-                {
-                    _rowCurrentExpansion.Add(row);
-                }
+                _rowCurrentExpansion.Add(id);
             }
         }
         return Task.CompletedTask;
@@ -2888,7 +2996,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             return;
         }
 
-        var itemCount = (ulong)ItemCount;
+        var itemCount = (ulong)CurrentItems.LongCount();
         if (Offset > itemCount)
         {
             Offset = 0;
@@ -2914,70 +3022,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         StateHasChanged();
     }
 
-    private void SetFilterQuery()
-    {
-        List<string>? filterQueries = null;
-
-        var quickFilter = QuickFilter?.Trim('"').Trim();
-        if (!string.IsNullOrEmpty(quickFilter))
-        {
-            (filterQueries ??= []).Add(new StringBuilder(Id)
-                .Append(";quick;'")
-                .Append(quickFilter)
-                .Append('\'')
-                .ToString());
-        }
-
-        var filterInfo = GetFilterInfo();
-        if (filterInfo is not null)
-        {
-            foreach (var filter in filterInfo)
-            {
-                var query = new StringBuilder(filter.Property);
-                if (filter.DateTimeFilterIsBefore)
-                {
-                    query.Append(";before");
-                }
-                if (filter.ExactMatch)
-                {
-                    query.Append(";exact");
-                }
-                if (filter.BoolFilter.HasValue)
-                {
-                    query.Append(";'")
-                        .Append(filter.BoolFilter.Value)
-                        .Append('\'');
-                }
-                else if (filter.DateTimeFilter.HasValue)
-                {
-                    query.Append(";'")
-                        .Append(filter.DateTimeFilter.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture))
-                        .Append('\'');
-                }
-                else if (filter.NumberFilter.HasValue)
-                {
-                    query.Append(";'")
-                        .Append(filter.NumberFilter.Value)
-                        .Append('\'');
-                }
-                else if (!string.IsNullOrEmpty(filter.TextFilter))
-                {
-                    query.Append(";'")
-                        .Append(filter.TextFilter)
-                        .Append('\'');
-                }
-                (filterQueries ??= []).Add(query.ToString());
-            }
-        }
-
-        if (PersistState)
-        {
-            QueryStateService.SetPropertyValues(
-                Id,
-                FilterQueryParamName,
-                filterQueries);
-        }
-    }
+    private Task SetFilterAsync() => SetFilterAsync(false);
 
     private void SetOffsetQuery()
     {
@@ -3001,14 +3046,22 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
     }
 
-    private void SetSortQuery()
+    private async Task SetSortOrderAsync()
     {
+        if (LoadItems is not null)
+        {
+            await LoadItemsAsync();
+        }
         if (PersistState)
         {
             QueryStateService.SetPropertyValues(
                 Id,
                 SortQueryParamName,
                 GetSortQueries(_sortOrder));
+        }
+        else
+        {
+            Regroup();
         }
     }
 

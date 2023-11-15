@@ -1,0 +1,14 @@
+tf-syntax-highlight {
+    --tavenem-mono: 1;
+    color: inherit;
+    display: block;
+    font-family: var(--tavenem-font-family-monospace);
+    font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
+    margin-bottom: 1rem;
+    margin-top: 0;
+    max-width: 100%;
+    overflow: auto;
+    white-space: pre;
+    word-break: keep-all;
+}

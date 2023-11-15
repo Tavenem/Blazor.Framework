@@ -21,11 +21,6 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     [Parameter] public string CheckedIcon { get; set; } = DefaultIcons.Radio_Checked;
 
     /// <summary>
-    /// The child content of this component.
-    /// </summary>
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
     /// <para>
     /// The converter used to convert bound values to HTML input element values, and vice versa.
     /// </para>

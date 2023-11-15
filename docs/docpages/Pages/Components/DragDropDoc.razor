@@ -10,7 +10,12 @@
     drop API</a> easier from your Blazor apps.
 </p>
 
-<Collapse Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<p>
+    Note: drag and drop components cannot be used on static server-side rendered pages, because they
+    rely on interactivity to operate.
+</p>
+
+<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded" OnDrop="@(e => Drop(_items1, e))">

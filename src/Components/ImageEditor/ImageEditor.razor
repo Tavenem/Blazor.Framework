@@ -9,99 +9,97 @@
             <tf-progress-circle class="primary"></tf-progress-circle>
         </div>
     }
-    @if (Interactive && !Editing && ShowEditButton && (AllowEditNoImage || HasImage))
+    @if (IsInteractive && !Editing && ShowEditButton && (AllowEditNoImage || HasImage))
     {
         <button class="btn btn-icon image-edit-button @ThemeClass" @onclick="BeginEditAsync">
             <tf-icon>@EditIcon</tf-icon>
         </button>
     }
-    <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle"></div>
+    @if (IsInteractive)
+    {
+        <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle"></div>
+    }
+    else if (!string.IsNullOrEmpty(Src))
+    {
+        <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle">
+            <img src="@Src" />
+        </div>
+    }
     @if (Editing)
     {
         <div class="image-editor-controls gap-2">
             @if (IsCropping)
             {
                 <div class="image-editor-toolbar" role="toolbar" aria-label="Cropping toolbar">
-                    <button id="@($"commit-crop-{Id}")"
-                            class="btn btn-icon @ThemeClass"
+                    <button class="btn btn-icon @ThemeClass"
                             @onclick="CropAsync"
                             aria-label="Crop">
                         <tf-icon>crop</tf-icon>
+                        <Tooltip Delay="1000">Crop</Tooltip>
                     </button>
-                    <Tooltip Anchor="@($"commit-crop-{Id}")" Delay="1000">Crop</Tooltip>
-                    <button id="@($"cancel-crop-{Id}")"
-                            class="btn btn-icon @ThemeClass"
+                    <button class="btn btn-icon @ThemeClass"
                             @onclick="CancelAsync"
                             aria-label="Cancel crop">
                         <tf-icon>cancel</tf-icon>
+                        <Tooltip Delay="1000">Cancel</Tooltip>
                     </button>
-                    <Tooltip Anchor="@($"cancel-crop-{Id}")" Delay="1000">Cancel</Tooltip>
                     @if (ShowCropAspectRatioControls)
                     {
                         <div class="button-group-text small @ThemeClass" role="group" aria-label="Aspect ratio group">
-                            <button id="@($"free-crop-{Id}")"
-                                    class="@GetAspectRatioClass(null)"
+                            <button class="@GetAspectRatioClass(null)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(null))"
                                     aria-label="Free crop">
                                 <tf-icon>crop_free</tf-icon>
+                                <Tooltip Delay="1000">Free</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"free-crop-{Id}")" Delay="1000">Free</Tooltip>
-                            <button id="@($"original-crop-{Id}")"
-                                    class="@GetAspectRatioClass(-1)"
+                            <button class="@GetAspectRatioClass(-1)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(-1))" 
                                     aria-label="Original aspect ratio">
                                 <tf-icon>crop_original</tf-icon>
+                                <Tooltip Delay="1000">Original</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"original-crop-{Id}")" Delay="1000">Original</Tooltip>
-                            <button id="@($"square-crop-{Id}")"
-                                    class="@GetAspectRatioClass(1)"
+                            <button class="@GetAspectRatioClass(1)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(1))"
                                     aria-label="Square aspect ratio">
                                 <tf-icon>crop_square</tf-icon>
+                                <Tooltip Delay="1000">Square</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"square-crop-{Id}")" Delay="1000">Square</Tooltip>
-                            <button id="@($"crop-5_4-{Id}")"
-                                    class="@GetAspectRatioClass(5.0/4.0)"
+                            <button class="@GetAspectRatioClass(5.0/4.0)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(5.0/4.0))"
                                     aria-label="5:4 aspect ratio">
                                 <tf-icon>crop_5_4</tf-icon>
+                                <Tooltip Delay="1000">5:4</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-5_4-{Id}")" Delay="1000">5:4</Tooltip>
-                            <button id="@($"crop-4_3-{Id}")"
-                                    class="@GetAspectRatioClass(4.0/3.0)"
+                            <button class="@GetAspectRatioClass(4.0/3.0)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(4.0/3.0))"
                                     aria-label="4:3 aspect ratio">
                                 <tf-icon>crop_landscape</tf-icon>
+                                <Tooltip Delay="1000">4:3</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-4_3-{Id}")" Delay="1000">4:3</Tooltip>
-                            <button id="@($"crop-3_2-{Id}")"
-                                    class="@GetAspectRatioClass(3.0/2.0)"
+                            <button class="@GetAspectRatioClass(3.0/2.0)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(3.0/2.0))"
                                     aria-label="3:2 aspect ratio">
                                 <tf-icon>crop_3_2</tf-icon>
+                                <Tooltip Delay="1000">3:2</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-3_2-{Id}")" Delay="1000">3:2</Tooltip>
-                            <button id="@($"crop-16_9-{Id}")"
-                                    class="@GetAspectRatioClass(16.0/9.0)"
+                            <button class="@GetAspectRatioClass(16.0/9.0)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(16.0/9.0))"
                                     aria-label="16:9 aspect ratio">
                                 <tf-icon>crop_16_9</tf-icon>
+                                <Tooltip Delay="1000">16:9</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-16_9-{Id}")" Delay="1000">16:9</Tooltip>
-                            <button id="@($"crop-7_5-{Id}")"
-                                    class="@GetAspectRatioClass(7.0/5.0)"
+                            <button class="@GetAspectRatioClass(7.0/5.0)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(7.0/5.0))"
                                     aria-label="7:5 aspect ratio">
                                 <tf-icon>crop_7_5</tf-icon>
+                                <Tooltip Delay="1000">7:5</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-7_5-{Id}")" Delay="1000">7:5</Tooltip>
-                            <button id="@($"crop-3_4-{Id}")"
-                                    class="@GetAspectRatioClass(3.0/4.0)"
+                            <button class="@GetAspectRatioClass(3.0/4.0)"
                                     @onclick="@(_ => SetCropAspectRatioAsync(3.0/4.0))"
                                     aria-label="3:4 aspect ratio">
                                 <tf-icon>crop_portrait</tf-icon>
+                                <Tooltip Delay="1000">3:4</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-3_4-{Id}")" Delay="1000">3:4</Tooltip>
                         </div>
                     }
                 </div>
@@ -110,47 +108,43 @@
             {
                 <div class="image-editor-toolbar" role="toolbar" aria-label="Image file toolbar">
                     <div class="button-group-text small @ThemeClass" role="group" aria-label="History group">
-                        <button id="@($"undo-{Id}")"
-                                class="btn btn-icon"
+                        <button class="btn btn-icon"
                                 @onclick="UndoAsync"
                                 disabled="@(!UndoHistoryHasState)"
                                 aria-label="Undo">
                             <tf-icon>undo</tf-icon>
+                            <Tooltip Delay="1000">Undo</Tooltip>
                         </button>
-                        <Tooltip Anchor="@($"undo-{Id}")" Delay="1000">Undo</Tooltip>
-                        <button id="@($"redo-{Id}")"
-                                class="btn btn-icon"
+                        <button class="btn btn-icon"
                                 @onclick="RedoAsync"
                                 disabled="@(!RedoHistoryHasState)"
                                 aria-label="Redo">
                             <tf-icon>redo</tf-icon>
+                            <Tooltip Delay="1000">Redo</Tooltip>
                         </button>
-                        <Tooltip Anchor="@($"redo-{Id}")" Delay="1000">Redo</Tooltip>
                     </div>
                     <div id="@SaveGroupId" class="button-group-text small @ThemeClass" role="group" aria-label="Save group">
                         @if (AllowSaving)
                         {
-                            <button id="@($"save-{Id}")"
-                                    class="btn btn-icon"
+                            <button class="btn btn-icon"
                                     @onclick="@(_ => SaveAsync(Format))"
                                     aria-label="Save">
                                 <tf-icon>save</tf-icon>
+                                <Tooltip Delay="1000">Save</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"save-{Id}")" Delay="1000">Save</Tooltip>
                         }
-                        <button id="@($"download-{Id}")"
-                                class="btn btn-icon"
+                        <button class="btn btn-icon"
                                 @onclick="@(_ => ExportImageAsync(Format))"
                                 aria-label="Download">
                             <tf-icon>file_download</tf-icon>
+                            <Tooltip Delay="1000">Download</Tooltip>
                         </button>
-                        <Tooltip Anchor="@($"download-{Id}")" Delay="1000">Download</Tooltip>
                         @if (ShowFormats)
                         {
-                            <Dropdown Id="@($"format-{Id}")"
-                                      AnchorId="@SaveGroupId"
+                            <Dropdown AnchorId="@SaveGroupId"
                                       Icon="arrow_drop_down"
-                                      Class="dense rounded-right">
+                                      Class="dense rounded-right"
+                                      data-tooltip-id="@($"{Id}-save-format-tooltip")">
                                 <span @onclick="@(_ => Format = "image/png")">
                                     @if (Format == "image/png")
                                     {
@@ -173,16 +167,15 @@
                                     <span>WebP</span>
                                 </span>
                             </Dropdown>
-                            <Tooltip Anchor="@($"format-{Id}")" Delay="1000">Save format</Tooltip>
+                            <Tooltip Id="@($"{Id}-save-format-tooltip")" Delay="1000" IsContainerTrigger="false">Save format</Tooltip>
                         }
                     </div>
-                    <button id="@($"cancel-{Id}")"
-                            class="btn btn-icon @ThemeClass"
+                    <button class="btn btn-icon @ThemeClass"
                             @onclick="CancelEditAsync"
                             aria-label="Cancel edit">
                         <tf-icon>cancel</tf-icon>
+                        <Tooltip Delay="1000" Side="Side.Left">Cancel edit</Tooltip>
                     </button>
-                    <Tooltip Anchor="@($"cancel-{Id}")" Delay="1000" Side="Side.Left">Cancel edit</Tooltip>
                 </div>
                 @if (ShowRotateControls || ShowCropControls || ShowFlipControls)
                 {
@@ -190,49 +183,44 @@
                         @if (ShowRotateControls)
                         {
                             <div class="button-group-text small @ThemeClass" role="group" aria-label="Rotate group">
-                                <button id="@($"rotate-left-{Id}")"
-                                        class="btn btn-icon"
+                                <button class="btn btn-icon"
                                         @onclick="RotateCounterClockwiseAsync"
                                         aria-label="Rotate left">
                                     <tf-icon>rotate_left</tf-icon>
+                                    <Tooltip Delay="1000" Side="Side.Right">Rotate left</Tooltip>
                                 </button>
-                                <Tooltip Anchor="@($"rotate-left-{Id}")" Delay="1000" Side="Side.Right">Rotate left</Tooltip>
-                                <button id="@($"rotate-left-{Id}")"
-                                        class="btn btn-icon"
+                                <button class="btn btn-icon"
                                         @onclick="RotateClockwiseAsync"
                                         aria-label="Rotate right">
                                     <tf-icon>rotate_right</tf-icon>
+                                    <Tooltip Delay="1000">Rotate right</Tooltip>
                                 </button>
-                                <Tooltip Anchor="@($"rotate-left-{Id}")" Delay="1000">Rotate right</Tooltip>
                             </div>
                         }
                         @if (ShowCropControls)
                         {
-                            <button id="@($"crop-{Id}")"
-                                    class="btn btn-icon @ThemeClass"
+                            <button class="btn btn-icon @ThemeClass"
                                     @onclick="StartCropAsync"
                                     aria-label="Crop">
                                 <tf-icon>crop</tf-icon>
+                                <Tooltip Delay="1000">Crop</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"crop-{Id}")" Delay="1000">Crop</Tooltip>
                         }
                         @if (ShowFlipControls)
                         {
                             <div class="button-group-text small @ThemeClass" role="group" aria-label="Rotate group">
-                                <button id="@($"flip-horizontal-{Id}")"
-                                        class="btn btn-icon"
+                                <button class="btn btn-icon"
                                         @onclick="FlipHorizontalAsync"
                                         aria-label="Flip horizontally">
                                     <tf-icon>swap_horiz</tf-icon>
+                                    <Tooltip Delay="1000" Side="Side.Left">Flip horizontally</Tooltip>
                                 </button>
-                                <Tooltip Anchor="@($"flip-horizontal-{Id}")" Delay="1000" Side="Side.Left">Flip horizontally</Tooltip>
-                                <button id="@($"flip-vertical-{Id}")"
-                                        class="btn btn-icon"
+                                <button class="btn btn-icon"
                                         @onclick="FlipVerticalAsync"
                                         aria-label="Flip vertically">
                                     <tf-icon>swap_vert</tf-icon>
+                                    <Tooltip Delay="1000" Side="Side.Left">Flip vertically</Tooltip>
                                 </button>
-                                <Tooltip Anchor="@($"flip-vertical-{Id}")" Delay="1000" Side="Side.Left">Flip vertically</Tooltip>
                             </div>
                         }
                     </div>
@@ -244,36 +232,33 @@
                         {
                             @if (IsErasing)
                             {
-                                <button id="@($"draw-{Id}")"
-                                        class="btn btn-icon @ThemeClass"
+                                <button class="btn btn-icon @ThemeClass"
                                         @onclick="@(_ => SetIsErasingAsync(false))"
                                         aria-label="Draw">
                                     <tf-icon>draw</tf-icon>
+                                    <Tooltip Delay="1000">Draw</Tooltip>
                                 </button>
-                                <Tooltip Anchor="@($"draw-{Id}")" Delay="1000">Draw</Tooltip>
                             }
                             else
                             {
                                 <div class="image-editor-toolbar" role="toolbar" aria-label="Color toolbar">
-                                    <ColorInput Id="@($"color-{Id}")"
-                                                DisplayType="PickerDisplayType.Button"
+                                    <ColorInput DisplayType="PickerDisplayType.Button"
                                                 @bind-Value:get="BrushColor"
                                                 @bind-Value:set="SetBrushColorAsync"
                                                 OutputHexStrings="true"
                                                 ShowAlpha="false"
-                                                ThemeColor="ThemeColor" />
-                                    <Tooltip Anchor="@($"color-{Id}")" Delay="1000" Side="Side.Right">Color</Tooltip>
-                                    <button id="@($"erase-{Id}")"
-                                            class="btn btn-icon @ThemeClass"
+                                                ThemeColor="ThemeColor">
+                                        <Tooltip Delay="1000" Side="Side.Right">Color</Tooltip>
+                                    </ColorInput>
+                                    <button class="btn btn-icon @ThemeClass"
                                             @onclick="@(_ => SetIsErasingAsync(true))"
                                             aria-label="Erase">
                                         <tf-icon>backspace</tf-icon>
+                                        <Tooltip Delay="1000">Erase</Tooltip>
                                     </button>
-                                    <Tooltip Anchor="@($"erase-{Id}")" Delay="1000">Erase</Tooltip>
                                 </div>
                             }
-                            <div id="@($"line-weight-{Id}")"
-                                 class="d-inline-flex align-items-center gap-2">
+                            <div class="d-inline-flex align-items-center gap-2">
                                 <tf-icon>line_weight</tf-icon>
                                 <Slider @bind-Value:get="BrushSize"
                                         @bind-Value:set="SetBrushSizeAsync"
@@ -282,59 +267,54 @@
                                         Step="0.1"
                                         ThemeColor="ThemeColor"
                                         aria-label="Brush size" />
+                                <Tooltip Delay="1000">Brush size</Tooltip>
                             </div>
-                            <Tooltip Anchor="@($"line-weight-{Id}")" Delay="1000">Brush size</Tooltip>
-                            <button id="@($"stop-drawing-{Id}")"
-                                    class="btn btn-icon @ThemeClass"
+                            <button class="btn btn-icon @ThemeClass"
                                     @onclick="@(_ => SetDrawingModeAsync(DrawingMode.None))"
                                     aria-label="Stop drawing">
                                 <tf-icon>done</tf-icon>
+                                <Tooltip Delay="1000">Stop drawing</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"stop-drawing-{Id}")" Delay="1000">Stop drawing</Tooltip>
                         }
                         else if (TextMode)
                         {
                             <div class="image-editor-toolbar" role="toolbar" aria-label="Color toolbar">
-                                <ColorInput Id="@($"text-color-{Id}")"
-                                            DisplayType="PickerDisplayType.Button"
+                                <ColorInput DisplayType="PickerDisplayType.Button"
                                             @bind-Value:get="BrushColor"
                                             @bind-Value:set="SetBrushColorAsync"
                                             OutputHexStrings="true"
                                             ShowAlpha="false"
-                                            ThemeColor="ThemeColor" />
-                                <Tooltip Anchor="@($"text-color-{Id}")" Delay="1000" Side="Side.Right">Color</Tooltip>
-                                <button id="@($"add-text-{Id}")"
-                                        class="btn btn-icon @ThemeClass"
+                                            ThemeColor="ThemeColor">
+                                    <Tooltip Delay="1000" Side="Side.Right">Color</Tooltip>
+                                </ColorInput>
+                                <button class="btn btn-icon @ThemeClass"
                                         @onclick="AddTextAsync"
                                         aria-label="Add text">
                                     <tf-icon>text_fields</tf-icon>
+                                    <Tooltip Delay="1000">Add text</Tooltip>
                                 </button>
-                                <Tooltip Anchor="@($"add-text-{Id}")" Delay="1000">Add text</Tooltip>
                             </div>
-                            <button id="@($"stop-text-{Id}")"
-                                    class="btn btn-icon @ThemeClass"
+                            <button class="btn btn-icon @ThemeClass"
                                     @onclick="@(_ => TextMode = false)"
                                     aria-label="Stop adding text">
                                 <tf-icon>done</tf-icon>
+                                <Tooltip Delay="1000">Stop adding text</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"stop-text-{Id}")" Delay="1000">Stop adding text</Tooltip>
                         }
                         else
                         {
-                            <button id="@($"draw-{Id}")"
-                                    class="btn btn-icon @ThemeClass"
+                            <button class="btn btn-icon @ThemeClass"
                                     @onclick="@(_ => SetDrawingModeAsync(DrawingMode.Brush))"
                                     aria-label="Draw">
                                 <tf-icon>draw</tf-icon>
+                                <Tooltip Delay="1000">Draw</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"draw-{Id}")" Delay="1000">Draw</Tooltip>
-                            <button id="@($"text-{Id}")"
-                                    class="btn btn-icon @ThemeClass"
+                            <button class="btn btn-icon @ThemeClass"
                                     @onclick="@(_ => TextMode = true)"
                                     aria-label="Add text">
                                 <tf-icon>text_fields</tf-icon>
+                                <Tooltip Delay="1000">Add text</Tooltip>
                             </button>
-                            <Tooltip Anchor="@($"text-{Id}")" Delay="1000">Add text</Tooltip>
                         }
                     </div>
                 }
