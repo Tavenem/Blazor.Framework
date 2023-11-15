@@ -65,7 +65,7 @@
 
             > tf-icon {
                 margin-inline-end: -.25rem;
-                margin-inline-start: auto;
+                margin-inline-start: .5rem;
                 order: 9999;
                 transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
                 transform: rotate(-180deg);
@@ -78,18 +78,38 @@
 
         > tf-icon.expand {
             margin-inline-end: -.25rem;
-            margin-inline-start: auto;
+            margin-inline-start: .5rem;
             order: 9999;
             transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
             transform: rotate(-180deg);
         }
 
-        > .clickable {
+        > .collapse-title {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
             outline: none;
             user-select: none;
 
             &:hover {
                 cursor: pointer;
+            }
+        }
+
+        > a.collapse-title {
+            color: inherit;
+        }
+
+        > .expand-link {
+            color: inherit;
+            margin-inline-end: -.25rem;
+            margin-inline-start: .5rem;
+            order: 9999;
+
+            tf-icon {
+                transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+                transform: rotate(-180deg);
             }
         }
     }
@@ -200,7 +220,6 @@
 
         > .header {
             @include ripple;
-
             padding-inline-end: 1px;
 
             &:hover,
@@ -281,6 +300,10 @@
             > tf-icon.expand {
                 transform: rotate(0deg);
             }
+
+            > .expand-link tf-icon {
+                transform: rotate(0deg);
+            }
         }
 
         > .body {
@@ -354,6 +377,10 @@
             > tf-icon.expand {
                 transform: rotate(0deg);
             }
+
+            > .expand-link tf-icon {
+                transform: rotate(0deg);
+            }
         }
 
         &.closed > .header {
@@ -362,6 +389,10 @@
             }
 
             > tf-icon.expand {
+                transform: rotate(-90deg);
+            }
+
+            > .expand-link tf-icon {
                 transform: rotate(-90deg);
             }
         }

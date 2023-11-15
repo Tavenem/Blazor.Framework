@@ -48,8 +48,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private const string SortQueryParamName = "s";
     private const string NullGroupKey = "NULL";
 
-    private readonly HashSet<int> _rowCurrentExpansion = [];
-    private readonly HashSet<int> _rowExpansion = [];
+    private readonly HashSet<string> _rowCurrentExpansion = [];
+    private readonly HashSet<string> _rowExpansion = [];
     private readonly HashSet<string> _groupExpansion = [];
     private readonly List<string> _objectUrls = [];
     private readonly List<Guid> _sortOrder = [];
@@ -454,6 +454,17 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// </para>
     /// </summary>
     [Parameter] public EventCallback<TDataItem> RowExpanded { get; set; }
+
+    /// <summary>
+    /// A function which retrieves a unique string ID for a given row.
+    /// </summary>
+    /// <remarks>
+    /// This function is optional, but if omitted row expansion will use the result of the row value
+    /// object's <see cref="object.GetHashCode"/> to uniquely identify each row (including across
+    /// page load events, when the query string contains information about row expansion states),
+    /// which may or may not always be appropriate.
+    /// </remarks>
+    [Parameter] public Func<TDataItem, string>? RowId { get; set; }
 
     /// <summary>
     /// <para>
@@ -878,12 +889,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (rowExpansions?.Count > 0)
         {
             _rowCurrentExpansion.Clear();
-            foreach (var item in rowExpansions)
+            foreach (var id in rowExpansions)
             {
-                if (int.TryParse(item, out var row))
-                {
-                    _rowCurrentExpansion.Add(row);
-                }
+                _rowCurrentExpansion.Add(id);
             }
         }
 
@@ -1504,8 +1512,20 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         StateHasChanged();
     }
 
-    internal bool GetRowIsExpanded(TDataItem item) => item is not null
-        && _rowCurrentExpansion.Contains(item.GetHashCode());
+    internal bool GetRowIsExpanded(TDataItem item)
+    {
+        if (item is null)
+        {
+            return false;
+        }
+        var id = RowId?.Invoke(item)
+            ?? item.GetHashCode().ToString();
+        if (id is null)
+        {
+            return false;
+        }
+        return _rowCurrentExpansion.Contains(id);
+    }
 
     internal string GetRowExpansionToggleUrl(Row<TDataItem> row)
     {
@@ -1514,21 +1534,36 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             return NavigationManager.Uri;
         }
 
-        var hash = row.Item.GetHashCode();
-        return _rowCurrentExpansion.Contains(hash)
+        var id = RowId?.Invoke(row.Item)
+            ?? row.Item.GetHashCode().ToString();
+        if (id is null)
+        {
+            return NavigationManager.Uri;
+        }
+
+        return _rowCurrentExpansion.Contains(id)
             ? QueryStateService.GetUriWithoutPropertyValue(
                 Id,
                 RowExpansionQueryParamName,
-                hash)
+                id)
             : QueryStateService.GetUriWithPropertyValue(
                 Id,
                 RowExpansionQueryParamName,
-                hash,
+                id,
                 true);
     }
 
-    internal bool GetRowWasExpanded(TDataItem item) => item is not null
-        && _rowExpansion.Contains(item.GetHashCode());
+    internal bool GetRowWasExpanded(TDataItem item)
+    {
+        if (item is null)
+        {
+            return false;
+        }
+
+        var id = RowId?.Invoke(item)
+            ?? item.GetHashCode().ToString();
+        return _rowExpansion.Contains(id);
+    }
 
     internal async Task OnColumnSortedAsync(Guid id)
     {
@@ -1664,16 +1699,22 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             return;
         }
 
-        var hash = row.Item.GetHashCode();
-        var rowIsExpanded = _rowCurrentExpansion.Contains(hash);
+        var id = RowId?.Invoke(row.Item)
+            ?? row.Item.GetHashCode().ToString();
+        if (id is null)
+        {
+            return;
+        }
+
+        var rowIsExpanded = _rowCurrentExpansion.Contains(id);
         if (rowIsExpanded)
         {
-            _rowCurrentExpansion.Remove(hash);
+            _rowCurrentExpansion.Remove(id);
         }
         else
         {
-            _rowExpansion.Add(hash);
-            _rowCurrentExpansion.Add(hash);
+            _rowExpansion.Add(id);
+            _rowCurrentExpansion.Add(id);
         }
         if (!rowIsExpanded && RowExpanded.HasDelegate)
         {
@@ -1691,14 +1732,14 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 QueryStateService.RemovePropertyValue(
                     Id,
                     RowExpansionQueryParamName,
-                    hash);
+                    id);
             }
             else
             {
                 QueryStateService.AddPropertyValue(
                     Id,
                     RowExpansionQueryParamName,
-                    hash);
+                    id);
             }
         }
     }
@@ -2826,12 +2867,9 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (args.Values?.Count > 0)
         {
             _rowCurrentExpansion.Clear();
-            foreach (var item in args.Values)
+            foreach (var id in args.Values)
             {
-                if (int.TryParse(item, out var row))
-                {
-                    _rowCurrentExpansion.Add(row);
-                }
+                _rowCurrentExpansion.Add(id);
             }
         }
         return Task.CompletedTask;
@@ -3020,6 +3058,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 Id,
                 SortQueryParamName,
                 GetSortQueries(_sortOrder));
+        }
+        else
+        {
+            Regroup();
         }
     }
 

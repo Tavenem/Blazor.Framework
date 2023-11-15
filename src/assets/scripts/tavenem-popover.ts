@@ -18,10 +18,6 @@ interface IPopoverPosition {
     top: number;
 }
 
-interface IPopoverScroller extends HTMLElement {
-    listeningForPopoverScroll?: boolean | undefined | null;
-}
-
 export namespace TavenemPopover {
     const flipClassReplacements: Record<string, Record<string, string>> = {
         'top': {
@@ -85,9 +81,8 @@ export namespace TavenemPopover {
         resizeObserver.observe(document.body);
         document.addEventListener('focusin', focusPopovers.bind(undefined, true));
         document.addEventListener('focusout', focusPopovers.bind(undefined, false));
-        window.addEventListener('resize', () => {
-            placePopovers();
-        });
+        document.addEventListener('scroll', placePopovers.bind(undefined), true);
+        window.addEventListener('resize', placePopovers.bind(undefined), true);
     }
 
     export function placePopover(popoverNode: Element): void {
@@ -608,25 +603,6 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
             && this.parentElement.hasAttribute('data-popover-container')) {
             this._parentMutationObserver.observe(this.parentElement, { attributeFilter: ['data-popover-open'] });
         }
-
-        let parentStyle: CSSStyleDeclaration;
-        const overflowRegex = /(auto|scroll)/;
-        let parent = this.parentElement as IPopoverScroller;
-        while (parent) {
-            if (parent.listeningForPopoverScroll) {
-                break;
-            }
-            parentStyle = getComputedStyle(parent);
-            if (parentStyle.position === 'static') {
-                parent = parent.parentElement as IPopoverScroller;
-                continue;
-            }
-            if (overflowRegex.test(parentStyle.overflow + parentStyle.overflowY + parentStyle.overflowX)) {
-                parent.addEventListener('scroll', TavenemPopover.placePopovers);
-                parent.listeningForPopoverScroll = true;
-            }
-            parent = parent.parentElement as IPopoverScroller;
-        }
     }
 
     disconnectedCallback() {
@@ -636,6 +612,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
         this.removeEventListener('mouseover', this.onMouseOver.bind(this));
         this.removeEventListener('touchstart', this.cancelFocusLoss.bind(this));
         this._mutationObserver.disconnect();
+        this._parentMutationObserver.disconnect();
         this._parentResizeObserver.disconnect();
         this._resizeObserver.disconnect();
     }
@@ -1321,6 +1298,10 @@ slot {
     }
 
     private openInner() {
+        const popover = this.querySelector('tf-popover.contained-popover');
+        if (popover) {
+            TavenemPopover.placePopover(popover);
+        }
         this.dataset.popoverOpen = '';
         this.dispatchEvent(TavenemDropdownHTMLElement.newDropdownToggleEvent(true));
     }

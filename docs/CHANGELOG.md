@@ -1,73 +1,42 @@
 # Changelog
 
-## 2.0-preview.11
-### Added
-- More manual control properties and methods to `Steps`
-
-## 2.0-preview.10
-### Fixed
-- Grouped paging in DataGrid
-- Added field flex grow
-
-## 2.0-preview.9
-### Fixed
-- QueryStateService initialization
-
-## 2.0-preview.8
-### Fixed
-- Tab scrolling
-
-## 2.0-preview.6-7
-### Fixed
-- Data grid loading behavior
-
-## 2.0-preview.5
-### Fixed
-- List style regression
-
-## 2.0-preview.4
-### Added
-- Added properties to `Contents` to improve customizability:
-   - `MaxLevel`
-   - `MaxLevelOffset`
-   - `MinHeadings`
-
-## 2.0-preview.3
-### Fixed
-- Improved `Tooltip` behavior
-
-## 2.0-preview.2
-### Changed
-- Added `ChildContent` outlet for most components where it was missing
-- More rework of `Tooltip` component
-   - Removed `Anchor` property introduced in 2.0-preview.1
-   - Any element can now reference a `Tooltip` by its `Id` with a `data-tooltip-id` HTML attribute
-   - A `Tooltip` nested inside an element is automatically associated with that element, unless `IsContainerTrigger` is set to `false`
-   - Added `IsButton` property to explicitly specify when to display an icon button to act as the trigger
-
-## 2.0-preview.1
+## 2.0
 ### Added
 - Trimming and AOT compatibility
 - Close button `auto` attribute, which allows automatically closing a parent element with the `data-can-close` attribute
 - `Collapse.NavUrl` and `Collapse.NavLinkMatch` to enable auto-open based on `NavLink`-style logic
+- Added properties to `Contents` to improve customizability:
+   - `MaxLevel`
+   - `MaxLevelOffset`
+   - `MinHeadings`
 - `DialogContainer` to support use of dialogs without the `FrameworkLayout`  
 - `DrawerToggle` placeable button to automatically control a drawer
 - `Drawer.ShowAtBreakpoint` and `Drawer.HideAtBreakpoint`
 - `MarkdownRenderer` component
 - `SnackbarContainer` to support use of snackbars without the `FrameworkLayout`
+- More manual control properties and methods to `Steps`
 - `tf-scroll-top` custom element (replacement for `ScrollToTop` component)
+- `tf-syntax-highlight` custom element (replacement for `SyntaxHighlighter` component)
 ### Changed
-- Update to .NET 8 RC
+- Update to .NET 8
+- Adds support for prerendering and static render mode
 - Use Material Symbols instead of Material Icons
-- Some support for prerendering and static render mode
+- Added `ChildContent` outlet for most components where it was missing
 - `AppBar` component replaced by simple CSS class (built-in drawer functionality replaced by `DrawerToggle`)
 - `Tooltip` component drastically changed
    - No longer wraps an anchor component
-   - The anchor/trigger element's HTML `id` must be specified with the `Anchor` property
-   - A tooltip with no `Anchor` displays a button which acts as the trigger (the same button as displayed for no-hover devices)
+   - Any element can now reference a `Tooltip` by its `Id` with a `data-tooltip-id` HTML attribute
+   - A `Tooltip` nested inside an element is automatically associated with that element, unless `IsContainerTrigger` is set to `false`
    - All properties for specifying the content of the tooltip have been dropped
    - The `ChildContent` specifies the content of the tooltip popover
    - Removed no-hover icons
+   - Added `IsButton` property to explicitly specify when to display an icon button to act as the trigger
+### Fixed
+- Grouped paging in DataGrid
+- Added field flex grow
+- Tab scrolling
+- Data grid loading behavior
+- Improved `Tooltip` behavior
 ### Removed
 - .NET 6 and .NET 7 targets
 - `AnchorLink` (replaced by native fragment handling and built-in Collapse NavLink functionality)
@@ -78,6 +47,7 @@
 - `LightDarkToggle` component (replaced by `tf-darkmode-toggle` custom HTML element)
 - `ScrollService.ScrollSpyTags` (`ScrollService.ScrollSpy` now accepts a CSS selector rather than a class name only)
 - `ScrollToTop` (replaced by `tf-scroll-top` custom element)
+- `SyntaxHighlighter` (replaced by `tf-syntax-highlight` custom element)
 - `ThemeService` (replaced by `tf-darkmode-toggle` custom HTML element and built-in features, in order to fully support static and prerendering)
 - `Timeline` component (`div` with `timeline` CSS class provides all the same functionality)
 

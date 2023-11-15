@@ -1,16 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace Tavenem.Blazor.Framework;
+﻿namespace Tavenem.Blazor.Framework;
 
 internal class DynamicTabInfo<TTabItem>
 {
     public DraggableDropTarget<TTabItem, TTabItem>? DragDropComponent { get; set; }
 
-    public ElementReference ElementReference { get; set; }
-
     public string Id { get; } = Guid.NewGuid().ToHtmlId();
-
-    public bool Observed { get; set; }
 
     public string PanelId => $"panel-{Id}";
 }

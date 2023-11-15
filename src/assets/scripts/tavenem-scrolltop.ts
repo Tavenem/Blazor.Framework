@@ -10,13 +10,17 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open' });
 
+        this.classList.add('hidden');
+
+        const local = 'local' in this.dataset;
+
         const style = document.createElement('style');
         style.textContent = `:host {
     bottom: 1rem;
     cursor: pointer;
     display: inline-flex;
     flex: 0 0 auto;
-    position: fixed;
+    position: ${local ? 'absolute' : 'fixed'};
     right: 1rem;
     z-index: var(--tavenem-zindex-scroll-to-top);
 }
@@ -50,7 +54,7 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
     z-index: var(--tavenem-zindex-tooltip);
 }
 
-slot button {
+slot button.default-scroll-top-button {
     background-color: var(--tavenem-color-primary);
     border-color: var(--tavenem-color-primary-text);
     border-radius: 9999px;
@@ -79,7 +83,7 @@ slot button {
     -webkit-tap-highlight-color: transparent;
 }
 
-    slot button:after {
+    slot button.default-scroll-top-button:after {
         background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
         background-position: 50%;
         background-repeat: no-repeat;
@@ -96,28 +100,28 @@ slot button {
         width: 100%;
     }
 
-    slot button:active:after {
+    slot button.default-scroll-top-button:active:after {
         transform: scale(0,0);
         opacity: .1;
         transition: 0s;
     }
 
-    slot button::-moz-focus-inner {
+    slot button.default-scroll-top-button::-moz-focus-inner {
         border-style: none;
     }
 
-    slot button:hover,
-    slot button:focus-visible {
+    slot button.default-scroll-top-button:hover,
+    slot button.default-scroll-top-button:focus-visible {
         background-color: var(--tavenem-color-primary-darken);
         color: var(--tavenem-color-primary-text);
     }`;
         shadow.appendChild(style);
 
         const slot = document.createElement('slot');
-        slot.name = "content";
         shadow.appendChild(slot);
 
         const button = document.createElement('button');
+        button.classList.add('default-scroll-top-button');
         slot.appendChild(button);
 
         const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');

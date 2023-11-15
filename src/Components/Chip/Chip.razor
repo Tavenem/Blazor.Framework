@@ -12,6 +12,7 @@
      role="listitem"
      class="@CssClass"
      style="@CssStyle"
+     data-can-close
      draggable="@(GetIsDraggable() ? "true" : "false")"
      @onclick="OnClickAsync">
     @if (!string.IsNullOrWhiteSpace(IconName))
@@ -32,7 +33,7 @@
     }
     else if (ChipSet?.AutoClose == true)
     {
-        <tf-close @onclick="OnClosedAsync" />
+        <tf-close data-close-auto />
     }
 </div>
 @if (SeparatorAfterValue)

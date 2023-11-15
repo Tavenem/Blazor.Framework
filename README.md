@@ -4,9 +4,14 @@ Tavenem.Blazor.Framework
 ==
 
 Tavenem.Blazor.Framework is a [Razor class
-library](https://docs.microsoft.com/en-us/aspnet/core/razor-pages/ui-class) (RCL) containing a
-stylesheet and [Razor components](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/class-libraries).
-It provides a framework for quickly creating [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) projects.
+library](https://docs.microsoft.com/en-us/aspnet/core/razor-pages/ui-class) (RCL) containing CSS
+styles, <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web components</a>,
+and [Razor
+components](https://docs.microsoft.com/en-us/aspnet/core/blazor/components/class-libraries). It
+provides a framework for quickly creating
+[Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) projects with a rich,
+visually appealing UI, and contains dozens of flexible, powerful controls to simplify the
+development experience.
 
 ## Documentation
 
@@ -18,19 +23,15 @@ Tavenem.Blazor.Framework is available as a [NuGet package](https://www.nuget.org
 
 ## Use
 
-1. Call the `AddTavenemFramework()` extension method on your `IServiceCollection`.
+Call the `AddTavenemFramework()` extension method on your `IServiceCollection` to automatically add
+all server and client dependencies.
 
-1. Add a link to the stylesheet in your index.html or _Host.cshtml file:
-
-    ```html
-    <link href="_content/Tavenem.Blazor.Framework/styles.css" rel="stylesheet" />
-    ```
-
-1. See the documentation for additional guidelines on using the framework in your project.
+See the [documentation](https://tavenem.com/Blazor.Framework/getting-started/installation) for more
+detailed instructions and additional guidelines on using the framework in your project.
 
 ## Roadmap
 
-Tavenem.Blazor.Framework now has a stable release.
+New releases of the framework are made regularly to address bugs, and to improve performance and utility.
 
 Additional components may be added based on user feedback.
 

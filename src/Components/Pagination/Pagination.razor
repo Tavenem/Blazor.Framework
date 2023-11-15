@@ -12,33 +12,33 @@
      tabindex="-1">
     <ol>
         <li>
-            @if (Interactive || IsDisabled || CurrentPage == 0)
+            @if (Interactive || Disabled || CurrentPage == 0)
             {
                 <button @onclick="OnFirstAsync"
                         class="@PageCssClassControl"
-                        disabled="@(IsDisabled || CurrentPage == 0)">
+                        disabled="@(Disabled || CurrentPage == 0)">
                     <tf-icon>@FirstPageIcon</tf-icon>
                 </button>
             }
             else
             {
-                <a href="GetFirstPageUrl" class="@PageCssClassControl">
+                <a href="@GetFirstPageUrl()" class="@PageCssClassControl">
                     <tf-icon>@FirstPageIcon</tf-icon>
                 </a>
             }
         </li>
         <li>
-            @if (Interactive || IsDisabled || CurrentPage == 0)
+            @if (Interactive || Disabled || CurrentPage == 0)
             {
                 <button @onclick="OnPreviousAsync"
                         class="@PageCssClassControl"
-                        disabled="@(IsDisabled || CurrentPage == 0)">
+                        disabled="@(Disabled || CurrentPage == 0)">
                     <tf-icon>@PreviousPageIcon</tf-icon>
                 </button>
             }
             else
             {
-                <a href="GetPreviousPageUrl" class="@PageCssClassControl">
+                <a href="@GetPreviousPageUrl()" class="@PageCssClassControl">
                     <tf-icon>@PreviousPageIcon</tf-icon>
                 </a>
             }
@@ -59,16 +59,16 @@
             else
             {
                 <li @key="index">
-                    @if (Interactive || IsDisabled)
+                    @if (Interactive || Disabled)
                     {
-                        <button @onclick="@(_ => OnSetPageAsync(index))" class="@PageCssClass" disabled="@IsDisabled">
+                        <button @onclick="@(_ => OnSetPageAsync(index))" class="@PageCssClass" disabled="@Disabled">
                             @((index + 1).ToString("N0"))
                         </button>
                     }
                     else
                     {
                         <a href="@GetPageUrl(index)" class="@PageCssClass">
-                            <tf-icon>@PreviousPageIcon</tf-icon>
+                            @((index + 1).ToString("N0"))
                         </a>
                     }
                 </li>
@@ -79,34 +79,34 @@
             <li>&hellip;</li>
         }
         <li>
-            @if (Interactive || IsDisabled || CurrentPage == PageCount - 1)
+            @if (Interactive || Disabled || CurrentPage == PageCount - 1)
             {
                 <button @onclick="OnNextAsync"
                         class="@PageCssClassControl"
-                        disabled="@(IsDisabled || CurrentPage == PageCount - 1)">
+                        disabled="@(Disabled || CurrentPage == PageCount - 1)">
                     <tf-icon>@NextPageIcon</tf-icon>
                 </button>
             }
             else
             {
-                <a href="GetNextPageUrl" class="@PageCssClassControl">
+                <a href="@GetNextPageUrl()" class="@PageCssClassControl">
                     <tf-icon>@NextPageIcon</tf-icon>
                 </a>
             }
         </li>
         <li>
-            @if (Interactive || IsDisabled || CurrentPage == PageCount - 1)
+            @if (Interactive || Disabled || CurrentPage == PageCount - 1)
             {
                 <button @ref="LastPageElement"
                         @onclick="OnLastAsync"
                         class="@PageCssClassControl"
-                        disabled="@(IsDisabled || CurrentPage == PageCount - 1)">
+                        disabled="@(Disabled || CurrentPage == PageCount - 1)">
                     <tf-icon>@LastPageIcon</tf-icon>
                 </button>
             }
             else
             {
-                <a href="GetLastPageUrl" class="@PageCssClassControl">
+                <a href="@GetLastPageUrl()" class="@PageCssClassControl">
                     <tf-icon>@LastPageIcon</tf-icon>
                 </a>
             }

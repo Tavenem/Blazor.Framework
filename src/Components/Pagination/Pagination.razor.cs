@@ -169,7 +169,7 @@ public partial class Pagination : PersistentComponentBase
     protected override string? CssClass => new CssBuilder("pagination")
         .Add(Class)
         .Add(ThemeColor.ToCSS())
-        .Add("disabled", IsDisabled)
+        .Add("disabled", Disabled)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
@@ -205,8 +205,6 @@ public partial class Pagination : PersistentComponentBase
     private int FocusSkipFirstPrev => CurrentPage == 0 ? 0 : 2;
 
     private bool Interactive { get; set; }
-
-    private bool IsDisabled => Disabled || !Interactive;
 
     private ulong LastPage
     {

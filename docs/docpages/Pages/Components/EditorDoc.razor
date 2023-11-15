@@ -9,6 +9,13 @@
     content.
 </p>
 
+<p>
+    Note: this control cannot be used on static server-side rendered pages, since it relies on
+    interactivity to operate. Its current value will be displayed in read-only form instead. When
+    <em>pre</em>rendered server-side, it will be disabled during the prerender pass, then become
+    enabled when interactivity becomes available.
+</p>
+
 <h2>Basics</h2>
 
 <p>

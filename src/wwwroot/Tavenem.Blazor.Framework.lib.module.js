@@ -22,8 +22,6 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             }
         }
     });
-
-    console.log(`Tavenem.Blazor.Framework${web ? ' web app' : ''} initialized`);
 }
 
 function tavenemBlazorFrameworkBeforeStart(web) {
@@ -31,7 +29,6 @@ function tavenemBlazorFrameworkBeforeStart(web) {
         return;
     }
     beforeStartComplete = true;
-    console.log(`Initializing Tavenem.Blazor.Framework${web ? ' web app' : ''}...`);
 
     addHeadContent();
 }
@@ -78,7 +75,7 @@ function addHeadContent() {
 function fixTablesOfContents() {
     document
         .querySelectorAll('tf-contents')
-        .forEach(x => x.refreshStyle());
+        .forEach(x => x.refresh());
 }
 
 function scrollToTopOnLoad() {
@@ -87,14 +84,15 @@ function scrollToTopOnLoad() {
     {
         tfLocation = path;
 
-        const main = document.querySelector('main');
-        if (main) {
-            main.scroll({
-                top: 0,
-                left: 0,
-                behavior: "smooth",
-            });
-        }
+        setTimeout(() => {
+            const main = document.querySelector('main');
+            if (main) {
+                main.scroll({
+                    top: 0,
+                    left: 0,
+                });
+            }
+        }, 50);
     }
 }
 

@@ -9,13 +9,22 @@
             <tf-progress-circle class="primary"></tf-progress-circle>
         </div>
     }
-    @if (Interactive && !Editing && ShowEditButton && (AllowEditNoImage || HasImage))
+    @if (IsInteractive && !Editing && ShowEditButton && (AllowEditNoImage || HasImage))
     {
         <button class="btn btn-icon image-edit-button @ThemeClass" @onclick="BeginEditAsync">
             <tf-icon>@EditIcon</tf-icon>
         </button>
     }
-    <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle"></div>
+    @if (IsInteractive)
+    {
+        <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle"></div>
+    }
+    else if (!string.IsNullOrEmpty(Src))
+    {
+        <div id="@ContainerId" class="@ContainerCssClass" style="@ImageStyle">
+            <img src="@Src" />
+        </div>
+    }
     @if (Editing)
     {
         <div class="image-editor-controls gap-2">

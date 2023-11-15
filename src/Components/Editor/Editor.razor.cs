@@ -244,6 +244,22 @@ public partial class Editor : FormComponentBase<string>
         }
     }
 
+    private MarkupString StaticContent
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Value))
+            {
+                if (string.IsNullOrEmpty(Placeholder))
+                {
+                    return new();
+                }
+                return new($"<span class=\"text-muted\">{Placeholder}</span>");
+            }
+            return new(Value);
+        }
+    }
+
     private string TableGroupId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     private string? ToolbarClass => new CssBuilder("editor-toolbar")

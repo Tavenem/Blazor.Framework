@@ -9,6 +9,13 @@
     type, and uses a toggle-switch appearance instead of a standard checkbox.
 </p>
 
+<p>
+    Note: like all Tavenem Framework forms components, this control cannot be used on static
+    server-side rendered pages. It will always be disabled when rendered statically. This is because
+    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
+    disabled during the prerender pass, then become enabled when interactivity becomes available.
+</p>
+
 <h2>Basics</h2>
 
 <p>

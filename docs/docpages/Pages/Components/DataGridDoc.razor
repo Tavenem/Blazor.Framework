@@ -10,6 +10,11 @@
     other data operations built in.
 </p>
 
+<p>
+    Note: the <code>DataGrid</code> can be used on static server-side rendered pages, but some
+    operations which rely on interactivity will be hidden or disabled. See below for details.
+</p>
+
 <h2>Basics</h2>
 
 <p>
@@ -59,6 +64,14 @@
 <p>
     It's also possible to load items dynamically, by assigning a function to the
     <code>LoadItems</code> property.
+</p>
+
+<p>
+    Note: loading items will not work in static server-side rendered pages, since the loading occurs
+    asynchronously after the page becomes interactive (which does not occur for static pages).
+    Instead the grid will display a perpetual loading animation on static pages. This appearance was
+    chosen over displaying an empty grid to avoid creating the impression for users that the source
+    actually contains no data, when in fact the component failed to operate as intended.
 </p>
 
 <Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -414,7 +427,7 @@
 <Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGrid Id="d-4" Items="_items">
+            <DataGrid Id="d-4" Items="_items" RowId="@(x => x.Id.ToString())">
                 <ChildContent>
                     <Column Label="Last" Value="@(x => x.LastName)" />
                     <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" />
@@ -433,7 +446,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"">
+        @CodeFormatter.CodeToMarkup(@"<DataGrid Items=""_items"" RowId=""@(x => x.Id.ToString())"">
     <ChildContent>
         <Column Label=""Last"" Value=""@(x => x.LastName)"" />
         <Column Label=""Hire date"" Value=""@(x => x.HireDate)"" Format=""d"" CanFilter=""false"" />
@@ -479,10 +492,23 @@
     a function to <code>HasExpandedContent</code> it is assumed that all rows can expand.
 </p>
 
+<p>
+    When rows can be expanded, it is usually important to supply a function to the
+    <code>UniqueId</code> parameter which produces a stable, unique ID string for each row. If
+    omitted the result of calling the row value object's <code>GetHashCode</code> is used. This ID
+    is used to identify which rows are expanded, including after a page load when the query string
+    contains persisted expansion information.
+</p>
+
 <h2>Filtering</h2>
 
 <p>
     A <code>DataGrid</code> supports two kinds of filtering: per-column, and quick filters.
+</p>
+
+<p>
+    Filtering is unavailable on static server-side rendered pages. The filter controls will be
+    hidden when the page is non-interactive.
 </p>
 
 <h3>Column filtering</h3>
@@ -600,27 +626,17 @@
     <code>IsQuickFilter</code> set to <code>true</code>.
 </p>
 
-<h3>Persistence</h3>
-
-<p>
-    Normally all filters will be reset when navigating away from the page. If you set an explicit
-    value for the <code>Id</code> property (which sets the HTML <code>id</code> attribute), the
-    current filters will persist between <em>in-app</em> navigations. Navigating away from the
-    Blazor app, or using the browser's refresh function, will reset this internal cache.
-</p>
-
-<p>
-    If you need filters to persist even when the user navigates away from the app or refreshes the
-    browser (or in other offline scenarios, such as in a bookmark or external link), you can use
-    query parameters in combination with the initial filter properties to achieve this result.
-</p>
-
 <h2>Sorting</h2>
 
 <p>
     Each <code>Column</code> supports sorting by default, although you can disable it by setting
     <code>CanSort</code> to <code>false</code> on any column. This property can be set for
     auto-generated columns with the <code>DataGridColumnAttribute</code>.
+</p>
+
+<p>
+    Sorting is unavailable on static server-side rendered pages. The sort controls will be hidden
+    when the page is non-interactive.
 </p>
 
 <p>
@@ -639,21 +655,6 @@
     column should be initially sorted. Combine this with the <code>SortDescending</code> property to
     control the direction of the initial sort. These properties can both be set for auto-generated
     columns with the <code>DataGridColumnAttribute</code>.
-</p>
-
-<h3>Persistence</h3>
-
-<p>
-    Normally all sorting options will be reset when navigating away from the page. If you set an
-    explicit value for the <code>Id</code> property (which sets the HTML <code>id</code> attribute),
-    the current sorting will persist between <em>in-app</em> navigations. Navigating away from the
-    Blazor app, or using the browser's refresh function, will reset this internal cache.
-</p>
-
-<p>
-    If you need sort options to persist even when the user navigates away from the app or refreshes
-    the browser (or in other offline scenarios, such as in a bookmark or external link), you can use
-    query parameters in combination with the initial sort properties to achieve this result.
 </p>
 
 <h2>Grouping</h2>
@@ -805,6 +806,10 @@
     <code>Multiple</code> to enable row selection.
 </p>
 
+<p>
+    Selection is unavailable on static server-side rendered pages.
+</p>
+
 <h3>Single selection</h3>
 
 <p>
@@ -915,6 +920,11 @@
 </p>
 
 <p>
+    Exporting is unavailable on static server-side rendered pages. The export controls will be
+    hidden when the page is non-interactive.
+</p>
+
+<p>
     Exporting to <a href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a>, <a
     href="https://www.microsoft.com/en-us/microsoft-365/excel">Excel</a>, and HTML formats is
     supported by default. The exported data will include the current set of visible columns, plus
@@ -953,6 +963,11 @@
 <p>
     The <code>DataGrid</code> component has built-in support for both editing existing data, as well
     as adding new items, although both features are disabled by default.
+</p>
+
+<p>
+    Editing is unavailable on static server-side rendered pages. The edit controls will be
+    hidden when the page is non-interactive.
 </p>
 
 <p>

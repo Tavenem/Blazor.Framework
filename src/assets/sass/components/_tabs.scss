@@ -7,23 +7,8 @@
     flex-direction: column;
     max-width: 100%;
 
-    &:not(.bottom, .left, .right) .tab-slider {
-        bottom: 0;
-    }
-
-    &:not(.left, .right) .tab-slider {
-        height: 2px;
-        left: 0;
-        transition: left .3s cubic-bezier(.64,.09,.08,1);
-        will-change: left;
-    }
-
     &.bottom {
         flex-direction: column-reverse;
-
-        .tab-slider {
-            top: 0;
-        }
     }
 
     &.left, &.right {
@@ -44,12 +29,6 @@
             }
         }
 
-        .tab-slider {
-            transition: top .3s cubic-bezier(.64,.09,.08,1);
-            width: 2px;
-            will-change: top;
-        }
-
         .tab-panels {
             display: flex;
             flex-grow: 1;
@@ -58,18 +37,10 @@
 
     &.left {
         flex-direction: row;
-
-        .tab-slider {
-            right: 0;
-        }
     }
 
     &.right {
         flex-direction: row-reverse;
-
-        .tab-slider {
-            left: 0;
-        }
     }
 
     &.bg-alt {
@@ -125,7 +96,7 @@
 .tabs-toolbar-content {
     flex: 1 1 auto;
     display: inline-block;
-    overflow: hidden;
+    overflow: auto;
     position: relative;
     transition: .3s cubic-bezier(.25,.8,.5,1);
     width: 100%;
@@ -181,10 +152,27 @@
 
     &.active {
         background-color: var(--tab-active-bg);
+        border-bottom: 2px solid var(--tab-active-color);
         color: var(--tab-active-color);
+        padding-bottom: 4px;
 
         &:hover {
             background-color: var(--tab-active-hover);
+        }
+
+        .tabs.left &, .tabs.right & {
+            border-bottom: none;
+            padding-bottom: 6px;
+        }
+
+        .tabs.left & {
+            border-right: 2px solid var(--tab-active-color);
+            padding-right: calc(.75rem - 2px);
+        }
+
+        .tabs.right & {
+            border-left: 2px solid var(--tab-active-color);
+            padding-left: calc(.75rem - 2px);
         }
     }
 
@@ -197,11 +185,6 @@
     tf-close {
         align-self: center;
     }
-}
-
-.tab-slider {
-    background-color: var(--tab-active-color);
-    position: absolute;
 }
 
 .tab-panels {

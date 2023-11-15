@@ -21,8 +21,8 @@
     margin: 0;
     overflow: auto;
     padding-bottom: .5em;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: .75em;
+    padding-right: .75em;
     padding-top: .5em;
     position: relative;
     scrollbar-gutter: stable;
@@ -41,6 +41,8 @@
             justify-content: flex-start;
             list-style: none;
             padding-bottom: .5em;
+            padding-inline-end: .25em;
+            padding-inline-start: .25em;
             padding-top: .5em;
             position: relative;
             text-align: start;
@@ -101,6 +103,7 @@
             background-color: var(--list-active-bg);
             border-inline-end: 1px solid var(--list-active-color);
             color: var(--list-active-color);
+            padding-inline-end: calc(.25em - 1px);
         }
 
         .clickable:not(.collapse), a {
@@ -126,7 +129,7 @@
 
             &.active {
                 border-inline-end: 1px solid var(--list-active-color);
-                padding-inline-end: calc(1em - 1px);
+                padding-inline-end: calc(.25em - 1px);
             }
 
             &:hover,
@@ -217,7 +220,7 @@
     }
 
     .list {
-        padding-inline-start: 2em;
+        padding-inline-start: 1.75em;
         scrollbar-gutter: auto;
     }
 
@@ -225,16 +228,16 @@
         > .active {
             border-inline-start: 1px solid var(--list-active-color);
             border-inline-end: none;
-            padding-inline-start: calc(1em - 1px);
-            padding-inline-end: 0;
+            padding-inline-start: calc(.25em - 1px);
+            padding-inline-end: .25em;
         }
 
         .list > .active,
         .list & > .active {
             border-inline-start: 1px solid var(--list-active-color);
             border-inline-end: none;
-            padding-inline-start: calc(1em - 1px);
-            padding-inline-end: 0;
+            padding-inline-start: calc(.25em - 1px);
+            padding-inline-end: .25em;
         }
     }
 

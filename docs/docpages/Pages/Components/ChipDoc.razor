@@ -119,6 +119,11 @@
 </p>
 
 <p>
+    Note: selection cannot be used on static server-side rendered pages, since it relies on
+    interactivity to operate.
+</p>
+
+<p>
     Each <code>ChipSet</code> and its child <code>Chip</code>s have a data type, indicated by the
     <code>TChip</code> parameter when it can't be inferred. The items in an <code>ChipSet</code>
     are displayed using either the <code>Template RenderFragment</code> for each item, or if no
@@ -234,6 +239,11 @@
 <p>
     Chips in an <code>ChipSet</code> can be draggable, both within the <code>ChipSet</code> (to
     reorder items), and between <code>ChipSet</code>s with the same item type.
+</p>
+
+<p>
+    Note: drag and drop cannot be used on static server-side rendered pages, since it relies on
+    interactivity to operate.
 </p>
 
 <p>

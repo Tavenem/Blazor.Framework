@@ -146,11 +146,16 @@
         }
 
         .ProseMirror,
-        .static-editor-html {
+        .static-editor-html,
+        .static-syntax-highlighting {
             flex-grow: 1;
+            padding: .25rem .5rem .25rem 1rem;
+        }
+
+        .ProseMirror,
+        .static-editor-html {
             line-height: 1.2;
             outline: none;
-            padding: .25rem .5rem .25rem 1rem;
             position: relative;
             white-space: break-spaces;
             word-wrap: break-word;
@@ -257,9 +262,18 @@
             }
         }
 
+        .static-syntax-highlighting > pre {
+            background-color: transparent;
+            border-radius: inherit;
+            color: inherit;
+            margin-bottom: 0;
+            padding: 0;
+        }
+
         &.set-height {
             .ProseMirror,
-            .static-editor-html {
+            .static-editor-html,
+            .static-syntax-highlighting {
                 overflow: auto;
             }
         }

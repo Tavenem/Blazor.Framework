@@ -118,6 +118,11 @@
 </p>
 
 <p>
+    Note: selection cannot be used on static server-side rendered pages, since it relies on
+    interactivity to operate.
+</p>
+
+<p>
     Each <code>ElementList</code> and its child <code>ListItem</code>s have a data type, indicated
     by the <code>TListItem</code> parameter when it can't be inferred. The items in an
     <code>ElementList</code> are displayed using either the <code>Template RenderFragment</code> for
@@ -276,6 +281,11 @@
 <p>
     Items in an <code>ElementList</code> can be draggable, both within the <code>ElementList</code>
     (to reorder items), and between <code>ElementList</code>s with the same item type.
+</p>
+
+<p>
+    Note: drag and drop cannot be used on static server-side rendered pages, since it relies on
+    interactivity to operate.
 </p>
 
 <p>

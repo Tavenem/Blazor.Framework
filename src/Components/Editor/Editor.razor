@@ -559,22 +559,33 @@
             {
                 @if (Syntax == EditorSyntax.HTML)
                 {
-                    <div class="static-editor-html">
-                        @(new MarkupString(Value ?? string.Empty))
-                    </div>
+                    <div class="static-editor-html">@StaticContent</div>
                 }
                 else if (Syntax == EditorSyntax.Markdown)
                 {
-                    <MarkdownRenderer Value="@Value" />
+                    @if (string.IsNullOrEmpty(Value))
+                    {
+                        <div class="static-editor-html">@StaticContent</div>
+                    }
+                    else
+                    {
+                        <MarkdownRenderer Value="@Value" />
+                    }
                 }
+            }
+            else if (string.IsNullOrEmpty(Value))
+            {
+                <div class="static-syntax-highlighting">
+                    <pre class="codeblock">
+                        <code class="text-muted">@Placeholder</code>
+                    </pre>
+                </div>
             }
             else
             {
-                <SyntaxHighlighter>
+                <SyntaxHighlighter Class="static-syntax-highlighting">
                     <pre class="codeblock">
-                        <code class="@Language">
-                            @Value
-                        </code>
+                        <code class="@Language">@Value</code>
                     </pre>
                 </SyntaxHighlighter>
             }

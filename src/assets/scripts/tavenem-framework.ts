@@ -1,4 +1,5 @@
 import { TavenemContentsHTMLElement } from './tavenem-contents';
+import { TavenemHighlightHTMLElement } from './tavenem-highlight';
 import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
 import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
 import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
@@ -631,6 +632,8 @@ slot button {
                 document.documentElement.setAttribute(`data-drawer-${side}`, 'false');
             }
         });
+
+        customElements.define('tf-syntax-highlight', TavenemHighlightHTMLElement);
 
         customElements.define('tf-popover', TavenemPopoverHTMLElement);
 

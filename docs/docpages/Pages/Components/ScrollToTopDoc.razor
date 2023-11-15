@@ -18,15 +18,94 @@
 <h2>Basics</h2>
 
 <p>
-    To insert your own scroll-to-top button (for instance, in a nested, scrollable container),
-    simply use the <code>tf-scroll-top</code> custom element. The element uses an icon button filled
-    with the primary theme color and a simple upward caret by default. You can replace that default
-    content by adding any HTML content you like to the named slot <code>content</code>. You will
-    always need to do this if you choose to use an icon library other than <a
-    href="https://fonts.google.com/icons?selected=Material+Icons">Google's Material Icons</a> (see
-    <a href="./getting-started/installation">Installation</a> for more information).
+    To place your own scroll-to-top button simply use the <code>tf-scroll-top</code> custom element.
+    If you wish to place it inside its parent, rather than at the bottom-right corner of the entire
+    page (for instance, inside a nested, scrollable container), add the <code>data-local</code>
+    attribute. Regardless of the presence of this attribute, the element will always scroll its
+    immediate parent to its own top when activated.
 </p>
 
-<CodeExample Id="ce-1" RowClass="align-items-center" Code="@(@"<tf-scroll-top>
-    <span class=""btn btn-icon info"" slot=""content""><tf-icon>arrow_upward</tf-icon></span>
-</tf-scroll-top>")" />
+<p>
+    The element uses an icon button filled with the primary theme color and a simple upward caret by
+    default. You can replace that default content by adding any HTML content you like inside. You
+    will always need to do this if you choose to use an icon library other than <a
+    href="https://fonts.google.com/icons?icon.set=Material+Symbolss">Google's Material Symbols</a>
+    (see <a href="./components/icon">Icons</a> for more information).
+</p>
+
+<CodeExample Id="ce-1" RowClass="align-items-center" Code="@(@"<div style=""max-height:5rem;overflow:auto"">
+    <tf-scroll-top data-local>
+        <span class=""btn btn-icon info filled""><tf-icon>arrow_upward</tf-icon></span>
+    </tf-scroll-top>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse sed felis sit amet ante
+        feugiat rhoncus non at elit. Etiam quis elit elit. Praesent accumsan, nibh quis pellentesque
+        auctor, ipsum arcu vestibulum ipsum, et rutrum ante mauris non ante. Vivamus eu tristique
+        tortor. Integer nec diam metus. Suspendisse potenti. Nam vel maximus ipsum, eu tincidunt
+        quam. Mauris condimentum metus et tempus eleifend. Maecenas commodo aliquet diam, ut
+        convallis ipsum fringilla id. Praesent tincidunt varius aliquet. Pellentesque quis pulvinar
+        justo. In vestibulum ac erat eget tristique. Etiam vitae arcu eu ex rhoncus euismod.
+        Suspendisse sed nisl massa.
+    </p>
+    <p>
+        Nunc sit amet facilisis orci, at imperdiet nisi. Nulla facilisi. Duis laoreet enim et
+        accumsan dictum. Proin facilisis sed est eu rhoncus. Praesent ex dolor, elementum vel mattis
+        nec, consequat ut erat. Morbi id pharetra ipsum. Suspendisse lobortis tellus enim, a dapibus
+        nulla euismod ac. Nulla vitae fermentum dui, eu lobortis purus. Morbi est odio, placerat vel
+        enim eget, pellentesque aliquet arcu.
+    </p>
+    <p>
+        Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis
+        egestas. Suspendisse suscipit mauris mauris, sed ultrices mauris elementum non. Etiam
+        maximus euismod fermentum. Mauris pellentesque massa ut tortor efficitur elementum. Sed
+        nulla lectus, pretium et venenatis in, vehicula vel libero. Donec varius hendrerit diam non
+        fringilla. Morbi vel vehicula est. Suspendisse sed enim ligula. Quisque eu laoreet est, a
+        rhoncus enim. In id turpis feugiat, lobortis nisi semper, pulvinar dui. Integer molestie
+        gravida nunc sit amet ornare. Nulla sit amet nunc quis tortor fringilla semper. Nulla cursus
+        quam purus.
+    </p>
+    <p>
+        Mauris id feugiat nisi. Donec a porta purus. Vestibulum non eros eu urna accumsan rhoncus
+        eget non orci. Praesent non pulvinar nisi. Sed eget aliquet ex. Nam ac dictum nisl, sit amet
+        aliquet massa. Praesent fringilla mollis venenatis. Nunc porttitor sed magna quis egestas.
+        Pellentesque dignissim velit sit amet rutrum tempus.
+    </p>
+    <p>
+        Suspendisse turpis ante, pretium in metus non, malesuada blandit ligula. Suspendisse tempus
+        vel odio a pellentesque. Pellentesque et faucibus ante. Mauris tincidunt enim sit amet erat
+        accumsan, vitae efficitur dolor imperdiet. Vestibulum sed luctus elit. Sed id vehicula
+        turpis, eget tempus risus. Duis aliquet luctus tristique. Pellentesque scelerisque sed leo
+        non tempor. Quisque eu egestas dui, vel condimentum augue. Nunc sodales neque justo.
+        Maecenas nisi lacus, convallis in placerat quis, lobortis vitae justo. Morbi nec justo vel
+        odio lacinia eleifend. In luctus arcu ut nibh aliquam, quis gravida mi euismod. Cras mollis
+        quis velit eu efficitur. Suspendisse eu tellus ultrices sapien rhoncus ullamcorper eget id
+        sem. Suspendisse pretium rhoncus orci ut pretium.
+    </p>
+    <p>
+        Aenean in odio vel diam convallis cursus eu nec lectus. Nullam tellus augue, aliquam in
+        sapien et, volutpat elementum justo. Duis auctor mauris in imperdiet egestas. Vestibulum
+        vitae feugiat nunc. Donec quis iaculis odio. Quisque quis massa eu orci faucibus tincidunt.
+        Suspendisse ultrices pretium mattis. Vestibulum dignissim consectetur leo, quis tempor ante
+        volutpat nec. Integer euismod sollicitudin suscipit. Maecenas est mauris, efficitur non
+        iaculis id, dignissim venenatis velit. Quisque eget gravida diam. Vestibulum et lobortis
+        odio, in tempor nulla. Donec tempus risus ac porttitor pharetra. Vestibulum pharetra iaculis
+        iaculis. Proin blandit, lacus ac ultrices sodales, velit magna finibus ex, ac hendrerit nunc
+        metus in libero. Proin aliquet nulla augue, non gravida nulla sodales ut.
+    </p>
+    <p>
+        Ut commodo mollis diam sit amet sodales. Mauris convallis lorem odio. Vestibulum lectus
+        quam, dapibus nec eros et, feugiat venenatis felis. Interdum et malesuada fames ac ante
+        ipsum primis in faucibus. Proin sodales bibendum nunc vel accumsan. Quisque tincidunt
+        laoreet metus ac commodo. Integer lacinia metus vitae mauris tempor aliquam. Vestibulum
+        scelerisque dui sit amet semper ultrices. Sed sodales metus in dui lobortis placerat.
+        Phasellus eu accumsan tellus. Mauris non iaculis lectus, non porta nisi. Cras consequat,
+        dolor in hendrerit tincidunt, leo sapien semper felis, eu pharetra urna elit quis nisi.
+        Donec commodo finibus tortor id dapibus.
+    </p>
+    <p>
+        Interdum et malesuada fames ac ante ipsum primis in faucibus. Phasellus mauris dui, interdum
+        at tincidunt vel, tempor eget ipsum. Maecenas tempor enim ac risus malesuada finibus. Duis
+        quis consequat magna. In eget arcu vel ex faucibus porta. Vivamus ac eleifend quam, non
+        fringilla eros. Praesent sed fermentum velit.
+    </p>
+</div>")" />

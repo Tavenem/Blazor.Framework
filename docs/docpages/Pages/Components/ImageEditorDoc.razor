@@ -10,6 +10,14 @@
     page, and/or saved to the back-end using custom logic.
 </p>
 
+<p>
+    Note: this control cannot be used on static server-side rendered pages, since it relies on
+    interactivity to operate. If a static image source has been configured, a normal
+    <code>img</code> element will be displayed instead. When <em>pre</em>rendered server-side, the
+    <code>img</code> be disabled during the prerender pass, then the full editor component will be
+    enabled when interactivity becomes available.
+</p>
+
 <h2>Basics</h2>
 
 <p>

@@ -28,7 +28,6 @@ public static class TavenemFrameworkDIExtensions
         services.AddTransient<EditorService>();
         services.AddTransient<IJSEventListener, JSEventListener>();
         services.AddTransient<IKeyListener, KeyListener>();
-        services.AddTransient<IResizeObserver, ResizeObserver>();
         return services;
     }
 }

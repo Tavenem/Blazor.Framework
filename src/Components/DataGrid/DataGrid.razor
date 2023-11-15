@@ -97,39 +97,24 @@
                     @foreach (var column in _columns.Where(x => x.GetIsShown()))
                     {
                         <th @key="column" class="@GetColumnHeaderClass(column)">
-                            @if (column.GetIsSortable())
-                            {
-                                <a href="@GetColumnSortUrl(column)">
-                                    @if (column.LabelContent is null)
-                                    {
-                                        <span style="white-space:nowrap">
-                                            @column.GetLabel()
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        @column.LabelContent
-                                    }
+                            <div @onclick="@(_ => OnColumnSortAsync(column))">
+                                @if (column.LabelContent is null)
+                                {
+                                    <span style="white-space:nowrap">
+                                        @column.GetLabel()
+                                    </span>
+                                }
+                                else
+                                {
+                                    @column.LabelContent
+                                }
+                                @if (IsInteractive && column.GetIsSortable())
+                                {
                                     <tf-icon class="@GetColumnHeaderIconClass(column)">
                                         @DefaultIcons.Sort_Ascending
                                     </tf-icon>
-                                </a>
-                            }
-                            else
-                            {
-                                <div>
-                                    @if (column.LabelContent is null)
-                                    {
-                                        <span style="white-space:nowrap">
-                                            @column.GetLabel()
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        @column.LabelContent
-                                    }
-                                </div>
-                            }
+                                }
+                            </div>
                             @if (IsInteractive && column.CanFilter)
                             {
                                 <div>
@@ -390,7 +375,8 @@
                 <span>of</span>
                 <span>@((LoadItems is null ? (ulong)ItemCount : CurrentDataPage!.TotalCount!.Value).ToString("N0"))</span>
             }
-            <Pagination CurrentPage="CurrentPage"
+            <Pagination Id="@($"{Id}-pg")"
+                        CurrentPage="CurrentPage"
                         CurrentPageChanged="OnPageChangedAsync"
                         LastRequested="OnLastPageAsync"
                         NextRequested="OnNextPageAsync"

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -9,24 +8,13 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A tab control component.
 /// </summary>
-public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
+public partial class Tabs<TTabItem> : PersistentComponentBase
 {
     private const string ActivePanelQueryParamName = "t";
 
     private readonly HashSet<string> _dropTargetElements = [];
     private readonly List<DynamicTabInfo<TTabItem>> _dynamicItems = [];
     private readonly List<TabPanel<TTabItem>> _panels = [];
-
-    private double _allTabsSize;
-    private bool _backButtonDisabled;
-    private bool _asyncDisposedValue;
-    private bool _forwardButtonDisabled;
-    private double _position;
-    private CancellationTokenSource? _renderCancellationTokenSource;
-    private double _scrollPosition;
-    private double _size;
-    private ElementReference _tabsContent;
-    private double _toolbarContentSize;
 
     /// <summary>
     /// The currently active item, if any. Includes bound items from static panels.
@@ -334,33 +322,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
 
     internal bool IsInteractive { get; set; }
 
-    [Inject, NotNull] private IResizeObserver? ResizeObserver { get; set; }
-
-    private string? ScrollStyle => new CssBuilder()
-        .AddStyle(
-            "transform",
-            $"translateX({(-1 * _scrollPosition).ToString(CultureInfo.InvariantCulture)}px)",
-            TabSide is Side.Top or Side.Bottom)
-        .AddStyle(
-            "transform",
-            $"translateY({(-1 * _scrollPosition).ToString(CultureInfo.InvariantCulture)}px)",
-            TabSide is Side.Left or Side.Right)
-        .ToString();
-
-    private bool ShowScrollButtons => _allTabsSize > _toolbarContentSize;
-
-    private string? SliderStyle => new CssBuilder()
-        .AddStyle(
-            TabSide is Side.Top or Side.Bottom ? "width" : "height",
-            _size.ToPixels())
-        .AddStyle(
-            TabSide is Side.Top or Side.Bottom ? "left" : "top",
-            _position.ToPixels())
-        .AddStyle(
-            "transition",
-            $"{(TabSide is Side.Top or Side.Bottom ? "left" : "top")} .3s cubic-bezier(.64,.09,.08,1)")
-        .ToString();
-
     private string? ToolbarCssClass => new CssBuilder("tabs-toolbar")
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, DragDropListener.DropValid == false)
@@ -377,13 +338,8 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
             && ((items is null) != (Items is null)
             || (Items is not null && items?.SequenceEqual(Items) != true)))
         {
-            _renderCancellationTokenSource?.Cancel();
             if (items is null)
             {
-                for (var i = 0; i < _dynamicItems.Count; i++)
-                {
-                    await ResizeObserver.UnobserveAsync(_dynamicItems[i].ElementReference);
-                }
                 _dynamicItems.Clear();
             }
             else
@@ -395,7 +351,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
 
                 while (_dynamicItems.Count > items.Count)
                 {
-                    await ResizeObserver.UnobserveAsync(_dynamicItems[items.Count].ElementReference);
                     _dynamicItems.RemoveAt(items.Count);
                 }
             }
@@ -435,8 +390,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
                 await ActivatePanelAsync(ActivePanelIndex - 1, true);
             }
         }
-
-        await RerenderAsync();
     }
 
     /// <inheritdoc/>
@@ -455,6 +408,16 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
     }
 
     /// <inheritdoc/>
+    protected override async Task OnInitializedAsync()
+    {
+        if (InitialActivePanelIndex >= _panels.Count
+            && InitialActivePanelIndex < _panels.Count + _dynamicItems.Count)
+        {
+            await ActivatePanelAsync(InitialActivePanelIndex);
+        }
+    }
+
+    /// <inheritdoc/>
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
@@ -463,43 +426,9 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
             DragDropListener.ElementId = ToolbarId;
             DragDropListener.GetEffect = GetDropEffectInternal;
             DragDropListener.OnDrop += OnDropAsync;
+            IsInteractive = true;
+            StateHasChanged();
         }
-    }
-
-    /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        for (var i = 0; i < _dynamicItems.Count; i++)
-        {
-            if (!_dynamicItems[i].Observed
-                && _dynamicItems[i].DragDropComponent is not null)
-            {
-                await ResizeObserver.ObserveAsync(_dynamicItems[i].ElementReference);
-                _dynamicItems[i].Observed = true;
-            }
-        }
-
-        if (!firstRender)
-        {
-            return;
-        }
-
-        var references = _panels.Select(x => x.PanelReference).ToList();
-        references.Add(_tabsContent);
-
-        await ResizeObserver.ObserveAsync(references);
-        ResizeObserver.OnResized += OnResized;
-
-        IsInteractive = true;
-        await RerenderAsync();
-    }
-
-    /// <inheritdoc/>
-    public async ValueTask DisposeAsync()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -561,15 +490,15 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
             return -1;
         }
 
-        _renderCancellationTokenSource?.Cancel();
         _panels.Add(panel);
+        StateHasChanged();
         if (_panels.Count == 1)
         {
             await ActivatePanelAsync(0, true);
         }
         else
         {
-            await RerenderAsync();
+            StateHasChanged();
         }
         return _panels.Count - 1;
     }
@@ -611,11 +540,8 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
             : DragEffect.None);
     }
 
-    internal int? IndexOfItem(TTabItem? item) => item is null ? null : Items?.IndexOf(item);
-
     internal async Task InsertItemAsync(TTabItem item, int? index)
     {
-        _renderCancellationTokenSource?.Cancel();
         if (index.HasValue)
         {
             (Items ??= []).Insert(index.Value, item);
@@ -654,23 +580,8 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
         {
             await ActivatePanelAsync(ActivePanelIndex - 1, true);
         }
-        _renderCancellationTokenSource?.Cancel();
         _panels.RemoveAt(index);
-        await ResizeObserver.UnobserveAsync(panel.PanelReference);
-        await RerenderAsync();
-    }
-
-    internal async Task SetPanelReferenceAsync(ElementReference reference)
-    {
-        if (_disposedValue
-            || !IsInteractive
-            || ResizeObserver.IsElementObserved(reference))
-        {
-            return;
-        }
-
-        await ResizeObserver.ObserveAsync(reference);
-        await RerenderAsync();
+        StateHasChanged();
     }
 
     /// <inheritdoc/>
@@ -678,31 +589,10 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
     {
         if (!_disposedValue && disposing)
         {
-            _renderCancellationTokenSource?.Cancel();
-            _renderCancellationTokenSource?.Dispose();
-            ResizeObserver.OnResized -= OnResized;
             DragDropListener.DropValidChanged -= OnDropValidChanged;
             DragDropListener.OnDrop -= OnDropAsync;
         }
         base.Dispose(disposing);
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting
-    /// unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-        if (!_asyncDisposedValue)
-        {
-            if (disposing)
-            {
-                await ResizeObserver.DisposeAsync();
-            }
-
-            _asyncDisposedValue = true;
-        }
     }
 
     private async Task ActivatePanelAsync(int index, bool ignoreDisabledState = false)
@@ -753,7 +643,7 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
         }
         await ActivePanelIndexChanged.InvokeAsync(index);
 
-        await RerenderAsync();
+        StateHasChanged();
 
         if (PersistState)
         {
@@ -764,105 +654,13 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
         }
     }
 
-    private async Task CenterScrollPositionAroundSelectedItemAsync()
-    {
-        var panelToStart = ActivePanelIndex;
-        var length = await GetPanelLengthAsync(panelToStart);
-        if (length >= _toolbarContentSize)
-        {
-            await ScrollToPanelAsync(panelToStart);
-            return;
-        }
-
-        var indexCorrection = 1;
-        while (true)
-        {
-            var panelAfterIndex = ActivePanelIndex + indexCorrection;
-            if (panelAfterIndex < _panels.Count + _dynamicItems.Count)
-            {
-                length += await GetPanelLengthAsync(panelAfterIndex);
-            }
-
-            if (length >= _toolbarContentSize)
-            {
-                await ScrollToPanelAsync(panelToStart);
-                break;
-            }
-
-            length = _toolbarContentSize - length;
-
-            var panelBeforeIndex = ActivePanelIndex - indexCorrection;
-            if (panelBeforeIndex >= 0)
-            {
-                length -= await GetPanelLengthAsync(panelBeforeIndex);
-            }
-            else
-            {
-                break;
-            }
-
-            if (length < 0)
-            {
-                await ScrollToPanelAsync(panelToStart);
-                break;
-            }
-
-            length = _toolbarContentSize - length;
-            panelToStart = ActivePanelIndex - indexCorrection;
-            indexCorrection++;
-        }
-
-        await ScrollToPanelAsync(panelToStart);
-    }
-
     private DragEffect GetDropEffectInternal(string[] types)
         => GetDropEffectShared(types);
-
-    private async Task<double> GetLengthOfPanelItemsAsync(int index)
-    {
-        var total = 0.0;
-        var i = 0;
-        for (; i < index && i < _panels.Count; i++)
-        {
-            total += await GetReferenceSizeAsync(_panels[i].PanelReference);
-        }
-        for (; i < index && i - _panels.Count < _dynamicItems.Count; i++)
-        {
-            total += await GetReferenceSizeAsync(_dynamicItems[i - _panels.Count].ElementReference);
-        }
-        return total;
-    }
-
-    private async Task<double> GetPanelLengthAsync(int index)
-    {
-        if (index < 0)
-        {
-            return 0;
-        }
-        if (index < _panels.Count)
-        {
-            return await GetReferenceSizeAsync(_panels[index].PanelReference);
-        }
-        else if (index - _panels.Count < _dynamicItems.Count)
-        {
-            return await GetReferenceSizeAsync(_dynamicItems[index - _panels.Count].ElementReference) + 2;
-        }
-        else
-        {
-            return 0.0;
-        }
-    }
 
     private string GetPanelUrl(int index) => QueryStateService.GetUriWithPropertyValue(
         Id,
         ActivePanelQueryParamName,
         index + 1);
-
-    private async Task<double> GetReferenceSizeAsync(ElementReference reference, bool forceRefresh = false) => TabSide switch
-    {
-        Side.Top or Side.Bottom => (await ResizeObserver.GetSizeInfoAsync(reference, forceRefresh))?.Width ?? 0,
-        _ => (await ResizeObserver.GetSizeInfoAsync(reference, forceRefresh))?.Height ?? 0,
-    };
 
     private string? GetTabClass(int index) => new CssBuilder("tab")
         .Add("active", index == ActivePanelIndex)
@@ -881,7 +679,7 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
         (Items ??= []).Add(item);
         _dynamicItems.Add(new());
         await ItemsChanged.InvokeAsync(Items);
-        await RerenderAsync();
+        StateHasChanged();
     }
 
     private async Task OnCloseTabAsync(int index, bool suppressClose = false)
@@ -902,8 +700,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
 
         if (index >= _panels.Count)
         {
-            _renderCancellationTokenSource?.Cancel();
-            await ResizeObserver.UnobserveAsync(_dynamicItems[index - _panels.Count].ElementReference);
             _dynamicItems.RemoveAt(index - _panels.Count);
             Items?.RemoveAt(index - _panels.Count);
             await ItemsChanged.InvokeAsync(Items);
@@ -919,7 +715,7 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
         }
         else
         {
-            await RerenderAsync();
+            StateHasChanged();
         }
     }
 
@@ -1079,91 +875,5 @@ public partial class Tabs<TTabItem> : PersistentComponentBase, IAsyncDisposable
             ActivePanelIndex = activePanelIndex - 1;
         }
         return Task.CompletedTask;
-    }
-
-    private async void OnResized(IDictionary<ElementReference, BoundingClientRect> changes) => await RerenderAsync();
-
-    private async Task RerenderAsync()
-    {
-        if (!IsInteractive)
-        {
-            return;
-        }
-
-        _renderCancellationTokenSource?.Cancel();
-        _renderCancellationTokenSource?.Dispose();
-        _renderCancellationTokenSource = new CancellationTokenSource();
-
-        await InvokeAsync(StateHasChanged);
-        await Task.Delay(1);
-
-        _toolbarContentSize = await GetReferenceSizeAsync(_tabsContent, true);
-
-        if (_renderCancellationTokenSource.IsCancellationRequested)
-        {
-            return;
-        }
-
-        var total = 0.0;
-        for (var i = 0; i < _panels.Count; i++)
-        {
-            total += await GetReferenceSizeAsync(_panels[i].PanelReference, true);
-            if (_renderCancellationTokenSource.IsCancellationRequested)
-            {
-                return;
-            }
-        }
-        for (var i = 0; i < _dynamicItems.Count; i++)
-        {
-            total += await GetReferenceSizeAsync(_dynamicItems[i].ElementReference, true);
-            if (_renderCancellationTokenSource.IsCancellationRequested)
-            {
-                return;
-            }
-        }
-        _allTabsSize = total;
-
-        await CenterScrollPositionAroundSelectedItemAsync();
-        await SetSliderStateAsync();
-        SetScrollabilityStates();
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private void ScrollBack()
-    {
-        _scrollPosition = Math.Max(0, _scrollPosition - _toolbarContentSize);
-        SetScrollabilityStates();
-    }
-
-    private void ScrollForward()
-    {
-        _scrollPosition = Math.Min(_allTabsSize - _toolbarContentSize, _scrollPosition + _toolbarContentSize);
-        SetScrollabilityStates();
-    }
-
-    private async Task ScrollToPanelAsync(int index)
-    {
-        _scrollPosition = await GetLengthOfPanelItemsAsync(index);
-        SetScrollabilityStates();
-    }
-
-    private void SetScrollabilityStates()
-    {
-        if (_allTabsSize <= _toolbarContentSize)
-        {
-            _forwardButtonDisabled = true;
-            _backButtonDisabled = true;
-        }
-        else
-        {
-            _forwardButtonDisabled = _scrollPosition + _toolbarContentSize >= _allTabsSize;
-            _backButtonDisabled = _scrollPosition <= 0;
-        }
-    }
-
-    private async Task SetSliderStateAsync()
-    {
-        _position = await GetLengthOfPanelItemsAsync(ActivePanelIndex);
-        _size = await GetPanelLengthAsync(ActivePanelIndex);
     }
 }

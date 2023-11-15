@@ -3,6 +3,10 @@ interface TavenemHeadingElement extends HTMLElement {
     headingTitle: string;
 }
 
+interface TavenemContentsLinkElement extends HTMLAnchorElement {
+    heading: TavenemHeadingElement;
+}
+
 export class TavenemContentsHTMLElement extends HTMLElement {
     private _headings: Array<TavenemHeadingElement>;
     private _activeHeading: Element | undefined;
@@ -99,13 +103,37 @@ export class TavenemContentsHTMLElement extends HTMLElement {
     flex-direction: column;
     margin-top: 1rem;
     max-width:15em;
+    overflow: auto;
+    padding-left: .75em;
+    padding-right: .75em;
     padding-top: .25em;
+    scrollbar-color: var(--tavenem-color-scrollbar) transparent;
+    scrollbar-width: thin;
 }
 
 @media print {
     :host {
         display: none;
     }
+}
+
+::-webkit-scrollbar {
+    height: .5rem;
+    width: .5rem;
+    z-index: 1;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--tavenem-color-scrollbar);
+    border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--tavenem-color-scrollbar-hover);
 }
 
 nav.contents-list {
@@ -115,8 +143,6 @@ nav.contents-list {
     list-style: none;
     overflow: auto;
     padding-bottom: .25em;
-    padding-left: 1em;
-    padding-right: 1em;
     padding-top: .25em;
     position: relative;
     scrollbar-gutter: stable;
@@ -139,6 +165,8 @@ nav.contents-list > * {
     justify-content: flex-start;
     list-style: none;
     padding-bottom: .25em;
+    padding-inline-end: .25em;
+    padding-inline-start: .25em;
     padding-top: .25em;
     position: relative;
     text-align: start;
@@ -168,13 +196,14 @@ nav.contents-list > a {
 
 nav.contents-list > a:hover,
 nav.contents-list > a:focus {
-    background-color: var(--tavenem-color-action);
+    background-color: var(--tavenem-color-primary-hover);
 }
 
 nav.contents-list > a.active {
     background-color: var(--tavenem-color-primary-hover);
     border-inline-start: 1px solid var(--tavenem-color-primary);
     color: var(--tavenem-color-primary);
+    padding-inline-start: calc(.25em - 1px);
 }
 
 nav.contents-list > a.active:hover,
@@ -249,26 +278,9 @@ slot .default-title {
         }
     }
 
-    refreshStyle() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const nav = root.querySelector('nav.contents-list');
-        if (!nav) {
-            return;
-        }
-
-        if (nav.childElementCount === 0) {
-            this.classList.add('empty');
-        }
-    }
-
-    private clearActive() {
-        if (this._activeHeading) {
-            this._activeHeading.classList.remove('active');
-        }
-        delete this._activeHeading;
+    refresh() {
+        this.getHeadings();
+        this.refreshHeadings();
     }
 
     private getHeadings() {
@@ -292,45 +304,63 @@ slot .default-title {
     }
 
     private handleScrollSpy() {
-        if (this._headings.length === 0) {
-            this.clearActive();
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const nav = root.querySelector('nav.contents-list');
+        if (!nav) {
             return;
         }
 
-        let lowest = Number.MAX_SAFE_INTEGER;
+        if (this._headings.length === 0) {
+            for (const link of nav.children) {
+                link.classList.remove('active');
+            }
+            delete this._activeHeading;
+            return;
+        }
+
+        let highestBelowZero = Number.MIN_SAFE_INTEGER;
         let lowestAboveZero = Number.MAX_SAFE_INTEGER;
-        let lowestElement: TavenemHeadingElement | undefined;
+        let highestElementBelowZero: TavenemHeadingElement | undefined;
         let lowestElementAboveZero: TavenemHeadingElement | undefined;
+        const minTop = window.innerHeight * 0.8;
         for (let i = 0; i < this._headings.length; i++) {
             const heading = this._headings[i];
 
             const rect = heading.getBoundingClientRect();
 
-            if (rect.top < lowest) {
-                lowest = rect.top;
-                lowestElement = heading;
-            }
-            if (rect.top > 0
+            if (rect.top < 0) {
+                if (rect.top > highestBelowZero) {
+                    highestBelowZero = rect.top;
+                    highestElementBelowZero = heading;
+                }
+            } else if (rect.top < minTop
                 && rect.top < lowestAboveZero) {
                 lowestAboveZero = rect.top;
                 lowestElementAboveZero = heading;
             }
         }
 
-        const activeHeading = lowestElementAboveZero || lowestElement;
+        const activeHeading = lowestElementAboveZero || highestElementBelowZero;
         if (!activeHeading) {
-            this.clearActive();
-            return;
-        }
-
-        if (activeHeading.getBoundingClientRect().top >= window.innerHeight * 0.8) {
+            for (const link of nav.children) {
+                link.classList.remove('active');
+            }
+            delete this._activeHeading;
             return;
         }
 
         if (activeHeading != this._activeHeading) {
-            this.clearActive();
             this._activeHeading = activeHeading;
-            activeHeading.classList.add('active');
+            for (const link of nav.children) {
+                if ((link as TavenemContentsLinkElement).heading === activeHeading) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            }
         }
     }
 
@@ -381,7 +411,8 @@ slot .default-title {
                         continue;
                     }
 
-                    const link = document.createElement('a');
+                    const link = document.createElement('a') as TavenemContentsLinkElement;
+                    link.heading = heading;
 
                     if (heading.id) {
                         link.href = `#${heading.id}`;
