@@ -1,0 +1,17 @@
+/* _content/Tavenem.Blazor.Framework.DocPages/Pages/GettingStarted/Themes.razor.rz.scp.css */
+dt[b-21wvxx4oge] {
+    --tavenem-mono: 1;
+    color: #015D8E;
+    font-family: var(--tavenem-font-family-monospace);
+}
+[data-theme="dark"] dt[b-21wvxx4oge] {
+    color: #9cdcfe;
+}
+
+.swatch[b-21wvxx4oge] {
+    display: inline-block;
+    height: 1rem;
+    margin-inline-end: .25rem;
+    vertical-align: text-top;
+    width: 1rem;
+}

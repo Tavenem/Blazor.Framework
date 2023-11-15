@@ -1,22 +1,7 @@
-/* /Pages/GettingStarted/Themes.razor.rz.scp.css */
-dt[b-t8xxe176xl] {
-    --tavenem-mono: 1;
-    color: #015D8E;
-    font-family: var(--tavenem-font-family-monospace);
-}
-[data-theme="dark"] dt[b-t8xxe176xl] {
-    color: #9cdcfe;
-}
+@import '_content/Tavenem.Blazor.Framework.DocPages/Tavenem.Blazor.Framework.DocPages.bundle.scp.css';
 
-.swatch[b-t8xxe176xl] {
-    display: inline-block;
-    height: 1rem;
-    margin-inline-end: .25rem;
-    vertical-align: text-top;
-    width: 1rem;
-}
-/* /Pages/Index.razor.rz.scp.css */
-.background-gradient[b-vxnpkoq5qv] {
+/* /Pages/Home.razor.rz.scp.css */
+.background-gradient[b-dlgkuift6q] {
     background: linear-gradient(transparent, transparent 25%, var(--tavenem-color-primary) 50%, var(--tavenem-color-success) 60%, transparent 69%, transparent),
         linear-gradient(to right, transparent, var(--tavenem-color-secondary), transparent);
     bottom: 0;

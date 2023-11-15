@@ -3,15 +3,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Wil Stead">
     <title>Tavenem Blazor Framework</title>
     <base href="/Blazor.Framework/">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
-    <link href="_content/Tavenem.Blazor.Framework/framework.css" rel="stylesheet">
     <link href="app.css" rel="stylesheet">
     <link href="Tavenem.Blazor.Framework.Docs.styles.css" rel="stylesheet">
     <meta name="apple-mobile-web-app-title" content="Tavenem Blazor Framework">
@@ -39,10 +34,11 @@
         </div>
     </div>
 
-    <div id="blazor-error-ui">
+
+    <div id="blazor-error-ui" data-nosnippet>
         An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss" onclick="document.getElementById('blazor-error-ui').style.display='none'">🗙</a>
+        <a href="#" class="reload" rel="nofollow">Reload</a>
+        <a href="#" class="dismiss" rel="nofollow" onclick="document.getElementById('blazor-error-ui').style.display='none'">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
