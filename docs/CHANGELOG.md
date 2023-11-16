@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1
+### Fixed
+- Trim issues
+- Image Editor display bug
+
 ## 2.0
 ### Added
 - Trimming and AOT compatibility

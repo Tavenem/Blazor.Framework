@@ -1,5 +1,6 @@
 ﻿using Microsoft.JSInterop;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Services.Editor;
 
 namespace Tavenem.Blazor.Framework.Services;
@@ -301,6 +302,9 @@ internal class EditorService : IAsyncDisposable
         catch { }
     }
 
+    [DynamicDependency(
+        DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties,
+        typeof(EditorInitializationOptions))]
     private async void SubscribeInput(EventHandler<string?> value)
     {
         if (string.IsNullOrEmpty(ElementId))
@@ -318,15 +322,15 @@ internal class EditorService : IAsyncDisposable
                     "initializeEditor",
                     ElementId,
                     _dotNetRef,
-                    new
+                    new EditorInitializationOptions
                     {
-                        AutoFocus,
-                        InitialValue,
+                        AutoFocus = AutoFocus,
+                        InitialValue = InitialValue,
                         Mode = EditMode,
-                        Placeholder,
-                        ReadOnly,
+                        Placeholder = Placeholder,
+                        ReadOnly = ReadOnly,
                         Syntax = Syntax.ToString(),
-                        UpdateOnInput,
+                        UpdateOnInput = UpdateOnInput,
                     });
             }
             catch (JSException) { }

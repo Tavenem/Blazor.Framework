@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -62,6 +63,9 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     /// <param name="options">
     /// An instance of <see cref="KeyListenerOptions"/>.
     /// </param>
+    [DynamicDependency(
+        DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties,
+        typeof(KeyListenerOptions))]
     public async Task ConnectAsync(string elementId, KeyListenerOptions options)
     {
         (_elementIds ??= []).Add(elementId);
@@ -131,6 +135,9 @@ internal class KeyListener : IKeyListener, IAsyncDisposable
     /// <param name="options">
     /// An instance of <see cref="KeyListenerOptions"/>.
     /// </param>
+    [DynamicDependency(
+        DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties,
+        typeof(KeyOptions))]
     public async Task UpdateKeyAsync(string elementId, KeyOptions options)
     {
         var module = await _moduleTask.Value.ConfigureAwait(false);

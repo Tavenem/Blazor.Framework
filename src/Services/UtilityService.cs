@@ -219,18 +219,6 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
         catch (TaskCanceledException) { }
     }
 
-    internal async ValueTask CancelOutsideEventListener()
-    {
-        try
-        {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.InvokeVoidAsync("cancelOutsideEvent");
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-    }
-
     internal async ValueTask<string[]> GetFontsAsync()
     {
         try

@@ -209,6 +209,10 @@ public partial class Editor : FormComponentBase<string>
         _ => $"language-{Syntax.ToString().ToLowerInvariant()}",
     };
 
+    private string? LanguageClass => new CssBuilder("static-syntax-highlighting")
+        .Add(Language)
+        .ToString();
+
     private string? ListGroupClass => new CssBuilder("small")
         .Add("button-group", IsActive(EditorCommandType.ListBullet))
         .Add("button-group-text", !IsActive(EditorCommandType.ListBullet))
