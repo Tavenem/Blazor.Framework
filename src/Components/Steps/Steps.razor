@@ -53,9 +53,9 @@
         <div class="d-flex">
             @if (IsPreviousButtonVisible)
             {
-                @if (IsInteractive || PreviousDisabled)
+                @if (IsInteractive || IsPreviousButtonDisabled)
                 {
-                    <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@PreviousDisabled">
+                    <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@IsPreviousButtonDisabled">
                         <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
                         <span>Back</span>
                     </button>
@@ -74,9 +74,9 @@
             }
             else if (IsNextButtonVisible)
             {
-                @if (IsInteractive || NextDisabled)
+                @if (IsInteractive || IsNextButtonDisabled)
                 {
-                    <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@NextDisabled">
+                    <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@IsNextButtonDisabled">
                         <span>Next</span>
                         <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
                     </button>

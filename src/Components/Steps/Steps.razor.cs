@@ -100,6 +100,16 @@ public partial class Steps : PersistentComponentBase
     [Parameter] public bool HideButtons { get; set; }
 
     /// <summary>
+    /// Whether the finish button is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// Note that this property is set even if <see cref="HideButtons"/> is <see langword="true"/>.
+    /// </remarks>
+    public bool IsFinishButtonDisabled => !IsInteractive
+        || FinishButtonDisabled
+        || !IsFormValid;
+
+    /// <summary>
     /// Whether the finish button is currently visible.
     /// </summary>
     /// <remarks>
@@ -111,6 +121,19 @@ public partial class Steps : PersistentComponentBase
         && _steps
         .Skip(CurrentStep + 1)
         .FirstOrDefault(x => x.IsVisible) is null;
+
+    /// <summary>
+    /// Whether the next button is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Note that this property is set even if <see cref="HideButtons"/> is <see langword="true"/>.
+    /// </para>
+    /// </remarks>
+    public bool IsNextButtonDisabled => _steps
+        .Skip(CurrentStep + 1)
+        .FirstOrDefault(x => x.IsVisible)?
+        .Disabled != false;
 
     /// <summary>
     /// Whether the next button is currently visible.
@@ -128,6 +151,19 @@ public partial class Steps : PersistentComponentBase
         && _steps
         .Skip(CurrentStep + 1)
         .FirstOrDefault(x => x.IsVisible) is not null;
+
+    /// <summary>
+    /// Whether the previous button is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Note that this property is set even if <see cref="HideButtons"/> is <see langword="true"/>.
+    /// </para>
+    /// </remarks>
+    public bool IsPreviousButtonDisabled => _steps
+        .Take(CurrentStep)
+        .LastOrDefault(x => x.IsVisible)?
+        .Disabled != false;
 
     /// <summary>
     /// Whether the previous button is currently visible.
@@ -189,10 +225,6 @@ public partial class Steps : PersistentComponentBase
     private ThemeColor CurrentThemeColor
         => ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor;
 
-    private bool IsFinishButtonDisabled => !IsInteractive
-        || FinishButtonDisabled
-        || !IsFormValid;
-
     private string? FinishButtonCssClass => new CssBuilder("btn ms-auto")
         .Add("btn-text", FinishButtonDisabled)
         .Add(CurrentThemeColor.ToCSS(), !FinishButtonDisabled)
@@ -203,24 +235,14 @@ public partial class Steps : PersistentComponentBase
     private bool IsFormValid { get; set; } = true;
 
     private string? NextButtonCssClass => new CssBuilder("btn ms-auto")
-        .Add("btn-text", NextDisabled)
-        .Add(CurrentThemeColor.ToCSS(), !NextDisabled)
+        .Add("btn-text", IsNextButtonDisabled)
+        .Add(CurrentThemeColor.ToCSS(), !IsNextButtonDisabled)
         .ToString();
-
-    private bool NextDisabled => _steps
-        .Skip(CurrentStep + 1)
-        .FirstOrDefault(x => x.IsVisible)?
-        .Disabled != false;
 
     private string? PreviousButtonCssClass => new CssBuilder("btn")
-        .Add("btn-text", PreviousDisabled)
-        .Add("outlined", !PreviousDisabled)
+        .Add("btn-text", IsPreviousButtonDisabled)
+        .Add("outlined", !IsPreviousButtonDisabled)
         .ToString();
-
-    private bool PreviousDisabled => _steps
-        .Take(CurrentStep)
-        .LastOrDefault(x => x.IsVisible)?
-        .Disabled != false;
 
     private IEnumerable<Step> VisibleSteps => _steps
         .Where(x => x.IsVisible || x == _steps[CurrentStep]);
