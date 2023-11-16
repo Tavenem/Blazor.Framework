@@ -26,7 +26,7 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                             || (node instanceof HTMLElement
                                 && node.classList.contains('tav-heading')))
                             && !('hideFromContents' in node.dataset)
-                            && node.closest('.editor') == null) {
+                            && node.closest('tf-popover, .dialog-container, .editor') == null) {
                             const index = this._headings.indexOf(node as TavenemHeadingElement);
                             if (index >= 0) {
                                 this._headings.splice(index, 1);
@@ -39,7 +39,7 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                             || (node instanceof HTMLElement
                                 && node.classList.contains('tav-heading')))
                             && !('hideFromContents' in node.dataset)
-                            && node.closest('.editor') == null) {
+                            && node.closest('tf-popover, .dialog-container, .editor') == null) {
                             const index = this._headings.indexOf(node as TavenemHeadingElement);
                             if (index == -1) {
                                 const heading = node as TavenemHeadingElement;
@@ -58,7 +58,7 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                     if ((mutation.target instanceof HTMLHeadingElement
                         || (mutation.target instanceof HTMLElement
                             && mutation.target.classList.contains('tav-heading')))
-                        && mutation.target.closest('.editor') == null) {
+                        && mutation.target.closest('tf-popover, .dialog-container, .editor') == null) {
                         const hidden = 'hideFromContents' in mutation.target.dataset;
                         const index = this._headings.indexOf(mutation.target as TavenemHeadingElement);
                         if (index >= 0) {
@@ -290,7 +290,7 @@ slot .default-title {
             .from(parent.querySelectorAll('h1,h2,h3,h4,h5,h6,.tav-heading'))
             .filter(x => x instanceof HTMLElement
                 && !('hideFromContents' in x.dataset)
-                && x.closest('.editor') == null)
+                && x.closest('tf-popover, .dialog-container, .editor') == null)
             .map((v, i) => {
                 const heading = v as TavenemHeadingElement;
                 heading.headingLevel = Number.parseInt(v.tagName.startsWith('H')

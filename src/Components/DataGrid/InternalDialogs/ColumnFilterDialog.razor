@@ -1,14 +1,16 @@
 ﻿<Dialog>
     <ChildContent>
         <div class="d-flex flex-column mx-auto">
-            <Checkbox @bind-Value:get="Columns.Where(x => x.CanHide).All(y => y.GetIsShown())"
-                      @bind-Value:set="OnSetAllColumnsVisiblity"
+            <Checkbox TValue="bool"
+                      Value="Columns.Where(x => x.CanHide).All(y => y.GetIsShown())"
+                      ValueChanged="OnSetAllColumnsVisiblity"
                       Label="All" />
             @foreach (var column in Columns.Where(x => x.CanHide))
             {
                 <Checkbox Label="@column.GetLabel()"
-                          @bind-Value:get="column.GetIsShown()"
-                          @bind-Value:set="@(v => column.SetIsShown(v))" />
+                          TValue="bool"
+                          Value="column.GetIsShown()"
+                          ValueChanged="@(v => column.SetIsShown(v))" />
             }
         </div>
     </ChildContent>

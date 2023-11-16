@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3
+### Fixed
+- `DataGrid` column filtering
+
 ## 2.2
 ### Added
 - More manual control properties to `Steps`
