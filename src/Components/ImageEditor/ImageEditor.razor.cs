@@ -233,7 +233,7 @@ public partial class ImageEditor : IAsyncDisposable
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
+    private string InnerContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     private string? ContainerCssClass => new CssBuilder(ImageClass)
         .Add("image-editor-container")
@@ -278,7 +278,7 @@ public partial class ImageEditor : IAsyncDisposable
             && !string.Equals(Src, src, StringComparison.Ordinal))
         {
             await SetLoadingAsync();
-            await _module.InvokeVoidAsync("loadImage", ContainerId, Src);
+            await _module.InvokeVoidAsync("loadImage", InnerContainerId, Src);
             HasImage = true;
             await SetLoadingAsync(false);
         }
@@ -332,7 +332,7 @@ public partial class ImageEditor : IAsyncDisposable
         if (!string.IsNullOrEmpty(Src))
         {
             await SetLoadingAsync();
-            await _module.InvokeVoidAsync("loadImage", ContainerId, Src);
+            await _module.InvokeVoidAsync("loadImage", InnerContainerId, Src);
             HasImage = true;
             IsInteractive = true;
             await SetLoadingAsync(false);
@@ -360,9 +360,9 @@ public partial class ImageEditor : IAsyncDisposable
         IsDisposed = true;
         if (_module is not null)
         {
-            if (!string.IsNullOrEmpty(ContainerId))
+            if (!string.IsNullOrEmpty(InnerContainerId))
             {
-                await _module.InvokeVoidAsync("destroy", ContainerId, true);
+                await _module.InvokeVoidAsync("destroy", InnerContainerId, true);
             }
             await _module.DisposeAsync();
         }
@@ -389,7 +389,7 @@ public partial class ImageEditor : IAsyncDisposable
         }
         if (_module is not null)
         {
-            await _module.InvokeVoidAsync("addText", ContainerId, text);
+            await _module.InvokeVoidAsync("addText", InnerContainerId, text);
         }
     }
 
@@ -408,7 +408,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             await EditingChanged.InvokeAsync(Editing);
         }
-        await _module.InvokeVoidAsync("loadEditor", Interop.Reference, ContainerId, null, CropAspectRatio);
+        await _module.InvokeVoidAsync("loadEditor", Interop.Reference, InnerContainerId, null, CropAspectRatio);
         if (Math.Abs(BrushSize - BrushSizeDefault) > 0.00001)
         {
             await SetBrushSizeAsync();
@@ -431,7 +431,7 @@ public partial class ImageEditor : IAsyncDisposable
         }
         if (_module is not null)
         {
-            await _module.InvokeVoidAsync("cancel", ContainerId);
+            await _module.InvokeVoidAsync("cancel", InnerContainerId);
         }
         IsCropping = false;
     }
@@ -445,7 +445,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("destroy", ContainerId);
+        await _module.InvokeVoidAsync("destroy", InnerContainerId);
         IsCropping = false;
         IsErasing = false;
         Editing = false;
@@ -468,7 +468,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("clear", ContainerId);
+        await _module.InvokeVoidAsync("clear", InnerContainerId);
         IsCropping = false;
     }
 
@@ -509,7 +509,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("exportImage", ContainerId, type, quality);
+        await _module.InvokeVoidAsync("exportImage", InnerContainerId, type, quality);
     }
 
     /// <summary>
@@ -528,7 +528,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             await BeginEditAsync();
         }
-        await _module.InvokeVoidAsync("flipHorizontal", ContainerId);
+        await _module.InvokeVoidAsync("flipHorizontal", InnerContainerId);
     }
 
     /// <summary>
@@ -547,7 +547,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             await BeginEditAsync();
         }
-        await _module.InvokeVoidAsync("flipVertical", ContainerId);
+        await _module.InvokeVoidAsync("flipVertical", InnerContainerId);
     }
 
     /// <summary>
@@ -563,11 +563,11 @@ public partial class ImageEditor : IAsyncDisposable
         await SetLoadingAsync();
         if (Editing)
         {
-            await _module.InvokeVoidAsync("setBackgroundImage", ContainerId, imageUrl);
+            await _module.InvokeVoidAsync("setBackgroundImage", InnerContainerId, imageUrl);
         }
         else
         {
-            await _module.InvokeVoidAsync("loadImage", ContainerId, imageUrl);
+            await _module.InvokeVoidAsync("loadImage", InnerContainerId, imageUrl);
         }
         HasImage = !string.IsNullOrEmpty(imageUrl);
         await SetLoadingAsync(false);
@@ -595,11 +595,11 @@ public partial class ImageEditor : IAsyncDisposable
         {
             if (Editing)
             {
-                await _module.InvokeVoidAsync("setBackgroundImageFromStream", ContainerId, streamReference);
+                await _module.InvokeVoidAsync("setBackgroundImageFromStream", InnerContainerId, streamReference);
             }
             else
             {
-                await _module.InvokeVoidAsync("loadImageFromStream", ContainerId, streamReference);
+                await _module.InvokeVoidAsync("loadImageFromStream", InnerContainerId, streamReference);
             }
         }
         HasImage = true;
@@ -622,7 +622,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             await BeginEditAsync();
         }
-        await _module.InvokeVoidAsync("rotateClockwise", ContainerId);
+        await _module.InvokeVoidAsync("rotateClockwise", InnerContainerId);
     }
 
     /// <summary>
@@ -641,7 +641,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             await BeginEditAsync();
         }
-        await _module.InvokeVoidAsync("rotateCounterClockwise", ContainerId);
+        await _module.InvokeVoidAsync("rotateCounterClockwise", InnerContainerId);
     }
 
     /// <summary>
@@ -699,9 +699,9 @@ public partial class ImageEditor : IAsyncDisposable
         {
             if (!Editing)
             {
-                await _module.InvokeVoidAsync("loadEditor", Interop.Reference, ContainerId);
+                await _module.InvokeVoidAsync("loadEditor", Interop.Reference, InnerContainerId);
             }
-            var streamReference = await _module.InvokeAsync<IJSStreamReference>("getStream", ContainerId, type, quality);
+            var streamReference = await _module.InvokeAsync<IJSStreamReference>("getStream", InnerContainerId, type, quality);
             if (streamReference is null)
             {
                 return;
@@ -711,7 +711,7 @@ public partial class ImageEditor : IAsyncDisposable
                 : MaxAllowedStreamSize);
             await SaveCallback.Invoke(stream);
         }
-        await _module.InvokeVoidAsync("save", ContainerId, type, quality);
+        await _module.InvokeVoidAsync("save", InnerContainerId, type, quality);
         Editing = false;
         if (wasEditing)
         {
@@ -776,7 +776,7 @@ public partial class ImageEditor : IAsyncDisposable
         }
         CropAspectRatio = ratio;
         await CropAspectRatioChanged.InvokeAsync();
-        await _module.InvokeVoidAsync("setCropAspectRatio", ContainerId, ratio);
+        await _module.InvokeVoidAsync("setCropAspectRatio", InnerContainerId, ratio);
     }
 
     /// <summary>
@@ -796,7 +796,7 @@ public partial class ImageEditor : IAsyncDisposable
             await BeginEditAsync();
         }
         IsCropping = true;
-        await _module.InvokeVoidAsync("startCrop", ContainerId);
+        await _module.InvokeVoidAsync("startCrop", InnerContainerId);
     }
 
     private static string? ColorString(string? color = null)
@@ -832,7 +832,7 @@ public partial class ImageEditor : IAsyncDisposable
         }
         if (VerifyCrop is not null)
         {
-            var bounds = await _module.InvokeAsync<CropBounds>("getCropBounds", ContainerId);
+            var bounds = await _module.InvokeAsync<CropBounds>("getCropBounds", InnerContainerId);
             if (bounds.Width > 0 && bounds.Height > 0)
             {
                 var verified = await VerifyCrop.Invoke(this, bounds);
@@ -843,7 +843,7 @@ public partial class ImageEditor : IAsyncDisposable
                 }
             }
         }
-        await _module.InvokeVoidAsync("crop", ContainerId);
+        await _module.InvokeVoidAsync("crop", InnerContainerId);
         IsCropping = false;
     }
 
@@ -860,7 +860,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("redo", ContainerId);
+        await _module.InvokeVoidAsync("redo", InnerContainerId);
     }
 
     private void RedoHistoryChanged(object? sender, bool e)
@@ -876,7 +876,7 @@ public partial class ImageEditor : IAsyncDisposable
             return;
         }
         DrawingMode = mode;
-        await _module.InvokeVoidAsync("setDrawingMode", ContainerId, (int)DrawingMode);
+        await _module.InvokeVoidAsync("setDrawingMode", InnerContainerId, (int)DrawingMode);
     }
 
     private async Task SetIsErasingAsync(bool value)
@@ -886,7 +886,7 @@ public partial class ImageEditor : IAsyncDisposable
             return;
         }
         IsErasing = value;
-        await _module.InvokeVoidAsync("setIsErasing", ContainerId, value);
+        await _module.InvokeVoidAsync("setIsErasing", InnerContainerId, value);
     }
 
     private async Task SetLoadingAsync(bool value = true)
@@ -901,7 +901,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("setBrushColor", ContainerId, BrushColor);
+        await _module.InvokeVoidAsync("setBrushColor", InnerContainerId, BrushColor);
     }
 
     private async Task SetBrushSizeAsync()
@@ -910,7 +910,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("setBrushSize", ContainerId, BrushSize);
+        await _module.InvokeVoidAsync("setBrushSize", InnerContainerId, BrushSize);
     }
 
     private async void TextEdit(object? sender, string e)
@@ -927,11 +927,11 @@ public partial class ImageEditor : IAsyncDisposable
             && result.Data is string text
             && !string.IsNullOrWhiteSpace(text))
         {
-            await _module.InvokeVoidAsync("editText", ContainerId, text);
+            await _module.InvokeVoidAsync("editText", InnerContainerId, text);
         }
         else
         {
-            await _module.InvokeVoidAsync("editText", ContainerId, e);
+            await _module.InvokeVoidAsync("editText", InnerContainerId, e);
         }
     }
 
@@ -941,7 +941,7 @@ public partial class ImageEditor : IAsyncDisposable
         {
             return;
         }
-        await _module.InvokeVoidAsync("undo", ContainerId);
+        await _module.InvokeVoidAsync("undo", InnerContainerId);
     }
 
     private void UndoHistoryChanged(object? sender, bool e)
