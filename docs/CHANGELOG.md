@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2
+### Added
+- More manual control properties to `Steps`
+
 ## 2.1
 ### Fixed
 - Trim issues
