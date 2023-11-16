@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Tavenem.Blazor.Framework.Docs",
   "resources": {
-    "hash": "sha256-vDO5/X7WX4+omRYtBbsoAQC+LQ2wYV+F/c4EhP4HBxo=",
+    "hash": "sha256-TMzeRqzh9Mo5FwIWx0MKM0WbTqpALvKLR+AXaRTv1gs=",
     "jsModuleNative": {
       "dotnet.native.8.0.0.45ykigla5r.js": "sha256-LjLDIz9+J7uuiwMlQ4HbNx2BnSpphOtO2MwkoI28vdI="
     },
@@ -72,7 +72,7 @@
       "System.IO.wasm": "sha256-eSBzAi2jWovBasxdxzVmvUuT0EI9fd7Y2kG75n/q9Zg=",
       "System.Linq.Expressions.wasm": "sha256-uSpVJzClkiiI6QsrKVAhKguEmUnqVR7Mt81AgPLB5yQ=",
       "System.Linq.Parallel.wasm": "sha256-Iib46GKbC40Um1kHNFg9X7Yy7oQyS90VIfFP9pScxug=",
-      "System.Linq.wasm": "sha256-u731LEqLDUF4ujBc9JpVP09tvlHi/0yWnVpHz5sbxuM=",
+      "System.Linq.wasm": "sha256-+SPb7oZFfn8EJzWn/Q/nK8A3ccJ2UVLmimOSyRE+Lyw=",
       "System.Memory.wasm": "sha256-8GQMtg5UKlKfK6bCeARjvdPWlelq3Ge9y99MLcqOE0M=",
       "System.Net.Http.wasm": "sha256-dtj5BPBUdBj98hyr7bM/Mz/e0z42EERA8bnaiTcVAxA=",
       "System.Net.Primitives.wasm": "sha256-/7zuy/rvC1iEfq32lp67WbuimpNIhJnqo2flhSAJBPo=",
@@ -119,9 +119,9 @@
       "System.Xml.ReaderWriter.wasm": "sha256-HZKQ5YucVEvBysfe0PpRAQPkEdYFVeAW61fb94eAbzY=",
       "System.Xml.XDocument.wasm": "sha256-sphf/XQ9D9hjeVUR1tt/PYgVEKXux9cr5dsfH3mtcWc=",
       "System.Xml.XPath.XDocument.wasm": "sha256-1uV5y5M45OoLQmxhTAzRCwntFk22Bo/RvQabr4RYsqw=",
-      "Tavenem.Blazor.Framework.DocPages.wasm": "sha256-QZlTtKJMJjhByLWydVdLiCZWaC3sY4kF7ybKLCS3CX8=",
-      "Tavenem.Blazor.Framework.Docs.wasm": "sha256-uMtfC3FYaYrdpIvIpVA/bkwymv25QM6fdsfSsuppbnY=",
-      "Tavenem.Blazor.Framework.wasm": "sha256-njbg1PNdNb/Yq8vyETylVC6Gowa+UnzoaUyZdktg0Ds=",
+      "Tavenem.Blazor.Framework.DocPages.wasm": "sha256-hn4v4bCOjguM1Ii73HLrIbiBB/g+KQR6Uq/IqyFYpU4=",
+      "Tavenem.Blazor.Framework.Docs.wasm": "sha256-Lt+hPBVwWTjK7kmooW+ykYogus+aBUaBJ6oxBYO2+ss=",
+      "Tavenem.Blazor.Framework.wasm": "sha256-gCklF3KHzclgYBxmSc22txhCMaZVOKjwWODk3yxRvfg=",
       "XLParser.wasm": "sha256-y9+iO5oW0od7XYaYhNN0cqGSKMAoLRD+xcX4uzqpF0U="
     },
     "satelliteResources": {
