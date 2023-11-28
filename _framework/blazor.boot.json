@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Tavenem.Blazor.Framework.Docs",
   "resources": {
-    "hash": "sha256-TMzeRqzh9Mo5FwIWx0MKM0WbTqpALvKLR+AXaRTv1gs=",
+    "hash": "sha256-+TJ0qmxzMyEzLQHFXOXfi+OJlHk/ZrEQUI+SiNC7UoE=",
     "jsModuleNative": {
       "dotnet.native.8.0.0.45ykigla5r.js": "sha256-LjLDIz9+J7uuiwMlQ4HbNx2BnSpphOtO2MwkoI28vdI="
     },
@@ -119,9 +119,9 @@
       "System.Xml.ReaderWriter.wasm": "sha256-HZKQ5YucVEvBysfe0PpRAQPkEdYFVeAW61fb94eAbzY=",
       "System.Xml.XDocument.wasm": "sha256-sphf/XQ9D9hjeVUR1tt/PYgVEKXux9cr5dsfH3mtcWc=",
       "System.Xml.XPath.XDocument.wasm": "sha256-1uV5y5M45OoLQmxhTAzRCwntFk22Bo/RvQabr4RYsqw=",
-      "Tavenem.Blazor.Framework.DocPages.wasm": "sha256-hn4v4bCOjguM1Ii73HLrIbiBB/g+KQR6Uq/IqyFYpU4=",
-      "Tavenem.Blazor.Framework.Docs.wasm": "sha256-Lt+hPBVwWTjK7kmooW+ykYogus+aBUaBJ6oxBYO2+ss=",
-      "Tavenem.Blazor.Framework.wasm": "sha256-gCklF3KHzclgYBxmSc22txhCMaZVOKjwWODk3yxRvfg=",
+      "Tavenem.Blazor.Framework.DocPages.wasm": "sha256-ZHr2QQkLyGtmcKiNMidaWUGDXGRkkvZRj5rzVY7E630=",
+      "Tavenem.Blazor.Framework.Docs.wasm": "sha256-0hnRsRbrjsIYjHYYC6naLJ/lkkA4KUHotNYUCbGSQes=",
+      "Tavenem.Blazor.Framework.wasm": "sha256-3a4tiPHThOkdyqCx65bE1rLVJC1q1g7kLEW/5+N9DT4=",
       "XLParser.wasm": "sha256-y9+iO5oW0od7XYaYhNN0cqGSKMAoLRD+xcX4uzqpF0U="
     },
     "satelliteResources": {
