@@ -14,15 +14,14 @@
 <h2>Basics</h2>
 
 <p>
-    The <code>tf-syntax-highlight</code> element formats its content as if it weere wrapped in a
-    <code>&lt;pre&gt;&lt;code&gt;</code> block, and will automatically apply syntax highlighting to
-    the content.
+    The <code>tf-syntax-highlight</code> element automatically applies syntax highlighting to
+    any nested <code>&lt;pre&gt;&lt;code&gt;</code> blocks.
 </p>
 
 <p>
     Syntax is autodetected when possible, but you can apply a <code>language-&lt;value&gt;</code>
-    class to the element to specify the language of a particular block of code. The supported
-    languages are:
+    class on the <code>code</code> element to specify the language of a particular block of code.
+    The supported languages are:
 </p>
 <ul>
     <li>C++ <span class="text-muted">language-cpp</span></li>
@@ -46,7 +45,9 @@
 <Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <tf-syntax-highlight language-csharp>
+            <tf-syntax-highlight>
+                <pre class="codeblock">
+                    <code class="language-csharp">
 using System.IO.Compression;
 
 #pragma warning disable 414, 3021
@@ -64,11 +65,15 @@ namespace MyApplication
         }
     }
 }
+                    </code>
+                </pre>
             </tf-syntax-highlight>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-syntax-highlight language-csharp>
+        @CodeFormatter.CodeToMarkup(@"<tf-syntax-highlight>
+    <pre class=""codeblock"">
+        <code class=""language-csharp"">
 using System.IO.Compression;
 
 #pragma warning disable 414, 3021
@@ -86,6 +91,13 @@ namespace MyApplication
         }
     }
 }
+        </code>
+    </pre>
 </tf-syntax-highlight>")
     </ChildContent>
 </Collapse>
+
+<p>
+    You may include multiple <code>&lt;pre&gt;&lt;code&gt;</code> blocks, with varying syntaxes, in
+    the same <code>tf-syntax-highlight</code> element, as well as any other content you wish.
+</p>

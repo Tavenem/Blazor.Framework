@@ -34,17 +34,9 @@ hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('xml', xml);
 
 hljs.configure({
+    cssSelector: 'tf-syntax-highlight pre code',
     ignoreUnescapedHTML: true,
 });
-
-export function highlight(elementId: string) {
-    hljs.configure({
-        cssSelector: `#${elementId} pre code`,
-        ignoreUnescapedHTML: true,
-    });
-
-    hljs.highlightAll();
-}
 
 export class TavenemHighlightHTMLElement extends HTMLElement {
     private _mutationObserver: MutationObserver;
@@ -66,9 +58,6 @@ export class TavenemHighlightHTMLElement extends HTMLElement {
     }
 
     applyHighlighting() {
-        if (this.textContent
-            && this.textContent.length) {
-            hljs.highlightElement(this);
-        }
+        hljs.highlightAll();
     }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4
+### Changed
+- Restore `tf-syntax-highlight` to previous behavior of `SyntaxHighlighter`: operate separately on all nested `pre code` elements, rather than the whole element content
+
 ## 2.3
 ### Fixed
 - `DataGrid` column filtering
