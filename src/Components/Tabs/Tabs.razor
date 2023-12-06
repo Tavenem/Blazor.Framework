@@ -19,7 +19,31 @@
                         @for (var i = 0; i < _panels.Count; i++)
                         {
                             var index = i;
-                            @if (IsInteractive)
+                            @if (PersistState && !IsInteractive)
+                            {
+                                <a href="@GetPanelUrl(index)"
+                                   @key="@_panels[index].Id"
+                                   id="@_panels[index].Id"
+                                   class="@GetTabClass(index)"
+                                   role="tab"
+                                   aria-controls="@_panels[index].PanelId"
+                                   aria-selected="@(index == ActivePanelIndex ? "true" : "false")">
+                                    @if (_panels[index].TabContent is not null)
+                                    {
+                                        @_panels[index].TabContent
+                                    }
+                                    else if (_panels[index].TitleMarkup.HasValue
+                                        && !string.IsNullOrWhiteSpace(_panels[index].TitleMarkup!.Value.Value))
+                                    {
+                                        @_panels[index].TitleMarkup!.Value
+                                    }
+                                    else
+                                    {
+                                        @_panels[index].Title
+                                    }
+                                </a>
+                            }
+                            else if (IsInteractive)
                             {
                                 <div @key="@_panels[index].Id"
                                      id="@_panels[index].Id"
@@ -51,13 +75,11 @@
                             }
                             else
                             {
-                                <a href="@GetPanelUrl(index)"
-                                   @key="@_panels[index].Id"
-                                   id="@_panels[index].Id"
-                                   class="@GetTabClass(index)"
-                                   role="tab"
-                                   aria-controls="@_panels[index].PanelId"
-                                   aria-selected="@(index == ActivePanelIndex ? "true" : "false")">
+                                <div @key="@_panels[index].Id"
+                                     id="@_panels[index].Id"
+                                     class="@GetTabClass(index)"
+                                     role="tab"
+                                     aria-selected="@(index == ActivePanelIndex ? "true" : "false")">
                                     @if (_panels[index].TabContent is not null)
                                     {
                                         @_panels[index].TabContent
@@ -71,7 +93,12 @@
                                     {
                                         @_panels[index].Title
                                     }
-                                </a>
+                                    @if (_panels[index].OnClose.HasDelegate
+                                        || OnClose.HasDelegate)
+                                    {
+                                        <tf-close disabled />
+                                    }
+                                </div>
                             }
                         }
                         @if (Items is not null
@@ -80,7 +107,24 @@
                             for (var i = 0; i < _dynamicItems.Count && i < Items.Count; i++)
                             {
                                 var index = i;
-                                @if (IsInteractive)
+                                @if (PersistState && !IsInteractive)
+                                {
+                                    <a href="@GetPanelUrl(index + _panels.Count)"
+                                       class="@GetTabClass(index + _panels.Count)"
+                                       role="tab"
+                                       aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")"
+                                       aria-controls="@_dynamicItems[index].PanelId">
+                                        @if (TabTemplate is not null)
+                                        {
+                                            @TabTemplate(Items[index + _panels.Count])
+                                        }
+                                        else if (TabTitle is not null)
+                                        {
+                                            @TabTitle(Items[index + _panels.Count])
+                                        }
+                                    </a>
+                                }
+                                else if (IsInteractive)
                                 {
                                     <DraggableDropTarget @ref="_dynamicItems[index].DragDropComponent"
                                                          @key="@_dynamicItems[index].Id"
@@ -120,11 +164,9 @@
                                 }
                                 else
                                 {
-                                    <a href="@GetPanelUrl(index + _panels.Count)"
-                                       class="@GetTabClass(index + _panels.Count)"
-                                       role="tab"
-                                       aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")"
-                                       aria-controls="@_dynamicItems[index].PanelId">
+                                    <div class="@GetTabClass(index + _panels.Count)"
+                                         role="tab"
+                                         aria-selected="@(index - _panels.Count == ActivePanelIndex ? "true" : "false")">
                                         @if (TabTemplate is not null)
                                         {
                                             @TabTemplate(Items[index + _panels.Count])
@@ -133,7 +175,11 @@
                                         {
                                             @TabTitle(Items[index + _panels.Count])
                                         }
-                                    </a>
+                                        @if (CanCloseTabs || OnClose.HasDelegate)
+                                        {
+                                            <tf-close disabled />
+                                        }
+                                    </div>
                                 }
                             }
                         }

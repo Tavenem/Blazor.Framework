@@ -259,7 +259,14 @@
                         <tr @key="group">
                             <td colspan="1000" style="background-color:var(--tavenem-color-bg-alt)">
                                 <span class="d-inline-flex align-items-center gap-2">
-                                    @if (IsInteractive)
+                                    @if (PersistState && !IsInteractive)
+                                    {
+                                        <a class="btn btn-icon small"
+                                           href="@GetGroupExpansionToggleUrl(group)">
+                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                        </a>
+                                    }
+                                    else if (IsInteractive)
                                     {
                                         <button class="btn btn-icon small"
                                                 @onclick="@(_ => OnToggleGroupExpansion(group))">
@@ -268,10 +275,9 @@
                                     }
                                     else
                                     {
-                                        <a class="btn btn-icon small"
-                                           href="@GetGroupExpansionToggleUrl(group)">
+                                        <button class="btn btn-icon small" disabled>
                                             <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
-                                        </a>
+                                        </button>
                                     }
                                     @if (GroupContent is null)
                                     {

@@ -71,7 +71,13 @@
         <td>
             @if (DataGrid.HasExpandedContent?.Invoke(Item!) != false)
             {
-                if (DataGrid.IsInteractive)
+                if (DataGrid.PersistState)
+                {
+                    <a class="btn btn-icon small" href="@GetRowExpansionToggleUrl()">
+                        <tf-icon class="@ExpandClass">@DefaultIcons.Expand</tf-icon>
+                    </a>
+                }
+                else if (DataGrid.IsInteractive)
                 {
                     <button class="btn btn-icon small"
                             @onclick="OnToggleExpansionAsync">
@@ -80,9 +86,9 @@
                 }
                 else
                 {
-                    <a class="btn btn-icon small" href="@GetRowExpansionToggleUrl()">
+                    <button class="btn btn-icon small" disabled>
                         <tf-icon class="@ExpandClass">@DefaultIcons.Expand</tf-icon>
-                    </a>
+                    </button>
                 }
             }
         </td>

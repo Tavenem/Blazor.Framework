@@ -8,17 +8,7 @@
         {
             <li class="step-selector">
                 <span class="step-separator step-separator-begin"></span>
-                @if (IsInteractive)
-                {
-                    <span class="@GetStepActivatorCssClass(step)" @onclick="@(_ => OnActivateStepAsync(step))">
-                        <span class="step-number"></span>
-                        @if (!string.IsNullOrEmpty(step.Title))
-                        {
-                            <span style="margin-inline-start:.5rem">@step.Title</span>
-                        }
-                    </span>
-                }
-                else
+                @if (PersistState && !IsInteractive)
                 {
                     <a href="@GetStepUrl(step)" class="@GetStepActivatorCssClass(step)">
                         <span class="step-number"></span>
@@ -27,6 +17,16 @@
                             <span style="margin-inline-start:.5rem">@step.Title</span>
                         }
                     </a>
+                }
+                else if (IsInteractive)
+                {
+                    <span class="@GetStepActivatorCssClass(step)" @onclick="@(_ => OnActivateStepAsync(step))">
+                        <span class="step-number"></span>
+                        @if (!string.IsNullOrEmpty(step.Title))
+                        {
+                            <span style="margin-inline-start:.5rem">@step.Title</span>
+                        }
+                    </span>
                 }
                 <span class="step-separator step-separator-end"></span>
             </li>
@@ -53,19 +53,26 @@
         <div class="d-flex">
             @if (IsPreviousButtonVisible)
             {
-                @if (IsInteractive || IsPreviousButtonDisabled)
+                @if (PersistState && !IsInteractive)
                 {
-                    <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass" disabled="@IsPreviousButtonDisabled">
+                    <a href="@GetPreviousStepUrl()" class="@PreviousButtonCssClass">
+                        <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                        <span>Back</span>
+                    </a>
+                }
+                else if (IsInteractive && !IsPreviousButtonDisabled)
+                {
+                    <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass">
                         <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
                         <span>Back</span>
                     </button>
                 }
                 else
                 {
-                    <a href="@GetPreviousStepUrl" class="@PreviousButtonCssClass">
+                    <button class="@PreviousButtonCssClass" disabled>
                         <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
                         <span>Back</span>
-                    </a>
+                    </button>
                 }
             }
             @if (IsFinishButtonVisible)
@@ -74,19 +81,26 @@
             }
             else if (IsNextButtonVisible)
             {
-                @if (IsInteractive || IsNextButtonDisabled)
+                @if (PersistState && !IsInteractive)
                 {
-                    <button @onclick="OnNextAsync" class="@NextButtonCssClass" disabled="@IsNextButtonDisabled">
+                    <a href="@GetNextStepUrl()" class="@NextButtonCssClass">
+                        <span>Next</span>
+                        <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                    </a>
+                }
+                else if (IsInteractive && !IsNextButtonDisabled)
+                {
+                    <button @onclick="OnNextAsync" class="@NextButtonCssClass">
                         <span>Next</span>
                         <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
                     </button>
                 }
                 else
                 {
-                    <a href="@GetNextStepUrl" class="@NextButtonCssClass">
+                    <button class="@NextButtonCssClass" disabled>
                         <span>Next</span>
                         <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
-                    </a>
+                    </button>
                 }
             }
         </div>

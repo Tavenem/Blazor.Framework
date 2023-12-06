@@ -402,7 +402,10 @@ public partial class Steps : PersistentComponentBase
     }
 
     private string? GetStepActivatorCssClass(Step step) => new CssBuilder("step-activator")
-        .Add("disabled", step != _steps[CurrentStep] && step.Disabled)
+        .Add(
+            "disabled",
+            (!IsInteractive && !PersistState)
+                || (step != _steps[CurrentStep] && step.Disabled))
         .Add(CurrentThemeColor.ToCSS(), step == _steps[CurrentStep])
         .ToString();
 

@@ -204,7 +204,7 @@ public partial class Pagination : PersistentComponentBase
 
     private int FocusSkipFirstPrev => CurrentPage == 0 ? 0 : 2;
 
-    private bool Interactive { get; set; }
+    private bool IsInteractive { get; set; }
 
     private ulong LastPage
     {
@@ -304,7 +304,7 @@ public partial class Pagination : PersistentComponentBase
     {
         if (firstRender)
         {
-            Interactive = true;
+            IsInteractive = true;
             StateHasChanged();
         }
     }
