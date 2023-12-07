@@ -22,7 +22,6 @@
                             @if (PersistState && !IsInteractive)
                             {
                                 <a href="@GetPanelUrl(index)"
-                                   @key="@_panels[index].Id"
                                    id="@_panels[index].Id"
                                    class="@GetTabClass(index)"
                                    role="tab"
@@ -45,8 +44,7 @@
                             }
                             else if (IsInteractive)
                             {
-                                <div @key="@_panels[index].Id"
-                                     id="@_panels[index].Id"
+                                <div id="@_panels[index].Id"
                                      @onclick="@(_ => ActivatePanelAsync(index))"
                                      draggable="@(_panels[index].GetIsDraggable() ? "true" : "false")"
                                      class="@GetTabClass(index)"
@@ -75,8 +73,7 @@
                             }
                             else
                             {
-                                <div @key="@_panels[index].Id"
-                                     id="@_panels[index].Id"
+                                <div id="@_panels[index].Id"
                                      class="@GetTabClass(index)"
                                      role="tab"
                                      aria-selected="@(index == ActivePanelIndex ? "true" : "false")">

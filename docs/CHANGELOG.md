@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6
+### Fixed
+- Tabs
+
 ## 2.5
 ### Changed
 - Do not present persistence links for stateful components when not interactive and not opted into persistence (e.g. when prerendering). Instead, show the component in a disabled state.
