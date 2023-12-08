@@ -277,8 +277,11 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        var newValue = parameters.TryGetValue<TValue>(nameof(Value), out var value)
-            && value?.Equals(Value) != true;
+        var newValue = parameters.TryGetValue<TValue>(
+            nameof(Value),
+            out var value)
+            && ((value is null) != (Value is null)
+                || value?.Equals(Value) == false);
 
         await base.SetParametersAsync(parameters);
 

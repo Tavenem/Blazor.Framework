@@ -438,7 +438,8 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         var hasNewValue = parameters.TryGetValue<TValue>(
             nameof(Value),
             out var value)
-            && value?.Equals(Value) != true;
+            && ((value is null) != (Value is null)
+                || value?.Equals(Value) == false);
 
         await base.SetParametersAsync(parameters);
 

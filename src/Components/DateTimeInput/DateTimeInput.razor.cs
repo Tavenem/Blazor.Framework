@@ -706,10 +706,11 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
                 DateTimeOffset.Offset);
         }
 
-        if (parameters.TryGetValue<TValue>(nameof(Value), out var value)
-            && value?.Equals(Value) != true
-            && (value is not null
-            || Value is not null))
+        if (parameters.TryGetValue<TValue>(
+            nameof(Value),
+            out var value)
+            && ((value is null) != (Value is null)
+                || value?.Equals(Value) == false))
         {
             if (value is null)
             {

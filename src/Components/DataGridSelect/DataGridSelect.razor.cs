@@ -195,9 +195,7 @@ public partial class DataGridSelect<
         await base.SetParametersAsync(parameters);
 
         if (((oldValue is null) != (Value is null))
-            || (oldValue is not null
-            && Value is not null
-            && !oldValue.Equals(Value)))
+            || oldValue?.Equals(Value) == false)
         {
             _valueUpdated = true;
         }

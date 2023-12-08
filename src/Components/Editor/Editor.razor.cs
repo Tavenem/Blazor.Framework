@@ -307,8 +307,11 @@ public partial class Editor : FormComponentBase<string>
                 pendingSyntax = true;
             }
 
-            if (parameters.TryGetValue(nameof(Value), out newValue)
-                && newValue != Value)
+            if (parameters.TryGetValue(
+                nameof(Value),
+                out newValue)
+                && ((newValue is null) != (Value is null)
+                    || newValue?.Equals(Value) == false))
             {
                 pendingValue = true;
             }

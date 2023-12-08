@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9
+### Fixed
+- Fixed change detection
+
 ## 2.8
 ### Fixed
 - Fixed change notification

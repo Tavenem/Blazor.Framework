@@ -433,8 +433,11 @@ public partial class TextInput : InputComponentBase<string>
     /// <inheritdoc/>
     public override Task SetParametersAsync(ParameterView parameters)
     {
-        if (parameters.TryGetValue<string>(nameof(Value), out var value)
-            && value != Value)
+        if (parameters.TryGetValue<string>(
+            nameof(Value),
+            out var value)
+            && ((value is null) != (Value is null)
+                || value?.Equals(Value) == false))
         {
             CurrentInput = value;
             DisplayString = Mask is null
