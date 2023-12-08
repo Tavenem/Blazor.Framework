@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7
+### Changed
+- Notify any containing `EditContext` when a `FormComponent` has its `Value` changed externally
+
 ## 2.6
 ### Fixed
 - Tabs

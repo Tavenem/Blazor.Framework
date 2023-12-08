@@ -435,6 +435,11 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
             ValueExpression = () => _dummyModel.This_field!;
         }
 
+        var hasNewValue = parameters.TryGetValue<TValue>(
+            nameof(Value),
+            out var value)
+            && value?.Equals(Value) != true;
+
         await base.SetParametersAsync(parameters);
 
         if (!_initialParametersSet)
@@ -493,6 +498,36 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
                 EditContext.NotifyValidationStateChanged();
             }
             await ValidateAsync();
+        }
+
+        if (hasNewValue)
+        {
+            _parsingFailed = false;
+
+            // EditContext may be null if the input is not a child component of EditForm.
+            if (EditContext is not null)
+            {
+                if (Required)
+                {
+                    if (HasValue)
+                    {
+                        if (_requiredValidationMessages?[FieldIdentifier].Any() == true)
+                        {
+                            _requiredValidationMessages.Clear(FieldIdentifier);
+                            EditContext.NotifyValidationStateChanged();
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(RequiredValidationMessage))
+                    {
+                        var validationErrorMessage = GetRequiredValidationMessage() ?? "Field is required";
+                        _requiredValidationMessages ??= new ValidationMessageStore(EditContext);
+                        _requiredValidationMessages.Add(FieldIdentifier, validationErrorMessage);
+                        EditContext.NotifyValidationStateChanged();
+                    }
+                }
+
+                EditContext.NotifyFieldChanged(FieldIdentifier);
+            }
         }
     }
 
