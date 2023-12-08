@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8
+### Fixed
+- Fixed change notification
+
 ## 2.7
 ### Changed
 - Notify any containing `EditContext` when a `FormComponent` has its `Value` changed externally
