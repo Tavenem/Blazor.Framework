@@ -20,7 +20,14 @@
     </pre>
 </pre>
 
-<h2 data-heading-title="Remove template CSS">3. Remove template CSS</h2>
+<h2 data-heading-title="Add CSS Link">3. Add CSS Link</h2>
+<p>
+    Add the following link to your HTML head in either <code>index.html</code> (WebAssembly standalone)
+    or <code>App.razor</code> (Web App).
+</p>
+<pre class="codeblock pre-razor-code">
+    @CodeFormatter.CodeToMarkup(@"<link href=""_content/Tavenem.Blazor.Framework/framework.css"" rel=""stylesheet"">", true)
+</pre>
 <p>
     If you started your project with the default Blazor template, delete the references to
     Bootstrap, and all the pregenerated content in the <code>app.css</code> file (you can delete
