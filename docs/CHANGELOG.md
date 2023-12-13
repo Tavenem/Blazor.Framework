@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.10
+### Changed
+- CSS file no longer auto-injected into head, enabling easier overrides
+
 ## 2.9
 ### Fixed
 - Fixed change detection

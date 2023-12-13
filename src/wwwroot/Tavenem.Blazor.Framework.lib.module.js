@@ -64,12 +64,6 @@ function addHeadContent() {
     font.type = 'text/css';
     font.href = "https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=swap";
     document.head.appendChild(font);
-
-    const style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.type = 'text/css';
-    style.href = "_content/Tavenem.Blazor.Framework/framework.css";
-    document.head.appendChild(style);
 }
 
 function fixTablesOfContents() {

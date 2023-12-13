@@ -26,6 +26,12 @@ Tavenem.Blazor.Framework is available as a [NuGet package](https://www.nuget.org
 Call the `AddTavenemFramework()` extension method on your `IServiceCollection` to automatically add
 all server and client dependencies.
 
+Add a link to the stylesheet in your index.html or App.razor file:
+
+```html
+<link href="_content/Tavenem.Blazor.Framework/framework.css" rel="stylesheet" />
+```
+
 See the [documentation](https://tavenem.com/Blazor.Framework/getting-started/installation) for more
 detailed instructions and additional guidelines on using the framework in your project.
 
