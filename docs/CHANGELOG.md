@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.11
+### Fixed
+- Grouped paging in DataGrid
+
 ## 2.10
 ### Changed
 - CSS file no longer auto-injected into head, enabling easier overrides

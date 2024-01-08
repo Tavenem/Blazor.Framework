@@ -2858,6 +2858,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             await LoadItemsAsync();
         }
+        else if (GroupBy is not null)
+        {
+            Regroup();
+        }
         await CurrentPageChanged.InvokeAsync();
         SetOffsetQuery();
     }
