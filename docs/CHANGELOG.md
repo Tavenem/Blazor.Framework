@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.12
+### Fixed
+- Drawer toggle
+
 ## 2.11
 ### Fixed
 - Grouped paging in DataGrid
