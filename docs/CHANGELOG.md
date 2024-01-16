@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.13
+### Fixed
+- Editor buttons
+
 ## 2.12
 ### Fixed
 - Drawer toggle
