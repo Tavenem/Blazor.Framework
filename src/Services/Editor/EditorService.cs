@@ -55,6 +55,12 @@ internal class EditorService : IAsyncDisposable
     /// Initializes a new instance of <see cref="EditorService"/>.
     /// </summary>
     /// <param name="jsRuntime">An instance of <see cref="IJSRuntime"/>.</param>
+    [DynamicDependency(
+        DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties,
+        typeof(EditorCommandUpdate))]
+    [DynamicDependency(
+        DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties,
+        typeof(EditorCommandInfo))]
     public EditorService(IJSRuntime jsRuntime)
     {
         CommandsActive = new ReadOnlyDictionary<EditorCommandType, bool>(_commandsActive);
