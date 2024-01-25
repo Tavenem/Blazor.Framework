@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.14
+### Fixed
+- Dropdown interactivity
+
 ## 2.13
 ### Fixed
 - Editor buttons
