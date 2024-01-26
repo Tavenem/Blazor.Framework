@@ -257,8 +257,37 @@ export namespace TavenemPopover {
             offsetY += popoverOffsetY;
         }
 
-        popoverNode.style.left = (left + offsetX) + 'px';
-        popoverNode.style.top = (top + offsetY) + 'px';
+        left += offsetX;
+        top += offsetY;
+        const right = window.innerWidth - left - selfRect.width;
+        const bottom = window.innerHeight - top - selfRect.height;
+
+        if (right < 0
+            && left >= 0
+            && -right <= selfRect.width
+            && left + right <= boundingRect.right) {
+            left += right;
+        }
+        if (bottom < 0
+            && top >= 0
+            && -bottom <= selfRect.height
+            && top + bottom <= boundingRect.bottom) {
+            top += bottom;
+        }
+        if (left < 0
+            && -left <= selfRect.width
+            && boundingRect.right > 0) {
+            left = 0;
+        }
+        if (top < 0
+            && -top <= selfRect.height
+            && top + bottom <= boundingRect.bottom
+            && boundingRect.bottom > 0) {
+            top = 0;
+        }
+
+        popoverNode.style.left = left + 'px';
+        popoverNode.style.top = top + 'px';
     }
 
     export function placePopovers(): void {

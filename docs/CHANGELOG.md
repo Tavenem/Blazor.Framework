@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.15
+### Changed
+- Improve popover placement
+
 ## 2.14
 ### Fixed
 - Dropdown interactivity
