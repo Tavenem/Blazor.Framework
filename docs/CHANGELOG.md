@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.16
+### Fixed
+- Popover placement in offset containers
+
 ## 2.15
 ### Changed
 - Improve popover placement

@@ -259,31 +259,28 @@ export namespace TavenemPopover {
 
         left += offsetX;
         top += offsetY;
-        const right = window.innerWidth - left - selfRect.width;
-        const bottom = window.innerHeight - top - selfRect.height;
+        const viewLeft = offsetBoundingRect.left + left;
+        const viewTop = offsetBoundingRect.top + top;
+        const viewRight = window.innerWidth - viewLeft - selfRect.width;
+        const viewBottom = window.innerHeight - viewTop - selfRect.height;
 
-        if (right < 0
-            && left >= 0
-            && -right <= selfRect.width
-            && left + right <= boundingRect.right) {
-            left += right;
+        if (viewRight < 0
+            && viewLeft >= 0
+            && -viewRight <= selfRect.width) {
+            left += viewRight;
         }
-        if (bottom < 0
-            && top >= 0
-            && -bottom <= selfRect.height
-            && top + bottom <= boundingRect.bottom) {
-            top += bottom;
+        if (viewBottom < 0
+            && viewTop >= 0
+            && -viewBottom <= selfRect.height) {
+            top += viewBottom;
         }
-        if (left < 0
-            && -left <= selfRect.width
-            && boundingRect.right > 0) {
-            left = 0;
+        if (viewLeft < 0
+            && -viewLeft <= selfRect.width) {
+            left += -viewLeft;
         }
-        if (top < 0
-            && -top <= selfRect.height
-            && top + bottom <= boundingRect.bottom
-            && boundingRect.bottom > 0) {
-            top = 0;
+        if (viewTop < 0
+            && -viewTop <= selfRect.height) {
+            top += -viewTop;
         }
 
         popoverNode.style.left = left + 'px';
