@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.17
+### Changed
+- Enable non-global interactivity for dialogs and snackbars
+### Removed
+- `DismissAllDialogs` method on `FrameworkLayout` (necessary to enable interactivity for the `DialogContainer`)
+
 ## 2.16
 ### Fixed
 - Popover placement in offset containers

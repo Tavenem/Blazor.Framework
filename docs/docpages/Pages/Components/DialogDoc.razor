@@ -1,4 +1,5 @@
 ﻿@page "/components/dialog"
+@rendermode InteractiveWebAssembly
 
 <PageTitle>Dialog - Tavenem Blazor Framework</PageTitle>
 
@@ -11,7 +12,10 @@
 
 <p>
     Note: dialogs cannot be used on static server-side rendered pages, because they rely on
-    interactivity to operate.
+    interactivity to operate. To enable dialogs for a site which does not use an interactive render
+    mode globally, set the <code>InteractiveRenderMode</code> property on your <a
+    href="./layout/layout">FrameworkLayout</a> component to a non-null value, which will enable that
+    mode for its embedded <code>DialogContainer</code> (without affecting the layout as a whole).
 </p>
 
 <h2>Message Box</h2>

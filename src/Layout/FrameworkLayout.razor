@@ -3,8 +3,8 @@
 @inherits TavenemComponentBase
 
 <div class="@CssClass" style="@Style">
-    <SnackbarContainer />
-    <DialogContainer @ref="DialogContainer" />
+    <SnackbarContainer @rendermode="InteractiveRenderMode" />
+    <DialogContainer @rendermode="InteractiveRenderMode" />
     <CascadingValue Value="this" IsFixed="true">
         @FrameworkContent
         <main class="container">

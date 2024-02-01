@@ -85,6 +85,13 @@ public partial class FrameworkLayout : IDisposable
     [Parameter] public RenderFragment? FrameworkContent { get; set; }
 
     /// <summary>
+    /// The render mode to use for the <see cref="SnackbarContainer"/> and <see
+    /// cref="Framework.DialogContainer"/>. If omitted, these containers will not function on static
+    /// server-side rendered pages.
+    /// </summary>
+    [Parameter] public IComponentRenderMode? InteractiveRenderMode { get; set; }
+
+    /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
@@ -99,8 +106,6 @@ public partial class FrameworkLayout : IDisposable
         Breakpoint.None => null,
         _ => $"d-none d-{ContentsBreakpoint.ToCSS()}-flex",
     };
-
-    private DialogContainer? DialogContainer { get; set; }
 
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
@@ -123,11 +128,6 @@ public partial class FrameworkLayout : IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
-
-    /// <summary>
-    /// Dismisses all open dialogs.
-    /// </summary>
-    public void DismissAllDialogs() => DialogContainer?.DismissAllDialogs();
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting

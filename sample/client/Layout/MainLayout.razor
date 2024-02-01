@@ -1,9 +1,9 @@
 ﻿@inherits LayoutComponentBase
 
-<FrameworkLayout>
+<FrameworkLayout InteractiveRenderMode="InteractiveWebAssembly">
     <FrameworkContent>
         <TopAppbar />
-        <LeftDrawer />
+        <LeftDrawer @rendermode="InteractiveWebAssembly" />
     </FrameworkContent>
     <ChildContent>
         @Body
