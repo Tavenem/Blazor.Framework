@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.18
+### Fixed
+- Contents links
+
 ## 2.17
 ### Changed
 - Enable non-global interactivity for dialogs and snackbars

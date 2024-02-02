@@ -415,7 +415,7 @@ slot .default-title {
                     link.heading = heading;
 
                     if (heading.id) {
-                        link.href = `#${heading.id}`;
+                        link.href = window.location.origin + window.location.pathname + `#${heading.id}`;
                     } else {
                         link.addEventListener('click', this.scrollToHeading.bind(this, heading));
                     }
