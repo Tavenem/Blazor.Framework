@@ -42,7 +42,6 @@
 </div>")
     </ChildContent>
 </Collapse>
-
 <p>
     You can also add the <code>dense</code> class to any variant to reduce the margins and padding.
 </p>
@@ -677,7 +676,7 @@
     This allows partial input to be cleaned.
 </p>
 
-<Collapse Id="ce-1"8 IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -771,13 +770,35 @@
     submission-type logic for text inputs, without duplicating validation logic.
 </p>
 
+<Collapse Id="ce-20" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <TextInput @bind-Value="_value5" Label="Type something and hit Enter" OnValidEnter="OnEnterAsync" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+        <TextInput @bind-Value=""_value"" Label=""Type something and hit Enter"" OnValidEnter=""OnEnterAsync"" />
+</div>
+
+@code {
+    [Inject, NotNull] private DialogService? DialogService { get; set; }
+    private string? _value5;
+    private async Task OnEnterAsync()
+        => await DialogService.ShowMessageBox(""You entered..."", new() { Message = new(_value5 ?? string.Empty) });
+}")
+    </ChildContent>
+</Collapse>
+
 <h2>Customization</h2>
 
 <p>
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-20" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-21" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -844,7 +865,7 @@
     <code>PrefixContent</code>, <code>PrefixText</code> and <code>PrefixIcon</code> are ignored.
 </p>
 
-<Collapse Id="ce-21" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-22" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -897,7 +918,7 @@
     <code>PostfixContent</code>, <code>PostfixText</code> and <code>PostfixIcon</code> are ignored.
 </p>
 
-<Collapse Id="ce-22" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-23" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -961,4 +982,8 @@
     private string? _value2 = "Start typing...";
     private string? _value3 = "Start typing...";
     private string? _value4 = "Start typing...";
+    [Inject, System.Diagnostics.CodeAnalysis.NotNull] private DialogService? DialogService { get; set; }
+    private string? _value5;
+    private async Task OnEnterAsync()
+        => await DialogService.ShowMessageBox("You entered...", new() { Message = new(_value5 ?? string.Empty) });
 }
