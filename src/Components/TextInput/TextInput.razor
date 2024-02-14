@@ -118,7 +118,8 @@
              AnchorOrigin="Origin.Bottom_Left"
              PopoverOrigin="Origin.Top_Left"
              IsOpen="ShowSuggestions"
-             MatchWidth="true">
+             MatchWidth="true"
+             MaxHeight="min(300px,90vh)">
         <menu class="@SuggestionListCssClass"
               @onclick:stopPropagation="true">
             @foreach (var suggestion in FilteredSuggestions)

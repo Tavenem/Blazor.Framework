@@ -112,10 +112,13 @@ public partial class Dropdown
     /// Sets the max-height CSS style for the popover.
     /// </para>
     /// <para>
-    /// Should include a unit, such as "200px" or "10rem."
+    /// Should include a unit, such as "200px" or "10rem".
+    /// </para>
+    /// <para>
+    /// Defaults to "min(300px,90vh)".
     /// </para>
     /// </summary>
-    [Parameter] public string? MaxHeight { get; set; }
+    [Parameter] public string? MaxHeight { get; set; } = "min(300px,90vh)";
 
     /// <summary>
     /// If <see langword="true"/> the popover will open at the position of the mouse click or tap

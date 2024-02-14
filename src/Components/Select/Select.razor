@@ -74,9 +74,9 @@
              FocusId="@ContainerId"
              FocusOut="ClosePopoverAsync"
              IsOpen="ShowPicker"
-             MatchWidth="true">
+             MatchWidth="true"
+             MaxHeight="min(300px,90vh)">
         <div class="@OptionListCssClass"
-             style="max-height:90vh"
              @onclick:stopPropagation="true">
             <CascadingValue Value="this" IsFixed="true">
                 @ChildContent

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.19
+### Changed
+- Improve popover list sizing
+
 ## 2.18
 ### Fixed
 - Contents links
