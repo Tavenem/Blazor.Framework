@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.20
+### Changed
+- Sublist style fix
+
 ## 2.19
 ### Changed
 - Improve popover list sizing
