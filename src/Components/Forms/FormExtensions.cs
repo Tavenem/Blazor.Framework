@@ -372,6 +372,12 @@ internal static class FormExtensions
 
     public static bool ValueIsLess<TValue>(TValue first, TValue second)
     {
+        if (first is null
+            || second is null)
+        {
+            return false;
+        }
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -433,6 +439,11 @@ internal static class FormExtensions
 
     public static bool ValueIsLess<TValue>(long first, TValue second)
     {
+        if (second is null)
+        {
+            return false;
+        }
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -504,6 +515,11 @@ internal static class FormExtensions
 
     public static bool ValueIsLess<TValue>(ulong first, TValue second)
     {
+        if (second is null)
+        {
+            return false;
+        }
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -571,6 +587,12 @@ internal static class FormExtensions
 
     public static bool ValueIsMore<TValue>(TValue first, TValue second)
     {
+        if (first is null
+            || second is null)
+        {
+            return false;
+        }
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -632,6 +654,11 @@ internal static class FormExtensions
 
     public static bool ValueIsMore<TValue>(long first, TValue second)
     {
+        if (second is null)
+        {
+            return false;
+        }
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {
@@ -701,6 +728,11 @@ internal static class FormExtensions
 
     public static bool ValueIsMore<TValue>(ulong first, TValue second)
     {
+        if (second is null)
+        {
+            return false;
+        }
+
         var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
         if (targetType == typeof(byte))
         {

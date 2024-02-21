@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.21
+### Fixed
+- Null exception
+
 ## 2.20
 ### Changed
 - Sublist style fix
