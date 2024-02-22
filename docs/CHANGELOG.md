@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.22
+### Fixed
+- Nested popovers
+
 ## 2.21
 ### Fixed
 - Null exception

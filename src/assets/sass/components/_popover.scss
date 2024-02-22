@@ -1,6 +1,6 @@
 ﻿tf-popover {
     &.open,
-    [data-popover-container][data-popover-open] &.contained-popover {
+    [data-popover-container][data-popover-open] > &.contained-popover {
         display: block;
         opacity: 1;
         pointer-events: initial;
