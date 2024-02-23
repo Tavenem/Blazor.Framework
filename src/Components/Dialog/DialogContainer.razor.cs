@@ -48,7 +48,7 @@ public partial class DialogContainer : IDisposable
         StateHasChanged();
     }
 
-    internal void DismissDialogInstance(Guid id, DialogResult? result = null)
+    internal void DismissDialogInstance(string id, DialogResult? result = null)
     {
         var reference = GetDialogReference(id);
         if (reference is not null)
@@ -81,7 +81,7 @@ public partial class DialogContainer : IDisposable
         StateHasChanged();
     }
 
-    private DialogReference? GetDialogReference(Guid id) => _dialogs
+    private DialogReference? GetDialogReference(string id) => _dialogs
         .SingleOrDefault(x => x.Id == id);
 
     private void OnDialogAdded(DialogReference reference)

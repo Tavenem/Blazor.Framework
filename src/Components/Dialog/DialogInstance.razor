@@ -3,12 +3,15 @@
 @inherits TavenemComponentBase
 
 <div @attributes="AdditionalAttributes" id="@_elementId" class="@ContainerCssClass">
-    <div class="overlay" @onclick="OnOverlayClick" @onclick:stopPropagation="true"></div>
-    <dialog id="_@Id.ToString("N")" open="true" class="@CssClass" style="@CssStyle">
+    @if (!Options.NonModal)
+    {
+        <div class="overlay" @onclick="OnOverlayClick" @onclick:stopPropagation="true"></div>
+    }
+    <dialog id="@Id" open="true" class="@CssClass" style="@CssStyle">
         <FocusTrap Style="border-radius:inherit">
             @if (!Options.HideHeader)
             {
-                <div class="header">
+                <div class="@HeaderCssClass">
                     @if (TitleContent is not null)
                     {
                         @TitleContent

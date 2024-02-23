@@ -706,7 +706,7 @@ public partial class ImageEditor : IAsyncDisposable
             {
                 return;
             }
-            using var stream = await streamReference.OpenReadStreamAsync(MaxAllowedStreamSize <= 0
+            await using var stream = await streamReference.OpenReadStreamAsync(MaxAllowedStreamSize <= 0
                 ? 512000
                 : MaxAllowedStreamSize);
             await SaveCallback.Invoke(stream);

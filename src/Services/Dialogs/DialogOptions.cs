@@ -49,6 +49,32 @@ public class DialogOptions
 
     /// <summary>
     /// <para>
+    /// Whether the dialog should be draggable.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    public bool IsDraggable { get; set; } = true;
+
+    /// <summary>
+    /// <para>
+    /// Whether the dialog should be resizable.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
+    /// </summary>
+    public bool IsResizable { get; set; } = true;
+
+    /// <summary>
+    /// Whether to show the dialog non-modally (i.e. without an overlay blocking the rest of the
+    /// window).
+    /// </summary>
+    public bool NonModal { get; set; }
+
+    /// <summary>
+    /// <para>
     /// The location of the dialog.
     /// </para>
     /// <para>

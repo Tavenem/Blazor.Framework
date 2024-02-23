@@ -19,13 +19,13 @@ public class DialogReference
 
     internal object? Dialog { get; private set; }
 
-    internal Guid Id { get; }
+    internal string Id { get; }
 
     internal RenderFragment? RenderFragment { get; set; }
 
     internal DialogReference(DialogService dialogService)
     {
-        Id = Guid.NewGuid();
+        Id = Guid.NewGuid().ToHtmlId();
         _dialogService = dialogService;
     }
 

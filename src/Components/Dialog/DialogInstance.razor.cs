@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
@@ -15,9 +16,10 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class DialogInstance
 {
-    private readonly string _elementId = string.Concat("dialog_", Guid.NewGuid().ToString("N").AsSpan(0, 8));
+    private readonly string _elementId = string.Concat("dialog_", Guid.NewGuid().ToHtmlId());
 
     private Dialog? _dialog;
+    private IJSObjectReference? _module;
 
     /// <summary>
     /// <para>
@@ -27,7 +29,7 @@ public partial class DialogInstance
     /// Should only be set internally.
     /// </para>
     /// </summary>
-    [Parameter] public Guid Id { get; set; }
+    [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
     /// <para>
@@ -70,10 +72,20 @@ public partial class DialogInstance
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder()
         .Add("fullscreen", Options.FullScreen)
+        .Add("resizable", Options.IsResizable)
         .Add($"dialog-{Options.Breakpoint.ToCSS()}", Options.Breakpoint != Breakpoint.None && !Options.FullScreen)
         .Add(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
+
+    /// <summary>
+    /// The value assigned to the header's class attribute.
+    /// </summary>
+    protected string? HeaderCssClass => new CssBuilder("header")
+        .Add("draggable", Options.IsDraggable)
+        .ToString();
+
+    [Inject, NotNull] IJSRuntime? JSRuntime { get; set; }
 
     [Inject, NotNull] private IKeyListener? KeyListener { get; set; }
 
@@ -82,11 +94,13 @@ public partial class DialogInstance
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !Options.DisableCloseOnEscape)
+        if (firstRender)
         {
-            await KeyListener.ConnectAsync(_elementId, new()
+            if (!Options.DisableCloseOnEscape)
             {
-                Keys =
+                await KeyListener.ConnectAsync(_elementId, new()
+                {
+                    Keys =
                 {
                     new()
                     {
@@ -94,8 +108,16 @@ public partial class DialogInstance
                         SubscribeDown = true,
                     }
                 },
-            });
-            KeyListener.KeyDown += OnEscapeKeyDown;
+                });
+                KeyListener.KeyDown += OnEscapeKeyDown;
+            }
+            if (Options.IsDraggable)
+            {
+                _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./_content/Tavenem.Blazor.Framework/tavenem-dialog.js");
+                await _module.InvokeVoidAsync("initialize", Id);
+            }
         }
     }
 

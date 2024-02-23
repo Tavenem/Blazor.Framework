@@ -12,4 +12,6 @@ public partial class DialogDoc
     private void ShowDialog() => DialogService.Show<ExampleDialog>("Example");
 
     private void ShowMessageBox() => DialogService.ShowMessageBox(MessageBoxOptions.Ok("Example dialog"));
+
+    private void ShowNonModalDialog() => DialogService.Show<ExampleDialog>("Non-Modal Example", new() { NonModal = true });
 }
