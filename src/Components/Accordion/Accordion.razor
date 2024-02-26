@@ -1,9 +1,0 @@
-﻿@namespace Tavenem.Blazor.Framework
-
-@inherits TavenemComponentBase
-
-<div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
-    <CascadingValue Value="this" IsFixed="true">
-        @ChildContent
-    </CascadingValue>
-</div>

@@ -34,7 +34,7 @@
     the properties of the dialog.
 </p>
 
-<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <button class="btn primary" @onclick="ShowMessageBox">Open</button>
@@ -107,7 +107,7 @@
     one of the <code>Show</code> overloads on <code>DialogService</code>.
 </p>
 
-<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <button class="btn primary" @onclick="ShowDialog">Open</button>
@@ -201,7 +201,7 @@
 
 <p>For example, this shows a non-modal dialog which allows interaction with the rest of the page while open:</p>
 
-<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <button class="btn primary" @onclick="ShowNonModalDialog">Open</button>
@@ -232,7 +232,7 @@
     the Dialog component to control the inline dialog's behavior.
 </p>
 
-<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <button class="btn primary" @onclick="@(_ => _isVisible = true)">Open</button>

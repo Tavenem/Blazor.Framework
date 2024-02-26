@@ -37,6 +37,13 @@ export default [{
     },
     plugins: plugins,
 }, {
+    input: "./scripts/tavenem-accordion.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
     input: "./scripts/tavenem-contents.ts",
     output: {
         format: 'es',

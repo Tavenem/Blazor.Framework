@@ -18,8 +18,7 @@
                           Disabled="Disabled"
                           Style="@Style"
                           ThemeColor="ThemeColor"
-                          Title="@(ChildContent is null ? Item?.ToString() : null)"
-                          TitleIsToggle="@(ElementList is null || ElementList.SelectionType == SelectionType.None)">
+                          Title="@(ChildContent is null ? Item?.ToString() : null)">
             <TitleContent>@ChildContent</TitleContent>
             <ChildContent>
                 @if (Item is not null)

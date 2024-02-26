@@ -24,7 +24,7 @@
     call one of the <code>Add</code> method overloads:
 </p>
 
-<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <button class="btn primary" @onclick="@(_ => SnackbarService.Add("This is a snackbar"))">Show snackbar</button>
@@ -201,7 +201,7 @@
     You may include your own custom icon, in any position you wish:
 </p>
 
-<Collapse Id="ce-4" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <button class="btn primary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Icon after the text <tf-icon>lightbulb</tf-icon>", AutoIcon = false }))">Show snackbar</button>

@@ -3,81 +3,24 @@
 @inherits PersistentComponentBase
 
 <div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
-    <div class="header">
-        @if (TitleContent is null)
-        {
-            if (PersistState && !IsInteractive)
+    <details open="@IsInitiallyOpen" @ontoggle="ToggleAsync">
+        <summary>
+            @if (TitleContent is null)
             {
-                <a href="@GetToggleUrl()" class="expand">
-                    <span>@Title</span>
-                    <tf-icon>@IconName</tf-icon>
-                </a>
-            }
-            else if (IsInteractive || Disabled)
-            {
-                <div class="expand" @onclick="OnToggleAsync">
-                    <span>@Title</span>
-                    <tf-icon>@IconName</tf-icon>
-                </div>
+                <span>@Title</span>
             }
             else
             {
-                <div class="expand text-muted">
-                    <span>@Title</span>
-                    <tf-icon>@IconName</tf-icon>
-                </div>
-            }
-        }
-        else if (TitleIsToggle)
-        {
-            if (PersistState && !IsInteractive)
-            {
-                <a href="@GetToggleUrl()" class="collapse-title">
-                    @TitleContent
-                </a>
-                <a href="@GetToggleUrl()" class="expand-link">
-                    <tf-icon>@IconName</tf-icon>
-                </a>
-            }
-            else if (IsInteractive || Disabled)
-            {
-                <div class="collapse-title" @onclick="OnToggleAsync">
+                <div class="d-flex flex-column flex-grow-1" style="min-width:0">
                     @TitleContent
                 </div>
-                <tf-icon class="expand" @onclick="OnToggleAsync">@IconName</tf-icon>
             }
-            else
-            {
-                <div class="collapse-title" @onclick="OnToggleAsync">
-                    @TitleContent
-                </div>
-                <tf-icon class="expand text-muted" @onclick="OnToggleAsync">@IconName</tf-icon>
-            }
-        }
-        else
-        {
-            <div class="d-flex flex-column flex-grow-1" style="min-width:0">
-                @TitleContent
-            </div>
-            @if (PersistState && !IsInteractive)
-            {
-                <a href="@GetToggleUrl()" class="expand-link">
-                    <tf-icon>@IconName</tf-icon>
-                </a>
-            }
-            else if (IsInteractive || Disabled)
-            {
-                <tf-icon class="expand" @onclick="OnToggleAsync">@IconName</tf-icon>
-            }
-            else
-            {
-                <tf-icon class="expand text-muted">@IconName</tf-icon>
-            }
-        }
-    </div>
-    <div class="@BodyCssClass">
-        @ChildContent
-    </div>
+            <tf-icon>@IconName</tf-icon>
+        </summary>
+        <div class="@BodyCssClass">
+            @ChildContent
+        </div>
+    </details>
     @if (FooterContent is not null)
     {
         <div class="@FooterCssClass">

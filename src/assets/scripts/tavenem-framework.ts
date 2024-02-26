@@ -1,3 +1,4 @@
+import { TavenemAccordionHTMLElement } from './tavenem-accordion';
 import { TavenemContentsHTMLElement } from './tavenem-contents';
 import { TavenemHighlightHTMLElement } from './tavenem-highlight';
 import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
@@ -82,24 +83,6 @@ namespace Tavenem {
             }
         });
         themeObserver.observe(document.documentElement, { attributes: true });
-        //window.addEventListener('load', () => {
-        //    const body = document.querySelector("body");
-        //    if (body) {
-        //        const observer = new MutationObserver(() => {
-        //            if (!('theme' in document.documentElement.dataset)) {
-        //                setPreferredColorScheme();
-        //            }
-        //        });
-        //        observer.observe(body, { childList: true, subtree: true });
-        //    }
-        //});
-        //window.addEventListener('popstate', () => {
-        //    setTimeout(() => {
-        //        if (!('theme' in document.documentElement.dataset)) {
-        //            setPreferredColorScheme();
-        //        }
-        //    }, 40);
-        //});
     }
 
     function registerTavenemComponents() {
@@ -207,7 +190,9 @@ namespace Tavenem {
             }
         });
 
-        customElements.define('tf-contents', TavenemContentsHTMLElement)
+        customElements.define('tf-accordion', TavenemAccordionHTMLElement);
+
+        customElements.define('tf-contents', TavenemContentsHTMLElement);
 
         customElements.define('tf-drawer-toggle', class extends HTMLElement {
             _open: boolean = false;

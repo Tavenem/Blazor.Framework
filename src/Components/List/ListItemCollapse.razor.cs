@@ -33,8 +33,7 @@ public partial class ListItemCollapse<TListItem>
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("collapse")
-        .Add("closed", !IsOpen)
-        .Add("disabled", DisabledValue || Accordion?.Disabled == true)
+        .Add("disabled", DisabledValue)
         .Add("loading", IsLoading)
         .Add(ThemeColorValue.ToCSS())
         .Add(

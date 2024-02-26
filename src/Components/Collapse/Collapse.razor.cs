@@ -43,15 +43,21 @@ public partial class Collapse : PersistentComponentBase
     [Parameter] public RenderFragment? FooterContent { get; set; }
 
     /// <summary>
+    /// Whether the collapsed content is initially displayed.
+    /// </summary>
+    [Parameter]
+    public bool IsInitiallyOpen { get; set; }
+
+    /// <summary>
     /// Will be <see langword="true"/> during opening, after <see cref="OnOpening"/> is invoked and
     /// before it completes.
     /// </summary>
-    public bool IsLoading { get; private set; }
+    public bool IsLoading { get; protected set; }
 
     /// <summary>
     /// Whether the collapsed content is currently displayed.
     /// </summary>
-    [Parameter] public bool IsOpen { get; set; }
+    public bool IsOpen { get; protected set; }
 
     /// <summary>
     /// Invoked when <see cref="IsOpen"/> changes.
@@ -77,11 +83,6 @@ public partial class Collapse : PersistentComponentBase
     [Parameter] public EventCallback<Collapse> OnOpening { get; set; }
 
     /// <summary>
-    /// Raised when <see cref="IsOpen"/> changes.
-    /// </summary>
-    public event EventHandler<bool>? OnIsOpenChanged;
-
-    /// <summary>
     /// <para>
     /// A simple header for the component.
     /// </para>
@@ -95,21 +96,6 @@ public partial class Collapse : PersistentComponentBase
     /// Complex header content.
     /// </summary>
     [Parameter] public RenderFragment? TitleContent { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// Whether the entire title should toggle the collapse.
-    /// </para>
-    /// <para>
-    /// Always <see langword="true"/> when <see cref="TitleContent"/> is <see langword="null"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public bool TitleIsToggle { get; set; }
-
-    /// <summary>
-    /// The group to which this component belongs, if any.
-    /// </summary>
-    [CascadingParameter] protected Accordion? Accordion { get; set; }
 
     /// <summary>
     /// The final value assigned to the body's class attribute.
@@ -126,8 +112,7 @@ public partial class Collapse : PersistentComponentBase
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("collapse")
-        .Add("closed", IsClosed || !IsOpen)
-        .Add("disabled", Disabled || Accordion?.Disabled == true)
+        .Add("disabled", Disabled)
         .Add("loading", IsLoading)
         .ToString();
 
@@ -137,24 +122,13 @@ public partial class Collapse : PersistentComponentBase
     protected string IconName => IsLoading ? DefaultIcons.Loading : DefaultIcons.Expand;
 
     /// <summary>
-    /// Whether the collapse has been explicitly closed.
-    /// </summary>
-    protected bool IsClosed { get; set; }
-
-    /// <summary>
     /// The final value assigned to the footer's class attribute.
     /// </summary>
     protected string? FooterCssClass => new CssBuilder("footer")
         .Add(FooterClass)
         .ToString();
 
-    internal bool ActiveLink { get; set; }
-
-    internal bool IsExpanded => IsOpen && !IsClosed;
-
-    private bool DefaultIsExpanded { get; set; }
-
-    private bool IsInteractive { get; set; }
+    private bool DefaultIsOpen { get; set; }
 
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
@@ -162,8 +136,8 @@ public partial class Collapse : PersistentComponentBase
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         if (QueryStateService.IsInitialized
-            && parameters.TryGetValue<bool>(nameof(IsOpen), out var isOpen)
-            && isOpen != IsOpen)
+            && parameters.TryGetValue<bool>(nameof(IsInitiallyOpen), out var isOpen)
+            && isOpen != IsInitiallyOpen)
         {
             await SetOpenAsync(isOpen);
         }
@@ -175,18 +149,14 @@ public partial class Collapse : PersistentComponentBase
     protected override async Task OnInitializedAsync()
     {
         NavigationManager.LocationChanged += OnLocationChanged;
-        if (Accordion is not null)
-        {
-            await Accordion.AddAsync(this);
-        }
 
-        DefaultIsExpanded = IsExpanded;
+        DefaultIsOpen = IsInitiallyOpen;
 
         var currentOpenStates = QueryStateService.RegisterProperty(
             Id,
             ExpansionQueryParamName,
             OnQueryChangedAsync,
-            DefaultIsExpanded);
+            DefaultIsOpen);
         if (currentOpenStates?.Count > 0
             && bool.TryParse(currentOpenStates[0], out var isOpen))
         {
@@ -206,22 +176,11 @@ public partial class Collapse : PersistentComponentBase
     }
 
     /// <inheritdoc />
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-        {
-            IsInteractive = true;
-            StateHasChanged();
-        }
-    }
-
-    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         if (!_disposedValue && disposing)
         {
             NavigationManager.LocationChanged -= OnLocationChanged;
-            Accordion?.Remove(this);
         }
         base.Dispose(disposing);
     }
@@ -230,28 +189,39 @@ public partial class Collapse : PersistentComponentBase
     /// Set the open state of this collapse.
     /// </summary>
     /// <param name="value">The open state.</param>
-    public Task SetOpenAsync(bool value) => SetOpenAsync(value, false);
+    public async Task SetOpenAsync(bool value)
+    {
+        if (IsOpen == value)
+        {
+            return;
+        }
+
+        IsOpen = value;
+        await IsOpenChanged.InvokeAsync(IsOpen);
+
+        if (value && OnOpening.HasDelegate)
+        {
+            IsLoading = true;
+            StateHasChanged();
+            await OnOpening.InvokeAsync(this);
+            IsLoading = false;
+            StateHasChanged();
+        }
+
+        if (PersistState)
+        {
+            QueryStateService.SetPropertyValue(
+                Id,
+                ExpansionQueryParamName,
+                IsOpen,
+                defaultValue: _isActiveNav || DefaultIsOpen);
+        }
+    }
 
     /// <summary>
     /// Toggle the open state of this collapse.
     /// </summary>
-    public Task ToggleAsync() => SetOpenAsync(IsClosed || !IsOpen, true);
-
-    internal void ForceRedraw() => StateHasChanged();
-
-    private protected async Task OnToggleAsync()
-    {
-        if (!Disabled && Accordion?.Disabled != true)
-        {
-            await SetOpenAsync(IsClosed || !IsOpen, true);
-        }
-    }
-
-    private string GetToggleUrl() => QueryStateService
-        .GetUriWithPropertyValue(
-        Id,
-        ExpansionQueryParamName,
-        IsClosed || !IsOpen ? true : null);
+    public Task ToggleAsync() => SetOpenAsync(!IsOpen);
 
     private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
     {
@@ -320,47 +290,6 @@ public partial class Collapse : PersistentComponentBase
         if (bool.TryParse(args.Value, out var value))
         {
             await SetOpenAsync(value);
-        }
-    }
-
-    private async Task SetOpenAsync(bool value, bool manual)
-    {
-        if (IsOpen == value
-            && (!manual
-            || IsClosed == !value))
-        {
-            return;
-        }
-
-        if (manual)
-        {
-            IsClosed = !value;
-        }
-        if (IsOpen != value)
-        {
-            if (value && !IsClosed && OnOpening.HasDelegate)
-            {
-                IsLoading = true;
-                StateHasChanged();
-                await OnOpening.InvokeAsync(this);
-                IsLoading = false;
-            }
-            IsOpen = value;
-            if (!value || !IsClosed)
-            {
-                OnIsOpenChanged?.Invoke(this, IsOpen);
-                await IsOpenChanged.InvokeAsync(IsOpen);
-            }
-            StateHasChanged();
-        }
-
-        if (PersistState)
-        {
-            QueryStateService.SetPropertyValue(
-                Id,
-                ExpansionQueryParamName,
-                IsOpen && !IsClosed,
-                defaultValue: _isActiveNav || DefaultIsExpanded);
         }
     }
 

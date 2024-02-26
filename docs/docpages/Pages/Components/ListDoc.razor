@@ -129,7 +129,7 @@
     each item, or if no template is provided, with the <code>ToString</code> method of the items.
 </p>
 
-<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" SelectionType="SelectionType.Single" />
@@ -152,7 +152,7 @@
     time may be selected. If set to <code>Multiple</code> any number of items may be selected.
 </p>
 
-<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" SelectionType="SelectionType.Multiple" />
@@ -183,7 +183,7 @@
     forced.
 </p>
 
-<Collapse Id="ce-10" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-10" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" SelectionType="SelectionType.Single" Required="true" />
@@ -208,7 +208,7 @@
     collapse.
 </p>
 
-<Collapse Id="ce-11" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
@@ -247,7 +247,7 @@
     of collapsible sublists, moving the expansion icon to the beginning and rotating it.
 </p>
 
-<Collapse Id="ce-12" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-12" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Class="tree" Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
@@ -295,7 +295,7 @@
     set its <code>IsDropTarget</code> property to <code>true</code>.
 </p>
 
-<Collapse Id="ce-13" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-13" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_dragItems" IsDragStart="true" IsDropTarget="true" />
@@ -354,7 +354,7 @@
     <code>IconClass</code> property can be used to customize the class of the icon.
 </p>
 
-<Collapse Id="ce-14" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-14" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
@@ -375,7 +375,7 @@
     appropriate items.
 </p>
 
-<Collapse Id="ce-15" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-15" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" SeparatorBefore="@(i => i == "Item 2")" />
@@ -404,7 +404,7 @@
     itself, rather than their own theme, to make it clear that they are currently selected.
 </p>
 
-<Collapse Id="ce-16" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
@@ -426,7 +426,7 @@
     your items, or when they require their own interactions.
 </p>
 
-<Collapse Id="ce-17" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-17" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList Items="_items" SelectionType="SelectionType.Single" SelectionIcons="true" />
@@ -449,7 +449,7 @@
     <code>OnItemClick</code> callback.
 </p>
 
-<Collapse Id="ce-18" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-18" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />

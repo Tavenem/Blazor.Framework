@@ -15,7 +15,7 @@
     components inside for each available tab.
 </p>
 
-<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Tabs Id="t-1" TTabItem="string">
@@ -77,7 +77,7 @@
     If there are more tabs than will fit, a scrollbar will appear.
 </p>
 
-<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Tabs Id="t-2" TTabItem="string">
@@ -112,7 +112,7 @@
     The tabs can be positioned on any side of the panels using the <code>TabSide</code> property.
 </p>
 
-<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Select TValue="Side" @bind-Value="Side" Label="Side" Class="dense" Style="max-width:200px">
@@ -186,7 +186,7 @@
     provides rich tab content).
 </p>
 
-<Collapse Id="ce-4" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Tabs Id="t-4" Items="_items" TabTitle="@(i => (MarkupString)i)">
@@ -238,7 +238,7 @@
     Dynamic panels are automatically removed from the <code>Items</code> collection when closed.
 </p>
 
-<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Tabs Id="t-5"

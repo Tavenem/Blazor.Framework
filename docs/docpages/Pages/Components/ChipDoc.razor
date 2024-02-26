@@ -130,7 +130,7 @@
     template is provided, with the <code>ToString</code> method of the items.
 </p>
 
-<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Single" />
@@ -160,7 +160,7 @@
     time may be selected. If set to <code>Multiple</code> any number of items may be selected.
 </p>
 
-<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" />
@@ -191,7 +191,7 @@
     forced.
 </p>
 
-<Collapse Id="ce-10" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-10" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Single" Required="true" />
@@ -219,7 +219,7 @@
     pressed.
 </p>
 
-<Collapse Id="ce-11" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-11" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" AutoClose="true" />
@@ -253,7 +253,7 @@
     set its <code>IsDropTarget</code> property to <code>true</code>.
 </p>
 
-<Collapse Id="ce-12" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-12" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_dragChips" IsDragStart="true" IsDropTarget="true" />
@@ -313,7 +313,7 @@
     <code>IconClass</code> property can be used to customize the class of the icon.
 </p>
 
-<Collapse Id="ce-13" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-13" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
@@ -334,7 +334,7 @@
     appropriate items.
 </p>
 
-<Collapse Id="ce-14" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-14" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SeparatorBefore="@(i => i == "Chip 2")" />
@@ -363,7 +363,7 @@
     itself, rather than their own theme, to make it clear that they are currently selected.
 </p>
 
-<Collapse Id="ce-15" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-15" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet Items="_chips" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
@@ -386,7 +386,7 @@
     <code>OnItemClick</code> callback.
 </p>
 
-<Collapse Id="ce-16" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />

@@ -90,7 +90,7 @@
     (which receives the current value as a context parameter) to set the displayed content.
 </p>
 
-<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select TValue="int">
@@ -159,7 +159,7 @@
     render the values in the option list.
 </p>
 
-<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select Options="_options1" Labels="@(x => $"Option {x}")">
@@ -190,7 +190,7 @@
     each option, and the <code>Value</code> should contain its label.
 </p>
 
-<Collapse Id="ce-6" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <Select OptionPairs="_options2" />
@@ -241,7 +241,7 @@
     that selects a value from a data item (row).
 </p>
 
-<Collapse Id="ce-7" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
@@ -295,7 +295,7 @@
     selects all other available options.
 </p>
 
-<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <MultiSelect Options="_options1" Labels="@(x => $"Option {x}")">
@@ -323,7 +323,7 @@
     <code>DataGrid</code>.
 </p>
 
-<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <DataGridMultiSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">

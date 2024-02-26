@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.23
+### Added
+- `tf-accordion` custom element (replacement for `Accordion` component which does not require interactivity)
+### Changed
+- Reimplemented Collapse with `details` and `summary` HTML elements, no longer requires interactivity for basic functionality
+  - `IsOpen` parameter of Collapse split into `IsOpen` public property for current state and `IsInitiallyOpen` parameter for initial state
+  - `OnOpening` callback now invoked after state change, rather than before
+### Removed
+- `Accordion` component (replaced with `tf-accordion` custom HTML element)
+- `OnIsOpenChanged` event from `Collapse`
+- `TitleIsToggle` property from `Collapse` (always true with new `details`+`summary` implementation)
+
 ## 2.22
 ### Fixed
 - Nested popovers

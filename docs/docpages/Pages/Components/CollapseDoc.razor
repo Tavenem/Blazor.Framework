@@ -14,10 +14,12 @@
 <p>
     Use the <code>Collapse</code> component to create a collapsible element. The <code>ChildContent
     RenderFragment</code> is used to set the body, and the <code>Title</code> property or
-    <code>TitleContent RenderFragment</code> is used to set the header.
+    <code>TitleContent RenderFragment</code> is used to set the header. The
+    <code>IsInitiallyOpen</code> parameter controls whether the collapse is open on page load, and
+    the <code>IsOpen</code> bindable public property reflects its current state.
 </p>
 
-<Collapse Id="ce-1" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="c-1-1" Title="Click here">This is the body</Collapse>
@@ -48,44 +50,6 @@
     </ChildContent>
 </Collapse>
 
-<p>
-    When you use a simple <code>Title</code>, the entire header can be interacted with to toggle the
-    visibility of the body panel. If you use a <code>TitleContent RenderFragment</code>, however,
-    users can interact with your custom <code>TitleContent</code> normally. Only the expansion arrow
-    toggles the body visibility. If you wish to make your entire header a toggle for the collapse
-    even when you use custom <code>TitleContent</code>, set the <code></code> property to
-    <code>true</code>.
-</p>
-
-<Collapse Id="ce-2" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-2" TitleIsToggle="true">
-                <TitleContent>
-                    <div class="d-flex align-items-center">
-                        <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
-                    </div>
-                </TitleContent>
-                <ChildContent>
-                    This is the body
-                </ChildContent>
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse TitleIsToggle=""true"">
-    <TitleContent>
-        <div class=""d-flex align-items-center"">
-            <tf-icon>info</tf-icon><span>&nbsp;Click this title</span>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        This is the body
-    </ChildContent>
-</Collapse>")
-    </ChildContent>
-</Collapse>
-
 <h2>Footer</h2>
 
 <p>
@@ -93,7 +57,7 @@
     by adding it to the <code>FooterContent RenderFragment</code>.
 </p>
 
-<Collapse Id="ce-3" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="c-3" Title="Click here">
@@ -127,7 +91,7 @@
     close a collapse which is already open.
 </p>
 
-<Collapse Id="ce-4" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="c-4" Title="Disabled" Disabled="true">
@@ -162,7 +126,7 @@
     but this one will stay open.
 </p>
 
-<Collapse Id="ce-5" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="cpd1" Title="Persistent" PersistState="true">
@@ -202,7 +166,7 @@
     You can also apply the <code>dense</code> class to the collapse itself to reduce padding.
 </p>
 
-<Collapse Id="ce-6" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="c-5" Title="Click here" Class="dense">
@@ -222,7 +186,7 @@
     usual), but also gives it internal borders between the header, body, and footer.
 </p>
 
-<Collapse Id="ce-7" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-7" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="c-6" Title="Click here" Class="align-self-stretch outlined">
@@ -252,7 +216,7 @@
     the appearance of a collapse.
 </p>
 
-<Collapse Id="ce-8" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
             <Collapse Id="c-7-1" Title="Click here" Class="align-self-stretch outlined primary">
@@ -296,46 +260,50 @@
 <h2>Events</h2>
 
 <p>
-    The <code>IsOpenChanged</code> event callback and <code>OnIsOpenChanged</code> event handler are
-    both invoked when the collapse is toggled.
+    The <code>OnOpening</code> event callback is invoked after opening only (not closing), and is
+    intended as a hook for the asynchronous loading of content. While waiting for this callback to
+    complete, the expand icon is changed to a spinning animation to indicate to the user that
+    loading is occurring, and the public property <code>IsLoading</code> will be set to
+    <code>true</code>.
 </p>
 
-<p>
-    The <code>OnOpening</code> event callback is invoked <em>before</em> opening (not closing), and
-    is intended as a hook for the asynchronous loading of content. While waiting for this callback
-    to complete, the expand icon is changed to a spinning animation to indicate to the user that
-    loading is occurring.
-</p>
-
-<Collapse Id="ce-9" IsOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-8" Title="Click here" OnOpening="LoadAsync">
-                @_asyncBody
+            <Collapse @ref="_collapse" Id="c-8" Title="Click here" OnOpening="LoadAsync">
+                @if (_collapse?.IsLoading == true)
+                {
+                    <span>Loading...</span>
+                }
+                else
+                {
+                    <span>Loaded</span>
+                }
             </Collapse>
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" OnOpening=""LoadAsync"">
-    @_asyncBody
+        @CodeFormatter.CodeToMarkup(@"<Collapse @ref=""_collapse"" Title=""Click here"" OnOpening=""LoadAsync"">
+    @if (_collapse?.IsLoading == true)
+    {
+        <span>Loading...</span>
+    }
+    else
+    {
+        <span>Loaded</span>
+    }
 </Collapse>
 
 @code {
     private string _asyncBody = string.Empty;
-    private async Task LoadAsync()
-    {
-        await Task.Delay(3000);
-        _asyncBody = ""Loaded"";
-    }
+    private Collapse? _collapse;
+    private Task LoadAsync() => Task.Delay(3000);
 }")
     </ChildContent>
 </Collapse>
 
 @code {
     private string _asyncBody = string.Empty;
-    private async Task LoadAsync()
-    {
-        await Task.Delay(3000);
-        _asyncBody = "Loaded";
-    }
+    private Collapse? _collapse;
+    private Task LoadAsync() => Task.Delay(3000);
 }
