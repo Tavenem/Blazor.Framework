@@ -1,0 +1,125 @@
+﻿.avatar {
+    align-items: center;
+    background-color: var(--tavenem-avatar-color-bg, var(--tavenem-color-dark));
+    border-radius: 50%;
+    color: var(--tavenem-avatar-color, var(--tavenem-color-dark-text));
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 1.25em;
+    height: 2.5em;
+    justify-content: center;
+    line-height: 1;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+    width: 2.5em;
+
+    &.small {
+        font-size: .875em;
+        height: 1.5em;
+        width: 1.5em;
+    }
+
+    &.large {
+        font-size: 1.75em;
+        height: 3.5em;
+        width: 3.5em;
+    }
+
+    img {
+        color: transparent;
+        height: 100%;
+        object-fit: cover;
+        text-align: center;
+        text-indent: 10000px;
+        width: 100%;
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --tavenem-avatar-color: var(--tavenem-theme-color-text);
+        --tavenem-avatar-color-bg: var(--tavenem-theme-color);
+        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
+    }
+}
+
+.avatar-group {
+    --tavenem-avatar-color: var(--tavenem-color-dark-text);
+    --tavenem-avatar-color-bg: var(--tavenem-color-dark);
+    --tavenem-avatar-color-border: var(--tavenem-color-bg);
+    display: flex;
+    counter-reset: avatar-count;
+
+    .avatar {
+        border: 2px solid var(--tavenem-avatar-color-border);
+        height: calc(2.5em + 2px);
+        margin-inline-start: -.75em;
+        width: calc(2.5em + 2px);
+
+        &:first-child {
+            margin-inline-start: 0px !important;
+        }
+
+        &.small {
+            height: calc(1.5em + 2px);
+            width: calc(1.5em + 2px);
+        }
+
+        &.large {
+            height: calc(3.5em + 2px);
+            width: calc(3.5em + 2px);
+        }
+
+        &:before {
+            counter-increment: avatar-count;
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+    }
+
+    &.outlined {
+        --tavenem-avatar-color-border: var(--tavenem-color-border);
+        border: none;
+    }
+
+    &.bg-alt {
+        --tavenem-avatar-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+        background-color: transparent;
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --tavenem-avatar-color: var(--tavenem-theme-color-text);
+        --tavenem-avatar-color-bg: var(--tavenem-theme-color);
+    }
+
+    &.border-primary,
+    &.border-secondary,
+    &.border-tertiary,
+    &.border-danger,
+    &.border-dark,
+    &.border-default,
+    &.border-info,
+    &.border-success,
+    &.border-warning {
+        .avatar {
+            --tavenem-avatar-color-border: var(--tavenem-color-border);
+        }
+    }
+}

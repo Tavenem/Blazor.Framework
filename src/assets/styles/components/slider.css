@@ -1,0 +1,452 @@
+﻿.slider {
+    --thumb-color: var(--tavenem-color-action);
+    --thumb-label-color: var(--tavenem-color-default-text);
+    --thumb-label-color-bg: var(--tavenem-color-default);
+    --thumb-shadow-color: rgba(0,0,0,.24);
+    --thumb-shadow: 0 0 0 2px var(--thumb-shadow-color);
+    --track-color: rgba(var(--tavenem-color-action-rgb), .3);
+    color: var(--tavenem-color-text);
+    display: inline-flex;
+    flex-direction: column;
+    margin: 0;
+    user-select: none;
+    width: 100%;
+
+    label {
+        transform: none !important;
+        z-index: auto;
+    }
+
+    .input {
+        display: inline-block;
+        line-height: 12px;
+        min-height: 12px;
+        padding: 0;
+        position: relative;
+        width: 100%;
+
+        > div {
+            align-items: center;
+            display: flex;
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
+    }
+
+    &:not(.outlined) .input:before {
+        content: none;
+    }
+
+    input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: transparent;
+        cursor: pointer;
+        display: block;
+        height: 12px;
+        position: relative;
+        width: 100%;
+
+        &:focus {
+            outline: none;
+        }
+
+        &:active + .label {
+            opacity: 1;
+        }
+    }
+
+    .input-core:not(text-area) {
+        height: auto;
+    }
+
+    .label {
+        align-items: center;
+        background-color: var(--thumb-label-color-bg);
+        border-radius: 2px;
+        color: var(--thumb-label-color);
+        display: none;
+        font-size: .75rem;
+        justify-content: center;
+        line-height: normal;
+        opacity: 0;
+        padding: 4px 8px;
+        pointer-events: none;
+        position: absolute;
+        text-align: center;
+        top: 0;
+        transform: translate(-50%, -125%);
+        transition: opacity .2s ease-in-out;
+        user-select: none;
+    }
+
+    &.show-value .label {
+        display: block;
+    }
+
+    .filler {
+        background-color: var(--thumb-color);
+        border-radius: 1px;
+        display: none;
+        height: 2px;
+    }
+
+    .hashes {
+        display: none;
+        flex-grow: 1;
+        justify-content: space-between;
+
+        div {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+
+            span:first-child {
+                background-color: var(--thumb-color);
+                border-radius: 9999px;
+                height: 2px;
+                width: 2px;
+            }
+
+            span + span {
+                left: 0;
+                padding-top: .25em;
+                position: absolute;
+                top: 0;
+                transform: translate(-50%, 50%);
+            }
+
+            &:first-child span + span {
+                transform: translate(0, 50%);
+            }
+
+            &:last-child span + span {
+                transform: translate(-100%, 50%);
+            }
+        }
+    }
+
+    &.hashmarks .hashes {
+        display: flex;
+    }
+
+    &.hash-labels {
+        padding-bottom: calc(.25em + 6px);
+    }
+
+    .field-helpers {
+        color: var(--thumb-color);
+    }
+
+    &.disabled {
+        .input input {
+            &, &:active, &:focus-visible {
+                --thumb-color: var(--tavenem-color-action-disabled);
+                --track-color: var(--tavenem-color-action-disabled-bg);
+                cursor: default;
+                opacity: 0.38;
+            }
+
+            &:active + .label {
+                opacity: 0;
+            }
+        }
+
+        label {
+            color: var(--tavenem-color-text-disabled);
+        }
+    }
+
+    &.read-only input {
+        &, &:active, &:focus-visible {
+            cursor: default;
+        }
+
+        &:active + .label {
+            opacity: 0;
+        }
+    }
+
+    &.required label:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-text);
+
+        .filler {
+            display: block;
+        }
+    }
+
+    &.outlined {
+        border: 0;
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --thumb-color: var(--tavenem-color-error);
+        --thumb-label-color: var(--tavenem-color-error-text);
+        --thumb-label-color-bg: var(--tavenem-color-error);
+        --thumb-shadow-color: var(--tavenem-color-error-hover-bright-2);
+        --track-lightness: var(--tavenem-color-error-lightness);
+        --track-color: hsla(var(--tavenem-color-error-hue), var(--tavenem-color-error-saturation), var(--track-lightness), 0.30);
+
+        label {
+            color: var(--tavenem-color-error);
+        }
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --thumb-color: var(--tavenem-theme-color);
+        --thumb-label-color: var(--tavenem-theme-color-text);
+        --thumb-label-color-bg: var(--tavenem-theme-color);
+        --thumb-shadow-color: var(--tavenem-theme-color-hover-bright-2);
+        color: var(--tavenem-color-text);
+    }
+
+    &:where(.primary) {
+        --track-lightness: var(--tavenem-color-primary-lightness);
+        --track-color: hsla(var(--tavenem-color-primary-hue), var(--tavenem-color-primary-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-primary-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-primary-lightness) + 10%);
+        }
+    }
+
+    &:where(.secondary) {
+        --track-lightness: var(--tavenem-color-secondary-lightness);
+        --track-color: hsla(var(--tavenem-color-secondary-hue), var(--tavenem-color-secondary-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-secondary-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-secondary-lightness) + 10%);
+        }
+    }
+
+    &:where(.tertiary) {
+        --track-lightness: var(--tavenem-color-tertiary-lightness);
+        --track-color: hsla(var(--tavenem-color-tertiary-hue), var(--tavenem-color-tertiary-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-tertiary-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-tertiary-lightness) + 10%);
+        }
+    }
+
+    &:where(.danger) {
+        --track-lightness: var(--tavenem-color-danger-lightness);
+        --track-color: hsla(var(--tavenem-color-danger-hue), var(--tavenem-color-danger-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-danger-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-danger-lightness) + 10%);
+        }
+    }
+
+    &:where(.dark) {
+        --track-lightness: var(--tavenem-color-dark-lightness);
+        --track-color: hsla(var(--tavenem-color-dark-hue), var(--tavenem-color-dark-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-dark-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-dark-lightness) + 10%);
+        }
+    }
+
+    &:where(.default) {
+        --track-lightness: var(--tavenem-color-default-lightness);
+        --track-color: hsla(var(--tavenem-color-default-hue), var(--tavenem-color-default-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-default-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-default-lightness) + 10%);
+        }
+    }
+
+    &:where(.info) {
+        --track-lightness: var(--tavenem-color-info-lightness);
+        --track-color: hsla(var(--tavenem-color-info-hue), var(--tavenem-color-info-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-info-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-info-lightness) + 10%);
+        }
+    }
+
+    &:where(.success) {
+        --track-lightness: var(--tavenem-color-success-lightness);
+        --track-color: hsla(var(--tavenem-color-success-hue), var(--tavenem-color-success-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-success-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-success-lightness) + 10%);
+        }
+    }
+
+    &:where(.warning) {
+        --track-lightness: var(--tavenem-color-warning-lightness);
+        --track-color: hsla(var(--tavenem-color-warning-hue), var(--tavenem-color-warning-saturation), var(--track-lightness), .3);
+
+        &.darken {
+            --track-lightness: calc(var(--tavenem-color-warning-lightness) - 10%);
+        }
+
+        &.lighten {
+            --track-lightness: calc(var(--tavenem-color-warning-lightness) + 10%);
+        }
+    }
+}
+
+.slider input::-webkit-slider-runnable-track {
+    background-color: var(--track-color);
+    border-radius: 1px;
+    height: 2px;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.slider input::-moz-range-track {
+    background-color: var(--track-color);
+    border-radius: 1px;
+    height: 2px;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.slider input::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--thumb-color);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 2px;
+    transition: box-shadow 0.2s;
+    transform: scale(6, 6);
+    width: 2px;
+}
+.slider input::-webkit-slider-thumb:hover {
+    box-shadow: var(--thumb-shadow);
+}
+
+.slider input::-moz-range-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--thumb-color);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 2px;
+    transition: box-shadow 0.2s;
+    transform: scale(6, 6);
+    width: 2px;
+}
+.slider input::-moz-range-thumb:hover {
+    box-shadow: var(--thumb-shadow);
+}
+
+.slider input:active::-webkit-slider-thumb {
+    box-shadow: var(--thumb-shadow);
+}
+.slider input:active::-moz-range-thumb {
+    box-shadow: var(--thumb-shadow);
+}
+.slider input:focus-visible::-webkit-slider-thumb {
+    box-shadow: var(--thumb-shadow);
+}
+.slider input:focus-visible::-moz-range-thumb {
+    box-shadow: var(--thumb-shadow);
+}
+
+.slider.disabled .input input::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.disabled .input input::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.disabled .input input:active::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.disabled .input input:active::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.disabled .input input:focus-visible::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.disabled .input input:focus-visible::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+
+.slider.read-only input::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.read-only input::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.read-only input:active::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.read-only input:active::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.read-only input:focus-visible::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider.read-only input:focus-visible::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}

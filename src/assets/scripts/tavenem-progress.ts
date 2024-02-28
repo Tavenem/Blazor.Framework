@@ -120,6 +120,18 @@ svg:first-child circle {
     stroke-dashoffset: 0px;
 }
 
+:host(.primary),
+:host(.secondary),
+:host(.tertiary),
+:host(.danger),
+:host(.dark),
+:host(.default),
+:host(.info),
+:host(.success),
+:host(.warning) {
+    --progress-color: var(--tavenem-theme-color);
+}
+
 ::slotted(*) {
     z-index: 1;
 }`;
@@ -421,6 +433,20 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         background: linear-gradient(to top, #ffffff05, #00000050 50%, #ffffff05 100%) repeat;
         background-size: 100% 50%;
     }
+
+    :host(.primary),
+    :host(.secondary),
+    :host(.tertiary),
+    :host(.danger),
+    :host(.dark),
+    :host(.default),
+    :host(.info),
+    :host(.success),
+    :host(.warning) {
+        --progress-background-color: var(--tavenem-theme-color-hover);
+        --progress-color: var(--tavenem-theme-color);
+    }
+
 
     ::slotted(*) {
         z-index: 1;

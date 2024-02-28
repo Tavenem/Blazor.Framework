@@ -1,0 +1,1097 @@
+﻿@keyframes tf-icon-to-full {
+    from {
+        max-width: 3.5rem;
+        width: 3.5rem;
+    }
+}
+
+@keyframes tf-full-to-icon {
+    from {
+        max-width: 15rem;
+        width: auto;
+    }
+}
+
+.drawer {
+    background-color: var(--tavenem-color-bg);
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--tavenem-color-text);
+    margin: 0 !important;
+    outline: 0;
+    overflow: hidden;
+    transition: transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+    z-index: var(--tavenem-zindex-drawer);
+
+    @media print {
+        display: none;
+    }
+
+    &.filled {
+        background-color: var(--tavenem-color-bg-surface);
+    }
+
+    > .header,
+    > .footer {
+        min-height: 4rem;
+
+        &.drawer-control {
+            height: auto;
+            margin-bottom: 0;
+            min-height: 0;
+
+            &.toolbar {
+                min-height: 0;
+            }
+        }
+    }
+
+    &.dense, .dense & {
+        > .header,
+        > .footer {
+            min-height: 3rem;
+        }
+    }
+
+    @media (min-width: 768px) and (orientation: landscape) {
+        > .header,
+        > .footer {
+            min-height: 3rem;
+        }
+    }
+
+    &.left,
+    &.right {
+        flex-direction: column;
+        height: 100%;
+        max-width: 0;
+        transition: width 0ms 400ms;
+
+        @media (prefers-reduced-motion) {
+            transition: none;
+        }
+
+        .drawer-control,
+        tf-drawer-close {
+            @media (min-width: 768px) {
+                display: none;
+            }
+        }
+
+        &.icon-drawer {
+            animation: forwards tf-full-to-icon 225ms cubic-bezier(0, 0, 0.2, 1);
+            transition: width 225ms cubic-bezier(0, 0, 0.2, 1);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+
+            &:hover {
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+                max-width: 15rem;
+                width: auto;
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            @media (prefers-reduced-motion) {
+                transition: none;
+            }
+
+            @media (max-width: 767px) {
+                animation: none;
+                max-width: 0;
+                width: 0;
+
+                &:hover {
+                    animation: none;
+                    max-width: 0;
+                    width: 0;
+                }
+            }
+        }
+
+        @media (max-width: 767px) {
+            max-width: unset;
+            width: 100%;
+        }
+    }
+
+    &.left {
+        grid-area: leftdrawer;
+        transform: translateX(-100%);
+
+        [data-drawer-left="true"] & {
+            max-width: 15rem;
+            overflow-y: auto;
+            transform: translateX(0);
+
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            &.icon-drawer {
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                &:hover {
+                    animation: none;
+                }
+
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-in-left 225ms cubic-bezier(0, 0, 0.2, 1);
+                    max-width: unset;
+                    width: 100%;
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            @media (max-width: 767px) {
+                max-width: unset;
+                width: 100%;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
+            }
+        }
+
+        [data-drawer-left="false"] & {
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            &.icon-drawer {
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-out-left 225ms cubic-bezier(0, 0, 0.2, 1);
+                    transform: translateX(-100%);
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+        }
+
+        @media (max-width: 767px) {
+            grid-area: main;
+        }
+    }
+
+    &.right {
+        grid-area: rightdrawer;
+        transform: translateX(100%);
+
+        [data-drawer-right="true"] & {
+            max-width: 15rem;
+            overflow-y: auto;
+            transform: translateX(0);
+
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            &.icon-drawer {
+                animation: forwards tf-icon-to-full 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                &:hover {
+                    animation: none;
+                }
+
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-in-right 225ms cubic-bezier(0, 0, 0.2, 1);
+                    max-width: unset;
+                    width: 100%;
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            @media (max-width: 767px) {
+                max-width: unset;
+                width: 100%;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
+            }
+        }
+
+        [data-drawer-left="false"] & {
+            &:not(.icon-drawer) {
+                animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+
+            &.icon-drawer {
+                @media (max-width: 767px) {
+                    animation: forwards tf-slide-out-right 225ms cubic-bezier(0, 0, 0.2, 1);
+                    transform: translateX(100%);
+                }
+
+                @media (prefers-reduced-motion) {
+                    animation: none;
+                }
+            }
+        }
+
+        @media (max-width: 767px) {
+            grid-area: main;
+        }
+    }
+
+    &.bottom,
+    &.top {
+        flex-direction: row;
+        flex-wrap: wrap;
+        max-height: 0;
+        padding-bottom: 0;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        padding-top: 0;
+        transition: height 0ms 400ms;
+        width: 100%;
+
+        @media (prefers-reduced-motion) {
+            transition: none;
+        }
+    }
+
+    &.bottom {
+        grid-area: bottomdrawer;
+        transform: translateY(100%);
+
+        [data-drawer-bottom="true"] & {
+            animation: forwards tf-slide-in-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 20rem;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+            transform: translateY(0);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
+            }
+        }
+
+        [data-drawer-bottom="false"] & {
+            animation: forwards tf-slide-out-bottom 225ms cubic-bezier(0, 0, 0.2, 1);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+        }
+    }
+
+    &.top {
+        grid-area: topdrawer;
+        transform: translateY(-100%);
+
+        [data-drawer-top="true"] & {
+            animation: forwards tf-slide-in-top 225ms cubic-bezier(0, 0, 0.2, 1);
+            max-height: 20rem;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+            padding-top: 1rem;
+            transform: translateY(0);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+
+            + tf-drawer-overlay:where(:defined) {
+                display: flex;
+
+                @media print {
+                    display: none;
+                }
+            }
+        }
+
+        [data-drawer-bottom="false"] & {
+            animation: forwards tf-slide-out-top 225ms cubic-bezier(0, 0, 0.2, 1);
+
+            @media (prefers-reduced-motion) {
+                animation: none;
+            }
+        }
+    }
+
+    .appbar.top ~ & {
+        padding-top: 0;
+    }
+}
+
+.drawer-breakpoint-none.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+    max-width: 3.5rem;
+    width: 3.5rem;
+
+    * {
+        font-size: 0;
+        overflow-x: hidden;
+    }
+
+    tf-icon {
+        display: inline-block !important;
+        font-size: 1.5rem;
+        margin: auto !important;
+    }
+
+    .avatar {
+        display: inline-flex !important;
+        font-size: 1.25rem;
+    }
+
+    @media (max-width: 767px) {
+        max-width: 0;
+        width: 0;
+    }
+}
+
+.drawer-breakpoint-none.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+    max-width: 3.5rem;
+    width: 3.5rem;
+
+    * {
+        font-size: 0;
+        overflow-x: hidden;
+    }
+
+    tf-icon {
+        display: inline-block !important;
+        font-size: 1.5rem;
+        margin: auto !important;
+    }
+
+    .avatar {
+        display: inline-flex !important;
+        font-size: 1.25rem;
+    }
+
+    @media (max-width: 767px) {
+        max-width: 0;
+        width: 0;
+    }
+}
+
+@media (min-width: 576px) {
+    .drawer-sm {
+        overflow-y: auto;
+
+        .drawer-control,
+        tf-close {
+            display: none;
+        }
+
+        &.left,
+        &.right {
+            max-width: 15rem;
+            transform: translateX(0);
+
+            &.icon-drawer {
+                max-width: 15rem;
+                transition: none;
+
+                &:hover {
+                    animation: none;
+                }
+            }
+        }
+
+        &.left {
+            [data-drawer-left="true"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.right {
+            [data-drawer-right="true"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.bottom,
+        &.top {
+            max-height: 20rem;
+            transform: translateY(0);
+        }
+
+        [data-drawer-bottom="false"] &.bottom {
+            animation: none;
+        }
+
+        [data-drawer-top="false"] &.top {
+            animation: none;
+        }
+
+        [data-drawer-left="true"] &,
+        [data-drawer-right="true"] &,
+        [data-drawer-bottom="true"] &,
+        [data-drawer-top="true"] & {
+            & + tf-drawer-overlay:where(:defined) {
+                display: none;
+            }
+        }
+    }
+
+    tf-drawer-toggle.visible-sm {
+        display: none;
+    }
+
+    .drawer-hidden-sm {
+        display: none;
+    }
+
+    tf-drawer-toggle.hidden-sm {
+        display: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .drawer-md {
+        overflow-y: auto;
+
+        .drawer-control,
+        tf-close {
+            display: none;
+        }
+
+        &.left,
+        &.right {
+            max-width: 15rem;
+            transform: translateX(0);
+
+            &.icon-drawer {
+                max-width: 15rem;
+                transition: none;
+
+                &:hover {
+                    animation: none;
+                }
+            }
+        }
+
+        &.left {
+            [data-drawer-left="true"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.right {
+            [data-drawer-right="true"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.bottom,
+        &.top {
+            max-height: 20rem;
+            transform: translateY(0);
+        }
+
+        [data-drawer-bottom="false"] &.bottom {
+            animation: none;
+        }
+
+        [data-drawer-top="false"] &.top {
+            animation: none;
+        }
+
+        [data-drawer-left="true"] &,
+        [data-drawer-right="true"] &,
+        [data-drawer-bottom="true"] &,
+        [data-drawer-top="true"] & {
+            & + tf-drawer-overlay:where(:defined) {
+                display: none;
+            }
+        }
+    }
+
+    tf-drawer-toggle.visible-md {
+        display: none;
+    }
+
+    .drawer-hidden-md {
+        display: none;
+    }
+
+    tf-drawer-toggle.hidden-md {
+        display: none;
+    }
+}
+
+@media (min-width: 992px) {
+    .drawer-lg {
+        overflow-y: auto;
+
+        .drawer-control,
+        tf-close {
+            display: none;
+        }
+
+        &.left,
+        &.right {
+            max-width: 15rem;
+            transform: translateX(0);
+
+            &.icon-drawer {
+                max-width: 15rem;
+                transition: none;
+
+                &:hover {
+                    animation: none;
+                }
+            }
+        }
+
+        &.left {
+            [data-drawer-left="true"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.right {
+            [data-drawer-right="true"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.bottom,
+        &.top {
+            max-height: 20rem;
+            transform: translateY(0);
+        }
+
+        [data-drawer-bottom="false"] &.bottom {
+            animation: none;
+        }
+
+        [data-drawer-top="false"] &.top {
+            animation: none;
+        }
+
+        [data-drawer-left="true"] &,
+        [data-drawer-right="true"] &,
+        [data-drawer-bottom="true"] &,
+        [data-drawer-top="true"] & {
+            & + tf-drawer-overlay:where(:defined) {
+                display: none;
+            }
+        }
+    }
+
+    tf-drawer-toggle.visible-lg {
+        display: none;
+    }
+
+    .drawer-hidden-lg {
+        display: none;
+    }
+
+    tf-drawer-toggle.hidden-lg {
+        display: none;
+    }
+}
+
+@media (min-width: 1200px) {
+    .drawer-xl {
+        overflow-y: auto;
+
+        .drawer-control,
+        tf-close {
+            display: none;
+        }
+
+        &.left,
+        &.right {
+            max-width: 15rem;
+            transform: translateX(0);
+
+            &.icon-drawer {
+                max-width: 15rem;
+                transition: none;
+
+                &:hover {
+                    animation: none;
+                }
+            }
+        }
+
+        &.left {
+            [data-drawer-left="true"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.right {
+            [data-drawer-right="true"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.bottom,
+        &.top {
+            max-height: 20rem;
+            transform: translateY(0);
+        }
+
+        [data-drawer-bottom="false"] &.bottom {
+            animation: none;
+        }
+
+        [data-drawer-top="false"] &.top {
+            animation: none;
+        }
+
+        [data-drawer-left="true"] &,
+        [data-drawer-right="true"] &,
+        [data-drawer-bottom="true"] &,
+        [data-drawer-top="true"] & {
+            & + tf-drawer-overlay:where(:defined) {
+                display: none;
+            }
+        }
+    }
+
+    tf-drawer-toggle.visible-xl {
+        display: none;
+    }
+
+    .drawer-hidden-xl {
+        display: none;
+    }
+
+    tf-drawer-toggle.hidden-xl {
+        display: none;
+    }
+}
+
+@media (min-width: 1400px) {
+    .drawer-xxl {
+        overflow-y: auto;
+
+        .drawer-control,
+        tf-close {
+            display: none;
+        }
+
+        &.left,
+        &.right {
+            max-width: 15rem;
+            transform: translateX(0);
+
+            &.icon-drawer {
+                max-width: 15rem;
+                transition: none;
+
+                &:hover {
+                    animation: none;
+                }
+            }
+        }
+
+        &.left {
+            [data-drawer-left="true"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &:not(.icon-drawer),
+            [data-drawer-left="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.right {
+            [data-drawer-right="true"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &:not(.icon-drawer),
+            [data-drawer-right="false"] &.icon-drawer {
+                animation: none;
+            }
+        }
+
+        &.bottom,
+        &.top {
+            max-height: 20rem;
+            transform: translateY(0);
+        }
+
+        [data-drawer-bottom="false"] &.bottom {
+            animation: none;
+        }
+
+        [data-drawer-top="false"] &.top {
+            animation: none;
+        }
+
+        [data-drawer-left="true"] &,
+        [data-drawer-right="true"] &,
+        [data-drawer-bottom="true"] &,
+        [data-drawer-top="true"] & {
+            & + tf-drawer-overlay:where(:defined) {
+                display: none;
+            }
+        }
+    }
+
+    tf-drawer-toggle.visible-xxl {
+        display: none;
+    }
+
+    .drawer-hidden-xxl {
+        display: none;
+    }
+
+    tf-drawer-toggle.hidden-xxl {
+        display: none;
+    }
+}
+
+@media (max-width: 575px) {
+    .drawer-sm.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+
+    .drawer-sm.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .drawer-md.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+
+    .drawer-md.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 991px) {
+    .drawer-lg.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+
+    .drawer-lg.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 1199px) {
+    .drawer-xl.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+
+    .drawer-xl.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+}
+
+@media (max-width: 1399px) {
+    .drawer-xxl.icon-drawer.left:not([data-drawer-left="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+
+    .drawer-xxl.icon-drawer.right:not([data-drawer-right="true"] .drawer, :hover) {
+        max-width: 3.5rem;
+        width: 3.5rem;
+
+        * {
+            font-size: 0;
+            overflow-x: hidden;
+        }
+
+        tf-icon {
+            font-size: 1.5rem;
+            margin: auto !important;
+        }
+
+        .avatar {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 767px) {
+            max-width: 0;
+            width: 0;
+
+            &.open {
+                max-width: unset;
+                width: 100%;
+            }
+        }
+    }
+}

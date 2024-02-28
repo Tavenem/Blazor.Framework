@@ -1,0 +1,105 @@
+﻿.meter {
+    --meter-color-bg: var(--tavenem-color-action-hover-bg);
+    --meter-color-border: var(--tavenem-color-border-input);
+    align-items: center;
+    display: inline-flex;
+    gap: .5rem;
+    width: 100%;
+
+    > :not(label) {
+        flex-grow: 1;
+    }
+
+    meter {
+        flex-grow: 1;
+        height: 1rem;
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-text);
+    }
+
+    &.outlined {
+        border: 0;
+    }
+
+    &.bg-alt {
+        --meter-color-bg: var(--tavenem-color-bg-input);
+        background-color: transparent;
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --meter-color-bg: var(--tavenem-theme-color-hover);
+        --meter-color-border: var(--tavenem-theme-color);
+    }
+}
+
+.meter meter::-webkit-meter-bar {
+    background: none;
+    background-color: var(--meter-color-bg);
+    border: 1px solid var(--meter-color-border);
+    border-radius: 9999px;
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+
+.meter meter::-moz-meter-bar {
+    background: none;
+    background-color: var(--meter-color-bg);
+    border: 1px solid var(--meter-color-border);
+    border-radius: 9999px;
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+
+.meter meter::-webkit-meter-optimum-value {
+    background: none;
+    background-color: var(--tavenem-color-success);
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+
+.meter meter::-moz-meter-optimum {
+    background: none;
+    background-color: var(--tavenem-color-success);
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+
+.meter meter::-webkit-meter-suboptimum-value {
+    background: none;
+    background-color: var(--tavenem-color-warning);
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+
+.meter meter::-moz-meter-sub-optimum {
+    background: none;
+    background-color: var(--tavenem-color-warning);
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+        
+.meter meter::-webkit-meter-even-less-good-value {
+    background: none;
+    background-color: var(--tavenem-color-danger);
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}
+
+.meter meter::-moz-meter-sub-sub-optimum {
+    background: none;
+    background-color: var(--tavenem-color-danger);
+    box-shadow: var(--tavenem-shadow-inset);
+    transition: width .5s;
+}

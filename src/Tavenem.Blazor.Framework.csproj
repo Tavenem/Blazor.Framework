@@ -62,10 +62,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
-    <ScssFiles Include="$(ClientAssetsDirectory)**\*.scss" Exclude="$(ClientAssetsDirectory)**\_*.scss" />
-    <ClientAssetsInputs Remove="assets\scripts\tavenem-accordion.ts" />
-    <ClientAssetsInputs Remove="assets\scripts\tavenem-dialog.ts" />
-    <CssLibFiles Include="$(ClientAssetsDirectory)node_modules\highlight.js\styles\stackoverflow-light.css;$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
+    <CssFiles Include="$(ClientAssetsDirectory)styles\**\*.css;$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
@@ -101,45 +98,24 @@
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>
-	
-  <Target Name="CssLibCopy" DependsOnTargets="ClientAssetsRestore" Inputs="@(CssLibFiles)" Outputs="$(IntermediateOutputPath)csslibs.complete.txt">
-    <PropertyGroup>
-      <_SassOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass'))/</_SassOutputFolderPath>
-    </PropertyGroup>
-    
-    <MakeDir Directories="$(_SassOutputFolderPath)" />
 
-    <Copy SourceFiles="@(CssLibFiles)" DestinationFolder="$(_SassOutputFolderPath)" />
-
-    <ItemGroup>
-      <_CssLibCopyOutput Include="$(IntermediateOutputPath)sass\**"></_CssLibCopyOutput>
-    </ItemGroup>
-    
-    <WriteLinesToFile File="$(IntermediateOutputPath)csslibs.complete.txt" Lines="@(_CssLibCopyOutput)" />
-  </Target>
-	
-  <Target Name="SassBuild" DependsOnTargets="CssLibCopy" BeforeTargets="AssignTargetPaths" Inputs="@(ScssFiles);@(CssLibFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
+  <Target Name="CssBuild" BeforeTargets="AssignTargetPaths" Inputs="@(CssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
     <PropertyGroup>
-      <_SassOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)sass/framework.css'))</_SassOutputFullPath>
       <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>
     </PropertyGroup>
-    
+
     <MakeDir Directories="$(_CssOutputFolderPath)" />
 
-    <Message Importance="high" Text="Running npm run sass..." />
-    <Exec Command="npm run sass -- $(_SassOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
-    
-    <Message Importance="high" Text="Running npm run postcss..." />
-    <Exec Command="npm run postcss -- $(_SassOutputFullPath) -d $(_CssOutputFolderPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
+    <Copy SourceFiles="@(CssFiles)" DestinationFolder="$(_CssOutputFolderPath)\%(RecursiveDir)" />
 
     <ItemGroup>
       <_CssBuildOutput Include="$(IntermediateOutputPath)css\**"></_CssBuildOutput>
     </ItemGroup>
-    
+
     <WriteLinesToFile File="$(IntermediateOutputPath)stylebuild.complete.txt" Lines="@(_CssBuildOutput)" />
   </Target>
   
-  <Target Name="DefineCssAssets" AfterTargets="SassBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+  <Target Name="DefineCssAssets" AfterTargets="CssBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
     <ItemGroup>
       <FileWrites Include="@(_CssBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />

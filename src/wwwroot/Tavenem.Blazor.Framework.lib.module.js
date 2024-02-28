@@ -62,7 +62,7 @@ function addHeadContent() {
     const font = document.createElement('link');
     font.rel = 'stylesheet';
     font.type = 'text/css';
-    font.href = "https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=swap";
+    font.href = "https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=block";
     document.head.appendChild(font);
 }
 

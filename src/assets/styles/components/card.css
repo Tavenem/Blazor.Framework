@@ -1,0 +1,725 @@
+﻿.card {
+    --card-color-bg: var(--tavenem-color-bg-alt);
+    align-self: stretch;
+    background-color: var(--card-color-bg);
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: var(--tavenem-shadow-1);
+    color: var(--tavenem-color-text);
+    column-gap: 1rem;
+    display: flex;
+    flex: 1 0 min-content;
+    flex-direction: column;
+    margin: 1rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+    position: relative;
+    row-gap: 0;
+
+    > * {
+        border-radius: 0;
+        flex: 0 0 auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    > hr {
+        flex: 0 0 auto;
+    }
+
+    > .body {
+        align-items: start;
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        overflow-y: auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    > .header,
+    > .footer {
+        column-gap: 1em;
+        display: flex;
+        flex: 0 0 auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+
+        > {
+            .btn,
+            .btn-text,
+            .btn-icon,
+            tf-close {
+                &:first-child {
+                    margin-inline-start: -.5rem;
+                }
+
+                &:last-child {
+                    margin-inline-end: -.5rem;
+                }
+            }
+        }
+    }
+
+    > .header {
+        margin-bottom: 1rem;
+        order: -1;
+
+        > {
+            * {
+                margin-bottom: 0;
+            }
+
+            button, .btn {
+                align-self: flex-start;
+            }
+        }
+    }
+
+    > .footer {
+        margin-top: 1rem;
+        order: 9999;
+
+        > {
+            * {
+                margin-top: 0;
+            }
+
+            button, .btn {
+                align-self: flex-end;
+            }
+        }
+    }
+
+    > .media {
+        object-fit: contain;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+        width: 100%;
+
+        .header + & {
+            margin-top: 0;
+        }
+
+        & + .footer {
+            margin-bottom: 0;
+        }
+
+        &:first-child {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            margin-top: -1rem;
+        }
+
+        &:last-child {
+            border-bottom-left-radius: inherit;
+            border-bottom-right-radius: inherit;
+            margin-bottom: -1rem;
+        }
+
+        &:only-child {
+            border-radius: inherit;
+            margin-bottom: -1rem;
+            margin-top: -1rem;
+        }
+
+        &.backdrop {
+            border-radius: inherit;
+            margin-bottom: -1rem;
+            margin-top: -1rem;
+            object-fit: cover;
+        }
+    }
+
+    > .media-overlay {
+        border-radius: inherit;
+        bottom: 0;
+        left: 0;
+        position: absolute;
+        padding: 1rem;
+        right: 0;
+        top: 0;
+    }
+
+    > *:first-child {
+        border-top: none;
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    > *:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    &.bg-alt {
+        --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg));
+        background-color: var(--card-color-bg);
+    }
+
+    &.filled {
+        --card-color-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-alt));
+        background-color: var(--card-color-bg);
+        color: var(--tavenem-theme-color, var(--tavenem-color-text));
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+        --card-color-bg: var(--tavenem-theme-color-hover);
+    }
+
+    .card {
+        --card-color-bg: var(--tavenem-color-bg);
+
+        &.bg-alt {
+            --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+        }
+
+        &.filled {
+            --card-color-bg: var(--tavenem-theme-color-hover-dark, var(--tavenem-color-bg));
+        }
+
+        &.primary,
+        &.secondary,
+        &.tertiary,
+        &.danger,
+        &.dark,
+        &.default,
+        &.info,
+        &.success,
+        &.warning {
+            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+            --card-color-bg: var(--tavenem-theme-color-hover-dark);
+        }
+
+        .card {
+            --card-color-bg: var(--tavenem-color-bg-alt);
+
+            &.bg-alt {
+                --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg));
+            }
+
+            &.filled {
+                --card-color-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-alt));
+            }
+
+            &.primary,
+            &.secondary,
+            &.tertiary,
+            &.danger,
+            &.dark,
+            &.default,
+            &.info,
+            &.success,
+            &.warning {
+                --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+                --card-color-bg: var(--tavenem-theme-color-hover);
+            }
+
+            .card {
+                --card-color-bg: var(--tavenem-color-bg);
+
+                &.bg-alt {
+                    --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+                }
+
+                &.filled {
+                    --card-color-bg: var(--tavenem-theme-color-hover-dark, var(--tavenem-color-bg));
+                }
+
+                &.primary,
+                &.secondary,
+                &.tertiary,
+                &.danger,
+                &.dark,
+                &.default,
+                &.info,
+                &.success,
+                &.warning {
+                    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+                    --card-color-bg: var(--tavenem-theme-color-hover-dark);
+                }
+
+                .card {
+                    --card-color-bg: var(--tavenem-color-bg-alt);
+
+                    &.bg-alt {
+                        --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg));
+                    }
+
+                    &.filled {
+                        --card-color-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-bg-alt));
+                    }
+
+                    &.primary,
+                    &.secondary,
+                    &.tertiary,
+                    &.danger,
+                    &.dark,
+                    &.default,
+                    &.info,
+                    &.success,
+                    &.warning {
+                        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover-dark);
+                        --card-color-bg: var(--tavenem-theme-color-hover);
+                    }
+
+                    .card {
+                        --card-color-bg: var(--tavenem-color-bg);
+
+                        &.bg-alt {
+                            --card-color-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+                        }
+
+                        &.filled {
+                            --card-color-bg: var(--tavenem-theme-color-hover-dark, var(--tavenem-color-bg));
+                        }
+
+                        &.primary,
+                        &.secondary,
+                        &.tertiary,
+                        &.danger,
+                        &.dark,
+                        &.default,
+                        &.info,
+                        &.success,
+                        &.warning {
+                            --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+                            --card-color-bg: var(--tavenem-theme-color-hover-dark);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.card-group {
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: var(--tavenem-shadow-1);
+    display: flex;
+    flex: 1 1 min-content;
+    flex-wrap: wrap;
+    gap: 1px;
+    margin: 1rem;
+
+    > .card {
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    &.cols-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+}
+
+.card-group.cols-2 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+}
+.card-group.cols-3 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+}
+.card-group.cols-4 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(4, 1fr);
+}
+.card-group.cols-5 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(5, 1fr);
+}
+.card-group.cols-6 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(6, 1fr);
+}
+.card-group.cols-7 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(7, 1fr);
+}
+.card-group.cols-8 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(8, 1fr);
+}
+.card-group.cols-9 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(9, 1fr);
+}
+.card-group.cols-10 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(10, 1fr);
+}
+.card-group.cols-11 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(11, 1fr);
+}
+.card-group.cols-12 {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-template-columns: repeat(12, 1fr);
+}
+.card-group-sm,
+.card-group-md,
+.card-group-lg,
+.card-group-xl,
+.card-group-xxl {
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: var(--tavenem-shadow-1);
+    display: flex;
+    flex: 1 1 min-content;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 1px;
+    margin: 1rem;
+
+    > .card {
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+}
+@media (min-width: 576px) {
+    .card-group-sm {
+        flex-direction: row;
+    }
+    .card-group.cols-sm-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .card-group.cols-sm-2 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card-group.cols-sm-3 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .card-group.cols-sm-4 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .card-group.cols-sm-5 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .card-group.cols-sm-6 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .card-group.cols-sm-7 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .card-group.cols-sm-8 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .card-group.cols-sm-9 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(9, 1fr);
+    }
+    .card-group.cols-sm-10 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .card-group.cols-sm-11 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(11, 1fr);
+    }
+    .card-group.cols-sm-12 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(12, 1fr);
+    }
+}
+@media (min-width: 768px) {
+    .card-group-md {
+        flex-direction: row;
+    }
+    .card-group.cols-md-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .card-group.cols-md-2 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card-group.cols-md-3 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .card-group.cols-md-4 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .card-group.cols-md-5 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .card-group.cols-md-6 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .card-group.cols-md-7 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .card-group.cols-md-8 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .card-group.cols-md-9 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(9, 1fr);
+    }
+    .card-group.cols-md-10 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .card-group.cols-md-11 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(11, 1fr);
+    }
+    .card-group.cols-md-12 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(12, 1fr);
+    }
+}
+@media (min-width: 992px) {
+    .card-group-lg {
+        flex-direction: row;
+    }
+    .card-group.cols-lg-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .card-group.cols-lg-2 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card-group.cols-lg-3 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .card-group.cols-lg-4 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .card-group.cols-lg-5 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .card-group.cols-lg-6 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .card-group.cols-lg-7 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .card-group.cols-lg-8 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .card-group.cols-lg-9 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(9, 1fr);
+    }
+    .card-group.cols-lg-10 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .card-group.cols-lg-11 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(11, 1fr);
+    }
+    .card-group.cols-lg-12 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(12, 1fr);
+    }
+}
+@media (min-width: 1200px) {
+    .card-group-xl {
+        flex-direction: row;
+    }
+    .card-group.cols-xl-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .card-group.cols-xl-2 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card-group.cols-xl-3 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .card-group.cols-xl-4 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .card-group.cols-xl-5 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .card-group.cols-xl-6 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .card-group.cols-xl-7 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .card-group.cols-xl-8 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .card-group.cols-xl-9 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(9, 1fr);
+    }
+    .card-group.cols-xl-10 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .card-group.cols-xl-11 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(11, 1fr);
+    }
+    .card-group.cols-xl-12 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(12, 1fr);
+    }
+}
+@media (min-width: 1400px) {
+    .card-group-xxl {
+        flex-direction: row;
+    }
+    .card-group.cols-xxl-1 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1fr;
+    }
+    .card-group.cols-xxl-2 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .card-group.cols-xxl-3 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .card-group.cols-xxl-4 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .card-group.cols-xxl-5 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(5, 1fr);
+    }
+    .card-group.cols-xxl-6 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .card-group.cols-xxl-7 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(7, 1fr);
+    }
+    .card-group.cols-xxl-8 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(8, 1fr);
+    }
+    .card-group.cols-xxl-9 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(9, 1fr);
+    }
+    .card-group.cols-xxl-10 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .card-group.cols-xxl-11 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(11, 1fr);
+    }
+    .card-group.cols-xxl-12 {
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: repeat(12, 1fr);
+    }
+}

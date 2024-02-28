@@ -1,0 +1,243 @@
+﻿.collapse {
+    align-items: stretch;
+    background-color: var(--tavenem-color-bg-surface);
+    border-radius: var(--tavenem-border-radius);
+    color: var(--tavenem-color-text);
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+    max-width: 100%;
+    position: relative;
+
+    > * {
+        border-radius: 0;
+    }
+
+    > *:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+        margin-bottom: 0;
+    }
+
+    > details {
+        > summary {
+            align-items: center;
+            border-top: none;
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            display: flex;
+            font-size: .9375rem;
+            justify-content: space-between;
+            list-style: none;
+            min-height: 3rem;
+            order: -1;
+            outline: none;
+            padding: 1rem 1.5rem;
+            position: relative;
+
+            > tf-icon {
+                margin-inline-end: -.25rem;
+                margin-inline-start: .5rem;
+                order: 9999;
+                transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+                transform: rotate(0deg);
+            }
+        }
+
+        > .body {
+            align-items: start;
+            display: flex;
+            flex: 1 0 auto;
+            flex-direction: column;
+            max-height: 9999px;
+            padding: 1rem 1.5rem;
+
+            > * {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            > *:first-child {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                margin-top: 0;
+            }
+
+            > *:last-child {
+                margin-bottom: 0;
+            }
+
+            > *:only-child {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                margin-bottom: 0;
+                margin-top: 0;
+            }
+
+            > .field {
+                align-self: stretch;
+            }
+        }
+
+        &[open] > summary > tf-icon {
+            transform: rotate(-180deg);
+        }
+    }
+
+    .list > & {
+        align-items: stretch;
+        background-color: transparent;
+        border-radius: 0;
+        color: inherit;
+
+        &.active {
+            border-inline-end: none;
+            color: inherit;
+
+            > details > summary {
+                background-color: var(--list-active-bg);
+                border-inline-end: 1px solid var(--list-active-color);
+                color: var(--list-active-color);
+                padding-inline-end: 0;
+            }
+        }
+
+        > details {
+            > summary {
+                min-height: 0;
+                padding: 0;
+            }
+
+            > .body {
+                padding: 0;
+
+                > .list {
+                    align-self: stretch;
+                    padding-bottom: 0;
+                    padding-inline-start: 1em;
+
+                    > :last-child {
+                        padding-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    .list > &.clickable,
+    .list.clickable > & {
+        padding-inline-end: 0;
+
+        &.active {
+            border-inline-end: none;
+            padding-inline-end: 0;
+
+            > details > summary {
+                border-inline-end: 1px solid var(--list-active-color);
+                padding-inline-end: 0;
+            }
+        }
+
+        > details > summary {
+            padding-inline-end: 1px;
+
+            &:hover,
+            &:focus:not(.active) {
+                background-color: var(--list-hover-bg);
+            }
+
+            &.active:hover,
+            &.active:focus {
+                background-color: var(--list-active-hover-bg);
+            }
+        }
+    }
+
+    &.disabled, tf-accordion[disabled] > & {
+        > details > summary {
+            color: var(--tavenem-color-text-disabled);
+            pointer-events: none;
+
+            a, button, input, select, textarea {
+                pointer-events: all;
+            }
+
+            &:hover,
+            &.active:hover,
+            &.active:focus,
+            &:focus:not(.active) {
+                background-color: transparent;
+            }
+        }
+    }
+
+    > .footer {
+        display: flex;
+        flex: 1 0 auto;
+        flex-direction: column;
+        padding: 1rem 1.5rem;
+    }
+
+    &.loading > details > summary > tf-icon {
+        animation: tf-rotation 1s infinite linear;
+    }
+
+    &.dense {
+        details > summary, > details .body, .footer {
+            padding: .25rem .75rem;
+        }
+    }
+
+    &.outlined {
+        > details > .body {
+            border-top-color: inherit;
+            border-top-style: none;
+            border-top-width: 1px;
+        }
+
+        > details[open] > .body {
+            border-top-style: solid;
+        }
+
+        > .footer {
+            border-top-color: inherit;
+            border-top-style: solid;
+            border-top-width: 1px;
+        }
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        background-color: var(--tavenem-theme-color-hover);
+    }
+}
+
+.tree .list,
+.tree.list {
+    > .collapse {
+        padding-inline-start: 0;
+
+        > details > summary {
+            padding-inline-start: 0;
+
+            > tf-icon {
+                margin-inline-end: 1rem;
+                margin-inline-start: 0 !important;
+                order: -1;
+                transform: rotate(-90deg);
+            }
+        }
+
+        > details[open] > summary > tf-icon {
+            transform: rotate(0deg);
+        }
+    }
+}

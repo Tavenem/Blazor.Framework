@@ -81,7 +81,6 @@
     "build": "npm run build:release",
     "build:Release": "rollup -c --environment build:Release",
     "build:Debug": "rollup -c --environment build:Debug",
-    "sass": "sass ./sass/framework.scss",
     "postcss": "postcss --config postcss.config.js"
   }
 }
