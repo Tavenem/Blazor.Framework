@@ -7,8 +7,9 @@ namespace Tavenem.Blazor.Framework;
 /// The data to provide to a drag-drop operation.
 /// </para>
 /// <para>
-/// <see cref="DragDropService.GetDragStartData{TData}(TData, string?, DragEffect,
-/// JsonTypeInfo{TData}?)"/> can be used to get an instance from a single data item.
+/// <see cref="DragDropService.GetDragStartData{TData}(TData, JsonTypeInfo{TData}, string?,
+/// DragEffect)"/> or <see cref="DragDropService.GetDragStartData{TData}(TData, string?,
+/// DragEffect)"/> can be used to get an instance from a single data item.
 /// </para>
 /// </summary>
 public class DragStartData
@@ -27,7 +28,7 @@ public class DragStartData
     /// The keys should be data types, such as 'application/json' or 'text/plain'. The values should
     /// usually be strings. Non-string data will be serialized to JSON. Links should be of type
     /// 'text/uri-list', and if more than one is provided, they should be included in the same
-    /// entry, separated by CRLF linebreaks.
+    /// entry, separated by CRLF line breaks.
     /// </para>
     /// <para>
     /// The order of the items in the list matters. Each type-data pair should represent the same

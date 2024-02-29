@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework.InternalComponents;
 
@@ -313,6 +314,14 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         }
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private protected override async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
         if (!GetIsDropTarget()
@@ -321,7 +330,9 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
             return;
         }
 
-        var item = DragDropService.TryGetData<TListItem>(e);
+        var item = JsonTypeInfo is null
+            ? DragDropService.TryGetData<TListItem>(e)
+            : DragDropService.TryGetData(e, JsonTypeInfo);
 
         if (OnDropIndex.HasDelegate)
         {

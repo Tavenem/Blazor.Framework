@@ -1,5 +1,7 @@
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework.InternalComponents;
@@ -9,6 +11,15 @@ namespace Tavenem.Blazor.Framework.InternalComponents;
 /// </summary>
 public partial class ListItemCollapse<TListItem>
 {
+    /// <summary>
+    /// The <see cref="JsonTypeInfo{T}"/> for <typeparamref name="TListItem"/>.
+    /// </summary>
+    /// <remarks>
+    /// If omitted, reflection-based deserialization may be used during drag-drop operations, which
+    /// is not trim safe or AOT compatible, and may cause runtime failures.
+    /// </remarks>
+    [Parameter] public JsonTypeInfo<TListItem>? JsonTypeInfo { get; set; }
+
     /// <summary>
     /// One of the built-in color themes.
     /// </summary>
@@ -177,6 +188,14 @@ public partial class ListItemCollapse<TListItem>
         base.Dispose(disposing);
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private DragStartData GetDragData()
     {
         if (!IsDraggable || DragEffectAllowed == DragEffect.None)
@@ -196,7 +215,10 @@ public partial class ListItemCollapse<TListItem>
         }
         else
         {
-            data = DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed, jsonTypeInfo: ListItem.JsonTypeInfo);
+            var typeInfo = JsonTypeInfo ?? ListItem.JsonTypeInfo;
+            data = typeInfo is null
+                ? DragDropService.GetDragStartData(ListItem.Item, effectAllowed: DragEffectAllowed)
+                : DragDropService.GetDragStartData(ListItem.Item, typeInfo, effectAllowed: DragEffectAllowed);
         }
 
         return data;
@@ -238,6 +260,14 @@ public partial class ListItemCollapse<TListItem>
         }
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
         if (!IsDropTarget
@@ -246,7 +276,10 @@ public partial class ListItemCollapse<TListItem>
             return;
         }
 
-        var item = DragDropService.TryGetData<TListItem>(e);
+        var typeInfo = JsonTypeInfo ?? ListItem.JsonTypeInfo;
+        var item = typeInfo is null
+            ? DragDropService.TryGetData<TListItem>(e)
+            : DragDropService.TryGetData(e, typeInfo);
         if (item?.Equals(ListItem.Item) == true)
         {
             return;

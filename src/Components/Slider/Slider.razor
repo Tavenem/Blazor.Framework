@@ -44,7 +44,7 @@
                value="@CurrentValueAsString"
                @oninput="OnInput"
                @onchange="OnChangeAsync" />
-        <span class="label" style="@($"left:{BarWidth.ToString("F2").TrimEnd('0').TrimEnd('.')}%")">@InputValue</span>
+        <output style="@($"left:{BarWidth.ToString("F2").TrimEnd('0').TrimEnd('.')}%")">@InputValue</output>
     </div>
     @if (IsInvalidAndTouched)
     {

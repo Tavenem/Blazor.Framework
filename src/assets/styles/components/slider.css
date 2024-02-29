@@ -1,4 +1,4 @@
-﻿.slider {
+.slider {
     --thumb-color: var(--tavenem-color-action);
     --thumb-label-color: var(--tavenem-color-default-text);
     --thumb-label-color-bg: var(--tavenem-color-default);
@@ -34,6 +34,26 @@
             top: 0;
             width: 100%;
         }
+
+        > output {
+            align-items: center;
+            background-color: var(--thumb-label-color-bg);
+            border-radius: 2px;
+            color: var(--thumb-label-color);
+            display: none;
+            font-size: .75rem;
+            justify-content: center;
+            line-height: normal;
+            opacity: 0;
+            padding: 4px 8px;
+            pointer-events: none;
+            position: absolute;
+            text-align: center;
+            top: 0;
+            transform: translate(-50%, -125%);
+            transition: opacity .2s ease-in-out;
+            user-select: none;
+        }
     }
 
     &:not(.outlined) .input:before {
@@ -54,7 +74,7 @@
             outline: none;
         }
 
-        &:active + .label {
+        &:active + output {
             opacity: 1;
         }
     }
@@ -63,27 +83,7 @@
         height: auto;
     }
 
-    .label {
-        align-items: center;
-        background-color: var(--thumb-label-color-bg);
-        border-radius: 2px;
-        color: var(--thumb-label-color);
-        display: none;
-        font-size: .75rem;
-        justify-content: center;
-        line-height: normal;
-        opacity: 0;
-        padding: 4px 8px;
-        pointer-events: none;
-        position: absolute;
-        text-align: center;
-        top: 0;
-        transform: translate(-50%, -125%);
-        transition: opacity .2s ease-in-out;
-        user-select: none;
-    }
-
-    &.show-value .label {
+    &.show-value > .input > output {
         display: block;
     }
 
@@ -150,7 +150,7 @@
                 opacity: 0.38;
             }
 
-            &:active + .label {
+            &:active + output {
                 opacity: 0;
             }
         }
@@ -165,7 +165,7 @@
             cursor: default;
         }
 
-        &:active + .label {
+        &:active + output {
             opacity: 0;
         }
     }
@@ -178,6 +178,14 @@
     &.filled {
         background-color: transparent;
         color: var(--tavenem-color-text);
+
+        > .input {
+            background-color: transparent;
+        }
+
+        > label + .input {
+            margin-top: 1rem;
+        }
 
         .filler {
             display: block;

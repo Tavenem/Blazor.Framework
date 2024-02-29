@@ -11,8 +11,8 @@ public class DropEventArgs
     /// </para>
     /// <para>
     /// To efficiently retrieve the desired information, the <see
-    /// cref="DragDropService.TryGetData{TData}(IEnumerable{KeyValuePair{string, string}}?, string?,
-    /// System.Text.Json.Serialization.Metadata.JsonTypeInfo{TData}?)"/> method can be used.
+    /// cref="DragDropService.TryGetData{TData}(IEnumerable{KeyValuePair{string, string}}?,
+    /// System.Text.Json.Serialization.Metadata.JsonTypeInfo{TData}, string?)"/> method can be used.
     /// </para>
     /// </summary>
     public IEnumerable<KeyValuePair<string, string>>? Data { get; set; }

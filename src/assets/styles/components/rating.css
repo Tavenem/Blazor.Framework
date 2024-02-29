@@ -16,11 +16,8 @@
         outline: none;
     }
 
-    &.disabled {
-        --button-inherited-color: var(--tavenem-color-text-disabled);
-
+    &.disabled, &.read-only {
         .btn-icon {
-            color: var(--tavenem-color-text-disabled);
             cursor: default;
             pointer-events: none;
 
@@ -30,12 +27,11 @@
         }
     }
 
-    &.read-only .btn-icon {
-        cursor: default;
-        pointer-events: none;
+    &.disabled {
+        --button-inherited-color: var(--tavenem-color-text-disabled);
 
-        &:hover, :focus-within {
-            transform: none;
+        .btn-icon {
+            color: var(--tavenem-color-text-disabled);
         }
     }
 

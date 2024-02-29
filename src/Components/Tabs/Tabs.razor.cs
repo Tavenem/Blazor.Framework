@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -182,6 +183,15 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     /// Raised when the items list changes.
     /// </summary>
     [Parameter] public EventCallback<List<TTabItem?>?> ItemsChanged { get; set; }
+
+    /// <summary>
+    /// The <see cref="JsonTypeInfo{T}"/> for <typeparamref name="TTabItem"/>.
+    /// </summary>
+    /// <remarks>
+    /// If omitted, reflection-based deserialization may be used during drag-drop operations, which
+    /// is not trim safe or AOT compatible, and may cause runtime failures.
+    /// </remarks>
+    [Parameter] public JsonTypeInfo<TTabItem>? JsonTypeInfo { get; set; }
 
     /// <summary>
     /// <para>
@@ -719,6 +729,14 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
         }
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
         if (!EnableDragDrop)
@@ -732,7 +750,9 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
             return;
         }
 
-        var item = DragDropService.TryGetData<TTabItem>(e);
+        var item = JsonTypeInfo is null
+            ? DragDropService.TryGetData<TTabItem>(e)
+            : DragDropService.TryGetData(e, JsonTypeInfo);
         if (item is not null)
         {
             (Items ??= []).Add(item);
@@ -741,6 +761,14 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
         }
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private async Task OnDropOnItemAsync(int index, DropEventArgs e)
     {
         if (!EnableDragDrop
@@ -752,7 +780,9 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
             return;
         }
 
-        var item = DragDropService.TryGetData<TTabItem>(e.Data);
+        var item = JsonTypeInfo is null
+            ? DragDropService.TryGetData<TTabItem>(e.Data)
+            : DragDropService.TryGetData(e.Data, JsonTypeInfo);
         if (item?.Equals(Items[index]) == true)
         {
             return;

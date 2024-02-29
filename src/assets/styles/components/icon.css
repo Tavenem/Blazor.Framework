@@ -1,7 +1,7 @@
 ﻿@font-face {
     font-family: "Adobe NotDef";
     src: local("Adobe NotDef"),
-        url("AND-Regular.otf") format('opentype');
+        url("..\AND-Regular.otf") format('opentype');
 }
 
 tf-icon {

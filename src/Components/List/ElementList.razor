@@ -20,6 +20,7 @@
                     <ListItem @key="item.ListId"
                               TListItem="TListItem"
                               Item="item.Item"
+                              JsonTypeInfo="JsonTypeInfo"
                               ListId="item.ListId"
                               OnDropIndex="OnDropIndex" />
                 }
@@ -31,6 +32,7 @@
                     <ListItem @key="item.ListId"
                               TListItem="TListItem"
                               Item="item.Item"
+                              JsonTypeInfo="JsonTypeInfo"
                               ListId="item.ListId"
                               OnDropIndex="OnDropIndex">
                         @TemplateValue(item.Item)

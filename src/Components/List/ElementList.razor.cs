@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Components.List;
 using Tavenem.Blazor.Framework.InternalComponents;
 using Tavenem.Blazor.Framework.Services;
@@ -299,6 +301,15 @@ public partial class ElementList<TListItem>
     /// </para>
     /// </summary>
     [Parameter] public virtual RenderFragment<TListItem>? Template { get; set; }
+
+    /// <summary>
+    /// The <see cref="JsonTypeInfo{T}"/> for <typeparamref name="TListItem"/>.
+    /// </summary>
+    /// <remarks>
+    /// If omitted, reflection-based deserialization may be used during drag-drop operations, which
+    /// is not trim safe or AOT compatible, and may cause runtime failures.
+    /// </remarks>
+    [Parameter] public JsonTypeInfo<TListItem>? JsonTypeInfo { get; set; }
 
     private ThemeColor _themeColor;
     /// <summary>
@@ -631,6 +642,14 @@ public partial class ElementList<TListItem>
     private protected override DragEffect GetDropEffectInternal(string[] types)
         => GetDropEffectShared(types);
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private protected override async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
         if (!GetIsDropTarget())
@@ -644,7 +663,9 @@ public partial class ElementList<TListItem>
             return;
         }
 
-        var item = DragDropService.TryGetData<TListItem>(e);
+        var item = JsonTypeInfo is null
+            ? DragDropService.TryGetData<TListItem>(e)
+            : DragDropService.TryGetData(e, JsonTypeInfo);
         if (item is not null)
         {
             if (DropIndex.HasValue)

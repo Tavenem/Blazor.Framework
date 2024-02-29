@@ -132,6 +132,7 @@
                                                          IsDraggable="EnableDragDrop"
                                                          IsDropTarget="EnableDragDrop"
                                                          Item="Items[index]"
+                                                         JsonTypeInfo="JsonTypeInfo"
                                                          OnDrop="@(e => OnDropOnItemAsync(index, e))"
                                                          OnDropped="@(e => OnDroppedItemAsync(index, e))">
                                         <div @onclick="@(_ => ActivatePanelAsync(index + _panels.Count))"

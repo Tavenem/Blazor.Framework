@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization.Metadata;
 using Tavenem.Blazor.Framework.Services;
 
@@ -159,6 +160,14 @@ public partial class Draggable<TDragItem> : IDisposable
         }
     }
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private DragStartData GetDragDataInner()
     {
         if (!IsDraggable || DragEffectAllowed == DragEffect.None)
@@ -177,7 +186,9 @@ public partial class Draggable<TDragItem> : IDisposable
         }
         else
         {
-            data = DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed, jsonTypeInfo: JsonTypeInfo);
+            data = JsonTypeInfo is null
+                ? DragDropService.GetDragStartData(Item, effectAllowed: DragEffectAllowed)
+                : DragDropService.GetDragStartData(Item, JsonTypeInfo, effectAllowed: DragEffectAllowed);
         }
 
         return data;

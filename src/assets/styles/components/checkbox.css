@@ -23,46 +23,37 @@
         z-index: auto;
         -webkit-tap-highlight-color: transparent;
 
-        &:
-        after {
-            transform: scale(7,7);
-        }
-
         > .btn {
-        background-color: transparent;
-        color: inherit;
-        cursor: pointer;
-        display: inline-flex;
-        vertical-align: middle;
+            background-color: transparent;
+            color: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            vertical-align: middle;
 
-            &:
-        hover,
+            &:hover,
             &:focus-visible {
                 background-color: var(--checkbox-inherited-hover-bg);
             }
 
-            >
-        input[type="checkbox"],
+            > input[type="checkbox"],
             > input[type="radio"] {
                 color: inherit;
-        cursor: inherit;
-        height: 100%;
-        left: 0;
-        margin: 0;
-        opacity: 0;
-        padding: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        z-index: 1;
+                cursor: inherit;
+                height: 100%;
+                left: 0;
+                margin: 0;
+                opacity: 0;
+                padding: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
+                z-index: 1;
             }
 
-            >
-        tf-icon {
+            > tf-icon {
                 color: var(--checkbox-inherited-color);
 
-                &:
-        hover {
+                &:hover {
                     background-color: var(--checkbox-inherited-hover-bg);
                 }
             }

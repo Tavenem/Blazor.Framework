@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -141,6 +142,14 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
         => Parent?.GetDropEffectShared(types)
         ?? DragEffect.None;
 
+    [UnconditionalSuppressMessage(
+        "Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Only causes dynamic access when JsonTypeInfo is missing, and a warning is provided on that member")]
     private protected override async void OnDropAsync(object? sender, IEnumerable<KeyValuePair<string, string>> e)
     {
         if (!GetIsDropTarget()
@@ -149,7 +158,9 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
             return;
         }
 
-        var item = DragDropService.TryGetData<TTabItem>(e);
+        var item = JsonTypeInfo is null
+            ? DragDropService.TryGetData<TTabItem>(e)
+            : DragDropService.TryGetData(e, JsonTypeInfo);
         if (item?.Equals(Item) == true)
         {
             return;
