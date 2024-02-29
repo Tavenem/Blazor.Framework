@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.24
+### Fixed
+- Font fallback
+
 ## 2.23
 ### Added
 - `tf-accordion` custom element (replacement for `Accordion` component which does not require interactivity)

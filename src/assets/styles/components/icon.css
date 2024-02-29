@@ -1,7 +1,7 @@
 ﻿@font-face {
-    font-family: "Adobe NotDef";
-    src: local("Adobe NotDef"),
-        url("..\AND-Regular.otf") format('opentype');
+    font-family: "Adobe Blank";
+    src: local("Adobe Blank"),
+        url("../AdobeBlank.otf.woff") format('woff');
 }
 
 tf-icon {
@@ -9,11 +9,10 @@ tf-icon {
     display: inline-block;
     fill: currentColor;
     flex: 0 0 auto;
-    font-family: 'Material Symbols Outlined', 'Adobe NotDef';
+    font-family: 'Material Symbols Outlined', 'Adobe Blank';
     font-size: 1.5em;
     font-style: normal;
     font-weight: normal;
-    font-display: block;
     font-variant: normal;
     font-variation-settings: 'FILL' var(--tavenem-fill), 'GRAD' var(--tavenem-grad);
     letter-spacing: normal;
