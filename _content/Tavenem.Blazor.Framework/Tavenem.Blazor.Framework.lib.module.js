@@ -42,6 +42,31 @@ export function afterStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor
 export function afterWebStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor, false); }
 
 function addHeadContent() {
+    const fontPreconnect = document.createElement('link');
+    fontPreconnect.rel = 'preconnect';
+    fontPreconnect.href = "https://fonts.googleapis.com";
+    document.head.appendChild(fontPreconnect);
+
+    const fontPreconnectCrossorigin = document.createElement('link');
+    fontPreconnectCrossorigin.rel = 'preconnect';
+    fontPreconnectCrossorigin.href = "https://fonts.gstatic.com";
+    fontPreconnectCrossorigin.crossOrigin = '';
+    document.head.appendChild(fontPreconnectCrossorigin);
+
+    const fallbackFontPreload = document.createElement('link');
+    fallbackFontPreload.rel = 'preload';
+    fallbackFontPreload.type = 'font/woff';
+    fallbackFontPreload.as = 'font';
+    fallbackFontPreload.crossOrigin = '';
+    fallbackFontPreload.href = "_content/Tavenem.Blazor.Framework/AdobeBlank.otf.woff";
+    document.head.appendChild(fallbackFontPreload);
+
+    const fallbackFont = document.createElement('link');
+    fallbackFont.rel = 'stylesheet';
+    fallbackFont.type = 'text/css';
+    fallbackFont.href = "https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=block";
+    document.head.appendChild(fallbackFont);
+
     const style = document.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
@@ -54,22 +79,6 @@ function addHeadContent() {
     script.async = true;
     document.head.appendChild(script);
 
-    const fontPreconnect = document.createElement('link');
-    fontPreconnect.rel = 'preconnect';
-    fontPreconnect.href = "https://fonts.googleapis.com";
-    document.head.appendChild(fontPreconnect);
-
-    const fontPreconnectCrossorigin = document.createElement('link');
-    fontPreconnectCrossorigin.rel = 'preconnect';
-    fontPreconnectCrossorigin.href = "https://fonts.gstatic.com";
-    fontPreconnectCrossorigin.crossOrigin = '';
-    document.head.appendChild(fontPreconnectCrossorigin);
-
-    const font = document.createElement('link');
-    font.rel = 'stylesheet';
-    font.type = 'text/css';
-    font.href = "https://fonts.googleapis.com/css2?family=Encode+Sans+SC:wdth,wght@75,100..900&family=Recursive:slnt,wght,CASL,MONO@-15..0,300..1000,0..1,0..1&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0..1,-25..0&display=block";
-    document.head.appendChild(font);
 }
 
 function fixTablesOfContents() {
