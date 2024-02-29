@@ -192,7 +192,7 @@
             box-shadow: none;
             height: 100%;
             left: 0;
-            margin: 0 !important;
+            margin: 0;
             max-height: 100vh;
             max-width: 100vw;
             position: fixed;

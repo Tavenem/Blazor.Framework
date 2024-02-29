@@ -42,7 +42,7 @@
 
     .dense {
         > .input {
-            padding: 6px !important;
+            padding: 6px;
 
             input {
                 text-align: center;

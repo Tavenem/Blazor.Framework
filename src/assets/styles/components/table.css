@@ -52,12 +52,12 @@
 
         &:last-child {
             tr:last-child {
-                border-bottom: none;
+                border-bottom-style: none;
                 border-bottom-left-radius: inherit;
                 border-bottom-right-radius: inherit;
 
                 > td {
-                    border-bottom: none;
+                    border-bottom-style: none;
 
                     &:first-child {
                         border-bottom-left-radius: inherit;
@@ -71,37 +71,35 @@
         }
 
         tr:last-child {
-            border-bottom: none;
+            border-bottom-style: none;
 
             > td {
-                border-bottom: none;
+                border-bottom-style: none;
             }
         }
     }
 
     > tfoot {
-        tr:first-child > {
-            td, th {
+        tr:first-child {
+            > td, > th {
                 border-top: 1px solid var(--tavenem-color-border-table);
             }
         }
 
         tr:last-child {
-            border-bottom: none;
+            border-bottom-style: none;
             border-bottom-left-radius: inherit;
             border-bottom-right-radius: inherit;
 
-            > {
-                td, th {
-                    border-bottom: none;
+            > td, > th {
+                border-bottom-style: none;
 
-                    &:first-child {
-                        border-bottom-left-radius: inherit;
-                    }
+                &:first-child {
+                    border-bottom-left-radius: inherit;
+                }
 
-                    &:last-child {
-                        border-bottom-right-radius: inherit;
-                    }
+                &:last-child {
+                    border-bottom-right-radius: inherit;
                 }
             }
         }
@@ -118,102 +116,100 @@
             color: var(--table-selected-color-text);
         }
 
-        > {
-            td, th {
-                border-bottom: 1px solid var(--tavenem-color-border-table);
-                color: inherit;
-                display: table-cell;
-                font-size: 0.875em;
-                font-weight: var(--tavenem-font-weight);
-                line-height: 1.43;
-                padding: 1rem;
-                text-align: start;
-                vertical-align: inherit;
+        > td, > th {
+            border-bottom: 1px solid var(--tavenem-color-border-table);
+            color: inherit;
+            display: table-cell;
+            font-size: 0.875em;
+            font-weight: var(--tavenem-font-weight);
+            line-height: 1.43;
+            padding: 1rem;
+            text-align: start;
+            vertical-align: inherit;
 
-                .btn {
-                    --button-inherited-padding-x: .25em;
-                    --button-inherited-padding-x-icon: .25em;
-                    --button-inherited-padding-y: 0;
-                    --button-inherited-padding-y-icon: 0;
+            .btn {
+                --button-inherited-padding-x: .25em;
+                --button-inherited-padding-x-icon: .25em;
+                --button-inherited-padding-y: 0;
+                --button-inherited-padding-y-icon: 0;
+            }
+
+            .field:not(.picker) {
+                flex-grow: 1;
+                margin-bottom: 0;
+                margin-top: 2px;
+
+                > .input, > .input-content {
+                    font-size: .875em;
                 }
 
-                .field:not(.picker) {
-                    flex-grow: 1;
-                    margin-bottom: 0;
-                    margin-top: 2px;
-
+                &:not(.filled, .outlined) {
                     > .input, > .input-content {
-                        font-size: .875em;
+                        margin-top: 0;
                     }
 
-                    &:not(.filled, .outlined) > {
-                        .input, .input-content {
-                            margin-top: 0;
-                        }
+                    > .input {
+                        padding-bottom: 3px;
+                    }
+                }
 
-                        .input {
-                            padding-bottom: 3px;
-                        }
+                &:not(.outlined) > .input {
+                    background-color: var(--tavenem-color-bg-input);
+
+                    &:before {
+                        content: none;
                     }
 
-                    &:not(.outlined) > .input {
-                        background-color: var(--tavenem-color-bg-input);
-
-                        &:before {
-                            content: none;
-                        }
-
-                        &:after {
-                            content: none;
-                        }
+                    &:after {
+                        content: none;
                     }
                 }
             }
+        }
 
-            th {
-                font-weight: var(--tavenem-font-weight-bold);
-                line-height: 1.5em;
+        > th {
+            font-weight: var(--tavenem-font-weight-bold);
+            line-height: 1.5em;
 
-                &.column-header {
-                    vertical-align: top;
+            &.column-header {
+                vertical-align: top;
 
-                    > a, > div {
-                        align-items: center;
-                        display: flex;
-                        justify-content: space-between;
+                > a, > div {
+                    align-items: center;
+                    display: flex;
+                    justify-content: space-between;
 
-                        > tf-icon {
-                            font-size: 1.125em;
-                            margin-left: 4px;
-                            margin-right: 4px;
-                            opacity: 0;
-                            transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-                            user-select: none;
+                    > tf-icon {
+                        font-size: 1.125em;
+                        margin-left: 4px;
+                        margin-right: 4px;
+                        opacity: 0;
+                        transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+                        user-select: none;
 
-                            &.active {
-                                opacity: 1;
-                            }
+                        &.active {
+                            opacity: 1;
+                        }
 
-                            &.desc {
-                                transform: rotate(180deg);
-                            }
+                        &.desc {
+                            transform: rotate(180deg);
                         }
                     }
+                }
 
-                    a {
-                        color: inherit;
-                    }
+                a {
+                    color: inherit;
+                }
 
-                    &.clickable {
-                        cursor: pointer;
+                &.clickable {
+                    cursor: pointer;
 
-                        &:hover {
-                            color: var(--table-action-color);
+                    &:hover {
+                        color: var(--table-action-color);
 
-                            > div, > a {
-                                > tf-icon:not(.active) {
-                                    opacity: 0.8;
-                                }
+                        > div, > a {
+                            > tf-icon:not(.active) {
+                                opacity: 0.8;
                             }
                         }
                     }
@@ -222,9 +218,9 @@
         }
     }
 
-    &.dense > {
-        thead > tr >, tbody > tr >, tfoot > tr >, tr > {
-            td, th {
+    &.dense {
+        > thead > tr, > tbody > tr, > tfoot > tr, > tr {
+            > td, > th {
                 padding-bottom: 6px;
                 padding-top: 6px;
 
@@ -235,8 +231,8 @@
         }
     }
 
-    &.hover > {
-        thead > tr:hover, tbody > tr:hover, tfoot > tr:hover, tr:hover {
+    &.hover {
+        > thead > tr:hover, > tbody > tr:hover, > tfoot > tr:hover, > tr:hover {
             background-color: var(--table-hover-color);
 
             &.selected {
@@ -246,23 +242,21 @@
     }
 
     &.border {
-        border-color: var(--tavenem-color-border-table) !important;
+        border-color: var(--tavenem-color-border-table);
 
-        > {
-            thead > tr, tbody > tr, tfoot > tr, tr {
-                td, th {
-                    border-right: 1px solid var(--tavenem-color-border-table);
+        > thead > tr, > tbody > tr, > tfoot > tr, > tr {
+            td, th {
+                border-right: 1px solid var(--tavenem-color-border-table);
 
-                    &:last-child {
-                        border-right: none;
-                    }
+                &:last-child {
+                    border-right-style: none;
                 }
             }
         }
     }
 
-    &.striped > {
-        thead > tr, tbody > tr, tfoot > tr, tr {
+    &.striped {
+        > thead > tr, > tbody > tr, > tfoot > tr, > tr {
             &:nth-of-type(even) {
                 background-color: var(--table-stripe-color);
 
@@ -299,13 +293,13 @@
     }
 
     > *:first-child {
-        border-top: none;
+        border-top-style: none;
         border-top-left-radius: inherit;
         border-top-right-radius: inherit;
     }
 
     > *:last-child {
-        border-bottom: none;
+        border-bottom-style: none;
         border-bottom-left-radius: inherit;
         border-bottom-right-radius: inherit;
     }
@@ -472,11 +466,11 @@
 
                 > td {
                     align-items: center;
-                    border: none;
+                    border-style: none;
                     display: flex;
                     justify-content: space-between;
                     padding: .875em 1em;
-                    text-align: start !important;
+                    text-align: start;
 
                     &:last-child {
                         border-bottom: 1px solid var(--tavenem-color-border-table);
@@ -525,11 +519,11 @@
 
                 > td {
                     align-items: center;
-                    border: none;
+                    border-style: none;
                     display: flex;
                     justify-content: space-between;
                     padding: .875em 1em;
-                    text-align: start !important;
+                    text-align: start;
 
                     &:last-child {
                         border-bottom: 1px solid var(--tavenem-color-border-table);
@@ -578,11 +572,11 @@
 
                 > td {
                     align-items: center;
-                    border: none;
+                    border-style: none;
                     display: flex;
                     justify-content: space-between;
                     padding: .875em 1em;
-                    text-align: start !important;
+                    text-align: start;
 
                     &:last-child {
                         border-bottom: 1px solid var(--tavenem-color-border-table);
@@ -631,11 +625,11 @@
 
                 > td {
                     align-items: center;
-                    border: none;
+                    border-style: none;
                     display: flex;
                     justify-content: space-between;
                     padding: .875em 1em;
-                    text-align: start !important;
+                    text-align: start;
 
                     &:last-child {
                         border-bottom: 1px solid var(--tavenem-color-border-table);
@@ -684,11 +678,11 @@
 
                 > td {
                     align-items: center;
-                    border: none;
+                    border-style: none;
                     display: flex;
                     justify-content: space-between;
                     padding: .875em 1em;
-                    text-align: start !important;
+                    text-align: start;
 
                     &:last-child {
                         border-bottom: 1px solid var(--tavenem-color-border-table);
@@ -785,7 +779,7 @@
         height: .25rem;
 
         td {
-            border: none;
+            border-style: none;
             line-height: 0;
             padding: 0;
         }

@@ -231,7 +231,7 @@
 
                 &.onvalue {
                     background-color: inherit;
-                    border: none;
+                    border-style: none;
                     height: 28px;
                     left: -13px;
                     top: -19px;

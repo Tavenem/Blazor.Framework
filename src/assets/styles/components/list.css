@@ -61,12 +61,12 @@
         }
 
         &:disabled, &.disabled {
-            color: var(--tavenem-color-action-disabled) !important;
-            cursor: default !important;
-            pointer-events: none !important;
+            color: var(--tavenem-color-action-disabled);
+            cursor: default;
+            pointer-events: none;
 
             tf-icon {
-                color: var(--tavenem-color-action-disabled) !important;
+                color: var(--tavenem-color-action-disabled);
             }
         }
     }
@@ -246,18 +246,18 @@
         }
     }
 
-    &.disabled > {
-        *:not(hr) {
-            color: var(--tavenem-color-action-disabled) !important;
-            cursor: default !important;
-            pointer-events: none !important;
+    &.disabled {
+        > *:not(hr) {
+            color: var(--tavenem-color-action-disabled);
+            cursor: default;
+            pointer-events: none;
 
             tf-icon {
-                color: var(--tavenem-color-action-disabled) !important;
+                color: var(--tavenem-color-action-disabled);
             }
         }
 
-        .clickable, a, button {
+        > .clickable, > a, > button {
             &:hover,
             &:focus:not(.active) {
                 background-color: transparent;
@@ -274,7 +274,7 @@
     &.highlight-start {
         > .active {
             border-inline-start: 1px solid var(--list-active-color);
-            border-inline-end: none;
+            border-inline-end-style: none;
             padding-inline-start: calc(.25em - 1px);
             padding-inline-end: .25em;
         }
@@ -282,7 +282,7 @@
         .list > .active,
         .list & > .active {
             border-inline-start: 1px solid var(--list-active-color);
-            border-inline-end: none;
+            border-inline-end-style: none;
             padding-inline-start: calc(.25em - 1px);
             padding-inline-end: .25em;
         }

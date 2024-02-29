@@ -13,7 +13,7 @@
     width: 100%;
 
     label {
-        transform: none !important;
+        transform: none;
         z-index: auto;
     }
 
@@ -360,7 +360,7 @@
     appearance: none;
     -webkit-appearance: none;
     background-color: var(--thumb-color);
-    border: none;
+    border-style: none;
     border-radius: 50%;
     cursor: pointer;
     height: 2px;
@@ -376,7 +376,7 @@
     appearance: none;
     -webkit-appearance: none;
     background-color: var(--thumb-color);
-    border: none;
+    border-style: none;
     border-radius: 50%;
     cursor: pointer;
     height: 2px;

@@ -7,6 +7,8 @@
 - Reimplemented Collapse with `details` and `summary` HTML elements, no longer requires interactivity for basic functionality
   - `IsOpen` parameter of Collapse split into `IsOpen` public property for current state and `IsInitiallyOpen` parameter for initial state
   - `OnOpening` callback now invoked after state change, rather than before
+- Implemented CSS cascade layers for the framework's CSS
+- It is no longer necessary to include the framework's CSS stylesheet manually. This is now handled automatically.
 ### Removed
 - `Accordion` component (replaced with `tf-accordion` custom HTML element)
 - `OnIsOpenChanged` event from `Collapse`

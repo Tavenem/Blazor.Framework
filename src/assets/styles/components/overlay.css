@@ -7,12 +7,12 @@
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     background-color: rgba(33, 33, 33, 0.5);
-    border: none;
+    border-style: none;
     border-radius: inherit;
     bottom: 0;
     height: 100%;
     left: 0;
-    margin: 0 !important;
+    margin: 0;
     justify-content: center;
     overflow: hidden;
     padding: 2rem;

@@ -108,7 +108,7 @@
 }
 
 .button-group {
-    background-color: transparent !important;
+    background-color: transparent;
     box-shadow: var(--tavenem-shadow-1);
     --button-inherited-active-shadow: var(--tavenem-shadow-2);
     --button-inherited-bg: var(--tavenem-color-default);
@@ -204,7 +204,7 @@
 }
 
 .button-group-text {
-    background-color: transparent !important;
+    background-color: transparent;
     box-shadow: none;
     --button-inherited-active-shadow: none;
     --button-inherited-bg: transparent;

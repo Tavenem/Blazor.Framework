@@ -64,7 +64,7 @@
         width: calc(2.5em + 2px);
 
         &:first-child {
-            margin-inline-start: 0px !important;
+            margin-inline-start: 0px;
         }
 
         &.small {
@@ -88,7 +88,7 @@
 
     &.outlined {
         --tavenem-avatar-color-border: var(--tavenem-color-border);
-        border: none;
+        border-style: none;
     }
 
     &.bg-alt {

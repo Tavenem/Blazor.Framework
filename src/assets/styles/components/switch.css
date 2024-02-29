@@ -1,4 +1,4 @@
-﻿.switch {
+.switch {
     --switch-inherited-color: var(--tavenem-color-action);
     --switch-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
     display: inline-flex;
@@ -12,7 +12,8 @@
         display: inline-flex;
         margin-right: 16px;
         pointer-events: auto;
-        transform: none !important;
+        position: relative;
+        transform: none;
         vertical-align: middle;
         z-index: auto;
         -webkit-tap-highlight-color: transparent;
@@ -147,7 +148,7 @@
     }
 
     &.outlined {
-        border: none;
+        border-style: none;
     }
 
     &.required {

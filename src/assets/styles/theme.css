@@ -215,3 +215,32 @@ a.warning:not(.disabled, :disabled) {
         color: var(--tavenem-theme-color-lighten);
     }
 }
+
+.darken {
+    --tavenem-theme-color: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-2);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-dark);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-base);
+}
+
+.lighten {
+    --tavenem-theme-color: var(--tavenem-theme-color-lighten-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-base);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-light);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-2);
+}
+
+.bg-alt {
+    background-color: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+}
+
+.filled {
+    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
+    background-color: var(--tavenem-theme-color, var(--tavenem-color-default));
+    color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
+}
+
+.outlined {
+    background-color: transparent;
+    border: 1px solid var(--tavenem-color-border);
+}

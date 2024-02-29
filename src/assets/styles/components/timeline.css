@@ -346,7 +346,7 @@
     }
 
     &.outlined {
-        border: none;
+        border-style: none;
     }
 
     &.primary,

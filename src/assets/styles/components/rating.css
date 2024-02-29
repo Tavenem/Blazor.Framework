@@ -20,7 +20,7 @@
         --button-inherited-color: var(--tavenem-color-text-disabled);
 
         .btn-icon {
-            color: var(--tavenem-color-text-disabled) !important;
+            color: var(--tavenem-color-text-disabled);
             cursor: default;
             pointer-events: none;
 
@@ -57,7 +57,7 @@
     }
 
     &.outlined {
-        border: none;
+        border-style: none;
     }
 
     &.required legend:after {

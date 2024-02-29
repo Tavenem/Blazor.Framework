@@ -20,7 +20,7 @@
         }
 
         a {
-            color: var(--tavenem-color-action-disabled) !important;
+            color: var(--tavenem-color-action-disabled);
             cursor: default;
             pointer-events: none;
             text-decoration: none;

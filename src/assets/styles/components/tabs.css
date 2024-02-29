@@ -61,7 +61,7 @@
     }
 
     &.outlined {
-        background-color: transparent !important;
+        background-color: transparent;
         border: 1px solid var(--tavenem-color-border);
     }
 
@@ -191,7 +191,7 @@
         }
 
         .tabs.left &, .tabs.right & {
-            border-bottom: none;
+            border-bottom-style: none;
             padding-bottom: 6px;
         }
 

@@ -77,10 +77,8 @@ export class TavenemAccordionHTMLElement extends HTMLElement {
     border-bottom: 1px solid var(--tavenem-color-border);
 }
 
-:host(.border-0) {
-    > .collapse {
-        border-bottom: 0 !important;
-    }
+:host(.border-0) > .collapse {
+    border-bottom: 0;
 }
 
 :host(.dense) > .collapse > details > summary,

@@ -106,6 +106,7 @@
 
     <MakeDir Directories="$(_CssOutputFolderPath)" />
 
+    <Message Importance="high" Text="Copying CSS files..." />
     <Copy SourceFiles="@(CssFiles)" DestinationFolder="$(_CssOutputFolderPath)\%(RecursiveDir)" />
 
     <ItemGroup>

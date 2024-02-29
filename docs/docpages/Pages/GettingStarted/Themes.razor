@@ -9,6 +9,45 @@
 	Tavenem Blazor Framework app.
 </p>
 
+<h2>Layers</h2>
+
+<p>
+    The Tavenem Blazor Framework makes uses of <a
+    href="https://developer.mozilla.org/en-US/docs/Web/CSS/@@layer">CSS cascade layers</a> to
+    facilitate convenient style rule precedence, both within the framework and between the framework
+    and your own code.
+</p>
+
+<p>The followeing layers are used, in order of precedence:</p>
+<dl>
+	<dt>tavenem-framework.reset</dt>
+	<dd>This layer provides style resets</dd>
+	
+	<dt>tavenem-framework.base</dt>
+	<dd>This layer contains variables, layout logic, and basic page styling</dd>
+	
+	<dt>tavenem-framework.theme</dt>
+	<dd>This layer provides common color styles</dd>
+	
+	<dt>tavenem-framework.base-components</dt>
+	<dd>This layer contains components upon which other components are built</dd>
+	
+	<dt>tavenem-framework.components</dt>
+	<dd>This layer contains most of the framework components</dd>
+	
+	<dt>tavenem-framework.special</dt>
+	<dd>This layer has styles used in special contexts, such as code syntax highlighting</dd>
+	
+	<dt>tavenem-framework.utilities</dt>
+	<dd>This layer provides utility classes, which usually set a single property</dd>
+</dl>
+
+<p>
+	Your own styles not in layers will always override the framework's layered styles. This helps to
+	avoid issues with selector specificity when you wish to customize any part of the framework, or
+	any specific element within your own content.
+</p>
+
 <h2>CSS Custom Properties</h2>
 
 <p>

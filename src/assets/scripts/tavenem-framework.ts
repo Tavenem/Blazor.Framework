@@ -136,7 +136,7 @@ namespace Tavenem {
 :host([disabled]),
 :host(.disabled) {
     box-shadow: none;
-    color: var(--tavenem-color-text-disabled) !important;
+    color: var(--tavenem-color-text-disabled);
     cursor: default;
     opacity: .25;
     pointer-events: none;
@@ -533,7 +533,7 @@ slot button {
 :host([disabled]),
 :host(.disabled) {
     box-shadow: none;
-    color: var(--tavenem-color-text-disabled) !important;
+    color: var(--tavenem-color-text-disabled);
     cursor: default;
     opacity: .25;
     pointer-events: none;

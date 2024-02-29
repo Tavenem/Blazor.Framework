@@ -5,8 +5,8 @@
     --tavenem-badge-color-bg: var(--tavenem-color-default);
     --badge-content-inset-x: 4px;
     --badge-content-inset-y: 4px;
-    background-color: transparent !important;
-    border: none !important;
+    background-color: transparent;
+    border-style: none;
     color: var(--tavenem-color-default-text);
     display: flex;
     flex: 0 1 auto;
@@ -162,7 +162,7 @@
     }
 
     &.border {
-        border-style: none !important;
+        border-style: none;
         --tavenem-badge-border-style: solid;
 
         > * {

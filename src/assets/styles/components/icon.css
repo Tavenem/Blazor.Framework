@@ -30,7 +30,7 @@ tf-icon {
 
     &.outlined {
         --tavenem-fill: 0;
-        border: none;
+        border-style: none;
     }
 
     [data-theme="dark"] & {

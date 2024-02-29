@@ -48,7 +48,7 @@
         &.disabled {
             --pagination-active-color: var(--tavenem-color-action-disabled-bg);
             --pagination-active-text-color: var(--tavenem-color-action-disabled);
-            color: var(--tavenem-color-action-disabled) !important;
+            color: var(--tavenem-color-action-disabled);
         }
     }
 
@@ -58,7 +58,7 @@
     }
 
     &.outlined {
-        border: none;
+        border-style: none;
 
         li {
             border: 1px solid var(--tavenem-color-border);
@@ -79,11 +79,11 @@
         --pagination-active-text-color: var(--tavenem-color-action-disabled);
 
         li {
-            color: var(--tavenem-color-action-disabled) !important;
+            color: var(--tavenem-color-action-disabled);
 
             > * {
                 box-shadow: none;
-                color: var(--tavenem-color-action-disabled) !important;
+                color: var(--tavenem-color-action-disabled);
                 cursor: default;
                 pointer-events: none;
             }

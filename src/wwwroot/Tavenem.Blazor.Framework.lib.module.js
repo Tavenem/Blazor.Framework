@@ -42,6 +42,12 @@ export function afterStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor
 export function afterWebStarted(blazor) { tavenemBlazorFrameworkAfterStarted(blazor, false); }
 
 function addHeadContent() {
+    const style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.type = 'text/css';
+    style.href = "_content/Tavenem.Blazor.Framework/framework.css";
+    document.head.appendChild(style);
+
     const script = document.createElement('script');
     script.type = 'module';
     script.src = './_content/Tavenem.Blazor.Framework/tavenem-framework.js';
