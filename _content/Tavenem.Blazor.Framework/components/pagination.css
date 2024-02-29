@@ -1,0 +1,126 @@
+﻿.pagination {
+    --pagination-active-color: var(--tavenem-color-primary);
+    --pagination-active-text-color: var(--tavenem-color-primary-text);
+    align-items: center;
+    color: var(--tavenem-color-action);
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    font-size: 1rem;
+    gap: .5rem;
+
+    > * {
+        align-items: center;
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        [dir="rtl"] & {
+            flex-direction: row-reverse;
+        }
+    }
+
+    li {
+        > * {
+            border-radius: 9999px;
+            height: 2rem;
+            min-width: 2rem;
+            padding: 0 6px;
+            text-align: center;
+        }
+
+        &:not(.active) > * {
+            box-shadow: none;
+        }
+
+        &.active > * {
+            background-color: var(--pagination-active-color);
+            color: var(--pagination-active-text-color);
+        }
+
+        .btn-icon {
+            padding: 0;
+        }
+
+        &.disabled {
+            --pagination-active-color: var(--tavenem-color-action-disabled-bg);
+            --pagination-active-text-color: var(--tavenem-color-action-disabled);
+            color: var(--tavenem-color-action-disabled);
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+    }
+
+    &.outlined {
+        border-style: none;
+
+        li {
+            border: 1px solid var(--tavenem-color-border);
+
+            &.active > * {
+                background-color: transparent;
+                border-color: (--pagination-active-color);
+            }
+        }
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.disabled {
+        --pagination-active-color: var(--tavenem-color-action-disabled-bg);
+        --pagination-active-text-color: var(--tavenem-color-action-disabled);
+
+        li {
+            color: var(--tavenem-color-action-disabled);
+
+            > * {
+                box-shadow: none;
+                color: var(--tavenem-color-action-disabled);
+                cursor: default;
+                pointer-events: none;
+            }
+        }
+    }
+
+    &.small {
+        --button-inherited-font-size: 0.7109375rem;
+        font-size: .8125rem;
+
+        li > * {
+            height: 1.625rem;
+            min-width: 1.625rem;
+        }
+    }
+
+    &.large {
+        --button-inherited-font-size: 1.3125rem;
+        font-size: 1.5rem;
+
+        li > * {
+            height: 2.5rem;
+            min-width: 2.5rem;
+        }
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --pagination-active-color: var(--tavenem-theme-color);
+        --pagination-active-text-color: var(--tavenem-theme-color-text);
+        color: var(--tavenem-color-action);
+    }
+}

@@ -1,0 +1,273 @@
+.checkbox {
+    --button-inherited-padding-y-icon: 6px;
+    --checkbox-inherited-color: var(--tavenem-color-action);
+    --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+    display: inline-flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    margin: 0;
+
+    &:has(:focus-visible):not(.disabled) {
+        background-color: var(--tavenem-color-action-hover-bg);
+    }
+
+    label {
+        align-items: center;
+        color: var(--tavenem-color-action);
+        cursor: pointer;
+        display: inline-flex;
+        pointer-events: auto;
+        position: relative;
+        transform: none;
+        vertical-align: middle;
+        z-index: auto;
+        -webkit-tap-highlight-color: transparent;
+
+        > .btn {
+            background-color: transparent;
+            color: inherit;
+            cursor: pointer;
+            display: inline-flex;
+            vertical-align: middle;
+
+            &:hover,
+            &:focus-visible {
+                background-color: var(--checkbox-inherited-hover-bg);
+            }
+
+            > input[type="checkbox"],
+            > input[type="radio"] {
+                color: inherit;
+                cursor: inherit;
+                height: 100%;
+                left: 0;
+                margin: 0;
+                opacity: 0;
+                padding: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
+                z-index: 1;
+            }
+
+            > tf-icon {
+                color: var(--checkbox-inherited-color);
+
+                &:hover {
+                    background-color: var(--checkbox-inherited-hover-bg);
+                }
+            }
+        }
+    }
+
+    .field-helpers {
+        color: var(--checkbox-inherited-color);
+        padding-inline-start: var(--button-inherited-padding-y-icon);
+    }
+
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.dense {
+        --button-inherited-padding-x-icon: 2px;
+        --button-inherited-padding-y-icon: 2px;
+        margin: 0;
+    }
+
+    &.disabled {
+        --checkbox-inherited-color: var(--tavenem-color-action-disabled);
+        --checkbox-inherited-hover-bg: transparent;
+
+        label {
+            &, &:hover, &:focus-visible {
+                color: var(--tavenem-color-action-disabled);
+
+                &, * {
+                    background-color: transparent;
+                    cursor: default;
+                }
+
+                * {
+                    color: var(--tavenem-color-text-disabled);
+                }
+
+                tf-icon {
+                    color: var(--tavenem-color-action-disabled);
+                }
+            }
+        }
+    }
+
+    &.read-only, &.read-only:hover {
+        --checkbox-inherited-hover-bg: transparent;
+
+        &, * {
+            cursor: default;
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+    }
+
+    &.outlined {
+        border-style: none;
+    }
+
+    &.required {
+        label:after {
+            content: none;
+        }
+
+        .label:after {
+            color: var(--tavenem-color-error);
+            content: " *";
+        }
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --checkbox-inherited-color: var(--tavenem-color-error);
+        --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
+
+        label {
+            color: var(--tavenem-color-error);
+        }
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --checkbox-inherited-color: var(--tavenem-theme-color);
+        --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        color: var(--tavenem-color-action);
+    }
+}
+
+.radio-group {
+    --button-inherited-padding-y-icon: 6px;
+    --checkbox-inherited-color: var(--tavenem-color-action);
+    --radio-group-text-color: var(--tavenem-color-text);
+    display: inline-flex;
+    flex-direction: column;
+    margin: 0;
+
+    .content {
+        display: inline-flex;
+        flex-direction: column;
+    }
+
+    legend {
+        color: var(--radio-group-text-color);
+    }
+
+    .options {
+        display: inline-flex;
+        flex-direction: column;
+        gap: .25rem;
+    }
+
+    &.inline {
+        .content {
+            align-items: center;
+            flex-direction: row;
+        }
+
+        legend {
+            margin-bottom: 0;
+            margin-right: .5rem;
+        }
+
+        .options {
+            align-items: center;
+            flex-direction: row;
+            min-width: fit-content;
+        }
+    }
+
+    .field-helpers {
+        color: var(--radio-group-text-color);
+        padding-inline-start: var(--button-inherited-padding-y-icon);
+    }
+
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.dense {
+        --button-inherited-padding-x-icon: 2px;
+        --button-inherited-padding-y-icon: 2px;
+
+        .options {
+            gap: 0;
+        }
+    }
+
+    &.disabled legend {
+        color: var(--tavenem-color-text-disabled);
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+    }
+
+    &.outlined {
+        border-style: none;
+    }
+
+    &.required legend:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --checkbox-inherited-color: var(--tavenem-color-error);
+        --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
+        --radio-group-text-color: var(--tavenem-color-error);
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --checkbox-inherited-color: var(--tavenem-theme-color);
+        --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        --radio-group-text-color: var(--tavenem-theme-color);
+        color: var(--tavenem-color-action);
+    }
+}

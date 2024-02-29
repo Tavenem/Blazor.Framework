@@ -1,0 +1,112 @@
+﻿.rating {
+    --button-inherited-color: #ffb400;
+    --button-inherited-hover-bg: transparent;
+    --button-inherited-hover-color: var(--button-inherited-color);
+    --button-inherited-hover-shadow: none;
+    --rating-color: var(--tavenem-color-text);
+    color: var(--rating-color);
+    display: inline-flex;
+    flex: 0 0 auto;
+
+    legend, .field-helpers {
+        color: var(--rating-color);
+    }
+
+    &:focus-visible, &:has(:focus-visible) {
+        outline: none;
+    }
+
+    &.disabled, &.read-only {
+        .btn-icon {
+            cursor: default;
+            pointer-events: none;
+
+            &:hover, :focus-within {
+                transform: none;
+            }
+        }
+    }
+
+    &.disabled {
+        --button-inherited-color: var(--tavenem-color-text-disabled);
+
+        .btn-icon {
+            color: var(--tavenem-color-text-disabled);
+        }
+    }
+
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-x-icon: 5px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-x-icon: 5px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--rating-color);
+    }
+
+    &.outlined {
+        border-style: none;
+    }
+
+    &.required legend:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --button-inherited-color: var(--tavenem-color-error);
+        --rating-color: var(--tavenem-color-error);
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --button-inherited-color: var(--tavenem-theme-color);
+    }
+}
+
+.rating-buttons {
+    display: inline-flex;
+
+    input {
+        border: 0;
+        clip: rect(0,0,0,0);
+        cursor: inherit;
+        margin: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 0;
+    }
+
+    .btn-icon {
+        min-width: calc(var(--button-font-size));
+        padding-left: 0;
+        padding-right: 0;
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+        &:hover, &:focus-within, &:focus-visible {
+            transform: scale(1.2);
+        }
+    }
+}

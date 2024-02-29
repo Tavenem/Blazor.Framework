@@ -1,0 +1,96 @@
+﻿.alert {
+    --alert-bg-color: var(--tavenem-color-bg-surface);
+    --tavenem-theme-color: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-2);
+    align-items: center;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background-color: var(--alert-bg-color);
+    border-radius: var(--tavenem-border-radius);
+    column-gap: .75rem;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 1rem;
+    font-weight: var(--tavenem-font-weight);
+    line-height: var(--tavenem-lineheight-body);
+    margin: .5rem;
+    overflow: hidden;
+    padding: 6px 1rem;
+    transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+    > *:first-child {
+        border-top-left-radius: inherit;
+        border-bottom-left-radius: inherit;
+    }
+
+    > *:last-child {
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
+    }
+
+    &.dense {
+        padding: 0px .75rem;
+    }
+
+    &.clickable {
+        cursor: pointer;
+    }
+
+    tf-icon {
+        display: flex;
+        font-size: 1.375em;
+        margin: .25em 0;
+        opacity: 0.9;
+    }
+
+    > tf-close {
+        margin: .25rem 0;
+        margin-inline-start: auto;
+        order: 9999;
+    }
+
+    &.darken {
+        --tavenem-theme-color: var(--tavenem-theme-color-darken-2);
+        --tavenem-theme-color-lighten: var(--tavenem-theme-color-darken);
+    }
+
+    &.lighten {
+        --tavenem-theme-color: var(--tavenem-theme-color-base);
+        --tavenem-theme-color-darken: var(--tavenem-theme-color-darken);
+        --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-base);
+    }
+
+    &.filled {
+        --alert-bg-color: var(--tavenem-theme-color, var(--tavenem-color-default));
+        --tavenem-theme-color: var(--tavenem-theme-color-base);
+        --tavenem-theme-color-darken: var(--tavenem-theme-color-darken);
+
+        &.darken {
+            --tavenem-theme-color: var(--tavenem-theme-color-darken);
+            --tavenem-theme-color-lighten: var(--tavenem-theme-color-base);
+        }
+
+        &.lighten {
+            --tavenem-theme-color: var(--tavenem-theme-color-lighten-base);
+            --tavenem-theme-color-darken: var(--tavenem-theme-color-base);
+            --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-2);
+        }
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --alert-bg-color: var(--tavenem-theme-color-hover);
+    }
+}

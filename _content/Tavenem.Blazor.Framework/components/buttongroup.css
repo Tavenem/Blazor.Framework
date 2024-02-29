@@ -1,0 +1,281 @@
+﻿.button-group,
+.button-group-text {
+    --button-inherited-border-color: var(--tavenem-color-border);
+    --button-inherited-border-style: none;
+    --button-inherited-font-size: var(--tavenem-font-size-button);
+    --button-inherited-shadow: none;
+    border-radius: var(--tavenem-border-radius);
+    display: inline-flex;
+
+    &:not(.vertical) {
+        > .btn,
+        > tf-dropdown > .btn {
+            border-bottom-left-radius: inherit;
+            border-top-left-radius: inherit;
+
+            + .btn,
+            + tf-dropdown > .btn {
+                border-bottom-left-radius: 0;
+                border-top-left-radius: 0;
+                border-left-style: solid;
+                margin-left: -1px;
+            }
+        }
+
+        > .btn {
+            &:not(:last-child) {
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            &:last-child {
+                border-bottom-right-radius: inherit;
+                border-top-right-radius: inherit;
+            }
+        }
+
+        > tf-dropdown {
+            border-bottom-left-radius: inherit;
+            border-top-left-radius: inherit;
+
+            &:not(:last-child) > .btn {
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            &:last-child {
+                &, > .btn {
+                    border-bottom-right-radius: inherit;
+                    border-top-right-radius: inherit;
+                }
+            }
+        }
+    }
+
+    &.vertical {
+        flex-direction: column;
+
+        > .btn,
+        > tf-dropdown > .btn {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            width: 100%;
+
+            + .btn,
+            + tf-dropdown > .btn {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                border-top-style: solid;
+                margin-top: -1px;
+            }
+        }
+
+        > .btn {
+            &:not(:last-child) {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom-style: solid;
+            }
+
+            &:last-child {
+                border-bottom-left-radius: inherit;
+                border-bottom-right-radius: inherit;
+            }
+        }
+
+        > tf-dropdown {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+
+            &:not(:last-child) > .btn {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                border-bottom-style: solid;
+            }
+
+            &:last-child {
+                &, > .btn {
+                    border-bottom-left-radius: inherit;
+                    border-bottom-right-radius: inherit;
+                }
+            }
+        }
+    }
+
+    &.border {
+        --button-inherited-border-style: solid;
+    }
+}
+
+.button-group {
+    background-color: transparent;
+    box-shadow: var(--tavenem-shadow-1);
+    --button-inherited-active-shadow: var(--tavenem-shadow-2);
+    --button-inherited-bg: var(--tavenem-color-default);
+    --button-inherited-color: var(--tavenem-color-default-text);
+    --button-inherited-font-size-icon: 1.5rem;
+    --button-inherited-hover-bg: var(--tavenem-color-default-darken);
+    --button-inherited-hover-color: var(--tavenem-color-default-text);
+    --button-inherited-hover-shadow: var(--tavenem-shadow-2);
+    --button-inherited-padding-x: 16px;
+    --button-inherited-padding-y: 6px;
+    --button-inherited-padding-y-icon: 6px;
+
+    &.elevation-0 {
+        --button-inherited-active-shadow: none;
+        --button-inherited-hover-shadow: none;
+    }
+
+    &.small {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-x: 10px;
+        --button-inherited-padding-y: 4px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-x: 22px;
+        --button-inherited-padding-y: 8px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.outlined {
+        box-shadow: none;
+        --button-inherited-active-shadow: none;
+        --button-inherited-bg: transparent;
+        --button-inherited-border-style: solid;
+        --button-inherited-color: var(--tavenem-color-text);
+        --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+        --button-inherited-hover-color: var(--tavenem-color-action);
+        --button-inherited-hover-shadow: none;
+        --button-inherited-padding-x: 15px;
+        --button-inherited-padding-y: 5px;
+        --button-inherited-padding-y-icon: 5px;
+
+        &.small {
+            --button-inherited-padding-x: 9px;
+            --button-inherited-padding-y: 3px;
+            --button-inherited-padding-y-icon: 4px;
+        }
+
+        &.large {
+            --button-inherited-padding-x: 21px;
+            --button-inherited-padding-y: 7px;
+            --button-inherited-padding-y-icon: 4px;
+        }
+    }
+
+    &.bg-alt {
+        --button-inherited-bg: var(--tavenem-theme-color-darken);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-darken-2);
+    }
+
+    &.darken, &.lighten {
+        --button-inherited-bg: var(--tavenem-theme-color);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-darken);
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --button-inherited-bg: var(--tavenem-theme-color);
+        --button-inherited-border-color: var(--tavenem-theme-color-text);
+        --button-inherited-color: var(--tavenem-theme-color-text);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-darken);
+        --button-inherited-hover-color: var(--tavenem-theme-color-text);
+
+        &.outlined {
+            --button-inherited-bg: transparent;
+            --button-inherited-border-color: var(--tavenem-theme-color);
+            --button-inherited-color: var(--tavenem-theme-color);
+            --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
+            --button-inherited-hover-color: var(--tavenem-theme-color);
+        }
+    }
+}
+
+.button-group-text {
+    background-color: transparent;
+    box-shadow: none;
+    --button-inherited-active-shadow: none;
+    --button-inherited-bg: transparent;
+    --button-inherited-color: var(--tavenem-color-text);
+    --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+    --button-inherited-hover-color: var(--tavenem-color-action);
+    --button-inherited-hover-shadow: none;
+    --button-inherited-padding-x: 8px;
+    --button-inherited-padding-y: 6px;
+    --button-inherited-padding-y-icon: 7px;
+
+    &.small {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-x: 5px;
+        --button-inherited-padding-y: 4px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-x: 11px;
+        --button-inherited-padding-y: 8px;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.outlined {
+        --button-inherited-border-style: solid;
+        --button-inherited-padding-x: 7px;
+        --button-inherited-padding-y: 5px;
+        --button-inherited-padding-y-icon: 5px;
+
+        &.small {
+            --button-inherited-padding-x: 4px;
+            --button-inherited-padding-y: 3px;
+            --button-inherited-padding-y-icon: 4px;
+        }
+
+        &.large {
+            --button-inherited-padding-x: 10px;
+            --button-inherited-padding-y: 7px;
+            --button-inherited-padding-y-icon: 4px;
+        }
+    }
+
+    &.bg-alt {
+        --button-inherited-color: var(--tavenem-theme-color-darken);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-hover-dark);
+        --button-inherited-hover-color: var(--tavenem-theme-color-darken);
+    }
+
+    &.darken, &.lighten {
+        --button-inherited-color: var(--tavenem-theme-color);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        --button-inherited-hover-color: var(--tavenem-theme-color);
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --button-inherited-bg: transparent;
+        --button-inherited-border-color: var(--tavenem-theme-color);
+        --button-inherited-color: var(--tavenem-theme-color);
+        --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        --button-inherited-hover-color: var(--tavenem-theme-color);
+    }
+}

@@ -1,0 +1,246 @@
+*[id] {
+    scroll-margin-top: 4rem;
+}
+
+html, body {
+    border-color: var(--tavenem-color-border);
+}
+
+html, body * {
+    scrollbar-color: var(--tavenem-color-scrollbar) transparent;
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    height: .5rem;
+    width: .5rem;
+    z-index: 1;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--tavenem-color-scrollbar);
+    border-radius: 1px;
+
+    &:hover {
+        background: var(--tavenem-color-scrollbar-hover);
+    }
+}
+
+a.primary:not(.disabled, :disabled),
+:where(.primary) {
+    --tavenem-theme-color-base: var(--tavenem-color-primary);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-primary-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-primary-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-primary-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-primary-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-primary-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-primary-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-primary-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-primary-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-primary-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-primary-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-primary-text);
+}
+
+a.secondary:not(.disabled, :disabled),
+:where(.secondary) {
+    --tavenem-theme-color-base: var(--tavenem-color-secondary);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-secondary-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-secondary-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-secondary-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-secondary-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-secondary-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-secondary-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-secondary-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-secondary-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-secondary-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-secondary-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-secondary-text);
+}
+
+a.tertiary:not(.disabled, :disabled),
+:where(.tertiary) {
+    --tavenem-theme-color-base: var(--tavenem-color-tertiary);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-tertiary-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-tertiary-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-tertiary-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-tertiary-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-tertiary-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-tertiary-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-tertiary-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-tertiary-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-tertiary-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-tertiary-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-tertiary-text);
+}
+
+a.danger:not(.disabled, :disabled),
+:where(.danger) {
+    --tavenem-theme-color-base: var(--tavenem-color-danger);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-danger-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-danger-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-danger-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-danger-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-danger-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-danger-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-danger-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-danger-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-danger-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-danger-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-danger-text);
+}
+
+a.dark:not(.disabled, :disabled),
+:where(.dark) {
+    --tavenem-theme-color-base: var(--tavenem-color-dark);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-dark-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-dark-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-dark-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-dark-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-dark-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-dark-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-dark-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-dark-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-dark-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-dark-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-dark-text);
+}
+
+a.default:not(.disabled, :disabled),
+:where(.default) {
+    --tavenem-theme-color-base: var(--tavenem-color-default);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-default-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-default-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-default-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-default-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-default-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-default-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-default-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-default-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-default-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-default-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-default-text);
+}
+
+a.info:not(.disabled, :disabled),
+:where(.info) {
+    --tavenem-theme-color-base: var(--tavenem-color-info);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-info-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-info-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-info-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-info-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-info-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-info-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-info-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-info-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-info-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-info-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-info-text);
+}
+
+a.success:not(.disabled, :disabled),
+:where(.success) {
+    --tavenem-theme-color-base: var(--tavenem-color-success);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-success-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-success-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-success-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-success-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-success-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-success-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-success-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-success-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-success-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-success-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-success-text);
+}
+
+a.warning:not(.disabled, :disabled),
+:where(.warning) {
+    --tavenem-theme-color-base: var(--tavenem-color-warning);
+    --tavenem-theme-color-darken-base: var(--tavenem-color-warning-darken);
+    --tavenem-theme-color-darken-2: var(--tavenem-color-warning-darken-2);
+    --tavenem-theme-color-hover-base: var(--tavenem-color-warning-hover);
+    --tavenem-theme-color-hover-bright: var(--tavenem-color-warning-hover-bright);
+    --tavenem-theme-color-hover-bright-2: var(--tavenem-color-warning-hover-bright-2);
+    --tavenem-theme-color-hover-dark: var(--tavenem-color-warning-hover-dark);
+    --tavenem-theme-color-hover-light: var(--tavenem-color-warning-hover-light);
+    --tavenem-theme-color-hover-light-bright: var(--tavenem-color-warning-hover-light-bright);
+    --tavenem-theme-color-lighten-base: var(--tavenem-color-warning-lighten);
+    --tavenem-theme-color-lighten-2: var(--tavenem-color-warning-lighten-2);
+    --tavenem-theme-color-text: var(--tavenem-color-warning-text);
+}
+
+:where(
+    .primary,
+    .secondary,
+    .tertiary,
+    .danger,
+    .dark,
+    .default,
+    .info,
+    .success,
+    .warning) {
+    --tavenem-theme-color: var(--tavenem-theme-color-base);
+    --tavenem-color-border: var(--tavenem-theme-color);
+    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-base);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-base);
+    color: var(--tavenem-theme-color);
+}
+
+a.primary:not(.disabled, :disabled),
+a.secondary:not(.disabled, :disabled),
+a.tertiary:not(.disabled, :disabled),
+a.danger:not(.disabled, :disabled),
+a.dark:not(.disabled, :disabled),
+a.default:not(.disabled, :disabled),
+a.info:not(.disabled, :disabled),
+a.success:not(.disabled, :disabled),
+a.warning:not(.disabled, :disabled) {
+    --tavenem-theme-color: var(--tavenem-theme-color-base);
+    --tavenem-color-border: var(--tavenem-theme-color);
+    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-hover);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-base);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-base);
+    color: var(--tavenem-theme-color);
+
+    &:hover,
+    &:focus {
+        color: var(--tavenem-theme-color-lighten);
+    }
+}
+
+.darken {
+    --tavenem-theme-color: var(--tavenem-theme-color-darken-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-darken-2);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-dark);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-base);
+}
+
+.lighten {
+    --tavenem-theme-color: var(--tavenem-theme-color-lighten-base);
+    --tavenem-theme-color-darken: var(--tavenem-theme-color-base);
+    --tavenem-theme-color-hover: var(--tavenem-theme-color-hover-light);
+    --tavenem-theme-color-lighten: var(--tavenem-theme-color-lighten-2);
+}
+
+.bg-alt {
+    background-color: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+}
+
+.filled {
+    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
+    background-color: var(--tavenem-theme-color, var(--tavenem-color-default));
+    color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
+}
+
+.outlined {
+    background-color: transparent;
+    border: 1px solid var(--tavenem-color-border);
+}

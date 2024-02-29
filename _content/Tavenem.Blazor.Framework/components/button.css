@@ -1,0 +1,371 @@
+﻿.btn {
+    --button-default-active-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+    --button-default-bg: var(--tavenem-color-default);
+    --button-default-color: var(--tavenem-color-default-text);
+    --button-default-hover-bg: var(--tavenem-color-default-darken);
+    --button-default-hover-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+    --button-default-padding-x: 16px;
+    --button-default-padding-y: 6px;
+    --button-default-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+    --button-active-shadow: var(--button-inherited-active-shadow, var(--button-default-active-shadow));
+    --button-bg: var(--button-inherited-bg, var(--button-default-bg));
+    --button-border-color: var(--button-inherited-border-color, var(--tavenem-color-border));
+    --button-border-style: var(--button-inherited-border-style, none);
+    --button-color: var(--button-inherited-color, var(--button-default-color));
+    --button-font-size: var(--button-inherited-font-size, var(--tavenem-font-size-button));
+    --button-hover-bg: var(--button-inherited-hover-bg, var(--button-default-hover-bg));
+    --button-hover-color: var(--button-inherited-hover-color, var(--tavenem-color-default-text));
+    --button-hover-shadow: var(--button-inherited-hover-shadow, var(--button-default-hover-shadow));
+    --button-padding-x: var(--button-inherited-padding-x, var(--button-default-padding-x));
+    --button-padding-y: var(--button-inherited-padding-y, var(--button-default-padding-y));
+    --button-shadow: var(--button-inherited-shadow, var(--button-default-shadow));
+    align-items: center;
+    background-color: var(--button-bg);
+    border-color: var(--button-border-color);
+    border-radius: var(--tavenem-border-radius);
+    border-style: var(--button-border-style);
+    border-width: 1px;
+    box-shadow: var(--button-shadow);
+    box-sizing: border-box;
+    color: var(--button-color);
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: var(--button-font-size);
+    font-weight: var(--tavenem-font-weight-semibold);
+    gap: .25rem;
+    justify-content: center;
+    line-height: var(--tavenem-lineheight-button);
+    margin: 0;
+    min-width: 4rem;
+    outline: 0;
+    overflow: hidden;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    position: relative;
+    text-decoration: none;
+    text-transform: var(--tavenem-texttransform-button);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    user-select: none;
+    vertical-align: middle;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:after {
+        background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
+        background-position: 50%;
+        background-repeat: no-repeat;
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        transform: scale(10,10);
+        transition: transform .3s,opacity 1s;
+        width: 100%;
+    }
+
+    tf-popover {
+        text-transform: initial;
+    }
+
+    > *:first-child {
+        border-top-left-radius: inherit;
+        border-bottom-left-radius: inherit;
+    }
+
+    > *:last-child {
+        border-top-right-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--button-hover-bg);
+        box-shadow: var(--button-hover-shadow);
+        color: var(--button-hover-color);
+    }
+
+    &:active {
+        box-shadow: var(--button-active-shadow);
+
+        &:after {
+            transform: scale(0,0);
+            opacity: .1;
+            transition: 0s;
+        }
+    }
+
+    &.small {
+        --button-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-default-padding-x: 10px;
+        --button-default-padding-y: 4px;
+    }
+
+    &.large {
+        --button-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-default-padding-x: 22px;
+        --button-default-padding-y: 8px;
+    }
+
+    &.bg-alt {
+        --button-bg: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
+        background-color: var(--button-bg);
+    }
+
+    &.filled {
+        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
+        --button-bg: var(--tavenem-theme-color, var(--tavenem-color-default));
+        --button-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
+        background-color: var(--button-bg);
+        color: var(--button-color);
+    }
+
+    &.outlined {
+        --button-active-shadow: none;
+        --button-bg: transparent;
+        --button-border-style: solid;
+        --button-color: var(--tavenem-color-action);
+        --button-hover-bg: var(--tavenem-color-action-hover-bg);
+        --button-hover-color: var(--tavenem-color-action);
+        --button-hover-shadow: none;
+        --button-shadow: none;
+        border-color: var(--button-border-color);
+        border-style: var(--button-border-style);
+        padding: calc(var(--button-padding-y) - 1px) calc(var(--button-padding-x) - 1px);
+    }
+
+    &.border {
+        --button-border-style: solid;
+        border-color: var(--button-border-color);
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --button-bg: var(--tavenem-theme-color);
+        --button-border-color: var(--tavenem-theme-color-text);
+        --button-color: var(--tavenem-theme-color-text);
+        --button-hover-bg: var(--tavenem-theme-color-darken);
+        --button-hover-color: var(--tavenem-theme-color-text);
+        color: var(--button-color);
+
+        &.outlined {
+            --button-bg: transparent;
+            --button-border-color: var(--tavenem-theme-color);
+            --button-color: var(--tavenem-theme-color);
+            --button-hover-bg: var(--tavenem-theme-color-hover);
+            --button-hover-color: var(--tavenem-theme-color);
+        }
+
+        &.border {
+            --button-border-color: var(--tavenem-theme-color-darken-2);
+        }
+    }
+
+    &:disabled, &.disabled {
+        --button-active-shadow: none;
+        --button-bg: var(--tavenem-color-action-disabled-bg);
+        --button-color: var(--tavenem-color-text-disabled);
+        --button-hover-shadow: none;
+        --button-shadow: none;
+        background-color: var(--tavenem-color-action-disabled-bg);
+        border-color: var(--tavenem-color-action-disabled-bg);
+        color: var(--tavenem-color-text-disabled);
+        cursor: default;
+        pointer-events: none;
+    }
+}
+.btn::-moz-focus-inner {
+    border-style: none;
+}
+a.btn:not(.disabled, :disabled) {
+    &:hover,
+    &:focus {
+        color: var(--button-hover-color);
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        color: var(--button-color);
+    }
+}
+
+.btn-text {
+    --button-default-active-shadow: none;
+    --button-default-bg: transparent;
+    --button-default-color: inherit;
+    --button-default-hover-bg: var(--tavenem-color-action-hover-bg);
+    --button-default-hover-shadow: none;
+    --button-default-shadow: none;
+    --button-hover-color: var(--button-inherited-hover-color, inherit);
+    min-width: 0;
+
+    &.small {
+        --button-font-size: calc(var(--tavenem-font-size-button) - 1px);
+        --button-padding-x: 5px;
+    }
+
+    &.large {
+        --button-font-size: calc(var(--tavenem-font-size-button) + 1px);
+        --button-padding-x: 11px;
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --button-bg: transparent;
+        --button-border-color: var(--tavenem-theme-color);
+        --button-color: var(--tavenem-theme-color);
+        --button-hover-bg: var(--tavenem-theme-color-hover);
+        --button-hover-color: var(--tavenem-theme-color);
+    }
+
+    &:disabled, &.disabled {
+        --button-bg: transparent;
+        background-color: transparent;
+    }
+}
+a.btn-text:not(.disabled, :disabled) {
+    &:hover,
+    &:focus {
+        color: var(--button-hover-color);
+    }
+}
+
+.btn-icon {
+    --button-default-active-shadow: none;
+    --button-default-bg: transparent;
+    --button-default-color: inherit;
+    --button-default-hover-bg: var(--tavenem-color-action-hover-bg);
+    --button-default-hover-shadow: none;
+    --button-default-shadow: none;
+    --button-font-size: var(--button-inherited-font-size-icon, 1.5rem);
+    --button-hover-color: var(--button-inherited-hover-color, inherit);
+    --button-padding-x: var(--button-inherited-padding-x-icon, var(--button-default-padding-y));
+    --button-padding-y: var(--button-inherited-padding-y-icon, var(--button-default-padding-y));
+    border-radius: 9999px;
+    flex: 0 0 auto;
+    min-width: calc(var(--button-font-size) + (var(--button-padding-x) * 2));
+    padding: var(--button-padding-y) var(--button-padding-x);
+    text-align: center;
+
+    &:after {
+        transform: scale(7,7);
+    }
+
+    tf-icon {
+        font-size: inherit;
+    }
+
+    &.small {
+        --button-font-size: 1.25rem;
+        --button-default-padding-y: 5px;
+    }
+
+    &.large {
+        --button-font-size: 2rem;
+        --button-default-padding-y: 5px;
+    }
+
+    &.darken, &.lighten {
+        --button-bg: var(--tavenem-theme-color-hover);
+        --button-color: var(--tavenem-theme-color);
+        --button-hover-bg: var(--tavenem-theme-color-hover);
+        --button-hover-color: var(--tavenem-theme-color);
+    }
+
+    &.bg-alt {
+        --button-bg: var(--tavenem-theme-color-bg-alt);
+        --button-color: var(--tavenem-theme-color-darken);
+        --button-hover-bg: var(--tavenem-theme-color-hover-dark);
+        --button-hover-color: var(--tavenem-theme-color-darken);
+        background-color: var(--button-bg);
+    }
+
+    &.outlined {
+        padding: calc(var(--button-padding-y) - 1px) calc(var(--button-padding-y) - 1px);
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --button-bg: transparent;
+        --button-color: var(--tavenem-theme-color);
+        --button-hover-bg: var(--tavenem-theme-color-hover);
+        --button-hover-color: var(--tavenem-theme-color);
+
+        &.filled {
+            --button-bg: var(--tavenem-theme-color);
+            --button-color: var(--tavenem-theme-color-text);
+            --button-hover-bg: var(--tavenem-theme-color-darken);
+            --button-hover-color: var(--tavenem-theme-color-text);
+
+            &:disabled, &.disabled {
+                --button-bg: var(--tavenem-color-action-disabled-bg);
+            }
+
+            &.border {
+                --button-border-color: var(--tavenem-theme-color-darken-2);
+            }
+        }
+    }
+
+    &:disabled, &.disabled {
+        --button-bg: transparent;
+        background-color: transparent;
+    }
+
+    &.filled {
+        --button-active-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
+        --button-bg: var(--tavenem-theme-color, var(--tavenem-color-default));
+        --button-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
+        --button-hover-bg: var(--tavenem-theme-color-darken, var(--tavenem-color-default-darken));
+        --button-hover-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
+        --button-hover-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
+        --button-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
+        background-color: var(--button-bg);
+        color: var(--button-color);
+
+        &:disabled, &.disabled {
+            --button-bg: var(--tavenem-color-action-disabled-bg);
+            background-color: var(--tavenem-color-action-disabled-bg);
+        }
+    }
+}
+
+[data-can-close].auto-closed {
+    display: none !important;
+}
