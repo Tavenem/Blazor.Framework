@@ -160,16 +160,6 @@
             white-space: break-spaces;
             word-wrap: break-word;
 
-            ::selection {
-                background-color: var(--tavenem-color-bg);
-            }
-
-            &:focus-within, &[contenteditable="false"] {
-                ::selection {
-                    background-color: var(--tavenem-color-bg-highlight-bright);
-                }
-            }
-
             &.resize-cursor {
                 cursor: col-resize;
             }
@@ -322,4 +312,23 @@
             background-color: transparent;
         }
     }
+}
+
+.editor-field > .editor .ProseMirror::selection {
+    background-color: var(--tavenem-color-bg);
+}
+.editor-field > .editor .ProseMirror:focus-within::selection {
+    background-color: var(--tavenem-color-bg-highlight-bright);
+}
+.editor-field > .editor .ProseMirror[contenteditable="false"]::selection {
+    background-color: var(--tavenem-color-bg-highlight-bright);
+}
+.editor-field > .editor .static-editor-html::selection {
+    background-color: var(--tavenem-color-bg);
+}
+.editor-field > .editor .static-editor-html:focus-within::selection {
+    background-color: var(--tavenem-color-bg-highlight-bright);
+}
+.editor-field > .editor .static-editor-html[contenteditable="false"]::selection {
+    background-color: var(--tavenem-color-bg-highlight-bright);
 }

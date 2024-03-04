@@ -1,0 +1,70 @@
+.number-field {
+    --number-field-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    &.show-steppers {
+        .input, .input-core {
+            padding-inline-end: 1.5rem;
+        }
+
+        &.dense {
+            .input, .input-core {
+                padding-inline-end: 1.25rem;
+            }
+        }
+    }
+
+    &.primary,
+    &.secondary,
+    &.tertiary,
+    &.danger,
+    &.dark,
+    &.default,
+    &.info,
+    &.success,
+    &.warning {
+        --number-field-inherited-hover-bg: var(--tavenem-theme-color-hover);
+    }
+}
+.number-field input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.number-field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.numeric-spin {
+    --button-inherited-font-size: 1rem;
+    bottom: 0;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    order: 9999;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    .field &.dense > & {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    button {
+        background-color: transparent;
+        color: inherit;
+        flex-shrink: 1;
+        min-height: unset;
+        min-width: unset;
+        padding: 2px 0;
+
+        &:hover,
+        &:focus-visible {
+            background-color: var(--number-field-inherited-hover-bg);
+        }
+    }
+}
