@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.25
+### Fixed
+- Input style regression
+
 ## 2.24
 ### Fixed
 - Font fallback

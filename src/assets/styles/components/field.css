@@ -233,11 +233,6 @@
             padding-top: 3px;
         }
 
-        > .numeric-spin {
-            --button-inherited-font-size-icon: 1.25rem;
-            --button-inherited-padding-y-icon: 5px;
-        }
-
         > .field-helpers {
             margin-top: 4px;
         }
@@ -581,70 +576,6 @@
 .range-separator {
     visibility: hidden;
     margin: 0 4px;
-}
-
-.number-field {
-    --number-field-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    input[type=number] {
-        -moz-appearance: textfield;
-    }
-
-    &.show-steppers {
-        .input, .input-core {
-            padding-inline-end: 1.5rem;
-        }
-
-        &.dense {
-            .input, .input-core {
-                padding-inline-end: 1.25rem;
-            }
-        }
-    }
-
-    &.primary,
-    &.secondary,
-    &.tertiary,
-    &.danger,
-    &.dark,
-    &.default,
-    &.info,
-    &.success,
-    &.warning {
-        --number-field-inherited-hover-bg: var(--tavenem-theme-color-hover);
-    }
-}
-
-.numeric-spin {
-    --button-inherited-font-size: 1rem;
-    bottom: 0;
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: space-between;
-    order: 9999;
-    position: absolute;
-    right: 0;
-    top: 0;
-
-    button {
-        background-color: transparent;
-        color: inherit;
-        flex-shrink: 1;
-        min-height: unset;
-        min-width: unset;
-        padding: 2px 0;
-
-        &:hover,
-        &:focus-visible {
-            background-color: var(--number-field-inherited-hover-bg);
-        }
-    }
 }
 
 .picker {
