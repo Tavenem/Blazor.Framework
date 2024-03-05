@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.26
+### Fixed
+- Contents behavior
+
 ## 2.25
 ### Fixed
 - Input style regression

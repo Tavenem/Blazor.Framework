@@ -27,11 +27,7 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                                 && node.classList.contains('tav-heading')))
                             && !('hideFromContents' in node.dataset)
                             && node.closest('tf-popover, .dialog-container, .editor') == null) {
-                            const index = this._headings.indexOf(node as TavenemHeadingElement);
-                            if (index >= 0) {
-                                this._headings.splice(index, 1);
-                                updated = true;
-                            }
+                            updated = true;
                         }
                     }
                     for (const node of mutation.addedNodes) {
@@ -40,56 +36,19 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                                 && node.classList.contains('tav-heading')))
                             && !('hideFromContents' in node.dataset)
                             && node.closest('tf-popover, .dialog-container, .editor') == null) {
-                            const index = this._headings.indexOf(node as TavenemHeadingElement);
-                            if (index == -1) {
-                                const heading = node as TavenemHeadingElement;
-                                heading.headingLevel = Number.parseInt(heading.tagName.startsWith('H')
-                                    ? heading.tagName.substring(1)
-                                    : (heading.getAttribute('data-heading-level') || '0'));
-                                heading.headingTitle = heading.getAttribute('data-heading-title')
-                                    || heading.textContent
-                                    || `Heading ${this._headings.length.toString()}`;
-                                this._headings.push(heading);
-                                updated = true;
-                            }
+                            updated = true;
                         }
                     }
-                } else if (mutation.type === 'attributes') {
-                    if ((mutation.target instanceof HTMLHeadingElement
+                } else if (mutation.type === 'attributes'
+                    && (mutation.target instanceof HTMLHeadingElement
                         || (mutation.target instanceof HTMLElement
                             && mutation.target.classList.contains('tav-heading')))
-                        && mutation.target.closest('tf-popover, .dialog-container, .editor') == null) {
-                        const hidden = 'hideFromContents' in mutation.target.dataset;
-                        const index = this._headings.indexOf(mutation.target as TavenemHeadingElement);
-                        if (index >= 0) {
-                            if (hidden) {
-                                this._headings.splice(index, 1);
-                            } else {
-                                const heading = this._headings[index];
-                                heading.headingLevel = Number.parseInt(heading.tagName.startsWith('H')
-                                    ? heading.tagName.substring(1)
-                                    : (heading.getAttribute('data-heading-level') || '0'));
-                                heading.headingTitle = heading.getAttribute('data-heading-title')
-                                    || heading.textContent
-                                    || `Heading ${this._headings.length.toString()}`;
-                            }
-                            updated = true;
-                        } else if (!hidden) {
-                            const heading = mutation.target as TavenemHeadingElement;
-                            heading.headingLevel = Number.parseInt(heading.tagName.startsWith('H')
-                                ? heading.tagName.substring(1)
-                                : (heading.getAttribute('data-heading-level') || '0'));
-                            heading.headingTitle = heading.getAttribute('data-heading-title')
-                                || heading.textContent
-                                || `Heading ${this._headings.length.toString()}`;
-                            this._headings.push(heading);
-                            updated = true;
-                        }
-                    }
+                    && mutation.target.closest('tf-popover, .dialog-container, .editor') == null) {
+                    updated = true;
                 }
             }
             if (updated) {
-                this.refreshHeadings();
+                this.refresh();
             }
         });
     }
@@ -237,9 +196,7 @@ slot .default-title {
         nav.classList.add('contents-list');
         shadow.appendChild(nav);
 
-        this.getHeadings();
-
-        this.refreshHeadings();
+        this.refresh();
 
         this._mutationObserver.observe(
             this.parentNode || document,
@@ -279,11 +236,15 @@ slot .default-title {
     }
 
     refresh() {
-        this.getHeadings();
-        this.refreshHeadings();
-    }
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const nav = root.querySelector('nav.contents-list');
+        if (!nav) {
+            return;
+        }
 
-    private getHeadings() {
         const parent = this.parentNode || document;
 
         this._headings = Array
@@ -300,81 +261,8 @@ slot .default-title {
                     || v.textContent
                     || `Heading ${i.toString()}`;
                 return heading;
-            });
-    }
+            }).sort(TavenemContentsHTMLElement.documentPositionComparator);
 
-    private handleScrollSpy() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const nav = root.querySelector('nav.contents-list');
-        if (!nav) {
-            return;
-        }
-
-        if (this._headings.length === 0) {
-            for (const link of nav.children) {
-                link.classList.remove('active');
-            }
-            delete this._activeHeading;
-            return;
-        }
-
-        let highestBelowZero = Number.MIN_SAFE_INTEGER;
-        let lowestAboveZero = Number.MAX_SAFE_INTEGER;
-        let highestElementBelowZero: TavenemHeadingElement | undefined;
-        let lowestElementAboveZero: TavenemHeadingElement | undefined;
-        const minTop = window.innerHeight * 0.8;
-        for (let i = 0; i < this._headings.length; i++) {
-            const heading = this._headings[i];
-
-            const rect = heading.getBoundingClientRect();
-
-            if (rect.top < 0) {
-                if (rect.top > highestBelowZero) {
-                    highestBelowZero = rect.top;
-                    highestElementBelowZero = heading;
-                }
-            } else if (rect.top < minTop
-                && rect.top < lowestAboveZero) {
-                lowestAboveZero = rect.top;
-                lowestElementAboveZero = heading;
-            }
-        }
-
-        const activeHeading = lowestElementAboveZero || highestElementBelowZero;
-        if (!activeHeading) {
-            for (const link of nav.children) {
-                link.classList.remove('active');
-            }
-            delete this._activeHeading;
-            return;
-        }
-
-        if (activeHeading != this._activeHeading) {
-            this._activeHeading = activeHeading;
-            for (const link of nav.children) {
-                if ((link as TavenemContentsLinkElement).heading === activeHeading) {
-                    link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
-                }
-            }
-        }
-    }
-
-    private refreshHeadings() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const nav = root.querySelector('nav.contents-list');
-        if (!nav) {
-            return;
-        }
-
-        this._headings = this._headings.sort(TavenemContentsHTMLElement.documentPositionComparator);
         const children: Node[] = [];
         if (this._headings.length > 0) {
             const minHeadings = parseInt(this.dataset.minHeadings || '3');
@@ -436,6 +324,67 @@ slot .default-title {
             this.classList.add('empty');
         } else {
             this.classList.remove('empty');
+        }
+    }
+
+    private handleScrollSpy() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const nav = root.querySelector('nav.contents-list');
+        if (!nav) {
+            return;
+        }
+
+        if (this._headings.length === 0) {
+            for (const link of nav.children) {
+                link.classList.remove('active');
+            }
+            delete this._activeHeading;
+            return;
+        }
+
+        let highestBelowZero = Number.MIN_SAFE_INTEGER;
+        let lowestAboveZero = Number.MAX_SAFE_INTEGER;
+        let highestElementBelowZero: TavenemHeadingElement | undefined;
+        let lowestElementAboveZero: TavenemHeadingElement | undefined;
+        const minTop = window.innerHeight * 0.8;
+        for (let i = 0; i < this._headings.length; i++) {
+            const heading = this._headings[i];
+
+            const rect = heading.getBoundingClientRect();
+
+            if (rect.top < 0) {
+                if (rect.top > highestBelowZero) {
+                    highestBelowZero = rect.top;
+                    highestElementBelowZero = heading;
+                }
+            } else if (rect.top < minTop
+                && rect.top < lowestAboveZero) {
+                lowestAboveZero = rect.top;
+                lowestElementAboveZero = heading;
+            }
+        }
+
+        const activeHeading = lowestElementAboveZero || highestElementBelowZero;
+        if (!activeHeading) {
+            for (const link of nav.children) {
+                link.classList.remove('active');
+            }
+            delete this._activeHeading;
+            return;
+        }
+
+        if (activeHeading != this._activeHeading) {
+            this._activeHeading = activeHeading;
+            for (const link of nav.children) {
+                if ((link as TavenemContentsLinkElement).heading === activeHeading) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            }
         }
     }
 
