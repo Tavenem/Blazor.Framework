@@ -233,7 +233,7 @@
     .tree &.clickable,
     &.tree,
     &.tree.clickable {
-        > *:not(hr) {
+        > *:not(hr, .collapse) {
             padding-inline-start: 2.5rem;
         }
 
@@ -241,7 +241,7 @@
             padding-inline-start: 2.5rem;
         }
 
-        &.highlight-start > .active {
+        &.highlight-start > .active:not(.collapse) {
             padding-inline-start: calc(2.5rem - 1px);
         }
     }
