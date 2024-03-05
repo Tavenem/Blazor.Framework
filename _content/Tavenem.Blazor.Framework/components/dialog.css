@@ -87,9 +87,8 @@
         margin: 0;
         max-height: calc(100vh - 4rem);
         max-width: calc(100% - 4rem);
-        min-height: calc(4rem + (var(--tavenem-lineheight-body) * 2) + 12px + var(--tavenem-lineheight-button));
+        min-height: calc(8.5rem + 12px);
         min-width: calc(1rem + 134px);
-        overflow: hidden;
         padding: 0;
         pointer-events: initial;
         position: relative;
