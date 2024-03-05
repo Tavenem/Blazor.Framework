@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.28
+### Fixed
+- Tree style
+
 ## 2.27
 ### Fixed
 - Dialog style
