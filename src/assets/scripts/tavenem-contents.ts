@@ -21,14 +21,9 @@ export class TavenemContentsHTMLElement extends HTMLElement {
             let updated = false;
             for (const mutation of mutations) {
                 if (mutation.type === 'childList') {
-                    for (const node of mutation.removedNodes) {
-                        if ((node instanceof HTMLHeadingElement
-                            || (node instanceof HTMLElement
-                                && node.classList.contains('tav-heading')))
-                            && !('hideFromContents' in node.dataset)
-                            && node.closest('tf-popover, .dialog-container, .editor') == null) {
-                            updated = true;
-                        }
+                    if (mutation.removedNodes.length) {
+                        updated = true;
+                        break;
                     }
                     for (const node of mutation.addedNodes) {
                         if ((node instanceof HTMLHeadingElement
@@ -37,7 +32,11 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                             && !('hideFromContents' in node.dataset)
                             && node.closest('tf-popover, .dialog-container, .editor') == null) {
                             updated = true;
+                            break;
                         }
+                    }
+                    if (updated) {
+                        break;
                     }
                 } else if (mutation.type === 'attributes'
                     && (mutation.target instanceof HTMLHeadingElement
@@ -45,6 +44,7 @@ export class TavenemContentsHTMLElement extends HTMLElement {
                             && mutation.target.classList.contains('tav-heading')))
                     && mutation.target.closest('tf-popover, .dialog-container, .editor') == null) {
                     updated = true;
+                    break;
                 }
             }
             if (updated) {

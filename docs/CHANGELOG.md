@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.27
+### Fixed
+- Dialog style
+
 ## 2.26
 ### Fixed
 - Contents behavior
