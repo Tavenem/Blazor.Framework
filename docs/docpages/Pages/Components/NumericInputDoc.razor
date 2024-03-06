@@ -26,12 +26,10 @@
 
 <Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" />
-                <NumericInput TValue="int" Label="Filled" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" Class="outlined" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Normal" />
+            <NumericInput TValue="int" Label="Filled" Class="filled" />
+            <NumericInput TValue="int" Label="Outlined" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -49,12 +47,10 @@
 
 <Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" Class="dense" />
-                <NumericInput TValue="int" Label="Filled" Class="filled dense" />
-                <NumericInput TValue="int" Label="Outlined" Class="outlined dense" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Normal" Class="dense" />
+            <NumericInput TValue="int" Label="Filled" Class="filled dense" />
+            <NumericInput TValue="int" Label="Outlined" Class="outlined dense" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -73,15 +69,13 @@
 
 <Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value1" Label="Int" Class="w-100" />
-                <span>Bound value: @_value1</span>
-                <NumericInput @bind-Value="_value2" Label="Double" Class="w-100" />
-                <span>Bound value: @_value2</span>
-                <NumericInput @bind-Value="_value3" Label="Byte" Class="w-100" />
-                <span>Bound value: @_value3</span>
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput @bind-Value="_value1" Label="Int" Class="w-100" />
+            <span>Bound value: @_value1</span>
+            <NumericInput @bind-Value="_value2" Label="Double" Class="w-100" />
+            <span>Bound value: @_value2</span>
+            <NumericInput @bind-Value="_value3" Label="Byte" Class="w-100" />
+            <span>Bound value: @_value3</span>
         </div>
     </TitleContent>
     <ChildContent>
@@ -138,12 +132,10 @@
 
 <Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value4" Label="On Change" HelpText="@_value4.ToString()" />
-                <NumericInput @bind-Value="_value5" UpdateOnInput="true" Label="On Input" HelpText="@_value5.ToString()" />
-                <NumericInput @bind-Value="_value6" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="Debounced" HelpText="@_value6.ToString()" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput @bind-Value="_value4" Label="On Change" HelpText="@_value4.ToString()" />
+            <NumericInput @bind-Value="_value5" UpdateOnInput="true" Label="On Input" HelpText="@_value5.ToString()" />
+            <NumericInput @bind-Value="_value6" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="Debounced" HelpText="@_value6.ToString()" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -170,10 +162,8 @@
 
 <Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="double" Label="5-8" Min="5" Max="8" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="double" Label="5-8" Min="5" Max="8" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -193,11 +183,9 @@
 
 <Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="double" Label="Default double" HelpText="Try typing a fractional value" />
-                <NumericInput TValue="double" Label="Step 0.1" Step="0.1" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="double" Label="Default double" HelpText="Try typing a fractional value" />
+            <NumericInput TValue="double" Label="Step 0.1" Step="0.1" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -280,11 +268,9 @@
 
 <Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int?" Label="Label" />
-                <NumericInput TValue="int" Label="Label" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int?" Label="Label" />
+            <NumericInput TValue="int" Label="Label" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -303,12 +289,10 @@
 
 <Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" HelpText="Some help text" />
-                <NumericInput TValue="int" Label="Filled" HelpText="Some help text" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" HelpText="Some help text" Class="outlined" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Normal" HelpText="Some help text" />
+            <NumericInput TValue="int" Label="Filled" HelpText="Some help text" Class="filled" />
+            <NumericInput TValue="int" Label="Outlined" HelpText="Some help text" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -327,12 +311,10 @@
 
 <Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" />
-                <NumericInput TValue="int" Label="Filled" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="outlined" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Normal" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" />
+            <NumericInput TValue="int" Label="Filled" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="filled" />
+            <NumericInput TValue="int" Label="Outlined" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -351,12 +333,10 @@
 
 <Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true" />
-                <NumericInput TValue="int" Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled" />
-                <NumericInput TValue="int" Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true" />
+            <NumericInput TValue="int" Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled" />
+            <NumericInput TValue="int" Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -383,12 +363,10 @@
 
 <Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int?" Label="Required" Required="true" />
-                <NumericInput TValue="int?" Label="Required" Required="true" Class="filled" />
-                <NumericInput TValue="int?" Label="Required" Required="true" Class="outlined" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int?" Label="Required" Required="true" />
+            <NumericInput TValue="int?" Label="Required" Required="true" Class="filled" />
+            <NumericInput TValue="int?" Label="Required" Required="true" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -519,11 +497,9 @@
 
 <Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="No Steppers" ShowStepButtons="false" />
-                <NumericInput TValue="int" Label="Custom Steppers" StepDownIcon="arrow_drop_down" StepUpIcon="arrow_drop_up" />
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="No Steppers" ShowStepButtons="false" />
+            <NumericInput TValue="int" Label="Custom Steppers" StepDownIcon="arrow_drop_down" StepUpIcon="arrow_drop_up" />
         </div>
     </TitleContent>
     <ChildContent>
@@ -551,13 +527,11 @@
 
 <Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput @bind-Value="_value7" Label="en-US" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US")" Class="w-100" />
-                <span>Bound value: @_value7</span>
-                <NumericInput @bind-Value="_value8" Label="de-DE" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("de-DE")" Class="w-100" />
-                <span>Bound value: @_value8</span>
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput @bind-Value="_value7" Label="en-US" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("en-US")" Class="w-100" />
+            <span>Bound value: @_value7</span>
+            <NumericInput @bind-Value="_value8" Label="de-DE" Format="F2" FormatProvider="@System.Globalization.CultureInfo.GetCultureInfo("de-DE")" Class="w-100" />
+            <span>Bound value: @_value8</span>
         </div>
     </TitleContent>
     <ChildContent>
@@ -605,18 +579,16 @@
 
 <Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Idea" PrefixIcon="lightbulb" />
-                <NumericInput TValue="int" Label="Amount" PrefixText="$" />
-                <NumericInput TValue="int" Label="Click">
-                    <PrefixContent>
-                        <button class="@_class" @onclick="@(_ => _class = "btn btn-icon success")">
-                            <tf-icon>verified</tf-icon>
-                        </button>
-                    </PrefixContent>
-                </NumericInput>
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Idea" PrefixIcon="lightbulb" />
+            <NumericInput TValue="int" Label="Amount" PrefixText="$" />
+            <NumericInput TValue="int" Label="Click">
+                <PrefixContent>
+                    <button class="@_class" @onclick="@(_ => _class = "btn btn-icon success")">
+                        <tf-icon>verified</tf-icon>
+                    </button>
+                </PrefixContent>
+            </NumericInput>
         </div>
     </TitleContent>
     <ChildContent>
@@ -662,18 +634,16 @@
 
 <Collapse Id="ce-17" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <NumericInput TValue="int" Label="Idea" PostfixIcon="lightbulb" />
-                <NumericInput TValue="int" Label="Program" PostfixText=".exe" />
-                <NumericInput TValue="int" Label="Click">
-                    <PostfixContent>
-                        <button class="@_class2" @onclick="@(_ => _class2 = "btn btn-icon success")">
-                            <tf-icon>verified</tf-icon>
-                        </button>
-                    </PostfixContent>
-                </NumericInput>
-            </div>
+        <div class="row fill align-items-center gap-2">
+            <NumericInput TValue="int" Label="Idea" PostfixIcon="lightbulb" />
+            <NumericInput TValue="int" Label="Program" PostfixText=".exe" />
+            <NumericInput TValue="int" Label="Click">
+                <PostfixContent>
+                    <button class="@_class2" @onclick="@(_ => _class2 = "btn btn-icon success")">
+                        <tf-icon>verified</tf-icon>
+                    </button>
+                </PostfixContent>
+            </NumericInput>
         </div>
     </TitleContent>
     <ChildContent>

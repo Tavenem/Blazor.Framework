@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.29
+### Changed
+- Fields no longer have `flex-grow` set to 1 by default
+
 ## 2.28
 ### Fixed
 - Tree style

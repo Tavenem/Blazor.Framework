@@ -9,8 +9,9 @@
     border: 0;
     color: var(--tavenem-color-text);
     display: flex;
-    flex: 1 1 auto;
+    flex-basis: auto;
     flex-direction: column;
+    flex-shrink: 1;
     margin: 0;
     margin-bottom: .5rem;
     margin-top: 1rem;

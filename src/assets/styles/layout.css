@@ -1,4 +1,4 @@
-﻿.tavenem-framework-layout {
+.tavenem-framework-layout {
     display: grid;
     flex: 1 0;
     grid-template-areas:
@@ -94,7 +94,9 @@
     width: 100%;
 
     &.fill > * {
-        flex: 1 0 auto;
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: auto;
     }
 
     &.cols-1 {
