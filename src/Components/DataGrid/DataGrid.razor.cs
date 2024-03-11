@@ -1170,6 +1170,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             await LoadItemsAsync();
         }
+        RecalculatePaging();
         if (PersistState)
         {
             List<string>? filterQueries = null;

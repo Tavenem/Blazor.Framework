@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.31
+### Fixed
+- Pagination collapsing
+- `DataGrid` pagination on filter changes
+
 ## 2.30
 ### Added
 - `ShowAllSuggestions` property to `TextInput`

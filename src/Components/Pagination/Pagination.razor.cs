@@ -182,15 +182,15 @@ public partial class Pagination : PersistentComponentBase
             if (MaxPagesDisplayed.HasValue)
             {
                 var half = (ulong)Math.Truncate(MaxPagesDisplayed.Value / 2.0);
-                var start = half > CurrentPage
+                var start = half >= CurrentPage
                     ? 0
-                    : CurrentPage - half;
+                    : CurrentPage - half - 1;
 
                 if (start > 0
                     && PageCount.HasValue
                     && CurrentPage + half >= PageCount.Value)
                 {
-                    start -= CurrentPage + half + 1 - PageCount.Value;
+                    start -= CurrentPage + half - PageCount.Value;
                 }
 
                 return Math.Max(start, 0);
