@@ -482,10 +482,17 @@
 </Collapse>
 
 <p>
-    You can also assign an enumertaion of <code>KeyValuePair&lt;string, object></code>s to the
+    If you set the <code>ShowAllSuggestions</code> to <code>true</code>, all suggestions will be
+    shown, rather than only those containing a substring which matches the current input. This can
+    be used to make a `TextInput` function like a "combo box" (a select which also accepts typed
+    input).
+</p>
+
+<p>
+    You can also assign an enumeration of <code>KeyValuePair&lt;string, object></code>s to the
     <code>SuggestionValues</code> property. The <code>Key</code> should be set to the value that
     will be assigned to the input if the suggestion is selected. The <code>Value</code> will be used
-    to generate the displayed entry in the suggetion list. If you provide a
+    to generate the displayed entry in the suggestion list. If you provide a
     <code>RenderFragment</code> for the <code>SuggestionTemplate</code> property, it will be used to
     render each value. If not, <code>ToString</code> will be called on the values.
 </p>

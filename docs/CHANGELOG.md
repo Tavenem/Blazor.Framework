@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.30
+### Added
+- `ShowAllSuggestions` property to `TextInput`
+### Changed
+- Made only dialog header a drag control, to avoid interfering with controls in the dialog.
+
 ## 2.29
 ### Changed
 - Fields no longer have `flex-grow` set to 1 by default

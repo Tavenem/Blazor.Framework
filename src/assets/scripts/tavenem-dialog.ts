@@ -15,8 +15,14 @@ export function initialize(elementId: string) {
     if (!element) {
         return;
     }
+    const headers = element.getElementsByClassName('header');
+    if (!headers
+        || !headers.length
+        || !(headers[0] instanceof HTMLElement)) {
+        return;
+    }
 
-    element.addEventListener('pointerdown', onPointerDown);
+    headers[0].addEventListener('pointerdown', onPointerDown);
     document.addEventListener('pointerup', stopDragging);
     document.addEventListener('pointermove', drag);
 }
@@ -75,16 +81,13 @@ function onPointerDown(e: PointerEvent) {
     if (e.target.hasPointerCapture(e.pointerId)) {
         e.target.releasePointerCapture(e.pointerId);
     }
-    if (!(e.currentTarget instanceof HTMLDialogElement)) {
+    if (!(e.currentTarget instanceof HTMLElement)
+        || !(e.currentTarget.parentElement instanceof HTMLElement)
+        || !(e.currentTarget.parentElement.parentElement instanceof HTMLDialogElement)) {
         return;
     }
-    const boundingRect = e.currentTarget.getBoundingClientRect();
-    if (e.clientX > boundingRect.left + boundingRect.width - 20
-        || e.clientY > boundingRect.top + boundingRect.height - 20) {
-        return; // ignore if may be over resize handler
-    }
     e.preventDefault();
-    draggedDialog = e.currentTarget as Dialog;
+    draggedDialog = e.currentTarget.parentElement.parentElement as Dialog;
     draggedDialog.dragStartX = e.clientX;
     draggedDialog.dragStartY = e.clientY;
 }

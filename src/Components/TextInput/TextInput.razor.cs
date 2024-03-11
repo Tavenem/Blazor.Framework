@@ -195,6 +195,17 @@ public partial class TextInput : InputComponentBase<string>
 
     /// <summary>
     /// <para>
+    /// Whether to show all <see cref="Suggestions"/> rather than only those with a matching
+    /// substring.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>
+    /// </para>
+    /// </summary>
+    [Parameter] public bool ShowAllSuggestions { get; set; }
+
+    /// <summary>
+    /// <para>
     /// Whether to show the current character count and maximum length, if <see cref="MaxLength"/>
     /// has been set.
     /// </para>
@@ -323,9 +334,9 @@ public partial class TextInput : InputComponentBase<string>
         {
             if (Suggestions is null)
             {
-                return Enumerable.Empty<string>();
+                return [];
             }
-            if (string.IsNullOrEmpty(CurrentInput))
+            if (ShowAllSuggestions || string.IsNullOrEmpty(CurrentInput))
             {
                 return Suggestions;
             }
@@ -342,9 +353,9 @@ public partial class TextInput : InputComponentBase<string>
             if (SuggestionValues is null
                 && LoadedSuggestions is null)
             {
-                return Enumerable.Empty<KeyValuePair<string, object>>();
+                return [];
             }
-            if (string.IsNullOrEmpty(CurrentInput))
+            if (ShowAllSuggestions || string.IsNullOrEmpty(CurrentInput))
             {
                 if (SuggestionValues is null)
                 {

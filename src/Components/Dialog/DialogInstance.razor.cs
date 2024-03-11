@@ -111,7 +111,7 @@ public partial class DialogInstance
                 });
                 KeyListener.KeyDown += OnEscapeKeyDown;
             }
-            if (Options.IsDraggable)
+            if (Options.IsDraggable && !Options.HideHeader)
             {
                 _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import",

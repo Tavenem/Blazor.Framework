@@ -52,6 +52,10 @@ public class DialogOptions
     /// Whether the dialog should be draggable.
     /// </para>
     /// <para>
+    /// Ignored if <see cref="HideHeader"/> is <see langword="true"/> (since the header is the drag
+    /// handle).
+    /// </para>
+    /// <para>
     /// Default is <see langword="true"/>.
     /// </para>
     /// </summary>
