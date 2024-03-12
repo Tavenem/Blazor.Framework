@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.32
+### Changed
+- Field style in lists
+
 ## 2.31
 ### Fixed
 - Pagination collapsing
