@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.33
+### Added
+- `RenderBodyWhenClosed` to `Collapse`
+
 ## 2.32
 ### Changed
 - Field style in lists
