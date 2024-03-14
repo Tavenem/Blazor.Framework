@@ -45,8 +45,7 @@ public partial class Collapse : PersistentComponentBase
     /// <summary>
     /// Whether the collapsed content is initially displayed.
     /// </summary>
-    [Parameter]
-    public bool IsInitiallyOpen { get; set; }
+    [Parameter] public bool IsInitiallyOpen { get; set; }
 
     /// <summary>
     /// Will be <see langword="true"/> during opening, after <see cref="OnOpening"/> is invoked and
@@ -146,18 +145,7 @@ public partial class Collapse : PersistentComponentBase
 
     [Inject, NotNull] private NavigationManager? NavigationManager { get; set; }
 
-    /// <inheritdoc/>
-    public override async Task SetParametersAsync(ParameterView parameters)
-    {
-        if (QueryStateService.IsInitialized
-            && parameters.TryGetValue<bool>(nameof(IsInitiallyOpen), out var isOpen)
-            && isOpen != IsInitiallyOpen)
-        {
-            await SetOpenAsync(isOpen);
-        }
-
-        await base.SetParametersAsync(parameters);
-    }
+    private bool StartOpen => IsInitiallyOpen || _isActiveNav;
 
     /// <inheritdoc/>
     protected override async Task OnInitializedAsync()
@@ -182,10 +170,6 @@ public partial class Collapse : PersistentComponentBase
                 ? null
                 : NavigationManager.ToAbsoluteUri(NavUrl).AbsoluteUri;
             _isActiveNav = ShouldMatch(NavigationManager.Uri);
-            if (_isActiveNav)
-            {
-                await SetOpenAsync(true);
-            }
         }
     }
 

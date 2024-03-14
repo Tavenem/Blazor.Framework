@@ -3,7 +3,7 @@
 @inherits PersistentComponentBase
 
 <div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle">
-    <details open="@IsInitiallyOpen" @ontoggle="ToggleAsync">
+    <details open="@StartOpen" @ontoggle="ToggleAsync">
         <summary>
             @if (TitleContent is null)
             {

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.34
+### Fixed
+- Collapse initial open behavior
+
 ## 2.33
 ### Added
 - `RenderBodyWhenClosed` to `Collapse`
