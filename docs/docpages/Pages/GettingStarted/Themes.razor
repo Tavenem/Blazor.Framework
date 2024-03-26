@@ -93,6 +93,21 @@
 	dark mode.
 </p>
 
+<p>
+	You can override the overall site theme in a specific element by applying the
+	<code>tf-theme-dark</code> or <code>tf-theme-light</code> CSS class to any element. For
+	instance, see the two examples below: the first will always be in light mode, and the second
+	will always be in dark mode, regardless of the site's current theme.
+</p>
+
+<CodeExample Code="@(@"<div class=""tf-theme-light d-flex align-items-center p-2 w-100"" style=""min-height:5em"">
+    <p>Here is some example text in a light container.</p>
+</div>")" />
+
+<CodeExample Code="@(@"<div class=""tf-theme-dark d-flex align-items-center p-2 w-100"" style=""min-height:5em"">
+    <p>Here is some example text in a dark container.</p>
+</div>")" />
+
 <h2>Theme Colors</h2>
 <p>
 	The Tavenem Blazor Framework has a color palette with @(Enum.GetValues<ThemeColor>().Length - 1) basic colors:

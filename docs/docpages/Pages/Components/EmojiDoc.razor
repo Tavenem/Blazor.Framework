@@ -1,0 +1,41 @@
+﻿@page "/components/emoji"
+
+<PageTitle>Emoji - Tavenem Blazor Framework</PageTitle>
+
+<h1>Emoji</h1>
+
+<p>
+    The Tavenem Blazor Framework includes a <a
+    href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web component</a> to easily
+    display emoji using a short code.
+</p>
+
+<h2>Basics</h2>
+
+<p>
+    To insert an emoji, simply use the <code>tf-emoji</code> custom element, with the short code of
+    the emoji as the content. Some emoji have multiple accepted short codes. Surrounding colons are
+    optional (e.g. :relaxed: vs. relaxed). Note that short codes for custom icons, such as those
+    used on a particular website or in a specific app, are not supported; only standard Unicode
+    emoji characters are available. If a short code is unsupported, the text renders as-is.
+</p>
+
+<CodeExample Id="ce-1" Code="@(@"<tf-emoji>relaxed</tf-emoji>
+<tf-emoji>alien</tf-emoji>
+<tf-emoji>purple_heart</tf-emoji>
+<tf-emoji>sloth</tf-emoji>
+<tf-emoji>vulcan_salute</tf-emoji>
+<tf-emoji>dragon</tf-emoji>
+<tf-emoji>brain</tf-emoji>
+<tf-emoji>bear</tf-emoji>")" />
+
+<h2>Font</h2>
+
+<p>
+    Emoji are rendered with a standardized font stack, to avoid issues with certain systems lacking
+    support for all emoji. To use the same font for native emoji within static content, apply
+    the <code>tf-emoji</code> CSS class to any element to use the same font stack as the
+    <code>tf-emoji</code> element.
+</p>
+
+<CodeExample Id="ce-2" Code="@(@"<span class=""tf-emoji"">🤖</span>")" />

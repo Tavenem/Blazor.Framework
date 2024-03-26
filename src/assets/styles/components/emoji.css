@@ -1,0 +1,12 @@
+.tf-emoji {
+    font-family: "Noto Color Emoji",
+                 system-ui,
+                 "Apple Color Emoji",
+                 "Segoe UI Emoji",
+                 "Segoe UI Symbol",
+                 "EmojiOne Color",
+                 "Android Emoji",
+                 sans-serif;
+    font-style: normal;
+    font-weight: 400;
+}

@@ -1,5 +1,6 @@
 import { TavenemAccordionHTMLElement } from './tavenem-accordion';
 import { TavenemContentsHTMLElement } from './tavenem-contents';
+import { TavenemEmojiHTMLElement } from './tavenem-emoji';
 import { TavenemHighlightHTMLElement } from './tavenem-highlight';
 import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
 import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
@@ -483,6 +484,8 @@ slot button {
                 setTavenemColorScheme(newTheme);
             }
         });
+
+        customElements.define('tf-emoji', TavenemEmojiHTMLElement);
 
         customElements.define('tf-progress-circle', TavenemProgressCircleHTMLElement);
 
