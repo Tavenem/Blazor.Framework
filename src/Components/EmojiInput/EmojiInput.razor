@@ -1,0 +1,311 @@
+@namespace Tavenem.Blazor.Framework
+
+@inherits PickerComponentBase<string>
+
+@code {
+    private RenderFragment _contentRenderFragment =>
+    @<CascadingValue Name="IsNested" Value="true" IsFixed="true">
+        <div class="emoji-picker input-content" @onclick:stopPropagation="true">
+            <ul class="emoji-category-tabs">
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("latest"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>history</tf-icon>
+                        <Tooltip Delay="750">Latest</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("smileys-emotion"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>mood</tf-icon>
+                        <Tooltip Delay="750">Smileys & Emotion</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("people-body"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_people</tf-icon>
+                        <Tooltip Delay="750">People & Body</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("animals-nature"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_nature</tf-icon>
+                        <Tooltip Delay="750">Animals & Nature</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("food-drink"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_food_beverage</tf-icon>
+                        <Tooltip Delay="750">Food & Drink</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("activities"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_events</tf-icon>
+                        <Tooltip Delay="750">Activities</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("travel-places"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_transportation</tf-icon>
+                        <Tooltip Delay="750">Travel & Places</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("objects"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_objects</tf-icon>
+                        <Tooltip Delay="750">Objects</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("symbols"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_symbols</tf-icon>
+                        <Tooltip Delay="750">Symbols</Tooltip>
+                    </button>
+                </li>
+                <li>
+                    <button class="@EmojiCategoryButtonClass"
+                            @onclick="@(_ => OnClickCategoryAsync("flags"))"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>emoji_flags</tf-icon>
+                        <Tooltip Delay="750">Flags</Tooltip>
+                    </button>
+                </li>
+            </ul>
+            <TextInput @ref="SearchInput"
+                       @bind-Value="SearchValue"
+                       @bind-Value:after="OnSearch"
+                       AutoFocus="@(DisplayType == PickerDisplayType.Inline ? AutoFocus : false)"
+                       Class="dense emoji-search"
+                       Disabled="@(Disabled || ReadOnly)"
+                       Placeholder="Search"
+                       PrefixIcon="search"
+                       TabIndex="@(DisplayType == PickerDisplayType.Inline ? TabIndex : 0)"
+                       ThemeColor="ThemeColor"
+                       UpdateOnInput="true">
+                <PostfixContent>
+                    <button class="@SkinToneCss"
+                            @onclick="@(_ => ShowSkinTonePicker = !ShowSkinTonePicker)"
+                            @onclick:stopPropagation="true"
+                            disabled="@(Disabled || ReadOnly || !IsInteractive)">
+                        <tf-icon>palette</tf-icon>
+                        <Tooltip Delay="750">Select skin tone(s)</Tooltip>
+                        <Popover Class="filled p-1"
+                                 FocusOut="@(_ => ShowSkinTonePicker = false)"
+                                 IsOpen="IsSkinTonePickerOpen">
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                @for (var i = 0; i < 6; i++)
+                                {
+                                    var index = i;
+                                    <button class="@($"btn btn-text small skin-tone-swatch tone{index} {(SkinTone1 == index ? "active" : null)}")"
+                                            @onclick="@(_ => SkinTone1 = index)"
+                                            @onclick:stopPropagation="true"></button>
+                                }
+                            </div>
+                            @if (SkinTone1 > 0)
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    <button class="@($"btn btn-text small skin-tone-swatch tone{SkinTone1} {(SkinTone2 == 0 ? "active" : null)}")"
+                                            @onclick="@(_ => SkinTone2 = 0)"
+                                            @onclick:stopPropagation="true"></button>
+                                    @for (var i = 1; i < 6; i++)
+                                    {
+                                        var index = i;
+                                        <button class="@($"btn btn-text small skin-tone-swatch tone{index} {(SkinTone2 == index ? "active" : null)}")"
+                                                @onclick="@(_ => SkinTone2 = index)"
+                                                @onclick:stopPropagation="true"></button>
+                                    }
+                                </div>
+                            }
+                        </Popover>
+                    </button>
+                </PostfixContent>
+            </TextInput>
+            <div class="emoji-categories">
+                @if (LatestEmoji.Count > 0)
+                {
+                    <div id="@($"{Id}-category-latest")" class="category">Latest</div>
+                    <div class="emoji-list">
+                        @foreach (var emoji in LatestEmoji)
+                        {
+                            <button class="@($"btn btn-text {(CurrentValue?.Equals(emoji.WithSkinTones(SkinTone1, SkinTone2)) == true ? "active" : null)}")"
+                                    @onclick="@(_ => OnSelectAsync(emoji))"
+                                    disabled="@(Disabled || ReadOnly || !IsInteractive)"
+                                    title="@emoji.Name">@emoji.WithSkinTones(SkinTone1, SkinTone2)</button>
+                        }
+                    </div>
+                }
+                @foreach (var (category, emojiList) in FilteredEmoji.OrderBy(x => x.Key, EmojiCategoryComparer.Instance))
+                {
+                    if (emojiList.Length == 0)
+                    {
+                        continue;
+                    }
+                    <div id="@($"{Id}-category-{category.ToLowerInvariant().Replace(" & ", "-")}")" class="category">@category</div>
+                    <div class="emoji-list">
+                        @foreach (var emoji in emojiList)
+                        {
+                            <button class="@($"btn btn-text {(CurrentValue?.Equals(emoji.WithSkinTones(SkinTone1, SkinTone2)) == true ? "active" : null)}")"
+                                    @onclick="@(_ => OnSelectAsync(emoji))"
+                                    disabled="@(Disabled || ReadOnly || !IsInteractive)"
+                                    title="@emoji.Name">@emoji.WithSkinTones(SkinTone1, SkinTone2)</button>
+                        }
+                    </div>
+                }
+            </div>
+            @if (DisplayType == PickerDisplayType.Button)
+            {
+                <div class="d-flex justify-content-end">
+                    @if (CanClear)
+                    {
+                        <button class="btn btn-text me-2" @onclick="ClearAndCloseAsync">Clear</button>
+                    }
+                    <button class="btn btn-text" @onclick="ClosePopoverAsync">Cancel</button>
+                </div>
+            }
+        </div>
+    </CascadingValue>;
+}
+
+@if (DisplayType == PickerDisplayType.Button)
+{
+    <span @attributes="AdditionalAttributes"
+          id="@ContainerId"
+          class="@ButtonContainerClass"
+          style="@CssStyle">
+        <button @ref="ElementReference"
+                @attributes="InputAttributes"
+                type="button"
+                id="@Id"
+                class="@ButtonClass"
+                style="@InputCssStyle"
+                disabled="@(Disabled || ReadOnly || !IsInteractive)"
+                @onclick="OnClickContainerAsync">
+            @if (IconButton)
+            {
+                <tf-icon>@ButtonIcon</tf-icon>
+            }
+            else
+            {
+                <span>@ButtonText</span>
+            }
+            @ChildContent
+        </button>
+        <input disabled="@IsDisabled"
+               name="@NameValue"
+               hidden
+               readonly
+               value="@CurrentValue" />
+        <Popover @ref="Popover"
+                 Class="filled"
+                 AnchorId="@Id"
+                 AnchorOrigin="Origin.Center_Center"
+                 FocusOut="ClosePopoverAsync"
+                 IsOpen="ShowPicker"
+                 PopoverOrigin="Origin.Top_Left">
+            @_contentRenderFragment
+        </Popover>
+    </span>
+}
+else
+{
+    <div @attributes="AdditionalAttributes"
+         id="@ContainerId"
+         class="@CssClass"
+         style="@InputContainerStyle"
+         tabindex="-1"
+         @onclick="OnClickContainerAsync">
+        <div id="@InputId"
+             class="input"
+             style="@(DisplayType == PickerDisplayType.Inline ? "display:none" : null)">
+            <input disabled="@IsDisabled"
+                   name="@NameValue"
+                   hidden
+                   readonly
+                   value="@CurrentValueAsString" />
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autofocus="@(DisplayType == PickerDisplayType.Inline ? false : AutoFocus)"
+                   disabled="@IsDisabled"
+                   placeholder="@Placeholder"
+                   readonly
+                   required="@Required"
+                   size="1"
+                   tabindex="@(DisplayType == PickerDisplayType.Inline ? -1 : TabIndex)"
+                   value="@CurrentValue"
+                   @onclick="TogglePopoverAsync"
+                   @onclick:stopPropagation="true" />
+            @if (ShowClear)
+            {
+                <button class="@ClearButtonCssClass"
+                        disabled="@(Disabled || ReadOnly || !IsInteractive)"
+                        tabindex="-1"
+                        @onclick="ClearAsync"
+                        @onclick:stopPropagation="true">
+                    <tf-icon>@ClearIcon</tf-icon>
+                </button>
+            }
+            <tf-icon class="expand" @onclick="TogglePopoverAsync" @onclick:stopPropagation="true">@ButtonIcon</tf-icon>
+        </div>
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <label for="@Id">@Label</label>
+        }
+        @if (DisplayType == PickerDisplayType.Inline)
+        {
+            @_contentRenderFragment
+        }
+        else
+        {
+            <Popover @ref="Popover"
+                     Class="filled"
+                     AnchorId="@InputId"
+                     AnchorOrigin="Origin.Bottom_Left"
+                     FocusId="@ContainerId"
+                     FocusOut="ClosePopoverAsync"
+                     IsOpen="ShowPicker"
+                     PopoverOrigin="Origin.Top_Left">
+                @_contentRenderFragment
+            </Popover>
+        }
+        @if (!string.IsNullOrEmpty(HelpText)
+            || IsInvalidAndTouched)
+        {
+            <div class="field-helpers">
+                @if (IsInvalidAndTouched)
+                {
+                    <ul class="mr-auto mb-0 pl-0">
+                        @foreach (var message in GetValidationMessages())
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                }
+                else if (!string.IsNullOrEmpty(HelpText))
+                {
+                    <div class="mr-auto">@HelpText</div>
+                }
+            </div>
+        }
+        @ChildContent
+    </div>
+}

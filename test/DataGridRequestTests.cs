@@ -35,7 +35,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false) },
+            [new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlCount(request);
 
@@ -61,7 +61,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false) },
+            [new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false)],
             null);
         var columnMapping = new Dictionary<string, string>
         {
@@ -160,10 +160,9 @@ public class DataGridRequestTests
             0,
             0,
             null,
-            new[]
-            {
+            [
                 new SortInfo(OrderProperty)
-            });
+            ]);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
         Console.WriteLine(command);
@@ -188,12 +187,11 @@ public class DataGridRequestTests
             0,
             0,
             null,
-            new[]
-            {
+            [
                 new SortInfo(OrderProperty1, true),
                 new SortInfo(OrderProperty2),
                 new SortInfo(OrderProperty3),
-            });
+            ]);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
         Console.WriteLine(command);
@@ -216,7 +214,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false) },
+            [new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -243,11 +241,10 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false) },
-            new[]
-            {
+            [new FilterInfo(ParameterName, ParameterValue, false, null, null, null, null, null, false)],
+            [
                 new SortInfo(OrderProperty)
-            });
+            ]);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
         Console.WriteLine(command);
@@ -272,7 +269,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, ParameterValue, true, null, null, null, null, null, false) },
+            [new FilterInfo(ParameterName, ParameterValue, true, null, null, null, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -301,7 +298,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(PropertyName, null, false, ParameterValue, null, null, null, null, false) },
+            [new FilterInfo(PropertyName, null, false, ParameterValue, null, null, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -333,7 +330,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(PropertyName, ParameterValue, false, QuickParameterValue, null, null, null, null, false) },
+            [new FilterInfo(PropertyName, ParameterValue, false, QuickParameterValue, null, null, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -365,11 +362,10 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[]
-            {
+            [
                 new FilterInfo(ParameterName1, ParameterValue1, false, null, null, null, null, null, false),
                 new FilterInfo(ParameterName2, ParameterValue2, false, null, null, null, null, null, false),
-            },
+            ],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -401,11 +397,10 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[]
-            {
+            [
                 new FilterInfo(PropertyName1, null, false, ParameterValue, null, null, null, null, false),
                 new FilterInfo(PropertyName2, null, false, ParameterValue, null, null, null, null, false),
-            },
+            ],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -439,11 +434,10 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[]
-            {
+            [
                 new FilterInfo(PropertyName1, ParameterValue1, false, ParameterValue3, null, null, null, null, false),
                 new FilterInfo(PropertyName2, ParameterValue2, false, ParameterValue3, null, null, null, null, false),
-            },
+            ],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -476,7 +470,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, null, true, null, ParameterValue, null, null, null, false) },
+            [new FilterInfo(ParameterName, null, true, null, ParameterValue, null, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -501,7 +495,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, null, true, null, null, ParameterValue, null, null, false) },
+            [new FilterInfo(ParameterName, null, true, null, null, ParameterValue, null, null, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -527,7 +521,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, null, true, null, null, null, parameterValue, ParameterFormat, false) },
+            [new FilterInfo(ParameterName, null, true, null, null, null, parameterValue, ParameterFormat, false)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 
@@ -553,7 +547,7 @@ public class DataGridRequestTests
         var request = new DataGridRequest(
             0,
             0,
-            new[] { new FilterInfo(ParameterName, null, true, null, null, null, parameterValue, ParameterFormat, true) },
+            [new FilterInfo(ParameterName, null, true, null, null, null, parameterValue, ParameterFormat, true)],
             null);
         var (command, parameters) = DataGridRequest.ToSqlQuery(request, PrimaryKey);
 

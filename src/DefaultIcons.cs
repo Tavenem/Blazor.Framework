@@ -121,6 +121,11 @@ public static class DefaultIcons
     public static string Edit { get; set; } = "edit";
 
     /// <summary>
+    /// An icon for emoji.
+    /// </summary>
+    public static string Emoji { get; set; } = "mood";
+
+    /// <summary>
     /// <para>
     /// An icon for buttons which expand a region.
     /// </para>

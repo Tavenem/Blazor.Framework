@@ -58,6 +58,14 @@
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
+        @if (ShowEmoji)
+        {
+            <EmojiInput IconButton="true"
+                        @bind-Value="Emoji"
+                        @bind-Value:after="OnSelectEmojiAsync">
+                <Tooltip Delay="750">insert emoji</Tooltip>
+            </EmojiInput>
+        }
         @if (PostfixContent is not null)
         {
             @PostfixContent(Value)

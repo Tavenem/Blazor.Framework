@@ -845,7 +845,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             {
                 var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), property.PropertyType);
                 var ctor = columnType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, [typeof(PropertyInfo)])!;
-                _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { property }));
+                _columns.Add((IColumn<TDataItem>)ctor.Invoke([property]));
             }
 
             foreach (var field in dataType
@@ -854,7 +854,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             {
                 var columnType = typeof(Column<,>).MakeGenericType(typeof(TDataItem), field.FieldType);
                 var ctor = columnType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, [typeof(FieldInfo)])!;
-                _columns.Add((IColumn<TDataItem>)ctor.Invoke(new[] { field }));
+                _columns.Add((IColumn<TDataItem>)ctor.Invoke([field]));
             }
 
             _columns.Sort((x, y) => x.ColumnOrder.CompareTo(y.ColumnOrder));
@@ -1175,7 +1175,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         {
             List<string>? filterQueries = null;
 
-            var quickFilter = QuickFilter?.Trim('"').Trim();
+            var quickFilter = QuickFilter?.Trim().Trim('"').Trim();
             if (!string.IsNullOrEmpty(quickFilter))
             {
                 (filterQueries ??= []).Add(new StringBuilder(Id)
@@ -1964,7 +1964,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     {
         quickFilter = null;
 
-        var parts = filterString.Split(';');
+        var parts = filterString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         string? property = null;
         string? value = null;
         var beforeFlag = false;
@@ -2288,7 +2288,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private FilterInfo[]? GetFilterInfo(bool export = false)
     {
         List<FilterInfo>? filterInfo = null;
-        var quickFilter = QuickFilter?.Trim('"').Trim();
+        var quickFilter = QuickFilter?.Trim().Trim('"').Trim();
         foreach (var column in _columns
             .Where(x => (x.GetIsShown()
                 || (x.IsQuickFilter
@@ -2304,16 +2304,19 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                 {
                     continue;
                 }
-                var exact = !string.IsNullOrEmpty(column.TextFilter)
-                    && column.TextFilter.Length >= 2
-                    && column.TextFilter[0] == '"'
-                    && column.TextFilter[^1] == '"';
                 string? textFilter = null;
+                var exact = false;
                 if (column.GetIsShown())
                 {
-                    textFilter = exact
-                        ? column.TextFilter![1..^1]
-                        : column.TextFilter;
+                    textFilter = column.TextFilter?.Trim();
+                    if (!string.IsNullOrEmpty(textFilter)
+                        && textFilter.Length >= 2
+                        && textFilter[0] == '"'
+                        && textFilter[^1] == '"')
+                    {
+                        exact = true;
+                        textFilter = textFilter[1..^1];
+                    }
                 }
                 (filterInfo ??= []).Add(new(
                     column.MemberName!,

@@ -205,6 +205,11 @@ public partial class TextInput : InputComponentBase<string>
     [Parameter] public bool ShowAllSuggestions { get; set; }
 
     /// <summary>
+    /// Whether to show an emoji picker button, which appends selected emoji to the current input.
+    /// </summary>
+    [Parameter] public bool ShowEmoji { get; set; }
+
+    /// <summary>
     /// <para>
     /// Whether to show the current character count and maximum length, if <see cref="MaxLength"/>
     /// has been set.
@@ -327,6 +332,8 @@ public partial class TextInput : InputComponentBase<string>
     private int CurrentLength { get; set; }
 
     private int EffectiveSize => Math.Max(1, Size ?? 1);
+
+    private string? Emoji { get; set; }
 
     private IEnumerable<string> FilteredSuggestions
     {
@@ -645,6 +652,16 @@ public partial class TextInput : InputComponentBase<string>
                 await OnValidEnter.InvokeAsync();
             }
         }
+    }
+
+    private async Task OnSelectEmojiAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Emoji))
+        {
+            return;
+        }
+        await SetValueAsync(CurrentValue + Emoji);
+        Emoji = null;
     }
 
     private void OnTimer()

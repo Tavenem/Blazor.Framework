@@ -111,10 +111,6 @@ export function getFonts() {
     return validFonts;
 }
 
-export function open(url?: string, target?: string, features?: string) {
-    window.open(url, target, features);
-}
-
 export async function openStream(fileName: string, fileType: string, streamReference: DotNetStreamReference, revoke: boolean) {
     const buffer = await streamReference.arrayBuffer();
     const file = new File([buffer], fileName, { type: fileType });
@@ -136,10 +132,6 @@ export function restoreElementFocus(element: IFocusableElement) {
             previous.focus();
         }
     }
-}
-
-export function revokeURL(url: string) {
-    URL.revokeObjectURL(url);
 }
 
 export function saveElementFocus(element: IFocusableElement) {

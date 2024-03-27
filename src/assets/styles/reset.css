@@ -19,7 +19,7 @@ body {
     background-color: var(--tavenem-color-bg);
     color: var(--tavenem-color-text);
     font-family: var(--tavenem-font-family);
-    font-size: 1rem;
+    font-size: var(--tavenem-font-size);
     font-weight: var(--tavenem-font-weight);
     line-height: var(--tavenem-lineheight-body);
     margin: 0;
@@ -376,7 +376,7 @@ input {
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-inset);
     color: var(--tavenem-color-text);
-    font-size: 1rem;
+    font-size: var(--tavenem-font-size);
     font-weight: var(--tavenem-font-weight);
     line-height: var(--tavenem-lineheight-body);
     padding: 6px .75rem;

@@ -719,6 +719,27 @@
     </ChildContent>
 </Collapse>
 
+<h2>Emoji</h2>
+
+<p>
+    A built-in <a href="/components/emoji">EmojiInput</a> button can be displayed with the
+    <code>ShowEmoji</code> property, which allows the user to select an emoji to be appended to the
+    current value.
+</p>
+
+<Collapse Id="ce-20" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row fill align-items-center gap-2">
+            <TextInput ShowEmoji="true" Class="w-100" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <TextInput ShowEmoji=""true"" Class=""w-100"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
 <h2>Methods</h2>
 
 <p>
@@ -745,7 +766,7 @@
     submission-type logic for text inputs, without duplicating validation logic.
 </p>
 
-<Collapse Id="ce-20" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-21" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
             <TextInput @bind-Value="_value5" Label="Type something and hit Enter" OnValidEnter="OnEnterAsync" />
@@ -771,7 +792,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-21" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-22" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -838,7 +859,7 @@
     <code>PrefixContent</code>, <code>PrefixText</code> and <code>PrefixIcon</code> are ignored.
 </p>
 
-<Collapse Id="ce-22" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-23" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
             <TextInput Label="Idea" PrefixIcon="lightbulb" />
@@ -889,7 +910,7 @@
     <code>PostfixContent</code>, <code>PostfixText</code> and <code>PostfixIcon</code> are ignored.
 </p>
 
-<Collapse Id="ce-23" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-24" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
             <TextInput Label="Idea" PostfixIcon="lightbulb" />

@@ -1,4 +1,6 @@
 using Microsoft.JSInterop;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -25,8 +27,8 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     {
         if (_moduleTask.IsValueCreated)
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module.DisposeAsync().ConfigureAwait(false);
+            var module = await _moduleTask.Value;
+            await module.DisposeAsync();
         }
 
         GC.SuppressFinalize(this);
@@ -40,14 +42,22 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// <param name="streamReference">
     /// A <see cref="DotNetStreamReference"/> wrapping a stream.
     /// </param>
-    public async ValueTask DownloadAsync(string fileName, string fileType, DotNetStreamReference streamReference)
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask DownloadAsync(
+        string fileName,
+        string fileType,
+        DotNetStreamReference streamReference,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("downloadStream", fileName, fileType, streamReference)
-                .ConfigureAwait(false);
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync(
+                "downloadStream",
+                cancellationToken,
+                fileName,
+                fileType,
+                streamReference);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
@@ -62,18 +72,80 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// <param name="url">
     /// A URL which points to a downloadable file.
     /// </param>
-    public async ValueTask DownloadAsync(string fileName, string url)
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask DownloadAsync(string fileName, string url, CancellationToken cancellationToken = default)
     {
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("downloadUrl", fileName, url)
-                .ConfigureAwait(false);
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("downloadUrl", cancellationToken, fileName, url);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
+    /// Gets a value from the browser's <c>localStorage</c>.
+    /// </summary>
+    /// <param name="key">The key of the value to retrieve.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// The string value stored under the given <paramref name="key"/> in the browser's
+    /// <c>localStorage</c>; or <see langword="null"/> if there is no such value.
+    /// </returns>
+    public async ValueTask<string?> GetFromLocalStorageAsync(string key, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+        try
+        {
+            return await jsRuntime.InvokeAsync<string?>("localStorage.getItem", cancellationToken, key);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets a value from the browser's <c>localStorage</c>.
+    /// </summary>
+    /// <typeparam name="T">The type of data to retrieve.</typeparam>
+    /// <param name="key">The key of the value to retrieve.</param>
+    /// <param name="typeInfo"><see cref="JsonTypeInfo{T}"/> for <typeparamref name="T"/>.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>
+    /// The string value stored under the given <paramref name="key"/> in the browser's
+    /// <c>localStorage</c>; or <see langword="null"/> if there is no such value.
+    /// </returns>
+    public async ValueTask<T?> GetFromLocalStorageAsync<T>(string key, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default)
+    {
+        var value = await GetFromLocalStorageAsync(key, cancellationToken);
+        if (string.IsNullOrEmpty(value))
+        {
+            return default;
+        }
+        // When retrieving a string, if the value doesn't appear to be serialized JSON, return it as-is.
+        if (typeof(T) == typeof(string)
+            && value[0] != '{'
+            && value[0] != '['
+            && value[0] != '"')
+        {
+            return (T)(object)value;
+        }
+        try
+        {
+            return JsonSerializer.Deserialize(value, typeInfo);
+        }
+        // If deserialization failed for the entire value (i.e. not a sub-property or element),
+        // and the type is string, return the value as-is.
+        catch (JsonException e) when (e.Path == "$" && typeof(T) == typeof(string))
+        {
+            return (T)(object)value;
+        }
     }
 
     /// <summary>
@@ -86,18 +158,24 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// A <see cref="DotNetStreamReference"/> wrapping a stream.
     /// </param>
     /// <param name="revoke">Whether to immediately revoke the allocated object URL.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     public async ValueTask<string?> OpenAsync(
         string fileName,
         string fileType,
         DotNetStreamReference streamReference,
-        bool revoke = true)
+        bool revoke = true,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            return await module
-                .InvokeAsync<string>("openStream", fileName, fileType, streamReference, revoke)
-                .ConfigureAwait(false);
+            var module = await _moduleTask.Value;
+            return await module.InvokeAsync<string>(
+                "openStream",
+                cancellationToken,
+                fileName,
+                fileType,
+                streamReference,
+                revoke);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
@@ -157,11 +235,13 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// langword="true"/>; the value of the <paramref name="noopener"/> parameter is ignored.
     /// </para>
     /// </param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     public async ValueTask OpenUrlAsync(
         string? url,
         string? target = null,
         bool noopener = false,
-        bool noreferrer = false)
+        bool noreferrer = false,
+        CancellationToken cancellationToken = default)
     {
         string? features = null;
         if (noreferrer)
@@ -175,10 +255,27 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
 
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("open", url, target, features)
-                .ConfigureAwait(false);
+            await jsRuntime.InvokeVoidAsync("window.open", cancellationToken, url, target, features);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
+    /// Removes a value from the browser's <c>localStorage</c>.
+    /// </summary>
+    /// <param name="key">The key of the value to remove.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask RemoveFromLocalStorageAsync(string key, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+        try
+        {
+            await jsRuntime.InvokeVoidAsync("localStorage.removeItem", cancellationToken, key);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
@@ -189,30 +286,65 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// Revokes a previously allocated object URL.
     /// </summary>
     /// <param name="url">The URL to revoke.</param>
-    public async ValueTask RevokeURLAsync(string url)
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask RevokeURLAsync(string url, CancellationToken cancellationToken = default)
     {
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("revokeURL", url)
-                .ConfigureAwait(false);
+            await jsRuntime.InvokeVoidAsync("URL.revokeObjectURL", cancellationToken, url);
         }
         catch { }
+    }
+
+    /// <summary>
+    /// Sets a value in the browser's <c>localStorage</c>.
+    /// </summary>
+    /// <param name="key">The key under which to set the value.</param>
+    /// <param name="value">The value to store.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask SetInLocalStorageAsync(string key, string value, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+        try
+        {
+            await jsRuntime.InvokeVoidAsync("localStorage.setItem", cancellationToken, key, value);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+    }
+
+    /// <summary>
+    /// Sets a value in the browser's <c>localStorage</c>.
+    /// </summary>
+    /// <typeparam name="T">The type of data to store.</typeparam>
+    /// <param name="key">The key under which to set the value.</param>
+    /// <param name="value">The value to store.</param>
+    /// <param name="typeInfo"><see cref="JsonTypeInfo{T}"/> for <typeparamref name="T"/>.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask SetInLocalStorageAsync<T>(string key, T value, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            throw new ArgumentNullException(nameof(key));
+        }
+        await SetInLocalStorageAsync(key, JsonSerializer.Serialize(value, typeInfo), cancellationToken);
     }
 
     /// <summary>
     /// Horizontally shake the HTML element with the given id.
     /// </summary>
     /// <param name="elementId">The id of an HTML element.</param>
-    public async ValueTask Shake(string? elementId)
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    public async ValueTask Shake(string? elementId, CancellationToken cancellationToken = default)
     {
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
-            await module
-                .InvokeVoidAsync("shake", elementId)
-                .ConfigureAwait(false);
+            var module = await _moduleTask.Value;
+            await module.InvokeVoidAsync("shake", cancellationToken, elementId);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
@@ -223,7 +355,7 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     {
         try
         {
-            var module = await _moduleTask.Value.ConfigureAwait(false);
+            var module = await _moduleTask.Value;
             return await module.InvokeAsync<string[]>("getFonts");
         }
         catch (JSException) { }

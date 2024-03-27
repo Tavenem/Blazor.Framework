@@ -187,6 +187,8 @@ public partial class Editor : FormComponentBase<string>
 
     [Inject, NotNull] private EditorService? EditorService { get; set; }
 
+    private string? Emoji { get; set; }
+
     private List<string> Fonts { get; } = ["sans-serif", "serif", "monospace", "cursive"];
 
     private ColorInput<string>? ForegroundPicker { get; set; }
@@ -583,7 +585,18 @@ public partial class Editor : FormComponentBase<string>
         if (!string.Equals(CurrentValueAsString, value))
         {
             CurrentValueAsString = value;
+            StateHasChanged();
         }
+    }
+
+    private async Task OnSelectEmojiAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Emoji))
+        {
+            return;
+        }
+        await EditorService.UpdateSelectedText(Emoji);
+        Emoji = null;
     }
 
     private Task SetFontFamilyAsync(string? value)

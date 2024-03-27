@@ -1,7 +1,8 @@
 ﻿:root {
-    --tavenem-font-family: Recursive, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --tavenem-font-family: Recursive, "Noto Color Emoji", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "EmojiOne Color", "Android Emoji";
     --tavenem-font-family-monospace: Recursive, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --tavenem-font-family-title: 'Encode Sans SC', Recursive, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --tavenem-font-family-title: 'Encode Sans SC', Recursive, "Noto Color Emoji", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "EmojiOne Color", "Android Emoji";
+    --tavenem-font-size: 1rem;
     --tavenem-font-size-h1: 3rem;
     --tavenem-font-size-h2: 2.5rem;
     --tavenem-font-size-h3: 2rem;

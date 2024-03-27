@@ -57,7 +57,6 @@ export namespace TavenemPopover {
             'bottom-right': 'top-left',
         },
     };
-    const focusLostEvent = new Event('focuslost', { bubbles: true });
     const resizeObserver = new ResizeObserver(function () {
         placePopovers();
     });
@@ -293,6 +292,10 @@ export namespace TavenemPopover {
         }
     }
 
+    function newFocusLostEvent(parentId?: string) {
+        return new CustomEvent('focuslost', { bubbles: true, detail: { parentId: parentId } });
+    }
+
     function calculatePopoverPosition(
         list: string[],
         boundingRect: DOMRect,
@@ -422,7 +425,7 @@ export namespace TavenemPopover {
             }
 
             popover.focusTimer = setTimeout(() => {
-                popover.dispatchEvent(focusLostEvent);
+                popover.dispatchEvent(newFocusLostEvent(popover.id));
             }, 150);
         }
     }

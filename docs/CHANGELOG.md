@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.35
+### Added
+- `tf-emoji` custom element which renders emoji short codes as emoji
+- `EmojiInput` component which displays a picker and binds the result to an input
+  - A built-in emoji button has been added to `TextInput` and `TextArea`, shown if the new `ShowEmoji` property is `true` (`false` by default)
+  - A new emoji toolbar button was also added to the `Editor`
+  - The new built-in emoji buttons insert the selected emoji into the input (or overwrite any selected text, in the case of the editor)
+### Changed
+- Default numeric format for integral `DataGrid` columns changed from `N0` to `F0`
+
 ## 2.34
 ### Fixed
 - Collapse initial open behavior

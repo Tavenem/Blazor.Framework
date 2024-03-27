@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Tavenem.Blazor.Framework.Services.Popovers;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -64,7 +65,7 @@ public partial class Popover
     /// <summary>
     /// Raised when the popover loses focus.
     /// </summary>
-    [Parameter] public EventCallback FocusOut { get; set; }
+    [Parameter] public EventCallback<FocusLostEventArgs> FocusOut { get; set; }
 
     /// <summary>
     /// <para>
@@ -208,4 +209,13 @@ public partial class Popover
     /// Gives focus to the popover element.
     /// </summary>
     public ValueTask FocusAsync() => ElementReference.FocusFirstAsync();
+
+    private async Task OnFocusLostAsync(FocusLostEventArgs e)
+    {
+        if (FocusOut.HasDelegate
+            && e.ParentId?.Equals(Id) == true)
+        {
+            await FocusOut.InvokeAsync(e);
+        }
+    }
 }

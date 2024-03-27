@@ -350,7 +350,7 @@ internal static class ColumnExtensions
                 }
                 else
                 {
-                    return formattable.ToString("N0", column.FormatProvider);
+                    return formattable.ToString("F0", column.FormatProvider);
                 }
             }
             return formattable.ToString(column.Format, column.FormatProvider);

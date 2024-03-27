@@ -1155,8 +1155,9 @@ class TavenemWysiwygEditor {
             deleteSelection(editor.view.state, editor.view.dispatch);
         } else {
             const node = editor.view.state.schema.text(value);
-            editor.view.state.applyTransaction(
+            const newState = editor.view.state.apply(
                 editor.view.state.tr.replaceSelectionWith(node));
+            editor.view.updateState(newState);
         }
 
         editor.ref.invokeMethodAsync(

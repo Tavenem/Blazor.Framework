@@ -36,6 +36,7 @@
     <PackageReference Include="Markdig" Version="0.33.0" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -63,26 +64,6 @@
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
     <CssFiles Include="$(ClientAssetsDirectory)styles\**\*.css;$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ClientAssetsInputs Remove="assets\scripts\tavenem-emoji.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <CssFiles Remove="assets\styles\components\emoji.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="assets\styles\components\emoji.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="assets\styles\components\emoji.css" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Emoji\" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">

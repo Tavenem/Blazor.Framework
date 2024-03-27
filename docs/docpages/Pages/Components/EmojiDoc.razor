@@ -10,14 +10,27 @@
     display emoji using a short code.
 </p>
 
+<p>
+    It also provides an emoji picker component which allows the user to select any single emoji, and
+    binds the result to a text input. Also see the <a href="/components/text-input">Text Input</a>,
+    <a href="/components/text-area">Text Area</a>, and <a href="/components/editor">Editor</a>
+    components, which have optional built-in emoji pickers to easily insert emoji into the text.
+</p>
+
 <h2>Basics</h2>
 
 <p>
-    To insert an emoji, simply use the <code>tf-emoji</code> custom element, with the short code of
-    the emoji as the content. Some emoji have multiple accepted short codes. Surrounding colons are
-    optional (e.g. :relaxed: vs. relaxed). Note that short codes for custom icons, such as those
-    used on a particular website or in a specific app, are not supported; only standard Unicode
-    emoji characters are available. If a short code is unsupported, the text renders as-is.
+    To place a single emoji into page content, simply use the <code>tf-emoji</code> custom element,
+    with the short code of the emoji as the content. Some emoji have multiple accepted short codes.
+    Surrounding colons are optional (e.g. :relaxed: vs. relaxed). Note that short codes for custom
+    icons, such as those used on a particular website or in a specific app, are not supported; only
+    standard Unicode emoji characters are available. If a short code is unsupported, the text
+    renders as-is.
+</p>
+
+<p>
+    Emoji are rendered with a standardized font stack, to avoid issues with certain systems lacking
+    support for all emoji.
 </p>
 
 <CodeExample Id="ce-1" Code="@(@"<tf-emoji>relaxed</tf-emoji>
@@ -29,13 +42,340 @@
 <tf-emoji>brain</tf-emoji>
 <tf-emoji>bear</tf-emoji>")" />
 
-<h2>Font</h2>
+<h2>Picker</h2>
+
+<p>The <code>EmojiInput</code> component is a rich wrapper for an input element.</p>
 
 <p>
-    Emoji are rendered with a standardized font stack, to avoid issues with certain systems lacking
-    support for all emoji. To use the same font for native emoji within static content, apply
-    the <code>tf-emoji</code> CSS class to any element to use the same font stack as the
-    <code>tf-emoji</code> element.
+    Note: like all Tavenem Framework forms components, this control cannot be used on static
+    server-side rendered pages. It will always be disabled when rendered statically. This is because
+    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
+    disabled during the prerender pass, then become enabled when interactivity becomes available.
 </p>
 
-<CodeExample Id="ce-2" Code="@(@"<span class=""tf-emoji"">🤖</span>")" />
+<h3>Basics</h3>
+
+<p>
+    The default emoji input displays as a button. The button text is the currently-selected emoji
+    (or a default if one has not yet been picked), unless set the <code>IconButton</code> property
+    to <code>true</code> (which causes the button to show a simple icon).
+</p>
+
+<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <EmojiInput DisplayType="PickerDisplayType.Button" />
+            <EmojiInput DisplayType="PickerDisplayType.Button" IconButton="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<EmojiInput />
+    <EmojiInput IconButton=""true"" />")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The label and any help text or validation messages are not displayed in this style, but the
+    button does get a special border color when the input is invalid.
+</p>
+
+<p>
+    This display style is intended for integration within a toolbar, or a similar compact layout,
+    where a full field would not be appropriate. It will usually be good practice to label the
+    button in some manner (e.g. with a <a href="./components/tooltip">tooltip</a>), and display any
+    help text or validation messages manually in an appropriate place. Otherwise the purpose of the
+    button may not be clear to a user.
+</p>
+
+<h3>Field</h3>
+
+<p>
+    If you set the <code>DisplayType</code> property to <code>PickerDisplayType.Field</code> a full
+    input field is displayed instead of a simple button. Emoji input fields come in three styles.
+    The default uses a simple underline. Add the <code>filled</code> class to give it a shaded
+    background. Add the <code>outlined</code> class to use a full outline.
+</p>
+
+<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row fill align-items-center gap-2">
+            <EmojiInput DisplayType="PickerDisplayType.Field" Label="Normal" />
+            <EmojiInput DisplayType="PickerDisplayType.Field" Label="Filled" Class="filled" />
+            <EmojiInput DisplayType="PickerDisplayType.Field" Label="Outlined" Class="outlined" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <EmojiInput DisplayType=""PickerDisplayType.Field"" Label=""Normal"" />
+    <EmojiInput DisplayType=""PickerDisplayType.Field"" Label=""Filled"" Class=""filled"" />
+    <EmojiInput DisplayType=""PickerDisplayType.Field"" Label=""Outlined"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    You can also add the <code>dense</code> class to any variant to reduce the margins and padding.
+</p>
+
+<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row fill align-items-center gap-2">
+            <EmojiInput DisplayType="PickerDisplayType.Field" Label="Normal" Class="dense" />
+            <EmojiInput DisplayType="PickerDisplayType.Field" Label="Filled" Class="filled dense" />
+            <EmojiInput DisplayType="PickerDisplayType.Field" Label="Outlined" Class="outlined dense" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <EmojiInput DisplayType=""PickerDisplayType.Field"" Label=""Normal"" Class=""dense"" />
+    <EmojiInput DisplayType=""PickerDisplayType.Field"" Label=""Filled"" Class=""filled dense"" />
+    <EmojiInput DisplayType=""PickerDisplayType.Field"" Label=""Outlined"" Class=""outlined dense"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<h3>Inline</h3>
+
+<p>
+    If you set the <code>DisplayType</code> property to <code>PickerDisplayType.Inline</code> the
+    full emoji picker is displayed in the document flow.
+</p>
+
+<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <EmojiInput Label="Inline" DisplayType="PickerDisplayType.Inline" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<EmojiInput Label=""Inline"" DisplayType=""PickerDisplayType.Inline"" />")
+    </ChildContent>
+</Collapse>
+
+<h3>Disabled & read-only</h3>
+
+<p>
+    The input can be set as disabled or read-only by setting the properties of the same names.
+</p>
+
+<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row mt-3 fill align-items-center gap-2">
+                <EmojiInput Label="Disabled" Disabled="true" />
+                <EmojiInput Label="Read-only" ReadOnly="true" />
+            </div>
+            <div class="row fill align-items-center gap-2">
+                <EmojiInput Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Field" />
+                <EmojiInput Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Field" Class="filled" />
+                <EmojiInput Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Field" Class="outlined" />
+            </div>
+            <div class="row mt-3 fill align-items-center gap-2">
+                <EmojiInput Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Field" />
+                <EmojiInput Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Field" Class="filled" />
+                <EmojiInput Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Field" Class="outlined" />
+            </div>
+            <div class="row mt-3 fill align-items-center gap-2">
+                <EmojiInput Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Inline" />
+                <EmojiInput Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Inline" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <EmojiInput Label=""Disabled"" Disabled=""true"" />
+    <EmojiInput Label=""Read-only"" ReadOnly=""true"" />
+</div>
+<div class=""row fill align-items-center gap-2"">
+    <EmojiInput Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Field"" />
+    <EmojiInput Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Field"" Class=""filled"" />
+    <EmojiInput Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Field"" Class=""outlined"" />
+</div>
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <EmojiInput Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Field"" />
+    <EmojiInput Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Field"" Class=""filled"" />
+    <EmojiInput Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Field"" Class=""outlined"" />
+</div>
+<div class=""row mt-3 fill align-items-center gap-2"">
+    <EmojiInput Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Inline"" />
+    <EmojiInput Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Inline"" />
+</div>
+
+@code {
+    private string _disabled = ""#0f0"";
+}")
+    </ChildContent>
+</Collapse>
+
+<h3>Label</h3>
+
+<p>
+    The <code>Label</code> property assigns a label to the input. The label will appear within the
+    input like a placeholder when it is empty and does not have focus. Labels are not visible in
+    button display mode (the default).
+</p>
+
+<p>
+    Note that while a <code>ColorInput</code> bound to a <code>string</code> or a nullable
+    <code>System.Drawing.Color</code> will allow an empty value, one bound to a non-nullable
+    <code>System.Drawing.Color</code> will never be empty, since the bound <code>struct</code> will
+    always have a value.
+</p>
+
+<Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row fill align-items-center gap-2">
+            <EmojiInput Label="Label" DisplayType="PickerDisplayType.Field" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <EmojiInput Label=""Label"" DisplayType=""PickerDisplayType.Field"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<h3>Help text</h3>
+
+<p>
+    You can supply help text for the field with the <code>HelpText</code> property. Help text is not
+    visible in button display mode (the default).
+</p>
+
+<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row fill align-items-center gap-2">
+            <EmojiInput Label="Normal" HelpText="Some help text" DisplayType="PickerDisplayType.Field" />
+            <EmojiInput Label="Filled" HelpText="Some help text" DisplayType="PickerDisplayType.Field" Class="filled" />
+            <EmojiInput Label="Outlined" HelpText="Some help text" DisplayType="PickerDisplayType.Field" Class="outlined" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <EmojiInput Label=""Normal"" HelpText=""Some help text"" DisplayType=""PickerDisplayType.Field"" />
+    <EmojiInput Label=""Filled"" HelpText=""Some help text"" DisplayType=""PickerDisplayType.Field"" Class=""filled"" />
+    <EmojiInput Label=""Outlined"" HelpText=""Some help text"" DisplayType=""PickerDisplayType.Field"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    Note that help text is replaced by any field validation errors.
+</p>
+
+<h3>Required</h3>
+
+<p>
+    Set the <code>Required</code> property to specify whether the input is required. This adds an
+    indicator to the label, and automatic verification rules which warn the user when the input is
+    empty. The warning will only appear after the user has interacted with the input for the first
+    time.
+</p>
+
+<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row fill align-items-center gap-2">
+            <EmojiInput Label="Required" Required="true" DisplayType="PickerDisplayType.Field" />
+            <EmojiInput Label="Required" Required="true" DisplayType="PickerDisplayType.Field" Class="filled" />
+            <EmojiInput Label="Required" Required="true" DisplayType="PickerDisplayType.Field" Class="outlined" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <EmojiInput Label=""Required"" Required=""true"" DisplayType=""PickerDisplayType.Field"" />
+    <EmojiInput Label=""Required"" Required=""true"" DisplayType=""PickerDisplayType.Field"" Class=""filled"" />
+    <EmojiInput Label=""Required"" Required=""true"" DisplayType=""PickerDisplayType.Field"" Class=""outlined"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<h2>Tab index</h2>
+
+<p>
+    Set the <code>TabIndex</code> property to specify the value of the input's <code>tabindex</code>
+    attribute.
+</p>
+
+<p>
+    When <code>Inline</code> is <code>true</code>, this sets the <code>tabindex</code> of the search
+    box.
+</p>
+
+<h2>Name</h2>
+
+<p>
+    The <code>name</code> attribute of the input can be set with the property of the same name.
+</p>
+
+<p>
+    Note: even when <code>Inline</code> is <code>true</code>, a hidden <code>input</code> element
+    still exists which receives this name, enabling native form submission.
+</p>
+
+<h2>Auto-focus</h2>
+
+<p>
+    Set the <code>AutoFocus</code> property to <code>true</code> to automatically focus the input on
+    page load. Setting this on more than one component will cause the first one in the DOM layout
+    order to receive focus.
+</p>
+
+<p>
+    Be cautious when using this property. It can be unfriendly to users who use screen-reading
+    technology.
+</p>
+
+<p>
+    When <code>Inline</code> is <code>true</code>, this sets the <code>AutoFocus</code> of the
+    search box.
+</p>
+
+<h3>Methods</h3>
+
+<p>
+    The <code>Clear</code> method will clear the current value.
+</p>
+
+<p>
+    The <code>FocusAsync</code> method will give the input focus. When <code>Inline</code> is
+    <code>true</code>, this sets the focus on the hue slider.
+</p>
+
+<h3>Customization</h3>
+
+<p>
+    You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
+</p>
+
+<Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <div class="row fill align-items-center gap-2">
+                <EmojiInput Label="Primary" ThemeColor="ThemeColor.Primary" />
+                <EmojiInput Label="Secondary" ThemeColor="ThemeColor.Secondary" />
+                <EmojiInput Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
+            </div>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+    <EmojiInput Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
+    <EmojiInput Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
+    <EmojiInput Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />
+</div>")
+    </ChildContent>
+</Collapse>
+
+<p>
+    The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
+    CSS attributes of the input itself, while the <code>InputAttributes</code> property can be used
+    to assign arbitrary attributes to it.
+</p>
+
+<h2>Validation</h2>
+
+<p>
+    See <a href="./components/form#validation">Validation</a> for information about validating Tavenem
+    Blazor Framework form components.
+</p>

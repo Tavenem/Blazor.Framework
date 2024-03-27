@@ -10,7 +10,12 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
 
     blazor.registerCustomEventType('focuslost', {
         createEventArgs: (event) => {
-            return event;
+            return {
+                parentId: event instanceof CustomEvent
+                    && event.detail
+                    ? event.detail.parentId
+                    : undefined
+            }
         }
 });
     blazor.registerCustomEventType('dropdowntoggle', {

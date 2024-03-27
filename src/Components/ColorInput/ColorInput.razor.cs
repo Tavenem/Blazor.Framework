@@ -227,7 +227,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         .AddStyle("min-width", "312px")
         .ToString();
 
-    [Inject] IJSEventListener JSEventListener { get; set; } = default!;
+    [Inject, NotNull] IJSEventListener? JSEventListener { get; set; }
 
     private string OverlayStyle => IsDisabled
         ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"

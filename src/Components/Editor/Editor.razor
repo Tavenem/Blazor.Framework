@@ -193,7 +193,7 @@
                                 @bind-Value:after="@(() => CommandAsync(EditorCommandType.ForegroundColor, NewForeground))"
                                 DisplayType="PickerDisplayType.Button"
                                 IconButton="true"
-                                InputClass="rounded"
+                                InputClass="rounded small"
                                 Disabled="IsCommandDisabled(EditorCommandType.ForegroundColor)">
                         <Tooltip Delay="750">foreground color</Tooltip>
                     </ColorInput>
@@ -204,7 +204,7 @@
                                 DisplayType="PickerDisplayType.Button"
                                 IconButton="true"
                                 Icon="@DefaultIcons.ColorBackgroundSelect"
-                                InputClass="rounded"
+                                InputClass="rounded small"
                                 Disabled="IsCommandDisabled(EditorCommandType.BackgroundColor)">
                         <Tooltip Delay="750">background color</Tooltip>
                     </ColorInput>
@@ -383,6 +383,13 @@
                         <tf-icon>@DefaultIcons.PageBreak</tf-icon>
                         <Tooltip Delay="750">page break</Tooltip>
                     </button>
+                    <EmojiInput Disabled="@(ReadOnly || Disabled)"
+                                IconButton="true"
+                                InputClass="rounded small"
+                                @bind-Value="Emoji"
+                                @bind-Value:after="OnSelectEmojiAsync">
+                        <Tooltip Delay="750">insert emoji</Tooltip>
+                    </EmojiInput>
                     @if (IsWysiwyg && !IsCommandDisabled(EditorCommandType.SetCodeSyntax))
                     {
                         <div class="vr"></div>

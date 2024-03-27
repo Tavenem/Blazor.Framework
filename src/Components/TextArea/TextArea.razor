@@ -21,6 +21,14 @@
                   value="@CurrentValue"
                   @oninput="OnInput"
                   @onchange="OnChange" />
+        @if (ShowEmoji)
+        {
+            <EmojiInput IconButton="true"
+                        @bind-Value="Emoji"
+                        @bind-Value:after="OnSelectEmoji">
+                <Tooltip Delay="750">insert emoji</Tooltip>
+            </EmojiInput>
+        }
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {

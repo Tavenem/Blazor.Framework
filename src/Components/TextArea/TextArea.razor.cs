@@ -63,6 +63,11 @@ public partial class TextArea : InputComponentBase<string>
     [Parameter] public string? Placeholder { get; set; }
 
     /// <summary>
+    /// Whether to show an emoji picker button, which appends selected emoji to the current input.
+    /// </summary>
+    [Parameter] public bool ShowEmoji { get; set; }
+
+    /// <summary>
     /// <para>
     /// Whether to show the current character count and maximum length, if <see cref="MaxLength"/>
     /// has been set.
@@ -123,6 +128,8 @@ public partial class TextArea : InputComponentBase<string>
     }
 
     private int CurrentLength { get; set; }
+
+    private string? Emoji { get; set; }
 
     private protected string? SpellcheckValue => Spellcheck == true ? "true" : "false";
 
@@ -252,6 +259,16 @@ public partial class TextArea : InputComponentBase<string>
         CurrentLength = str?.Length ?? 0;
 
         CurrentValueAsString = str;
+    }
+
+    private void OnSelectEmoji()
+    {
+        if (string.IsNullOrWhiteSpace(Emoji))
+        {
+            return;
+        }
+        CurrentValueAsString += Emoji;
+        Emoji = null;
     }
 
     private void OnTimer() => CurrentValueAsString = _newValue;
