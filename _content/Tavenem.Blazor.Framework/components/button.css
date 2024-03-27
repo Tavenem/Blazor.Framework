@@ -1,4 +1,4 @@
-﻿.btn {
+.btn {
     --button-default-active-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
     --button-default-bg: var(--tavenem-color-default);
     --button-default-color: var(--tavenem-color-default-text);
@@ -272,6 +272,7 @@ a.btn-text:not(.disabled, :disabled) {
     --button-padding-y: var(--button-inherited-padding-y-icon, var(--button-default-padding-y));
     border-radius: 9999px;
     flex: 0 0 auto;
+    line-height: 1;
     min-width: calc(var(--button-font-size) + (var(--button-padding-x) * 2));
     padding: var(--button-padding-y) var(--button-padding-x);
     text-align: center;
@@ -279,7 +280,6 @@ a.btn-text:not(.disabled, :disabled) {
     &:after {
         transform: scale(7,7);
     }
-
     tf-icon {
         font-size: inherit;
     }

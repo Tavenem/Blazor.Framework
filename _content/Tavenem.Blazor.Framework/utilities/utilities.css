@@ -29,8 +29,8 @@ h1, h2, h3, h4, h5, h6,
 .lh-lg { line-height: var(--tavenem-lineheight-large); }
 
 .small {
-    font-size: var(--tavenem-font-size-sm);
-    line-height: var(--tavenem-lineheight-small);
+    --tavenem-font-size: var(--tavenem-font-size-sm);
+    --tavenem-lineheight-body: var(--tavenem-lineheight-small);
 }
 
 .codeblock {

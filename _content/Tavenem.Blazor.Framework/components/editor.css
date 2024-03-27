@@ -57,12 +57,12 @@
         > div:first-child {
             border-top-left-radius: var(--tavenem-border-radius);
             border-top-right-radius: var(--tavenem-border-radius);
-            column-gap: .5rem;
+            column-gap: .125rem;
             display: flex;
             flex-wrap: wrap;
             height: calc(2.25rem + 12px);
             padding: .5rem calc(2.75rem + 10px) .5rem 1rem;
-            row-gap: .75rem;
+            row-gap: .25rem;
 
             > .btn:not(:disabled),
             > .button-group,
