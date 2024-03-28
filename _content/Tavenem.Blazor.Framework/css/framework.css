@@ -54,7 +54,7 @@
 @import "utilities/lg.css" layer(tavenem-framework.utilities);
 @import "utilities/xl.css" layer(tavenem-framework.utilities);
 @import "utilities/xxl.css" layer(tavenem-framework.utilities);
-@import "math.css" layer(tavenem-framework.special);
-@import "katex.min.css" layer(tavenem-framework.special);
+@import "../math.css" layer(tavenem-framework.special);
+@import "../katex.min.css" layer(tavenem-framework.special);
 @import "highlight.css" layer(tavenem-framework.special);
 @import "blazor.css" layer(tavenem-framework.special);
