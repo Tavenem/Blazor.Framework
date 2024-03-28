@@ -99,7 +99,7 @@
     }
 
     > .field,
-    > [role-"listitem"] > .field {
+    > [role="listitem"] > .field {
         flex-grow: 1;
     }
 
@@ -297,7 +297,7 @@
         padding-bottom: .25em;
         padding-top: .25em;
 
-        > *:not(hr) {
+        & > *:not(hr) {
             padding-bottom: .25em;
             padding-top: .25em;
         }
