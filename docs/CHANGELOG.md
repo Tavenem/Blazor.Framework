@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.38
+### Added
+- Additional URI modifier methods to `QueryStateService`
+### Fixed
+- CSS import location
+
 ## 2.37
 ### Fixed
 - List styles

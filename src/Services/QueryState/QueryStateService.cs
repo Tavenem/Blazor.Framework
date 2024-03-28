@@ -247,6 +247,36 @@ public class QueryStateService
     }
 
     /// <summary>
+    /// Gets the given URI if the given <see langword="property"/> for the component with the given
+    /// <paramref name="id"/> did not have the provided <paramref name="value"/>.
+    /// </summary>
+    /// <param name="uri">The URI to modify.</param>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property to be persisted.</param>
+    /// <param name="value">
+    /// <para>
+    /// A value to be removed from the <see langword="property"/>, if it is currently assigned.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> the property is omitted completely.
+    /// </para>
+    /// </param>
+    /// <returns>
+    /// The given URI, with a query string modified to omit the given property value, if present.
+    /// </returns>
+    public string GetUriWithoutPropertyValue(
+        string uri,
+        string id,
+        string property,
+        object? value) => _navigationManager.GetUriWithQueryParameters(
+            uri,
+            GetQueryWithoutParameter(
+                id,
+                property,
+                value,
+                GetPropertiesFromQuery(uri)));
+
+    /// <summary>
     /// Gets the current URI if the given <see langword="property"/> for the component with the
     /// given <paramref name="id"/> did not have the provided <paramref name="value"/>.
     /// </summary>
@@ -276,6 +306,37 @@ public class QueryStateService
                 property,
                 value));
     }
+
+    /// <summary>
+    /// Gets the given URI if the given <see langword="property"/> for the component with the given
+    /// <paramref name="id"/> did not have the provided <paramref name="values"/>.
+    /// </summary>
+    /// <param name="uri">The URI to modify.</param>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property to be persisted.</param>
+    /// <param name="values">
+    /// <para>
+    /// A collection of values to be removed from the <see langword="property"/>, if any are
+    /// currently assigned.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> the property is omitted completely.
+    /// </para>
+    /// </param>
+    /// <returns>
+    /// The given URI, with a query string modified to omit the given property values, if present.
+    /// </returns>
+    public string GetUriWithoutPropertyValues(
+        string uri,
+        string id,
+        string property,
+        IEnumerable<object?>? values) => _navigationManager.GetUriWithQueryParameters(
+            uri,
+            GetQueryWithoutParameter(
+                id,
+                property,
+                values,
+                GetPropertiesFromQuery(uri)));
 
     /// <summary>
     /// Gets the current URI if the given <see langword="property"/> for the component with the
@@ -308,6 +369,49 @@ public class QueryStateService
                 property,
                 values));
     }
+
+    /// <summary>
+    /// Gets the given URI if the given <see langword="property"/> for the component with the given
+    /// <paramref name="id"/> had the provided <paramref name="value"/>.
+    /// </summary>
+    /// <param name="uri">The URI to modify.</param>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property to be persisted.</param>
+    /// <param name="value">
+    /// <para>
+    /// A value to be assigned to the <see langword="property"/>.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> the property is omitted completely.
+    /// </para>
+    /// <para>
+    /// Only built-in numeric value types, <see cref="bool"/>, <see cref="char"/>, <see
+    /// cref="string"/>, <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, <see
+    /// cref="DateOnly"/>, <see cref="TimeOnly"/>, <see cref="TimeSpan"/>, <see cref="Guid"/>,
+    /// nullable versions of those types are supported.
+    /// </para>
+    /// </param>
+    /// <param name="add">
+    /// Whether the given <paramref name="value"/> should be added to any current value(s) already
+    /// present in the query string. If <see langword="false"/>, the given <paramref name="value"/>
+    /// will replace any current value(s).
+    /// </param>
+    /// <returns>
+    /// The given URI, with a query string modified to reflect the given property value.
+    /// </returns>
+    public string GetUriWithPropertyValue(
+        string uri,
+        string id,
+        string property,
+        object? value,
+        bool add = false) => _navigationManager.GetUriWithQueryParameters(
+            uri,
+            GetQueryParameter(
+                id,
+                property,
+                value,
+                add,
+                GetPropertiesFromQuery(uri)));
 
     /// <summary>
     /// Gets the current URI if the given <see langword="property"/> for the component with the
@@ -352,6 +456,49 @@ public class QueryStateService
                 value,
                 add));
     }
+
+    /// <summary>
+    /// Gets the given URI if the given <see langword="property"/> for the component with the
+    /// given <paramref name="id"/> had the provided <paramref name="values"/>.
+    /// </summary>
+    /// <param name="uri">The URI to modify.</param>
+    /// <param name="id">A unique ID for the component.</param>
+    /// <param name="property">A name for the property to be persisted.</param>
+    /// <param name="values">
+    /// <para>
+    /// A collection of values to assign to the <see langword="property"/>.
+    /// </para>
+    /// <para>
+    /// If <see langword="null"/> the property is omitted completely.
+    /// </para>
+    /// <para>
+    /// Only built-in numeric value types, <see cref="bool"/>, <see cref="char"/>, <see
+    /// cref="string"/>, <see cref="DateTime"/>, <see cref="DateTimeOffset"/>, <see
+    /// cref="DateOnly"/>, <see cref="TimeOnly"/>, <see cref="TimeSpan"/>, <see cref="Guid"/>,
+    /// nullable versions of those types are supported.
+    /// </para>
+    /// </param>
+    /// <param name="add">
+    /// Whether the given <paramref name="values"/> should be added to any current value(s) already
+    /// present in the query string. If <see langword="false"/>, the given <paramref name="values"/>
+    /// will replace any current value(s).
+    /// </param>
+    /// <returns>
+    /// The given URI, with a query string modified to reflect the given property value.
+    /// </returns>
+    public string GetUriWithPropertyValues(
+        string uri,
+        string id,
+        string property,
+        IEnumerable<object?>? values,
+        bool add = false) => _navigationManager.GetUriWithQueryParameters(
+            uri,
+            GetQueryParameter(
+                id,
+                property,
+                values,
+                add,
+                GetPropertiesFromQuery(uri)));
 
     /// <summary>
     /// Gets the current URI if the given <see langword="property"/> for the component with the
@@ -976,6 +1123,50 @@ public class QueryStateService
         return value;
     }
 
+    private Dictionary<string, Dictionary<string, List<string>>> GetPropertiesFromQuery(string uriString)
+    {
+        if (!Uri.TryCreate(uriString, UriKind.Absolute, out var uri))
+        {
+            return [];
+        }
+
+        if (!QueryHelpers
+            .ParseQuery(uri.Query)
+            .TryGetValue(QueryParameterName, out var queryValues))
+        {
+            return [];
+        }
+
+        var changes = new Dictionary<string, Dictionary<string, QueryChangeEventArgs>>();
+        foreach (var queryValue in queryValues)
+        {
+            ParseQueryParameter(changes, queryValue);
+        }
+
+        Dictionary<string, Dictionary<string, List<string>>> allComponentProperties = [];
+        foreach (var (id, propertyChanges) in changes)
+        {
+            Dictionary<string, List<string>> componentProperties = [];
+            foreach (var (property, changeEventArgs) in propertyChanges)
+            {
+                if (changeEventArgs.Values is not null)
+                {
+                    componentProperties[property] = changeEventArgs.Values;
+                }
+                else if (changeEventArgs.Value is not null)
+                {
+                    componentProperties[property] = [changeEventArgs.Value];
+                }
+            }
+            if (componentProperties.Count > 0)
+            {
+                allComponentProperties[id] = componentProperties;
+            }
+        }
+
+        return allComponentProperties;
+    }
+
     private void InitializeFromQuery()
     {
         if (IsInitialized
@@ -1019,19 +1210,6 @@ public class QueryStateService
         }
 
         IsInitialized = true;
-    }
-
-    private void InvokeCallback(string id, string property, QueryChangeEventArgs e)
-    {
-        if (!_callbacks.TryGetValue(id, out var componentCallbacks))
-        {
-            return;
-        }
-        if (!componentCallbacks.TryGetValue(property, out var propertyCallback))
-        {
-            return;
-        }
-        propertyCallback.Invoke(e);
     }
 
     private Dictionary<string, object?> GetQueryParameter()
@@ -1089,9 +1267,10 @@ public class QueryStateService
         string id,
         string property,
         object? value,
-        bool add = false)
+        bool add = false,
+        Dictionary<string, Dictionary<string, List<string>>>? componentProperties = null)
     {
-        var componentProperties = _componentProperties.ToDictionary(
+        componentProperties ??= _componentProperties.ToDictionary(
             x => x.Key,
             x => x.Value.ToDictionary(
                 y => y.Key,
@@ -1162,9 +1341,10 @@ public class QueryStateService
     private Dictionary<string, object?> GetQueryWithoutParameter(
         string id,
         string property,
-        object? value)
+        object? value,
+        Dictionary<string, Dictionary<string, List<string>>>? componentProperties = null)
     {
-        var componentProperties = _componentProperties.ToDictionary(
+        componentProperties ??= _componentProperties.ToDictionary(
             x => x.Key,
             x => x.Value.ToDictionary(
                 y => y.Key,
