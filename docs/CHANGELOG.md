@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.37
+### Fixed
+- List styles
+
 ## 2.36
 ### Changed
 - Simplify build
