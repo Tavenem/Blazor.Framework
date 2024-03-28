@@ -1,15 +1,9 @@
-﻿@font-face {
-    font-family: "Adobe Blank";
-    src: local("Adobe Blank"),
-        url("../AdobeBlank.otf.woff") format('woff');
-}
-
-tf-icon {
+﻿tf-icon {
     direction: ltr;
     display: inline-block;
     fill: currentColor;
     flex: 0 0 auto;
-    font-family: 'Material Symbols Outlined', 'Adobe Blank';
+    font-family: 'Material Symbols Outlined';
     font-size: 1.5em;
     font-style: normal;
     font-weight: normal;

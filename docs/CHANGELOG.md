@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.36
+### Changed
+- Simplify build
+
 ## 2.35
 ### Added
 - `tf-emoji` custom element which renders emoji short codes as emoji

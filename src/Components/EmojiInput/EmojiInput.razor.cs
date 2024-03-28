@@ -6,6 +6,9 @@ using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework;
 
+/// <summary>
+/// A picker for emoji.
+/// </summary>
 public partial class EmojiInput : PickerComponentBase<string>
 {
     private const string LatestEmojiStorageKey = "tavenem.latest-emoji";

@@ -63,7 +63,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
-    <CssFiles Include="$(ClientAssetsDirectory)styles\**\*.css;$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
+    <CssFiles Include="$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
