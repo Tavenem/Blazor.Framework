@@ -63,6 +63,8 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("shrink", ShrinkWhen)
         .Add("open", ShowPicker)
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
         .ToString();
 
     /// <summary>

@@ -206,19 +206,38 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
 
     private bool DecrementDisabled => Disabled
         || ReadOnly
-        || !IsInteractive
-        || (CurrentValue is not null
-        && (FormExtensions.ValuesEqual(CurrentValue, Min)
-        || FormExtensions.ValueIsLess(CurrentValue, Min)));
+        || (IsInteractive
+            && CurrentValue is not null
+            && (FormExtensions.ValuesEqual(CurrentValue, Min)
+                || FormExtensions.ValueIsLess(CurrentValue, Min)));
 
     private int EffectiveSize => Math.Max(1, Size ?? 1);
 
     private bool IncrementDisabled => Disabled
         || ReadOnly
-        || !IsInteractive
-        || (CurrentValue is not null
-        && (FormExtensions.ValuesEqual(CurrentValue, Max)
-        || FormExtensions.ValueIsMore(CurrentValue, Max)));
+        || (IsInteractive
+            && CurrentValue is not null
+            && (FormExtensions.ValuesEqual(CurrentValue, Max)
+                || FormExtensions.ValueIsMore(CurrentValue, Max)));
+
+    private protected int IncrementPrecision
+    {
+        get
+        {
+            var incrementString = IncrementString;
+            var decimalIndex = incrementString.IndexOf('.');
+            if (decimalIndex < 0)
+            {
+                return 1;
+            }
+            return (incrementString.Length - decimalIndex - 1) * 10;
+        }
+    }
+
+    private protected string IncrementString => Step is not null
+        && !FormExtensions.ValuesEqual(Step, _zero)
+        ? FormExtensions.SuppressScientificFormat(Step)
+        : "1";
 
     [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
 

@@ -21,32 +21,57 @@
                 <span>@PrefixText</span>
             }
         }
-        <input type="number"
-               disabled="@IsDisabled"
-               hidden
-               inputmode="@InputMode"
-               name="@NameValue"
-               readonly="@IsReadOnly"
-               step="@StepString"
-               tabindex="@TabIndex"
-               value="@CurrentValueAsString" />
-        <input @ref="ElementReference"
-               @attributes="InputAttributes"
-               id="@Id"
-               class="@InputCssClass"
-               style="@InputCssStyle"
-               autocomplete="@AutocompleteValue"
-               autofocus="@AutoFocus"
-               disabled="@IsDisabled"
-               inputmode="@InputMode"
-               readonly="@IsReadOnly"
-               required="@Required"
-               size="@EffectiveSize"
-               step="@StepString"
-               tabindex="@TabIndex"
-               value="@DisplayString"
-               @oninput="OnInput"
-               @onchange="OnChange" />
+        @if (IsInteractive)
+        {
+            <input type="number"
+                   disabled="@Disabled"
+                   hidden
+                   inputmode="@InputMode"
+                   name="@NameValue"
+                   readonly="@ReadOnly"
+                   step="@StepString"
+                   tabindex="@TabIndex"
+                   value="@CurrentValueAsString" />
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autocomplete="@AutocompleteValue"
+                   autofocus="@AutoFocus"
+                   disabled="@Disabled"
+                   inputmode="@InputMode"
+                   readonly="@ReadOnly"
+                   required="@Required"
+                   size="@EffectiveSize"
+                   step="@StepString"
+                   tabindex="@TabIndex"
+                   value="@DisplayString"
+                   @oninput="OnInput"
+                   @onchange="OnChange" />
+        }
+        else
+        {
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autocomplete="@AutocompleteValue"
+                   autofocus="@AutoFocus"
+                   disabled="@Disabled"
+                   inputmode="@InputMode"
+                   name="@NameValue"
+                   readonly="@ReadOnly"
+                   required="@Required"
+                   size="@EffectiveSize"
+                   step="@StepString"
+                   tabindex="@TabIndex"
+                   type="number"
+                   value="@CurrentValueAsString"
+                   @oninput="OnInput"
+                   @onchange="OnChange" />
+        }
         @if (PostfixContent is not null)
         {
             @PostfixContent(Value)
@@ -62,15 +87,33 @@
                 <span>@PostfixText</span>
             }
         }
-        @if (ShowStepButtons && !ReadOnly && IsInteractive)
+        @if (ShowStepButtons && !ReadOnly)
         {
             <div class="numeric-spin">
-                <button @onclick="Increment" class="btn btn-text" disabled="@IncrementDisabled" tabindex="-1">
-                    <tf-icon class="@ThemeColor.ToCSS()">@StepUpIcon</tf-icon>
-                </button>
-                <button @onclick="Decrement" class="btn btn-text" disabled="@DecrementDisabled" tabindex="-1">
-                    <tf-icon class="@ThemeColor.ToCSS()">@StepDownIcon</tf-icon>
-                </button>
+                @if (IsInteractive)
+                {
+                    <button @onclick="Increment" class="btn btn-text" disabled="@IncrementDisabled" tabindex="-1">
+                        <tf-icon class="@ThemeColor.ToCSS()">@StepUpIcon</tf-icon>
+                    </button>
+                    <button @onclick="Decrement" class="btn btn-text" disabled="@DecrementDisabled" tabindex="-1">
+                        <tf-icon class="@ThemeColor.ToCSS()">@StepDownIcon</tf-icon>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-text"
+                            disabled="@IncrementDisabled"
+                            tabindex="-1"
+                            onclick="const i = document.getElementById('@Id');i.value = Math.round((parseFloat(i.value) + @IncrementString) * @IncrementPrecision) / @IncrementPrecision">
+                        <tf-icon class="@ThemeColor.ToCSS()">@StepUpIcon</tf-icon>
+                    </button>
+                    <button class="btn btn-text"
+                            disabled="@DecrementDisabled"
+                            tabindex="-1"
+                            onclick="const i = document.getElementById('@Id');i.value = Math.round((parseFloat(i.value) - @IncrementString) * @IncrementPrecision) / @IncrementPrecision">
+                        <tf-icon class="@ThemeColor.ToCSS()">@StepDownIcon</tf-icon>
+                    </button>
+                }
             </div>
         }
     </div>

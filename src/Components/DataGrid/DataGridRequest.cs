@@ -220,7 +220,7 @@ public readonly record struct DataGridRequest(
             .Select(x => x.Property)
             .Union(request.Order?
                 .Select(x => x.Property)
-                ?? Enumerable.Empty<string>())
+                ?? [])
             .Any(x => x.Any(y => !char.IsAscii(y) || (!char.IsLetter(y) && !char.IsNumber(y)))) == true)
         {
             throw new ArgumentException("A property contains a character which is not an ASCII letter or number", nameof(request));
@@ -548,7 +548,7 @@ public readonly record struct DataGridRequest(
         if (request.Filters is null
             || request.Filters.Length == 0)
         {
-            return Array.Empty<(string, string)>();
+            return [];
         }
 
         var parameters = new List<(string, string)>();

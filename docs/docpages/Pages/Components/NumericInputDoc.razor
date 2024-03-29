@@ -9,13 +9,6 @@
     numeric type.
 </p>
 
-<p>
-    Note: like all Tavenem Framework forms components, this control cannot be used on static
-    server-side rendered pages. It will always be disabled when rendered statically. This is because
-    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
-    disabled during the prerender pass, then become enabled when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -361,6 +354,12 @@
     time.
 </p>
 
+<p>
+    Note that advanced verification is not available on static server-side rendered pages, although
+    the indicator will be rendered and the <code>required</code> attribute on the <code>input</code>
+    will be set accordingly.
+</p>
+
 <Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
@@ -523,6 +522,12 @@
     href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">custom
     numeric format string</a> supported for the bound numeric type. This format will be used to
     format the displayed value.
+</p>
+
+<p>
+    Note: formatting is not used on static server-side rendered pages. The static control leverages
+    the browser's built-in numeric input, and is not dynamically re-rendered using .NET formatting
+    rules as the value is changed by user input.
 </p>
 
 <Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

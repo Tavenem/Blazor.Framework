@@ -150,12 +150,12 @@ public partial class MultiSelect<TValue>
 
         if (string.IsNullOrEmpty(value))
         {
-            result = Enumerable.Empty<TValue>();
+            result = [];
             success = true;
         }
         else if (Converter is not null)
         {
-            result = Enumerable.Empty<TValue>();
+            result = [];
 
             var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(value));
             if (JsonDocument.TryParseValue(ref reader, out var doc)

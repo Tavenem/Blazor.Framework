@@ -78,6 +78,13 @@ function addHeadContent() {
 
 }
 
+function fixCheckboxes() {
+    const cbs = document.querySelectorAll('.checkbox label > .btn > input:is([type="checkbox"],[type="radio"])');
+    for (var cb of cbs) {
+        cb.indeterminate = true;
+    }
+}
+
 function fixTablesOfContents() {
     document
         .querySelectorAll('tf-contents')
@@ -106,6 +113,7 @@ function onEnhancedLoad() {
     addHeadContent();
     fixTablesOfContents();
     scrollToTopOnLoad();
+    fixCheckboxes();
 }
 
 Blazor.addEventListener('enhancedload', onEnhancedLoad);

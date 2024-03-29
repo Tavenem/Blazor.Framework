@@ -11,7 +11,7 @@
         background-color: var(--tavenem-color-action-hover-bg);
     }
 
-    label {
+    > label {
         align-items: center;
         color: var(--tavenem-color-action);
         cursor: pointer;
@@ -37,17 +37,49 @@
 
             > input[type="checkbox"],
             > input[type="radio"] {
+                -webkit-appearance: none;
+                appearance: none;
+                background: none;
+                border: none;
                 color: inherit;
                 cursor: inherit;
                 height: 100%;
                 left: 0;
                 margin: 0;
-                opacity: 0;
                 padding: 0;
                 position: absolute;
                 top: 0;
                 width: 100%;
                 z-index: 1;
+
+                ~ tf-icon.checked,
+                ~ tf-icon.indeterminate {
+                    display: none;
+                }
+
+                &:checked {
+                    ~ tf-icon.checked {
+                        display: block;
+                    }
+
+                    ~ tf-icon.unchecked {
+                        display: none;
+                    }
+                }
+
+                &:indeterminate {
+                    ~ tf-icon.unchecked {
+                        display: none;
+                    }
+
+                    ~ tf-icon.indeterminate {
+                        display: block;
+                    }
+                }
+
+                &:read-only {
+                    pointer-events: none;
+                }
             }
 
             > tf-icon {
@@ -110,6 +142,7 @@
 
         &, * {
             cursor: default;
+            pointer-events: none;
         }
     }
 

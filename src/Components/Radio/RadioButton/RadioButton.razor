@@ -22,15 +22,16 @@
                    value="@Value?.ToString()"
                    @onchange="OnChangeAsync"
                    @onclick:preventDefault="@(IsDisabled || IsReadOnly)" />
-            <tf-icon>@Icon</tf-icon>
+            <tf-icon class="@CheckedIconClass">@CheckedIcon</tf-icon>
+            <tf-icon class="@UncheckedIconClass">@UncheckedIcon</tf-icon>
         </span>
         @if (LabelContent is not null)
         {
-            <span class="label">@LabelContent(Value)</span>
+            <label class="label" for="@Id">@LabelContent(Value)</label>
         }
         else if (!string.IsNullOrEmpty(Label))
         {
-            <span class="label">@Label</span>
+            <label class="label" for="@Id">@Label</label>
         }
     </label>
     @ChildContent

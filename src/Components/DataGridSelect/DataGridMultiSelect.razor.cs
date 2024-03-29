@@ -439,12 +439,12 @@ public partial class DataGridMultiSelect<
 
         if (string.IsNullOrEmpty(value))
         {
-            result = Enumerable.Empty<TValue>();
+            result = [];
             success = true;
         }
         else if (Converter is not null)
         {
-            result = Enumerable.Empty<TValue>();
+            result = [];
 
             var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(value));
             if (JsonDocument.TryParseValue(ref reader, out var doc)
@@ -570,7 +570,7 @@ public partial class DataGridMultiSelect<
     {
         if (DataGrid is null)
         {
-            CurrentValue = Enumerable.Empty<TValue>();
+            CurrentValue = [];
             return;
         }
         if (RowValue is null)
@@ -581,7 +581,7 @@ public partial class DataGridMultiSelect<
             }
             else
             {
-                CurrentValue = Enumerable.Empty<TValue>();
+                CurrentValue = [];
             }
         }
         else

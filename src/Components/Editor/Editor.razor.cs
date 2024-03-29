@@ -138,6 +138,8 @@ public partial class Editor : FormComponentBase<string>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("editor-field")
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
         .ToString();
 
     private string? AdditionalMarksClass => new CssBuilder("small")

@@ -14,6 +14,11 @@ public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
     /// </summary>
     [Parameter] public string CheckedIcon { get; set; } = DefaultIcons.CheckBox_Checked;
 
+    /// <summary>
+    /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
+    /// </summary>
+    [Parameter] public bool CheckedIconOutlined { get; set; }
+
     /// <inheritdoc/>
     public override bool HasValue => RequiresTrue
         ? IsChecked == true
@@ -30,6 +35,11 @@ public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
     [Parameter] public string IndeterminateIcon { get; set; } = DefaultIcons.CheckBox_Indeterminate;
 
     /// <summary>
+    /// Whether to use an outlined variant of the <see cref="IndeterminateIcon"/>.
+    /// </summary>
+    [Parameter] public bool IndeterminateIconOutlined { get; set; }
+
+    /// <summary>
     /// Whether a <see cref="InputBase{TValue}.Value"/> of <see langword="true"/> is
     /// required to fulfill the <see cref="FormComponentBase{TValue}.Required"/> requirement (rather
     /// than a non-<see langword="null"/> value, which is the default behavior).
@@ -41,29 +51,25 @@ public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
     /// </summary>
     [Parameter] public string UncheckedIcon { get; set; } = DefaultIcons.CheckBox_Unchecked;
 
+    /// <summary>
+    /// Whether to use an outlined variant of the <see cref="UncheckedIcon"/>.
+    /// </summary>
+    [Parameter] public bool UncheckedIconOutlined { get; set; }
+
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("checkbox")
         .ToString();
 
-    private string Icon
-    {
-        get
-        {
-            if (Value is null)
-            {
-                return IndeterminateIcon;
-            }
-            else
-            {
-                return IsChecked == true ? CheckedIcon : UncheckedIcon;
-            }
-        }
-    }
+    private string? CheckedIconClass => CheckedIconOutlined ? "checked outlined" : "checked";
 
     private string? IconClass => new CssBuilder("btn btn-icon")
         .Add(ThemeColor.ToCSS())
         .ToString();
+
+    private string? IndeterminateIconClass => IndeterminateIconOutlined ? "indeterminate outlined" : "indeterminate";
+
+    private string? UncheckedIconClass => UncheckedIconOutlined ? "unchecked outlined" : "unchecked";
 
     private void OnChange(ChangeEventArgs e) => Toggle();
 }

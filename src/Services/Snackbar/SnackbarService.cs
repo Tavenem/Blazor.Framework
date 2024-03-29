@@ -220,7 +220,7 @@ public class SnackbarService : IDisposable
         {
             return _snackbars.TryGetValue(corner, out var snackbars)
                 ? snackbars.Take(MaxSnackbars)
-                : Enumerable.Empty<Snackbar>();
+                : [];
         }
         finally
         {

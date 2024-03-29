@@ -564,20 +564,14 @@
              tabindex="@TabIndex">
             @if (IsWysiwyg)
             {
-                @if (Syntax == EditorSyntax.HTML)
+                @if (Syntax == EditorSyntax.HTML
+                    || string.IsNullOrEmpty(Value))
                 {
                     <div class="static-editor-html">@StaticContent</div>
                 }
                 else if (Syntax == EditorSyntax.Markdown)
                 {
-                    @if (string.IsNullOrEmpty(Value))
-                    {
-                        <div class="static-editor-html">@StaticContent</div>
-                    }
-                    else
-                    {
-                        <MarkdownRenderer Value="@Value" />
-                    }
+                    <MarkdownRenderer Value="@Value" />
                 }
             }
             else if (string.IsNullOrEmpty(Value))
@@ -590,7 +584,7 @@
             }
             else
             {
-                <tf-syntax-highlight class="@LanguageClass"></tf-syntax-highlight>
+                <tf-syntax-highlight class="@LanguageClass">@Value</tf-syntax-highlight>
             }
         </div>
     }

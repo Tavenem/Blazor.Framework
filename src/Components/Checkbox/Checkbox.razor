@@ -15,18 +15,31 @@
                    style="@InputCssStyle"
                    autofocus="@AutoFocus"
                    checked="@IsChecked"
-                   disabled="@IsDisabled"
+                   disabled="@Disabled"
                    name="@NameValue"
-                   readonly="@IsReadOnly"
+                   readonly="@ReadOnly"
+                   required="@Required"
                    tabindex="@TabIndex"
                    value="@bool.TrueString"
                    @onchange="OnChange"
-                   @onclick:preventDefault="IsReadOnly" />
-            <tf-icon>@Icon</tf-icon>
+                   @onclick:preventDefault="ReadOnly"
+                   onclick="@(AllowNull ? "if (this.multiple) this.checked=this.multiple=false; else if (!this.checked) this.multiple=this.indeterminate=true;" : null)"/>
+            <tf-icon class="@CheckedIconClass">@CheckedIcon</tf-icon>
+            <tf-icon class="@UncheckedIconClass">@UncheckedIcon</tf-icon>
+            <tf-icon class="@IndeterminateIconClass">@IndeterminateIcon</tf-icon>
         </span>
+        @if (Value is null)
+        {
+            <script type="text/javascript">
+                (() => {
+                    const cb = document.getElementById('@Id');
+                    cb.indeterminate = true;
+                })();
+            </script>
+        }
         @if (!string.IsNullOrEmpty(Label))
         {
-            <span class="label">@Label</span>
+            <label class="label" for="@Id">@Label</label>
         }
     </label>
     @if (IsInvalidAndTouched)
