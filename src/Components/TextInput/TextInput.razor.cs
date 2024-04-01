@@ -285,12 +285,12 @@ public partial class TextInput : InputComponentBase<string>
     /// <inheritdoc/>
     protected override string? InputCssClass => new CssBuilder(InputClass)
         .Add("input-core")
+        .Add("has-placeholder", !string.IsNullOrEmpty(Placeholder))
         .ToString();
 
     /// <inheritdoc/>
     protected override bool ShrinkWhen => base.ShrinkWhen
         || PrefixContent is not null
-        || !string.IsNullOrEmpty(Placeholder)
         || !string.IsNullOrEmpty(PrefixIcon)
         || !string.IsNullOrEmpty(PrefixText);
 

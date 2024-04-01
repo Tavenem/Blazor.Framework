@@ -9,11 +9,11 @@
                   style="@InputCssStyle"
                   autocomplete="@AutocompleteValue"
                   autocorrect="@AutocorrectValue"
-                  disabled="@IsDisabled"
+                  disabled="@Disabled"
                   maxlength="@MaxLength"
                   name="@NameValue"
-                  placeholder="@Placeholder"
-                  readonly="@IsReadOnly"
+                  placeholder="@(string.IsNullOrEmpty(Placeholder) ? " " : Placeholder)"
+                  readonly="@ReadOnly"
                   required="@Required"
                   rows="@Rows"
                   spellcheck="@SpellcheckValue"
@@ -21,7 +21,7 @@
                   value="@CurrentValue"
                   @oninput="OnInput"
                   @onchange="OnChange" />
-        @if (ShowEmoji)
+        @if (ShowEmoji && IsInteractive)
         {
             <EmojiInput IconButton="true"
                         @bind-Value="Emoji"
@@ -57,7 +57,7 @@
             {
                 <div class="mr-auto">@HelpText</div>
             }
-            @if (ShowLength && MaxLength.HasValue)
+            @if (ShowLength && MaxLength.HasValue && IsInteractive)
             {
                 <div class="ml-auto">
                     <span>@CurrentLength</span>

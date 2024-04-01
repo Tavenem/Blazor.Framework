@@ -101,7 +101,7 @@ public partial class Rating : FormComponentBase<byte>
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("field")
         .Add("disabled", Disabled)
-        .Add("read-only", IsReadOnly)
+        .Add("read-only", ReadOnly)
         .Add("required", Required)
         .Add("no-label", string.IsNullOrEmpty(Label))
         .Add("modified", IsTouched)
@@ -119,9 +119,9 @@ public partial class Rating : FormComponentBase<byte>
         .Add(RatingItemClass)
         .ToString();
 
-    private string? ActiveIconClass => IsActiveOutlined ? "outlined" : null;
+    private string? ActiveIconClass => IsActiveOutlined ? "checked outlined" : "checked";
 
-    private string? InactiveIconClass => IsInactiveOutlined ? "outlined" : null;
+    private string? InactiveIconClass => IsInactiveOutlined ? "unchecked outlined" : "unchecked";
 
     /// <inheritdoc/>
     protected override void OnParametersSet()

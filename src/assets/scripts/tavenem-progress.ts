@@ -461,7 +461,7 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         }
         div.role = "progressbar";
         div.ariaValueMin = '0';
-        div.ariaValueMax = '0';
+        div.ariaValueMax = '100';
         if (indeterminate) {
             div.dataset.indeterminate = '';
         } else {

@@ -9,33 +9,31 @@
             <span class="label">@UncheckedLabel</span>
         }
         <span class="toggle">
-            <span id="@ButtonId" class="@ButtonClass" tabindex="@TabIndex">
+            <span id="@ButtonId" class="@ButtonClass">
                 <input @ref="ElementReference"
                        @attributes="InputAttributes"
                        id="@Id"
                        type="checkbox"
-                       tabindex="-1"
+                       tabindex="@TabIndex"
                        class="@InputCssClass"
                        style="@InputCssStyle"
                        autofocus="@AutoFocus"
                        checked="@IsChecked"
-                       disabled="@IsDisabled"
+                       disabled="@Disabled"
                        name="@NameValue"
-                       readonly="@IsReadOnly"
+                       readonly="@ReadOnly"
                        @onchange="@OnChange"
-                       @onclick:preventDefault="@IsReadOnly" />
+                       @onclick:preventDefault="@ReadOnly" />
                 <span class="switch-thumb">
-                    @if (!string.IsNullOrEmpty(Icon))
-                    {
-                        <tf-icon>@Icon</tf-icon>
-                    }
+                    <tf-icon class="@CheckedIconClass">@CheckedIcon</tf-icon>
+                    <tf-icon class="@UncheckedIconClass">@UncheckedIcon</tf-icon>
                 </span>
             </span>
             <span class="switch-track"></span>
         </span>
         @if (!string.IsNullOrEmpty(Label))
         {
-            <span class="label">@Label</span>
+            <label class="label" for="@Id">@Label</label>
         }
     </label>
     @if (IsInvalidAndTouched)

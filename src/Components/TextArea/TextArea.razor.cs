@@ -97,11 +97,8 @@ public partial class TextArea : InputComponentBase<string>
     /// </summary>
     protected override string? InputCssClass => new CssBuilder(InputClass)
         .Add("input-core")
+        .Add("has-placeholder", !string.IsNullOrEmpty(Placeholder))
         .ToString();
-
-    /// <inheritdoc/>
-    protected override bool ShrinkWhen => base.ShrinkWhen
-        || !string.IsNullOrEmpty(Placeholder);
 
     private string? AutocompleteValue
     {

@@ -106,34 +106,37 @@
                             disabled="@(Disabled || ReadOnly || !IsInteractive)">
                         <tf-icon>palette</tf-icon>
                         <Tooltip Delay="750">Select skin tone(s)</Tooltip>
-                        <Popover Class="filled p-1"
-                                 FocusOut="@(_ => ShowSkinTonePicker = false)"
-                                 IsOpen="IsSkinTonePickerOpen">
-                            <div class="d-flex flex-wrap gap-1 justify-content-center">
-                                @for (var i = 0; i < 6; i++)
-                                {
-                                    var index = i;
-                                    <button class="@($"btn btn-text small skin-tone-swatch tone{index} {(SkinTone1 == index ? "active" : null)}")"
-                                            @onclick="@(_ => SkinTone1 = index)"
-                                            @onclick:stopPropagation="true"></button>
-                                }
-                            </div>
-                            @if (SkinTone1 > 0)
-                            {
-                                <div class="d-flex flex-wrap gap-1">
-                                    <button class="@($"btn btn-text small skin-tone-swatch tone{SkinTone1} {(SkinTone2 == 0 ? "active" : null)}")"
-                                            @onclick="@(_ => SkinTone2 = 0)"
-                                            @onclick:stopPropagation="true"></button>
-                                    @for (var i = 1; i < 6; i++)
+                        @if (IsInteractive)
+                        {
+                            <Popover Class="filled p-1"
+                                     FocusOut="@(_ => ShowSkinTonePicker = false)"
+                                     IsOpen="IsSkinTonePickerOpen">
+                                <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                    @for (var i = 0; i < 6; i++)
                                     {
                                         var index = i;
-                                        <button class="@($"btn btn-text small skin-tone-swatch tone{index} {(SkinTone2 == index ? "active" : null)}")"
-                                                @onclick="@(_ => SkinTone2 = index)"
+                                        <button class="@($"btn btn-text small skin-tone-swatch tone{index} {(SkinTone1 == index ? "active" : null)}")"
+                                                @onclick="@(_ => SkinTone1 = index)"
                                                 @onclick:stopPropagation="true"></button>
                                     }
                                 </div>
-                            }
-                        </Popover>
+                                @if (SkinTone1 > 0)
+                                {
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button class="@($"btn btn-text small skin-tone-swatch tone{SkinTone1} {(SkinTone2 == 0 ? "active" : null)}")"
+                                                @onclick="@(_ => SkinTone2 = 0)"
+                                                @onclick:stopPropagation="true"></button>
+                                        @for (var i = 1; i < 6; i++)
+                                        {
+                                            var index = i;
+                                            <button class="@($"btn btn-text small skin-tone-swatch tone{index} {(SkinTone2 == index ? "active" : null)}")"
+                                                    @onclick="@(_ => SkinTone2 = index)"
+                                                    @onclick:stopPropagation="true"></button>
+                                        }
+                                    </div>
+                                }
+                            </Popover>
+                        }
                     </button>
                 </PostfixContent>
             </TextInput>

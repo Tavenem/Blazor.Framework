@@ -19,46 +19,81 @@
                 <span>@PrefixText</span>
             }
         }
-        <input type="@InputType.ToCSS()"
-               disabled="@IsDisabled"
-               hidden
-               name="@NameValue"
-               readonly="@IsReadOnly"
-               value="@CurrentValue" />
-        <input @ref="ElementReference"
-               @attributes="InputAttributes"
-               id="@Id"
-               type="@InputType.ToCSS()"
-               class="@InputCssClass"
-               style="@InputCssStyle"
-               autocomplete="@AutocompleteValue"
-               autocorrect="@AutocorrectValue"
-               autofocus="@AutoFocus"
-               disabled="@IsDisabled"
-               maxlength="@MaxLength"
-               pattern="@Pattern"
-               placeholder="@Placeholder"
-               readonly="@IsReadOnly"
-               required="@Required"
-               size="@EffectiveSize"
-               spellcheck="@SpellcheckValue"
-               tabindex="@TabIndex"
-               value="@DisplayString"
-               @onclick="OnClick"
-               @onclick:stopPropagation="true"
-               @oninput="OnInputAsync"
-               @onchange="OnChangeAsync"
-               @onfocusin="OnFocusIn"
-               @onfocusout="OnFocusOut"
-               @onkeydown="OnKeyDownAsync"
-               @onkeyup="OnKeyUpAsync" />
+        @if (IsInteractive)
+        {
+            <input type="@InputType.ToCSS()"
+                   disabled="@Disabled"
+                   hidden
+                   name="@NameValue"
+                   readonly="@ReadOnly"
+                   value="@CurrentValue" />
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   type="@InputType.ToCSS()"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autocomplete="@AutocompleteValue"
+                   autocorrect="@AutocorrectValue"
+                   autofocus="@AutoFocus"
+                   disabled="@Disabled"
+                   maxlength="@MaxLength"
+                   pattern="@Pattern"
+                   placeholder="@(string.IsNullOrEmpty(Placeholder) ? " " : Placeholder)"
+                   readonly="@ReadOnly"
+                   required="@Required"
+                   size="@EffectiveSize"
+                   spellcheck="@SpellcheckValue"
+                   tabindex="@TabIndex"
+                   value="@DisplayString"
+                   @onclick="OnClick"
+                   @onclick:stopPropagation="true"
+                   @oninput="OnInputAsync"
+                   @onchange="OnChangeAsync"
+                   @onfocusin="OnFocusIn"
+                   @onfocusout="OnFocusOut"
+                   @onkeydown="OnKeyDownAsync"
+                   @onkeyup="OnKeyUpAsync" />
+        }
+        else
+        {
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   autocomplete="@AutocompleteValue"
+                   autocorrect="@AutocorrectValue"
+                   autofocus="@AutoFocus"
+                   class="@InputCssClass"
+                   disabled="@Disabled"
+                   list="@(Suggestions?.Any() == true || SuggestionValues?.Any() == true ? $"{Id}-suggestions" : null)"
+                   maxlength="@MaxLength"
+                   name="@NameValue"
+                   pattern="@Pattern"
+                   placeholder="@(string.IsNullOrEmpty(Placeholder) ? " " : Placeholder)"
+                   readonly="@ReadOnly"
+                   required="@Required"
+                   size="@EffectiveSize"
+                   spellcheck="@SpellcheckValue"
+                   style="@InputCssStyle"
+                   tabindex="@TabIndex"
+                   type="@InputType.ToCSS()"
+                   value="@CurrentValue"
+                   @onclick="OnClick"
+                   @onclick:stopPropagation="true"
+                   @oninput="OnInputAsync"
+                   @onchange="OnChangeAsync"
+                   @onfocusin="OnFocusIn"
+                   @onfocusout="OnFocusOut"
+                   @onkeydown="OnKeyDownAsync"
+                   @onkeyup="OnKeyUpAsync" />
+        }
         @if (ShowClear)
         {
             <button class="@ClearButtonCssClass" tabindex="-1" @onclick="Clear">
                 <tf-icon>@ClearIcon</tf-icon>
             </button>
         }
-        @if (ShowEmoji)
+        @if (ShowEmoji && IsInteractive)
         {
             <EmojiInput IconButton="true"
                         @bind-Value="Emoji"
@@ -109,7 +144,7 @@
             {
                 <div class="mr-auto">@HelpText</div>
             }
-            @if (ShowLength && MaxLength.HasValue)
+            @if (ShowLength && MaxLength.HasValue && IsInteractive)
             {
                 <div class="ml-auto">
                     <span>@CurrentLength</span>
@@ -120,49 +155,81 @@
         </div>
     }
     @ChildContent
-    <Popover @ref="SuggestionPopover"
-             Class="filled"
-             AnchorId="@InputId"
-             AnchorOrigin="Origin.Bottom_Left"
-             PopoverOrigin="Origin.Top_Left"
-             IsOpen="ShowSuggestions"
-             MatchWidth="true"
-             MaxHeight="min(300px,90vh)">
-        <menu class="@SuggestionListCssClass"
-              @onclick:stopPropagation="true">
-            @foreach (var suggestion in FilteredSuggestions)
-            {
-                <li @key="suggestion"
-                    tabindex="0"
-                    @onclick="@(_ => SuggestionSelectedAsync(suggestion))"
-                    @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion))">@suggestion</li>
-            }
-            @if (SuggestionTemplate is null)
-            {
-                @foreach (var suggestion in FilteredSuggestionValues)
+    @if (IsInteractive)
+    {
+        <Popover @ref="SuggestionPopover"
+                 Class="filled"
+                 AnchorId="@InputId"
+                 AnchorOrigin="Origin.Bottom_Left"
+                 PopoverOrigin="Origin.Top_Left"
+                 IsOpen="ShowSuggestions"
+                 MatchWidth="true"
+                 MaxHeight="min(300px,90vh)">
+            <menu class="@SuggestionListCssClass"
+                  @onclick:stopPropagation="true">
+                @foreach (var suggestion in FilteredSuggestions)
                 {
-                    <li @key="suggestion.Key"
+                    <li @key="suggestion"
                         tabindex="0"
-                        @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
-                        @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">@suggestion.Value.ToString()</li>
+                        @onclick="@(_ => SuggestionSelectedAsync(suggestion))"
+                        @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion))">@suggestion</li>
+                }
+                @if (SuggestionTemplate is null)
+                {
+                    @foreach (var suggestion in FilteredSuggestionValues)
+                    {
+                        <li @key="suggestion.Key"
+                            tabindex="0"
+                            @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
+                            @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">@suggestion.Value.ToString()</li>
+                    }
+                }
+                else
+                {
+                    @foreach (var suggestion in FilteredSuggestionValues)
+                    {
+                        <li @key="suggestion.Key"
+                            tabindex="0"
+                            @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
+                            @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">
+                            @SuggestionTemplate(suggestion.Value)
+                        </li>
+                    }
+                }
+                @if (LoadingSuggestions)
+                {
+                    <tf-progress-circle></tf-progress-circle>
+                }
+            </menu>
+        </Popover>
+    }
+    else if (Suggestions?.Any() == true || SuggestionValues?.Any() == true)
+    {
+        <datalist id="@($"{Id}-suggestions")">
+            @if (Suggestions?.Any() == true)
+            {
+                @foreach (var suggestion in Suggestions)
+                {
+                    <option value="@suggestion"></option>
                 }
             }
-            else
+            @if (SuggestionValues?.Any() == true)
             {
-                @foreach (var suggestion in FilteredSuggestionValues)
+                @if (SuggestionTemplate is null)
                 {
-                    <li @key="suggestion.Key"
-                        tabindex="0"
-                        @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
-                        @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">
-                        @SuggestionTemplate(suggestion.Value)
-                    </li>
+                    @foreach (var suggestion in SuggestionValues)
+                    {
+                        <option value="@suggestion.Key">@suggestion.Value</option>
+                    }
+                }
+                else
+                {
+                    @foreach (var suggestion in SuggestionValues)
+                    {
+                        <option value="@suggestion.Key">@SuggestionTemplate(suggestion.Value)</option>
+                    }
                 }
             }
-            @if (LoadingSuggestions)
-            {
-                <tf-progress-circle></tf-progress-circle>
-            }
-        </menu>
-    </Popover>
+        </datalist>
+    }
 </div>

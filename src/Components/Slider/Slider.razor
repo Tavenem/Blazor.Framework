@@ -9,11 +9,8 @@
     {
         <label for="@Id">@Label</label>
     }
-    <div class="input">
-        <div>
-            <div class="filler" style="@($"width:{BarWidth.ToString("F2").TrimEnd('0').TrimEnd('.')}%")"></div>
-        </div>
-        <div>
+    <tf-slider data-value="@CurrentValueAsString">
+        <div class="input">
             <div class="hashes">
                 @for (var i = 0; i < _tickCount; i++)
                 {
@@ -27,25 +24,24 @@
                     </div>
                 }
             </div>
+            <input @ref="ElementReference"
+                   @attributes="InputAttributes"
+                   id="@Id"
+                   type="range"
+                   class="@InputCssClass"
+                   style="@InputCssStyle"
+                   autofocus="@AutoFocus"
+                   disabled="@(Disabled || ReadOnly)"
+                   max="@MaxString"
+                   min="@MinString"
+                   name="@NameValue"
+                   step="@StepString"
+                   tabindex="@TabIndex"
+                   value="@CurrentValueAsString"
+                   @oninput="OnInput"
+                   @onchange="OnChangeAsync" />
         </div>
-        <input @ref="ElementReference"
-               @attributes="InputAttributes"
-               id="@Id"
-               type="range"
-               class="@InputCssClass"
-               style="@InputCssStyle"
-               autofocus="@AutoFocus"
-               disabled="@(Disabled || ReadOnly || !IsInteractive)"
-               max="@MaxString"
-               min="@MinString"
-               name="@NameValue"
-               step="@StepString"
-               tabindex="@TabIndex"
-               value="@CurrentValueAsString"
-               @oninput="OnInput"
-               @onchange="OnChangeAsync" />
-        <output style="@($"left:{BarWidth.ToString("F2").TrimEnd('0').TrimEnd('.')}%")">@InputValue</output>
-    </div>
+    </tf-slider>
     @if (IsInvalidAndTouched)
     {
         <div class="field-helpers">

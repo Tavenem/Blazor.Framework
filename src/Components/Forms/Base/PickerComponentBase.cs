@@ -73,6 +73,26 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     protected virtual string? DisplayString { get; }
 
     /// <summary>
+    /// Whether this control is currently disabled.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="FormComponentBase{T}.Disabled"/> is <see
+    /// langword="true"/> or <see cref="FormComponentBase{T}.IsInteractive"/> is <see
+    /// langword="false"/>.
+    /// </remarks>
+    protected virtual bool IsDisabled => Disabled || !IsInteractive;
+
+    /// <summary>
+    /// Whether this control is currently read-only.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="true"/> if <see cref="FormComponentBase{T}.ReadOnly"/> is <see
+    /// langword="true"/> or <see cref="FormComponentBase{T}.IsInteractive"/> is <see
+    /// langword="false"/>.
+    /// </remarks>
+    protected virtual bool IsReadOnly => ReadOnly || !IsInteractive;
+
+    /// <summary>
     /// Whether the popover should open when the enter key is pressed.
     /// </summary>
     protected virtual bool OpenOnEnter => true;

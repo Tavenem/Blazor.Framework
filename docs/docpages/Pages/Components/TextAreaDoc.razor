@@ -9,13 +9,6 @@
     string.
 </p>
 
-<p>
-    Note: like all Tavenem Framework forms components, this control cannot be used on static
-    server-side rendered pages. It will always be disabled when rendered statically. This is because
-    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
-    disabled during the prerender pass, then become enabled when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -310,7 +303,9 @@
 
 <p>
     If you do specify a maximum length, you can also set the <code>ShowLength</code> property to
-    <code>true</code> to display the current and maximum character count.
+    <code>true</code> to display the current and maximum character count. Note that current input
+    length is not available on static server-side rendered pages, although <code>MaxLength</code>
+    works as expected.
 </p>
 
 <Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -337,6 +332,12 @@
     indicator to the label, and automatic verification rules which warn the user when the input is
     empty. The warning will only appear after the user has interacted with the input for the first
     time.
+</p>
+
+<p>
+    Note that advanced verification is not available on static server-side rendered pages, although
+    the indicator will be rendered and the <code>required</code> attribute on the <code>input</code>
+    will be set accordingly.
 </p>
 
 <Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -397,6 +398,10 @@
     A built-in <a href="/components/emoji">EmojiInput</a> button can be displayed with the
     <code>ShowEmoji</code> property, which allows the user to select an emoji to be appended to the
     current value.
+</p>
+
+<p>
+    Note that the emoji picker is not available on static server-side rendered pages.
 </p>
 
 <Collapse Id="ce-20" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

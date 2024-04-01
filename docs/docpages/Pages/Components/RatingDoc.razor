@@ -9,13 +9,6 @@
     value scale.
 </p>
 
-<p>
-    Note: like all Tavenem Framework forms components, this control cannot be used on static
-    server-side rendered pages. It will always be disabled when rendered statically. This is because
-    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
-    disabled during the prerender pass, then become enabled when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -79,6 +72,12 @@
     <code>null</code>. The warning will only appear after the user has interacted with the input for
     the first time (which should always result in a value, so the warning should not appear in
     normal usage).
+</p>
+
+<p>
+    Note that advanced verification is not available on static server-side rendered pages, although
+    the indicator will be rendered and the <code>required</code> attribute on the <code>input</code>
+    will be set accordingly.
 </p>
 
 <Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

@@ -82,31 +82,99 @@
         .warning) {
         --button-inherited-color: var(--tavenem-theme-color);
     }
-}
 
-.rating-buttons {
-    display: inline-flex;
+    .rating-buttons {
+        display: inline-flex;
 
-    input {
-        border: 0;
-        clip: rect(0,0,0,0);
-        cursor: inherit;
-        margin: 0;
-        opacity: 0;
-        overflow: hidden;
-        padding: 0;
-        position: absolute;
-        width: 0;
-    }
+        > .btn {
+            min-width: calc(var(--button-font-size));
+            padding-left: 0;
+            padding-right: 0;
+            transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
-    .btn-icon {
-        min-width: calc(var(--button-font-size));
-        padding-left: 0;
-        padding-right: 0;
-        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+            > input {
+                -webkit-appearance: none;
+                appearance: none;
+                background: none;
+                border: none;
+                clip: rect(0,0,0,0);
+                cursor: inherit;
+                height: 100%;
+                left: 0;
+                margin: 0;
+                padding: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
 
-        &:hover, &:focus-within, &:focus-visible {
-            transform: scale(1.2);
+                ~ tf-icon.checked {
+                    display: none;
+                }
+
+                &:checked {
+                    ~ tf-icon.checked {
+                        display: block;
+                    }
+
+                    ~ tf-icon.unchecked {
+                        display: none;
+                    }
+                }
+
+                &:read-only {
+                    pointer-events: none;
+                }
+            }
+
+            &:hover, &:focus-within, &:focus-visible {
+                &:has(> input:not(read-only)) {
+                    transform: scale(1.2);
+                
+                    > input ~ tf-icon {
+                        &.checked {
+                            display: block;
+                        }
+
+                        &.unchecked {
+                            display: none;
+                        }
+                    }
+
+                    ~ .btn > input ~ tf-icon {
+                        &.checked {
+                            display: none;
+                        }
+
+                        &.unchecked {
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            &:has(~ .btn > input:is(:checked)) {
+                > input ~ tf-icon {
+                    &.checked {
+                        display: block;
+                    }
+
+                    &.unchecked {
+                        display: none;
+                    }
+                }
+            }
+
+            &:has(~ .btn:is(:hover, :focus-within, :focus-visible)) {
+                > input:not(read-only) ~ tf-icon {
+                    &.checked {
+                        display: block;
+                    }
+
+                    &.unchecked {
+                        display: none;
+                    }
+                }
+            }
         }
     }
 }

@@ -18,6 +18,16 @@ public partial class Switch : BoolInputComponentBase<bool>
     public override bool HasValue => IsChecked == true;
 
     /// <summary>
+    /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
+    /// </summary>
+    [Parameter] public bool IsCheckedIconOutlined { get; set; }
+
+    /// <summary>
+    /// Whether to use an outlined variant of the <see cref="UncheckedIcon"/>.
+    /// </summary>
+    [Parameter] public bool IsUncheckedIconOutlined { get; set; }
+
+    /// <summary>
     /// An optional icon to display in the unchecked state.
     /// </summary>
     [Parameter] public string? UncheckedIcon { get; set; }
@@ -39,9 +49,7 @@ public partial class Switch : BoolInputComponentBase<bool>
 
     private protected string ButtonId { get; set; } = Guid.NewGuid().ToHtmlId();
 
-    private string? Icon => IsChecked == true
-        ? CheckedIcon
-        : UncheckedIcon;
+    private string? CheckedIconClass => IsCheckedIconOutlined ? "checked outlined" : "checked";
 
     [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
 
@@ -54,6 +62,8 @@ public partial class Switch : BoolInputComponentBase<bool>
             PreventDown = "key+none",
         }
     ];
+
+    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "unchecked outlined" : "unchecked";
 
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)

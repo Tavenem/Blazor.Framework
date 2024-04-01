@@ -195,7 +195,10 @@
         --field-label-color: var(--field-active-label-color);
     }
 
-    &.shrink, &:focus-within {
+    &.shrink,
+    &:focus-within,
+    &:has(.input-core.has-placeholder),
+    &:has(.input-core:not(.has-placeholder, :placeholder-shown)) {
         &:not(.filled, .outlined) > label {
             transform: translate(0, 1.5px) scale(.75);
         }
@@ -276,8 +279,11 @@
             padding-bottom: 2.5px;
             padding-top: 2.5px;
         }
-
-        &.shrink, &:focus-within {
+        
+        &.shrink,
+        &:focus-within,
+        &:has(.input-core.has-placeholder),
+        &:has(.input-core:not(.has-placeholder, :placeholder-shown)) {
             &:not(.filled, .outlined) > label {
                 transform: translate(0, 1.5px) scale(.75);
             }
@@ -522,11 +528,6 @@
         resize: none;
     }
 
-    &:focus-within .range-separator,
-    .shrink > & .range-separator {
-        visibility: visible;
-    }
-
     > .expand {
         cursor: pointer;
         transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
@@ -572,11 +573,6 @@
         transform: translateY(-100%);
         transition: opacity 50ms cubic-bezier(0,0,.2,1) 0ms,color 200ms cubic-bezier(0,0,.2,1) 0ms,transform 200ms cubic-bezier(0,0,.2,1) 0ms;
     }
-}
-
-.range-separator {
-    visibility: hidden;
-    margin: 0 4px;
 }
 
 .picker {

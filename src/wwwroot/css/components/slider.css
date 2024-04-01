@@ -1,4 +1,6 @@
 .slider {
+    --output-display: none;
+    --output-opacity: 0;
     --thumb-color: var(--tavenem-color-action);
     --thumb-label-color: var(--tavenem-color-default-text);
     --thumb-label-color-bg: var(--tavenem-color-default);
@@ -17,6 +19,10 @@
         z-index: auto;
     }
 
+    &:not(.no-label) > tf-slider {
+        margin-top: 1rem;
+    }
+
     .input {
         display: inline-block;
         line-height: 12px;
@@ -24,40 +30,6 @@
         padding: 0;
         position: relative;
         width: 100%;
-
-        > div {
-            align-items: center;
-            display: flex;
-            height: 100%;
-            left: 0;
-            position: absolute;
-            top: 0;
-            width: 100%;
-        }
-
-        > output {
-            align-items: center;
-            background-color: var(--thumb-label-color-bg);
-            border-radius: 2px;
-            color: var(--thumb-label-color);
-            display: none;
-            font-size: .75rem;
-            justify-content: center;
-            line-height: normal;
-            opacity: 0;
-            padding: 4px 8px;
-            pointer-events: none;
-            position: absolute;
-            text-align: center;
-            top: 0;
-            transform: translate(-50%, -125%);
-            transition: opacity .2s ease-in-out;
-            user-select: none;
-        }
-    }
-
-    &:not(.outlined) .input:before {
-        content: none;
     }
 
     input {
@@ -73,31 +45,22 @@
         &:focus {
             outline: none;
         }
-
-        &:active + output {
-            opacity: 1;
-        }
     }
 
     .input-core:not(text-area) {
         height: auto;
     }
 
-    &.show-value > .input > output {
-        display: block;
-    }
-
-    .filler {
-        background-color: var(--thumb-color);
-        border-radius: 1px;
-        display: none;
-        height: 2px;
-    }
-
     .hashes {
+        align-items: center;
         display: none;
         flex-grow: 1;
+        height: 100%;
         justify-content: space-between;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
 
         div {
             display: flex;
@@ -137,6 +100,14 @@
         padding-bottom: calc(.25em + 6px);
     }
 
+    &.show-value {
+        --output-display: block;
+    }
+
+    &:not(.disabled, .read-only):has(input:active) {
+        --output-opacity: 1;
+    }
+
     .field-helpers {
         color: var(--thumb-color);
     }
@@ -149,10 +120,6 @@
                 cursor: default;
                 opacity: 0.38;
             }
-
-            &:active + output {
-                opacity: 0;
-            }
         }
 
         label {
@@ -163,10 +130,6 @@
     &.read-only input {
         &, &:active, &:focus-visible {
             cursor: default;
-        }
-
-        &:active + output {
-            opacity: 0;
         }
     }
 
@@ -185,10 +148,6 @@
 
         > label + .input {
             margin-top: 1rem;
-        }
-
-        .filler {
-            display: block;
         }
     }
 

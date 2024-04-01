@@ -31,14 +31,12 @@
                                          Label="@Values[0]?.ToString()"
                                          AutoFocus="AutoFocus"
                                          CheckedIcon="@CheckedIcon"
-                                         CheckedIconOutlined="CheckedIconOutlined"
-                                         Disabled="Disabled"
+                                         IsCheckedIconOutlined="IsCheckedIconOutlined"
                                          InputAttributes="InputAttributes"
                                          InputClass="@InputClass"
                                          InputStyle="@InputStyle"
-                                         ReadOnly="ReadOnly"
                                          UncheckedIcon="@UncheckedIcon"
-                                         UncheckedIconOutlined="CheckedIconOutlined" />
+                                         IsUncheckedIconOutlined="IsCheckedIconOutlined" />
                             for (var i = 1; i < Values.Count; i++)
                             {
                                 var index = i;
@@ -46,14 +44,12 @@
                                              Value="Values[index]"
                                              Label="@Values[index]?.ToString()"
                                              CheckedIcon="@CheckedIcon"
-                                             CheckedIconOutlined="CheckedIconOutlined"
-                                             Disabled="Disabled"
+                                             IsCheckedIconOutlined="IsCheckedIconOutlined"
                                              InputAttributes="InputAttributes"
                                              InputClass="@InputClass"
                                              InputStyle="@InputStyle"
-                                             ReadOnly="ReadOnly"
                                              UncheckedIcon="@UncheckedIcon"
-                                             UncheckedIconOutlined="CheckedIconOutlined" />
+                                             IsUncheckedIconOutlined="IsCheckedIconOutlined" />
                             }
                         }
                         else
@@ -65,14 +61,12 @@
                                          Label="@Values[0]?.ToString()"
                                          AutoFocus="AutoFocus"
                                          CheckedIcon="@CheckedIcon"
-                                         CheckedIconOutlined="CheckedIconOutlined"
-                                         Disabled="Disabled"
+                                         IsCheckedIconOutlined="IsCheckedIconOutlined"
                                          InputAttributes="InputAttributes"
                                          InputClass="@InputClass"
                                          InputStyle="@InputStyle"
-                                         ReadOnly="ReadOnly"
                                          UncheckedIcon="@UncheckedIcon"
-                                         UncheckedIconOutlined="CheckedIconOutlined">
+                                         IsUncheckedIconOutlined="IsCheckedIconOutlined">
                                 <LabelContent>
                                     @LabelTemplate(context)
                                 </LabelContent>
@@ -84,14 +78,12 @@
                                              Value="Values[index]"
                                              Label="@Values[index]?.ToString()"
                                              CheckedIcon="@CheckedIcon"
-                                             CheckedIconOutlined="CheckedIconOutlined"
-                                             Disabled="Disabled"
+                                             IsCheckedIconOutlined="IsCheckedIconOutlined"
                                              InputAttributes="InputAttributes"
                                              InputClass="@InputClass"
                                              InputStyle="@InputStyle"
-                                             ReadOnly="ReadOnly"
                                              UncheckedIcon="@UncheckedIcon"
-                                             UncheckedIconOutlined="CheckedIconOutlined">
+                                             IsUncheckedIconOutlined="IsCheckedIconOutlined">
                                     <LabelContent>
                                         @LabelTemplate(context)
                                     </LabelContent>
@@ -111,14 +103,12 @@
                                          Label="@ValuePairs[0].Value"
                                          AutoFocus="AutoFocus"
                                          CheckedIcon="@CheckedIcon"
-                                         CheckedIconOutlined="CheckedIconOutlined"
-                                         Disabled="Disabled"
+                                         IsCheckedIconOutlined="IsCheckedIconOutlined"
                                          InputAttributes="InputAttributes"
                                          InputClass="@InputClass"
                                          InputStyle="@InputStyle"
-                                         ReadOnly="ReadOnly"
                                          UncheckedIcon="@UncheckedIcon"
-                                         UncheckedIconOutlined="CheckedIconOutlined" />
+                                         IsUncheckedIconOutlined="IsCheckedIconOutlined" />
                         }
                         for (var i = startIndex; i < ValuePairs.Count; i++)
                         {
@@ -127,14 +117,12 @@
                                          Value="ValuePairs[index].Key"
                                          Label="@ValuePairs[index].Value"
                                          CheckedIcon="@CheckedIcon"
-                                         CheckedIconOutlined="CheckedIconOutlined"
-                                         Disabled="Disabled"
+                                         IsCheckedIconOutlined="IsCheckedIconOutlined"
                                          InputAttributes="InputAttributes"
                                          InputClass="@InputClass"
                                          InputStyle="@InputStyle"
-                                         ReadOnly="ReadOnly"
                                          UncheckedIcon="@UncheckedIcon"
-                                         UncheckedIconOutlined="CheckedIconOutlined" />
+                                         IsUncheckedIconOutlined="IsCheckedIconOutlined" />
                         }
                     }
                 </CascadingValue>

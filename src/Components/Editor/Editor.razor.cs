@@ -195,6 +195,10 @@ public partial class Editor : FormComponentBase<string>
 
     private ColorInput<string>? ForegroundPicker { get; set; }
 
+    private bool IsDisabled => Disabled || !IsInteractive;
+
+    private bool IsReadOnly => ReadOnly || !IsInteractive;
+
     private bool IsWysiwyg => EditorMode == EditorMode.WYSIWYG
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
 

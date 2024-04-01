@@ -8,13 +8,6 @@
     The <code>Slider</code> component is a rich wrapper for a range input element.
 </p>
 
-<p>
-    Note: like all Tavenem Framework forms components, this control cannot be used on static
-    server-side rendered pages. It will always be disabled when rendered statically. This is because
-    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
-    disabled during the prerender pass, then become enabled when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -188,6 +181,14 @@
     You can display hash marks at each step by adding the <code>hashmarks</code> class.
 </p>
 
+<p>
+    Note that a maximum of 20 hash marks are displayed. If your minimum, maximum, and step values
+    would result in a greater number of subdivisions, the value is divided in half until the result
+    is 20 or less. This results in hash marks which are evenly spaced and placed at values allowed
+    by your settings, but skipping as many intermediary values as necessary to avoid excessively
+    cluttering the UI and DOM.
+</p>
+
 <Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
@@ -323,6 +324,12 @@
     Set the <code>Required</code> property to specify whether the input is required. This adds an
     indicator to the label, but since a slider cannot have an empty value (not even when bound to a
     nullable type), this property has no other real effects.
+</p>
+
+<p>
+    Note that advanced verification is not available on static server-side rendered pages, although
+    the indicator will be rendered and the <code>required</code> attribute on the <code>input</code>
+    will be set accordingly.
 </p>
 
 <Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

@@ -368,15 +368,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
         .ToString();
 
     /// <summary>
-    /// Whether this control is currently disabled.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="Disabled"/> is <see langword="true"/> or <see
-    /// cref="IsInteractive"/> is <see langword="false"/>.
-    /// </remarks>
-    protected virtual bool IsDisabled => Disabled || !IsInteractive;
-
-    /// <summary>
     /// <para>
     /// Whether this component is nested within a larger input.
     /// </para>
@@ -395,15 +386,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// Whether this field is currently invalid and has been changed.
     /// </summary>
     protected bool IsInvalidAndTouched => !IsValid && IsTouched;
-
-    /// <summary>
-    /// Whether this control is currently read-only.
-    /// </summary>
-    /// <remarks>
-    /// Returns <see langword="true"/> if <see cref="ReadOnly"/> is <see langword="true"/> or <see
-    /// cref="IsInteractive"/> is <see langword="false"/>.
-    /// </remarks>
-    protected virtual bool IsReadOnly => ReadOnly || !IsInteractive;
 
     /// <summary>
     /// The final value to be assigned to the HTML input element's <c>name</c> attribute.

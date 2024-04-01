@@ -135,6 +135,13 @@ export default [{
     },
     plugins: plugins,
 }, {
+    input: "./scripts/tavenem-slider.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
     input: "./scripts/tavenem-framework.ts",
     output: {
         format: 'es',

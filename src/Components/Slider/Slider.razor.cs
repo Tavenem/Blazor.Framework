@@ -308,6 +308,10 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
         MinDouble = Convert.ToDouble(Min);
         var step = Step is null ? 1 : Convert.ToDouble(Step);
         _tickCount = 1 + (int)((MaxDouble - MinDouble) / step);
+        while (_tickCount > 20)
+        {
+            _tickCount /= 2;
+        }
 
         BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(Value) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
     }

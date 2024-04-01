@@ -5,6 +5,7 @@ import { TavenemHighlightHTMLElement } from './tavenem-highlight';
 import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
 import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
 import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
+import { TavenemSliderHTMLElement } from './tavenem-slider';
 
 enum ThemePreference {
     Light = 1,
@@ -492,6 +493,8 @@ slot button {
         customElements.define('tf-progress-linear', TavenemProgressLinearHTMLElement);
 
         customElements.define('tf-scroll-top', TavenemScrollTopHTMLElement);
+
+        customElements.define('tf-slider', TavenemSliderHTMLElement);
 
         customElements.define('tf-drawer-close', class extends HTMLElement {
             connectedCallback() {

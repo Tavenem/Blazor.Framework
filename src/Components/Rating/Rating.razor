@@ -14,49 +14,46 @@
     @if (Max > 0)
     {
         <div class="rating-buttons">
-            <span @onclick="@(_ => OnRatingClick(0))"
-                  @onmouseout="OnMouseOutAsync"
-                  @onmouseover="@(_ => OnMouseOverAsync(0))">
+            <label class="@RatingItemCssClass"
+                   style="@RatingItemStyle"
+                   @onclick="@(_ => OnRatingClick(0))"
+                   @onmouseout="OnMouseOutAsync"
+                   @onmouseover="@(_ => OnMouseOverAsync(0))">
                 <input @ref="ElementReference"
                        id="@Id"
                        type="radio"
                        autofocus="@AutoFocus"
-                       checked="@(0 < Value)"
+                       checked="@(Value == 1)"
                        class="@InputCssClass"
-                       disabled="@IsDisabled"
+                       disabled="@Disabled"
                        name="@NameValue"
-                       readonly="@IsReadOnly"
+                       readonly="@ReadOnly"
                        style="@InputCssStyle"
-                       tabindex="-1"
+                       tabindex="@(Disabled ? -1 : TabIndex)"
                        value="1" />
-                <button class="@RatingItemCssClass" style="@RatingItemStyle" tabindex="@(IsDisabled ? -1 : TabIndex)">
-                    <tf-icon class="@(IndexIsActive(0) ? ActiveIconClass : InactiveIconClass)">
-                        @(IndexIsActive(0) ? ActiveIcon : InactiveIcon)
-                    </tf-icon>
-                </button>
-            </span>
+                <tf-icon class="@ActiveIconClass">@ActiveIcon</tf-icon>
+                <tf-icon class="@InactiveIconClass">@InactiveIcon</tf-icon>
+            </label>
             @for (var i = 1; i < Max; i++)
             {
                 var index = i;
-                var tabIndex = IsDisabled ? -1 : TabIndex + index;
-                <span @onclick="@(_ => OnRatingClick(index))"
-                      @onmouseout="OnMouseOutAsync"
-                      @onmouseover="@(_ => OnMouseOverAsync(index))">
+                <label class="@RatingItemCssClass"
+                       style="@RatingItemStyle"
+                       @onclick="@(_ => OnRatingClick(index))"
+                       @onmouseout="OnMouseOutAsync"
+                       @onmouseover="@(_ => OnMouseOverAsync(index))">
                     <input type="radio"
-                           checked="@(index < Value)"
+                           checked="@(index == Value - 1)"
                            class="@InputCssClass"
-                           disabled="@IsDisabled"
+                           disabled="@Disabled"
                            name="@NameValue"
-                           readonly="@IsReadOnly"
+                           readonly="@ReadOnly"
                            style="@InputCssStyle"
-                           tabindex="@tabIndex"
+                           tabindex="@(Disabled ? -1 : TabIndex)"
                            value="@(index + 1)" />
-                    <button class="@RatingItemCssClass" style="@RatingItemStyle">
-                        <tf-icon class="@(IndexIsActive(index) ? ActiveIconClass : InactiveIconClass)">
-                            @(IndexIsActive(index) ? ActiveIcon : InactiveIcon)
-                        </tf-icon>
-                    </button>
-                </span>
+                    <tf-icon class="@ActiveIconClass">@ActiveIcon</tf-icon>
+                    <tf-icon class="@InactiveIconClass">@InactiveIcon</tf-icon>
+                </label>
             }
         </div>
     }

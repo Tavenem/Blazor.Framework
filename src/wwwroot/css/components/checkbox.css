@@ -76,10 +76,6 @@
                         display: block;
                     }
                 }
-
-                &:read-only {
-                    pointer-events: none;
-                }
             }
 
             > tf-icon {

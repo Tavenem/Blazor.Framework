@@ -21,11 +21,6 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     [Parameter] public string CheckedIcon { get; set; } = DefaultIcons.Radio_Checked;
 
     /// <summary>
-    /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
-    /// </summary>
-    [Parameter] public bool CheckedIconOutlined { get; set; }
-
-    /// <summary>
     /// <para>
     /// The converter used to convert bound values to HTML input element values, and vice versa.
     /// </para>
@@ -69,6 +64,16 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     [Parameter] public IFormatProvider? FormatProvider { get; set; }
 
     /// <summary>
+    /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
+    /// </summary>
+    [Parameter] public bool IsCheckedIconOutlined { get; set; }
+
+    /// <summary>
+    /// Whether to use an outlined variant of the <see cref="UncheckedIcon"/>.
+    /// </summary>
+    [Parameter] public bool IsUncheckedIconOutlined { get; set; }
+
+    /// <summary>
     /// A template for the labels of dynamic radio buttons generated from the <see cref="Values"/>
     /// collection.
     /// </summary>
@@ -78,11 +83,6 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// The icon to use for the unchecked state.
     /// </summary>
     [Parameter] public string UncheckedIcon { get; set; } = DefaultIcons.Radio_Unchecked;
-
-    /// <summary>
-    /// Whether to use an outlined variant of the <see cref="UncheckedIcon"/>.
-    /// </summary>
-    [Parameter] public bool UncheckedIconOutlined { get; set; }
 
     /// <summary>
     /// <para>

@@ -19,24 +19,24 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
     [Parameter] public string? CheckedIcon { get; set; } = DefaultIcons.Radio_Checked;
 
     /// <summary>
-    /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
-    /// </summary>
-    [Parameter] public bool CheckedIconOutlined { get; set; }
-
-    /// <summary>
     /// Content for the label of the field.
     /// </summary>
     [Parameter] public RenderFragment<TValue?>? LabelContent { get; set; }
 
     /// <summary>
-    /// The icon to use for the unchecked state.
+    /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
     /// </summary>
-    [Parameter] public string? UncheckedIcon { get; set; } = DefaultIcons.Radio_Unchecked;
+    [Parameter] public bool IsCheckedIconOutlined { get; set; }
 
     /// <summary>
     /// Whether to use an outlined variant of the <see cref="UncheckedIcon"/>.
     /// </summary>
-    [Parameter] public bool UncheckedIconOutlined { get; set; }
+    [Parameter] public bool IsUncheckedIconOutlined { get; set; }
+
+    /// <summary>
+    /// The icon to use for the unchecked state.
+    /// </summary>
+    [Parameter] public string? UncheckedIcon { get; set; } = DefaultIcons.Radio_Unchecked;
 
     /// <summary>
     /// The context for this <see cref="InputRadio{TValue}"/>.
@@ -70,17 +70,15 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
         }
     }
 
-    /// <inheritdoc/>
-    protected override bool IsDisabled => Disabled || Group?.Disabled == true;
+    private bool IsDisabled => Disabled || Group?.Disabled == true;
 
-    /// <inheritdoc/>
-    protected override bool IsReadOnly => ReadOnly || Group?.ReadOnly == true;
+    private bool IsReadOnly => ReadOnly || Group?.ReadOnly == true;
 
     [CascadingParameter] private RadioGroup<TValue>? Group { get; set; }
 
     [CascadingParameter] private RadioContext<TValue>? CascadingContext { get; set; }
 
-    private string? CheckedIconClass => CheckedIconOutlined ? "checked outlined" : "checked";
+    private string? CheckedIconClass => IsCheckedIconOutlined ? "checked outlined" : "checked";
 
     private string? IconClass => new CssBuilder("btn btn-icon")
         .Add(ThemeColor.ToCSS())
@@ -91,7 +89,7 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
         ? GetToggledTrueValue()
         : IsChecked?.ToString();
 
-    private string? UncheckedIconClass => UncheckedIconOutlined ? "unchecked outlined" : "unchecked";
+    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "unchecked outlined" : "unchecked";
 
     /// <inheritdoc/>
     protected override void OnParametersSet()

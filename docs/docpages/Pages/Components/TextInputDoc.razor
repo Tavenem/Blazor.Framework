@@ -9,13 +9,6 @@
     string.
 </p>
 
-<p>
-    Note: like all Tavenem Framework forms components, this control cannot be used on static
-    server-side rendered pages. It will always be disabled when rendered statically. This is because
-    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
-    disabled during the prerender pass, then become enabled when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -348,7 +341,9 @@
 
 <p>
     If you do specify a maximum length, you can also set the <code>ShowLength</code> property to
-    <code>true</code> to display the current and maximum character count.
+    <code>true</code> to display the current and maximum character count. Note that current input
+    length is not available on static server-side rendered pages, although <code>MaxLength</code>
+    works as expected.
 </p>
 
 <Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -375,6 +370,12 @@
     indicator to the label, and automatic verification rules which warn the user when the input is
     empty. The warning will only appear after the user has interacted with the input for the first
     time.
+</p>
+
+<p>
+    Note that advanced verification is not available on static server-side rendered pages, although
+    the indicator will be rendered and the <code>required</code> attribute on the <code>input</code>
+    will be set accordingly.
 </p>
 
 <Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -406,7 +407,8 @@
 <p>
     Set the <code>Clearable</code> property to <code>false</code> to disable the button which clears
     the input. Even when <code>true</code> (the default), the button will only appear when there is
-    currently text in the input, and it is not disabled, read-only, or required.
+    currently text in the input, and it is not disabled, read-only, or required. Note also that
+    clearing is not available on static server-side rendered pages.
 </p>
 
 <Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -547,6 +549,14 @@
     suggestions might load.
 </p>
 
+<p>
+    Note that on static server-side rendered pages, suggestions fall back to the built-in
+    <code>datalist</code> browser implementation. <code>ShowAllSuggestions</code> and
+    <code>LoadSuggestions</code> are ignored. <code>SuggestionTemplate</code> will be used, but in
+    some browsers the result may be shown along with the <code>Key</code> which is intended to be
+    bound to the value.
+</p>
+
 <h2>Pattern</h2>
 
 <p>
@@ -593,6 +603,10 @@
     a US phone number entered with parenthesis and hyphens might be reduced to a series of digits.
     Be careful to note, however, that masks are simple formatting constructs, and are no
     substitution for proper server-side input sanitization or validation.
+</p>
+
+<p>
+    Note that masking does not function on static server-side rendered pages.
 </p>
 
 <h3>Mask rules</h3>
@@ -725,6 +739,10 @@
     A built-in <a href="/components/emoji">EmojiInput</a> button can be displayed with the
     <code>ShowEmoji</code> property, which allows the user to select an emoji to be appended to the
     current value.
+</p>
+
+<p>
+    Note that the emoji picker is not available on static server-side rendered pages.
 </p>
 
 <Collapse Id="ce-20" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

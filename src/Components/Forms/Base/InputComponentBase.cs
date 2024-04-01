@@ -100,7 +100,7 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// <summary>
     /// Controls when this component adds the "shrink" CSS class.
     /// </summary>
-    protected virtual bool ShrinkWhen => !string.IsNullOrEmpty(CurrentValueAsString);
+    protected virtual bool ShrinkWhen => false;
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
