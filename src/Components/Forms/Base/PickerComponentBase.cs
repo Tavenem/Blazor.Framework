@@ -63,14 +63,17 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("shrink", ShrinkWhen)
         .Add("open", ShowPicker)
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
         .ToString();
 
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
     protected virtual string? DisplayString { get; }
+
+    /// <inheritdoc/>
+    protected string? OuterInputCssClass => new CssBuilder("input picker-value")
+        .Add("clearable", ShowClear)
+        .ToString();
 
     /// <summary>
     /// Whether this control is currently disabled.
@@ -150,7 +153,6 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         && Clearable
         && !Disabled
         && !ReadOnly
-        && IsInteractive
         && !Required;
 
     private protected bool ShowPicker => PopoverOpen

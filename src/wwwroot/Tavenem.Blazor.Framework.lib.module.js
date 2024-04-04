@@ -17,8 +17,35 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                     : undefined
             }
         }
-});
+    });
     blazor.registerCustomEventType('dropdowntoggle', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            }
+        }
+    });
+    blazor.registerCustomEventType('searchinput', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            }
+        }
+    });
+    blazor.registerCustomEventType('valuechange', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            }
+        }
+    });
+    blazor.registerCustomEventType('valueinput', {
         createEventArgs: (event) => {
             return {
                 value: event instanceof CustomEvent
@@ -79,7 +106,7 @@ function addHeadContent() {
 }
 
 function fixCheckboxes() {
-    const cbs = document.querySelectorAll('.checkbox label > .btn > input:is([type="checkbox"],[type="radio"])');
+    const cbs = document.querySelectorAll('.checkbox label > .btn > input:is([type="checkbox"])');
     for (var cb of cbs) {
         cb.indeterminate = true;
     }

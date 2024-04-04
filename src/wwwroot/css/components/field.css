@@ -198,7 +198,10 @@
     &.shrink,
     &:focus-within,
     &:has(.input-core.has-placeholder),
-    &:has(.input-core:not(.has-placeholder, :placeholder-shown)) {
+    &:has(.input-core:not(.has-placeholder, :placeholder-shown)),
+    &:has(tf-input[placeholder]),
+    &:has(tf-input[value]:not([value=""])),
+    &:has(tf-input > *[slot="prefix"]) {
         &:not(.filled, .outlined) > label {
             transform: translate(0, 1.5px) scale(.75);
         }

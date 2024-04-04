@@ -211,6 +211,12 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
     /// </summary>
     [Parameter] public TimeZoneInfo TimeZone { get; set; }
 
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
+        .ToString();
+
     /// <summary>
     /// The display text for the current selection.
     /// </summary>

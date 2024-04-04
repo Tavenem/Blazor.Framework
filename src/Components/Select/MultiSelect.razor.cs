@@ -17,6 +17,12 @@ public partial class MultiSelect<TValue>
 {
     private readonly object _selectAll = new();
 
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
+        .ToString();
+
     /// <summary>
     /// Whether this select allows multiple selections.
     /// </summary>
@@ -74,6 +80,9 @@ public partial class MultiSelect<TValue>
         StateHasChanged();
     }
 
+    /// <inheritdoc/>
+    public override string? GetOptionValueAsString(Option<TValue>? option) => FormatSingleValueAsString(option is null ? default : option.Value);
+
     /// <summary>
     /// Selects all options.
     /// </summary>
@@ -97,6 +106,30 @@ public partial class MultiSelect<TValue>
             UpdateCurrentValue();
             SelectedIndex = _options.Count - 1;
         }
+    }
+
+    /// <summary>
+    /// Formats a single value as a string. Derived classes can override this to determine
+    /// the formatting used for <see cref="GetOptionValueAsString"/>.
+    /// </summary>
+    /// <param name="value">The value to format.</param>
+    /// <returns>A string representation of the value.</returns>
+    protected virtual string? FormatSingleValueAsString(TValue? value)
+    {
+        if (Converter is not null
+            && Converter.TrySetValue(value, out var input))
+        {
+            return input;
+        }
+        if (typeof(TValue) == typeof(bool))
+        {
+            return (bool)(object)value! ? "true" : "false";
+        }
+        else if (typeof(TValue) == typeof(bool?))
+        {
+            return value is not null && (bool)(object)value ? "true" : "false";
+        }
+        return value?.ToString();
     }
 
     /// <inheritdoc/>

@@ -2,7 +2,14 @@ import { TavenemAccordionHTMLElement } from './tavenem-accordion';
 import { TavenemContentsHTMLElement } from './tavenem-contents';
 import { TavenemEmojiHTMLElement } from './tavenem-emoji';
 import { TavenemHighlightHTMLElement } from './tavenem-highlight';
-import { TavenemDropdownHTMLElement, TavenemPopoverHTMLElement, TavenemPopover, TavenemTooltipHTMLElement } from './tavenem-popover';
+import { TavenemInputHtmlElement } from './tavenem-input';
+import {
+    TavenemDropdownHTMLElement,
+    TavenemPickerHtmlElement,
+    TavenemPopoverHTMLElement,
+    TavenemPopover,
+    TavenemTooltipHTMLElement
+} from './tavenem-popover';
 import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
 import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
 import { TavenemSliderHTMLElement } from './tavenem-slider';
@@ -94,6 +101,10 @@ namespace Tavenem {
         }
 
         customElements.define('tf-icon', class extends HTMLElement { });
+
+        customElements.define('tf-progress-circle', TavenemProgressCircleHTMLElement);
+
+        customElements.define('tf-progress-linear', TavenemProgressLinearHTMLElement);
 
         customElements.define('tf-close', class extends HTMLElement {
             connectedCallback() {
@@ -486,16 +497,6 @@ slot button {
             }
         });
 
-        customElements.define('tf-emoji', TavenemEmojiHTMLElement);
-
-        customElements.define('tf-progress-circle', TavenemProgressCircleHTMLElement);
-
-        customElements.define('tf-progress-linear', TavenemProgressLinearHTMLElement);
-
-        customElements.define('tf-scroll-top', TavenemScrollTopHTMLElement);
-
-        customElements.define('tf-slider', TavenemSliderHTMLElement);
-
         customElements.define('tf-drawer-close', class extends HTMLElement {
             connectedCallback() {
                 const shadow = this.attachShadow({ mode: 'open' });
@@ -624,13 +625,23 @@ slot button {
             }
         });
 
-        customElements.define('tf-syntax-highlight', TavenemHighlightHTMLElement);
+        customElements.define('tf-scroll-top', TavenemScrollTopHTMLElement);
+
+        customElements.define('tf-input', TavenemInputHtmlElement);
 
         customElements.define('tf-popover', TavenemPopoverHTMLElement);
 
+        customElements.define('tf-tooltip', TavenemTooltipHTMLElement);
+
         customElements.define('tf-dropdown', TavenemDropdownHTMLElement);
 
-        customElements.define('tf-tooltip', TavenemTooltipHTMLElement);
+        customElements.define('tf-picker', TavenemPickerHtmlElement);
+
+        customElements.define('tf-emoji', TavenemEmojiHTMLElement);
+
+        customElements.define('tf-slider', TavenemSliderHTMLElement);
+
+        customElements.define('tf-syntax-highlight', TavenemHighlightHTMLElement);
     }
 
     function setDarkmodeToggles(mode: string | null | undefined) {

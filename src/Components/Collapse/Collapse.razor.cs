@@ -83,20 +83,6 @@ public partial class Collapse : PersistentComponentBase
 
     /// <summary>
     /// <para>
-    /// Whether the content of the body will be rendered when the collapse is closed.
-    /// </para>
-    /// <para>
-    /// Default is <see langword="false"/>.
-    /// </para>
-    /// </summary>
-    /// <remarks>
-    /// Setting this to <see langword="true"/> may be required if page logic requires body elements
-    /// to be present in the DOM even when the collapse is not open.
-    /// </remarks>
-    [Parameter] public bool RenderBodyWhenClosed { get; set; }
-
-    /// <summary>
-    /// <para>
     /// A simple header for the component.
     /// </para>
     /// <para>

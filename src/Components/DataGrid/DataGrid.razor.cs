@@ -2703,6 +2703,10 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     private async Task OnColumnSortAsync(IColumn<TDataItem> column)
     {
+        if (!column.GetIsSortable())
+        {
+            return;
+        }
         if (_sortOrder.Contains(column.Id))
         {
             column.SortDescending = !column.SortDescending;

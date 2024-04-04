@@ -40,14 +40,10 @@
 
 .numeric-spin {
     --button-inherited-font-size: 1rem;
-    bottom: 0;
     display: inline-flex;
     flex-direction: column;
     justify-content: space-between;
     order: 9999;
-    position: absolute;
-    right: 0;
-    top: 0;
 
     .field &.dense > & {
         --button-inherited-font-size-icon: 1.25rem;
@@ -58,6 +54,7 @@
         background-color: transparent;
         color: inherit;
         flex-shrink: 1;
+        max-height: .9375rem;
         min-height: unset;
         min-width: unset;
         padding: 2px 0;

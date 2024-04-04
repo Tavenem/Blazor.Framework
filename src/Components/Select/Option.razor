@@ -9,8 +9,11 @@
 <div @ref="ElementReference"
      @attributes="AdditionalAttributes"
      id="@Id"
-     role="listitem"
      class="@CssClass"
+     disabled="@Disabled"
+     data-close-picker
+     data-close-picker-value="@(Select?.GetOptionValueAsString(this) ?? Value?.ToString())"
+     data-close-picker-display="@(Label ?? Select?.GetOptionValueAsString(this) ?? Value?.ToString())"
      style="@CssStyle"
      @onclick="OnClickAsync">
     @if (!string.IsNullOrWhiteSpace(IconName))
@@ -19,7 +22,7 @@
     }
     @if (ChildContent is null)
     {
-        @Label
+        @(Label ?? Select?.GetOptionValueAsString(this) ?? Value?.ToString())
     }
     else
     {

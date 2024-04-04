@@ -108,6 +108,8 @@ public partial class DataGridMultiSelect<
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
         .ToString();
 
     /// <summary>

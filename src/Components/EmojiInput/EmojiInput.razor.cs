@@ -37,6 +37,12 @@ public partial class EmojiInput : PickerComponentBase<string>
     /// </summary>
     [Parameter] public bool IconButton { get; set; }
 
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("disabled", IsDisabled)
+        .Add("read-only", IsReadOnly)
+        .ToString();
+
     /// <summary>
     /// The display text for the current selection.
     /// </summary>

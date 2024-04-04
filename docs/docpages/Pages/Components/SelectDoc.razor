@@ -9,10 +9,12 @@
 </p>
 
 <p>
-    Note: like all Tavenem Framework picker components, this control cannot be used on static
-    server-side rendered pages. It will always be disabled when rendered statically. This is because
-    it relies on interactivity to operate. When <em>pre</em>rendered server-side, it will be
-    disabled during the prerender pass, then become enabled when interactivity becomes available.
+    Note: on static server-side rendered pages this component falls back to a native
+    <code>select</code> element with only partial styling to match the look and feel of the rest of
+    the framework (because browsers support only limited styling for the <code>select</code> and
+    <code>option</code> elements). When <em>pre</em>rendered server-side, the component will render
+    using the native elements during the prerender pass, then be enhanced with fully styled Blazor
+    components when interactivity becomes available.
 </p>
 
 <h2>Basics</h2>
@@ -482,6 +484,12 @@
     time.
 </p>
 
+<p>
+    Note that advanced verification is not available on static server-side rendered pages, although
+    the indicator will be rendered and the <code>required</code> attribute on the
+    <code>select</code> will be set accordingly.
+</p>
+
 <Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
@@ -511,8 +519,28 @@
 <p>
     If your bound data type is a reference type, or a nullable value type, the select will have a
     button that allows the user to clear the selected value. The button will only appear when there
-    is currently a selected value, and it is not disabled, read-only, or required.
+    is currently a selected value, and it is not disabled, read-only, or required. It will not
+    appear on static server-side rendered pages.
 </p>
+
+<Collapse Id="ce-15" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <Select TValue="int?">
+                <Option TValue="int?" Value="1" Label="Option 1" />
+                <Option TValue="int?" Value="2" Label="Option 2" />
+                <Option TValue="int?" Value="3" Label="Option 3" />
+            </Select>
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<Select TValue=""int?"">
+    <Option TValue=""int?"" Value=""1"" Label=""Option 1"" />
+    <Option TValue=""int?"" Value=""2"" Label=""Option 2"" />
+    <Option TValue=""int?"" Value=""3"" Label=""Option 3"" />
+</Select>")
+    </ChildContent>
+</Collapse>
 
 <h2>Name</h2>
 
@@ -549,7 +577,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
@@ -592,7 +620,7 @@
     You can add the <code>dense</code> class to any variant to reduce the margins and padding.
 </p>
 
-<Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+<Collapse Id="ce-17" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
             <Select Options="_options" Label="Normal" Class="dense" />

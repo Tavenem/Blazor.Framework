@@ -18,10 +18,7 @@
             <tf-icon>@IconName</tf-icon>
         </summary>
         <div class="@BodyCssClass">
-            @if (IsOpen || RenderBodyWhenClosed)
-            {
-                @ChildContent
-            }
+            @ChildContent
         </div>
     </details>
     @if (FooterContent is not null)

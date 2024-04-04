@@ -5,73 +5,46 @@
 @inherits InputComponentBase<TValue>
 
 <div @attributes="AdditionalAttributes" id="@ContainerId" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
-    <div id="@InputId" class="input">
+    <tf-input @ref="ElementReference"
+              @attributes="InputAttributes"
+              id="@InputId"
+              autocomplete="@AutocompleteValue"
+              autofocus="@AutoFocus"
+              class="input"
+              data-input-class="@InputCssClass"
+              data-input-debounce="@UpdateOnInputDebounce"
+              data-input-id="@Id"
+              data-input-style="@InputCssStyle"
+              disabled="@Disabled"
+              display="@DisplayString"
+              inputmode="@InputMode"
+              max="@MaxString"
+              min="@MinString"
+              name="@NameValue"
+              readonly="@ReadOnly"
+              required="@Required"
+              size="@EffectiveSize"
+              step="@StepString"
+              tabindex="@TabIndex"
+              value="@CurrentValueAsString"
+              @valuechange="OnValueChange"
+              @valueinput="OnValueInput">
         @if (PrefixContent is not null)
         {
-            @PrefixContent(Value)
-        }
-        else if (!string.IsNullOrEmpty(PrefixIcon) || !string.IsNullOrEmpty(PrefixText))
-        {
-            @if (!string.IsNullOrEmpty(PrefixIcon))
-            {
-                <tf-icon>@PrefixIcon</tf-icon>
-            }
-            @if (!string.IsNullOrEmpty(PrefixText))
-            {
-                <span>@PrefixText</span>
-            }
-        }
-        @if (IsInteractive)
-        {
-            <input type="number"
-                   disabled="@Disabled"
-                   hidden
-                   inputmode="@InputMode"
-                   name="@NameValue"
-                   readonly="@ReadOnly"
-                   step="@StepString"
-                   tabindex="@TabIndex"
-                   value="@CurrentValueAsString" />
-            <input @ref="ElementReference"
-                   @attributes="InputAttributes"
-                   id="@Id"
-                   class="@InputCssClass"
-                   style="@InputCssStyle"
-                   autocomplete="@AutocompleteValue"
-                   autofocus="@AutoFocus"
-                   disabled="@Disabled"
-                   inputmode="@InputMode"
-                   readonly="@ReadOnly"
-                   required="@Required"
-                   size="@EffectiveSize"
-                   step="@StepString"
-                   tabindex="@TabIndex"
-                   value="@DisplayString"
-                   @oninput="OnInput"
-                   @onchange="OnChange" />
+            <div slot="prefix" style="display:contents">
+                @PrefixContent(Value)
+            </div>
         }
         else
         {
-            <input @ref="ElementReference"
-                   @attributes="InputAttributes"
-                   id="@Id"
-                   class="@InputCssClass"
-                   style="@InputCssStyle"
-                   autocomplete="@AutocompleteValue"
-                   autofocus="@AutoFocus"
-                   disabled="@Disabled"
-                   inputmode="@InputMode"
-                   name="@NameValue"
-                   placeholder=" "
-                   readonly="@ReadOnly"
-                   required="@Required"
-                   size="@EffectiveSize"
-                   step="@StepString"
-                   tabindex="@TabIndex"
-                   type="number"
-                   value="@CurrentValueAsString"
-                   @oninput="OnInput"
-                   @onchange="OnChange" />
+            if (!string.IsNullOrEmpty(PrefixIcon))
+            {
+                <tf-icon slot="prefix">@PrefixIcon</tf-icon>
+            }
+            if (!string.IsNullOrEmpty(PrefixText))
+            {
+                <span slot="prefix">@PrefixText</span>
+            }
         }
         @if (PostfixContent is not null)
         {
@@ -105,19 +78,19 @@
                     <button class="btn btn-text"
                             disabled="@IncrementDisabled"
                             tabindex="-1"
-                            onclick="const i = document.getElementById('@Id');i.value = Math.round((parseFloat(i.value) + @IncrementString) * @IncrementPrecision) / @IncrementPrecision">
+                            onclick="document.getElementById('@InputId').increment()">
                         <tf-icon class="@ThemeColor.ToCSS()">@StepUpIcon</tf-icon>
                     </button>
                     <button class="btn btn-text"
                             disabled="@DecrementDisabled"
                             tabindex="-1"
-                            onclick="const i = document.getElementById('@Id');i.value = Math.round((parseFloat(i.value) - @IncrementString) * @IncrementPrecision) / @IncrementPrecision">
+                            onclick="document.getElementById('@InputId').decrement()">
                         <tf-icon class="@ThemeColor.ToCSS()">@StepDownIcon</tf-icon>
                     </button>
                 }
             </div>
         }
-    </div>
+    </tf-input>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label for="@Id">@Label</label>

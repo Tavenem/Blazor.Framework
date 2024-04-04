@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -37,6 +38,9 @@ public partial class Select<TValue>
     /// </summary>
     public Select() => Clearable = Nullable.GetUnderlyingType(typeof(TValue)) is not null
         || typeof(TValue).IsClass;
+
+    /// <inheritdoc/>
+    public override string? GetOptionValueAsString(Option<TValue>? option) => FormatValueAsString(option is null ? default : option.Value);
 
     /// <inheritdoc/>
     protected override string? FormatValueAsString(TValue? value)
@@ -163,5 +167,11 @@ public partial class Select<TValue>
             }
         }
         StateHasChanged();
+    }
+
+    private void OnPickerValueChange(ValueChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value;
+        RefreshOptions();
     }
 }

@@ -1,4 +1,6 @@
-﻿enum MouseEventType {
+﻿import { TavenemInputHtmlElement } from './tavenem-input'
+
+enum MouseEventType {
     None = 0,
     LeftClick = 1 << 0,
     RightClick = 1 << 1,
@@ -91,7 +93,7 @@ export namespace TavenemPopover {
         }
 
         if (!popoverNode.classList.contains('open')) {
-            const parent = popoverNode.parentElement; ('tf-tooltip');
+            const parent = popoverNode.parentElement;
             if (!parent
                 || !parent.hasAttribute('data-popover-container')
                 || !('popoverOpen' in parent.dataset)) {
@@ -919,7 +921,7 @@ slot {
         document.removeEventListener('mouseout', this.onAttentionOutTarget.bind(this));
 
         this.removeEventListener('click', this.dismiss.bind(this));
-        
+
         if (this._button) {
             this._button.removeEventListener('click', this.toggle.bind(this));
             this._button.removeEventListener('focusin', this.onAttentionOnButton.bind(this));
@@ -932,7 +934,7 @@ slot {
     onPopoverMouseLeave(popover: TavenemPopoverHTMLElement, event: MouseEvent) {
         if (this.contains(popover)
             && (!(event.relatedTarget instanceof Node)
-            || !this.contains(event.relatedTarget))) {
+                || !this.contains(event.relatedTarget))) {
             this._mouseOver = false;
         }
         if ('popoverOpen' in this.dataset && !this._mouseOver) {
@@ -974,7 +976,7 @@ slot {
         const target = this.verifyTarget(event);
         if (!target
             || (target === this
-            && !('dismissOnTap' in this.dataset))) {
+                && !('dismissOnTap' in this.dataset))) {
             return;
         }
 
@@ -1406,6 +1408,690 @@ slot {
         }
         else if (!this.hasAttribute('disabled') && correctButton) {
             this.open(event);
+        }
+    }
+}
+
+export class TavenemPickerHtmlElement extends HTMLElement {
+    _closeCooldownTimer: number;
+    _closed: boolean;
+    _hideTimer: number;
+    _searchText: string | null | undefined;
+    _searchTimer: number = -1;
+
+    static get observedAttributes() {
+        return ['disabled', 'readonly', 'value'];
+    }
+
+    constructor() {
+        super();
+
+        this._closeCooldownTimer = -1;
+        this._closed = false;
+        this._hideTimer = -1;
+    }
+
+    private static newSearchInputEvent(value: string) {
+        return new CustomEvent('searchinput', { bubbles: true, detail: { value: value } });
+    }
+
+    private static newValueChangeEvent(value: string) {
+        return new CustomEvent('valuechange', { bubbles: true, detail: { value: value } });
+    }
+
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+
+        const style = document.createElement('style');
+        style.textContent = `:host {
+    position: relative;
+}
+
+slot {
+    border-radius: inherit;
+}`;
+        shadow.appendChild(style);
+
+        const slot = document.createElement('slot');
+        shadow.appendChild(slot);
+
+        this.addEventListener('focuslost', this.onPopoverFocusLost.bind(this));
+        this.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.addEventListener('mouseup', this.onMouseUp.bind(this));
+        this.addEventListener('keyup', this.onKeyUp.bind(this));
+
+        document.addEventListener('mousedown', this.onDocMouseDown.bind(this));
+    }
+
+    disconnectedCallback() {
+        clearTimeout(this._hideTimer);
+        this.removeEventListener('focuslost', this.onPopoverFocusLost.bind(this));
+        this.removeEventListener('mousedown', this.onMouseDown.bind(this));
+        this.removeEventListener('mouseup', this.onMouseUp.bind(this));
+        this.removeEventListener('keyup', this.onKeyUp.bind(this));
+        document.removeEventListener('mousedown', this.onDocMouseDown.bind(this));
+    }
+
+    attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if ((name === 'disabled'
+            || name === 'readonly')
+            && newValue) {
+            this.close();
+        } else if (name === 'value'
+            && newValue) {
+            this.onSubmitValue(newValue);
+        }
+    }
+
+    setOpen(value: boolean) {
+        if (value) {
+            this.openInner();
+        } else {
+            this.closeInner();
+        }
+        clearTimeout(this._hideTimer);
+    }
+
+    toggleOpen() {
+        if ('popoverOpen' in this.dataset) {
+            this.closeInner();
+        } else {
+            this.openInner();
+        }
+        clearTimeout(this._hideTimer);
+    }
+
+    private static documentPositionComparator(a: Node, b: Node) {
+        if (a === b) {
+            return 0;
+        }
+
+        var position = a.compareDocumentPosition(b);
+
+        if (position & Node.DOCUMENT_POSITION_FOLLOWING || position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
+            return -1;
+        } else if (position & Node.DOCUMENT_POSITION_PRECEDING || position & Node.DOCUMENT_POSITION_CONTAINS) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    private close() {
+        clearTimeout(this._hideTimer);
+        if ('popoverOpen' in this.dataset) {
+            this.closeInner();
+        }
+    }
+
+    private closeInner() {
+        this._closed = true;
+        delete this.dataset.popoverOpen;
+
+        const input = this.querySelector('.picker-value');
+        if (input
+            && (input instanceof HTMLInputElement
+            || input instanceof TavenemInputHtmlElement)) {
+            this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(input.value));
+        }
+
+        this._closeCooldownTimer = setTimeout(() => this._closed = false, 200);
+    }
+
+    private getSelectedIndices(): {
+        options?: HTMLElement[],
+        firstSelectedIndex?: number,
+        lastSelectedIndex?: number
+    } {
+        const root = this.shadowRoot;
+        if (!root) {
+            return {};
+        }
+
+        let value: string | undefined;
+        const input = this.querySelector('.picker-value');
+        if (input
+            && (input instanceof HTMLInputElement
+                || input instanceof TavenemInputHtmlElement)) {
+            value = input.value;
+        }
+        if (!value) {
+            return {};
+        }
+
+        const options = Array
+            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
+            .sort(TavenemPickerHtmlElement.documentPositionComparator);
+        let firstSelectedIndex: number | undefined;
+        let lastSelectedIndex: number | undefined;
+        for (var i = 0; i < options.length; i++) {
+            const option = options[i];
+            if ('closePickerValue' in option.dataset) {
+                if (option.dataset.closePickerValue === value) {
+                    if (firstSelectedIndex == null) {
+                        firstSelectedIndex = i;
+                    }
+                    lastSelectedIndex = i;
+                }
+            } else if (option instanceof HTMLOptionElement
+                && option.value === value) {
+                if (firstSelectedIndex == null) {
+                    firstSelectedIndex = i;
+                }
+                lastSelectedIndex = i;
+            }
+        }
+
+        return {
+            options,
+            firstSelectedIndex,
+            lastSelectedIndex
+        };
+    }
+
+    private onArrowDown(event: KeyboardEvent) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const selectedIndices = this.getSelectedIndices();
+        if (!selectedIndices.options
+            || (selectedIndices.lastSelectedIndex != null
+                && selectedIndices.lastSelectedIndex >= selectedIndices.options.length - 1)) {
+            return;
+        }
+
+        this.onSubmitOption(selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) + 1]);
+    }
+
+    private onArrowUp(event: KeyboardEvent) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const selectedIndices = this.getSelectedIndices();
+        if (!selectedIndices.options
+            || (selectedIndices.firstSelectedIndex != null
+                && selectedIndices.firstSelectedIndex <= 0)) {
+            return;
+        }
+
+        this.onSubmitOption(selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) - 1]);
+    }
+
+    private onClear(event: Event) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.onSubmitValue('', '');
+    }
+
+    private onDocMouseDown(event: MouseEvent) {
+        if (event.target
+            && event.target !== this
+            && event.target instanceof Node
+            && !this.contains(event.target)) {
+            this.close();
+        }
+    }
+
+    private onKeyUp(event: KeyboardEvent) {
+        if (event.key === "Enter" || event.key === " ") {
+            this.onSubmit(event);
+        } else if (event.key === "ArrowDown") {
+            if (event.altKey) {
+                if (!('popoverOpen' in this.dataset)) {
+                    this.onToggle(event);
+                }
+            } else {
+                this.onArrowDown(event);
+            }
+        } else if (event.key === "ArrowUp") {
+            if (event.altKey) {
+                if ('popoverOpen' in this.dataset) {
+                    this.onToggle(event);
+                }
+            } else {
+                this.onArrowUp(event);
+            }
+        } else if (event.key === "Delete") {
+            this.onClear(event);
+        } else if (event.key === "Escape") {
+            if ('popoverOpen' in this.dataset) {
+                this.onToggle(event);
+            }
+        } else if (event.key === "a") {
+            if (event.ctrlKey && this.hasAttribute('multiple')) {
+                this.selectAll(event);
+            } else {
+                this.onSearchInput(event);
+            }
+        } else {
+            if (event.key.length === 1
+                && !event.altKey
+                && !event.ctrlKey
+                && !event.metaKey) {
+                this.onSearchInput(event);
+            }
+        }
+    }
+
+    private onMouseDown() { clearTimeout(this._hideTimer); }
+
+    private onMouseUp(event: MouseEvent) {
+        if (event.button === 0) {
+            this.onSubmit(event);
+        }
+}
+
+    private onSubmit(event: Event) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            if (event.target instanceof HTMLElement
+                && 'pickerNoToggle' in event.target.dataset) {
+                return;
+            }
+
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+
+                if (!(event.target instanceof HTMLElement)
+                    || !('closePicker' in event.target.dataset)) {
+                    return;
+                } else {
+                    this.onSubmitOption(event.target);
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggle();
+    }
+
+    private onSubmitOption(element: HTMLElement) {
+        if ('closePickerValue' in element.dataset) {
+            if (!element.hasAttribute('disabled')) {
+                this.onSubmitValue(
+                    element.dataset.closePickerValue || '',
+                    element.dataset.closePickerDisplay);
+                return;
+            }
+        }
+
+        if (element instanceof HTMLOptionElement
+            && !element.disabled) {
+            let value = element.value;
+            if ((!value || !value.length)
+                && element.innerText
+                && element.innerText.length) {
+                value = element.innerText;
+            }
+
+            let display: string | null = element.label;
+            if (!display || !display.length) {
+                display = element.value;
+            }
+            if (!display || !display.length) {
+                display = element.innerText;
+            }
+            if (display && !display.length) {
+                display = null;
+            }
+            this.onSubmitValue(value, display);
+        }
+    }
+
+    private onSubmitValue(value?: string, display?: string | null) {
+        if (!value) {
+            return;
+        }
+
+        const input = this.querySelector('.picker-value');
+        if (input
+            && (input instanceof HTMLInputElement
+                || input instanceof TavenemInputHtmlElement)) {
+            input.value = value;
+        }
+
+        if (display && input instanceof TavenemInputHtmlElement) {
+            input.display = display;
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const options = Array
+            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
+            .sort(TavenemPickerHtmlElement.documentPositionComparator);
+        for (var i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option instanceof HTMLElement
+                && 'closePickerValue' in option.dataset) {
+                if (option.dataset.closePickerValue === value) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            } else if (option instanceof HTMLOptionElement) {
+                if (option.value === value) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            }
+        }
+    }
+
+    private open() {
+        clearTimeout(this._hideTimer);
+
+        if (this._closed
+            || this.hasAttribute('disabled')
+            || this.hasAttribute('readonly')) {
+            return;
+        }
+
+        this.openInner();
+    }
+
+    private openInner() {
+        if (this._closed) {
+            return;
+        }
+
+        const popover = this.querySelector('tf-popover.contained-popover');
+        if (popover) {
+            TavenemPopover.placePopover(popover);
+        }
+        this.dataset.popoverOpen = '';
+
+        const input = this.querySelector('.picker-value');
+        if (input && input instanceof HTMLElement) {
+            input.focus();
+        }
+    }
+
+    private onPopoverFocusLost(event: Event) {
+        if (event.target
+            && event.target instanceof TavenemPopoverHTMLElement
+            && event.target.parentElement === this) {
+            this._hideTimer = setTimeout(this.close.bind(this), 100);
+        }
+    }
+
+    private onSearchInput(event: KeyboardEvent) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const options = Array
+            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .sort(TavenemPickerHtmlElement.documentPositionComparator);
+        if (!options.length) {
+            return;
+        }
+
+        this._searchText += event.key;
+        clearTimeout(this._searchTimer);
+
+        if (!this._searchText || !this._searchText.length) {
+            return;
+        }
+
+        this._searchTimer = setTimeout(() => this._searchText = null, 2000);
+
+        let match;
+        for (var option of options) {
+            if (!(option instanceof HTMLElement)) {
+                continue;
+            }
+
+            if (this._searchText.length === 1) {
+                if (option instanceof HTMLElement
+                    && 'closePickerValue' in option.dataset) {
+                    if (!option.hasAttribute('disabled')
+                        && (('closePickerDisplay' in option.dataset
+                            && option.dataset.closePickerDisplay
+                            && option.dataset.closePickerDisplay.startsWith(this._searchText))
+                            || (!('closePickerDisplay' in option.dataset)
+                                && option.dataset.closePickerValue
+                                && option.dataset.closePickerValue.startsWith(this._searchText)))) {
+                        match = option;
+                        break;
+                    }
+                } else if (option instanceof HTMLOptionElement
+                    && !option.disabled
+                    && (option.label.startsWith(this._searchText)
+                        || (!option.label
+                            && option.textContent
+                            && option.textContent.startsWith(this._searchText))
+                        || (!option.label
+                            && !option.textContent
+                            && option.value.startsWith(this._searchText)))) {
+                    match = option;
+                    break;
+                }
+            } else if (option instanceof HTMLElement
+                && 'closePickerValue' in option.dataset) {
+                if (!option.hasAttribute('disabled')
+                    && (('closePickerDisplay' in option.dataset
+                        && option.dataset.closePickerDisplay
+                        && option.dataset.closePickerDisplay.includes(this._searchText))
+                        || (!('closePickerDisplay' in option.dataset)
+                            && option.dataset.closePickerValue
+                            && option.dataset.closePickerValue.includes(this._searchText)))) {
+                    match = option;
+                    break;
+                }
+            } else if (option instanceof HTMLOptionElement
+                && !option.disabled
+                && (option.label.includes(this._searchText)
+                    || (!option.label
+                        && option.textContent
+                        && option.textContent.includes(this._searchText))
+                    || (!option.label
+                        && !option.textContent
+                        && option.value.includes(this._searchText)))) {
+                match = option;
+                break;
+            }
+        }
+        if (!match) {
+            TavenemPickerHtmlElement.newSearchInputEvent(this._searchText);
+            return;
+        }
+
+        let value: string;
+        let display: string | null | undefined;
+        if (match instanceof HTMLOptionElement) {
+            value = match.value;
+            display = match.label || match.textContent;
+        } else if (match instanceof HTMLElement
+            && 'closePickerValue' in match.dataset) {
+            value = match.dataset.closePickerValue || '';
+            display = match.dataset.closePickerDisplay;
+        } else {
+            return;
+        }
+
+        if ('popoverOpen' in this.dataset) {
+            match.focus();
+            match.scrollIntoView({ behavior: 'smooth' });
+        }
+        this.onSubmitValue(value, display);
+    }
+
+    private onToggle(event: Event) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            if (event.target instanceof HTMLElement
+                && 'pickerNoToggle' in event.target.dataset) {
+                return;
+            }
+
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+
+                if (!(event.target instanceof HTMLElement)
+                    || !('closePicker' in event.target.dataset)) {
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.toggle();
+}
+
+    private selectAll(event: Event) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                if (!('popoverOpen' in this.dataset)) {
+                    return;
+                }
+            }
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const options = Array
+            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .sort(TavenemPickerHtmlElement.documentPositionComparator)
+            .filter(x => {
+                if (x instanceof HTMLElement
+                    && 'closePickerValue' in x.dataset
+                    && x.dataset.closePickerValue
+                    && x.dataset.closePickerValue.length) {
+                    return true;
+                }
+
+                if (x instanceof HTMLOptionElement) {
+                    return x.value && x.value.length;
+                }
+
+                return false;
+            }).map(x => {
+                if (x instanceof HTMLElement
+                    && 'closePickerValue' in x.dataset) {
+                    return x.dataset.closePickerValue!;
+                }
+
+                if (x instanceof HTMLOptionElement) {
+                    return x.value;
+                }
+
+                return '';
+            });
+        if (options.length === 0) {
+            return;
+        }
+
+        let display = options[0];
+        if (display.length) {
+            display += " +" + (options.length - 1).toFixed(0);
+        } else {
+            display += options.length.toFixed(0);
+        }
+        this.onSubmitValue(JSON.stringify(options), display);
+    }
+
+    private toggle() {
+        if ('popoverOpen' in this.dataset) {
+            this.close();
+        } else if (!this.hasAttribute('disabled')
+            && !this.hasAttribute('readonly')) {
+            this.open();
         }
     }
 }

@@ -19,6 +19,13 @@ public interface ISelect<TOption>
     void Add(Option<TOption> option);
 
     /// <summary>
+    /// Converts the given <paramref name="option"/> to its equivalent value as a string.
+    /// </summary>
+    /// <param name="option">The <see cref="Option{T}"/> to convert.</param>
+    /// <returns>The string which represents the value of <paramref name="option"/>.</returns>
+    string? GetOptionValueAsString(Option<TOption>? option);
+
+    /// <summary>
     /// Determine whether the given value is currently selected.
     /// </summary>
     /// <param name="option">The value to check for selection.</param>

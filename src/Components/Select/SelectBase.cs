@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Text;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
 
@@ -18,10 +19,8 @@ public abstract class SelectBase<TValue, TOption>
 {
     private protected readonly List<Option<TOption>> _options = [];
     private protected readonly List<KeyValuePair<TOption?, string?>> _selectedOptions = [];
-    private readonly AdjustableTimer _typeTimer;
 
     private protected bool _valueUpdated;
-    private bool _disposedValue;
 
     /// <summary>
     /// Whether all (non-<see langword="null"/>) options are currently selected.
@@ -53,10 +52,9 @@ public abstract class SelectBase<TValue, TOption>
     /// text.
     /// </para>
     /// <para>
-    /// If this function is not provided, an option is considered to match if its <see
-    /// cref="Option{TOption}.Label"/> contains the given text, or if it does not have a label (e.g.
-    /// because <see cref="Option{TOption}.ChildContent"/> was used instead), then the value's <see
-    /// cref="object.ToString"/> is used.
+    /// Simple string matching is attempted first, using the labels of the options. Only if no match
+    /// is found for the current search text will this function be invoked to determine if a match
+    /// exists based on logic other than item labels.
     /// </para>
     /// </summary>
     [Parameter] public Func<string, TOption, bool>? MatchTypedText { get; set; }
@@ -67,8 +65,8 @@ public abstract class SelectBase<TValue, TOption>
     /// </para>
     /// <para>
     /// If provided, dynamic option elements will be generated for these values. The value of each
-    /// radio button will be the <see cref="KeyValuePair{TKey, TValue}.Key"/>, and the label will be
-    /// the <see cref="KeyValuePair{TKey, TValue}.Value"/>.
+    /// option will be the <see cref="KeyValuePair{TKey, TValue}.Key"/>, and the label will be the
+    /// <see cref="KeyValuePair{TKey, TValue}.Value"/>.
     /// </para>
     /// </summary>
     [Parameter] public IEnumerable<KeyValuePair<TOption, string>>? OptionPairs { get; set; }
@@ -153,7 +151,10 @@ public abstract class SelectBase<TValue, TOption>
         {
             if (_selectedOptions.Count == 0)
             {
-                return null;
+                var matchingOption = _options.Find(x => EqualityComparer<TOption>.Default.Equals(x.Value, default));
+                return matchingOption?.Label
+                    ?? GetOptionValueAsString(matchingOption)
+                    ?? matchingOption?.Value?.ToString();
             }
 
             var first = _selectedOptions[0].Value;
@@ -218,11 +219,6 @@ public abstract class SelectBase<TValue, TOption>
 
     private protected string? TypedValue { get; set; }
 
-    /// <summary>
-    /// Constructs a new instance of <see cref="SelectBase{TValue, TOption}"/>.
-    /// </summary>
-    protected SelectBase() => _typeTimer = new(ClearTyped, 2000);
-
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -273,7 +269,14 @@ public abstract class SelectBase<TValue, TOption>
     public void Add(Option<TOption> option)
     {
         _options.Add(option);
-        MaxOptionSize = Math.Max(MaxOptionSize, option.Label?.Length ?? 0);
+        MaxOptionSize = Math.Max(
+            MaxOptionSize,
+            (option.Label
+                ?? GetOptionValueAsString(option)
+                ?? option.Value?.ToString())?
+                .Length
+                ?? 0);
+        StateHasChanged();
     }
 
     /// <inheritdoc/>
@@ -286,6 +289,13 @@ public abstract class SelectBase<TValue, TOption>
         StateHasChanged();
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Converts the given <paramref name="option"/> to its equivalent value as a string.
+    /// </summary>
+    /// <param name="option">The <see cref="Option{T}"/> to convert.</param>
+    /// <returns>The string which represents the value of <paramref name="option"/>.</returns>
+    public abstract string? GetOptionValueAsString(Option<TOption>? option);
 
     /// <summary>
     /// Determine whether the given value is currently selected.
@@ -307,12 +317,16 @@ public abstract class SelectBase<TValue, TOption>
     /// <summary>
     /// Called internally.
     /// </summary>
-    public virtual void Remove(Option<TOption> option)
+    public void Remove(Option<TOption> option)
     {
         _options.Remove(option);
         MaxOptionSize = _options.Count == 0
             ? 0
-            : _options.Max(x => x.Label?.Length ?? 0);
+            : _options.Max(x => (x.Label
+                ?? GetOptionValueAsString(x)
+                ?? x.Value?.ToString())?
+                .Length
+                ?? 0);
     }
 
     /// <summary>
@@ -332,96 +346,31 @@ public abstract class SelectBase<TValue, TOption>
     public Task ToggleValueAsync(Option<TOption> option)
         => ToggleValueAsync(option, !IsMultiselect);
 
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    private protected override void OnKeyDownAsync(KeyboardEventArgs e) { }
+
+    private protected async Task OnSearchInputAsync(ValueChangeEventArgs e)
     {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _typeTimer.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        base.Dispose(disposing);
-    }
-
-    private protected Task OnArrowDownAsync(KeyboardEventArgs e) => SelectIndexAsync(e, SelectedIndex + 1);
-
-    private protected Task OnArrowUpAsync(KeyboardEventArgs e) => SelectIndexAsync(e, SelectedIndex - 1);
-
-    private protected override async void OnKeyDownAsync(KeyboardEventArgs e)
-    {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (MatchTypedText is null
+            || string.IsNullOrWhiteSpace(e.Value))
         {
             return;
         }
-
-        switch (e.Key)
+        foreach (var option in _options.Where(x => !x.Disabled))
         {
-            case "ArrowDown":
-                if (e.AltKey)
+            if (option.Value is not null
+                && MatchTypedText(e.Value, option.Value))
+            {
+                if (ShowPicker)
                 {
-                    if (!PopoverOpen)
-                    {
-                        await TogglePopoverAsync();
-                    }
+                    await option.ElementReference.FocusAsync();
+                    await ScrollService.ScrollToId(option.Id, setHistory: false);
+                    await SelectItemAsync(option);
                 }
                 else
                 {
-                    await OnArrowDownAsync(e);
+                    await OnTypeClosedAsync(option);
                 }
-                break;
-            case "ArrowUp":
-                if (e.AltKey)
-                {
-                    if (PopoverOpen)
-                    {
-                        await TogglePopoverAsync();
-                    }
-                }
-                else
-                {
-                    await OnArrowUpAsync(e);
-                }
-                break;
-            case "Delete":
-                if (CanClear)
-                {
-                    await ClearAsync();
-                }
-                break;
-            case " ":
-            case "Enter":
-                await TogglePopoverAsync();
-                break;
-            case "Escape":
-                if (PopoverOpen)
-                {
-                    await TogglePopoverAsync();
-                }
-                break;
-            case "a":
-                if (e.CtrlKey)
-                {
-                    await SelectAllAsync();
-                }
-                else
-                {
-                    await OnTypeAsync(e.Key);
-                }
-                break;
-            default:
-                if (e.Key.Length == 1
-                    && !e.AltKey
-                    && !e.CtrlKey
-                    && !e.MetaKey)
-                {
-                    await OnTypeAsync(e.Key);
-                }
-                break;
+            }
         }
     }
 
@@ -462,43 +411,4 @@ public abstract class SelectBase<TValue, TOption>
     private protected abstract void UpdateCurrentValue();
 
     private protected abstract void UpdateSelectedFromValue();
-
-    private void ClearTyped() => TypedValue = null;
-
-    private async Task OnTypeAsync(string value)
-    {
-        TypedValue += value;
-
-        foreach (var option in _options.Where(x => !x.Disabled))
-        {
-            var matched = false;
-            if (MatchTypedText is null)
-            {
-                var matchText = string.IsNullOrEmpty(option.Label)
-                    ? option.Value?.ToString()
-                    : option.Label;
-                matched = matchText?.Contains(TypedValue) == true;
-            }
-            else
-            {
-                matched = option.Value is not null
-                    && MatchTypedText(TypedValue, option.Value);
-            }
-            if (matched)
-            {
-                if (ShowPicker)
-                {
-                    await option.ElementReference.FocusAsync();
-                    await ScrollService.ScrollToId(option.Id, setHistory: false);
-                    await SelectItemAsync(option);
-                }
-                else
-                {
-                    await OnTypeClosedAsync(option);
-                }
-            }
-        }
-
-        _typeTimer.Start();
-    }
 }

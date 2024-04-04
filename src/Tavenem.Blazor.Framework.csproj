@@ -63,6 +63,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
+    <ClientAssetsInputs Remove="assets\scripts\tavenem-input.ts" />
     <ClientAssetsInputs Remove="assets\scripts\tavenem-slider.ts" />
     <CssFiles Include="$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
   </ItemGroup>

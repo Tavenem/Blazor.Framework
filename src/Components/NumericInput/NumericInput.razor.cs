@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -17,11 +17,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
 {
     private static readonly bool _isFloatingPoint;
     private static readonly TValue _maxDefault, _minDefault, _one, _zero;
-
-    private readonly AdjustableTimer _timer;
-
-    private bool _disposedValue;
-    private string? _newValue;
 
     /// <summary>
     /// <para>
@@ -182,12 +177,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         .Add("input-core")
         .ToString();
 
-    /// <inheritdoc/>
-    protected override bool ShrinkWhen => base.ShrinkWhen
-        || PrefixContent is not null
-        || !string.IsNullOrEmpty(PrefixIcon)
-        || !string.IsNullOrEmpty(PrefixText);
-
     private static string InputMode => _isFloatingPoint ? "decimal" : "numeric";
 
     private string? AutocompleteValue
@@ -220,48 +209,27 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
             && (FormExtensions.ValuesEqual(CurrentValue, Max)
                 || FormExtensions.ValueIsMore(CurrentValue, Max)));
 
-    private protected int IncrementPrecision
-    {
-        get
-        {
-            var incrementString = IncrementString;
-            var decimalIndex = incrementString.IndexOf('.');
-            if (decimalIndex < 0)
-            {
-                return 1;
-            }
-            return (incrementString.Length - decimalIndex - 1) * 10;
-        }
-    }
+    private protected string? MaxString
+        => FormExtensions.ValuesEqual(Max, _maxDefault)
+        ? null
+        : FormExtensions.SuppressScientificFormat(Max);
 
-    private protected string IncrementString => Step is not null
-        && !FormExtensions.ValuesEqual(Step, _zero)
-        ? FormExtensions.SuppressScientificFormat(Step)
-        : "1";
-
-    [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
-
-    private protected virtual List<KeyOptions> KeyOptions { get; set; } =
-    [
-        new()
-        {
-            Key = "/ArrowDown|ArrowUp/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-        }
-    ];
+    private protected string? MinString
+        => FormExtensions.ValuesEqual(Min, _minDefault)
+        ? null
+        : FormExtensions.SuppressScientificFormat(Min);
 
     private protected string? StepString
     {
         get
         {
-            if (Step is not null
-                && !FormExtensions.ValuesEqual(Step, _zero))
+            if (Step is null
+                || FormExtensions.ValuesEqual(Step, _zero))
             {
-                return FormExtensions.SuppressScientificFormat(Step);
+                return _isFloatingPoint ? "any" : "1";
             }
 
-            return _isFloatingPoint ? "any" : "1";
+            return FormExtensions.SuppressScientificFormat(Step);
         }
     }
 
@@ -382,8 +350,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// </summary>
     public NumericInput()
     {
-        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
-
         Max = _maxDefault;
         Min = _minDefault;
     }
@@ -440,27 +406,10 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         SetDisplay();
     }
 
-    /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await KeyListener.ConnectAsync(ContainerId, new()
-            {
-                Keys = KeyOptions,
-            });
-            KeyListener.KeyDown += OnKeyDown;
-        }
-    }
-
     /// <summary>
     /// Clears the current input text.
     /// </summary>
-    public void Clear()
-    {
-        _timer.Cancel();
-        CurrentValueAsString = null;
-    }
+    public void Clear() => CurrentValueAsString = null;
 
     /// <summary>
     /// <para>
@@ -574,22 +523,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         => ElementReference.SelectRangeAsync(start, end);
 
     /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _timer.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        base.Dispose(disposing);
-    }
-
-    /// <inheritdoc/>
     protected override string? FormatValueAsString(TValue? value)
     {
         if (Converter is not null
@@ -633,54 +566,21 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         return success;
     }
 
-    private void OnInput(ChangeEventArgs e)
+    private void OnValueChange(ValueChangeEventArgs e)
     {
-        if (!UpdateOnInput
-            || string.Equals(CurrentValueAsString, e.Value as string))
+        if (!string.Equals(CurrentValueAsString, e.Value))
         {
-            return;
-        }
-
-        if (UpdateOnInputDebounce > 0)
-        {
-            _newValue = e.Value as string;
-            _timer.Change(UpdateOnInputDebounce.Value);
-        }
-        else
-        {
-            CurrentValueAsString = e.Value as string;
+            CurrentValueAsString = e.Value;
+            SetDisplay();
         }
     }
 
-    private void OnChange(ChangeEventArgs e)
+    private void OnValueInput(ValueChangeEventArgs e)
     {
-        _timer.Cancel();
-        CurrentValueAsString = e.Value as string;
-        SetDisplay();
-    }
-
-    private protected void OnKeyDown(KeyboardEventArgs e)
-    {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (UpdateOnInput)
         {
-            return;
+            OnValueChange(e);
         }
-
-        switch (e.Key)
-        {
-            case "ArrowDown":
-                Decrement();
-                break;
-            case "ArrowUp":
-                Increment();
-                break;
-        }
-    }
-
-    private void OnTimer()
-    {
-        CurrentValueAsString = _newValue;
-        StateHasChanged();
     }
 
     private void SetDisplay() => DisplayString = Value switch
