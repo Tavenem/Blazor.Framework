@@ -95,8 +95,7 @@ public partial class TextArea : InputComponentBase<string>
     /// <summary>
     /// The final value assigned to the input element's class attribute, including component values.
     /// </summary>
-    protected override string? InputCssClass => new CssBuilder(InputClass)
-        .Add("input-core")
+    protected override string? InputCssClass => new CssBuilder(base.InputCssClass)
         .Add("has-placeholder", !string.IsNullOrEmpty(Placeholder))
         .ToString();
 

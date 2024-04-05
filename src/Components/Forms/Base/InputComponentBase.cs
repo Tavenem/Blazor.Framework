@@ -80,11 +80,6 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     [Parameter] public int? UpdateOnInputDebounce { get; set; }
 
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("shrink", ShrinkWhen)
-        .ToString();
-
     /// <summary>
     /// The CSS class(es) for the field helpers section.
     /// </summary>
@@ -96,11 +91,6 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     /// The HTML <c>id</c> value for the <c>input</c> element.
     /// </summary>
     protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
-
-    /// <summary>
-    /// Controls when this component adds the "shrink" CSS class.
-    /// </summary>
-    protected virtual bool ShrinkWhen => false;
 
     /// <inheritdoc/>
     protected override void OnParametersSet()

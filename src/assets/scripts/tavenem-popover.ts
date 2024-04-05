@@ -1,6 +1,4 @@
-﻿import { TavenemInputHtmlElement } from './tavenem-input'
-
-enum MouseEventType {
+﻿enum MouseEventType {
     None = 0,
     LeftClick = 1 << 0,
     RightClick = 1 << 1,
@@ -907,7 +905,7 @@ slot {
         const slot = document.createElement('slot');
         shadow.appendChild(slot);
 
-        this.addEventListener('click', this.dismiss.bind(this));
+        this.addEventListener('click', this.onClick.bind(this));
     }
 
     disconnectedCallback() {
@@ -920,7 +918,7 @@ slot {
         document.removeEventListener('mouseover', this.onAttentionOnTarget.bind(this));
         document.removeEventListener('mouseout', this.onAttentionOutTarget.bind(this));
 
-        this.removeEventListener('click', this.dismiss.bind(this));
+        this.removeEventListener('click', this.onClick.bind(this));
 
         if (this._button) {
             this._button.removeEventListener('click', this.toggle.bind(this));
@@ -1058,6 +1056,16 @@ slot {
             }
         }
         this.onAttentionOut();
+    }
+
+    private onClick(event: Event) {
+        if (event.target instanceof Node
+            && this.contains(event.target)
+            && 'dismissOnTap' in this.dataset) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.dismiss();
+        }
     }
 
     private show() {
@@ -1412,6 +1420,968 @@ slot {
     }
 }
 
+export class TavenemInputHtmlElement extends HTMLElement {
+    _inputDebounce: number = -1;
+
+    static get observedAttributes() {
+        return [
+            'data-input-class',
+            'data-input-style',
+            'disabled',
+            'display',
+            'max',
+            'min',
+            'readonly',
+            'value'
+        ];
+    }
+
+    private static newEnterEvent() {
+        return new CustomEvent('enter', { bubbles: true });
+    }
+
+    private static newValueChangeEvent(value: string) {
+        return new CustomEvent('valuechange', { bubbles: true, detail: { value: value } });
+    }
+
+    private static newValueInputEvent(value: string) {
+        return new CustomEvent('valueinput', { bubbles: true, detail: { value: value } });
+    }
+
+    get display() {
+        const display = this.getAttribute('display');
+        if (display) {
+            return display;
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return this.getAttribute('value');
+        }
+
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input
+            && input instanceof HTMLInputElement
+            && input.value) {
+            return input.value;
+        }
+
+        return this.getAttribute('value');
+    }
+
+    set display(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input
+            && input instanceof HTMLInputElement) {
+            input.value = value || '';
+        }
+    }
+
+    get value() {
+        return this.getAttribute('value') || '';
+    }
+
+    set value(value: string) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (!value && value != '0') {
+            this.removeAttribute('value');
+            if (hiddenInput
+                && hiddenInput instanceof HTMLInputElement
+                && input
+                && input instanceof HTMLInputElement) {
+                hiddenInput.value = input.value = '';
+                this.setAttribute('empty', '');
+                this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
+            }
+        } else {
+            this.setAttribute('value', value);
+            if (hiddenInput
+                && hiddenInput instanceof HTMLInputElement
+                && input
+                && input instanceof HTMLInputElement) {
+                hiddenInput.value = input.value = value;
+                if (!value.length) {
+                    this.setAttribute('empty', '');
+                } else {
+                    this.removeAttribute('empty');
+                }
+                this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
+            }
+        }
+    }
+
+    get suggestion() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement
+            && suggestion.textContent) {
+            return suggestion.textContent;
+        }
+
+        return null;
+    }
+
+    set suggestion(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement) {
+            suggestion.textContent = value || null;
+            delete suggestion.dataset.display;
+            delete suggestion.dataset.value;
+        }
+    }
+
+    get suggestionDisplay() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement
+            && suggestion.dataset.display
+            && suggestion.dataset.display.length) {
+            return suggestion.dataset.value;
+        }
+
+        return null;
+    }
+
+    set suggestionDisplay(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement) {
+            if (!value || !value.length) {
+                delete suggestion.dataset.display;
+            } else {
+                suggestion.dataset.display = value;
+            }
+        }
+    }
+
+    get suggestionValue() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement
+            && suggestion.dataset.value
+            && suggestion.dataset.value.length) {
+            return suggestion.dataset.value;
+        }
+
+        return null;
+    }
+
+    set suggestionValue(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement) {
+            if (!value || !value.length) {
+                delete suggestion.dataset.value;
+            } else {
+                suggestion.dataset.value = value;
+            }
+        }
+    }
+
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open' });
+
+        const style = document.createElement('style');
+        style.textContent = `
+:host {
+    align-items: center;
+    box-sizing: content-box;
+    color: var(--field-color);
+    column-gap: 8px;
+    cursor: text;
+    display: inline-flex;
+    font-size: 1rem;
+    font-weight: var(--tavenem-font-weight);
+    line-height: 1.1875rem;
+    min-height: 1.1875rem;
+    padding-bottom: 7px;
+    padding-top: 6px;
+    position: relative;
+}
+
+:host(.input-content) {
+    align-self: flex-start;
+    flex-direction: column;
+}
+
+input {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: none;
+    box-sizing: content-box;
+    color: currentColor;
+    display: block;
+    font: inherit;
+    margin: 0;
+    min-height: calc(1.25rem + 10px);
+    min-width: 0;
+    overflow: visible;
+    padding: 0;
+    position: relative;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+
+    &:focus {
+        outline: 0;
+    }
+
+    &:disabled,
+    &[readonly] {
+        background-color: var(--tavenem-color-bg-alt);
+        opacity: 1;
+    }
+
+    &:invalid {
+        box-shadow: none;
+        color: var(--tavenem-color-error);
+    }
+
+    &[type=search] {
+        -moz-appearance: textfield;
+        -webkit-appearance: textfield;
+    }
+}
+input:hover:not(:disabled):not([readonly])::file-selector-button {
+    background-color: var(--tavenem-color-bg-alt);
+}
+
+input::-webkit-date-and-time-value {
+    height: calc(var(--tavenem-lineheight-body) * 1rem);
+}
+
+input::placeholder {
+    color: currentColor;
+    opacity: 0.42;
+    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+input::file-selector-button {
+    border-color: inherit;
+    border-inline-end-width: 1px;
+    border-radius: 0;
+    border-style: solid;
+    border-width: 0;
+    color: var(--tavenem-color-text);
+    margin: -6px -.75rem;
+    margin-inline-end: .75rem;
+    padding: 6px .75rem;
+    pointer-events: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+input[type="file"]::file-selector-button {
+    background: var(--tavenem-color-default);
+    color: var(--tavenem-color-default-text);
+}
+input[type="file"]::file-selector-button:hover {
+    background: var(--tavenem-color-default-darken);
+}
+
+input[type="color"] {
+    height: auto;
+    padding: 6px;
+    width: 3rem;
+}
+input[type="color"]:not(:disabled):not([readonly]) {
+    cursor: pointer;
+}
+input[type="color"]::-moz-color-swatch {
+    border-radius: var(--tavenem-border-radius);
+    height: calc(var(--tavenem-lineheight-body) * 1rem);
+}
+input[type="color"]::-webkit-color-swatch {
+    border-radius: var(--tavenem-border-radius);
+    height: calc(var(--tavenem-lineheight-body) * 1rem);
+}
+
+[list]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+::-moz-focus-inner {
+    padding: 0;
+    border-style: none;
+}
+
+::-webkit-datetime-edit-fields-wrapper,
+::-webkit-datetime-edit-text,
+::-webkit-datetime-edit-minute,
+::-webkit-datetime-edit-hour-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-year-field {
+    padding: 0;
+}
+
+::-webkit-inner-spin-button {
+    height: auto;
+}
+
+[type="search"] {
+    outline-offset: -2px;
+    -webkit-appearance: textfield;
+}
+
+::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+::file-selector-button {
+    font: inherit;
+    -webkit-appearance: button;
+}
+
+:host-context(.field.filled) {
+    input:-webkit-autofill {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+}
+
+:host-context(.field.outlined) {
+    input:-webkit-autofill {
+        border-radius: inherit;
+    }
+}
+
+:host-context(.field.dense.filled) {
+    button {
+        margin-top: -7px;
+    }
+}
+
+:host-context(.field:disabled),
+:host-context(.field.disabled),
+:host-context(.field.read-only),
+:host-context(.field[readonly]) {
+    input {
+        opacity: 1;
+    }
+}
+
+.suggestion {
+    color: var(--tavenem-color-text-disabled);
+    pointer-events: none;
+    position: absolute;
+}
+
+button.clear {
+    align-items: center;
+    background-color: transparent;
+    border-radius: 9999px;
+    border-style: none;
+    box-sizing: border-box;
+    color: inherit;
+    cursor: pointer;
+    display: none;
+    flex: 0 0 auto;
+    font-size: 1.25rem;
+    font-weight: var(--tavenem-font-weight-semibold);
+    gap: .25rem;
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+    min-width: calc(var(--button-font-size) + (var(--button-padding-x) * 2));
+    outline: 0;
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    text-transform: var(--tavenem-texttransform-button);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    user-select: none;
+    vertical-align: middle;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:after {
+        background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
+        background-position: 50%;
+        background-repeat: no-repeat;
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        transform: scale(7,7);
+        transition: transform .3s,opacity 1s;
+        width: 100%;
+    }
+
+    &:focus:not(:focus-visible) {
+        outline: 0;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--tavenem-color-action-hover-bg);
+    }
+
+    &:active:after {
+        transform: scale(0,0);
+        opacity: .1;
+        transition: 0s;
+    }
+
+    :host(.clearable) & {
+        display: inline-flex;
+    }
+
+    :host(:disabled) &,
+    :host([readonly]) &,
+    :host(:required) &,
+    :host([empty]) & {
+        display: none;
+    }
+}
+button.clear::-moz-focus-inner {
+    border-style: none;
+}`;
+        shadow.appendChild(style);
+
+        const prefixSlot = document.createElement('slot');
+        prefixSlot.name = 'prefix'
+        shadow.appendChild(prefixSlot);
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.disabled = this.hasAttribute('disabled');
+        hiddenInput.hidden = true;
+        if (this.hasAttribute('name')) {
+            hiddenInput.name = this.getAttribute('name') || '';
+        }
+        hiddenInput.required = this.hasAttribute('required');
+        hiddenInput.type = 'hidden';
+        if (this.hasAttribute('value')) {
+            hiddenInput.value = this.getAttribute('value') || '';
+        }
+        shadow.appendChild(hiddenInput);
+
+        if (!hiddenInput.value || !hiddenInput.value.length) {
+            this.setAttribute('empty', '');
+        }
+
+        const suggestion = document.createElement('span');
+        suggestion.classList.add('suggestion');
+        shadow.appendChild(suggestion);
+
+        const input = document.createElement('input');
+        if (this.hasAttribute('autocomplete')) {
+            input.autocomplete = this.getAttribute('autocomplete') as AutoFill || 'off';
+        }
+        if (this.hasAttribute('autocorrect')) {
+            input.setAttribute('autocorrect', this.getAttribute('autocorrect') || 'off');
+        }
+        input.autofocus = this.hasAttribute('autofocus');
+        input.className = this.dataset.inputClass || '';
+        input.disabled = hiddenInput.disabled;
+        input.id = this.dataset.inputId || '';
+        if (this.hasAttribute('inputmode')) {
+            const inputModeValue = this.getAttribute('inputmode');
+            if (inputModeValue) {
+                input.inputMode = inputModeValue;
+            }
+        }
+        if (this.hasAttribute('maxlength')) {
+            const maxLengthValue = this.getAttribute('maxlength');
+            if (maxLengthValue) {
+                const maxLength = parseInt(maxLengthValue);
+                input.maxLength = maxLength;
+            }
+        }
+        if (this.hasAttribute('pattern')) {
+            input.pattern = this.getAttribute('pattern') || '';
+        }
+        if (this.hasAttribute('placeholder')) {
+            input.placeholder = this.getAttribute('placeholder') || '';
+        }
+        input.readOnly = this.hasAttribute('readonly');
+        if (this.hasAttribute('size')) {
+            const sizeValue = this.getAttribute('size');
+            if (sizeValue) {
+                const size = parseFloat(sizeValue);
+                input.size = size;
+            }
+        }
+        if (this.hasAttribute('step')) {
+            const stepValue = this.getAttribute('step');
+            if (stepValue) {
+                input.step = stepValue;
+            }
+        }
+        if (this.hasAttribute('spellcheck')) {
+            input.spellcheck = this.hasAttribute('spellcheck');
+        }
+        input.style.cssText = this.dataset.inputStyle || '';
+        if (this.hasAttribute('tabindex')) {
+            const tabIndexValue = this.getAttribute('tabindex');
+            if (tabIndexValue) {
+                const tabIndex = parseInt(tabIndexValue);
+                input.tabIndex = tabIndex;
+            }
+        }
+        if (this.hasAttribute('type')) {
+            input.type = this.getAttribute('type') || 'text';
+        }
+
+        const display = this.getAttribute('display');
+        if ((display && display.length)
+            || (hiddenInput.value && hiddenInput.value.length)) {
+            input.value = display || hiddenInput.value;
+        }
+
+        shadow.appendChild(input);
+
+        if (display && !display.length) {
+            this.setAttribute('empty', '');
+        }
+
+        const clear = document.createElement('button');
+        clear.classList.add('clear');
+        clear.tabIndex = -1;
+        shadow.appendChild(clear);
+
+        const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+        icon.setAttributeNS(null, 'viewBox', '0 0 24 24');
+        icon.setAttributeNS(null, 'height', '1rem');
+        icon.setAttributeNS(null, 'width', '1rem');
+        icon.innerHTML = '<path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>';
+        clear.appendChild(icon);
+
+        const slot = document.createElement('slot');
+        shadow.appendChild(slot);
+
+        input.addEventListener('change', this.onChange.bind(this));
+        input.addEventListener('input', this.onInput.bind(this));
+        input.addEventListener('keydown', this.onKeyDown.bind(this));
+        clear.addEventListener('mouseup', this.onClearMouseUp.bind(this));
+        clear.addEventListener('click', this.onClear.bind(this));
+    }
+
+    disconnectedCallback() {
+        const input = this.querySelector('input:not([hidden])');
+        if (input) {
+            input.removeEventListener('change', this.onChange.bind(this));
+            input.removeEventListener('input', this.onInput.bind(this));
+            if (input instanceof HTMLElement) {
+                input.removeEventListener('keydown', this.onKeyDown.bind(this));
+            }
+        }
+        const clear = this.querySelector('button.clear');
+        if (clear) {
+            clear.removeEventListener('mousedown', this.onClearMouseUp.bind(this));
+            clear.removeEventListener('click', this.onClear.bind(this));
+        }
+    }
+
+    attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (!hiddenInput
+            || !(hiddenInput instanceof HTMLInputElement)
+            || !input
+            || !(input instanceof HTMLInputElement)) {
+            return;
+        }
+        if (name === 'data-input-class') {
+            input.className = newValue || '';
+        } else if (name === 'data-input-style') {
+            input.style.cssText = newValue || '';
+        } else if (name === 'disabled') {
+            input.disabled = hiddenInput.disabled = !!newValue;
+        } else if (name === 'display') {
+            input.value = newValue || '';
+            if (!newValue
+                || !newValue.length) {
+                this.setAttribute('empty', '');
+            } else {
+                this.removeAttribute('empty');
+            }
+        } else if (name === 'max') {
+            if (newValue) {
+                const max = parseFloat(newValue);
+                if (!Number.isNaN(max)) {
+                    const value = parseFloat(hiddenInput.value);
+                    if (!Number.isNaN(value) && value > max) {
+                        input.value = hiddenInput.value = max.toString();
+                        this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
+                    }
+                }
+            }
+        } else if (name === 'min') {
+            if (newValue) {
+                const min = parseFloat(newValue);
+                if (!Number.isNaN(min)) {
+                    const value = parseFloat(hiddenInput.value);
+                    if (!Number.isNaN(value) && value < min) {
+                        input.value = hiddenInput.value = min.toString();
+                        this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
+                    }
+                }
+            }
+        } else if (name === 'readonly') {
+            input.readOnly = !!newValue;
+        } else if (name === 'required') {
+            hiddenInput.required = !!newValue;
+        } else if (name === 'value') {
+            hiddenInput.value = newValue || '';
+            const display = this.getAttribute('display');
+            if (!display || !display.length) {
+                input.value = hiddenInput.value;
+                if (!input.value
+                    || !input.value.length) {
+                    this.setAttribute('empty', '');
+                } else {
+                    this.removeAttribute('empty');
+                }
+            } else if (!hiddenInput.value
+                || !hiddenInput.value.length) {
+                this.setAttribute('empty', '');
+            }
+        }
+    }
+
+    decrement(event?: Event) {
+        this.stepValue(true, event);
+    }
+
+    focusInnerInput() {
+        const root = this.shadowRoot;
+        if (!root) {
+            this.focus();
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input instanceof HTMLElement) {
+            input.focus();
+            return;
+        }
+        this.focus();
+    }
+
+    increment(event?: Event) {
+        this.stepValue(false, event);
+    }
+
+    select() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input instanceof HTMLInputElement) {
+            input.select();
+        }
+    }
+
+    selectRange(start: number, end?: number) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input instanceof HTMLInputElement) {
+            input.setSelectionRange(start, end || null);
+            input.focus();
+        }
+    }
+
+    private static getPrecision(value: number) {
+        if (isNaN(value)
+            || value % 1 === 0) {
+            return 0;
+        }
+
+        let [i, p, d, e, n] = value.toString().split(/(\.|[eE][\-+])/g);
+        if (e) {
+            e = e.toLowerCase();
+        }
+        if (p && p !== '.') {
+            p = p.toLowerCase();
+        }
+        const f = e === 'e-';
+        return (+(p === '.'
+            && (!e || f)
+            && d.length)
+            + +(f && parseInt(n)))
+            || (p === 'e-' && parseInt(d))
+            || 0;
+    }
+
+    private onChange() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        this.onInput();
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input
+            && input instanceof HTMLInputElement) {
+            this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
+        }
+    }
+
+    private onClear(e: Event) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (hiddenInput
+            && hiddenInput instanceof HTMLInputElement
+            && input
+            && input instanceof HTMLInputElement) {
+            hiddenInput.value = input.value = '';
+            this.onInput();
+        }
+    }
+
+    private onClearMouseUp(e: Event) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    private onInput() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (!hiddenInput
+            || !(hiddenInput instanceof HTMLInputElement)
+            || !input
+            || !(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        hiddenInput.value = input.value;
+        if ((!input.value || !input.value.length)
+            && input.value != '0') {
+            this.removeAttribute('value');
+            this.setAttribute('empty', '');
+        } else {
+            this.setAttribute('value', input.value);
+            this.removeAttribute('empty');
+        }
+
+        const currentLengthDisplay = this.querySelector('.current-length');
+        if (currentLengthDisplay instanceof HTMLElement) {
+            currentLengthDisplay.innerText = hiddenInput.value.length.toString();
+        }
+
+        if ('inputDebounce' in this.dataset) {
+            const debounce = parseInt(this.dataset.inputDebounce || '');
+            if (Number.isFinite(debounce)
+                && debounce > 0) {
+                clearTimeout(this._inputDebounce);
+                this._inputDebounce = setTimeout(this.updateInputDebounced.bind(this), debounce);
+                return;
+            }
+        }
+
+        this.dispatchEvent(TavenemInputHtmlElement.newValueInputEvent(input.value));
+    }
+
+    private onKeyDown(event: KeyboardEvent) {
+        if (event.key === "ArrowDown") {
+            this.decrement();
+        } else if (event.key === "ArrowUp") {
+            this.increment();
+        } else if (event.key === "Enter") {
+            event.preventDefault();
+            event.stopPropagation();
+            this.dispatchEvent(TavenemInputHtmlElement.newEnterEvent());
+            this.onChange();
+        } else if (event.key === "Tab") {
+            this.onTab(event);
+        }
+    }
+
+    private onTab(event: KeyboardEvent) {
+        if (!event.target) {
+            return;
+        }
+        if (event.target !== this) {
+            const popover = this.querySelector('tf-popover.contained-popover');
+            if (popover
+                && event.target instanceof Node
+                && popover.contains(event.target)) {
+                return;
+            }
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (!(suggestion instanceof HTMLElement)) {
+            return;
+        }
+
+        const suggestionDisplay = suggestion.dataset.display && suggestion.dataset.display.length
+            ? suggestion.dataset.display
+            : suggestion.textContent;
+
+        const suggestionValue = suggestion.dataset.value && suggestion.dataset.value.length
+            ? suggestion.dataset.value
+            : suggestionDisplay;
+        if (!suggestionValue
+            || !suggestionValue.length) {
+            return;
+        }
+
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (!hiddenInput
+            || !(hiddenInput instanceof HTMLInputElement)
+            || !input
+            || !(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.setAttribute('value', suggestionValue);
+        hiddenInput.value = suggestionValue;
+        input.value = suggestionDisplay || suggestionValue;
+        this.removeAttribute('empty');
+
+        suggestion.textContent = null;
+
+        if (this.parentElement
+            && this.parentElement instanceof TavenemPickerHtmlElement
+            && this.parentElement.querySelector('tf-popover.contained-popover > .suggestion-list')) {
+            this.parentElement.setOpen(false);
+        }
+
+        this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(suggestionValue));
+    }
+
+    private stepValue(down: boolean, event?: Event) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (!input
+            || !(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        let value = parseFloat(input.value);
+        if (Number.isNaN(value)) {
+            return;
+        }
+
+        let stepString = this.getAttribute('step') || 'any';
+        if (stepString === 'any') {
+            stepString = '1';
+        }
+        let step = parseFloat(stepString);
+        if (!Number.isFinite(step)
+            || step <= 0) {
+            step = 1;
+        }
+
+        if (down) {
+            value -= step;
+        } else {
+            value += step;
+        }
+
+        const precision = TavenemInputHtmlElement.getPrecision(step);
+        if (precision === 0) {
+            value = Math.round(value);
+        } else {
+            const factor = precision * 10;
+            value = Math.round(value * factor) / factor;
+        }
+
+        const max = parseFloat(this.getAttribute('max') || '');
+        if (!Number.isNaN(max)) {
+            value = Math.min(max, value);
+        }
+
+        const min = parseFloat(this.getAttribute('min') || '');
+        if (!Number.isNaN(min)) {
+            value = Math.max(min, value);
+        }
+
+        input.value = value.toString();
+        this.onInput();
+
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+
+    private updateInputDebounced() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input
+            && input instanceof HTMLInputElement) {
+            input.dispatchEvent(TavenemInputHtmlElement.newValueInputEvent(input.value));
+        }
+    }
+}
+
 export class TavenemPickerHtmlElement extends HTMLElement {
     _closeCooldownTimer: number;
     _closed: boolean;
@@ -1449,7 +2419,8 @@ export class TavenemPickerHtmlElement extends HTMLElement {
 
 slot {
     border-radius: inherit;
-}`;
+}
+`;
         shadow.appendChild(style);
 
         const slot = document.createElement('slot');
@@ -1459,6 +2430,7 @@ slot {
         this.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.addEventListener('mouseup', this.onMouseUp.bind(this));
         this.addEventListener('keyup', this.onKeyUp.bind(this));
+        this.addEventListener('valueinput', this.onValueInput.bind(this));
 
         document.addEventListener('mousedown', this.onDocMouseDown.bind(this));
     }
@@ -1469,6 +2441,7 @@ slot {
         this.removeEventListener('mousedown', this.onMouseDown.bind(this));
         this.removeEventListener('mouseup', this.onMouseUp.bind(this));
         this.removeEventListener('keyup', this.onKeyUp.bind(this));
+        this.removeEventListener('valueinput', this.onValueInput.bind(this));
         document.removeEventListener('mousedown', this.onDocMouseDown.bind(this));
     }
 
@@ -1517,6 +2490,21 @@ slot {
         }
     }
 
+    private clearSearchFilter() {
+        const options = Array
+            .from(this.querySelectorAll('option, [data-close-picker-value]'))
+            .sort(TavenemPickerHtmlElement.documentPositionComparator);
+        if (!options.length) {
+            return;
+        }
+        for (var option of options) {
+            if (!(option instanceof HTMLElement)) {
+                continue;
+            }
+            option.classList.remove('search-nonmatch');
+        }
+    }
+
     private close() {
         clearTimeout(this._hideTimer);
         if ('popoverOpen' in this.dataset) {
@@ -1531,7 +2519,7 @@ slot {
         const input = this.querySelector('.picker-value');
         if (input
             && (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement)) {
+                || input instanceof TavenemInputHtmlElement)) {
             this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(input.value));
         }
 
@@ -1543,11 +2531,6 @@ slot {
         firstSelectedIndex?: number,
         lastSelectedIndex?: number
     } {
-        const root = this.shadowRoot;
-        if (!root) {
-            return {};
-        }
-
         let value: string | undefined;
         const input = this.querySelector('.picker-value');
         if (input
@@ -1560,7 +2543,7 @@ slot {
         }
 
         const options = Array
-            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .from(this.querySelectorAll('option, [data-close-picker-value]'))
             .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
             .sort(TavenemPickerHtmlElement.documentPositionComparator);
         let firstSelectedIndex: number | undefined;
@@ -1580,6 +2563,19 @@ slot {
                     firstSelectedIndex = i;
                 }
                 lastSelectedIndex = i;
+            }
+        }
+
+        if (firstSelectedIndex == null) {
+            for (var i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option instanceof HTMLElement
+                    && option.classList.contains('active')) {
+                    if (firstSelectedIndex == null) {
+                        firstSelectedIndex = i;
+                    }
+                    lastSelectedIndex = i;
+                }
             }
         }
 
@@ -1605,9 +2601,6 @@ slot {
             }
         }
 
-        event.preventDefault();
-        event.stopPropagation();
-
         const selectedIndices = this.getSelectedIndices();
         if (!selectedIndices.options
             || (selectedIndices.lastSelectedIndex != null
@@ -1615,7 +2608,32 @@ slot {
             return;
         }
 
-        this.onSubmitOption(selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) + 1]);
+        event.preventDefault();
+        event.stopPropagation();
+
+        let newOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) + 1];
+
+        const input = this.querySelector('.picker-value');
+        if (input instanceof HTMLInputElement
+            || input instanceof TavenemInputHtmlElement) {
+            const currentOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || 0)];
+            let currentOptionValue;
+            if ('closePickerValue' in currentOption.dataset) {
+                currentOptionValue = currentOption.dataset.closePickerValue;
+            } else if (currentOption instanceof HTMLOptionElement) {
+                currentOptionValue = currentOption.value;
+                if ((!currentOptionValue || !currentOptionValue.length)
+                    && currentOption.innerText
+                    && currentOption.innerText.length) {
+                    currentOptionValue = currentOption.innerText;
+                }
+            }
+            if (input.value.toLowerCase() != (currentOptionValue || '').toLowerCase()) {
+                newOption = currentOption;
+            }
+        }
+
+        this.onSubmitOption(newOption);
     }
 
     private onArrowUp(event: KeyboardEvent) {
@@ -1633,9 +2651,6 @@ slot {
             }
         }
 
-        event.preventDefault();
-        event.stopPropagation();
-
         const selectedIndices = this.getSelectedIndices();
         if (!selectedIndices.options
             || (selectedIndices.firstSelectedIndex != null
@@ -1643,7 +2658,32 @@ slot {
             return;
         }
 
-        this.onSubmitOption(selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) - 1]);
+        event.preventDefault();
+        event.stopPropagation();
+
+        let newOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) - 1];
+
+        const input = this.querySelector('.picker-value');
+        if (input instanceof HTMLInputElement
+            || input instanceof TavenemInputHtmlElement) {
+            const currentOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || 0)];
+            let currentOptionValue;
+            if ('closePickerValue' in currentOption.dataset) {
+                currentOptionValue = currentOption.dataset.closePickerValue;
+            } else if (currentOption instanceof HTMLOptionElement) {
+                currentOptionValue = currentOption.value;
+                if ((!currentOptionValue || !currentOptionValue.length)
+                    && currentOption.innerText
+                    && currentOption.innerText.length) {
+                    currentOptionValue = currentOption.innerText;
+                }
+            }
+            if (input.value.toLowerCase() != (currentOptionValue || '').toLowerCase()) {
+                newOption = currentOption;
+            }
+        }
+
+        this.onSubmitOption(newOption);
     }
 
     private onClear(event: Event) {
@@ -1695,8 +2735,14 @@ slot {
             } else {
                 this.onArrowUp(event);
             }
-        } else if (event.key === "Delete") {
-            this.onClear(event);
+        } else if (event.key === "Delete"
+            || event.key === "Backspace"
+            || event.key === "Clear") {
+            if ('allowDelete' in this.dataset) {
+                this.onSearchInput(event);
+            } else {
+                this.onClear(event);
+            }
         } else if (event.key === "Escape") {
             if ('popoverOpen' in this.dataset) {
                 this.onToggle(event);
@@ -1707,13 +2753,11 @@ slot {
             } else {
                 this.onSearchInput(event);
             }
-        } else {
-            if (event.key.length === 1
-                && !event.altKey
-                && !event.ctrlKey
-                && !event.metaKey) {
-                this.onSearchInput(event);
-            }
+        } else if (event.key.length === 1
+            && !event.altKey
+            && !event.ctrlKey
+            && !event.metaKey) {
+            this.onSearchInput(event);
         }
     }
 
@@ -1723,32 +2767,37 @@ slot {
         if (event.button === 0) {
             this.onSubmit(event);
         }
-}
+    }
 
     private onSubmit(event: Event) {
         if (!event.target) {
             return;
         }
-        if (event.target !== this) {
-            if (event.target instanceof HTMLElement
-                && 'pickerNoToggle' in event.target.dataset) {
+
+        if (event.target instanceof HTMLElement
+            && 'pickerNoToggle' in event.target.dataset) {
+            return;
+        }
+
+        if (event.target === this
+            && 'pickerNoToggle' in this.dataset) {
+            return;
+        }
+
+        const popover = this.querySelector('tf-popover.contained-popover');
+        if (!popover) {
+            return;
+        }
+
+        if (event.target !== this
+            && event.target instanceof Node
+            && popover.contains(event.target)) {
+            if (!('popoverOpen' in this.dataset)
+                || !(event.target instanceof HTMLElement)
+                || !('closePicker' in event.target.dataset)) {
                 return;
-            }
-
-            const popover = this.querySelector('tf-popover.contained-popover');
-            if (popover
-                && event.target instanceof Node
-                && popover.contains(event.target)) {
-                if (!('popoverOpen' in this.dataset)) {
-                    return;
-                }
-
-                if (!(event.target instanceof HTMLElement)
-                    || !('closePicker' in event.target.dataset)) {
-                    return;
-                } else {
-                    this.onSubmitOption(event.target);
-                }
+            } else {
+                this.onSubmitOption(event.target);
             }
         }
 
@@ -1807,12 +2856,8 @@ slot {
             input.display = display;
         }
 
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
         const options = Array
-            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .from(this.querySelectorAll('option, [data-close-picker-value]'))
             .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
             .sort(TavenemPickerHtmlElement.documentPositionComparator);
         for (var i = 0; i < options.length; i++) {
@@ -1857,9 +2902,17 @@ slot {
         }
         this.dataset.popoverOpen = '';
 
+        if ('searchFilter' in this.dataset) {
+            this.clearSearchFilter();
+        }
+
         const input = this.querySelector('.picker-value');
-        if (input && input instanceof HTMLElement) {
-            input.focus();
+        if (input) {
+            if (input instanceof TavenemInputHtmlElement) {
+                input.focusInnerInput();
+            } else if (input instanceof HTMLElement) {
+                input.focus();
+            }
         }
     }
 
@@ -1875,120 +2928,51 @@ slot {
         if (!event.target) {
             return;
         }
+
+        const input = this.querySelector('.picker-value');
+        if (event.target === input
+            && (input instanceof HTMLInputElement
+                || input instanceof TavenemInputHtmlElement)) {
+            return;
+        }
+
         if (event.target !== this) {
             const popover = this.querySelector('tf-popover.contained-popover');
             if (popover
                 && event.target instanceof Node
-                && popover.contains(event.target)) {
-                if (!('popoverOpen' in this.dataset)) {
-                    return;
-                }
+                && popover.contains(event.target)
+                && !('popoverOpen' in this.dataset)) {
+                return;
             }
         }
 
-        event.preventDefault();
-        event.stopPropagation();
-
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-
-        const options = Array
-            .from(root.querySelectorAll('option, [data-close-picker-value]'))
-            .sort(TavenemPickerHtmlElement.documentPositionComparator);
-        if (!options.length) {
-            return;
-        }
-
-        this._searchText += event.key;
         clearTimeout(this._searchTimer);
+
+        if (this._searchText) {
+            if (event.key === "Delete" || event.key === "Clear") {
+                this._searchText = null;
+            } else if (event.key === "Backspace") {
+                if (this._searchText.length > 1) {
+                    this._searchText = this._searchText.substring(0, this._searchText.length - 1);
+                } else {
+                    this._searchText = null;
+                }
+            } else {
+                this._searchText += event.key.toLowerCase();
+            }
+        } else if (event.key !== "Delete"
+            && event.key !== "Backspace"
+            && event.key !== "Clear") {
+            this._searchText = event.key.toLowerCase();
+        }
 
         if (!this._searchText || !this._searchText.length) {
             return;
         }
 
+        this.onValueInput(event);
+
         this._searchTimer = setTimeout(() => this._searchText = null, 2000);
-
-        let match;
-        for (var option of options) {
-            if (!(option instanceof HTMLElement)) {
-                continue;
-            }
-
-            if (this._searchText.length === 1) {
-                if (option instanceof HTMLElement
-                    && 'closePickerValue' in option.dataset) {
-                    if (!option.hasAttribute('disabled')
-                        && (('closePickerDisplay' in option.dataset
-                            && option.dataset.closePickerDisplay
-                            && option.dataset.closePickerDisplay.startsWith(this._searchText))
-                            || (!('closePickerDisplay' in option.dataset)
-                                && option.dataset.closePickerValue
-                                && option.dataset.closePickerValue.startsWith(this._searchText)))) {
-                        match = option;
-                        break;
-                    }
-                } else if (option instanceof HTMLOptionElement
-                    && !option.disabled
-                    && (option.label.startsWith(this._searchText)
-                        || (!option.label
-                            && option.textContent
-                            && option.textContent.startsWith(this._searchText))
-                        || (!option.label
-                            && !option.textContent
-                            && option.value.startsWith(this._searchText)))) {
-                    match = option;
-                    break;
-                }
-            } else if (option instanceof HTMLElement
-                && 'closePickerValue' in option.dataset) {
-                if (!option.hasAttribute('disabled')
-                    && (('closePickerDisplay' in option.dataset
-                        && option.dataset.closePickerDisplay
-                        && option.dataset.closePickerDisplay.includes(this._searchText))
-                        || (!('closePickerDisplay' in option.dataset)
-                            && option.dataset.closePickerValue
-                            && option.dataset.closePickerValue.includes(this._searchText)))) {
-                    match = option;
-                    break;
-                }
-            } else if (option instanceof HTMLOptionElement
-                && !option.disabled
-                && (option.label.includes(this._searchText)
-                    || (!option.label
-                        && option.textContent
-                        && option.textContent.includes(this._searchText))
-                    || (!option.label
-                        && !option.textContent
-                        && option.value.includes(this._searchText)))) {
-                match = option;
-                break;
-            }
-        }
-        if (!match) {
-            TavenemPickerHtmlElement.newSearchInputEvent(this._searchText);
-            return;
-        }
-
-        let value: string;
-        let display: string | null | undefined;
-        if (match instanceof HTMLOptionElement) {
-            value = match.value;
-            display = match.label || match.textContent;
-        } else if (match instanceof HTMLElement
-            && 'closePickerValue' in match.dataset) {
-            value = match.dataset.closePickerValue || '';
-            display = match.dataset.closePickerDisplay;
-        } else {
-            return;
-        }
-
-        if ('popoverOpen' in this.dataset) {
-            match.focus();
-            match.scrollIntoView({ behavior: 'smooth' });
-        }
-        this.onSubmitValue(value, display);
     }
 
     private onToggle(event: Event) {
@@ -2020,7 +3004,192 @@ slot {
         event.stopPropagation();
 
         this.toggle();
-}
+    }
+
+    private onValueInput(event: Event) {
+        if (!event.target) {
+            return;
+        }
+
+        let searchText = this._searchText;
+        const input = this.querySelector('.picker-value');
+        if (event.target === input
+            && (input instanceof HTMLInputElement
+                || input instanceof TavenemInputHtmlElement)) {
+            searchText = input.value.toLowerCase();
+        }
+
+        if (input instanceof TavenemInputHtmlElement) {
+            input.suggestion = null;
+        }
+
+        const options = Array
+            .from(this.querySelectorAll('option, [data-close-picker-value]'))
+            .sort(TavenemPickerHtmlElement.documentPositionComparator);
+        if (!options.length) {
+            return;
+        }
+
+        if (!searchText || !searchText.length) {
+            for (var option of options) {
+                if (option instanceof HTMLElement) {
+                    option.classList.remove('search-nonmatch');
+                }
+            }
+            return;
+        }
+
+        let match;
+        if (searchText.length === 1) {
+            for (var option of options) {
+                if (!(option instanceof HTMLElement)) {
+                    continue;
+                }
+
+                if (option instanceof HTMLElement
+                    && 'closePickerValue' in option.dataset) {
+                    if (!option.hasAttribute('disabled')
+                        && (('closePickerDisplay' in option.dataset
+                            && option.dataset.closePickerDisplay
+                            && option.dataset.closePickerDisplay.toLowerCase().startsWith(searchText))
+                            || (!('closePickerDisplay' in option.dataset)
+                                && option.dataset.closePickerValue
+                                && option.dataset.closePickerValue.toLowerCase().startsWith(searchText)))) {
+                        if (!match) {
+                            match = option;
+                        }
+                    }
+                } else if (option instanceof HTMLOptionElement
+                    && !option.disabled
+                    && (option.label.startsWith(searchText)
+                        || (!option.label
+                            && option.textContent
+                            && option.textContent.toLowerCase().startsWith(searchText))
+                        || (!option.label
+                            && !option.textContent
+                            && option.value.toLowerCase().startsWith(searchText)))) {
+                    if (!match) {
+                        match = option;
+                    }
+                }
+            }
+        }
+
+        for (var option of options) {
+            if (!(option instanceof HTMLElement)) {
+                continue;
+            }
+
+            if (option instanceof HTMLElement
+                && 'closePickerValue' in option.dataset) {
+                if (!option.hasAttribute('disabled')
+                    && (('closePickerDisplay' in option.dataset
+                        && option.dataset.closePickerDisplay
+                        && option.dataset.closePickerDisplay.toLowerCase().includes(searchText))
+                        || (!('closePickerDisplay' in option.dataset)
+                            && option.dataset.closePickerValue
+                            && option.dataset.closePickerValue.toLowerCase().includes(searchText)))) {
+                    if (!match) {
+                        match = option;
+                    }
+                    option.classList.remove('search-nonmatch');
+                } else if ('searchFilter' in this.dataset) {
+                    option.classList.remove('active');
+                    option.classList.add('search-nonmatch');
+                }
+            } else if (option instanceof HTMLOptionElement
+                && !option.disabled
+                && (option.label.includes(searchText)
+                    || (!option.label
+                        && option.textContent
+                        && option.textContent.toLowerCase().includes(searchText))
+                    || (!option.label
+                        && !option.textContent
+                        && option.value.toLowerCase().includes(searchText)))) {
+                if (!match) {
+                    match = option;
+                }
+                option.classList.remove('search-nonmatch');
+            } else if ('searchFilter' in this.dataset) {
+                option.classList.remove('active');
+                option.classList.add('search-nonmatch');
+            }
+        }
+
+        if (!match) {
+            this.dispatchEvent(TavenemPickerHtmlElement.newSearchInputEvent(searchText));
+            return;
+        }
+
+        if (!('popoverOpen' in this.dataset)) {
+            if (!this.hasAttribute('disabled')
+                && !this.hasAttribute('readonly')) {
+                this.open();
+            }
+
+            if ('disableAutosearch' in this.dataset) {
+                return;
+            }
+        }
+
+        let value: string;
+        let display: string | null | undefined;
+        if (match instanceof HTMLOptionElement) {
+            value = match.value;
+            display = match.label || match.textContent;
+        } else if (match instanceof HTMLElement
+            && 'closePickerValue' in match.dataset) {
+            value = match.dataset.closePickerValue || '';
+            display = match.dataset.closePickerDisplay;
+        } else {
+            return;
+        }
+
+        if (input instanceof TavenemInputHtmlElement) {
+            const current = input.display || input.value;
+            const suggestionDisplay = display || value;
+            if (suggestionDisplay.toLowerCase().startsWith(current.toLowerCase())
+                && suggestionDisplay.length > current.length) {
+                input.suggestion = current + suggestionDisplay.substring(current.length);
+                if (!suggestionDisplay.startsWith(current)) {
+                    input.suggestionDisplay = suggestionDisplay;
+                }
+                if (display && display.length) {
+                    input.suggestionValue = value;
+                }
+            }
+        }
+
+        if ('disableAutosearch' in this.dataset) {
+            for (var i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option instanceof HTMLElement
+                    && 'closePickerValue' in option.dataset) {
+                    if (option.dataset.closePickerValue === value) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                } else if (option instanceof HTMLOptionElement) {
+                    if (option.value === value) {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                }
+            }
+        } else {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if ('popoverOpen' in this.dataset) {
+                match.focus();
+                match.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            this.onSubmitValue(value, display);
+        }
+    }
 
     private selectAll(event: Event) {
         if (!event.target) {
@@ -2040,13 +3209,8 @@ slot {
         event.preventDefault();
         event.stopPropagation();
 
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-
         const options = Array
-            .from(root.querySelectorAll('option, [data-close-picker-value]'))
+            .from(this.querySelectorAll('option, [data-close-picker-value]'))
             .sort(TavenemPickerHtmlElement.documentPositionComparator)
             .filter(x => {
                 if (x instanceof HTMLElement
@@ -2061,28 +3225,33 @@ slot {
                 }
 
                 return false;
-            }).map(x => {
-                if (x instanceof HTMLElement
-                    && 'closePickerValue' in x.dataset) {
-                    return x.dataset.closePickerValue!;
-                }
-
-                if (x instanceof HTMLOptionElement) {
-                    return x.value;
-                }
-
-                return '';
             });
         if (options.length === 0) {
             return;
         }
 
-        let display = options[0];
+        for (var i = 0; i < options.length; i++) {
+            const option = options[i];
+            if (option instanceof HTMLElement) {
+                option.classList.add('active');
+            }
+        }
+
+        const displayOption = options[0];
+        let display = '';
+        if (displayOption instanceof HTMLElement
+            && 'closePickerValue' in displayOption.dataset) {
+            display = displayOption.dataset.closePickerValue!;
+        } else if (displayOption instanceof HTMLOptionElement) {
+            display = displayOption.value;
+        }
+
         if (display.length) {
             display += " +" + (options.length - 1).toFixed(0);
         } else {
             display += options.length.toFixed(0);
         }
+
         this.onSubmitValue(JSON.stringify(options), display);
     }
 

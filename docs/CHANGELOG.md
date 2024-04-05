@@ -8,6 +8,7 @@
   - `TextInput` suggestions fall back to the default `datalist` browser implementation when rendered non-interactively, which lacks some features of the interactive Blazor implementation and does not support custom styles
 ### Removed
 - `RenderBodyWhenClosed` from `Collapse`
+- `LostFocus` from `TextInput`
 
 ## 2.38
 ### Added

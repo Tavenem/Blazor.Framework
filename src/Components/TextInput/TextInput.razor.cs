@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
 
@@ -10,11 +9,9 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class TextInput : InputComponentBase<string>
 {
-    private readonly AdjustableTimer _focusTimer;
-    private readonly AdjustableTimer _inputTimer;
     private readonly AsyncAdjustableTimer _suggestionTimer;
 
-    private bool _disposedValue, _focusingOnSuggestions;
+    private bool _disposedValue;
 
     /// <summary>
     /// <para>
@@ -94,11 +91,6 @@ public partial class TextInput : InputComponentBase<string>
     /// </para>
     /// </summary>
     [Parameter] public Func<string?, Task<IEnumerable<KeyValuePair<string, object>>>>? LoadSuggestions { get; set; }
-
-    /// <summary>
-    /// Invoked when the input loses focus.
-    /// </summary>
-    [Parameter] public EventCallback LostFocus { get; set; }
 
     /// <summary>
     /// <para>
@@ -282,18 +274,6 @@ public partial class TextInput : InputComponentBase<string>
     /// </summary>
     protected string? DisplayString { get; set; }
 
-    /// <inheritdoc/>
-    protected override string? InputCssClass => new CssBuilder(InputClass)
-        .Add("input-core")
-        .Add("has-placeholder", !string.IsNullOrEmpty(Placeholder))
-        .ToString();
-
-    /// <inheritdoc/>
-    protected override bool ShrinkWhen => base.ShrinkWhen
-        || PrefixContent is not null
-        || !string.IsNullOrEmpty(PrefixIcon)
-        || !string.IsNullOrEmpty(PrefixText);
-
     private string? AutocompleteValue
     {
         get
@@ -318,42 +298,13 @@ public partial class TextInput : InputComponentBase<string>
         }
     }
 
-    private bool _canClear = false;
-    private bool CanClear => ShowClear
-        && (!string.IsNullOrEmpty(CurrentValue)
-        || _canClear);
-
-    private string? ClearButtonCssClass => new CssBuilder("btn btn-icon small")
-        .Add("invisible", !CanClear)
-        .ToString();
-
     private string? CurrentInput { get; set; }
-
-    private int CurrentLength { get; set; }
 
     private int EffectiveSize => Math.Max(1, Size ?? 1);
 
     private string? Emoji { get; set; }
 
-    private IEnumerable<string> FilteredSuggestions
-    {
-        get
-        {
-            if (Suggestions is null)
-            {
-                return [];
-            }
-            if (ShowAllSuggestions || string.IsNullOrEmpty(CurrentInput))
-            {
-                return Suggestions;
-            }
-            return Suggestions
-                .Where(x => x.Contains(CurrentInput, StringComparison.InvariantCultureIgnoreCase))
-                .OrderBy(x => x);
-        }
-    }
-
-    private IEnumerable<KeyValuePair<string, object>> FilteredSuggestionValues
+    private IEnumerable<KeyValuePair<string, object>> AllSuggestionValues
     {
         get
         {
@@ -362,67 +313,40 @@ public partial class TextInput : InputComponentBase<string>
             {
                 return [];
             }
-            if (ShowAllSuggestions || string.IsNullOrEmpty(CurrentInput))
-            {
-                if (SuggestionValues is null)
-                {
-                    return LoadedSuggestions!
-                        .OrderBy(x => x.Key);
-                }
-                if (LoadedSuggestions is null)
-                {
-                    return SuggestionValues!
-                        .OrderBy(x => x.Key);
-                }
-                return SuggestionValues
-                    .Concat(LoadedSuggestions)
-                    .OrderBy(x => x.Key);
-            }
             if (SuggestionValues is null)
             {
                 return LoadedSuggestions!
-                    .Where(x => x.Key.Contains(CurrentInput, StringComparison.InvariantCultureIgnoreCase))
                     .OrderBy(x => x.Key);
             }
             if (LoadedSuggestions is null)
             {
                 return SuggestionValues!
-                    .Where(x => x.Key.Contains(CurrentInput, StringComparison.InvariantCultureIgnoreCase))
                     .OrderBy(x => x.Key);
             }
             return SuggestionValues
                 .Concat(LoadedSuggestions)
-                .Where(x => x.Key.Contains(CurrentInput, StringComparison.InvariantCultureIgnoreCase))
                 .OrderBy(x => x.Key);
         }
     }
 
-    private bool HasFocus { get; set; }
-
-    private bool HasSuggestions => Suggestions?.Any() == true
-        || SuggestionValues?.Any() == true
-        || LoadedSuggestions?.Any() == true;
-
-    private bool ShowClear => Clearable
-        && !Disabled
-        && !ReadOnly
-        && IsInteractive
-        && !Required;
-
-    private string? SuggestionListCssClass => new CssBuilder("list clickable dense")
-        .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
+    /// <inheritdoc/>
+    protected string? OuterInputCssClass => new CssBuilder("input picker-value")
+        .Add("clearable", Clearable)
         .ToString();
 
-    private Popover? SuggestionPopover { get; set; }
+    private string? SuggestionListCssClass => new CssBuilder("suggestion-list list clickable dense")
+        .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
+        .ToString();
 
     private IEnumerable<KeyValuePair<string, object>>? LoadedSuggestions { get; set; }
 
     private bool LoadingSuggestions { get; set; }
 
     private bool ShowSuggestions => InputType != InputType.Password
-        && HasFocus
-        && HasSuggestions
-        && !SuggestionsClosed;
+        && (LoadingSuggestions
+        || Suggestions?.Any() == true
+        || SuggestionValues?.Any() == true
+        || LoadedSuggestions?.Any() == true);
 
     private string? SpellcheckValue
     {
@@ -436,17 +360,10 @@ public partial class TextInput : InputComponentBase<string>
         }
     }
 
-    private bool SuggestionsClosed { get; set; } = true;
-
     /// <summary>
     /// Constructs a new instance of <see cref="TextInput"/>.
     /// </summary>
-    public TextInput()
-    {
-        _focusTimer = new(ClearFocus, 200);
-        _inputTimer = new(OnTimer, UpdateOnInputDebounce ?? 0);
-        _suggestionTimer = new(GetSuggestionsAsync, 300);
-    }
+    public TextInput() => _suggestionTimer = new(GetSuggestionsAsync, 300);
 
     /// <inheritdoc/>
     public override Task SetParametersAsync(ParameterView parameters)
@@ -471,10 +388,7 @@ public partial class TextInput : InputComponentBase<string>
     /// </summary>
     public void Clear()
     {
-        _inputTimer.Cancel();
         _suggestionTimer.Cancel();
-        _canClear = false;
-        CurrentLength = 0;
         CurrentValueAsString = null;
         CurrentInput = null;
         DisplayString = null;
@@ -507,8 +421,6 @@ public partial class TextInput : InputComponentBase<string>
         {
             if (disposing)
             {
-                _focusTimer.Dispose();
-                _inputTimer.Dispose();
                 _suggestionTimer.Dispose();
             }
 
@@ -550,14 +462,6 @@ public partial class TextInput : InputComponentBase<string>
         return true;
     }
 
-    private void ClearFocus()
-    {
-        HasFocus = false;
-        SuggestionsClosed = true;
-        StateHasChanged();
-        _ = LostFocus.InvokeAsync();
-    }
-
     private async Task GetSuggestionsAsync()
     {
         if (LoadSuggestions is null)
@@ -572,50 +476,23 @@ public partial class TextInput : InputComponentBase<string>
         catch { }
     }
 
-    private Task OnChangeAsync(ChangeEventArgs e) => SetValueAsync(e.Value as string);
-
-    private void OnClick() => SuggestionsClosed = false;
-
-    private void OnFocusIn()
+    private async Task OnChangeAsync(ChangeEventArgs e)
     {
-        _focusTimer.Cancel();
-        HasFocus = true;
-    }
-
-    private void OnFocusOut()
-    {
-        if (_focusingOnSuggestions)
+        if (!string.Equals(CurrentValueAsString, e.Value as string))
         {
-            return;
+            await SetValueAsync(e.Value as string);
         }
-        _suggestionTimer.Cancel();
-        _focusTimer.Start();
     }
 
     private async Task OnInputAsync(ChangeEventArgs e)
     {
-        SuggestionsClosed = false;
         LoadedSuggestions = null;
 
         CurrentInput = e.Value as string;
 
-        _canClear = CurrentInput?.Length > 0;
-
-        CurrentLength = CurrentInput?.Length ?? 0;
-
-        if (!UpdateOnInput
-            || string.Equals(CurrentValueAsString, CurrentInput))
+        if (UpdateOnInput)
         {
-            return;
-        }
-
-        if (UpdateOnInputDebounce > 0)
-        {
-            _inputTimer.Change(UpdateOnInputDebounce.Value);
-        }
-        else
-        {
-            await SetValueAsync(CurrentInput);
+            await OnChangeAsync(e);
         }
 
         if (LoadSuggestions is not null)
@@ -624,33 +501,16 @@ public partial class TextInput : InputComponentBase<string>
         }
     }
 
-    private async Task OnKeyDownAsync(KeyboardEventArgs e)
+    private async Task OnEnterAsync()
     {
-        if (e.Key is "ArrowDown" or "Tab"
-            && ShowSuggestions
-            && SuggestionPopover is not null)
+        if (!OnValidEnter.HasDelegate)
         {
-            _focusingOnSuggestions = true;
-            await SuggestionPopover.FocusAsync();
-            _focusingOnSuggestions = false;
+            return;
         }
-        else if (e.Key == "Escape"
-            && ShowSuggestions)
+        await ValidateAsync();
+        if (IsValid)
         {
-            _suggestionTimer.Cancel();
-            SuggestionsClosed = true;
-        }
-    }
-
-    private async Task OnKeyUpAsync(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            await ValidateAsync();
-            if (IsValid)
-            {
-                await OnValidEnter.InvokeAsync();
-            }
+            await OnValidEnter.InvokeAsync();
         }
     }
 
@@ -664,31 +524,17 @@ public partial class TextInput : InputComponentBase<string>
         Emoji = null;
     }
 
-    private void OnTimer()
-    {
-        CurrentValueAsString = CurrentInput;
-        StateHasChanged();
-    }
-
     private async Task SetValueAsync(string? value)
     {
-        _inputTimer.Cancel();
-
         CurrentInput = value;
 
-        var str = Mask is null
+        CurrentValueAsString = Mask is null
             ? value
             : Mask.UnmaskInput(value);
-
-        CurrentLength = str?.Length ?? 0;
-
-        CurrentValueAsString = str;
 
         var display = Mask is null
             ? value
             : Mask.FormatInput(value);
-
-        _canClear = display?.Length > 0;
 
         DisplayString = value;
         if (!string.Equals(display, value))
@@ -696,24 +542,5 @@ public partial class TextInput : InputComponentBase<string>
             await Task.Delay(1);
             DisplayString = display;
         }
-    }
-
-    private async Task SuggestionKeyDownAsync(KeyboardEventArgs e, string? suggestion)
-    {
-        if (e.Key is " " or "Enter")
-        {
-            SuggestionsClosed = true;
-            await SetValueAsync(suggestion);
-        }
-        else if (e.Key == "Escape")
-        {
-            SuggestionsClosed = true;
-        }
-    }
-
-    private async Task SuggestionSelectedAsync(string? suggestion)
-    {
-        SuggestionsClosed = true;
-        await SetValueAsync(suggestion);
     }
 }

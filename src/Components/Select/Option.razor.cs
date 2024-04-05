@@ -113,10 +113,13 @@ public partial class Option<TValue> : IDisposable
     [Parameter]
     public TValue? Value { get; set; }
 
+    internal bool SearchNonmatch { get; set; }
+
     private string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
         .Add("active", IsSelected)
         .Add("disabled", Disabled)
+        .Add("search-nonmatch", SearchNonmatch)
         .ToString();
 
     private string? CssStyle => new CssBuilder(Style)

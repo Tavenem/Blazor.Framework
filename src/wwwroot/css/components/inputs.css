@@ -1,20 +1,12 @@
+.field[data-search-filter] .search-nonmatch {
+    display: none;
+}
+
 .number-field {
     --number-field-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
 
     input[type=number] {
         -moz-appearance: textfield;
-    }
-
-    &.show-steppers {
-        .input, .input-core {
-            padding-inline-end: 1.5rem;
-        }
-
-        &.dense {
-            .input, .input-core {
-                padding-inline-end: 1.25rem;
-            }
-        }
     }
 
     &.primary,
@@ -44,11 +36,6 @@
     flex-direction: column;
     justify-content: space-between;
     order: 9999;
-
-    .field &.dense > & {
-        --button-inherited-font-size-icon: 1.25rem;
-        --button-inherited-padding-y-icon: 5px;
-    }
 
     button {
         background-color: transparent;

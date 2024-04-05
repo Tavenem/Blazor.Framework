@@ -140,7 +140,7 @@ public partial class Rating : FormComponentBase<byte>
 
     private void OnKeyDown(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (Disabled || ReadOnly)
         {
             return;
         }
@@ -174,7 +174,7 @@ public partial class Rating : FormComponentBase<byte>
 
     private async Task OnMouseOutAsync()
     {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (Disabled || ReadOnly)
         {
             return;
         }
@@ -185,7 +185,7 @@ public partial class Rating : FormComponentBase<byte>
 
     private async Task OnMouseOverAsync(int index)
     {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (Disabled || ReadOnly)
         {
             return;
         }
@@ -196,7 +196,7 @@ public partial class Rating : FormComponentBase<byte>
 
     private void OnRatingClick(int index)
     {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (Disabled || ReadOnly)
         {
             return;
         }

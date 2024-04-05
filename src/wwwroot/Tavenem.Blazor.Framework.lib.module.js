@@ -8,6 +8,11 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
     }
     afterStartedComplete = true;
 
+    blazor.registerCustomEventType('enter', {
+        createEventArgs: () => {
+            return {};
+        }
+    });
     blazor.registerCustomEventType('focuslost', {
         createEventArgs: (event) => {
             return {
@@ -15,7 +20,7 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                     && event.detail
                     ? event.detail.parentId
                     : undefined
-            }
+            };
         }
     });
     blazor.registerCustomEventType('dropdowntoggle', {
@@ -24,7 +29,7 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                 value: event instanceof CustomEvent
                     && event.detail
                     && event.detail.value
-            }
+            };
         }
     });
     blazor.registerCustomEventType('searchinput', {
@@ -33,7 +38,7 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                 value: event instanceof CustomEvent
                     && event.detail
                     && event.detail.value
-            }
+            };
         }
     });
     blazor.registerCustomEventType('valuechange', {
@@ -42,7 +47,7 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                 value: event instanceof CustomEvent
                     && event.detail
                     && event.detail.value
-            }
+            };
         }
     });
     blazor.registerCustomEventType('valueinput', {
@@ -51,7 +56,7 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                 value: event instanceof CustomEvent
                     && event.detail
                     && event.detail.value
-            }
+            };
         }
     });
 }

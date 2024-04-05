@@ -38,17 +38,13 @@
         background-color: transparent;
         cursor: pointer;
         display: block;
-        height: 12px;
+        height: auto;
         position: relative;
         width: 100%;
 
         &:focus {
             outline: none;
         }
-    }
-
-    .input-core:not(text-area) {
-        height: auto;
     }
 
     .hashes {

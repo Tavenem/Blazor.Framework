@@ -7,6 +7,7 @@ namespace Tavenem.Blazor.Framework.Utilities;
 /// <summary>
 /// Event handlers for <c>Tavenem.Blazor.Framework</c>.
 /// </summary>
+[EventHandler("enter", typeof(EventArgs))]
 [EventHandler("onfocuslost", typeof(FocusLostEventArgs))]
 [EventHandler("dropdowntoggle", typeof(DropdownToggleEventArgs))]
 [EventHandler("searchinput", typeof(ValueChangeEventArgs))]

@@ -353,13 +353,22 @@ public abstract class SelectBase<TValue, TOption>
         if (MatchTypedText is null
             || string.IsNullOrWhiteSpace(e.Value))
         {
+            _options.ForEach(x => x.SearchNonmatch = false);
             return;
         }
-        foreach (var option in _options.Where(x => !x.Disabled))
+
+        foreach (var option in _options)
         {
             if (option.Value is not null
                 && MatchTypedText(e.Value, option.Value))
             {
+                option.SearchNonmatch = false;
+
+                if (option.Disabled)
+                {
+                    continue;
+                }
+
                 if (ShowPicker)
                 {
                     await option.ElementReference.FocusAsync();
@@ -370,6 +379,10 @@ public abstract class SelectBase<TValue, TOption>
                 {
                     await OnTypeClosedAsync(option);
                 }
+            }
+            else
+            {
+                option.SearchNonmatch = true;
             }
         }
     }

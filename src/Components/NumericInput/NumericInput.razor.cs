@@ -169,12 +169,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("number-field")
-        .Add("show-steppers", ShowStepButtons && !ReadOnly && IsInteractive)
-        .ToString();
-
-    /// <inheritdoc/>
-    protected override string? InputCssClass => new CssBuilder(InputClass)
-        .Add("input-core")
         .ToString();
 
     private static string InputMode => _isFloatingPoint ? "decimal" : "numeric";
@@ -409,7 +403,11 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// <summary>
     /// Clears the current input text.
     /// </summary>
-    public void Clear() => CurrentValueAsString = null;
+    public void Clear()
+    {
+        CurrentValueAsString = null;
+        DisplayString = null;
+    }
 
     /// <summary>
     /// <para>

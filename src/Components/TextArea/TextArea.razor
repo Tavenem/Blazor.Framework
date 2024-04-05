@@ -57,10 +57,10 @@
             {
                 <div class="mr-auto">@HelpText</div>
             }
-            @if (ShowLength && MaxLength.HasValue && IsInteractive)
+            @if (ShowLength && MaxLength.HasValue)
             {
                 <div class="ml-auto">
-                    <span>@CurrentLength</span>
+                    <span class="current-length">@(CurrentValue?.Length ?? 0)</span>
                     <span>/</span>
                     <span>@MaxLength</span>
                 </div>

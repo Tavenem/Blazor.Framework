@@ -82,7 +82,7 @@ public partial class Switch : BoolInputComponentBase<bool>
 
     private protected void OnKeyDown(KeyboardEventArgs e)
     {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (Disabled || ReadOnly)
         {
             return;
         }

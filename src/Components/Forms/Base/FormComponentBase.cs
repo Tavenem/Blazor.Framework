@@ -357,7 +357,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// </summary>
     protected virtual string? InputCssClass => new CssBuilder(InputClass)
         .AddClassFromDictionary(InputAttributes)
-        .Add("input-core")
         .ToString();
 
     /// <summary>

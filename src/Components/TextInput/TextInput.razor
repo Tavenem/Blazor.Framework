@@ -2,96 +2,57 @@
 
 @inherits InputComponentBase<string>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
-    <div id="@InputId" class="input">
+<tf-picker @attributes="AdditionalAttributes"
+           class="@CssClass"
+           data-allow-delete
+           data-disable-autosearch
+           data-popover-container
+           data-search-filter="@(!ShowAllSuggestions)"
+           style="@CssStyle">
+    <tf-input @ref="ElementReference"
+              @attributes="InputAttributes"
+              id="@InputId"
+              autocomplete="@AutocompleteValue"
+              autocorrect="@AutocorrectValue"
+              autofocus="@AutoFocus"
+              class="@OuterInputCssClass"
+              data-input-class="@InputCssClass"
+              data-input-debounce="@UpdateOnInputDebounce"
+              data-input-id="@Id"
+              data-input-style="@InputCssStyle"
+              disabled="@Disabled"
+              display="@DisplayString"
+              maxlength="@MaxLength"
+              name="@NameValue"
+              pattern="@Pattern"
+              placeholder="@Placeholder"
+              readonly="@ReadOnly"
+              required="@Required"
+              size="@EffectiveSize"
+              spellcheck="@SpellcheckValue"
+              tabindex="@TabIndex"
+              type="@InputType.ToCSS()"
+              value="@CurrentValue"
+              @onclick:stopPropagation="true"
+              @oninput="OnInputAsync"
+              @onchange="OnChangeAsync"
+              @enter="OnEnterAsync">
         @if (PrefixContent is not null)
         {
-            @PrefixContent(Value)
-        }
-        else if (!string.IsNullOrEmpty(PrefixIcon) || !string.IsNullOrEmpty(PrefixText))
-        {
-            @if (!string.IsNullOrEmpty(PrefixIcon))
-            {
-                <tf-icon>@PrefixIcon</tf-icon>
-            }
-            @if (!string.IsNullOrEmpty(PrefixText))
-            {
-                <span>@PrefixText</span>
-            }
-        }
-        @if (IsInteractive)
-        {
-            <input type="@InputType.ToCSS()"
-                   disabled="@Disabled"
-                   hidden
-                   name="@NameValue"
-                   readonly="@ReadOnly"
-                   value="@CurrentValue" />
-            <input @ref="ElementReference"
-                   @attributes="InputAttributes"
-                   id="@Id"
-                   type="@InputType.ToCSS()"
-                   class="@InputCssClass"
-                   style="@InputCssStyle"
-                   autocomplete="@AutocompleteValue"
-                   autocorrect="@AutocorrectValue"
-                   autofocus="@AutoFocus"
-                   disabled="@Disabled"
-                   maxlength="@MaxLength"
-                   pattern="@Pattern"
-                   placeholder="@(string.IsNullOrEmpty(Placeholder) ? " " : Placeholder)"
-                   readonly="@ReadOnly"
-                   required="@Required"
-                   size="@EffectiveSize"
-                   spellcheck="@SpellcheckValue"
-                   tabindex="@TabIndex"
-                   value="@DisplayString"
-                   @onclick="OnClick"
-                   @onclick:stopPropagation="true"
-                   @oninput="OnInputAsync"
-                   @onchange="OnChangeAsync"
-                   @onfocusin="OnFocusIn"
-                   @onfocusout="OnFocusOut"
-                   @onkeydown="OnKeyDownAsync"
-                   @onkeyup="OnKeyUpAsync" />
+            <div slot="prefix" style="display:content">
+                @PrefixContent(Value)
+            </div>
         }
         else
         {
-            <input @ref="ElementReference"
-                   @attributes="InputAttributes"
-                   id="@Id"
-                   autocomplete="@AutocompleteValue"
-                   autocorrect="@AutocorrectValue"
-                   autofocus="@AutoFocus"
-                   class="@InputCssClass"
-                   disabled="@Disabled"
-                   list="@(Suggestions?.Any() == true || SuggestionValues?.Any() == true ? $"{Id}-suggestions" : null)"
-                   maxlength="@MaxLength"
-                   name="@NameValue"
-                   pattern="@Pattern"
-                   placeholder="@(string.IsNullOrEmpty(Placeholder) ? " " : Placeholder)"
-                   readonly="@ReadOnly"
-                   required="@Required"
-                   size="@EffectiveSize"
-                   spellcheck="@SpellcheckValue"
-                   style="@InputCssStyle"
-                   tabindex="@TabIndex"
-                   type="@InputType.ToCSS()"
-                   value="@CurrentValue"
-                   @onclick="OnClick"
-                   @onclick:stopPropagation="true"
-                   @oninput="OnInputAsync"
-                   @onchange="OnChangeAsync"
-                   @onfocusin="OnFocusIn"
-                   @onfocusout="OnFocusOut"
-                   @onkeydown="OnKeyDownAsync"
-                   @onkeyup="OnKeyUpAsync" />
-        }
-        @if (ShowClear)
-        {
-            <button class="@ClearButtonCssClass" tabindex="-1" @onclick="Clear">
-                <tf-icon>@ClearIcon</tf-icon>
-            </button>
+            @if (!string.IsNullOrEmpty(PrefixIcon))
+            {
+                <tf-icon slot="prefix">@PrefixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PrefixText))
+            {
+                <span slot="prefix">@PrefixText</span>
+            }
         }
         @if (ShowEmoji && IsInteractive)
         {
@@ -116,7 +77,7 @@
                 <span>@PostfixText</span>
             }
         }
-    </div>
+    </tf-input>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label for="@Id">@Label</label>
@@ -144,10 +105,10 @@
             {
                 <div class="mr-auto">@HelpText</div>
             }
-            @if (ShowLength && MaxLength.HasValue && IsInteractive)
+            @if (ShowLength && MaxLength.HasValue)
             {
                 <div class="ml-auto">
-                    <span>@CurrentLength</span>
+                    <span class="current-length">@(CurrentValue?.Length ?? 0)</span>
                     <span>/</span>
                     <span>@MaxLength</span>
                 </div>
@@ -155,43 +116,45 @@
         </div>
     }
     @ChildContent
-    @if (IsInteractive)
+    @if (ShowSuggestions)
     {
-        <Popover @ref="SuggestionPopover"
-                 Class="filled"
+        <Popover Class="contained-popover filled"
                  AnchorId="@InputId"
                  AnchorOrigin="Origin.Bottom_Left"
                  PopoverOrigin="Origin.Top_Left"
-                 IsOpen="ShowSuggestions"
                  MatchWidth="true"
                  MaxHeight="min(300px,90vh)">
             <menu class="@SuggestionListCssClass"
-                  @onclick:stopPropagation="true">
-                @foreach (var suggestion in FilteredSuggestions)
+                    @onclick:stopPropagation="true">
+                @if (Suggestions is not null)
                 {
-                    <li @key="suggestion"
-                        tabindex="0"
-                        @onclick="@(_ => SuggestionSelectedAsync(suggestion))"
-                        @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion))">@suggestion</li>
+                    @foreach (var suggestion in Suggestions.Order())
+                    {
+                        <li @key="suggestion"
+                            data-close-picker
+                            data-close-picker-value="@suggestion"
+                            tabindex="0">@suggestion</li>
+                    }
                 }
                 @if (SuggestionTemplate is null)
                 {
-                    @foreach (var suggestion in FilteredSuggestionValues)
+                    @foreach (var suggestion in AllSuggestionValues)
                     {
                         <li @key="suggestion.Key"
-                            tabindex="0"
-                            @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
-                            @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">@suggestion.Value.ToString()</li>
+                            data-close-picker
+                            data-close-picker-value="@suggestion.Key"
+                            data-close-picker-display="@suggestion.Value.ToString()"
+                            tabindex="0">@suggestion.Value.ToString()</li>
                     }
                 }
                 else
                 {
-                    @foreach (var suggestion in FilteredSuggestionValues)
+                    @foreach (var suggestion in AllSuggestionValues)
                     {
                         <li @key="suggestion.Key"
-                            tabindex="0"
-                            @onclick="@(_ => SuggestionSelectedAsync(suggestion.Key))"
-                            @onkeydown="@(e => SuggestionKeyDownAsync(e, suggestion.Key))">
+                            data-close-picker
+                            data-close-picker-value="@suggestion.Key"
+                            tabindex="0">
                             @SuggestionTemplate(suggestion.Value)
                         </li>
                     }
@@ -203,33 +166,4 @@
             </menu>
         </Popover>
     }
-    else if (Suggestions?.Any() == true || SuggestionValues?.Any() == true)
-    {
-        <datalist id="@($"{Id}-suggestions")">
-            @if (Suggestions?.Any() == true)
-            {
-                @foreach (var suggestion in Suggestions)
-                {
-                    <option value="@suggestion"></option>
-                }
-            }
-            @if (SuggestionValues?.Any() == true)
-            {
-                @if (SuggestionTemplate is null)
-                {
-                    @foreach (var suggestion in SuggestionValues)
-                    {
-                        <option value="@suggestion.Key">@suggestion.Value</option>
-                    }
-                }
-                else
-                {
-                    @foreach (var suggestion in SuggestionValues)
-                    {
-                        <option value="@suggestion.Key">@SuggestionTemplate(suggestion.Value)</option>
-                    }
-                }
-            }
-        </datalist>
-    }
-</div>
+</tf-picker>

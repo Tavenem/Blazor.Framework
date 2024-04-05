@@ -2,9 +2,9 @@ import { TavenemAccordionHTMLElement } from './tavenem-accordion';
 import { TavenemContentsHTMLElement } from './tavenem-contents';
 import { TavenemEmojiHTMLElement } from './tavenem-emoji';
 import { TavenemHighlightHTMLElement } from './tavenem-highlight';
-import { TavenemInputHtmlElement } from './tavenem-input';
 import {
     TavenemDropdownHTMLElement,
+    TavenemInputHtmlElement,
     TavenemPickerHtmlElement,
     TavenemPopoverHTMLElement,
     TavenemPopover,
