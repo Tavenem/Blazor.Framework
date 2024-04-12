@@ -149,11 +149,7 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
 
     private protected bool PopoverOpen { get; set; }
 
-    private protected virtual bool ShowClear => AllowClear
-        && Clearable
-        && !Disabled
-        && !ReadOnly
-        && !Required;
+    private protected virtual bool ShowClear => AllowClear && Clearable;
 
     private protected bool ShowPicker => PopoverOpen
         && !Disabled

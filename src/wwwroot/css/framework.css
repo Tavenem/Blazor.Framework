@@ -1,4 +1,4 @@
-﻿@layer
+@layer
     tavenem-framework.reset,
     tavenem-framework.base,
     tavenem-framework.theme,
@@ -24,7 +24,6 @@
 @import "components/checkbox.css" layer(tavenem-framework.components);
 @import "components/chip.css" layer(tavenem-framework.components);
 @import "components/collapse.css" layer(tavenem-framework.components);
-@import "components/colorpicker.css" layer(tavenem-framework.components);
 @import "components/datepicker.css" layer(tavenem-framework.components);
 @import "components/dialog.css" layer(tavenem-framework.components);
 @import "components/drawer.css" layer(tavenem-framework.components);

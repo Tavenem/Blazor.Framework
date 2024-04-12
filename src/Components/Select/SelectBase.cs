@@ -209,7 +209,7 @@ public abstract class SelectBase<TValue, TOption>
 
     private protected int MaxOptionSize { get; set; }
 
-    private protected virtual string? OptionListCssClass => new CssBuilder("list clickable dense")
+    private protected virtual string? OptionListCssClass => new CssBuilder("option-list list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
 
@@ -348,6 +348,13 @@ public abstract class SelectBase<TValue, TOption>
 
     private protected override void OnKeyDownAsync(KeyboardEventArgs e) { }
 
+    private protected void OnPickerValueChange(ValueChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value;
+        UpdateSelectedFromValue();
+        RefreshOptions();
+    }
+
     private protected async Task OnSearchInputAsync(ValueChangeEventArgs e)
     {
         if (MatchTypedText is null
@@ -394,8 +401,6 @@ public abstract class SelectBase<TValue, TOption>
         _options.ForEach(x => x.InvokeStateChange());
         StateHasChanged();
     }
-
-    private protected abstract Task SelectIndexAsync(KeyboardEventArgs e, int index);
 
     private protected abstract Task SelectItemAsync(Option<TOption> option);
 

@@ -24,16 +24,6 @@ public static class DefaultIcons
     /// <summary>An icon to indicate left alignment.</summary>
     public static string AlignRight { get; set; } = "format_align_right";
 
-    /// <summary>
-    /// <para>
-    /// A backward directional indicator.
-    /// </para>
-    /// <para>
-    /// The default is a chevron with the point at the left.
-    /// </para>
-    /// </summary>
-    public static string Back { get; set; } = "chevron_left";
-
     /// <summary>An icon to indicate a bold or strong format.</summary>
     public static string Bold { get; set; } = "format_bold";
 
@@ -46,11 +36,6 @@ public static class DefaultIcons
     /// A checked checkbox.
     /// </summary>
     public static string CheckBox_Checked { get; set; } = "check_box";
-
-    /// <summary>
-    /// An indeterminate checkbox.
-    /// </summary>
-    public static string CheckBox_Indeterminate { get; set; } = "indeterminate_check_box";
 
     /// <summary>
     /// An unchecked checkbox.
@@ -81,11 +66,6 @@ public static class DefaultIcons
     public static string ColorBackgroundSelect { get; set; } = "format_color_fill";
 
     /// <summary>
-    /// Indicates dark mode.
-    /// </summary>
-    public static string DarkMode { get; set; } = "dark_mode";
-
-    /// <summary>
     /// An icon for date/time selection.
     /// </summary>
     public static string DateTimeSelect { get; set; } = "calendar_month";
@@ -94,16 +74,6 @@ public static class DefaultIcons
     /// An icon for delete buttons.
     /// </summary>
     public static string Delete { get; set; } = "delete";
-
-    /// <summary>
-    /// <para>
-    /// An downward directional indicator.
-    /// </para>
-    /// <para>
-    /// The default is a caret with the point at the bottom.
-    /// </para>
-    /// </summary>
-    public static string Down { get; set; } = "keyboard_arrow_down";
 
     /// <summary>
     /// <para>
@@ -156,19 +126,6 @@ public static class DefaultIcons
     /// <summary>An icon to indicate font size.</summary>
     public static string FontSize { get; set; } = "format_size";
 
-    /// <summary>
-    /// <para>
-    /// A forward directional indicator.
-    /// </para>
-    /// <para>
-    /// The default is a chevron with the point at the right.
-    /// </para>
-    /// </summary>
-    public static string Forward { get; set; } = "chevron_right";
-
-    /// <summary>A help icon.</summary>
-    public static string Help { get; set; } = "help";
-
     /// <summary>An icon to indicate highlighting.</summary>
     public static string Highlight { get; set; } = "highlight";
 
@@ -207,11 +164,6 @@ public static class DefaultIcons
     /// <summary>An icon to indicate an italic or emphasized format.</summary>
     public static string Italic { get; set; } = "format_italic";
 
-    /// <summary>
-    /// Indicates light mode.
-    /// </summary>
-    public static string LightMode { get; set; } = "light_mode";
-
     /// <summary>An icon to indicate line height.</summary>
     public static string LineHeight { get; set; } = "line_weight";
 
@@ -226,16 +178,6 @@ public static class DefaultIcons
 
     /// <summary>An icon to indicate a numbered list.</summary>
     public static string List_Number { get; set; } = "format_list_numbered";
-
-    /// <summary>
-    /// <para>
-    /// A loading icon.
-    /// </para>
-    /// <para>
-    /// The default is two circling arrows.
-    /// </para>
-    /// </summary>
-    public static string Loading { get; set; } = "sync";
 
     /// <summary>
     /// <para>
@@ -265,38 +207,8 @@ public static class DefaultIcons
     /// <summary>An icon to indicate a page break.</summary>
     public static string PageBreak { get; set; } = "insert_page_break";
 
-    /// <summary>
-    /// An icon for buttons which move to a first page.
-    /// </summary>
-    public static string Page_First { get; set; } = "first_page";
-
-    /// <summary>
-    /// An icon for buttons which move to a last page.
-    /// </summary>
-    public static string Page_Last { get; set; } = "last_page";
-
-    /// <summary>
-    /// An icon for buttons which move to a next page.
-    /// </summary>
-    public static string Page_Next { get; set; } = "navigate_next";
-
-    /// <summary>
-    /// An icon for buttons which move to a next page.
-    /// </summary>
-    public static string Page_Previous { get; set; } = "navigate_before";
-
     /// <summary>An icon to indicate a preview.</summary>
     public static string Preview { get; set; } = "preview";
-
-    /// <summary>
-    /// A checked radio button.
-    /// </summary>
-    public static string Radio_Checked { get; set; } = "radio_button_checked";
-
-    /// <summary>
-    /// An unchecked radio button.
-    /// </summary>
-    public static string Radio_Unchecked { get; set; } = "radio_button_unchecked";
 
     /// <summary>A redo icon.</summary>
     public static string Redo { get; set; } = "redo";
@@ -317,11 +229,6 @@ public static class DefaultIcons
     public static string Selected { get; set; } = "done";
 
     /// <summary>
-    /// A settings icon.
-    /// </summary>
-    public static string Settings { get; set; } = "settings";
-
-    /// <summary>
     /// <para>
     /// A sort ascending icon.
     /// </para>
@@ -331,23 +238,8 @@ public static class DefaultIcons
     /// </summary>
     public static string Sort_Ascending { get; set; } = "arrow_downward";
 
-    /// <summary>
-    /// <para>
-    /// A sort descending icon.
-    /// </para>
-    /// <para>
-    /// The default is an arrow pointing up.
-    /// </para>
-    /// </summary>
-    public static string Sort_Descending { get; set; } = "arrow_upward";
-
     /// <summary>An icon to indicate source code editing.</summary>
     public static string Source { get; set; } = "source";
-
-    /// <summary>
-    /// A star. Used by the <see cref="Rating"/> component.
-    /// </summary>
-    public static string Star { get; set; } = "star";
 
     /// <summary>An icon to indicate strikethrough format.</summary>
     public static string Strikethrough { get; set; } = "strikethrough_s";
@@ -392,14 +284,4 @@ public static class DefaultIcons
 
     /// <summary>An icon to indicate removing a link.</summary>
     public static string UnLink { get; set; } = "link_off";
-
-    /// <summary>
-    /// <para>
-    /// An upward directional indicator.
-    /// </para>
-    /// <para>
-    /// The default is a caret with the point at the top.
-    /// </para>
-    /// </summary>
-    public static string Up { get; set; } = "keyboard_arrow_up";
 }

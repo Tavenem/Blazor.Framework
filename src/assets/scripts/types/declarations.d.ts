@@ -1,4 +1,25 @@
-﻿declare module 'markdown-it-attrs' {
+﻿interface ColorSelectionOptions {
+    signal?: AbortSignal
+}
+
+interface ColorSelectionResult {
+    sRGBHex: string
+}
+
+interface EyeDropper {
+    open: (options?: ColorSelectionOptions) => Promise<ColorSelectionResult>
+}
+
+declare const EyeDropper: {
+    prototype: EyeDropper;
+    new(): EyeDropper;
+}
+
+interface Window {
+    EyeDropper?: EyeDropper | undefined
+}
+
+declare module 'markdown-it-attrs' {
     export default function attributes(md, options: { leftDelimiter?: string, rightDelimiter?: string, allowedAttributes?: string[] }): void;
 }
 declare module 'markdown-it-deflist' {

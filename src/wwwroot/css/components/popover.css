@@ -1,48 +1,11 @@
-﻿tf-popover {
-    &.open,
-    [data-popover-container][data-popover-open] > &.contained-popover {
-        display: block;
-        opacity: 1;
-        pointer-events: initial;
-        transition: opacity;
-        transition-duration: 250ms;
-        transition-delay: initial;
-        visibility: initial;
-    }
+﻿* {
+    --tavenem-popover-opacity: 0;
+    --tavenem-popover-events: none;
+    --tavenem-popover-visibility: hidden;
+}
 
-    .list {
-        max-height: inherit;
-        overflow-y: auto;
-        padding-inline-end: 1em;
-        padding-inline-start: 1em;
-    }
-
-    .tree & .list,
-    .tree & .list.clickable {
-        > *:not(hr) {
-            padding-inline-start: 0;
-        }
-
-        .drop-placeholder {
-            padding-inline-start: 0;
-        }
-    }
-
-    .tree & .list > *:not(hr) {
-        padding-inline-start: 0;
-    }
-
-    &:where(
-        .primary,
-        .secondary,
-        .tertiary,
-        .danger,
-        .dark,
-        .default,
-        .info,
-        .success,
-        .warning) {
-        --popover-color: var(--tavenem-theme-color-text);
-        --popover-color-bg: var(--tavenem-theme-color-hover);
-    }
+[data-popover-open] {
+    --tavenem-popover-opacity: 1;
+    --tavenem-popover-events: auto;
+    --tavenem-popover-visibility: visible;
 }

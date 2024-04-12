@@ -33,16 +33,6 @@ public partial class Pagination : PersistentComponentBase
 
     /// <summary>
     /// <para>
-    /// The name of the icon displayed for the "first page" control.
-    /// </para>
-    /// <para>
-    /// Defaults to "first_page".
-    /// </para>
-    /// </summary>
-    [Parameter] public string FirstPageIcon { get; set; } = DefaultIcons.Page_First;
-
-    /// <summary>
-    /// <para>
     /// The maximum number of pages displayed at a time.
     /// </para>
     /// <para>
@@ -58,16 +48,6 @@ public partial class Pagination : PersistentComponentBase
     /// </para>
     /// </summary>
     [Parameter] public int? MaxPagesDisplayed { get; set; } = 5;
-
-    /// <summary>
-    /// <para>
-    /// The name of the icon displayed for the "last page" control.
-    /// </para>
-    /// <para>
-    /// Defaults to "last_page".
-    /// </para>
-    /// </summary>
-    [Parameter] public string LastPageIcon { get; set; } = DefaultIcons.Page_Last;
 
     /// <summary>
     /// <para>
@@ -89,16 +69,6 @@ public partial class Pagination : PersistentComponentBase
     /// </para>
     /// </summary>
     [Parameter] public EventCallback LastRequested { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The name of the icon displayed for the "next page" control.
-    /// </para>
-    /// <para>
-    /// Defaults to "navigate_next".
-    /// </para>
-    /// </summary>
-    [Parameter] public string NextPageIcon { get; set; } = DefaultIcons.Page_Next;
 
     /// <summary>
     /// <para>
@@ -140,16 +110,6 @@ public partial class Pagination : PersistentComponentBase
     /// </para>
     /// </summary>
     [Parameter] public ulong? PageCount { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The name of the icon displayed for the "previous page" control.
-    /// </para>
-    /// <para>
-    /// Defaults to "navigate_before".
-    /// </para>
-    /// </summary>
-    [Parameter] public string PreviousPageIcon { get; set; } = DefaultIcons.Page_Previous;
 
     /// <summary>
     /// Custom CSS style(s) for the page button elements.

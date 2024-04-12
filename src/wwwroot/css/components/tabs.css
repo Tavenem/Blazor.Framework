@@ -20,15 +20,6 @@
             flex-direction: column;
         }
 
-        .tab-scroll-btn {
-            height: 2rem;
-            width: 100%;
-
-            tf-icon {
-                transform: rotate(90deg);
-            }
-        }
-
         .tab-panels {
             display: flex;
             flex-grow: 1;
@@ -93,10 +84,6 @@
     .add-btn {
         align-self: center;
     }
-}
-
-.tab-scroll-btn {
-    border-radius: 0;
 }
 
 .tabs-toolbar-content {

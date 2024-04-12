@@ -34,8 +34,8 @@
               type="@InputType.ToCSS()"
               value="@CurrentValue"
               @onclick:stopPropagation="true"
-              @oninput="OnInputAsync"
-              @onchange="OnChangeAsync"
+              @valueinput="OnInputAsync"
+              @valuechange="OnChangeAsync"
               @enter="OnEnterAsync">
         @if (PrefixContent is not null)
         {

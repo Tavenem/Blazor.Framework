@@ -107,16 +107,16 @@
                 top: 0;
                 width: 100%;
 
-                ~ tf-icon.checked {
+                ~ .checked {
                     display: none;
                 }
 
                 &:checked {
-                    ~ tf-icon.checked {
+                    ~ .checked {
                         display: block;
                     }
 
-                    ~ tf-icon.unchecked {
+                    ~ .unchecked {
                         display: none;
                     }
                 }
@@ -130,22 +130,22 @@
                 &:has(> input:not(read-only)) {
                     transform: scale(1.2);
                 
-                    > input ~ tf-icon {
-                        &.checked {
+                    > input {
+                        ~ .checked {
                             display: block;
                         }
 
-                        &.unchecked {
+                        ~ .unchecked {
                             display: none;
                         }
                     }
 
-                    ~ .btn > input ~ tf-icon {
-                        &.checked {
+                    ~ .btn > input {
+                        ~ .checked {
                             display: none;
                         }
 
-                        &.unchecked {
+                        ~ .unchecked {
                             display: block;
                         }
                     }
@@ -153,24 +153,24 @@
             }
 
             &:has(~ .btn > input:is(:checked)) {
-                > input ~ tf-icon {
-                    &.checked {
+                > input {
+                    ~ .checked {
                         display: block;
                     }
 
-                    &.unchecked {
+                    ~ .unchecked {
                         display: none;
                     }
                 }
             }
 
             &:has(~ .btn:is(:hover, :focus-within, :focus-visible)) {
-                > input:not(read-only) ~ tf-icon {
-                    &.checked {
+                > input:not(read-only) {
+                    ~ .checked {
                         display: block;
                     }
 
-                    &.unchecked {
+                    ~ .unchecked {
                         display: none;
                     }
                 }

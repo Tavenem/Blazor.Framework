@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
@@ -16,12 +15,6 @@ namespace Tavenem.Blazor.Framework;
 public partial class MultiSelect<TValue>
 {
     private readonly object _selectAll = new();
-
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
-        .ToString();
 
     /// <summary>
     /// Whether this select allows multiple selections.
@@ -219,55 +212,6 @@ public partial class MultiSelect<TValue>
         HasConversionError = !success;
 
         return success;
-    }
-
-    private protected override async Task SelectIndexAsync(KeyboardEventArgs e, int index)
-    {
-        if (index < 0)
-        {
-            index = _options.Count - 1;
-        }
-        else if (index >= _options.Count)
-        {
-            index = 0;
-        }
-
-        if (index < 0 || index >= _options.Count)
-        {
-            return;
-        }
-
-        SelectedIndex = index;
-
-        if (e.CtrlKey)
-        {
-            if (ShowPicker)
-            {
-                await _options[index].ElementReference.FocusAsync();
-                await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
-            }
-            return;
-        }
-
-        if (!_options[index].Disabled)
-        {
-            if (!e.ShiftKey)
-            {
-                _selectedOptions.Clear();
-            }
-
-            await ToggleValueAsync(_options[index]);
-            if (PopoverOpen)
-            {
-                await TogglePopoverAsync();
-            }
-        }
-
-        if (ShowPicker)
-        {
-            await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
-        }
     }
 
     private protected override async Task SelectItemAsync(Option<TValue>? option)

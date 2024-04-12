@@ -234,23 +234,6 @@
         }
     }
 
-    .tree &,
-    .tree &.clickable,
-    &.tree,
-    &.tree.clickable {
-        > *:not(hr, .collapse) {
-            padding-inline-start: 2.5rem;
-        }
-
-        .drop-placeholder {
-            padding-inline-start: 2.5rem;
-        }
-
-        &.highlight-start > .active:not(.collapse) {
-            padding-inline-start: calc(2.5rem - 1px);
-        }
-    }
-
     &.disabled {
         > *:not(hr) {
             color: var(--tavenem-color-action-disabled);
@@ -290,6 +273,38 @@
             border-inline-end-style: none;
             padding-inline-start: calc(.25em - 1px);
             padding-inline-end: .25em;
+        }
+    }
+
+    .tree &,
+    .tree &.clickable,
+    &.tree,
+    &.tree.clickable {
+        > *:not(hr, .collapse) {
+            padding-inline-start: 2.5rem;
+        }
+
+        .drop-placeholder {
+            padding-inline-start: 2.5rem;
+        }
+
+        &.highlight-start > .active:not(.collapse) {
+            padding-inline-start: calc(2.5rem - 1px);
+        }
+    }
+
+    .tree tf-popover &,
+    .tree tf-popover &.clickable {
+        > *:not(hr, .collapse) {
+            padding-inline-start: .25em;
+        }
+
+        .drop-placeholder {
+            padding-inline-start: 0;
+        }
+
+        &.highlight-start > .active:not(.collapse) {
+            padding-inline-start: calc(.25em - 1px);
         }
     }
 

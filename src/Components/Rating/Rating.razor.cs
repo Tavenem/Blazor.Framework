@@ -18,7 +18,7 @@ public partial class Rating : FormComponentBase<byte>
     /// The default is "star".
     /// </para>
     /// </summary>
-    [Parameter] public string ActiveIcon { get; set; } = DefaultIcons.Star;
+    [Parameter] public string? ActiveIcon { get; set; }
 
     /// <summary>
     /// The value being hovered over by the user.
@@ -39,7 +39,7 @@ public partial class Rating : FormComponentBase<byte>
     /// The default is "star_border".
     /// </para>
     /// </summary>
-    [Parameter] public string InactiveIcon { get; set; } = DefaultIcons.Star;
+    [Parameter] public string? InactiveIcon { get; set; }
 
     /// <summary>
     /// <para>
@@ -166,8 +166,6 @@ public partial class Rating : FormComponentBase<byte>
                 {
                     OnValueUp(1);
                 }
-                break;
-            default:
                 break;
         }
     }

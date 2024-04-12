@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
-using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -93,35 +91,6 @@ public partial class Select<TValue>
 
     private protected override Task OnTypeClosedAsync(Option<TValue> option) => ToggleValueAsync(option);
 
-    private protected override async Task SelectIndexAsync(KeyboardEventArgs e, int index)
-    {
-        if (index < 0)
-        {
-            index = _options.Count - 1;
-        }
-        else if (index >= _options.Count)
-        {
-            index = 0;
-        }
-
-        if (index < 0 || index >= _options.Count)
-        {
-            await ClearAsync();
-            return;
-        }
-
-        if (!_options[index].Disabled)
-        {
-            await ToggleValueAsync(_options[index], false);
-        }
-
-        if (ShowPicker)
-        {
-            await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
-        }
-    }
-
     private protected override async Task SelectItemAsync(Option<TValue>? option)
     {
         var index = option is null
@@ -167,11 +136,5 @@ public partial class Select<TValue>
             }
         }
         StateHasChanged();
-    }
-
-    private void OnPickerValueChange(ValueChangeEventArgs e)
-    {
-        CurrentValueAsString = e.Value;
-        RefreshOptions();
     }
 }

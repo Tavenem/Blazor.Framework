@@ -18,7 +18,7 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// <summary>
     /// The icon to use for the checked state.
     /// </summary>
-    [Parameter] public string CheckedIcon { get; set; } = DefaultIcons.Radio_Checked;
+    [Parameter] public string? CheckedIcon { get; set; }
 
     /// <summary>
     /// <para>
@@ -82,7 +82,7 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// <summary>
     /// The icon to use for the unchecked state.
     /// </summary>
-    [Parameter] public string UncheckedIcon { get; set; } = DefaultIcons.Radio_Unchecked;
+    [Parameter] public string? UncheckedIcon { get; set; }
 
     /// <summary>
     /// <para>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -50,16 +51,6 @@ public partial class TextInput : InputComponentBase<string>
     /// </para>
     /// </summary>
     [Parameter] public bool Clearable { get; set; } = true;
-
-    /// <summary>
-    /// <para>
-    /// The icon displayed for the clear button.
-    /// </para>
-    /// <para>
-    /// Default is "clear".
-    /// </para>
-    /// </summary>
-    [Parameter] public string ClearIcon { get; set; } = DefaultIcons.Clear;
 
     /// <summary>
     /// <para>
@@ -476,19 +467,19 @@ public partial class TextInput : InputComponentBase<string>
         catch { }
     }
 
-    private async Task OnChangeAsync(ChangeEventArgs e)
+    private async Task OnChangeAsync(ValueChangeEventArgs e)
     {
-        if (!string.Equals(CurrentValueAsString, e.Value as string))
+        if (!string.Equals(CurrentValueAsString, e.Value))
         {
-            await SetValueAsync(e.Value as string);
+            await SetValueAsync(e.Value);
         }
     }
 
-    private async Task OnInputAsync(ChangeEventArgs e)
+    private async Task OnInputAsync(ValueChangeEventArgs e)
     {
         LoadedSuggestions = null;
 
-        CurrentInput = e.Value as string;
+        CurrentInput = e.Value;
 
         if (UpdateOnInput)
         {

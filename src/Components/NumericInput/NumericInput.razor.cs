@@ -132,26 +132,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
 
     /// <summary>
     /// <para>
-    /// The icon used for the decrement stepper.
-    /// </para>
-    /// <para>
-    /// Default is <see cref="DefaultIcons.Down"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public string StepDownIcon { get; set; } = DefaultIcons.Down;
-
-    /// <summary>
-    /// <para>
-    /// The icon used for the increment stepper.
-    /// </para>
-    /// <para>
-    /// Default is <see cref="DefaultIcons.Up"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public string StepUpIcon { get; set; } = DefaultIcons.Up;
-
-    /// <summary>
-    /// <para>
     /// The step value for this input.
     /// </para>
     /// <para>
@@ -212,6 +192,10 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         => FormExtensions.ValuesEqual(Min, _minDefault)
         ? null
         : FormExtensions.SuppressScientificFormat(Min);
+
+    private string? StepIconClass => new CssBuilder("svg-icon")
+        .Add(ThemeColor.ToCSS(), ThemeColor != ThemeColor.None)
+        .ToString();
 
     private protected string? StepString
     {

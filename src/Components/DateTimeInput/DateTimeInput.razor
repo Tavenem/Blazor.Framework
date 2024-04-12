@@ -186,7 +186,7 @@
                     case DatePickerView.Date:
                         <div class="date-picker-nav">
                             <button class="btn btn-icon" disabled="@(!CanGoBackMonth)" @onclick="OnPreviousMonth">
-                                <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                             </button>
                             <button class="@GetMonthClass(Month)"
                                     disabled="@IsDisabled"
@@ -194,7 +194,7 @@
                                 @MonthTitle
                             </button>
                             <button class="btn btn-icon" disabled="@(!CanGoForwardMonth)" @onclick="OnNextMonth">
-                                <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                             </button>
                         </div>
                         <div class="date-picker-selection date-picker-calendar" style="@CalendarStyle">
@@ -244,14 +244,14 @@
                     case DatePickerView.Month:
                         <div class="date-picker-nav">
                             <button class="btn btn-icon" disabled="@(!CanGoBackYear)" @onclick="OnPreviousYear">
-                                <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                             </button>
                             <button class="@GetYearClass(Year)"
                                     @onclick="@(_ => SetViewAsync(DatePickerView.Year))">
                                 @YearTitle
                             </button>
                             <button class="btn btn-icon" disabled="@(!CanGoForwardYear)" @onclick="OnNextYear">
-                                <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                             </button>
                         </div>
                         <div class="date-picker-selection date-picker-months">
@@ -271,7 +271,7 @@
                             <button class="btn btn-icon"
                                     disabled="@(!CanGoBackDecade)"
                                     @onclick="OnPreviousDecade">
-                                <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                             </button>
                             <button class="@GetDecadeClass(Decade)"
                                     disabled="@Disabled"
@@ -279,7 +279,7 @@
                                 @DecadeTitle
                             </button>
                             <button class="btn btn-icon" disabled="@(!CanGoForwardDecade)" @onclick="OnNextDecade">
-                                <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                             </button>
                         </div>
                         <div class="date-picker-selection">
@@ -299,7 +299,7 @@
                     case DatePickerView.Decade:
                         <div class="date-picker-nav">
                             <button class="btn btn-icon" disabled="@(!CanGoBackCentury)" @onclick="OnPreviousCentury">
-                                <tf-icon>@DefaultIcons.Page_Previous</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                             </button>
                             <button class="@GetCenturyClass(Century)"
                                     disabled="@IsDisabled"
@@ -307,7 +307,7 @@
                                 @CenturyTitle
                             </button>
                             <button class="btn btn-icon" disabled="@(!CanGoForwardCentury)" @onclick="OnNextCentury">
-                                <tf-icon>@DefaultIcons.Page_Next</tf-icon>
+                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                             </button>
                         </div>
                         <div class="date-picker-selection">

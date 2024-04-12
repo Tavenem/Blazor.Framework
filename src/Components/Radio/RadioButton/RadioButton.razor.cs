@@ -16,7 +16,7 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
     /// <summary>
     /// The icon to use for the checked state.
     /// </summary>
-    [Parameter] public string? CheckedIcon { get; set; } = DefaultIcons.Radio_Checked;
+    [Parameter] public string? CheckedIcon { get; set; }
 
     /// <summary>
     /// Content for the label of the field.
@@ -36,7 +36,7 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
     /// <summary>
     /// The icon to use for the unchecked state.
     /// </summary>
-    [Parameter] public string? UncheckedIcon { get; set; } = DefaultIcons.Radio_Unchecked;
+    [Parameter] public string? UncheckedIcon { get; set; }
 
     /// <summary>
     /// The context for this <see cref="InputRadio{TValue}"/>.

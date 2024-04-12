@@ -283,6 +283,9 @@ a.btn-text:not(.disabled, :disabled) {
     tf-icon {
         font-size: inherit;
     }
+    .svg-icon {
+        max-height: 1em;
+    }
 
     &.small {
         --button-font-size: 1.25rem;

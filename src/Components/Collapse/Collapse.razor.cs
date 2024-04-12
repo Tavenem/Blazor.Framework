@@ -116,11 +116,6 @@ public partial class Collapse : PersistentComponentBase
         .ToString();
 
     /// <summary>
-    /// The expansion icon displayed in the header.
-    /// </summary>
-    protected string IconName => IsLoading ? DefaultIcons.Loading : DefaultIcons.Expand;
-
-    /// <summary>
     /// The final value assigned to the footer's class attribute.
     /// </summary>
     protected string? FooterCssClass => new CssBuilder("footer")

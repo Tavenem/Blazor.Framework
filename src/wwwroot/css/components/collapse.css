@@ -36,12 +36,19 @@
             padding: 1rem 1.5rem;
             position: relative;
 
-            > tf-icon {
+            > .expand, > .loading {
                 margin-inline-end: -.25rem;
                 margin-inline-start: .5rem;
                 order: 9999;
-                transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+                transition: .3s cubic-bezier(.25,.8,.5,1);
+            }
+
+            > .expand {
                 transform: rotate(0deg);
+            }
+
+            > .loading {
+                display: none;
             }
         }
 
@@ -80,7 +87,7 @@
             }
         }
 
-        &[open] > summary > tf-icon {
+        &[open] > summary > .expand {
             transform: rotate(-180deg);
         }
     }
@@ -179,8 +186,15 @@
         padding: 1rem 1.5rem;
     }
 
-    &.loading > details > summary > tf-icon {
-        animation: tf-rotation 1s infinite linear;
+    &.loading > details > summary {
+        > .expand {
+            display: none;
+        }
+
+        > .loading {
+            animation: tf-rotation 1s infinite linear;
+            display: inline-block;
+        }
     }
 
     &.dense {
@@ -228,7 +242,7 @@
         > details > summary {
             padding-inline-start: 0;
 
-            > tf-icon {
+            > .expand {
                 margin-inline-end: 1rem;
                 margin-inline-start: 0;
                 order: -1;
@@ -236,7 +250,7 @@
             }
         }
 
-        > details[open] > summary > tf-icon {
+        > details[open] > summary > .expand {
             transform: rotate(0deg);
         }
     }

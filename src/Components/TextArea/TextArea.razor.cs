@@ -123,8 +123,6 @@ public partial class TextArea : InputComponentBase<string>
         }
     }
 
-    private int CurrentLength { get; set; }
-
     private string? Emoji { get; set; }
 
     private protected string? SpellcheckValue => Spellcheck == true ? "true" : "false";
@@ -151,7 +149,6 @@ public partial class TextArea : InputComponentBase<string>
     public void Clear()
     {
         _timer.Cancel();
-        CurrentLength = 0;
         CurrentValueAsString = null;
     }
 
@@ -227,8 +224,6 @@ public partial class TextArea : InputComponentBase<string>
     {
         var str = e.Value as string;
 
-        CurrentLength = str?.Length ?? 0;
-
         if (!UpdateOnInput
             || string.Equals(CurrentValueAsString, str))
         {
@@ -249,12 +244,7 @@ public partial class TextArea : InputComponentBase<string>
     private void OnChange(ChangeEventArgs e)
     {
         _timer.Cancel();
-
-        var str = e.Value as string;
-
-        CurrentLength = str?.Length ?? 0;
-
-        CurrentValueAsString = str;
+        CurrentValueAsString = e.Value as string;
     }
 
     private void OnSelectEmoji()

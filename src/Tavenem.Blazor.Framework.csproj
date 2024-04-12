@@ -31,11 +31,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.102.1" />
-    <PackageReference Include="HtmlSanitizer" Version="8.0.746" />
-    <PackageReference Include="Markdig" Version="0.33.0" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="HtmlSanitizer" Version="8.0.843" />
+    <PackageReference Include="Markdig" Version="0.36.2" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.3" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
   </ItemGroup>
 	
@@ -63,7 +63,7 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
-    <ClientAssetsInputs Remove="assets\scripts\tavenem-slider.ts" />
+    <ClientAssetsInputs Remove="assets\scripts\tavenem-color-input.ts" />
     <CssFiles Include="$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
   </ItemGroup>
 

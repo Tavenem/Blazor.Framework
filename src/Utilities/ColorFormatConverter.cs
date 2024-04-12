@@ -2692,317 +2692,87 @@ public struct ColorFormatConverter
         ReadOnlySpan<char> rSpan, gSpan, bSpan, aSpan;
         var hasAlpha = false;
 
-        if (css.StartsWith("rgb"))
+        if (span[0] == '#')
         {
-            span = span[3..];
-            if (span[0] == 'a')
-            {
-                span = span[1..];
-            }
-
-            span = span.Trim();
-
-            if (span[0] != '('
-                || span[^1] != ')')
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                span = span[1..^1];
-            }
-
-            var index = span.IndexOf(',');
-            if (index == -1)
-            {
-                index = span.IndexOf(' ');
-            }
-            if (index == -1 || index == span.Length - 1)
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            rSpan = span[..index];
-            rSpan = rSpan.Trim();
-            if (!double.TryParse(rSpan, out var rDouble))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Red = (byte)Math.Clamp((int)Math.Round(rDouble), 0, 255);
-            }
-            span = span[(index + 1)..];
-
-            index = span.IndexOf(',');
-            if (index == -1)
-            {
-                index = span.IndexOf(' ');
-            }
-            if (index == -1 || index == span.Length - 1)
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            gSpan = span[..index];
-            gSpan = gSpan.Trim();
-            if (!double.TryParse(gSpan, out var gDouble))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Green = (byte)Math.Clamp((int)Math.Round(gDouble), 0, 255);
-            }
-            span = span[(index + 1)..];
-
-            index = span.IndexOf(',');
-            if (index == -1)
-            {
-                index = span.IndexOf('/');
-            }
-            if (index == -1 || index == span.Length - 1)
-            {
-                bSpan = span[(index + 1)..];
-                aSpan = [];
-            }
-            else
-            {
-                bSpan = span[..index];
-                aSpan = span[(index + 1)..];
-                hasAlpha = true;
-            }
-
-            bSpan = bSpan.Trim();
-            if (!double.TryParse(bSpan, out var bDouble))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Blue = (byte)Math.Clamp((int)Math.Round(bDouble), 0, 255);
-            }
-
-            if (hasAlpha && !aSpan.IsWhiteSpace())
-            {
-                aSpan = aSpan.Trim();
-                if (!float.TryParse(aSpan, out var alpha))
-                {
-                    throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-                }
-                else
-                {
-                    AlphaFloat = alpha;
-                    AlphaByte = (byte)Math.Clamp((int)(alpha * 255), 0, 255);
-                }
-            }
-            else
-            {
-                AlphaFloat = 1;
-                AlphaByte = 255;
-            }
-
-            var hsl = RGBToHSL(Red, Green, Blue);
-            Hue = hsl[0];
-            Saturation = (byte)hsl[1];
-            Lightness = (byte)hsl[2];
+            span = span[1..];
         }
-        else if (css.StartsWith("hsl"))
+
+        if (span.Length == 3)
         {
-            span = span[3..];
-            if (span[0] == 'a')
-            {
-                span = span[1..];
-            }
-
-            span = span.Trim();
-
-            if (span[0] != '('
-                || span[^1] != ')')
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                span = span[1..^1];
-            }
-
-            ReadOnlySpan<char> hSpan, sSpan, lSpan;
-            var index = span.IndexOf(',');
-            if (index == -1)
-            {
-                index = span.IndexOf(' ');
-            }
-            if (index == -1 || index == span.Length - 1)
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            hSpan = span[..index];
-            hSpan = hSpan.Trim();
-            if (!double.TryParse(hSpan, out var hDouble))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Hue = (ushort)Math.Clamp((int)Math.Round(hDouble) % 360, 0, 359);
-            }
-            span = span[(index + 1)..];
-
-            index = span.IndexOf(',');
-            if (index == -1)
-            {
-                index = span.IndexOf(' ');
-            }
-            if (index == -1 || index == span.Length - 1)
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            sSpan = span[..index];
-            sSpan = sSpan.Trim().TrimEnd('%').TrimEnd();
-            if (!double.TryParse(sSpan, out var sDouble))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Saturation = (byte)Math.Clamp((int)Math.Round(sDouble), 0, 100);
-            }
-            span = span[(index + 1)..];
-
-            index = span.IndexOf(',');
-            if (index == -1)
-            {
-                index = span.IndexOf('/');
-            }
-            if (index == -1 || index == span.Length - 1)
-            {
-                lSpan = span[(index + 1)..];
-                aSpan = [];
-            }
-            else
-            {
-                lSpan = span[..index];
-                aSpan = span[(index + 1)..];
-                hasAlpha = true;
-            }
-
-            lSpan = lSpan.Trim().TrimEnd('%').TrimEnd();
-            if (!double.TryParse(lSpan, out var lDouble))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Lightness = (byte)Math.Clamp((int)Math.Round(lDouble), 0, 100);
-            }
-
-            if (hasAlpha && !aSpan.IsWhiteSpace())
-            {
-                aSpan = aSpan.Trim();
-                if (!float.TryParse(aSpan, out var alpha))
-                {
-                    throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-                }
-                else
-                {
-                    AlphaFloat = alpha;
-                    AlphaByte = (byte)Math.Clamp((int)Math.Round(alpha * 255), 0, 255);
-                }
-            }
-            else
-            {
-                AlphaFloat = 1;
-                AlphaByte = 255;
-            }
-
-            var rgb = HSLToRGB(Hue, Saturation, Lightness);
-            Red = rgb[0];
-            Green = rgb[1];
-            Blue = rgb[2];
+            rSpan = new ReadOnlySpan<char>([span[0], span[0]]);
+            gSpan = new ReadOnlySpan<char>([span[1], span[1]]);
+            bSpan = new ReadOnlySpan<char>([span[2], span[2]]);
+            aSpan = [];
+        }
+        else if (span.Length == 6)
+        {
+            rSpan = span[..2];
+            gSpan = span[2..4];
+            bSpan = span[4..];
+            aSpan = [];
+        }
+        else if (span.Length == 8)
+        {
+            rSpan = span[..2];
+            gSpan = span[2..4];
+            bSpan = span[4..6];
+            aSpan = span[6..];
+            hasAlpha = true;
         }
         else
         {
-            if (span[0] == '#')
-            {
-                span = span[1..];
-            }
-
-            if (span.Length == 3)
-            {
-                rSpan = new ReadOnlySpan<char>([span[0], span[0]]);
-                gSpan = new ReadOnlySpan<char>([span[1], span[1]]);
-                bSpan = new ReadOnlySpan<char>([span[2], span[2]]);
-                aSpan = [];
-            }
-            else if (span.Length == 6)
-            {
-                rSpan = span[..2];
-                gSpan = span[2..4];
-                bSpan = span[4..];
-                aSpan = [];
-            }
-            else if (span.Length == 8)
-            {
-                rSpan = span[..2];
-                gSpan = span[2..4];
-                bSpan = span[4..6];
-                aSpan = span[6..];
-                hasAlpha = true;
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-
-            if (!byte.TryParse(rSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var red))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Red = red;
-            }
-
-            if (!byte.TryParse(gSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var green))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Green = green;
-            }
-
-            if (!byte.TryParse(bSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var blue))
-            {
-                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-            }
-            else
-            {
-                Blue = blue;
-            }
-
-            if (hasAlpha)
-            {
-                if (!byte.TryParse(aSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var alpha))
-                {
-                    throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
-                }
-                else
-                {
-                    AlphaByte = alpha;
-                    AlphaFloat = Math.Clamp(alpha / 255f, 0, 1);
-                }
-            }
-            else
-            {
-                AlphaByte = 255;
-                AlphaFloat = 1;
-            }
-
-            var hsl = RGBToHSL(red, green, blue);
-            Hue = hsl[0];
-            Saturation = (byte)hsl[1];
-            Lightness = (byte)hsl[2];
+            throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
         }
+
+        if (!byte.TryParse(rSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var red))
+        {
+            throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
+        }
+        else
+        {
+            Red = red;
+        }
+
+        if (!byte.TryParse(gSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var green))
+        {
+            throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
+        }
+        else
+        {
+            Green = green;
+        }
+
+        if (!byte.TryParse(bSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var blue))
+        {
+            throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
+        }
+        else
+        {
+            Blue = blue;
+        }
+
+        if (hasAlpha)
+        {
+            if (!byte.TryParse(aSpan, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var alpha))
+            {
+                throw new ArgumentNullException(nameof(css), $"{nameof(css)} must be a valid CSS-style color string");
+            }
+            else
+            {
+                AlphaByte = alpha;
+                AlphaFloat = Math.Clamp(alpha / 255f, 0, 1);
+            }
+        }
+        else
+        {
+            AlphaByte = 255;
+            AlphaFloat = 1;
+        }
+
+        var hsl = RGBToHSL(red, green, blue);
+        Hue = hsl[0];
+        Saturation = (byte)hsl[1];
+        Lightness = (byte)hsl[2];
 
         Color = Color.FromArgb(AlphaByte, Red, Green, Blue);
     }

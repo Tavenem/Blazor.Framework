@@ -39,13 +39,9 @@ export class TavenemSliderHTMLElement extends HTMLElement {
 .filler {
     background-color: var(--thumb-color);
     border-radius: 1px;
-    display: none;
+    display: var(--tavenem-slider-filler-display, none);
     height: 2px;
     position: absolute;
-}
-
-:host-context(.slider.filled) .filler {
-    display: block;
 }
 
 output {

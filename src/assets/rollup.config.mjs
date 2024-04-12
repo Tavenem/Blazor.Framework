@@ -121,6 +121,20 @@ export default [{
     },
     plugins: plugins,
 }, {
+    input: "./scripts/tavenem-input.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
+    input: "./scripts/tavenem-color-input.ts",
+    output: {
+        format: 'es',
+        sourcemap: true,
+    },
+    plugins: plugins,
+}, {
     input: "./scripts/tavenem-resize.ts",
     output: {
         format: 'es',

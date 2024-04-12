@@ -1,24 +1,48 @@
 ﻿.select {
-    .expand {
-        transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+    > tf-input > .expand {
+        transition: .3s cubic-bezier(.25,.8,.5,1);
     }
 
-    &.open, &[data-popover-container][data-popover-open] {
-        .expand {
+    &.open, &[data-popover-open] {
+        > tf-input > .expand {
             transform: rotate(-180deg);
         }
     }
 
-    .input > select > option {
-        background-color: var(--tavenem-color-bg-alt);
-        padding-bottom: .25em;
-        padding-left: 1em;
-        padding-right: 1em;
-        padding-top: .25em;
-    }
-
-    &.read-only, &:readonly {
+    &.read-only, &[readonly] {
         cursor: default;
         pointer-events: none;
+    }
+
+    > tf-popover.contained-popover > .option-list {
+        > * > .selected-icon {
+            visibility: hidden;
+        }
+
+        > * > .unselected-icon {
+            display: none;
+        }
+
+        > .active > .selected-icon {
+            visibility: visible;
+        }
+    }
+
+    &[multiple] > tf-popover.contained-popover > .option-list {
+        > * > .selected-icon {
+            display: none;
+        }
+
+        > * > .unselected-icon {
+            display: inline-block;
+        }
+
+        > .active > .selected-icon {
+            display: inline-block;
+        }
+
+        > .active > .unselected-icon {
+            display: none;
+        }
     }
 }

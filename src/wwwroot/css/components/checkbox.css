@@ -52,33 +52,33 @@
                 width: 100%;
                 z-index: 1;
 
-                ~ tf-icon.checked,
-                ~ tf-icon.indeterminate {
+                ~ .checked,
+                ~ .indeterminate {
                     display: none;
                 }
 
                 &:checked {
-                    ~ tf-icon.checked {
-                        display: block;
+                    ~ .checked {
+                        display: inline-block;
                     }
 
-                    ~ tf-icon.unchecked {
+                    ~ .unchecked {
                         display: none;
                     }
                 }
 
                 &:indeterminate {
-                    ~ tf-icon.unchecked {
+                    ~ .unchecked {
                         display: none;
                     }
 
-                    ~ tf-icon.indeterminate {
-                        display: block;
+                    ~ .indeterminate {
+                        display: inline-block;
                     }
                 }
             }
 
-            > tf-icon {
+            > tf-icon, svg {
                 color: var(--checkbox-inherited-color);
 
                 &:hover {
@@ -126,7 +126,7 @@
                     color: var(--tavenem-color-text-disabled);
                 }
 
-                tf-icon {
+                tf-icon, svg {
                     color: var(--tavenem-color-action-disabled);
                 }
             }

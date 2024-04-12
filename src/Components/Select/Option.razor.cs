@@ -126,20 +126,6 @@ public partial class Option<TValue> : IDisposable
         .AddStyleFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private protected string? IconName
-    {
-        get
-        {
-            if (IsMultiselect)
-            {
-                return IsSelected
-                    ? DefaultIcons.CheckBox_Checked
-                    : DefaultIcons.CheckBox_Unchecked;
-            }
-            return IsSelected ? DefaultIcons.Selected : null;
-        }
-    }
-
     private bool IsMultiselect => Select is MultiSelect<TValue>;
 
     [CascadingParameter] private ISelect<TValue>? Select { get; set; }

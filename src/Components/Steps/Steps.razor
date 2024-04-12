@@ -56,21 +56,21 @@
                 @if (PersistState && !IsInteractive)
                 {
                     <a href="@GetPreviousStepUrl()" class="@PreviousButtonCssClass">
-                        <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                        <svg class="svg-icon me-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                         <span>Back</span>
                     </a>
                 }
                 else if (IsInteractive && !IsPreviousButtonDisabled)
                 {
                     <button @onclick="OnPreviousAsync" class="@PreviousButtonCssClass">
-                        <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                        <svg class="svg-icon me-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                         <span>Back</span>
                     </button>
                 }
                 else
                 {
                     <button class="@PreviousButtonCssClass" disabled>
-                        <tf-icon class="me-2">@DefaultIcons.Page_Previous</tf-icon>
+                        <svg class="svg-icon me-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                         <span>Back</span>
                     </button>
                 }
@@ -85,21 +85,21 @@
                 {
                     <a href="@GetNextStepUrl()" class="@NextButtonCssClass">
                         <span>Next</span>
-                        <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                        <svg class="svg-icon ms-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                     </a>
                 }
                 else if (IsInteractive && !IsNextButtonDisabled)
                 {
                     <button @onclick="OnNextAsync" class="@NextButtonCssClass">
                         <span>Next</span>
-                        <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                        <svg class="svg-icon ms-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                     </button>
                 }
                 else
                 {
                     <button class="@NextButtonCssClass" disabled>
                         <span>Next</span>
-                        <tf-icon class="ms-2">@DefaultIcons.Page_Next</tf-icon>
+                        <svg class="svg-icon ms-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
                     </button>
                 }
             }

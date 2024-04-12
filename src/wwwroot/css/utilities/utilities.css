@@ -1063,4 +1063,5 @@ dl.inline > dd { margin-bottom: 0; }
 .svg-icon {
     height: 1.5em;
     fill: currentColor;
+    width: auto;
 }

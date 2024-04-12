@@ -44,16 +44,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     [Parameter] public EventCallback<int?> ActivePanelIndexChanged { get; set; }
 
     /// <summary>
-    /// The icon to use for the "new tab" button.
-    /// </summary>
-    [Parameter] public string AddIcon { get; set; } = DefaultIcons.Add;
-
-    /// <summary>
-    /// The icon to use for scrolling back through the tabs.
-    /// </summary>
-    [Parameter] public string BackIcon { get; set; } = DefaultIcons.Back;
-
-    /// <summary>
     /// Can be set to <see langword="true"/> to indicate that non-staic tabs (i.e. those generated
     /// from <see cref="Items"/>) should have close buttons, even if <see cref="OnClose"/> has not
     /// been configured.
@@ -116,11 +106,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     /// </para>
     /// </summary>
     [Parameter] public bool EnableDragDrop { get; set; }
-
-    /// <summary>
-    /// The icon to use for scrolling forward through the tabs.
-    /// </summary>
-    [Parameter] public string ForwardIcon { get; set; } = DefaultIcons.Forward;
 
     /// <summary>
     /// <para>

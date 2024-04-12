@@ -4,13 +4,19 @@ import { TavenemEmojiHTMLElement } from './tavenem-emoji';
 import { TavenemHighlightHTMLElement } from './tavenem-highlight';
 import {
     TavenemDropdownHTMLElement,
-    TavenemInputHtmlElement,
-    TavenemPickerHtmlElement,
     TavenemPopoverHTMLElement,
     TavenemPopover,
     TavenemTooltipHTMLElement
 } from './tavenem-popover';
-import { TavenemProgressCircleHTMLElement, TavenemProgressLinearHTMLElement } from './tavenem-progress';
+import {
+    TavenemInputHtmlElement,
+    TavenemPickerHtmlElement
+} from './tavenem-input';
+import { TavenemColorInputHtmlElement } from './tavenem-color-input';
+import {
+    TavenemProgressCircleHTMLElement,
+    TavenemProgressLinearHTMLElement
+} from './tavenem-progress';
 import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
 import { TavenemSliderHTMLElement } from './tavenem-slider';
 
@@ -636,6 +642,8 @@ slot button {
         customElements.define('tf-dropdown', TavenemDropdownHTMLElement);
 
         customElements.define('tf-picker', TavenemPickerHtmlElement);
+
+        customElements.define('tf-color-input', TavenemColorInputHtmlElement);
 
         customElements.define('tf-emoji', TavenemEmojiHTMLElement);
 

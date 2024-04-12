@@ -135,6 +135,7 @@
     }
 
     &.filled {
+        --tavenem-slider-filler-display: block;
         background-color: transparent;
         color: var(--tavenem-color-text);
 

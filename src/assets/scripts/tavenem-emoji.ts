@@ -109,7 +109,6 @@ slot {
             this._replacing = true;
             span.textContent = null;
             this._replacing = false;
-            console.log('!this.textContent');
             return;
         }
 
@@ -119,13 +118,11 @@ slot {
             this._replacing = true;
             span.textContent = null;
             this._replacing = false;
-            console.log('!text');
             return;
         }
 
         const emoji = emojiData.find(v => v.shortName === text || v.shortNames?.includes(text));
         if (!emoji) {
-            console.log('!emoji');
             this._replacing = true;
             span.textContent = this.textContent;
             this._replacing = false;

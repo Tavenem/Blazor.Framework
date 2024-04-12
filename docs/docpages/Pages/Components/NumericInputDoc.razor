@@ -490,21 +490,18 @@
 
 <p>
     The <code>ShowStepButtons</code> property can be set to <code>false</code> to remove the up/down
-    stepper buttons. You can also set the <code>StepDownIcon</code> and <code>StepUpIcon</code>
-    properties to configure the icons used for the buttons.
+    stepper buttons.
 </p>
 
 <Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
             <NumericInput TValue="int" Label="No Steppers" ShowStepButtons="false" />
-            <NumericInput TValue="int" Label="Custom Steppers" StepDownIcon="arrow_drop_down" StepUpIcon="arrow_drop_up" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
     <NumericInput TValue=""int"" Label=""No Steppers"" ShowStepButtons=""false"" />
-    <NumericInput TValue=""int"" Label=""Custom Steppers"" StepDownIcon=""arrow_drop_down"" StepUpIcon=""arrow_drop_up"" />
 </div>")
     </ChildContent>
 </Collapse>

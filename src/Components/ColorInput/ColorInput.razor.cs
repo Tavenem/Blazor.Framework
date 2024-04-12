@@ -56,7 +56,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 {
     private const int OverlayHeight = 250;
     private const int OverlayMargin = 40;
-    private const int OverlayWidth = 312;
+    private const int OverlayWidth = 255;
     private const int HalfSelectorSize = 13;
     private readonly Type _baseType;
     private readonly Type? _nullableType;
@@ -175,12 +175,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     /// </summary>
     [Parameter] public bool ShowAlpha { get; set; } = true;
 
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
-        .ToString();
-
     /// <summary>
     /// The display text for the current selection.
     /// </summary>
@@ -230,7 +224,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 
     private string? InputContainerStyle => new CssBuilder(Style)
         .AddStyleFromDictionary(AdditionalAttributes)
-        .AddStyle("min-width", "312px")
+        .AddStyle("min-width", "255px")
         .ToString();
 
     [Inject, NotNull] IJSEventListener? JSEventListener { get; set; }

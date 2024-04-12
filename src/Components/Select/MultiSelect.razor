@@ -5,44 +5,37 @@
 
 @inherits SelectBase<IEnumerable<TValue>, TValue>
 
-<div @attributes="AdditionalAttributes"
-     id="@ContainerId"
-     class="@CssClass"
-     style="@CssStyle"
-     tabindex="-1"
-     @onclick="OnClickContainerAsync">
-    <div id="@InputId" class="input">
-        <input disabled="@IsDisabled"
-               name="@NameValue"
-               hidden
-               readonly
-               value="@CurrentValueAsString" />
-        <input @ref="ElementReference"
-               @attributes="InputAttributes"
-               id="@Id"
-               class="@InputCssClass"
-               style="@InputCssStyle"
-               autofocus="@AutoFocus"
-               disabled="@IsDisabled"
-               placeholder="@Placeholder"
-               readonly
-               required="@Required"
-               size="1"
-               tabindex="@TabIndex"
-               value="@DisplayString"
-               @onclick="TogglePopoverAsync"
-               @onclick:stopPropagation="true" />
-        @if (ShowClear)
-        {
-            <button class="@ClearButtonCssClass"
-                    tabindex="-1"
-                    @onclick="ClearAsync"
-                    @onclick:stopPropagation="true">
-                <tf-icon>@ClearIcon</tf-icon>
-            </button>
-        }
-        <tf-icon class="expand" @onclick="TogglePopoverAsync" @onclick:stopPropagation="true">@DefaultIcons.Expand</tf-icon>
-    </div>
+<tf-picker @attributes="AdditionalAttributes"
+           id="@ContainerId"
+           class="@CssClass"
+           data-popover-container
+           disabled="@Disabled"
+           multiple
+           readonly="@ReadOnly"
+           style="@CssStyle"
+           tabindex="-1"
+           value="@CurrentValueAsString"
+           @searchinput="OnSearchInputAsync"
+           @valuechange="OnPickerValueChange">
+    <tf-input @ref="ElementReference"
+              @attributes="InputAttributes"
+              id="@InputId"
+              autofocus="@AutoFocus"
+              class="@OuterInputCssClass"
+              data-input-class="@InputCssClass"
+              data-input-id="@Id"
+              data-input-style="@InputCssStyle"
+              disabled="@Disabled"
+              display="@DisplayString"
+              name="@NameValue"
+              placeholder="@Placeholder"
+              readonly="@ReadOnly"
+              required="@Required"
+              size="1"
+              tabindex="@TabIndex"
+              value="@CurrentValueAsString">
+        <svg class="svg-icon expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+    </tf-input>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label for="@Id">@Label</label>
@@ -67,19 +60,21 @@
         </div>
     }
     <Popover @ref="Popover"
-             Class="filled"
+             Class="contained-popover filled"
              AnchorId="@InputId"
              AnchorOrigin="Origin.Bottom_Left"
              PopoverOrigin="Origin.Top_Left"
-             FocusId="@ContainerId"
-             FocusOut="ClosePopoverAsync"
-             IsOpen="ShowPicker"
              MatchWidth="true"
              MaxHeight="min(300px,90vh)">
-        <div class="@OptionListCssClass"
-             @onclick:stopPropagation="true">
+        <div class="@OptionListCssClass">
             <CascadingValue Value="this" IsFixed="true">
-                <Option @ref="SelectAllOption" @key="_selectAll" TValue="TValue" Value="default" Label="Select All" IsSelectAll="true" SeparatorAfter="true" />
+                <Option @ref="SelectAllOption"
+                        @key="_selectAll"
+                        TValue="TValue"
+                        Value="default"
+                        Label="Select All"
+                        IsSelectAll="true"
+                        SeparatorAfter="true" />
                 @ChildContent
                 @if (Options is not null)
                 {
@@ -94,8 +89,8 @@
                     {
                         foreach (var value in Options)
                         {
-                            <Option @key="value" Value="value">
-                                @OptionTemplate(context)
+                            <Option @key="value" Value="value" Label="@(Labels?.Invoke(value) ?? value?.ToString())">
+                                @OptionTemplate(value)
                             </Option>
                         }
                     }
@@ -110,4 +105,4 @@
             </CascadingValue>
         </div>
     </Popover>
-</div>
+</tf-picker>
