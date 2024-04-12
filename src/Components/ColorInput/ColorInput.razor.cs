@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.Globalization;
-using System.Text;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -54,19 +51,8 @@ namespace Tavenem.Blazor.Framework;
 /// </typeparam>
 public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 {
-    private const int OverlayHeight = 250;
-    private const int OverlayMargin = 40;
-    private const int OverlayWidth = 255;
-    private const int HalfSelectorSize = 13;
     private readonly Type _baseType;
     private readonly Type? _nullableType;
-    private readonly string _overlayIdString;
-
-    private bool _addMouseOverEvent;
-    private bool _disposedValue;
-    private Guid? _eventListenerId;
-    private double _selectorX;
-    private double _selectorY = OverlayHeight;
 
     /// <summary>
     /// The alpha value of the currently selected color, as a value in the range [0-1].
@@ -128,11 +114,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     public ushort Hue { get; private set; }
 
     /// <summary>
-    /// This can be used to override the default icon.
-    /// </summary>
-    [Parameter] public string? Icon { get; set; }
-
-    /// <summary>
     /// When <see cref="DisplayType"/> is <see cref="PickerDisplayType.Button"/> and this is <see
     /// langword="true"/>, the button displays an icon rather than the current selected color.
     /// </summary>
@@ -175,77 +156,18 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     /// </summary>
     [Parameter] public bool ShowAlpha { get; set; } = true;
 
-    /// <summary>
-    /// The display text for the current selection.
-    /// </summary>
-    protected override string? DisplayString => CurrentValue is null
-        ? null
-        : (Color.Keyword ?? Color.Css);
-
-    private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline
-        || CurrentValue is not null;
-
-    private string AlphaSliderStyle => new StringBuilder("--alpha-background:linear-gradient(to right, transparent, ")
-        .Append("hsl(")
-        .Append(Hue)
-        .Append(",100%,50%))")
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("clearable", ShowClear)
         .ToString();
 
-    private string? ButtonClass => new CssBuilder(InputClass)
-        .AddClassFromDictionary(InputAttributes)
-        .Add(ThemeColor.ToCSS())
-        .Add("picker-btn btn")
-        .Add("btn-icon", IconButton)
-        .ToString();
-
-    private string? ButtonContainerClass => new CssBuilder(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
-        .Add("field picker")
-        .Add("modified", IsTouched)
-        .Add("valid", IsValid)
-        .Add("invalid", IsInvalidAndTouched)
-        .ToString();
-
-    private string ButtonIcon => Icon ?? DefaultIcons.ColorSelect;
-
-    private string? ButtonSwatchStyle => new CssBuilder("width:1.5em")
-        .AddStyle(SwatchStyle)
-        .ToString();
+    private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline;
 
     private ColorFormatConverter Color { get; set; }
-
-    private string? CycleButtonClass => new CssBuilder("btn btn-icon")
-        .Add(ThemeColor.ToCSS())
-        .ToString();
-
-    private string? HexInput { get; set; }
-
-    private Slider<ushort>? HueSlider { get; set; }
-
-    private string? InputContainerStyle => new CssBuilder(Style)
-        .AddStyleFromDictionary(AdditionalAttributes)
-        .AddStyle("min-width", "255px")
-        .ToString();
-
-    [Inject, NotNull] IJSEventListener? JSEventListener { get; set; }
-
-    private string OverlayStyle => IsDisabled
-        ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"
-        : $"background-color:hsl({Hue},100%,50%)";
-
-    private string SelectorStyle => $"transform:translate({_selectorX.ToPixels(0)}, {_selectorY.ToPixels(0)})";
-
-    private string SwatchStyle => IsDisabled
-        ? $"background-color:hsl({Hue},{(int)Math.Round(Math.Max(10, Saturation / 5.0))}%,{Lightness}%)"
-        : $"background:{Color.Css}";
 
     /// <summary>
     /// Constructs a new instance of <see cref="ColorInput{TValue}"/>.
     /// </summary>
-    [DynamicDependency(
-        DynamicallyAccessedMemberTypes.All,
-        "Microsoft.AspNetCore.Components.Web.MouseEventArgs",
-        "Microsoft.AspNetCore.Components.Web")]
     public ColorInput()
     {
         _nullableType = Nullable.GetUnderlyingType(typeof(TValue));
@@ -255,8 +177,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         {
             throw new InvalidOperationException($"Type {_baseType.Name} is not supported. Only string and System.Drawing.Color are supported.");
         }
-
-        _overlayIdString = Guid.NewGuid().ToHtmlId();
 
         Clearable = _nullableType is not null
             || _baseType == typeof(string);
@@ -271,7 +191,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         }
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
-        HexInput = HexColor;
     }
 
     /// <inheritdoc/>
@@ -327,9 +246,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
             Lightness = Color.Lightness;
             Alpha = Color.AlphaFloat;
             HexColor = Color.HexCompact;
-            HexInput = HexColor;
-            _selectorX = Saturation / 100.0 * OverlayWidth;
-            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
         }
     }
 
@@ -349,33 +265,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
                 Converter.FormatProvider = FormatProvider;
             }
         }
-    }
-
-    /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if ((firstRender && DisplayType == PickerDisplayType.Inline)
-            || _addMouseOverEvent)
-        {
-            await AddMouseOverEventAsync();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    /// <inheritdoc/>
-    protected override async void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing && _eventListenerId.HasValue)
-            {
-                await JSEventListener.UnsubscribeAsync(_eventListenerId.Value);
-            }
-
-            _disposedValue = true;
-        }
-
-        base.Dispose(disposing);
     }
 
     /// <summary>
@@ -405,14 +294,12 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         Lightness = Color.Lightness;
         Alpha = Color.AlphaFloat;
         HexColor = Color.HexCompact;
-        _selectorX = Saturation / 100.0 * OverlayWidth;
-        _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
 
         if (_nullableType is null)
         {
             if (_baseType == typeof(string))
             {
-                CurrentValue = (TValue)(object)Color.Css;
+                CurrentValue = (TValue)(object)Color.HexCompact;
             }
             else if (_baseType == typeof(Color))
             {
@@ -429,22 +316,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Focuses this element.
-    /// </summary>
-    public override async Task FocusAsync()
-    {
-        if (DisplayType == PickerDisplayType.Inline
-            && HueSlider is not null)
-        {
-            await HueSlider.FocusAsync();
-        }
-        else
-        {
-            await ElementReference.FocusAsync();
-        }
-    }
-
     /// <inheritdoc/>
     protected override string? FormatValueAsString(TValue? value)
     {
@@ -456,13 +327,20 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 
         if (value is Color color)
         {
-            return color.ToArgb().ToString(CultureInfo.InvariantCulture);
+            try
+            {
+                return new ColorFormatConverter(color).HexCompact;
+            }
+            catch
+            {
+                return base.FormatValueAsString(value);
+            }
         }
         else if (value is string str)
         {
             try
             {
-                return new ColorFormatConverter(str).Css;
+                return new ColorFormatConverter(str).HexCompact;
             }
             catch
             {
@@ -475,197 +353,31 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         }
     }
 
-    private protected override async Task OnClosePopoverAsync()
+    private void OnValueChange(ValueChangeEventArgs e)
     {
-        await RemoveMouseOverEventAsync();
-        if (DisplayType == PickerDisplayType.Button)
+        if (string.IsNullOrEmpty(e.Value))
         {
-            SetValue();
-        }
-    }
-
-    private protected override void OnOpenPopover()
-    {
-        _addMouseOverEvent = true;
-        StateHasChanged();
-    }
-
-    private async Task AddMouseOverEventAsync()
-    {
-        _addMouseOverEvent = false;
-        _eventListenerId = await JSEventListener
-            .SubscribeAsync<MouseEventArgs>(
-            "mousemove",
-            _overlayIdString,
-            true,
-            10,
-            async e =>
-            {
-                var args = e as MouseEventArgs;
-                if (args is not null)
-                {
-                    await InvokeAsync(() => OnColorOverlayInteract(args));
-                    StateHasChanged();
-                }
-            });
-    }
-
-    private async Task ClearAndCloseAsync()
-    {
-        await ClearAsync();
-        await ClosePopoverAsync();
-    }
-
-    private void OnAlphaSliderChanged(float alpha)
-    {
-        if (Alpha == 0 && alpha > 0)
-        {
-            Saturation = 100;
-            Lightness = 50;
-        }
-        Alpha = alpha;
-        OnHSLChanged();
-    }
-
-    private void OnAlphaValueChanged(float alpha)
-    {
-        Alpha = alpha;
-        if (ColorMode == ColorMode.RGB)
-        {
-            OnRGBChanged();
+            Color = ShowAlpha
+                ? ColorFormatConverter.Transparent
+                : ColorFormatConverter.Black;
         }
         else
         {
-            OnHSLChanged();
+            Color = new ColorFormatConverter(e.Value);
         }
-    }
+        Red = Color.Red;
+        Green = Color.Green;
+        Blue = Color.Blue;
+        Hue = Color.Hue;
+        Saturation = Color.Saturation;
+        Lightness = Color.Lightness;
+        Alpha = Color.AlphaFloat;
+        HexColor = Color.HexCompact;
 
-    private void OnColorOverlayClick(MouseEventArgs e)
-    {
-        if (Disabled || ReadOnly || !IsInteractive)
-        {
-            return;
-        }
-
-        _selectorX = Math.Clamp(e.OffsetX - OverlayMargin, 0, OverlayWidth);
-        _selectorY = Math.Clamp(e.OffsetY - OverlayMargin, 0, OverlayHeight);
-        UpdateColor();
-    }
-
-    private void OnColorOverlayInteract(MouseEventArgs e)
-    {
-        if (e.Buttons == 1)
-        {
-            OnColorOverlayClick(e);
-        }
-    }
-
-    private void OnCycleMode()
-    {
-        if (Disabled || !IsInteractive)
-        {
-            return;
-        }
-
-        ColorMode = ColorMode switch
-        {
-            ColorMode.HSL => ColorMode.Hex,
-            ColorMode.RGB => ColorMode.HSL,
-            _ => ColorMode.RGB,
-        };
-    }
-
-    private void OnHSLChanged()
-    {
-        try
-        {
-            Color = ColorFormatConverter.FromHSLA(Hue, Saturation, Lightness, Alpha);
-            Red = Color.Red;
-            Green = Color.Green;
-            Blue = Color.Blue;
-            HexColor = Color.HexCompact;
-            HexInput = HexColor;
-            _selectorX = Saturation / 100.0 * OverlayWidth;
-            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
-            if (DisplayType != PickerDisplayType.Button)
-            {
-                SetValue();
-            }
-        }
-        catch { }
-    }
-
-    private void OnHexChanged()
-    {
-        if (string.IsNullOrWhiteSpace(HexInput))
-        {
-            return;
-        }
-
-        try
-        {
-            Color = new ColorFormatConverter(HexInput);
-            Red = Color.Red;
-            Green = Color.Green;
-            Blue = Color.Blue;
-            Hue = Color.Hue;
-            Saturation = Color.Saturation;
-            Lightness = Color.Lightness;
-            Alpha = Color.AlphaFloat;
-            HexColor = Color.HexCompact;
-            _selectorX = Saturation / 100.0 * OverlayWidth;
-            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
-            if (DisplayType != PickerDisplayType.Button)
-            {
-                SetValue();
-            }
-        }
-        catch { }
-    }
-
-    private void OnRGBChanged()
-    {
-        try
-        {
-            Color = new ColorFormatConverter(Red, Green, Blue, Alpha);
-            Hue = Color.Hue;
-            Saturation = Color.Saturation;
-            Lightness = Color.Lightness;
-            HexColor = Color.HexCompact;
-            HexInput = HexColor;
-            _selectorX = Saturation / 100.0 * OverlayWidth;
-            _selectorY = ((Lightness / 100.0) + 1) * OverlayHeight;
-            if (DisplayType != PickerDisplayType.Button)
-            {
-                SetValue();
-            }
-        }
-        catch { }
-    }
-
-    private void OnSelectorClicked(MouseEventArgs e)
-    {
-        _selectorX = Math.Clamp(e.OffsetX - HalfSelectorSize + _selectorX, 0, OverlayWidth);
-        _selectorY = Math.Clamp(e.OffsetY - HalfSelectorSize + _selectorY, 0, OverlayHeight);
-        UpdateColor();
-    }
-
-    private async Task RemoveMouseOverEventAsync()
-    {
-        if (_eventListenerId.HasValue)
-        {
-            await JSEventListener.UnsubscribeAsync(_eventListenerId.Value);
-        }
-    }
-
-    private void SetValue()
-    {
         TValue? newValue;
         if (_baseType == typeof(string))
         {
-            newValue = (TValue)(object)(OutputHexStrings
-                ? Color.HexCompact
-                : Color.Css);
+            newValue = (TValue)(object)Color.HexCompact;
         }
         else if (_baseType == typeof(Color))
         {
@@ -684,31 +396,5 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
 
         CurrentValue = newValue;
         StateHasChanged();
-    }
-
-    private void UpdateColor()
-    {
-        var x = Math.Clamp(_selectorX / OverlayWidth, 0, 1);
-        var y = Math.Clamp(1 - (_selectorY / OverlayHeight), 0, 1);
-
-        var saturation = (int)Math.Round(100 * x);
-        var lightness = (int)Math.Round(100 * y);
-        Color = ShowAlpha && Alpha > 0
-            ? ColorFormatConverter.FromHSLA(Hue, saturation, lightness, Alpha)
-            : ColorFormatConverter.FromHSLA(Hue, saturation, lightness);
-        Red = Color.Red;
-        Green = Color.Green;
-        Blue = Color.Blue;
-        Hue = Color.Hue;
-        Saturation = Color.Saturation;
-        Lightness = Color.Lightness;
-        Alpha = Color.AlphaFloat;
-        HexColor = Color.HexCompact;
-        HexInput = HexColor;
-
-        if (DisplayType != PickerDisplayType.Button)
-        {
-            SetValue();
-        }
     }
 }

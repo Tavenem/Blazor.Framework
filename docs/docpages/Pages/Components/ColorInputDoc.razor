@@ -5,7 +5,7 @@
 <h1>Color Input</h1>
 
 <p>
-    The <code>NewColorInput</code> component is a rich wrapper for an input element that binds to a
+    The <code>ColorInput</code> component is a rich wrapper for an input element that binds to a
     color type.
 </p>
 
@@ -33,16 +33,16 @@
 <Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput TValue="string" Label="Normal" />
-            <NewColorInput TValue="string" Label="Filled" Class="filled" />
-            <NewColorInput TValue="string" Label="Outlined" Class="outlined" />
+            <ColorInput TValue="string" Label="Normal" />
+            <ColorInput TValue="string" Label="Filled" Class="filled" />
+            <ColorInput TValue="string" Label="Outlined" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Normal"" />
-    <NewColorInput TValue=""string"" Label=""Filled"" Class=""filled"" />
-    <NewColorInput TValue=""string"" Label=""Outlined"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Normal"" />
+    <ColorInput TValue=""string"" Label=""Filled"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Outlined"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -54,22 +54,22 @@
 <Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput TValue="string" Label="Normal" Class="dense" />
-            <NewColorInput TValue="string" Label="Filled" Class="filled dense" />
-            <NewColorInput TValue="string" Label="Outlined" Class="outlined dense" />
+            <ColorInput TValue="string" Label="Normal" Class="dense" />
+            <ColorInput TValue="string" Label="Filled" Class="filled dense" />
+            <ColorInput TValue="string" Label="Outlined" Class="outlined dense" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Normal"" Class=""dense"" />
-    <NewColorInput TValue=""string"" Label=""Filled"" Class=""filled dense"" />
-    <NewColorInput TValue=""string"" Label=""Outlined"" Class=""outlined dense"" />
+    <ColorInput TValue=""string"" Label=""Normal"" Class=""dense"" />
+    <ColorInput TValue=""string"" Label=""Filled"" Class=""filled dense"" />
+    <ColorInput TValue=""string"" Label=""Outlined"" Class=""outlined dense"" />
 </div>")
     </ChildContent>
 </Collapse>
 
 <p>
-    A <code>NewColorInput</code>'s <code>Value</code> property can be bound to either a string or a
+    A <code>ColorInput</code>'s <code>Value</code> property can be bound to either a string or a
     <code>System.Drawing.Color</code> structure (including a nullable version).
 </p>
 
@@ -86,17 +86,17 @@
 <Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput @bind-Value="_value1" Label="String" Class="w-100" />
+            <ColorInput @bind-Value="_value1" Label="String" Class="w-100" />
             <span>Bound value: @_value1</span>
-            <NewColorInput @bind-Value="_value2" Label="Color" Class="w-100" />
+            <ColorInput @bind-Value="_value2" Label="Color" Class="w-100" />
             <span>Bound value: @_value2</span>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput @bind-Value=""_value1"" Label=""String"" Class=""w-100"" />
+    <ColorInput @bind-Value=""_value1"" Label=""String"" Class=""w-100"" />
     <span>Bound value: @_value1</span>
-    <NewColorInput @bind-Value=""_value2"" Label=""Color"" Class=""w-100"" />
+    <ColorInput @bind-Value=""_value2"" Label=""Color"" Class=""w-100"" />
     <span>Bound value: @_value2</span>
 </div>
 
@@ -140,13 +140,13 @@
 <Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <NewColorInput @bind-Value="_value3" DisplayType="PickerDisplayType.Button" />
-            <NewColorInput TValue="string" DisplayType="PickerDisplayType.Button" IconButton="true" />
+            <ColorInput @bind-Value="_value3" DisplayType="PickerDisplayType.Button" />
+            <ColorInput TValue="string" DisplayType="PickerDisplayType.Button" IconButton="true" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<NewColorInput @bind-Value=""_value"" DisplayType=""PickerDisplayType.Button"" />
-<NewColorInput TValue=""string"" DisplayType=""PickerDisplayType.Button"" IconButton=""true"" />
+        @CodeFormatter.CodeToMarkup(@"<ColorInput @bind-Value=""_value"" DisplayType=""PickerDisplayType.Button"" />
+<ColorInput TValue=""string"" DisplayType=""PickerDisplayType.Button"" IconButton=""true"" />
 
 @code {
     private string _value = ""#08f"";
@@ -177,11 +177,11 @@
 <Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <NewColorInput TValue="string" Label="Inline" DisplayType="PickerDisplayType.Inline" />
+            <ColorInput TValue="string" Label="Inline" DisplayType="PickerDisplayType.Inline" />
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<NewColorInput TValue=""string"" Label=""Inline"" DisplayType=""PickerDisplayType.Inline"" />")
+        @CodeFormatter.CodeToMarkup(@"<ColorInput TValue=""string"" Label=""Inline"" DisplayType=""PickerDisplayType.Inline"" />")
     </ChildContent>
 </Collapse>
 
@@ -195,12 +195,12 @@
 <Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput TValue="string" ShowAlpha="false" />
+            <ColorInput TValue="string" ShowAlpha="false" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" ShowAlpha=""false"" />
+    <ColorInput TValue=""string"" ShowAlpha=""false"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -215,35 +215,35 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NewColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" />
-                <NewColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
-                <NewColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
             </div>
             <div class="row mt-3 fill align-items-center gap-2">
-                <NewColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
-                <NewColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
-                <NewColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
             </div>
             <div class="row mt-3 fill align-items-center gap-2">
-                <NewColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Inline" />
-                <NewColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Inline" />
+                <ColorInput @bind-Value="_disabled" Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Inline" />
+                <ColorInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Inline" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
-    <NewColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
-    <NewColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
 </div>
 <div class=""row mt-3 fill align-items-center gap-2"">
-    <NewColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
-    <NewColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
-    <NewColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""filled"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
 </div>
 <div class=""row mt-3 fill align-items-center gap-2"">
-    <NewColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Inline"" />
-    <NewColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Inline"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Inline"" />
+    <ColorInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Inline"" />
 </div>
 
 @code {
@@ -260,7 +260,7 @@
 </p>
 
 <p>
-    Note that while a <code>NewColorInput</code> bound to a <code>string</code> or a nullable
+    Note that while a <code>ColorInput</code> bound to a <code>string</code> or a nullable
     <code>System.Drawing.Color</code> will allow an empty value, one bound to a non-nullable
     <code>System.Drawing.Color</code> will never be empty, since the bound <code>struct</code> will
     always have a value.
@@ -269,12 +269,12 @@
 <Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput TValue="string" Label="Label" />
+            <ColorInput TValue="string" Label="Label" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Label"" />
+    <ColorInput TValue=""string"" Label=""Label"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -288,16 +288,16 @@
 <Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput TValue="string" Label="Normal" HelpText="Some help text" />
-            <NewColorInput TValue="string" Label="Filled" HelpText="Some help text" Class="filled" />
-            <NewColorInput TValue="string" Label="Outlined" HelpText="Some help text" Class="outlined" />
+            <ColorInput TValue="string" Label="Normal" HelpText="Some help text" />
+            <ColorInput TValue="string" Label="Filled" HelpText="Some help text" Class="filled" />
+            <ColorInput TValue="string" Label="Outlined" HelpText="Some help text" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Normal"" HelpText=""Some help text"" />
-    <NewColorInput TValue=""string"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
-    <NewColorInput TValue=""string"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Normal"" HelpText=""Some help text"" />
+    <ColorInput TValue=""string"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -318,16 +318,16 @@
 <Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row fill align-items-center gap-2">
-            <NewColorInput TValue="string" Label="Required" Required="true" />
-            <NewColorInput TValue="string" Label="Required" Required="true" Class="filled" />
-            <NewColorInput TValue="string" Label="Required" Required="true" Class="outlined" />
+            <ColorInput TValue="string" Label="Required" Required="true" />
+            <ColorInput TValue="string" Label="Required" Required="true" Class="filled" />
+            <ColorInput TValue="string" Label="Required" Required="true" Class="outlined" />
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Required"" Required=""true"" />
-    <NewColorInput TValue=""string"" Label=""Required"" Required=""true"" Class=""filled"" />
-    <NewColorInput TValue=""string"" Label=""Required"" Required=""true"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Required"" Required=""true"" />
+    <ColorInput TValue=""string"" Label=""Required"" Required=""true"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Required"" Required=""true"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
@@ -399,37 +399,37 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <NewColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
-                <NewColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
-                <NewColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
+                <ColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
+                <ColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
+                <ColorInput TValue="string" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
             </div>
             <div class="row fill align-items-center gap-2">
-                <NewColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
-                <NewColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
-                <NewColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
+                <ColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
+                <ColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
+                <ColorInput TValue="string" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
             </div>
             <div class="row fill align-items-center gap-2">
-                <NewColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
-                <NewColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
-                <NewColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
+                <ColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
+                <ColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
+                <ColorInput TValue="string" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
-    <NewColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
-    <NewColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
+    <ColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
 </div>
 <div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" />
-    <NewColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
-    <NewColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" />
+    <ColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Secondary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Secondary"" Class=""outlined"" />
 </div>
 <div class=""row fill align-items-center gap-2"">
-    <NewColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
-    <NewColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
-    <NewColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
+    <ColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
+    <ColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
+    <ColorInput TValue=""string"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
 </div>")
     </ChildContent>
 </Collapse>
