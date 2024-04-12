@@ -56,11 +56,6 @@ public static class DefaultIcons
     public static string Code { get; set; } = "code";
 
     /// <summary>
-    /// An icon for color selection.
-    /// </summary>
-    public static string ColorSelect { get; set; } = "palette";
-
-    /// <summary>
     /// An icon for background color selection.
     /// </summary>
     public static string ColorBackgroundSelect { get; set; } = "format_color_fill";
@@ -178,16 +173,6 @@ public static class DefaultIcons
 
     /// <summary>An icon to indicate a numbered list.</summary>
     public static string List_Number { get; set; } = "format_list_numbered";
-
-    /// <summary>
-    /// <para>
-    /// An icon for changing modes.
-    /// </para>
-    /// <para>
-    /// The default is two vertical arrows pointing in opposite directions.
-    /// </para>
-    /// </summary>
-    public static string ModeSwitch { get; set; } = "swap_vert";
 
     /// <summary>
     /// <para>

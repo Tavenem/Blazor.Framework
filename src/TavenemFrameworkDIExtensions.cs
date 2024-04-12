@@ -26,7 +26,6 @@ public static class TavenemFrameworkDIExtensions
         services.AddScoped<SnackbarService>();
         services.AddTransient<DragDropListener>();
         services.AddTransient<EditorService>();
-        services.AddTransient<IJSEventListener, JSEventListener>();
         services.AddTransient<IKeyListener, KeyListener>();
         return services;
     }

@@ -86,13 +86,6 @@ export default [{
     },
     plugins: plugins,
 }, {
-    input: "./scripts/tavenem-events.ts",
-    output: {
-        format: 'es',
-        sourcemap: true,
-    },
-    plugins: plugins,
-}, {
     input: "./scripts/tavenem-highlight.ts",
     output: {
         format: 'es',
