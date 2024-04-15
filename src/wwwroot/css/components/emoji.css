@@ -1,167 +1,17 @@
-.emoji-picker {
-    padding: .25rem;
-}
+.emoji-list {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    justify-content: center;
+    place-items: center;
 
-.emoji-category-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0;
-    padding: 0;
-}
-
-.emoji-search {
-    .skin-tone-swatch {
-        border-width: 1px;
-        min-height: 1rem;
-        min-width: 1rem;
-
-        &.active {
-            border-color: var(--tavenem-color-border);
-            border-style: solid;
-        }
+    button {
+        font-size: 1.25rem;
+        line-height: 1.2;
+        padding: 2px 2px;
     }
 
-    .skin-tone-btn {
-        --button-font-size: 1rem;
-        --button-default-padding-y: 2px;
-    }
-
-    .tone0 {
-        background-color: #ffc83e;
-    }
-    .tone1 {
-        background-color: #ffd6c2;
-    }
-    .tone2 {
-        background-color: #eebfaa;
-    }
-    .tone3 {
-        background-color: #c78d7b;
-    }
-    .tone4 {
-        background-color: #966661;
-    }
-    .tone5 {
-        background-color: #57373a;
-    }
-    .tone0-tone1 {
-        background: linear-gradient(to right, #ffc83e, #ffd6c2);
-    }
-    .tone0-tone2 {
-        background: linear-gradient(to right, #ffc83e, #eebfaa);
-    }
-    .tone0-tone3 {
-        background: linear-gradient(to right, #ffc83e, #c78d7b);
-    }
-    .tone0-tone4 {
-        background: linear-gradient(to right, #ffc83e, #966661);
-    }
-    .tone0-tone5 {
-        background: linear-gradient(to right, #ffc83e, #57373a);
-    }
-    .tone1-tone0 {
-        background: linear-gradient(to right, #ffd6c2, #ffc83e);
-    }
-    .tone1-tone2 {
-        background: linear-gradient(to right, #ffd6c2, #eebfaa);
-    }
-    .tone1-tone3 {
-        background: linear-gradient(to right, #ffd6c2, #c78d7b);
-    }
-    .tone1-tone4 {
-        background: linear-gradient(to right, #ffd6c2, #966661);
-    }
-    .tone1-tone5 {
-        background: linear-gradient(to right, #ffd6c2, #57373a);
-    }
-    .tone2-tone0 {
-        background: linear-gradient(to right, #eebfaa, #ffc83e);
-    }
-    .tone2-tone1 {
-        background: linear-gradient(to right, #eebfaa, #ffd6c2);
-    }
-    .tone2-tone3 {
-        background: linear-gradient(to right, #eebfaa, #c78d7b);
-    }
-    .tone2-tone4 {
-        background: linear-gradient(to right, #eebfaa, #966661);
-    }
-    .tone2-tone5 {
-        background: linear-gradient(to right, #eebfaa, #57373a);
-    }
-    .tone3-tone0 {
-        background: linear-gradient(to right, #c78d7b, #ffc83e);
-    }
-    .tone3-tone1 {
-        background: linear-gradient(to right, #c78d7b, #ffd6c2);
-    }
-    .tone3-tone2 {
-        background: linear-gradient(to right, #c78d7b, #eebfaa);
-    }
-    .tone3-tone4 {
-        background: linear-gradient(to right, #c78d7b, #966661);
-    }
-    .tone3-tone5 {
-        background: linear-gradient(to right, #c78d7b, #57373a);
-    }
-    .tone4-tone0 {
-        background: linear-gradient(to right, #966661, #ffc83e);
-    }
-    .tone4-tone1 {
-        background: linear-gradient(to right, #966661, #ffd6c2);
-    }
-    .tone4-tone2 {
-        background: linear-gradient(to right, #966661, #eebfaa);
-    }
-    .tone4-tone3 {
-        background: linear-gradient(to right, #966661, #c78d7b);
-    }
-    .tone4-tone5 {
-        background: linear-gradient(to right, #966661, #57373a);
-    }
-    .tone5-tone0 {
-        background: linear-gradient(to right, #57373a, #ffc83e);
-    }
-    .tone5-tone1 {
-        background: linear-gradient(to right, #57373a, #ffd6c2);
-    }
-    .tone5-tone2 {
-        background: linear-gradient(to right, #57373a, #eebfaa);
-    }
-    .tone5-tone3 {
-        background: linear-gradient(to right, #57373a, #c78d7b);
-    }
-    .tone5-tone4 {
-        background: linear-gradient(to right, #57373a, #966661);
-    }
-}
-
-.emoji-categories {
-    display: flex;
-    flex-direction: column;
-    gap: .25rem;
-    max-height: calc(10.5rem + 28px);
-    overflow-y: auto;
-
-    .category {
-        margin-top: .25em;
-    }
-
-    .emoji-list {
-        display: grid;
-        grid-template-columns: repeat(9, 1fr);
-        justify-content: center;
-        place-items: center;
-
-        button {
-            font-size: 1.25rem;
-            line-height: 1.2;
-            padding: 2px 2px;
-        }
-
-        .active {
-            border-color: var(--tavenem-color-border);
-            border-style: solid;
-        }
+    .active {
+        border-color: var(--tavenem-color-border);
+        border-style: solid;
     }
 }

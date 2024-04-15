@@ -15,7 +15,6 @@
                 data-input-class="@InputCssClass"
                 data-input-mode="@ColorMode.ToCSS()"
                 data-input-style="@InputCssStyle"
-                data-input-tab-index="@TabIndex"
                 data-popover-container
                 data-show-swatch="@(!IconButton)"
                 disabled="@Disabled"
@@ -24,31 +23,34 @@
                 readonly="@ReadOnly"
                 required="@Required"
                 style="@CssStyle"
-                tabindex="-1"
+                tabindex="@TabIndex"
                 value="@CurrentValueAsString"
                 @valuechange="OnValueChange">
-    @if (DisplayType != PickerDisplayType.Button && !string.IsNullOrEmpty(Label))
+    @if (DisplayType != PickerDisplayType.Button)
     {
-        <label for="@Id">@Label</label>
-    }
-    @if (!string.IsNullOrEmpty(HelpText)
-        || IsInvalidAndTouched)
-    {
-        <div class="field-helpers">
-            @if (IsInvalidAndTouched)
-            {
-                <ul class="mr-auto mb-0 pl-0">
-                    @foreach (var message in GetValidationMessages())
-                    {
-                        <li>@message</li>
-                    }
-                </ul>
-            }
-            else if (!string.IsNullOrEmpty(HelpText))
-            {
-                <div class="mr-auto">@HelpText</div>
-            }
-        </div>
+        if (!string.IsNullOrEmpty(Label))
+        {
+            <label for="@Id">@Label</label>
+        }
+        @if (!string.IsNullOrEmpty(HelpText)
+            || IsInvalidAndTouched)
+        {
+            <div class="field-helpers">
+                @if (IsInvalidAndTouched)
+                {
+                    <ul class="mr-auto mb-0 pl-0">
+                        @foreach (var message in GetValidationMessages())
+                        {
+                            <li>@message</li>
+                        }
+                    </ul>
+                }
+                else if (!string.IsNullOrEmpty(HelpText))
+                {
+                    <div class="mr-auto">@HelpText</div>
+                }
+            </div>
+        }
     }
     @ChildContent
 </tf-color-input>

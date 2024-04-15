@@ -1,6 +1,9 @@
 import { TavenemAccordionHTMLElement } from './tavenem-accordion';
 import { TavenemContentsHTMLElement } from './tavenem-contents';
-import { TavenemEmojiHTMLElement } from './tavenem-emoji';
+import {
+    TavenemEmojiHTMLElement,
+    TavenemEmojiPickerHTMLElement,
+} from './tavenem-emoji';
 import { TavenemHighlightHTMLElement } from './tavenem-highlight';
 import {
     TavenemDropdownHTMLElement,
@@ -646,6 +649,8 @@ slot button {
         customElements.define('tf-color-input', TavenemColorInputHtmlElement);
 
         customElements.define('tf-emoji', TavenemEmojiHTMLElement);
+
+        customElements.define('tf-emoji-input', TavenemEmojiPickerHTMLElement);
 
         customElements.define('tf-slider', TavenemSliderHTMLElement);
 

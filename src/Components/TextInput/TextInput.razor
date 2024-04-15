@@ -54,11 +54,9 @@
                 <span slot="prefix">@PrefixText</span>
             }
         }
-        @if (ShowEmoji && IsInteractive)
+        @if (ShowEmoji)
         {
-            <EmojiInput IconButton="true"
-                        @bind-Value="Emoji"
-                        @bind-Value:after="OnSelectEmojiAsync">
+            <EmojiInput Class="nested m-0" IconButton="true">
                 <Tooltip Delay="750">insert emoji</Tooltip>
             </EmojiInput>
         }

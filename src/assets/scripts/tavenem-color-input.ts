@@ -1,5 +1,6 @@
 import { TavenemPopoverHTMLElement } from './tavenem-popover'
 import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './tavenem-input'
+import { randomUUID } from './tavenem-utility'
 
 const halfSelectorSize = 13;
 const overlayHeight = 250;
@@ -131,20 +132,6 @@ tf-input {
         position: absolute;
         transition: border-bottom 0.2s, border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 0.2s;
     }
-
-    &:after {
-        border-bottom-color: var(--tavenem-color-error);
-        border-bottom-style: solid;
-        border-bottom-width: 2px;
-        bottom: 0;
-        content: "";
-        left: 0;
-        right: 0;
-        pointer-events: none;
-        position: absolute;
-        transform: scaleX(0);
-        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-    }
 }
 
 :host(:not(.outlined, [disabled], [readonly])) > tf-input:hover:before {
@@ -253,7 +240,7 @@ tf-input {
     --field-border-hover-color: var(--tavenem-color-action);
     --field-color: var(--tavenem-color-text);
     border: 0;
-    color: var(--tavenem-color-text);
+    color: var(--field-color);
     display: flex;
     flex-basis: auto;
     flex-direction: column;
@@ -298,6 +285,12 @@ tf-input {
         padding-left: 8px;
         padding-right: 8px;
     }
+}
+
+input::placeholder {
+    color: currentColor;
+    opacity: 0.42;
+    transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
 :host([disabled]) > tf-input,
@@ -638,6 +631,10 @@ button {
     }
 }
 
+button::-moz-focus-inner {
+    border-style: none;
+}
+
 .picker-btn {
     align-self: center;
 }
@@ -655,10 +652,6 @@ button {
     &:focus-visible {
         background-color: var(--tavenem-color-default-darken);
     }
-}
-
-button::-moz-focus-inner {
-    border-style: none;
 }
 
 .dialog-buttons {
@@ -854,7 +847,7 @@ button::-moz-focus-inner {
         let anchorOrigin;
         let input: HTMLInputElement | TavenemInputHtmlElement;
         if (this.hasAttribute('button')) {
-            anchorId = this.dataset.inputId || (window.isSecureContext ? crypto.randomUUID() : this.randomUUID());
+            anchorId = this.dataset.inputId || (window.isSecureContext ? crypto.randomUUID() : randomUUID());
             anchorOrigin = 'anchor-center-center';
 
             const button = document.createElement('button');
@@ -865,9 +858,6 @@ button::-moz-focus-inner {
             button.style.cssText = this.dataset.inputStyle || '';
             button.disabled = this.hasAttribute('disabled')
                 || this.hasAttribute('readonly');
-            if ('inputTabIndex' in this.dataset) {
-                button.tabIndex = parseInt(this.dataset.inputTabIndex || '') || 0;
-            }
             shadow.appendChild(button);
 
             const slot = document.createElement('slot');
@@ -898,11 +888,10 @@ button::-moz-focus-inner {
             } else {
                 const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                 button.appendChild(buttonIcon);
-                button.appendChild(buttonIcon);
                 buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
             }
         } else {
-            anchorId = (window.isSecureContext ? crypto.randomUUID() : this.randomUUID());
+            anchorId = (window.isSecureContext ? crypto.randomUUID() : randomUUID());
             anchorOrigin = 'anchor-bottom-left';
 
             input = document.createElement('tf-input') as TavenemInputHtmlElement;
@@ -930,8 +919,6 @@ button::-moz-focus-inner {
             input.setAttribute('size', "1");
             if (this.hasAttribute('inline')) {
                 input.style.display = 'none';
-            } else if ('inputTabIndex' in this.dataset) {
-                input.tabIndex = parseInt(this.dataset.inputTabIndex || '') || 0;
             }
             if (this.hasAttribute('value')) {
                 input.value = hex || '';
@@ -982,7 +969,6 @@ button::-moz-focus-inner {
         }
 
         const inputContent = document.createElement('div');
-        inputContent.classList.add('input-content');
         controlContainer.appendChild(inputContent);
 
         const colorPicker = document.createElement('div');
@@ -1067,9 +1053,6 @@ button::-moz-focus-inner {
         hueSliderInput.value = hsla.hue.toString();
         if (this.hasAttribute('inline')) {
             hueSliderInput.autofocus = this.hasAttribute('autofocus');
-            if ('inputTabIndex' in this.dataset) {
-                input.tabIndex = parseInt(this.dataset.inputTabIndex || '') || 0;
-            }
         }
         hueSlider.appendChild(hueSliderInput);
         hueSliderInput.addEventListener('input', this.onHueInput.bind(this));
@@ -3090,12 +3073,6 @@ button::-moz-focus-inner {
         this._selectorX = Math.max(0, Math.min(overlayWidth, event.offsetX - halfSelectorSize + this._selectorX));
         this._selectorY = Math.max(0, Math.min(overlayHeight, event.offsetY - halfSelectorSize + this._selectorY));
         this.updateColorFromSelector();
-    }
-
-    private randomUUID() {
-        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
-            (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
-        );
     }
 
     private setValue(value?: string | null) {

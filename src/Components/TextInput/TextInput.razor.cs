@@ -293,8 +293,6 @@ public partial class TextInput : InputComponentBase<string>
 
     private int EffectiveSize => Math.Max(1, Size ?? 1);
 
-    private string? Emoji { get; set; }
-
     private IEnumerable<KeyValuePair<string, object>> AllSuggestionValues
     {
         get
@@ -503,16 +501,6 @@ public partial class TextInput : InputComponentBase<string>
         {
             await OnValidEnter.InvokeAsync();
         }
-    }
-
-    private async Task OnSelectEmojiAsync()
-    {
-        if (string.IsNullOrWhiteSpace(Emoji))
-        {
-            return;
-        }
-        await SetValueAsync(CurrentValue + Emoji);
-        Emoji = null;
     }
 
     private async Task SetValueAsync(string? value)

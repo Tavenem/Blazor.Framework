@@ -123,8 +123,6 @@ public partial class TextArea : InputComponentBase<string>
         }
     }
 
-    private string? Emoji { get; set; }
-
     private protected string? SpellcheckValue => Spellcheck == true ? "true" : "false";
 
     /// <summary>
@@ -245,16 +243,6 @@ public partial class TextArea : InputComponentBase<string>
     {
         _timer.Cancel();
         CurrentValueAsString = e.Value as string;
-    }
-
-    private void OnSelectEmoji()
-    {
-        if (string.IsNullOrWhiteSpace(Emoji))
-        {
-            return;
-        }
-        CurrentValueAsString += Emoji;
-        Emoji = null;
     }
 
     private void OnTimer() => CurrentValueAsString = _newValue;

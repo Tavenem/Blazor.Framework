@@ -560,9 +560,11 @@ button.clear::-moz-focus-inner {
         input.addEventListener('keydown', this.onKeyDown.bind(this));
         clear.addEventListener('mouseup', this.onClearMouseUp.bind(this));
         clear.addEventListener('click', this.onClear.bind(this));
+        this.addEventListener('valuechange', this.onNestedValueChange.bind(this));
     }
 
     disconnectedCallback() {
+        this.removeEventListener('valuechange', this.onNestedValueChange.bind(this));
         const root = this.shadowRoot;
         let input = this.querySelector('input:not([hidden])');
         if (!input && root) {
@@ -825,6 +827,31 @@ button.clear::-moz-focus-inner {
         }
     }
 
+    private onNestedValueChange(event: Event) {
+        if (event.target === this
+            || !(event instanceof CustomEvent)
+            || !event.detail
+            || !event.detail.value
+            || typeof event.detail.value !== 'string') {
+            return;
+        }
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (!input
+            || !(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        input.value += event.detail.value;
+        this.onInput();
+
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     private onTab(event: KeyboardEvent) {
         if (!event.target) {
             return;
@@ -1077,7 +1104,13 @@ slot {
             && event.target !== this
             && event.target instanceof Node
             && !TavenemPopover.nodeContains(this, event.target)) {
-            this.close();
+            const root = this.getRootNode();
+            if (!root
+                || !(root instanceof ShadowRoot)
+                || !root.host
+                || root.host !== event.target) {
+                this.close();
+            }
         }
     }
 
@@ -1136,6 +1169,8 @@ slot {
             this.onSubmit(event);
         }
     }
+
+    protected onOpening() { }
 
     protected onPopoverFocusLost(event: Event) {
         if (event.target
@@ -2024,6 +2059,8 @@ slot {
                 input.focus();
             }
         }
+
+        this.onOpening();
     }
 
     private onSearchInput(event: KeyboardEvent) {

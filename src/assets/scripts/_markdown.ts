@@ -1,8 +1,8 @@
 ﻿import MarkdownIt from 'markdown-it';
-import Renderer from 'markdown-it/lib/renderer';
-import StateBlock from 'markdown-it/lib/rules_block/state_block';
-import StateInline from 'markdown-it/lib/rules_inline/state_inline';
-import Token from 'markdown-it/lib/token';
+import Renderer from 'markdown-it/lib/renderer.mjs';
+import StateBlock from 'markdown-it/lib/rules_block/state_block.mjs';
+import StateInline, { Delimiter } from 'markdown-it/lib/rules_inline/state_inline.mjs';
+import Token from 'markdown-it/lib/token.mjs';
 import attributes from 'markdown-it-attrs';
 import deflist_plugin from 'markdown-it-deflist';
 import ins_plugin from 'markdown-it-ins';
@@ -418,7 +418,7 @@ const span_plugin = function (md: MarkdownIt) {
     }
 
     // Walk through delimiter list and replace text tokens with tags
-    function postProcess(state: StateInline, delimiters: StateInline.Delimiter[]) {
+    function postProcess(state: StateInline, delimiters: Delimiter[]) {
         let i: number, j,
             startDelim,
             endDelim,

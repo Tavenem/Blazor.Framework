@@ -1,11 +1,11 @@
-﻿* {
-    --tavenem-popover-opacity: 0;
-    --tavenem-popover-events: none;
-    --tavenem-popover-visibility: hidden;
-}
-
-[data-popover-open] {
+﻿[data-popover-open] {
     --tavenem-popover-opacity: 1;
     --tavenem-popover-events: auto;
     --tavenem-popover-visibility: visible;
+}
+
+[data-popover-container]:not([data-popover-open]) {
+    --tavenem-popover-opacity: 0;
+    --tavenem-popover-events: none;
+    --tavenem-popover-visibility: hidden;
 }

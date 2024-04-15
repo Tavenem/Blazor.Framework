@@ -144,7 +144,7 @@ export namespace TavenemPopover {
         const offsetParent = getOffsetParent(popoverNode);
         const offsetBoundingRect = offsetParent.getBoundingClientRect();
 
-        let anchorElement: HTMLElement | null = null;
+        let anchorElement: Element | null = null;
         if (popoverNode instanceof TavenemPopoverHTMLElement
             && popoverNode.anchor) {
             anchorElement = popoverNode.anchor;
@@ -565,7 +565,7 @@ export namespace TavenemPopover {
 }
 
 export class TavenemPopoverHTMLElement extends HTMLElement {
-    private _anchor: HTMLElement | null | undefined;
+    private _anchor: Element | null | undefined;
     private _mouseOver: boolean;
     private _mutationObserver: MutationObserver;
     private _parentMutationObserver: MutationObserver;
@@ -577,7 +577,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
     }
 
     get anchor() { return this._anchor; }
-    set anchor(value: HTMLElement | null | undefined) { this._anchor = value; }
+    set anchor(value: Element | null | undefined) { this._anchor = value; }
 
     get mouseOver() { return this._mouseOver; }
     set mouseOver(value: boolean) { this._mouseOver = value; }
@@ -665,6 +665,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
     border-radius: var(--tavenem-border-radius);
     box-shadow: var(--tavenem-shadow-2);
     color: var(--popover-color);
+    font-size: var(--tavenem-font-size);
     max-width: 100vw;
     opacity: var(--tavenem-popover-opacity, 0);
     outline: 0;
@@ -887,7 +888,7 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
 }
 
 export class TavenemTooltipHTMLElement extends HTMLElement {
-    private _anchor: HTMLElement | null | undefined;
+    private _anchor: Element | null | undefined;
     private _button: HTMLButtonElement | undefined;
     private _dismissed: boolean;
     private _hasButton: boolean;
@@ -1213,7 +1214,8 @@ slot {
             return this;
         }
 
-        if (!(event.target instanceof HTMLElement)) {
+        if (!(event.target instanceof HTMLElement)
+            && !(event.target instanceof SVGElement)) {
             return null;
         }
 
