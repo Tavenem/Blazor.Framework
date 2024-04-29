@@ -63,7 +63,7 @@ export namespace TavenemPopover {
 
     export function getPopoverParent(popover: HTMLElement) {
         const anchorId = popover.dataset.anchorId;
-        const anchor = anchorId ? document.getElementById(anchorId) : null;
+        let anchor = anchorId ? document.getElementById(anchorId) : null;
 
         let containingParent: HTMLElement | null;
         if (anchor) {
@@ -74,7 +74,8 @@ export namespace TavenemPopover {
                 const root = popover.getRootNode();
                 if (root instanceof ShadowRoot
                     && root.host instanceof HTMLElement) {
-                    containingParent = root.host;
+                    anchor = anchorId ? root.getElementById(anchorId) : null;
+                    containingParent = anchor || root.host;
                 }
             }
         }
@@ -85,6 +86,14 @@ export namespace TavenemPopover {
             containingParent = containingParent.parentElement;
         }
         return containingParent;
+    }
+
+    export function getShadowParent(node: Node) {
+        const root = node.getRootNode();
+        if (root instanceof ShadowRoot
+            && root.host instanceof HTMLElement) {
+            return root.host;
+        }
     }
 
     export function initialize() {
@@ -109,8 +118,10 @@ export namespace TavenemPopover {
                 && (node as HTMLElement).assignedSlot?.parentNode) {
                 // Element is slotted
                 node = (node as HTMLElement).assignedSlot?.parentNode;
-            } else if (node.parentNode?.nodeType === 11) { // DOCUMENT_FRAGMENT
+            } else if (node.nodeType === 11) { // DOCUMENT_FRAGMENT
                 // Element is in shadow root
+                node = (node as ShadowRoot).host;
+            } else if (node.parentNode?.nodeType === 11) {
                 node = (node.parentNode as ShadowRoot).host;
             } else {
                 node = node.parentNode;
@@ -125,12 +136,14 @@ export namespace TavenemPopover {
             return;
         }
 
+        let docRoot: Document | ShadowRoot = document;
         if (!popoverNode.classList.contains('open')) {
             let parent = popoverNode.parentElement;
             if (!parent) {
                 const root = popoverNode.getRootNode();
                 if (root instanceof ShadowRoot
                     && root.host instanceof HTMLElement) {
+                    docRoot = root;
                     parent = root.host;
                 }
             }
@@ -149,7 +162,7 @@ export namespace TavenemPopover {
             && popoverNode.anchor) {
             anchorElement = popoverNode.anchor;
         } else if (popoverNode.dataset.anchorId) {
-            anchorElement = document.getElementById(popoverNode.dataset.anchorId);
+            anchorElement = docRoot.getElementById(popoverNode.dataset.anchorId);
         }
         const anchorBoundingRect = anchorElement
             ? anchorElement.getBoundingClientRect()
@@ -1388,8 +1401,14 @@ slot {
         if (event.target
             && event.target !== this
             && event.target instanceof Node
-            && !this.contains(event.target)) {
-            this.close();
+            && !TavenemPopover.nodeContains(this, event.target)) {
+            const root = this.getRootNode();
+            if (!root
+                || !(root instanceof ShadowRoot)
+                || !root.host
+                || root.host !== event.target) {
+                this.close();
+            }
         }
     }
 

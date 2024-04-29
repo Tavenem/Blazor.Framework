@@ -1,27 +1,28 @@
-import { TavenemAccordionHTMLElement } from './tavenem-accordion';
-import { TavenemContentsHTMLElement } from './tavenem-contents';
+import { TavenemAccordionHTMLElement } from './_accordion';
+import { TavenemContentsHTMLElement } from './_contents';
 import {
     TavenemEmojiHTMLElement,
     TavenemEmojiPickerHTMLElement,
-} from './tavenem-emoji';
-import { TavenemHighlightHTMLElement } from './tavenem-highlight';
+} from './_emoji';
+import { TavenemHighlightHTMLElement } from './_highlight';
 import {
     TavenemDropdownHTMLElement,
     TavenemPopoverHTMLElement,
     TavenemPopover,
     TavenemTooltipHTMLElement
-} from './tavenem-popover';
+} from './_popover';
 import {
     TavenemInputHtmlElement,
     TavenemPickerHtmlElement
-} from './tavenem-input';
-import { TavenemColorInputHtmlElement } from './tavenem-color-input';
+} from './_input';
+import { TavenemColorInputHtmlElement } from './_color-input';
+import { TavenemDateTimeInputHtmlElement } from './_datetime';
 import {
     TavenemProgressCircleHTMLElement,
     TavenemProgressLinearHTMLElement
-} from './tavenem-progress';
-import { TavenemScrollTopHTMLElement } from './tavenem-scrolltop';
-import { TavenemSliderHTMLElement } from './tavenem-slider';
+} from './_progress';
+import { TavenemScrollTopHTMLElement } from './_scrolltop';
+import { TavenemSliderHTMLElement } from './_slider';
 
 enum ThemePreference {
     Light = 1,
@@ -647,6 +648,8 @@ slot button {
         customElements.define('tf-picker', TavenemPickerHtmlElement);
 
         customElements.define('tf-color-input', TavenemColorInputHtmlElement);
+
+        customElements.define('tf-datetime-input', TavenemDateTimeInputHtmlElement);
 
         customElements.define('tf-emoji', TavenemEmojiHTMLElement);
 

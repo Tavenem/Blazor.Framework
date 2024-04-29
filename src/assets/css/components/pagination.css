@@ -45,7 +45,7 @@
             padding: 0;
         }
 
-        &.disabled {
+        &.disabled, &[inert], [inert] & {
             --pagination-active-color: var(--tavenem-color-action-disabled-bg);
             --pagination-active-text-color: var(--tavenem-color-action-disabled);
             color: var(--tavenem-color-action-disabled);
@@ -74,7 +74,7 @@
         background-color: transparent;
     }
 
-    &.disabled {
+    &.disabled, &[inert], [inert] & {
         --pagination-active-color: var(--tavenem-color-action-disabled-bg);
         --pagination-active-text-color: var(--tavenem-color-action-disabled);
 

@@ -1,5 +1,5 @@
-﻿import { TavenemPopoverHTMLElement } from './tavenem-popover'
-import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './tavenem-input'
+﻿import { TavenemPopoverHTMLElement } from './_popover'
+import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './_input'
 import { randomUUID } from './tavenem-utility'
 
 interface Emoji {
@@ -882,6 +882,8 @@ button::-moz-focus-inner {
         clearButton.classList.add('emoji-clear', 'btn-text');
         clearButton.textContent = "Clear";
         clearButton.type = 'button';
+        clearButton.disabled = this.hasAttribute('disabled')
+            || this.hasAttribute('readonly');
         buttonsDiv.appendChild(clearButton);
         clearButton.addEventListener('click', this.onClearButton.bind(this));
 

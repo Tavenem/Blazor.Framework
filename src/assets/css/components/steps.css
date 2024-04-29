@@ -25,11 +25,11 @@
             display: flex;
             margin-right: .5rem;
 
-            &.disabled {
+            &.disabled, &[inert], [inert] & {
                 color: var(--tavenem-color-text-disabled);
             }
 
-            &:not(.disabled) {
+            &:not(.disabled, [inert]) {
                 cursor: pointer;
             }
         }

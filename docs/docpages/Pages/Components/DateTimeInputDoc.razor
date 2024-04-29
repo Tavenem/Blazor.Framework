@@ -74,12 +74,10 @@
 </p>
 
 <p>
-    When binding to a string, any value which can be parsed as a <code>DateTimeOffset</code> is
-    accepted as input.
-</p>
-
-<p>
-    The string returned depends on the <code>DateType</code> parameter:
+    The underlying <code>input</code> element will always use an <a
+    href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> string as its value. The specific
+    format of the string depends on whether the value includes date, time, or both kinds of
+    information, and the <code>DateType</code> parameter:
 </p>
 
 <dl>
@@ -91,13 +89,13 @@
        
     <dt><code>DateType.Week</code></dt>
     <dd>
-        <code>yyyy-W{Calendar.GetWeekOfYear()}</code>
+        <code>yyyy-Www-D</code>
     </dd>
        
     <dt><code>DateType.Date</code></dt>
     <dd>
         <ul>
-            <li>When <code>ShowTime</code> is <code>true</code>: <code>s</code></li>
+            <li>When <code>ShowTime</code> is <code>true</code>: <code>yyyy-MM-ddTHH:mm:ss.fffffff</code></li>
             <li>When it is <code>false</code>: <code>yyyy-MM-dd</code></li>
         </ul>
     </dd>
@@ -111,10 +109,31 @@
                     <li>When it is <code>false</code>: <code>HH:mm</code></li>
                 </ul>
             </li>
-            <li>When it is <code>false</code>: <code>s</code></li>
+            <li>When it is <code>false</code>: <code>yyyy-MM-ddTHH:mm:ss.fffffff</code></li>
         </ul>
     </dd>
 </dl>
+
+<p>
+    Additionally, time zone information is indicated in the ISO string if any of the
+    <code>TimeZone</code>, <code>TimeZoneInfo</code>, or <code>ShowTimeZone</code> properties are
+    set.
+</p>
+
+<p>
+    When binding to a string, any value which can be parsed as a <code>DateTimeOffset</code> is
+    accepted as input. Normally the output will be the same as the ISO 8601 string used for the
+    underlying <code>input</code> element. However, you can override the default behavior by
+    assigning a special converter class to the <code>Converter</code> property which can perform
+    bespoke conversions. Only the <code>setter</code> parameter of the converter requires
+    implementation, as the <code>getter</code> is not used for date-time pickers.
+</p>
+
+<p>
+    Note that when bound to a nullable type, clearing the input results in a <code>null</code>
+    value. Clearing the input when bound to a non-nullable type results in a default value
+    (the current date/time).
+</p>
 
 <Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
@@ -135,28 +154,6 @@
 }")
     </ChildContent>
 </Collapse>
-
-<p>
-    Note that when bound to a nullable type, clearing the input results in a <code>null</code>
-    value. Clearing the input when bound to a non-nullable type results in a default value
-    (<code>DateTimeOffset.Now</code>).
-</p>
-
-<p>
-    Note that the underlying <code>input</code> element always receives a <code>string</code> value
-    for use with standard HTML form submission operations. This is the same string as returned when
-    binding to a string, and conforms to the expected format for an input of type <code>date</code>,
-    <code>datetime-local</code>, <code>month</code>, <code>time</code>, or <code>week</code>. The
-    component automatically decides the most appropriate input type based on the bound data type and
-    the component's parameter values.
-</p>
-
-<p>
-    You can override the default behavior by assigning a special converter class to the
-    <code>Converter</code> property which can perform bespoke conversions. Only the
-    <code>setter</code> parameter of the converter requires implementation, as the
-    <code>getter</code> is not used for date-time pickers.
-</p>
 
 <h2>Button</h2>
 
@@ -225,28 +222,33 @@
 
     <dt><code>DateType.Year</code></dt>
     <dd>
-        The month and date views are disabled. The user is guided to select a year, and the returned
-        date will be set to the first date in that year.
+        The month and date views are disabled. The user is guided to select a year. The ISO 8601
+        string value will be that year, and the bound value for a <code>DateTime</code>,
+        <code>DateTimeOffset</code>, or <code>DateOnly</code> will be set to the first date in that
+        year.
     </dd>
        
     <dt><code>DateType.Month</code></dt>
     <dd>
-        The date view is disabled. The user is guided to select a month, and the returned date will
-        be set to the first date in that month.
+        The date view is disabled. The user is guided to select a month. The ISO 8601 string value
+        will be that year and month, and the bound value for a <code>DateTime</code>,
+        <code>DateTimeOffset</code>, or <code>DateOnly</code> will be set to the first date in that
+        month.
     </dd>
        
     <dt><code>DateType.Week</code></dt>
     <dd>
         This mode behaves very similarly to <code>DateType.Date</code>, except that week numbers are
-        displayed on the calendar. When the bound data type is string, the value will include only
-        the year and week number. When bound to a <code>DateTime</code>,
-        <code>DateTimeOffset</code>, or <code>DateOnly</code>, however, the full selected date is
-        returned.
+        displayed on the calendar. The ISO 8601 string value will be the <a
+        href="https://en.wikipedia.org/wiki/ISO_week_date">ISO week year, week number, and weekday
+        number</a>. The bound value for a <code>DateTime</code>, <code>DateTimeOffset</code>, or
+        <code>DateOnly</code> will be the actual date selected.
     </dd>
        
     <dt><code>DateType.Date</code></dt>
     <dd>
-        All views of the calendar are supported, and the user is guided to select a specific date.
+        All views of the calendar are supported, and the user is guided to select a specific date.<br />
+        If <code>ShowTime</code> is <code>true</code>, the time picker is also shown.
     </dd>
 </dl>
 
@@ -278,6 +280,11 @@
     Set the <code>Min</code> and <code>Max</code> properties to control the range of dates allowed.
 </p>
 
+<p>
+    When the bound data type is <code>TimeOnly</code>, only the <code>TimeOfDay</code> portion of
+    these properties is observed to determine a range of allowed times.
+</p>
+
 <Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
@@ -289,17 +296,17 @@
     </ChildContent>
 </Collapse>
 
-<p>
-    When the bound data type is <code>TimeOnly</code>, only the <code>TimeOfDay</code> portion of
-    these properties is observed to determine a range of allowed times.
-</p>
-
 <h2>Time</h2>
 
 <p>
     Set the <code>ShowTime</code> property to <code>true</code> to display the time picker controls
     and allow both a date and time to be selected. When <code>DateType</code> has been set to
     <code>None</code>, <em>only</em> the time controls are displayed.
+</p>
+
+<p>
+    Setting <code>ShowTime</code> is unnecessary when the bound data type is <code>TimeOnly</code>,
+    and is ignored if the bound data type is <code>DateOnly</code>.
 </p>
 
 <Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -313,24 +320,27 @@
     </ChildContent>
 </Collapse>
 
-<p>
-    Setting <code>ShowTime</code> is unnecessary when the bound data type is <code>TimeOnly</code>,
-    and is ignored if the bound data type is <code>DateOnly</code>.
-</p>
-
 <h2>Time zones</h2>
 
 <p>
     Set the <code>ShowTimeZone</code> property to <code>true</code> to display a time zone select
-    control. This is ignored if the bound data type is <code>DateOnly</code> or if
-    <code>ShowTime</code> is <code>false</code>.
+    control. This is ignored if the bound data type is anything except <code>string</code> or
+    <code>DateTimeOffset</code>, or if <code>ShowTime</code> is <code>false</code>.
 </p>
 
 <p>
-    The <code>TimeZone</code> property can be set to a starting <code>TimeZoneInfo</code> object. It
-    uses the system's current time zone by default. This is used even when <code>ShowTimeZone</code>
-    is <code>false</code>, to control the offset of the underlying <code>DateTimeOffset</code>
-    value.
+    The <code>TimeZone</code> property can be set to an IANA time zone identifier. This is used even
+    when <code>ShowTimeZone</code> is <code>false</code> to control the offset of the underlying
+    value when binding to a <code>DateTimeOffset</code>.
+</p>
+
+<p>
+    The <code>TimeZoneInfo</code> property can be set to a <code>TimeZoneInfo</code> object, which
+    automatically sets the <code>TimeZone</code> property to the corresponding identifier, if it can
+    be determined. It uses the system's current time zone by default when binding to a
+    <code>DateTimeOffset</code>. Note that it is usually preferable to set <code>TimeZone</code>
+    directly when possible, since the IANA identifier selected for a given <code>TimeZoneInfo</code>
+    object may not always be correct for the user's location.
 </p>
 
 <Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -344,20 +354,46 @@
     </ChildContent>
 </Collapse>
 
+<h2>Calendar</h2>
+
+<p>
+    Set the <code>Calendar</code> property to any supported calendar name to control the appearance
+    of the picker (but not bound values, which use ISO 8601 formats for maximum
+    interoperability). The available calendars depend on the user's browser. See <a
+    href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/supportedValuesOf">the
+    Intl documentation</a> for more information. Note that even when a user's browser provides a
+    calendar, the <code>DateTimeInput</code> component may not provide support for that calendar.
+</p>
+
+<p>
+    The <code>ShowCalendar</code> property allows the user to select their preferred calendar from
+    among the full list of those supported in their own environment.
+</p>
+
+<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
+    <TitleContent>
+        <div class="row justify-content-center">
+            <DateTimeInput TValue="string" ShowCalendar="true" />
+        </div>
+    </TitleContent>
+    <ChildContent>
+        @CodeFormatter.CodeToMarkup(@"<DateTimeInput TValue=""string"" ShowCalendar=""true"" />")
+    </ChildContent>
+</Collapse>
+
 <h2>Culture</h2>
 
 <p>
     Set the <code>Culture</code> property to a <code>CultureInfo</code> object to control the
-    appearance of the picker, and the format of display strings (but not bound strings, which use
-    the <code>InvariantCulture</code> for maximum interoperability).
+    appearance of the picker and the format of display strings (but not bound values, which use ISO
+    8601 formats for maximum interoperability).
 </p>
 
 <p>
-    The <code>Culture</code> property also controls which calendars are available. Bound data uses
-    invariant data structures which aren't tied to any specific calendar, but the picker can display
-    dates according to the conventions of any <code>Calendar</code> defined for the selected
-    culture. When more than one calendar exists, a select control is automatically displayed which
-    allows the user to choose their preferred calendar.
+    The <code>Culture</code> property also sets the <code>Calendar</code> property, if it was not
+    specified explicitly. It may, however, be helpful to set the <code>ShowCalendar</code> property
+    to <code>true</code> when assigning a specific culture, so the user may opt to use a different
+    calendar than the one .NET or their browser selects.
 </p>
 
 <Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -430,10 +466,9 @@
 </p>
 
 <p>
-    Note that while a <code>DateTimeInput</code> bound to a <code>string</code> or a nullable
-    <code>System.Drawing.Color</code> will allow an empty value, one bound to a non-nullable
-    <code>System.Drawing.Color</code> will never be empty, since the bound <code>struct</code> will
-    always have a value.
+    Note that while a <code>DateTimeInput</code> bound to a <code>string</code> or a nullable type
+    will allow an empty value, one bound to a non-nullable type will never be empty, since the bound
+    <code>struct</code> will always have a value.
 </p>
 
 <Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -511,20 +546,10 @@
     attribute.
 </p>
 
-<p>
-    When <code>Inline</code> is <code>true</code>, this sets the <code>tabindex</code> of the first
-    focusable control.
-</p>
-
 <h2>Name</h2>
 
 <p>
     The <code>name</code> attribute of the input can be set with the property of the same name.
-</p>
-
-<p>
-    Note: even when <code>Inline</code> is <code>true</code>, a hidden <code>input</code> element
-    still exists which receives this name, enabling native form submission.
 </p>
 
 <h2>Auto-focus</h2>
@@ -540,11 +565,6 @@
     technology.
 </p>
 
-<p>
-    When <code>Inline</code> is <code>true</code>, this sets the <code>AutoFocus</code> of the first
-    focusable control.
-</p>
-
 <h2>Methods</h2>
 
 <p>
@@ -553,8 +573,7 @@
 </p>
 
 <p>
-    The <code>FocusAsync</code> method will give the input focus. When <code>Inline</code> is
-    <code>true</code>, this sets the focus on the first focusable control.
+    The <code>FocusAsync</code> method will give the input focus.
 </p>
 
 <h2>Customization</h2>

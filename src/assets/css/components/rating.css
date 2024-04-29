@@ -16,7 +16,7 @@
         outline: none;
     }
 
-    &.disabled, &.read-only {
+    &.disabled, &.read-only, &[inert], [inert] & {
         .btn-icon {
             cursor: default;
             pointer-events: none;
@@ -27,7 +27,7 @@
         }
     }
 
-    &.disabled {
+    &.disabled, &[inert], [inert] & {
         --button-inherited-color: var(--tavenem-color-text-disabled);
 
         .btn-icon {
@@ -121,13 +121,13 @@
                     }
                 }
 
-                &:read-only {
+                &:read-only, &[inert], [inert] & {
                     pointer-events: none;
                 }
             }
 
             &:hover, &:focus-within, &:focus-visible {
-                &:has(> input:not(read-only)) {
+                &:has(> input:not([read-only])) {
                     transform: scale(1.2);
                 
                     > input {
@@ -165,7 +165,7 @@
             }
 
             &:has(~ .btn:is(:hover, :focus-within, :focus-visible)) {
-                > input:not(read-only) {
+                > input:not([read-only]) {
                     ~ .checked {
                         display: block;
                     }

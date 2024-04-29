@@ -1,4 +1,4 @@
-import { TavenemPopover, TavenemPopoverHTMLElement } from './tavenem-popover'
+import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover'
 
 export class TavenemInputHtmlElement extends HTMLElement {
     _inputDebounce: number = -1;
@@ -60,8 +60,24 @@ export class TavenemInputHtmlElement extends HTMLElement {
             return;
         }
         const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement) {
-            input.value = value || '';
+        if (!(input instanceof HTMLInputElement)) {
+            return;
+        }
+        if (value && value.length) {
+            input.value = value;
+        } else {
+            const hiddenInput = root.querySelector('input[type="hidden"]');
+            if (hiddenInput instanceof HTMLInputElement) {
+                const minLength = parseInt(this.dataset.minLength || '');
+                if (Number.isFinite(minLength)
+                    && minLength > hiddenInput.value.length) {
+                    input.value = hiddenInput.value.padStart(minLength, this.dataset.paddingChar);
+                } else {
+                    input.value = hiddenInput.value;
+                }
+            } else {
+                input.value = '';
+            }
         }
     }
 
@@ -88,9 +104,6 @@ export class TavenemInputHtmlElement extends HTMLElement {
             }
         } else {
             this.setAttribute('value', value);
-            if (input instanceof HTMLInputElement) {
-                input.value = value;
-            }
             if (hiddenInput instanceof HTMLInputElement) {
                 hiddenInput.value = value;
                 if (!value.length) {
@@ -99,6 +112,15 @@ export class TavenemInputHtmlElement extends HTMLElement {
                     this.removeAttribute('empty');
                 }
                 this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
+            }
+            if (input instanceof HTMLInputElement) {
+                const minLength = parseInt(this.dataset.minLength || '');
+                if (Number.isFinite(minLength)
+                    && minLength > value.length) {
+                    input.value = value.padStart(minLength, this.dataset.paddingChar);
+                } else {
+                    input.value = value;
+                }
             }
         }
     }
@@ -515,6 +537,8 @@ button.clear::-moz-focus-inner {
         }
         if (this.hasAttribute('spellcheck')) {
             input.spellcheck = this.hasAttribute('spellcheck');
+        } else {
+            input.spellcheck = false;
         }
         input.style.cssText = this.dataset.inputStyle || '';
         if (this.hasAttribute('tabindex')) {
@@ -529,9 +553,16 @@ button.clear::-moz-focus-inner {
         }
 
         const display = this.getAttribute('display');
-        if ((display && display.length)
-            || (hiddenInput.value && hiddenInput.value.length)) {
-            input.value = display || hiddenInput.value;
+        if (display && display.length) {
+            input.value = display;
+        } else if (hiddenInput.value && hiddenInput.value.length) {
+            const minLength = parseInt(this.dataset.minLength || '');
+            if (Number.isFinite(minLength)
+                && minLength > hiddenInput.value.length) {
+                input.value = hiddenInput.value.padStart(minLength, this.dataset.paddingChar);
+            } else {
+                input.value = hiddenInput.value;
+            }
         }
 
         shadow.appendChild(input);
@@ -1010,7 +1041,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
         return new CustomEvent('searchinput', { bubbles: true, composed: true, detail: { value: value } });
     }
 
-    private static newValueChangeEvent(value: string) {
+    protected static newValueChangeEvent(value: string) {
         return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
     }
 
@@ -2040,8 +2071,8 @@ slot {
             popover = this.shadowRoot.querySelector('tf-popover.contained-popover');
         }
         if (popover) {
-            TavenemPopover.placePopover(popover);
             this.dataset.popoverOpen = '';
+            TavenemPopover.placePopover(popover);
         }
 
         if ('searchFilter' in this.dataset) {

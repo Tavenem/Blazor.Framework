@@ -9,7 +9,7 @@
         }
     }
 
-    &.read-only, &[readonly] {
+    &.read-only, &[readonly], &[inert], [inert] & {
         cursor: default;
         pointer-events: none;
     }

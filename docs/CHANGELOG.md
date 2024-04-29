@@ -7,8 +7,13 @@
   - Data binding, validation, and other features which operate exclusively in an interactive context will still not function
   - `TextInput` suggestions fall back to the default `datalist` browser implementation when rendered non-interactively, which lacks some features of the interactive Blazor implementation and does not support custom styles
 ### Removed
-- `RenderBodyWhenClosed` from `Collapse`
-- `LostFocus` from `TextInput`
+- `RenderBodyWhenClosed` on `Collapse`
+- `LostFocus` and `ClearIcon` on `TextInput`
+- `StepDownIcon` and `StepUpIcon` on `NumericInput`
+- `FirstPageIcon`, `LastPageIcon`, `NextPageIcon`, and `PreviousPageIcon` on `Pagination`
+- `AddIcon`, `BackIcon`, and `ForwardIcon` on `Tabs`
+- `Icon` and `OutputHexStrings` on `ColorInput`
+- `Icon` on `DateTimeInput`
 
 ## 2.38
 ### Added

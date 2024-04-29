@@ -203,7 +203,7 @@ public partial class Editor : FormComponentBase<string>
         && Syntax is EditorSyntax.HTML or EditorSyntax.Markdown;
 
     private string? ItalicClass => new CssBuilder()
-        .Add("filled", IsActive(EditorCommandType.Italic))
+        .Add("filled", IsActive(EditorCommandType.Emphasis))
         .Add("outlined", IsActive(EditorCommandType.Italic))
         .ToString();
 

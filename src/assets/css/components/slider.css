@@ -100,7 +100,7 @@
         --output-display: block;
     }
 
-    &:not(.disabled, .read-only):has(input:active) {
+    &:not(.disabled, .read-only, [inert]):has(input:active) {
         --output-opacity: 1;
     }
 
@@ -123,9 +123,11 @@
         }
     }
 
-    &.read-only input {
-        &, &:active, &:focus-visible {
-            cursor: default;
+    &.read-only, &[inert], [inert] & {
+        input {
+            &, &:active, &:focus-visible {
+                cursor: default;
+            }
         }
     }
 
@@ -411,6 +413,56 @@
     cursor: default;
 }
 .slider.read-only input:focus-visible::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+
+.slider[inert] input::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider[inert] input::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider[inert] input:active::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider[inert] input:active::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider[inert] input:focus-visible::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+.slider[inert] input:focus-visible::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+
+[inert] .slider input::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+[inert] .slider input::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+[inert] .slider input:active::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+[inert] .slider input:active::-moz-range-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+[inert] .slider input:focus-visible::-webkit-slider-thumb {
+    box-shadow: none;
+    cursor: default;
+}
+[inert] .slider input:focus-visible::-moz-range-thumb {
     box-shadow: none;
     cursor: default;
 }

@@ -99,7 +99,7 @@ function addHeadContent() {
     const style = document.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
-    style.href = "_content/Tavenem.Blazor.Framework/css/framework.css";
+    style.href = "_content/Tavenem.Blazor.Framework/tavenem-framework.css";
     document.head.appendChild(style);
 
     const script = document.createElement('script');

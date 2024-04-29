@@ -1,5 +1,5 @@
-import { TavenemPopoverHTMLElement } from './tavenem-popover'
-import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './tavenem-input'
+import { TavenemPopoverHTMLElement } from './_popover'
+import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './_input'
 import { randomUUID } from './tavenem-utility'
 
 const halfSelectorSize = 13;
@@ -386,11 +386,6 @@ svg:not(.color-selector) {
     flex: 1 1 auto;
     gap: .25rem;
     margin-top: .25rem;
-}
-
-.buttons {
-    display: flex;
-    justify-content: flex-end;
 }
 
 :host([data-input-mode="hex"]) .field.alpha {
@@ -968,12 +963,9 @@ button::-moz-focus-inner {
             controlContainer = popover;
         }
 
-        const inputContent = document.createElement('div');
-        controlContainer.appendChild(inputContent);
-
         const colorPicker = document.createElement('div');
         colorPicker.classList.add('color-picker');
-        inputContent.appendChild(colorPicker);
+        controlContainer.appendChild(colorPicker);
 
         const overlay = document.createElement('div');
         overlay.classList.add('color-overlay');
@@ -1011,7 +1003,7 @@ button::-moz-focus-inner {
 
         const colorControls = document.createElement('div');
         colorControls.classList.add('color-controls');
-        inputContent.appendChild(colorControls);
+        controlContainer.appendChild(colorControls);
 
         const slidersContainer = document.createElement('div');
         slidersContainer.classList.add('sliders-container');
@@ -1340,11 +1332,13 @@ button::-moz-focus-inner {
         if (this.hasAttribute('button')) {
             const buttonsDiv = document.createElement('div');
             buttonsDiv.classList.add('dialog-buttons');
-            inputContent.appendChild(buttonsDiv);
+            controlContainer.appendChild(buttonsDiv);
 
             const clearButton = document.createElement('button');
             clearButton.classList.add('color-clear');
             clearButton.textContent = "Clear";
+            clearButton.disabled = this.hasAttribute('disabled')
+                || this.hasAttribute('readonly');
             buttonsDiv.appendChild(clearButton);
             clearButton.addEventListener('click', this.onClearButton.bind(this));
 

@@ -176,7 +176,7 @@
         }
     }
 
-    &:disabled, &.disabled {
+    &:disabled, &.disabled, &[inert], [inert] & {
         --button-active-shadow: none;
         --button-bg: var(--tavenem-color-action-disabled-bg);
         --button-color: var(--tavenem-color-text-disabled);
@@ -192,7 +192,7 @@
 .btn::-moz-focus-inner {
     border-style: none;
 }
-a.btn:not(.disabled, :disabled) {
+a.btn:not(.disabled, :disabled, [inert]) {
     &:hover,
     &:focus {
         color: var(--button-hover-color);
@@ -247,12 +247,12 @@ a.btn:not(.disabled, :disabled) {
         --button-hover-color: var(--tavenem-theme-color);
     }
 
-    &:disabled, &.disabled {
+    &:disabled, &.disabled, &[inert], [inert] & {
         --button-bg: transparent;
         background-color: transparent;
     }
 }
-a.btn-text:not(.disabled, :disabled) {
+a.btn-text:not(.disabled, :disabled, [inert]) {
     &:hover,
     &:focus {
         color: var(--button-hover-color);
@@ -336,7 +336,7 @@ a.btn-text:not(.disabled, :disabled) {
             --button-hover-bg: var(--tavenem-theme-color-darken);
             --button-hover-color: var(--tavenem-theme-color-text);
 
-            &:disabled, &.disabled {
+            &:disabled, &.disabled, &[inert], [inert] & {
                 --button-bg: var(--tavenem-color-action-disabled-bg);
             }
 
@@ -346,7 +346,7 @@ a.btn-text:not(.disabled, :disabled) {
         }
     }
 
-    &:disabled, &.disabled {
+    &:disabled, &.disabled, &[inert], [inert] & {
         --button-bg: transparent;
         background-color: transparent;
     }
@@ -362,7 +362,7 @@ a.btn-text:not(.disabled, :disabled) {
         background-color: var(--button-bg);
         color: var(--button-color);
 
-        &:disabled, &.disabled {
+        &:disabled, &.disabled, &[inert], [inert] & {
             --button-bg: var(--tavenem-color-action-disabled-bg);
             background-color: var(--tavenem-color-action-disabled-bg);
         }

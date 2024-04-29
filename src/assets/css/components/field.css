@@ -69,7 +69,7 @@
         }
     }
 
-    &:not(.outlined, .disabled, .read-only) > .input:hover:before {
+    &:not(.outlined, .disabled, .read-only, [inert]) > .input:hover:before {
         border-bottom-color: var(--field-border-hover-color);
     }
 
@@ -91,7 +91,7 @@
                 background-color: rgba(0, 0, 0, 0.13);
             }
 
-            &:disabled {
+            &:disabled, &[inert], [inert] & {
                 background-color: rgba(0, 0, 0, 0.12);
             }
 
@@ -137,7 +137,7 @@
             position: relative;
             transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 
-            &:disabled {
+            &:disabled, &[inert], [inert] & {
                 border-color: var(--tavenem-color-action-disabled);
             }
 
@@ -170,11 +170,11 @@
         padding-top: 2.5px;
     }
 
-    &.outlined:not(.disabled, .read-only) > .input:hover {
+    &.outlined:not(.disabled, .read-only, [inert]) > .input:hover {
         border-color: var(--field-border-hover-color);
     }
 
-    &:focus-within:not(.disabled, .read-only) {
+    &:focus-within:not(.disabled, .read-only, [inert]) {
         --field-border-color: var(--field-active-border-color);
         --field-border-hover-color: var(--field-active-border-hover-color);
         --field-label-color: var(--field-active-label-color);
@@ -342,7 +342,9 @@
     &.disabled,
     &[disabled],
     &.read-only,
-    &[readonly] {
+    &[readonly],
+    &[inert],
+    [inert] & {
         --tavenem-field-input-opacity: 1;
 
         > .input {
@@ -375,7 +377,7 @@
     &.info,
     &.success,
     &.warning {
-        &:not(.invalid, .disabled) {
+        &:not(.invalid, .disabled, [inert]) {
             --field-active-border-color: var(--tavenem-theme-color);
             --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
             --field-active-label-color: var(--tavenem-theme-color);
@@ -387,8 +389,10 @@
         &.filled {
             background-color: transparent;
             
-            > .input:disabled {
-                background-color: var(--tavenem-theme-color-hover-bright);
+            > .input {
+                &:disabled, &[inert], [inert] & {
+                    background-color: var(--tavenem-theme-color-hover-bright);
+                }
             }
         }
     }
@@ -458,7 +462,9 @@
     }
 
     &:disabled,
-    &.disabled {
+    &.disabled,
+    &[inert],
+    [inert] & {
         --field-color: var(--tavenem-color-text-disabled);
         --field-label-color: var(--tavenem-color-text-disabled);
 
@@ -605,15 +611,15 @@
         --field-active-label-color: var(--tavenem-color-error);
     }
 
-    &.primary:not(.invalid, .disabled),
-    &.secondary:not(.invalid, .disabled),
-    &.tertiary:not(.invalid, .disabled),
-    &.danger:not(.invalid, .disabled),
-    &.dark:not(.invalid, .disabled),
-    &.default:not(.invalid, .disabled),
-    &.info:not(.invalid, .disabled),
-    &.success:not(.invalid, .disabled),
-    &.warning:not(.invalid, .disabled) {
+    &.primary:not(.invalid, .disabled, [inert]),
+    &.secondary:not(.invalid, .disabled, [inert]),
+    &.tertiary:not(.invalid, .disabled, [inert]),
+    &.danger:not(.invalid, .disabled, [inert]),
+    &.dark:not(.invalid, .disabled, [inert]),
+    &.default:not(.invalid, .disabled, [inert]),
+    &.info:not(.invalid, .disabled, [inert]),
+    &.success:not(.invalid, .disabled, [inert]),
+    &.warning:not(.invalid, .disabled, [inert]) {
         --field-active-label-color: var(--tavenem-theme-color);
     }
 }

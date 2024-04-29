@@ -161,7 +161,8 @@
         }
     }
 
-    &.disabled, tf-accordion[disabled] > & {
+    &.disabled, &[inert], [inert] &,
+    tf-accordion[disabled] > & {
         > details > summary {
             color: var(--tavenem-color-text-disabled);
             pointer-events: none;

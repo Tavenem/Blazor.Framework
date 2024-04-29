@@ -62,9 +62,7 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
-    <ClientAssetsInputs Include="$(ClientAssetsDirectory)rollup.config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts" />
-    <ClientAssetsInputs Remove="assets\scripts\tavenem-color-input.ts" />
-    <CssFiles Include="$(ClientAssetsDirectory)node_modules\@benrbray\prosemirror-math\style\math.css;$(ClientAssetsDirectory)node_modules\katex\dist\katex.min.css" />
+    <ClientAssetsInputs Include="$(ClientAssetsDirectory)esbuild_config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts;$(ClientAssetsDirectory)scripts\**\_*.ts" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">
@@ -80,8 +78,8 @@
 
     <MakeDir Directories="$(_ClientAssetsOutputFullPath)" />
     
-    <Message Importance="high" Text="Running npm run build:$(Configuration)..." />
-    <Exec Command="npm run build:$(Configuration) -- -d $(_ClientAssetsOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
+    <Message Importance="high" Text="Running npm run build..." />
+    <Exec Command="npm run build -- -o $(_ClientAssetsOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
 
     <ItemGroup>
       <_ClientAssetsBuildOutput Include="$(IntermediateOutputPath)clientassets\**"></_ClientAssetsBuildOutput>
@@ -97,34 +95,6 @@
     </ItemGroup>
     
     <DefineStaticWebAssets CandidateAssets="@(_ClientAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_ClientAssetsOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
-      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
-    </DefineStaticWebAssets>
-  </Target>
-
-  <Target Name="CssBuild" BeforeTargets="AssignTargetPaths" Inputs="@(CssFiles)" Outputs="$(IntermediateOutputPath)stylebuild.complete.txt">
-    <PropertyGroup>
-      <_CssOutputFolderPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)css'))/</_CssOutputFolderPath>
-    </PropertyGroup>
-
-    <MakeDir Directories="$(_CssOutputFolderPath)" />
-
-    <Message Importance="high" Text="Copying CSS files..." />
-    <Copy SourceFiles="@(CssFiles)" DestinationFolder="$(_CssOutputFolderPath)\%(RecursiveDir)" />
-
-    <ItemGroup>
-      <_CssBuildOutput Include="$(IntermediateOutputPath)css\**"></_CssBuildOutput>
-    </ItemGroup>
-
-    <WriteLinesToFile File="$(IntermediateOutputPath)stylebuild.complete.txt" Lines="@(_CssBuildOutput)" />
-  </Target>
-  
-  <Target Name="DefineCssAssets" AfterTargets="CssBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
-    <ItemGroup>
-      <FileWrites Include="@(_CssBuildOutput)" />
-      <FileWrites Include="$(IntermediateOutputPath)stylebuild.complete.txt" />
-    </ItemGroup>
-    
-    <DefineStaticWebAssets CandidateAssets="@(_CssBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_CssOutputFolderPath)" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
   </Target>

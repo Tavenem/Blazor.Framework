@@ -277,7 +277,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     /// </summary>
     public override Task ClearAsync()
     {
-        if (Disabled || ReadOnly || !IsInteractive)
+        if (Disabled || ReadOnly)
         {
             return Task.CompletedTask;
         }

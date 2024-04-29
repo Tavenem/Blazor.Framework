@@ -24,11 +24,9 @@
 @import "components/checkbox.css" layer(tavenem-framework.components);
 @import "components/chip.css" layer(tavenem-framework.components);
 @import "components/collapse.css" layer(tavenem-framework.components);
-@import "components/datepicker.css" layer(tavenem-framework.components);
 @import "components/dialog.css" layer(tavenem-framework.components);
 @import "components/drawer.css" layer(tavenem-framework.components);
 @import "components/editor.css" layer(tavenem-framework.components);
-@import "components/emoji.css" layer(tavenem-framework.components);
 @import "components/imageeditor.css" layer(tavenem-framework.components);
 @import "components/inputs.css" layer(tavenem-framework.components);
 @import "components/list.css" layer(tavenem-framework.components);
@@ -53,7 +51,7 @@
 @import "utilities/lg.css" layer(tavenem-framework.utilities);
 @import "utilities/xl.css" layer(tavenem-framework.utilities);
 @import "utilities/xxl.css" layer(tavenem-framework.utilities);
-@import "../math.css" layer(tavenem-framework.special);
-@import "../katex.min.css" layer(tavenem-framework.special);
+@import "@benrbray/prosemirror-math/dist/prosemirror-math.css" layer(tavenem-framework.special);
+@import "katex/dist/katex.min.css" layer(tavenem-framework.special);
 @import "highlight.css" layer(tavenem-framework.special);
 @import "blazor.css" layer(tavenem-framework.special);

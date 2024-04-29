@@ -193,7 +193,7 @@
         }
     }
 
-    &.disabled {
+    &.disabled, &[inert], [inert] & {
         color: var(--tavenem-color-text-disabled);
         cursor: default;
         pointer-events: none;

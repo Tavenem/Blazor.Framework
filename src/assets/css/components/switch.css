@@ -129,7 +129,7 @@
         color: var(--switch-inherited-color);
     }
 
-    &.disabled {
+    &.disabled, &[inert], [inert] & {
         --switch-inherited-color: var(--tavenem-color-action-disabled);
         --switch-inherited-hover-bg: transparent;
 

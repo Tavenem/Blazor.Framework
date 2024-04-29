@@ -4,6 +4,10 @@
 
 <div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
     @ChildContent
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label for="@Id">@Label</label>
+    }
     <textarea @ref="ElementReference"
               class="@InputCssClass"
               name="@NameValue"
@@ -11,10 +15,6 @@
               readonly
               style="@InputCssStyle"
               value="@Value" />
-    @if (!string.IsNullOrEmpty(Label))
-    {
-        <label for="@Id">@Label</label>
-    }
     @if (!IsReadOnly)
     {
         <div class="@ToolbarClass">

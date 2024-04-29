@@ -7,7 +7,7 @@
     flex-direction: column;
     margin: 0;
 
-    &:has(:focus-visible):not(.disabled) {
+    &:has(:focus-visible):not(.disabled, [inert]) {
         background-color: var(--tavenem-color-action-hover-bg);
     }
 
@@ -109,7 +109,7 @@
         margin: 0;
     }
 
-    &.disabled {
+    &.disabled, &[inert], [inert] & {
         --checkbox-inherited-color: var(--tavenem-color-action-disabled);
         --checkbox-inherited-hover-bg: transparent;
 
@@ -256,8 +256,10 @@
         }
     }
 
-    &.disabled legend {
-        color: var(--tavenem-color-text-disabled);
+    &.disabled, &[inert], [inert] & {
+        legend {
+            color: var(--tavenem-color-text-disabled);
+        }
     }
 
     &.filled {
