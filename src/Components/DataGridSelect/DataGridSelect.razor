@@ -6,48 +6,35 @@
 @typeparam TDataItem
 @typeparam TValue
 
-@inherits PickerComponentBase<TValue>
+@inherits DataGridSelectBase<TDataItem, TValue, TValue>
 
-<div class="d-none">
-    <CascadingValue Value="this" TValue="IDataGrid<TDataItem>" IsFixed="true">
-        @ChildContent
-    </CascadingValue>
-</div>
-<div @attributes="AdditionalAttributes"
-     id="@ContainerId"
-     class="@CssClass"
-     style="@CssStyle"
-     tabindex="-1"
-     @onclick="OnClickContainerAsync">
-    <div id="@InputId" class="input">
-        <input disabled="@IsDisabled"
-               name="@NameValue"
-               hidden
-               readonly
-               value="@CurrentValueAsString" />
-        <input @ref="ElementReference"
-               @attributes="InputAttributes"
-               id="@Id"
-               class="@InputCssClass"
-               style="@InputCssStyle"
-               autofocus="@AutoFocus"
-               disabled="@IsDisabled"
-               placeholder="@Placeholder"
-               readonly
-               required="@Required"
-               size="1"
-               tabindex="@TabIndex"
-               value="@DisplayString"
-               @onclick="TogglePopoverAsync"
-               @onclick:stopPropagation="true" />
-        <button class="@ClearButtonCssClass"
-                tabindex="-1"
-                @onclick="ClearAsync"
-                @onclick:stopPropagation="true">
-            <tf-icon>@ClearIcon</tf-icon>
-        </button>
-        <tf-icon class="expand" @onclick="TogglePopoverAsync" @onclick:stopPropagation="true">@DefaultIcons.Expand</tf-icon>
-    </div>
+<tf-select @attributes="AdditionalAttributes"
+           id="@ContainerId"
+           class="@CssClass"
+           data-popover-container
+           disabled="@Disabled"
+           readonly="@ReadOnly"
+           style="@CssStyle"
+           tabindex="-1"
+           value="@CurrentValueAsString"
+           @valuechange="OnPickerValueChangeAsync">
+    <tf-input @ref="ElementReference"
+              @attributes="InputAttributes"
+              id="@InputId"
+              autofocus="@AutoFocus"
+              class="@OuterInputCssClass"
+              data-input-class="@InputCssClass"
+              data-input-id="@Id"
+              data-input-style="@InputCssStyle"
+              disabled="@Disabled"
+              name="@NameValue"
+              placeholder="@Placeholder"
+              readonly
+              required="@Required"
+              size="1"
+              tabindex="@TabIndex">
+        <svg class="svg-icon expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
+    </tf-input>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label for="@Id">@Label</label>
@@ -71,16 +58,13 @@
             }
         </div>
     }
-    <Popover @ref="Popover"
-             Class="filled"
+    <Popover Class="contained-popover filled"
              AnchorId="@InputId"
              AnchorOrigin="Origin.Bottom_Left"
              PopoverOrigin="Origin.Top_Left"
-             FocusId="@ContainerId"
-             FocusOut="ClosePopoverAsync"
-             IsOpen="ShowPicker"
              MatchWidth="true">
-        <div @onclick:stopPropagation="true">
+        <CascadingValue Value="this" TValue="IDataGridSelect<TDataItem>" IsFixed="true">
+            @ChildContent
             <DataGrid @ref="DataGrid"
                       TDataItem="TDataItem"
                       AllowExport="false"
@@ -88,12 +72,10 @@
                       LoadItems="LoadItems"
                       RowsPerPage="5"
                       SelectionType="SelectionType.Single"
-                      SelectedItemChanged="UpdateCurrentValueAsync"
+                      SelectedItemChanged="UpdateCurrentValue"
                       ShowRowsPerPage="false"
                       ThemeColor="ThemeColor"
                       MaxHeight="90vh" />
-        </div>
+        </CascadingValue>
     </Popover>
-</div>
-
-
+</tf-select>

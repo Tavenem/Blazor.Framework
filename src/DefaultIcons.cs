@@ -42,16 +42,6 @@ public static class DefaultIcons
     /// </summary>
     public static string CheckBox_Unchecked { get; set; } = "check_box_outline_blank";
 
-    /// <summary>
-    /// <para>
-    /// An icon for buttons which clear content.
-    /// </para>
-    /// <para>
-    /// The default is an X.
-    /// </para>
-    /// </summary>
-    public static string Clear { get; set; } = "clear";
-
     /// <summary>An icon to indicate code.</summary>
     public static string Code { get; set; } = "code";
 
@@ -59,11 +49,6 @@ public static class DefaultIcons
     /// An icon for background color selection.
     /// </summary>
     public static string ColorBackgroundSelect { get; set; } = "format_color_fill";
-
-    /// <summary>
-    /// An icon for date/time selection.
-    /// </summary>
-    public static string DateTimeSelect { get; set; } = "calendar_month";
 
     /// <summary>
     /// An icon for delete buttons.
@@ -84,11 +69,6 @@ public static class DefaultIcons
     /// An icon for edit buttons.
     /// </summary>
     public static string Edit { get; set; } = "edit";
-
-    /// <summary>
-    /// An icon for emoji.
-    /// </summary>
-    public static string Emoji { get; set; } = "mood";
 
     /// <summary>
     /// <para>
@@ -184,11 +164,6 @@ public static class DefaultIcons
     /// </summary>
     public static string More { get; set; } = "more_horiz";
 
-    /// <summary>
-    /// An icon for the current time.
-    /// </summary>
-    public static string Now { get; set; } = "schedule";
-
     /// <summary>An icon to indicate a page break.</summary>
     public static string PageBreak { get; set; } = "insert_page_break";
 
@@ -240,16 +215,6 @@ public static class DefaultIcons
 
     /// <summary>An icon to indicate a table.</summary>
     public static string Table { get; set; } = "window";
-
-    /// <summary>
-    /// An icon for time-only selection.
-    /// </summary>
-    public static string TimeSelect { get; set; } = "schedule";
-
-    /// <summary>
-    /// An icon for today's date.
-    /// </summary>
-    public static string Today { get; set; } = "today";
 
     /// <summary>
     /// <para>

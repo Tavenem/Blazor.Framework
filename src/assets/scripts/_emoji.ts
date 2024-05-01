@@ -1,5 +1,6 @@
-﻿import { TavenemPopoverHTMLElement } from './_popover'
-import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './_input'
+﻿import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover'
+import { TavenemInputHtmlElement } from './_input'
+import { TavenemPickerHtmlElement } from './_picker'
 import { randomUUID } from './tavenem-utility'
 
 interface Emoji {
@@ -895,7 +896,7 @@ button::-moz-focus-inner {
         cancelButton.addEventListener('click', this.onCancel.bind(this));
 
         shadow.addEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
-        shadow.addEventListener('mousedown', this.onMouseDown.bind(this));
+        shadow.addEventListener('mousedown', this.onOuterMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
         shadow.addEventListener('keyup', this.onOuterKeyUp.bind(this));
         document.addEventListener('mousedown', this.onDocMouseDown.bind(this));
@@ -1306,6 +1307,22 @@ button::-moz-focus-inner {
     }
 
     private onOuterKeyUp(event: Event) { this.onKeyUp(event as KeyboardEvent); }
+
+    private onOuterMouseDown(event: Event) {
+        this.onMouseDown();
+        if (event.target
+            && event.target instanceof Node) {
+            const root = this.shadowRoot;
+            if (root) {
+                const pickers = root.querySelectorAll<TavenemPickerHtmlElement>('tf-picker');
+                for (const picker of pickers) {
+                    if (!TavenemPopover.nodeContains(picker, event.target)) {
+                        picker.setOpen(false);
+                    }
+                }
+            }
+        }
+    }
 
     private onOuterMouseUp(event: Event) { this.onMouseUp(event as MouseEvent); }
 

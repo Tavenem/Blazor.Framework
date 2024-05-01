@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Tavenem.Blazor.Framework;
@@ -89,8 +88,6 @@ public partial class Select<TValue>
         return success;
     }
 
-    private protected override Task OnTypeClosedAsync(Option<TValue> option) => ToggleValueAsync(option);
-
     private protected override async Task SelectItemAsync(Option<TValue>? option)
     {
         var index = option is null
@@ -107,13 +104,7 @@ public partial class Select<TValue>
         if (!_options[index].Disabled)
         {
             _selectedOptions.Clear();
-            await ToggleValueAsync(_options[index], false);
-        }
-
-        if (ShowPicker)
-        {
-            await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
+            ToggleValue(_options[index]);
         }
     }
 

@@ -214,14 +214,14 @@ public partial class MultiSelect<TValue>
         return success;
     }
 
-    private protected override async Task SelectItemAsync(Option<TValue>? option)
+    private protected override Task SelectItemAsync(Option<TValue>? option)
     {
         var index = option is null
             ? -1
             : _options.IndexOf(option);
         if (index == -1)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         SelectedIndex = index;
@@ -229,14 +229,10 @@ public partial class MultiSelect<TValue>
         if (!_options[index].Disabled)
         {
             _selectedOptions.Clear();
-            await ToggleValueAsync(_options[index], false);
+            ToggleValue(_options[index]);
         }
 
-        if (ShowPicker)
-        {
-            await _options[index].ElementReference.FocusAsync();
-            await ScrollService.ScrollToId(_options[index].Id, setHistory: false);
-        }
+        return Task.CompletedTask;
     }
 
     private protected override void UpdateCurrentValue()

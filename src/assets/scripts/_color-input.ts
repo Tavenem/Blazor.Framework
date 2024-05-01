@@ -1,5 +1,6 @@
 import { TavenemPopoverHTMLElement } from './_popover'
-import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './_input'
+import { TavenemInputHtmlElement } from './_input'
+import { TavenemPickerHtmlElement } from './_picker'
 import { randomUUID } from './tavenem-utility'
 
 const halfSelectorSize = 13;

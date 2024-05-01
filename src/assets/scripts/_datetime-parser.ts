@@ -3,9 +3,9 @@ import {
     CalendarDateTime,
     DateDuration,
     DateFields,
+    DateFormatter,
     DateTimeDuration,
     DateValue,
-    getDayOfWeek,
     getLocalTimeZone,
     GregorianCalendar,
     now,
@@ -84,12 +84,17 @@ interface Zone {
     equals(otherZone: Zone): boolean;
 }
 
+interface MonthObject {
+    monthName?: string;
+}
+
 interface WeekObject {
     week?: number;
     weekday?: number;
+    weekdayName?: string;
 }
 
-type DateTimeObject = DateFields & TimeFields & WeekObject;
+type DateTimeObject = DateFields & TimeFields & MonthObject & WeekObject;
 
 type ExtractorResult = [
     DateTimeObject | null,
@@ -124,20 +129,7 @@ const isoTimeOnly = RegExp(`^T?${isoTimeBaseRegex.source}$`);
 const isoYmdRegex = /([+-]\d{6}|\d{4})(?:-?(\d\d)(?:-?(\d\d))?)?/;
 const isoWeekRegex = /(\d{4})-?W(\d\d)(?:-?(\d))?/;
 const isoOrdinalRegex = /(\d{4})-?(\d{3})/;
-const monthsShort = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-];
+const monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const extractISOWeekData = simpleParse("weekYear", "weekNumber", "weekDay");
 const extractISOOrdinalData = simpleParse("year", "ordinal");
 const obsOffsets: Record<string, number> = {
@@ -151,16 +143,6 @@ const obsOffsets: Record<string, number> = {
     PDT: -7 * 60,
     PST: -8 * 60,
 };
-const orderedUnits: (keyof DateTimeObject)[] = ["year", "month", "day", "hour", "minute", "second", "millisecond"],
-    orderedWeekUnits: (keyof DateTimeObject)[] = [
-        "year",
-        "week",
-        "weekday",
-        "hour",
-        "minute",
-        "second",
-        "millisecond",
-    ];
 const rfc1123 =
     /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d\d) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d\d):(\d\d):(\d\d) GMT$/,
     rfc850 =
@@ -190,16 +172,10 @@ const typeToPos: Intl.DateTimeFormatPartTypesRegistry = {
     weekday: 11,
     unknown: 12,
 };
-const weekdaysLong = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-];
+const weekdaysLong = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const weekdaysShort = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const mdyRegex = /(?:(\d{1,2}[-/ ]))?(?:(\d{1,2})[-/ ])?([+-]\d{6}|\d{4}|\d{2})/;
+const timeExtensionRegex = RegExp(`(?:[,\s]*${isoTimeRegex.source})?`);
 
 /**
  * A zone with a fixed offset (meaning no DST)
@@ -650,6 +626,156 @@ function extractASCII(match: RegExpMatchArray): ExtractorResult {
     return [result, FixedOffsetZone.utcInstance];
 }
 
+function extractMdy(match: RegExpMatchArray, cursor?: number): ExtractorResult {
+    if (typeof cursor === "undefined") {
+        cursor = 0;
+    }
+
+    const c1 = int(match, cursor);
+    const c2 = match.length > cursor + 1 ? int(match, cursor + 1) : undefined;
+    const c3 = match.length > cursor + 2 ? int(match, cursor + 2) : undefined;
+
+    let y: number | undefined;
+    if (c2) {
+        if (c3) {
+            y = c3;
+        } else {
+            y = c2;
+        }
+    } else {
+        y = c1;
+    }
+    if (y && y < 100) {
+        if (y <= twoDigitCutoffYear) {
+            y += 2000;
+        } else {
+            y += 1900;
+        }
+    }
+
+    const item: DateTimeObject = {
+        month: match.length > cursor + 1 ? c1 : 1,
+        day: match.length > cursor + 2 ? c2 : 1,
+        year: y,
+    };
+
+    return [item, null, cursor + 3];
+}
+
+function extractTextMdy(match: RegExpMatchArray, cursor?: number): ExtractorResult {
+    if (typeof cursor === "undefined") {
+        cursor = 0;
+    }
+
+    const c1 = int(match, cursor);
+    const c2 = match.length > cursor + 1 ? match[cursor + 1] : undefined;
+    const c3 = match.length > cursor + 2 ? int(match, cursor + 2) : undefined;
+    const c4 = match.length > cursor + 3 ? int(match, cursor + 3) : undefined;
+
+    let item: DateTimeObject = {
+        monthName: c2,
+        year: c4,
+    };
+    if (c1 != null) {
+        item = {
+            ...item,
+            day: c1,
+        };
+    } else if (c3 != null) {
+        item = {
+            ...item,
+            day: c3,
+        };
+    }
+
+    if (item.year && item.year < 100) {
+        if (item.year <= twoDigitCutoffYear) {
+            item.year += 2000;
+        } else {
+            item.year += 1900;
+        }
+    }
+
+    return [item, null, cursor + 4];
+}
+
+function extractWeekdayMdy(match: RegExpMatchArray, cursor?: number): ExtractorResult {
+    if (typeof cursor === "undefined") {
+        cursor = 0;
+    }
+
+    const c1 = match.length > cursor ? match[cursor] : undefined;
+    const c2 = match.length > cursor + 1 ? int(match, cursor + 1) : undefined;
+    const c3 = match.length > cursor + 2 ? int(match, cursor + 2) : undefined;
+    const c4 = match.length > cursor + 3 ? int(match, cursor + 3) : undefined;
+
+    let y: number | undefined;
+    if (c3) {
+        if (c4) {
+            y = c4;
+        } else {
+            y = c3;
+        }
+    } else {
+        y = c2;
+    }
+    if (y && y < 100) {
+        if (y <= twoDigitCutoffYear) {
+            y += 2000;
+        } else {
+            y += 1900;
+        }
+    }
+
+    let item: DateTimeObject = {
+        weekdayName: c1,
+        month: match.length > cursor + 2 ? c2 : 1,
+        day: match.length > cursor + 3 ? c3 : 1,
+        year: y,
+    };
+
+    return [item, null, cursor + 4];
+}
+
+function extractWeekdayTextMdy(match: RegExpMatchArray, cursor?: number): ExtractorResult {
+    if (typeof cursor === "undefined") {
+        cursor = 0;
+    }
+
+    const c1 = match.length > cursor ? match[cursor] : undefined;
+    const c2 = int(match, cursor + 1);
+    const c3 = match.length > cursor + 2 ? match[cursor + 2] : undefined;
+    const c4 = match.length > cursor + 3 ? int(match, cursor + 3) : undefined;
+    const c5 = match.length > cursor + 4 ? int(match, cursor + 4) : undefined;
+
+    let item: DateTimeObject = {
+        weekdayName: c1,
+        monthName: c3,
+        year: c5,
+    };
+    if (c2 != null) {
+        item = {
+            ...item,
+            day: c2,
+        };
+    } else if (c4 != null) {
+        item = {
+            ...item,
+            day: c4,
+        };
+    }
+
+    if (item.year && item.year < 100) {
+        if (item.year <= twoDigitCutoffYear) {
+            item.year += 2000;
+        } else {
+            item.year += 1900;
+        }
+    }
+
+    return [item, null, cursor + 5];
+}
+
 const isoYmdWithTimeExtensionRegex = combineRegexes(isoYmdRegex, isoTimeExtensionRegex);
 const isoWeekWithTimeExtensionRegex = combineRegexes(isoWeekRegex, isoTimeExtensionRegex);
 const isoOrdinalWithTimeExtensionRegex = combineRegexes(isoOrdinalRegex, isoTimeExtensionRegex);
@@ -727,6 +853,123 @@ function parseSQL(s?: string | null) {
         [sqlYmdWithTimeExtensionRegex, extractISOYmdTimeAndOffset],
         [sqlTimeCombinedRegex, extractISOTimeOffsetAndIANAZone]
     );
+}
+
+const mdYWithTimeExtensionRegex = combineRegexes(mdyRegex, timeExtensionRegex);
+const extractMdyTimeAndOffset = combineExtractors(
+    extractMdy,
+    extractISOTime,
+    extractISOOffset,
+    extractIANAZone
+);
+const extractTextMdyTimeAndOffset = combineExtractors(
+    extractTextMdy,
+    extractISOTime,
+    extractISOOffset,
+    extractIANAZone
+);
+const extractWeekdayMdyTimeAndOffset = combineExtractors(
+    extractWeekdayMdy,
+    extractISOTime,
+    extractISOOffset,
+    extractIANAZone
+);
+const extractWeekdayTextMdyTimeAndOffset = combineExtractors(
+    extractWeekdayTextMdy,
+    extractISOTime,
+    extractISOOffset,
+    extractIANAZone
+);
+
+function getTextMdyRegex(months: string[]) {
+    return new RegExp(String.raw`(?:(\d{1,2})[-,/ ]*)?(${months.join('|')})[-,/ ]*(?:(\d{1,2})[-,/ ]+)?([+-]\d{6}|\d{4}|\d{2})`);
+}
+
+function getWeekdayExtensionRegex(weekdays: string[]) {
+    return new RegExp(String.raw`(${weekdays.join('|')})[-,/ ]+`);
+}
+
+function getWeekdayMdyRegex(weekdays: string[]) {
+    return combineRegexes(getWeekdayExtensionRegex(weekdays), mdYWithTimeExtensionRegex);
+}
+
+function getWeekdayTextMdyRegex(weekdays: string[], months: string[]) {
+    return combineRegexes(getWeekdayExtensionRegex(weekdays), getTextMdyRegex(months));
+}
+
+function parseInformalDate(s?: string | null, locale?: string, options?: Intl.DateTimeFormatOptions) {
+    let result = parse(
+        s,
+        [mdYWithTimeExtensionRegex, extractMdyTimeAndOffset],
+        [isoTimeCombinedRegex, extractISOTimeAndOffset]
+    );
+    if (result[0]
+        && result[0].month
+        && result[0].day) {
+        if (result[0].month > 13) {
+            const d = result[0].day;
+            result[0].day = result[0].month;
+            result[0].month = d;
+        } else {
+            const formatter = new DateFormatter(locale || 'en-US', options);
+            const formatted = formatter.formatToParts(new Date(2020, 1, 1));
+            if (formatted.findIndex(x => x.type === 'day')
+                < formatted.findIndex(x => x.type === 'month')) {
+                const d = result[0].day;
+                result[0].day = result[0].month;
+                result[0].month = d;
+            }
+        }
+    } else if (!result[0]) {
+        const longMonthFormatter = new DateFormatter(locale || 'en-US', { ...options, month: 'long' });
+        const longMonths = [...Array(12).keys()]
+            .map(x => longMonthFormatter.format(new Date(2020, x)).toLowerCase());
+        const shortMonthFormatter = new DateFormatter(locale || 'en-US', { ...options, month: 'short' });
+        const shortMonths = [...Array(12).keys()]
+            .map(x => shortMonthFormatter.format(new Date(2020, x)).toLowerCase());
+        const longWeekdayFormatter = new DateFormatter(locale || 'en-US', { ...options, weekday: 'long' });
+        const longWeekdays = [...Array(7).keys()]
+            .map(x => longWeekdayFormatter.format(new Date(2020, 5, x + 1)).toLowerCase());
+        const shortWeekdayFormatter = new DateFormatter(locale || 'en-US', { ...options, weekday: 'short' });
+        const shortWeekdays = [...Array(7).keys()]
+            .map(x => shortWeekdayFormatter.format(new Date(2020, 5, x + 1)).toLowerCase());
+        result = parse(
+            s?.toLowerCase(),
+            [getWeekdayMdyRegex(longWeekdays), extractWeekdayMdyTimeAndOffset],
+            [getWeekdayMdyRegex(shortWeekdays), extractWeekdayMdyTimeAndOffset],
+            [getWeekdayTextMdyRegex(longWeekdays, longMonths), extractWeekdayTextMdyTimeAndOffset],
+            [getWeekdayTextMdyRegex(longWeekdays, shortMonths), extractWeekdayTextMdyTimeAndOffset],
+            [getWeekdayTextMdyRegex(shortWeekdays, longMonths), extractWeekdayTextMdyTimeAndOffset],
+            [getWeekdayTextMdyRegex(shortWeekdays, shortMonths), extractWeekdayTextMdyTimeAndOffset],
+            [getTextMdyRegex(shortMonths), extractTextMdyTimeAndOffset],
+            [getTextMdyRegex(longMonths), extractTextMdyTimeAndOffset],
+            [getTextMdyRegex(shortMonths), extractTextMdyTimeAndOffset],
+            [isoTimeCombinedRegex, extractISOTimeAndOffset]
+        );
+        if (result[0]
+            && result[0].monthName
+            && result[0].monthName.length) {
+            result[0].month = longMonths.indexOf(result[0].monthName) + 1;
+            if (result[0].month <= 0) {
+                result[0].month = shortMonths.indexOf(result[0].monthName) + 1;
+            }
+            if (result[0].month <= 0) {
+                delete result[0].month;
+            }
+        }
+        if (result[0]
+            && result[0].weekdayName
+            && result[0].weekdayName.length) {
+            result[0].weekday = longWeekdays.indexOf(result[0].weekdayName) + 1;
+            if (result[0].weekday <= 0) {
+                result[0].weekday = shortWeekdays.indexOf(result[0].weekdayName) + 1;
+            }
+            if (result[0].weekday <= 0) {
+                delete result[0].weekday;
+            }
+        }
+    }
+    return result;
 }
 
 function dayOfWeek(year: number, month: number, day: number) {
@@ -863,32 +1106,26 @@ function fromResult(result: ExtractorResult): CalendarDate | CalendarDateTime | 
             console.log(`DateTime parse error: string contained date information but resolved to a time-only value.`);
             return undefined;
         }
-        for (const p in obj) {
-            const key = p as keyof DateFields;
-            const value = obj[key];
-            if (typeof value !== 'undefined') {
-                const newValue = dateTime[key];
-                if (newValue != value) {
-                    console.log(`DateTime parse error: ${key} was ${value} in string but resolved to ${newValue} when assigned to a date.`);
-                    return undefined;
-                }
-            }
-        }
     }
     if (containsTime) {
         if (dateTime instanceof CalendarDate) {
             console.log(`DateTime parse error: string contained time information but resolved to a date-only value.`);
             return undefined;
         }
-        for (const p in obj) {
-            const key = p as keyof TimeFields;
-            const value = obj[key];
-            if (typeof value !== 'undefined') {
-                const newValue = dateTime[key];
-                if (newValue != value) {
-                    console.log(`DateTime parse error: ${key} was ${value} in string but resolved to ${newValue} when assigned to a date-time.`);
-                    return undefined;
-                }
+    }
+    for (const p in obj) {
+        if (p === "monthName"
+            || p === "weekday"
+            || p === "weekdayName") {
+            continue;
+        }
+        const key = p as keyof (DateFields | TimeFields);
+        const value = obj[key];
+        if (typeof value !== 'undefined') {
+            const newValue = dateTime[key];
+            if (newValue != value) {
+                console.log(`DateTime parse error: ${key} was ${value} in string but resolved to ${newValue} when assigned to a date.`);
+                return undefined;
             }
         }
     }
@@ -932,7 +1169,7 @@ function getInvariantDayOfWeek(date: DateValue): number {
         dayOfWeek += 7;
     }
 
-    return dayOfWeek + 1;
+    return dayOfWeek;
 }
 
 function getOrdinal(year: number, month: number, day: number) {
@@ -1152,8 +1389,8 @@ export function getWeek(date: DateValue) {
     return { weekYear, weekNumber, weekday };
 }
 
-export function parseDateOrTime(s?: string | null) {
-    const dateTime = parseDateTime(s);
+export function parseDateOrTime(s?: string | null, locale?: string, options?: Intl.DateTimeFormatOptions) {
+    const dateTime = parseDateTime(s, locale, options);
     if (dateTime) {
         return dateTime;
     }
@@ -1163,7 +1400,7 @@ export function parseDateOrTime(s?: string | null) {
     }
 }
 
-export function parseDateTime(s?: string | null) {
+export function parseDateTime(s?: string | null, locale?: string, options?: Intl.DateTimeFormatOptions) {
     let result = fromResult(parseISODate(s));
     if (result) {
         return result;
@@ -1177,6 +1414,10 @@ export function parseDateTime(s?: string | null) {
         return result;
     }
     result = fromResult(parseSQL(s));
+    if (result) {
+        return result;
+    }
+    result = fromResult(parseInformalDate(s, locale, options));
     if (result) {
         return result;
     }
@@ -1222,8 +1463,8 @@ export function parseTime(s?: string | null) {
     }
 }
 
-export function parseAny(s?: string | null) {
-    const dateTime = parseDateOrTime(s);
+export function parseAny(s?: string | null, locale?: string, options?: Intl.DateTimeFormatOptions) {
+    const dateTime = parseDateOrTime(s, locale, options);
     if (dateTime) {
         return dateTime;
     }

@@ -181,7 +181,9 @@
     }
 
     &.shrink,
+    &.invalid-value,
     &:focus-within,
+    &[placeholder],
     &[value]:not([value=""]),
     &:has(textarea.has-placeholder),
     &:has(textarea:not(.has-placeholder, :placeholder-shown)),

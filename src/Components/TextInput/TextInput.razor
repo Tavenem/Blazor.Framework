@@ -2,10 +2,10 @@
 
 @inherits InputComponentBase<string>
 
-<tf-picker @attributes="AdditionalAttributes"
+<tf-select @attributes="AdditionalAttributes"
            class="@CssClass"
-           data-allow-delete
            data-disable-autosearch
+           data-has-text-input
            data-popover-container
            data-search-filter="@(!ShowAllSuggestions)"
            style="@CssStyle">
@@ -164,4 +164,4 @@
             </menu>
         </Popover>
     }
-</tf-picker>
+</tf-select>

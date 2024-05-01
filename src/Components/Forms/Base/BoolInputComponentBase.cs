@@ -9,6 +9,8 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 public abstract class BoolInputComponentBase<TValue>
     : FormComponentBase<TValue>
 {
+    private protected readonly bool _canBeNull = false;
+
     /// <summary>
     /// <para>
     /// Whether a <see langword="null"/> value can be set by interacting with the component.
@@ -24,15 +26,31 @@ public abstract class BoolInputComponentBase<TValue>
     [Parameter] public bool AllowNull { get; set; }
 
     /// <summary>
+    /// Whether this input allows <see langword="null"/> values, based on <typeparamref name="TValue"/>.
+    /// </summary>
+    protected bool CanBeNull => _canBeNull;
+
+    /// <summary>
     /// The current boolean value of this input.
     /// </summary>
     protected virtual bool? IsChecked => Value switch
     {
-        null => null,
+        null => CanBeNull ? null : false,
         bool b => b,
         IConvertible c => c.ToBoolean(null),
         var x => bool.TryParse(x.ToString(), out var s) && s,
     };
+
+    /// <summary>
+    /// Constructs a new instance of <see cref="BoolInputComponentBase{TValue}"/>.
+    /// </summary>
+    protected BoolInputComponentBase()
+    {
+        if (Nullable.GetUnderlyingType(typeof(TValue)) is not null)
+        {
+            _canBeNull = true;
+        }
+    }
 
     /// <summary>
     /// Sets this input's value.
@@ -173,7 +191,7 @@ public abstract class BoolInputComponentBase<TValue>
     /// </remarks>
     public void Toggle()
     {
-        if (AllowNull)
+        if (AllowNull && CanBeNull)
         {
             if (Value is null)
             {

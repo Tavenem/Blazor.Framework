@@ -5,7 +5,7 @@
 
 @inherits SelectBase<IEnumerable<TValue>, TValue>
 
-<tf-picker @attributes="AdditionalAttributes"
+<tf-select @attributes="AdditionalAttributes"
            id="@ContainerId"
            class="@CssClass"
            data-popover-container
@@ -26,14 +26,12 @@
               data-input-id="@Id"
               data-input-style="@InputCssStyle"
               disabled="@Disabled"
-              display="@DisplayString"
               name="@NameValue"
               placeholder="@Placeholder"
-              readonly="@ReadOnly"
+              readonly
               required="@Required"
               size="1"
-              tabindex="@TabIndex"
-              value="@CurrentValueAsString">
+              tabindex="@TabIndex">
         <svg class="svg-icon expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
     </tf-input>
     @if (!string.IsNullOrEmpty(Label))
@@ -59,8 +57,7 @@
             }
         </div>
     }
-    <Popover @ref="Popover"
-             Class="contained-popover filled"
+    <Popover Class="contained-popover filled"
              AnchorId="@InputId"
              AnchorOrigin="Origin.Bottom_Left"
              PopoverOrigin="Origin.Top_Left"
@@ -105,4 +102,4 @@
             </CascadingValue>
         </div>
     </Popover>
-</tf-picker>
+</tf-select>

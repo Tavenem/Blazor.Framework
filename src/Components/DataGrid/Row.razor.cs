@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Components.Forms;
 
 namespace Tavenem.Blazor.Framework.InternalComponents.DataGrid;
 
@@ -43,7 +44,7 @@ public partial class Row<[DynamicallyAccessedMembers(
     /// <summary>
     /// Gets the data item bound to this row.
     /// </summary>
-    [Parameter] public TDataItem Item { get; set; } = default!;
+    [Parameter, NotNull] public TDataItem? Item { get; set; }
 
     [CascadingParameter] private Form? TableEditForm { get; set; }
 
@@ -71,7 +72,9 @@ public partial class Row<[DynamicallyAccessedMembers(
         .Add("selected", IsSelected)
         .ToString();
 
-    [Inject] private protected ScrollService ScrollService { get; set; } = default!;
+    [Inject, NotNull] private protected ScrollService? ScrollService { get; set; }
+
+    [CascadingParameter] private IDataGridSelect<TDataItem>? Select { get; set; }
 
     private ThemeColor ThemeColor => DataGrid?.ThemeColor ?? ThemeColor.None;
 

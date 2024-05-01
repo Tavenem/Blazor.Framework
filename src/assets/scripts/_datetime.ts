@@ -1,5 +1,7 @@
 import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover'
-import { TavenemInputHtmlElement, TavenemPickerHtmlElement } from './_input'
+import { TavenemInputHtmlElement } from './_input'
+import { TavenemPickerHtmlElement } from './_picker'
+import { TavenemSelectInputHtmlElement } from './_select'
 import { randomUUID } from './tavenem-utility'
 import {
     CalendarDate,
@@ -96,9 +98,11 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 switch (type.toLowerCase()) {
                     case 'year':
                         this._type = DateTimeType.Year;
+                        this._view = DateTimeViewType.year;
                         break;
                     case 'month':
                         this._type = DateTimeType.Month;
+                        this._view = DateTimeViewType.month;
                         break;
                     case 'week':
                         this._type = DateTimeType.Week;
@@ -482,6 +486,10 @@ input::placeholder {
     .expand {
         transform: rotate(-180deg);
     }
+}
+
+.main-expand {
+    cursor: pointer;
 }
 
 button, .btn {
@@ -1234,14 +1242,18 @@ button::-moz-focus-inner,
                 hasMax = true;
             }
         }
+
+        let display = this.getValueAndDisplay(this._value);
+
         if ((hasValue && this._value == null)
             || (this._value
                 && (this._value > this._max
                 || this._value < this._min))) {
             this.classList.add('invalid');
+            if (display.value && display.value.length) {
+                this.classList.add('invalid-value');
+            }
         }
-
-        let display = this.getValueAndDisplay(this._value);
 
         let anchorId;
         let anchorOrigin;
@@ -1302,7 +1314,9 @@ button::-moz-focus-inner,
             if (this.hasAttribute('placeholder')) {
                 input.setAttribute('placeholder', this.getAttribute('placeholder') || '');
             }
-            input.setAttribute('readonly', '');
+            if (this.hasAttribute('readonly')) {
+                input.setAttribute('readonly', '');
+            }
             if (this.hasAttribute('required')) {
                 input.setAttribute('required', '');
             }
@@ -1317,14 +1331,19 @@ button::-moz-focus-inner,
                 }
             }
             input.dataset.inputId = this.dataset.inputId;
-            input.dataset.inputClass = this.dataset.inputClass;
-            input.dataset.inputStyle = this.dataset.inputStyle;
+            if ('inputClass' in this.dataset) {
+                input.dataset.inputClass = this.dataset.inputClass;
+            }
+            if ('inputStyle' in this.dataset) {
+                input.dataset.inputStyle = this.dataset.inputStyle;
+            }
+            input.dataset.pickerNoToggle = '';
             shadow.appendChild(input);
             input.addEventListener('valuechange', this.onInput.bind(this));
 
             const expand = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             input.appendChild(expand);
-            expand.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
+            expand.outerHTML = `<svg class="main-expand" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Z"/></svg>`;
 
             const slot = document.createElement('slot');
             shadow.appendChild(slot);
@@ -1426,7 +1445,7 @@ button::-moz-focus-inner,
 
                 const dn = new Intl.DisplayNames("en", { type: "calendar" });
 
-                const select = document.createElement('tf-picker') as TavenemPickerHtmlElement;
+                const select = document.createElement('tf-select') as TavenemSelectInputHtmlElement;
                 select.classList.add('field', 'select', 'calendar-select');
                 select.dataset.popoverContainer = '';
                 select.tabIndex = -1;
@@ -1511,7 +1530,7 @@ button::-moz-focus-inner,
                     localeControls.appendChild(timeZoneContainer);
                 }
 
-                const select = document.createElement('tf-picker');
+                const select = document.createElement('tf-select');
                 select.classList.add('field', 'select', 'timezone-select');
                 select.dataset.popoverContainer = '';
                 select.tabIndex = -1;
@@ -2107,7 +2126,9 @@ button::-moz-focus-inner,
             }
             this._max = newMax;
             if (this._value && this._value > this._max) {
+                this.classList.remove('valid');
                 this.classList.add('invalid');
+                this.classList.add('invalid-value');
             }
         } else if (name === 'min') {
             let newMin: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
@@ -2134,12 +2155,23 @@ button::-moz-focus-inner,
             }
             this._min = newMin;
             if (this._value && this._value < this._min) {
+                this.classList.remove('valid');
                 this.classList.add('invalid');
+                this.classList.add('invalid-value');
             }
         } else if (name === 'readonly') {
             const root = this.shadowRoot;
             if (!root) {
                 return;
+            }
+
+            const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+            if (input) {
+                if (newValue) {
+                    input.setAttribute('readonly', '');
+                } else {
+                    input.removeAttribute('readonly');
+                }
             }
 
             const header = root.querySelector('.header');
@@ -2175,7 +2207,9 @@ button::-moz-focus-inner,
         this._value = null;
 
         this.removeAttribute('value');
+        this.classList.remove('valid');
         this.classList.remove('invalid');
+        this.classList.remove('invalid-value');
 
         const root = this.shadowRoot;
         if (!root) {
@@ -2185,6 +2219,16 @@ button::-moz-focus-inner,
         const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
         if (input) {
             input.value = '';
+        }
+    }
+
+    protected onClosing() {
+        const root = this.shadowRoot;
+        if (root) {
+            const pickers = root.querySelectorAll<TavenemSelectInputHtmlElement>('tf-select');
+            for (const picker of pickers) {
+                picker.setOpen(false);
+            }
         }
     }
 
@@ -2698,12 +2742,18 @@ button::-moz-focus-inner,
     private onOuterKeyUp(event: Event) { this.onKeyUp(event as KeyboardEvent); }
 
     private onOuterMouseDown(event: Event) {
+        if (event.target instanceof SVGElement
+            && event.target.classList.contains('main-expand')) {
+            this.onToggle(event);
+            return;
+        }
+
         this.onMouseDown();
         if (event.target
             && event.target instanceof Node) {
             const root = this.shadowRoot;
             if (root) {
-                const pickers = root.querySelectorAll<TavenemPickerHtmlElement>('tf-picker');
+                const pickers = root.querySelectorAll<TavenemSelectInputHtmlElement>('tf-select');
                 for (const picker of pickers) {
                     if (!TavenemPopover.nodeContains(picker, event.target)) {
                         picker.setOpen(false);
@@ -2720,27 +2770,21 @@ button::-moz-focus-inner,
     private onOuterPopoverFocusLost(event: Event) { this.onPopoverFocusLost(event); }
 
     private onInput(event: Event) {
-        if (this._settingValue) {
-            return;
-        }
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector('.picker-value');
-        if (!(input instanceof TavenemInputHtmlElement)) {
+        if (this._settingValue
+            || !(event instanceof CustomEvent)
+            || !event.detail) {
             return;
         }
 
         event.preventDefault();
         event.stopPropagation();
 
-        this.setValue(input.value);
+        this.setValue(event.detail.value);
 
         if ('popoverOpen' in this.dataset) {
             this.setOpen(false);
         } else {
-            this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(input.value));
+            this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(event.detail.value));
         }
     }
 
@@ -2935,11 +2979,11 @@ button::-moz-focus-inner,
 
         if (this._value) {
             if (this._value instanceof ZonedDateTime) {
-                this.setDateTimeValue(toZoned(toCalendarDateTime(value, toTime(this._value)), this._value.timeZone));
+                this.setDateTimeValue(toZoned(toCalendarDateTime(value, toTime(this._value)), this._value.timeZone), true);
             } else if (this._value instanceof CalendarDateTime) {
-                this.setDateTimeValue(toCalendarDateTime(value, toTime(this._value)));
+                this.setDateTimeValue(toCalendarDateTime(value, toTime(this._value)), true);
             } else {
-                this.setDateTimeValue(value);
+                this.setDateTimeValue(value, true);
             }
         } else if (this.hasAttribute('time')) {
             if ('timeZone' in this.dataset || 'showTimeZone' in this.dataset) {
@@ -2957,12 +3001,12 @@ button::-moz-focus-inner,
                     timeZone: timeZone || getLocalTimeZone(),
                 }).resolvedOptions();
                 timeZone = options.timeZone;
-                this.setDateTimeValue(toZoned(toCalendarDateTime(value, this._displayedTime), timeZone));
+                this.setDateTimeValue(toZoned(toCalendarDateTime(value, this._displayedTime), timeZone), true);
             } else {
-                this.setDateTimeValue(toCalendarDateTime(value, this._displayedTime));
+                this.setDateTimeValue(toCalendarDateTime(value, this._displayedTime), true);
             }
         } else {
-            this.setDateTimeValue(value);
+            this.setDateTimeValue(value, true);
         }
 
         this.setOpen(false);
@@ -3178,10 +3222,12 @@ button::-moz-focus-inner,
 
         calendar = calendar && supportedCalendars.includes(calendar) ? calendar : "gregory";
 
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
+        const parseOptions: Intl.DateTimeFormatOptions = {
             calendar: calendar,
             timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        };
+        const options = new DateFormatter(this.dataset.locale || 'en-US', parseOptions).resolvedOptions();
+        const locale = options.locale;
         calendar = options.calendar;
         timeZone = options.timeZone;
 
@@ -3248,7 +3294,7 @@ button::-moz-focus-inner,
             if (value) {
                 return value;
             }
-            value = parseDateTimeString(input);
+            value = parseDateTimeString(input, locale, parseOptions);
             if (value instanceof CalendarDate) {
                 value = undefined;
             } else if (value instanceof ZonedDateTime
@@ -3283,7 +3329,7 @@ button::-moz-focus-inner,
                 } catch { }
                 break;
         }
-        value = parseDateTimeString(input);
+        value = parseDateTimeString(input, locale, parseOptions);
         if (value instanceof Time) {
             value = undefined;
         } else if (value instanceof ZonedDateTime
@@ -3472,7 +3518,11 @@ button::-moz-focus-inner,
                 || (!(this._max instanceof Time) && monthDate.compare(this._max) > 0);
             monthButton.textContent = getLocaleString(monthDate, locale, timeZone, calendar, { month: 'short' });
             selection.appendChild(monthButton);
-            monthButton.addEventListener('click', this.onSelectViewDate.bind(this, monthDate, DateTimeViewType.date, 1));
+            if (this._type === DateTimeType.Month) {
+                monthButton.addEventListener('click', this.onSelectDate.bind(this, monthDate));
+            } else {
+                monthButton.addEventListener('click', this.onSelectViewDate.bind(this, monthDate, DateTimeViewType.date, 1));
+            }
 
             const newMonth = monthDate.add({ months: 1 });
             if (newMonth.month === monthDate.month) {
@@ -3557,7 +3607,11 @@ button::-moz-focus-inner,
                 : getLocaleString(displayedDate, locale, timeZone, calendar, { year: 'numeric' });
             selection.appendChild(periodButton);
             if (this._yearStep === 1) {
-                periodButton.addEventListener('click', this.onSelectViewDate.bind(this, displayedDate, DateTimeViewType.month, 1));
+                if (this._type === DateTimeType.Year) {
+                    periodButton.addEventListener('click', this.onSelectDate.bind(this, displayedDate));
+                } else {
+                    periodButton.addEventListener('click', this.onSelectViewDate.bind(this, displayedDate, DateTimeViewType.month, 1));
+                }
             } else {
                 periodButton.addEventListener('click', this.onSelectViewDate.bind(this, displayedDate, DateTimeViewType.year, getDividedByTen(this._yearStep)));
             }
@@ -3717,7 +3771,7 @@ button::-moz-focus-inner,
         }
     }
 
-    private setDateTimeValue(value?: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null) {
+    private setDateTimeValue(value?: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null, preserveView?: boolean) {
         if (!value) {
             this.clear();
             return;
@@ -3746,25 +3800,41 @@ button::-moz-focus-inner,
         }
 
         this._value = value;
+
+        const display = this.getValueAndDisplay(this._value);
+
         if (this._value instanceof Time) {
             if ((this._max instanceof Time && this._value.compare(this._max) > 0)
                 || (this._min instanceof Time && this._value.compare(this._min) < 0)) {
+                this.classList.remove('valid');
                 this.classList.add('invalid');
+                if (display.value && display.value.length) {
+                    this.classList.add('invalid-value');
+                }
             } else {
                 this.classList.remove('invalid');
+                this.classList.remove('invalid-value');
             }
         } else if ((!(this._max instanceof Time) && this._value.compare(this._max) > 0)
             || (!(this._min instanceof Time) && this._value.compare(this._min) < 0)) {
+            this.classList.remove('valid');
             this.classList.add('invalid');
+            if (display.value && display.value.length) {
+                this.classList.add('invalid-value');
+            }
         } else {
             this.classList.remove('invalid');
+            this.classList.remove('invalid-value');
         }
 
-        const display = this.getValueAndDisplay(this._value);
         if (display.value.length) {
             this.setAttribute('value', display.value);
         } else {
             this.removeAttribute('value');
+        }
+
+        if (!preserveView) {
+            this.setView(this._view);
         }
 
         const root = this.shadowRoot;
@@ -3964,6 +4034,15 @@ button::-moz-focus-inner,
         if (!dateTimeValue) {
             this.clear();
             this.classList.add('invalid');
+            this.classList.add('invalid-value');
+
+            const root = this.shadowRoot;
+            if (root) {
+                const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+                if (input) {
+                    input.display = value;
+                }
+            }
         } else {
             this.setDateTimeValue(dateTimeValue);
         }

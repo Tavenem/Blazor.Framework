@@ -11,10 +11,9 @@ import {
     TavenemPopover,
     TavenemTooltipHTMLElement
 } from './_popover';
-import {
-    TavenemInputHtmlElement,
-    TavenemPickerHtmlElement
-} from './_input';
+import { TavenemInputHtmlElement } from './_input';
+import { TavenemPickerHtmlElement } from './_picker';
+import { TavenemSelectInputHtmlElement } from './_select';
 import { TavenemColorInputHtmlElement } from './_color-input';
 import { TavenemDateTimeInputHtmlElement } from './_datetime';
 import {
@@ -646,6 +645,8 @@ slot button {
         customElements.define('tf-dropdown', TavenemDropdownHTMLElement);
 
         customElements.define('tf-picker', TavenemPickerHtmlElement);
+
+        customElements.define('tf-select', TavenemSelectInputHtmlElement);
 
         customElements.define('tf-color-input', TavenemColorInputHtmlElement);
 

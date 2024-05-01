@@ -8,6 +8,9 @@
 }
 <tr id="@Id"
     class="@RowCssClass"
+    data-close-picker="@(Select is not null)"
+    data-close-picker-value="@(Select?.GetRowValueAsString(this) ?? Item?.ToString())"
+    data-close-picker-display="@(Select?.GetRowAsDisplayString(this) ?? Item?.ToString())"
     @onclick="@OnClickAsync">
     @if (DataGrid.SelectionType == SelectionType.Multiple)
     {

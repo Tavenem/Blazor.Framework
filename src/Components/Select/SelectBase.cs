@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using System.Text;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
@@ -143,69 +141,9 @@ public abstract class SelectBase<TValue, TOption>
         .ToString();
 
     /// <summary>
-    /// The display text for the current selection.
-    /// </summary>
-    protected override string? DisplayString
-    {
-        get
-        {
-            if (_selectedOptions.Count == 0)
-            {
-                var matchingOption = _options.Find(x => EqualityComparer<TOption>.Default.Equals(x.Value, default));
-                return matchingOption?.Label
-                    ?? GetOptionValueAsString(matchingOption)
-                    ?? matchingOption?.Value?.ToString();
-            }
-
-            var first = _selectedOptions[0].Value;
-            if (_selectedOptions.Count == 1)
-            {
-                return first;
-            }
-
-            var sb = new StringBuilder(first);
-            if (sb.Length > 0)
-            {
-                sb.Append(" +")
-                    .Append((_selectedOptions.Count - 1).ToString("N0"));
-            }
-            else
-            {
-                sb.Append(_selectedOptions.Count.ToString("N0"));
-            }
-
-            return sb.ToString();
-        }
-    }
-
-    /// <summary>
     /// Whether this select allows multiple selections.
     /// </summary>
     protected virtual bool IsMultiselect => false;
-
-    private protected override bool CanClear => ShowClear
-        && _selectedOptions.Count > 0;
-
-    private protected override List<KeyOptions> InputKeyOptions { get; set; } =
-    [
-        new()
-        {
-            Key = "/^(?!ArrowDown$|ArrowUp$|Delete$|Enter$|Escape$|Tab$)/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-            TargetOnly = true,
-        }
-    ];
-
-    private protected override List<KeyOptions> KeyOptions { get; set; } =
-    [
-        new()
-        {
-            Key = "/ArrowDown|ArrowUp|Delete|Enter|Escape/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-        }
-    ];
 
     private protected int MaxOptionSize { get; set; }
 
@@ -213,11 +151,7 @@ public abstract class SelectBase<TValue, TOption>
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
 
-    [Inject] private protected ScrollService ScrollService { get; set; } = default!;
-
     private protected int SelectedIndex { get; set; } = -1;
-
-    private protected string? TypedValue { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -343,10 +277,23 @@ public abstract class SelectBase<TValue, TOption>
     /// Toggle the given option's selected state.
     /// </summary>
     /// <param name="option">The option to toggle.</param>
-    public Task ToggleValueAsync(Option<TOption> option)
-        => ToggleValueAsync(option, !IsMultiselect);
-
-    private protected override void OnKeyDownAsync(KeyboardEventArgs e) { }
+    public void ToggleValue(Option<TOption> option)
+    {
+        SelectedIndex = _options.IndexOf(option);
+        if (IsSelected(option.Value))
+        {
+            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
+        }
+        else
+        {
+            if (!IsMultiselect)
+            {
+                _selectedOptions.Clear();
+            }
+            _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
+        }
+        UpdateCurrentValue();
+    }
 
     private protected void OnPickerValueChange(ValueChangeEventArgs e)
     {
@@ -376,16 +323,7 @@ public abstract class SelectBase<TValue, TOption>
                     continue;
                 }
 
-                if (ShowPicker)
-                {
-                    await option.ElementReference.FocusAsync();
-                    await ScrollService.ScrollToId(option.Id, setHistory: false);
-                    await SelectItemAsync(option);
-                }
-                else
-                {
-                    await OnTypeClosedAsync(option);
-                }
+                await SelectItemAsync(option);
             }
             else
             {
@@ -394,8 +332,6 @@ public abstract class SelectBase<TValue, TOption>
         }
     }
 
-    private protected virtual Task OnTypeClosedAsync(Option<TOption> option) => Task.CompletedTask;
-
     private protected void RefreshOptions()
     {
         _options.ForEach(x => x.InvokeStateChange());
@@ -403,28 +339,6 @@ public abstract class SelectBase<TValue, TOption>
     }
 
     private protected abstract Task SelectItemAsync(Option<TOption> option);
-
-    private protected async Task ToggleValueAsync(Option<TOption> option, bool close)
-    {
-        if (PopoverOpen && close)
-        {
-            await TogglePopoverAsync();
-        }
-        SelectedIndex = _options.IndexOf(option);
-        if (IsSelected(option.Value))
-        {
-            _selectedOptions.RemoveAll(x => option.Value is null ? x.Key is null : x.Key?.Equals(option.Value) == true);
-        }
-        else
-        {
-            if (!IsMultiselect)
-            {
-                _selectedOptions.Clear();
-            }
-            _selectedOptions.Add(new(option.Value, option.Label ?? Labels?.Invoke(option.Value) ?? option.Value?.ToString()));
-        }
-        UpdateCurrentValue();
-    }
 
     private protected abstract void UpdateCurrentValue();
 

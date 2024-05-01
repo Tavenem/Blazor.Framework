@@ -111,7 +111,7 @@ function addHeadContent() {
 }
 
 function fixCheckboxes() {
-    const cbs = document.querySelectorAll('.checkbox label > .btn > input:is([type="checkbox"])');
+    const cbs = document.querySelectorAll('.checkbox[data-allow-null].indeterminate input:is([type="checkbox"])');
     for (var cb of cbs) {
         cb.indeterminate = true;
     }
