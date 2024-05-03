@@ -368,17 +368,24 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
 
         if (string.IsNullOrEmpty(Format))
         {
-            var count = 0;
-            var step = FormExtensions.SuppressScientificFormat(Step);
-            if (step is not null)
+            if (_isFloatingPoint && (Step is null || FormExtensions.ValuesEqual(Step, _zero)))
             {
-                var separator = step.IndexOf(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
-                if (separator > -1)
-                {
-                    count = step[(separator + 1)..].Length;
-                }
+                Format = "G";
             }
-            Format = $"F{count}";
+            else
+            {
+                var count = 0;
+                var step = FormExtensions.SuppressScientificFormat(Step);
+                if (step is not null)
+                {
+                    var separator = step.IndexOf(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+                    if (separator > -1)
+                    {
+                        count = step[(separator + 1)..].Length;
+                    }
+                }
+                Format = $"F{count}";
+            }
         }
 
         SetDisplay();
