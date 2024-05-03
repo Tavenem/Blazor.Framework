@@ -103,7 +103,7 @@ public partial class DraggableDropTarget<TDragItem, TDropItem>
     /// The final value assigned to the class attribute, including component
     /// values.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("border-transparent")
+    protected override string? CssClass => new CssBuilder("droptarget")
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, !DragDropListener.DropValid)
         .Add(Class)

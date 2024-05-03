@@ -77,6 +77,16 @@ public abstract class DataGridSelectBase<
 
     /// <summary>
     /// <para>
+    /// The maximum number of items to show on each page.
+    /// </para>
+    /// <para>
+    /// Default is 5.
+    /// </para>
+    /// </summary>
+    [Parameter] public ushort RowsPerPage { get; set; } = 5;
+
+    /// <summary>
+    /// <para>
     /// A function which retrieves the value of a given data item (row).
     /// </para>
     /// <para>

@@ -2,11 +2,10 @@ import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover'
 import { TavenemInputHtmlElement } from './_input'
 
 export class TavenemPickerHtmlElement extends HTMLElement {
-    _closeCooldownTimer: number;
-    _closed: boolean;
-    _hideTimer: number;
-    _searchText: string | null | undefined;
-    _searchTimer: number = -1;
+    protected _hideTimer: number;
+
+    private _closeCooldownTimer: number;
+    private _closed: boolean;
 
     static get observedAttributes() {
         return ['disabled', 'readonly'];
@@ -71,12 +70,11 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     }
 
     protected clear() {
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             input.value = '';
         }
     }
@@ -214,16 +212,15 @@ export class TavenemPickerHtmlElement extends HTMLElement {
         this._closed = true;
         delete this.dataset.popoverOpen;
 
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input
-            && (input instanceof HTMLInputElement
-                || input instanceof TavenemInputHtmlElement)) {
+        if (input) {
             this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(input.value));
         }
 
+        clearTimeout(this._closeCooldownTimer);
         this._closeCooldownTimer = setTimeout(() => this._closed = false, 200);
 
         this.onClosing();

@@ -2,6 +2,9 @@ import { TavenemInputHtmlElement } from './_input'
 import { TavenemPickerHtmlElement } from './_picker'
 
 export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
+    private _searchText: string | null | undefined;
+    private _searchTimer: number = -1;
+
     static get observedAttributes() {
         return ['disabled', 'readonly', 'value'];
     }
@@ -67,12 +70,11 @@ slot {
     }
 
     protected clear() {
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             input.value = '';
         }
 
@@ -114,12 +116,11 @@ slot {
 
         let newOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) + 1];
 
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             const currentOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || 0)];
             let currentOptionValue;
             if (!('pickerSelectAll' in currentOption.dataset)) {
@@ -172,12 +173,11 @@ slot {
 
         let newOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || -1) - 1];
 
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             const currentOption = selectedIndices.options[(selectedIndices.lastSelectedIndex || 0)];
             let currentOptionValue;
             if (!('pickerSelectAll' in currentOption.dataset)) {
@@ -211,13 +211,11 @@ slot {
             return;
         }
 
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (event.target === input
-            && (input instanceof HTMLInputElement
-                || input instanceof TavenemInputHtmlElement)) {
+        if (input && event.target === input) {
             return;
         }
 
@@ -367,13 +365,11 @@ slot {
         lastSelectedIndex?: number
     } {
         let value: string | undefined;
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input
-            && (input instanceof HTMLInputElement
-                || input instanceof TavenemInputHtmlElement)) {
+        if (input) {
             value = input.value;
         }
         if (!value) {
@@ -455,7 +451,7 @@ slot {
         searchText = event.detail.value.toLowerCase();
 
         if (input instanceof TavenemInputHtmlElement) {
-            input.suggestion = null;
+            delete input.suggestion;
         }
 
         let options = Array
@@ -642,7 +638,7 @@ slot {
             return;
         }
 
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLElement>('.picker-value');
         if (!input && this.shadowRoot) {
             input = this.shadowRoot.querySelector('.picker-value');
         }
@@ -651,9 +647,16 @@ slot {
             || input instanceof TavenemInputHtmlElement) {
             input.value = value;
         }
+        else if (input instanceof HTMLElement) {
+            input.setAttribute('value', value);
+        }
 
-        if (display && input instanceof TavenemInputHtmlElement) {
-            input.display = display;
+        if (display) {
+            if (input instanceof TavenemInputHtmlElement) {
+                input.display = display;
+            } else if (input && !(input instanceof HTMLInputElement)) {
+                input.setAttribute('display', display);
+            }
         }
 
         let useShadowOptions = false;
@@ -672,29 +675,22 @@ slot {
             if ('pickerSelectAll' in option.dataset) {
                 continue;
             }
-            if ('closePickerValue' in option.dataset) {
-                if (option.dataset.closePickerValue === value) {
+            if ('closePickerValue' in option.dataset
+                || option instanceof HTMLOptionElement) {
+                const optionValue = 'closePickerValue' in option.dataset
+                    ? option.dataset.closePickerValue
+                    : (option as HTMLOptionElement).value;
+                if (optionValue === value) {
                     option.classList.add('active');
                     if (!display
                         && 'closePickerDisplay' in option.dataset
                         && option.dataset.closePickerDisplay
-                        && option.dataset.closePickerDisplay.length
-                        && input instanceof TavenemInputHtmlElement) {
-                        input.display = option.dataset.closePickerDisplay;
-                    }
-                } else {
-                    anyNotSelected = true;
-                    option.classList.remove('active');
-                }
-            } else if (option instanceof HTMLOptionElement) {
-                if (option.value === value) {
-                    option.classList.add('active');
-                    if (!display
-                        && 'closePickerDisplay' in option.dataset
-                        && option.dataset.closePickerDisplay
-                        && option.dataset.closePickerDisplay.length
-                        && input instanceof TavenemInputHtmlElement) {
-                        input.display = option.dataset.closePickerDisplay;
+                        && option.dataset.closePickerDisplay.length) {
+                        if (input instanceof TavenemInputHtmlElement) {
+                            input.display = display;
+                        } else if (input && !(input instanceof HTMLInputElement)) {
+                            input.setAttribute('display', option.dataset.closePickerDisplay);
+                        }
                     }
                 } else {
                     anyNotSelected = true;
@@ -718,14 +714,13 @@ slot {
     private onSetValueForMultiple(value: string, display?: string | null) {
         let currentValue: string | string[] | undefined;
         let useShadow = false;
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
             useShadow = true;
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
 
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             currentValue = input.value;
             if (currentValue.startsWith('[')
                 && currentValue.endsWith(']')) {
@@ -762,8 +757,7 @@ slot {
             currentValue = value;
         }
 
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             input.value = value;
         }
 
@@ -995,12 +989,11 @@ slot {
 
         const value = JSON.stringify(values);
 
-        let input = this.querySelector('.picker-value');
+        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
         }
-        if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+        if (input) {
             input.value = value;
         }
 

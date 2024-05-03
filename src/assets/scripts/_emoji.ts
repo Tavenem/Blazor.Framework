@@ -206,11 +206,11 @@ slot {
 }
 
 export class TavenemEmojiPickerHTMLElement extends TavenemPickerHtmlElement {
-    _categorizedEmoji: Record<string, Emoji[]> = {};
-    _filteredEmoji: Record<string, Emoji[]> = {};
-    _latestEmoji: Emoji[] = [];
-    _skinTone1 = 0;
-    _skinTone2 = 0;
+    private _categorizedEmoji: Record<string, Emoji[]> = {};
+    private _filteredEmoji: Record<string, Emoji[]> = {};
+    private _latestEmoji: Emoji[] = [];
+    private _skinTone1 = 0;
+    private _skinTone2 = 0;
 
     static get observedAttributes() {
         return ['disabled', 'readonly', 'value'];
@@ -711,7 +711,7 @@ button::-moz-focus-inner {
 `;
         shadow.appendChild(style);
 
-        const anchorId = this.dataset.inputId || (window.isSecureContext ? crypto.randomUUID() : randomUUID());
+        const anchorId = this.dataset.inputId || randomUUID();
 
         const button = document.createElement('button');
         button.type = 'button';

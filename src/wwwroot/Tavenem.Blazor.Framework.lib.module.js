@@ -23,6 +23,16 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             };
         }
     });
+    blazor.registerCustomEventType('delete', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    ? event.detail.value
+                    : undefined
+            };
+        }
+    });
     blazor.registerCustomEventType('dropdowntoggle', {
         createEventArgs: (event) => {
             return {

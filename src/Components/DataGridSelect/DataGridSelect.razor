@@ -70,12 +70,12 @@
                       AllowExport="false"
                       Items="Items"
                       LoadItems="LoadItems"
-                      RowsPerPage="5"
+                      RowsPerPage="@RowsPerPage"
                       SelectionType="SelectionType.Single"
                       SelectedItemChanged="UpdateCurrentValue"
                       ShowRowsPerPage="false"
                       ThemeColor="ThemeColor"
-                      MaxHeight="90vh" />
+                      MaxHeight="min(332px,90vh)" />
         </CascadingValue>
     </Popover>
 </tf-select>

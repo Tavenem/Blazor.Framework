@@ -1,0 +1,24 @@
+@typeparam TTabItem
+
+@inherits DraggableDropTarget<TTabItem, TTabItem>
+
+<tf-tab id="@Id"
+        class="@CssClass"
+        data-can-close="@CanClose"
+        data-url="@GetPanelUrl()"
+        draggable="@GetIsDraggableString()">
+    @ChildContent
+    @if (TabPanel?.TabContent is not null)
+    {
+        @TabPanel.TabContent
+    }
+    else if (TabPanel?.TitleMarkup.HasValue == true
+    && !string.IsNullOrWhiteSpace(TabPanel.TitleMarkup!.Value.Value))
+    {
+        @TabPanel.TitleMarkup!.Value
+    }
+    else if (TabPanel is not null)
+    {
+        @TabPanel.Title
+    }
+</tf-tab>

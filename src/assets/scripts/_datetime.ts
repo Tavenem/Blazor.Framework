@@ -69,15 +69,17 @@ interface DateButton extends HTMLButtonElement {
 }
 
 export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
-    _displayedDate: CalendarDate;
-    _displayedTime: Time;
     _max: CalendarDate | CalendarDateTime | ZonedDateTime | Time = new CalendarDate(9999, 12, 31);
     _min: CalendarDate | CalendarDateTime | ZonedDateTime | Time = new CalendarDate('BC', 9999, 12, 31);
-    _settingValue = false;
-    _type: DateTimeType = DateTimeType.Date;
     _value: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
-    _view: DateTimeViewType = DateTimeViewType.date;
-    _yearStep: number = 1;
+
+    private _displayedDate: CalendarDate;
+    private _displayedTime: Time;
+    private _localTimeZone: string | undefined;
+    private _settingValue = false;
+    private _type: DateTimeType = DateTimeType.Date;
+    private _view: DateTimeViewType = DateTimeViewType.date;
+    private _yearStep: number = 1;
 
     static get observedAttributes() {
         return ['disabled', 'max', 'min', 'readonly', 'value'];
@@ -1259,7 +1261,7 @@ button::-moz-focus-inner,
         let anchorOrigin;
         let input: HTMLInputElement | TavenemInputHtmlElement;
         if (this.hasAttribute('button')) {
-            anchorId = this.dataset.inputId || (window.isSecureContext ? crypto.randomUUID() : randomUUID());
+            anchorId = this.dataset.inputId || randomUUID();
             anchorOrigin = 'anchor-center-center';
 
             const button = document.createElement('button');
@@ -1293,7 +1295,7 @@ button::-moz-focus-inner,
             button.appendChild(buttonIcon);
             buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Z"/></svg>`;
         } else {
-            anchorId = (window.isSecureContext ? crypto.randomUUID() : randomUUID());
+            anchorId = randomUUID();
             anchorOrigin = 'anchor-bottom-left';
 
             input = document.createElement('tf-input') as TavenemInputHtmlElement;
@@ -1453,7 +1455,7 @@ button::-moz-focus-inner,
                 calendarContainer.appendChild(select);
                 select.addEventListener('valuechange', this.onCalendarChange.bind(this));
 
-                const inputId = window.isSecureContext ? crypto.randomUUID() : randomUUID();
+                const inputId = randomUUID();
                 const input = document.createElement('tf-input') as TavenemInputHtmlElement;
                 input.id = inputId;
                 input.classList.add('picker-value', 'calendar-input');
@@ -1498,7 +1500,7 @@ button::-moz-focus-inner,
                     allCalendarsCheckboxSpan.classList.add('btn');
                     allCalendarsCheckboxLabel.appendChild(allCalendarsCheckboxSpan);
 
-                    const allCalendarsCheckboxInputId = window.isSecureContext ? crypto.randomUUID() : randomUUID();
+                    const allCalendarsCheckboxInputId = randomUUID();
                     const allCalendarsCheckboxInput = document.createElement('input');
                     allCalendarsCheckboxInput.id = allCalendarsCheckboxInputId;
                     allCalendarsCheckboxInput.type = 'checkbox';
@@ -1538,7 +1540,7 @@ button::-moz-focus-inner,
                 timeZoneContainer.appendChild(select);
                 select.addEventListener('valuechange', this.onTimeZoneChange.bind(this));
 
-                const inputId = window.isSecureContext ? crypto.randomUUID() : randomUUID();
+                const inputId = randomUUID();
                 const input = document.createElement('tf-input');
                 input.id = inputId;
                 input.classList.add('picker-value', 'timezone-input');
@@ -1581,7 +1583,7 @@ button::-moz-focus-inner,
                     allTimeZonesCheckboxSpan.classList.add('btn');
                     allTimeZonesCheckboxLabel.appendChild(allTimeZonesCheckboxSpan);
 
-                    const allTimeZonesCheckboxInputId = window.isSecureContext ? crypto.randomUUID() : randomUUID();
+                    const allTimeZonesCheckboxInputId = randomUUID();
                     const allTimeZonesCheckboxInput = document.createElement('input');
                     allTimeZonesCheckboxInput.id = allTimeZonesCheckboxInputId;
                     allTimeZonesCheckboxInput.type = 'checkbox';
@@ -2107,22 +2109,7 @@ button::-moz-focus-inner,
                 newMax = this.parseValue(newValue);
             }
             if (!newMax) {
-                let timeZone = this.dataset.timeZone;
-                const root = this.shadowRoot;
-                if (root) {
-                    const timeZoneInput = root.querySelector('.timezone-input');
-                    if (timeZoneInput instanceof TavenemInputHtmlElement
-                        && timeZoneInput.value
-                        && timeZoneInput.value.length) {
-                        timeZone = timeZoneInput.value;
-                    }
-                }
-                const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                    timeZone: timeZone || getLocalTimeZone(),
-                }).resolvedOptions();
-                timeZone = options.timeZone;
-
-                newMax = fromDate(new Date(8.64e15), timeZone);
+                newMax = fromDate(new Date(8.64e15), this.getOptions().timeZone);
             }
             this._max = newMax;
             if (this._value && this._value > this._max) {
@@ -2136,22 +2123,7 @@ button::-moz-focus-inner,
                 newMin = this.parseValue(newValue);
             }
             if (!newMin) {
-                let timeZone = this.dataset.timeZone;
-                const root = this.shadowRoot;
-                if (root) {
-                    const timeZoneInput = root.querySelector('.timezone-input');
-                    if (timeZoneInput instanceof TavenemInputHtmlElement
-                        && timeZoneInput.value
-                        && timeZoneInput.value.length) {
-                        timeZone = timeZoneInput.value;
-                    }
-                }
-                const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                    timeZone: timeZone || getLocalTimeZone(),
-                }).resolvedOptions();
-                timeZone = options.timeZone;
-
-                newMin = fromDate(new Date(-8.64e15), timeZone);
+                newMin = fromDate(new Date(-8.64e15), this.getOptions().timeZone);
             }
             this._min = newMin;
             if (this._value && this._value < this._min) {
@@ -2165,7 +2137,7 @@ button::-moz-focus-inner,
                 return;
             }
 
-            const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+            const input = root.querySelector<TavenemInputHtmlElement>('.picker-value');
             if (input) {
                 if (newValue) {
                     input.setAttribute('readonly', '');
@@ -2183,7 +2155,7 @@ button::-moz-focus-inner,
                 }
             }
 
-            const clearButton = root.querySelector('.color-clear') as HTMLButtonElement;
+            const clearButton = root.querySelector<HTMLButtonElement>('.color-clear');
             if (clearButton) {
                 if (newValue) {
                     clearButton.disabled = true;
@@ -2216,7 +2188,7 @@ button::-moz-focus-inner,
             return;
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+        const input = root.querySelector<TavenemInputHtmlElement>('.picker-value');
         if (input) {
             input.value = '';
         }
@@ -2247,31 +2219,37 @@ button::-moz-focus-inner,
     }
 
     private getNow() {
+        return now(this.getOptions().timeZone);
+    }
+
+    private getOptions() {
         let calendar = this.dataset.calendar;
         let timeZone = this.dataset.timeZone;
         const root = this.shadowRoot;
         if (root) {
-            const calendarInput = root.querySelector('.calendar-input');
-            if (calendarInput instanceof TavenemInputHtmlElement
+            const calendarInput = root.querySelector<TavenemInputHtmlElement>('.calendar-input');
+            if (calendarInput
                 && calendarInput.value
                 && calendarInput.value.length) {
                 calendar = calendarInput.value;
             }
 
-            const timeZoneInput = root.querySelector('.timezone-input');
-            if (timeZoneInput instanceof TavenemInputHtmlElement
+            const timeZoneInput = root.querySelector<TavenemInputHtmlElement>('.timezone-input');
+            if (timeZoneInput
                 && timeZoneInput.value
                 && timeZoneInput.value.length) {
                 timeZone = timeZoneInput.value;
             }
         }
 
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
-            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
-            timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        if (!timeZone && !this._localTimeZone) {
+            this._localTimeZone = getLocalTimeZone();
+        }
 
-        return now(options.timeZone);
+        return new DateFormatter(this.dataset.locale || 'en-US', {
+            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
+            timeZone: timeZone || this._localTimeZone,
+        }).resolvedOptions();
     }
 
     private getValueAndDisplay(value?: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null): {
@@ -2286,28 +2264,11 @@ button::-moz-focus-inner,
                 currentDate: undefined,
             };
         }
-        
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-        const root = this.shadowRoot;
-        if (root) {
-            const calendarInput = root.querySelector('.calendar-input');
-            if (calendarInput instanceof TavenemInputHtmlElement
-                && calendarInput.value
-                && calendarInput.value.length) {
-                calendar = calendarInput.value;
-            }
 
-            const timeZoneInput = root.querySelector('.timezone-input');
-            if (timeZoneInput instanceof TavenemInputHtmlElement
-                && timeZoneInput.value
-                && timeZoneInput.value.length) {
-                timeZone = timeZoneInput.value;
-            }
-        }
-        calendar = calendar && supportedCalendars.includes(calendar) ? calendar : "gregory";
-        const locale = this.dataset.locale || 'en-US';
-        timeZone = timeZone || getLocalTimeZone();
+        const options = this.getOptions();
+        const calendar = options.calendar;
+        const locale = options.locale;
+        const timeZone = options.timeZone;
 
         switch (this._type) {
             case DateTimeType.Year:
@@ -2544,21 +2505,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.subtract({ hours: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.subtract({ hours: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.subtract({ hours: 1 }));
@@ -2585,21 +2532,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.set({ hour: value }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.set({ hour: value }));
         } else {
             this.setDateTimeValue(this._displayedTime.set({ hour: value }));
@@ -2614,21 +2547,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.add({ hours: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.add({ hours: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.add({ hours: 1 }));
@@ -2642,21 +2561,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.subtract({ minutes: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.subtract({ minutes: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.subtract({ minutes: 1 }));
@@ -2683,21 +2588,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.set({ minute: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.set({ minute: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.set({ minute: 1 }));
@@ -2711,21 +2602,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.add({ minutes: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.add({ minutes: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.add({ minutes: 1 }));
@@ -2875,21 +2752,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.subtract({ seconds: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.subtract({ seconds: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.subtract({ seconds: 1 }));
@@ -2916,21 +2779,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.set({ second: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.set({ second: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.set({ second: 1 }));
@@ -2944,21 +2793,7 @@ button::-moz-focus-inner,
         if (this._value) {
             this.setDateTimeValue(this._value.add({ seconds: 1 }));
         } else if (this.hasAttribute('date')) {
-            let timeZone = this.dataset.timeZone;
-            const root = this.shadowRoot;
-            if (root) {
-                const timeZoneInput = root.querySelector('.timezone-input');
-                if (timeZoneInput instanceof TavenemInputHtmlElement
-                    && timeZoneInput.value
-                    && timeZoneInput.value.length) {
-                    timeZone = timeZoneInput.value;
-                }
-            }
-            const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                timeZone: timeZone || getLocalTimeZone(),
-            }).resolvedOptions();
-            timeZone = options.timeZone;
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), timeZone);
+            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
             this.setDateTimeValue(dateTime.add({ seconds: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.add({ seconds: 1 }));
@@ -2987,21 +2822,7 @@ button::-moz-focus-inner,
             }
         } else if (this.hasAttribute('time')) {
             if ('timeZone' in this.dataset || 'showTimeZone' in this.dataset) {
-                let timeZone = this.dataset.timeZone;
-                const root = this.shadowRoot;
-                if (root) {
-                    const timeZoneInput = root.querySelector('.timezone-input');
-                    if (timeZoneInput instanceof TavenemInputHtmlElement
-                        && timeZoneInput.value
-                        && timeZoneInput.value.length) {
-                        timeZone = timeZoneInput.value;
-                    }
-                }
-                const options = new DateFormatter(this.dataset.locale || 'en-US', {
-                    timeZone: timeZone || getLocalTimeZone(),
-                }).resolvedOptions();
-                timeZone = options.timeZone;
-                this.setDateTimeValue(toZoned(toCalendarDateTime(value, this._displayedTime), timeZone), true);
+                this.setDateTimeValue(toZoned(toCalendarDateTime(value, this._displayedTime), this.getOptions().timeZone), true);
             } else {
                 this.setDateTimeValue(toCalendarDateTime(value, this._displayedTime), true);
             }
@@ -3027,8 +2848,8 @@ button::-moz-focus-inner,
         if (!root) {
             return;
         }
-        const allCalendarsCheckboxInput = root.querySelector('.all-calendars-input');
-        if (!(allCalendarsCheckboxInput instanceof HTMLInputElement)) {
+        const allCalendarsCheckboxInput = root.querySelector<HTMLInputElement>('.all-calendars-input');
+        if (!allCalendarsCheckboxInput) {
             return;
         }
 
@@ -3097,8 +2918,8 @@ button::-moz-focus-inner,
         if (!root) {
             return;
         }
-        const allTimeZonesCheckboxInput = root.querySelector('.all-time-zones-input');
-        if (!(allTimeZonesCheckboxInput instanceof HTMLInputElement)) {
+        const allTimeZonesCheckboxInput = root.querySelector<HTMLInputElement>('.all-time-zones-input');
+        if (!allTimeZonesCheckboxInput) {
             return;
         }
 
@@ -3185,8 +3006,8 @@ button::-moz-focus-inner,
             } else {
                 const root = this.shadowRoot;
                 if (root) {
-                    const timeZoneInput = root.querySelector('.timezone-input');
-                    if (timeZoneInput instanceof TavenemInputHtmlElement
+                    const timeZoneInput = root.querySelector<TavenemInputHtmlElement>('.timezone-input');
+                    if (timeZoneInput
                         && timeZoneInput.value
                         && timeZoneInput.value.length) {
                         timeZoneInput.value = this._value.timeZone;
@@ -3201,35 +3022,15 @@ button::-moz-focus-inner,
             return undefined;
         }
 
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-        const root = this.shadowRoot;
-        if (root) {
-            const calendarInput = root.querySelector('.calendar-input');
-            if (calendarInput instanceof TavenemInputHtmlElement
-                && calendarInput.value
-                && calendarInput.value.length) {
-                calendar = calendarInput.value;
-            }
-
-            const timeZoneInput = root.querySelector('.timezone-input');
-            if (timeZoneInput instanceof TavenemInputHtmlElement
-                && timeZoneInput.value
-                && timeZoneInput.value.length) {
-                timeZone = timeZoneInput.value;
-            }
-        }
-
-        calendar = calendar && supportedCalendars.includes(calendar) ? calendar : "gregory";
+        const options = this.getOptions();
+        const calendar = options.calendar;
+        const locale = options.locale;
+        const timeZone = options.timeZone;
 
         const parseOptions: Intl.DateTimeFormatOptions = {
             calendar: calendar,
-            timeZone: timeZone || getLocalTimeZone(),
+            timeZone: timeZone,
         };
-        const options = new DateFormatter(this.dataset.locale || 'en-US', parseOptions).resolvedOptions();
-        const locale = options.locale;
-        calendar = options.calendar;
-        timeZone = options.timeZone;
 
         const hasTime = this._type === DateTimeType.Date && this.hasAttribute('time');
         const hasDate = !hasTime || this.hasAttribute('date');
@@ -3357,30 +3158,10 @@ button::-moz-focus-inner,
         root.querySelectorAll('.calendar-control')
             .forEach(x => x.remove());
 
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-
-        const calendarInput = root.querySelector('.calendar-input');
-        if (calendarInput instanceof TavenemInputHtmlElement
-            && calendarInput.value
-            && calendarInput.value.length) {
-            calendar = calendarInput.value;
-        }
-
-        const timeZoneInput = root.querySelector('.timezone-input');
-        if (timeZoneInput instanceof TavenemInputHtmlElement
-            && timeZoneInput.value
-            && timeZoneInput.value.length) {
-            timeZone = timeZoneInput.value;
-        }
-
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
-            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
-            timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        const options = this.getOptions();
+        const calendar = options.calendar;
         const locale = options.locale;
-        calendar = options.calendar;
-        timeZone = options.timeZone;
+        const timeZone = options.timeZone;
 
         const nowDateTime = now(timeZone);
         
@@ -3466,30 +3247,10 @@ button::-moz-focus-inner,
         root.querySelectorAll('.calendar-control')
             .forEach(x => x.remove());
 
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-
-        const calendarInput = root.querySelector('.calendar-input');
-        if (calendarInput instanceof TavenemInputHtmlElement
-            && calendarInput.value
-            && calendarInput.value.length) {
-            calendar = calendarInput.value;
-        }
-
-        const timeZoneInput = root.querySelector('.timezone-input');
-        if (timeZoneInput instanceof TavenemInputHtmlElement
-            && timeZoneInput.value
-            && timeZoneInput.value.length) {
-            timeZone = timeZoneInput.value;
-        }
-
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
-            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
-            timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        const options = this.getOptions();
+        const calendar = options.calendar;
         const locale = options.locale;
-        calendar = options.calendar;
-        timeZone = options.timeZone;
+        const timeZone = options.timeZone;
 
         const nowDateTime = now(timeZone);
 
@@ -3546,30 +3307,10 @@ button::-moz-focus-inner,
         root.querySelectorAll('.calendar-control')
             .forEach(x => x.remove());
 
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-
-        const calendarInput = root.querySelector('.calendar-input');
-        if (calendarInput instanceof TavenemInputHtmlElement
-            && calendarInput.value
-            && calendarInput.value.length) {
-            calendar = calendarInput.value;
-        }
-
-        const timeZoneInput = root.querySelector('.timezone-input');
-        if (timeZoneInput instanceof TavenemInputHtmlElement
-            && timeZoneInput.value
-            && timeZoneInput.value.length) {
-            timeZone = timeZoneInput.value;
-        }
-
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
-            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
-            timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        const options = this.getOptions();
+        const calendar = options.calendar;
         const locale = options.locale;
-        calendar = options.calendar;
-        timeZone = options.timeZone;
+        const timeZone = options.timeZone;
 
         const nowDateTime = now(timeZone);
 
@@ -3686,30 +3427,10 @@ button::-moz-focus-inner,
             }
         }
 
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-
-        const calendarInput = root.querySelector('.calendar-input');
-        if (calendarInput instanceof TavenemInputHtmlElement
-            && calendarInput.value
-            && calendarInput.value.length) {
-            calendar = calendarInput.value;
-        }
-
-        const timeZoneInput = root.querySelector('.timezone-input');
-        if (timeZoneInput instanceof TavenemInputHtmlElement
-            && timeZoneInput.value
-            && timeZoneInput.value.length) {
-            timeZone = timeZoneInput.value;
-        }
-
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
-            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
-            timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        const options = this.getOptions();
+        const calendar = options.calendar;
         const locale = options.locale;
-        calendar = options.calendar;
-        timeZone = options.timeZone;
+        const timeZone = options.timeZone;
 
         const expandViewButton = root.querySelector('.expand-view');
         if (expandViewButton) {
@@ -3852,30 +3573,10 @@ button::-moz-focus-inner,
             this._settingValue = false;
         }
 
-        let calendar = this.dataset.calendar;
-        let timeZone = this.dataset.timeZone;
-
-        const calendarInput = root.querySelector('.calendar-input');
-        if (calendarInput instanceof TavenemInputHtmlElement
-            && calendarInput.value
-            && calendarInput.value.length) {
-            calendar = calendarInput.value;
-        }
-
-        const timeZoneInput = root.querySelector('.timezone-input');
-        if (timeZoneInput instanceof TavenemInputHtmlElement
-            && timeZoneInput.value
-            && timeZoneInput.value.length) {
-            timeZone = timeZoneInput.value;
-        }
-
-        const options = new DateFormatter(this.dataset.locale || 'en-US', {
-            calendar: calendar && supportedCalendars.includes(calendar) ? calendar : "gregory",
-            timeZone: timeZone || getLocalTimeZone(),
-        }).resolvedOptions();
+        const options = this.getOptions();
+        const calendar = options.calendar;
         const locale = options.locale;
-        calendar = options.calendar;
-        timeZone = options.timeZone;
+        const timeZone = options.timeZone;
 
         const nowDateTime = now(timeZone);
         const valueOrNow = this._value || nowDateTime;
@@ -3902,8 +3603,8 @@ button::-moz-focus-inner,
         if (currentButton) {
             currentButton.textContent = valueOrNowDisplay.currentDate || '';
         }
-        const hourInput = root.querySelector('.hour-input');
-        if (hourInput instanceof TavenemInputHtmlElement) {
+        const hourInput = root.querySelector<TavenemInputHtmlElement>('.hour-input');
+        if (hourInput) {
             const hour12 = 'hour12' in this.dataset;
             if (hour12) {
                 if (this._displayedTime.hour === 0) {
@@ -3917,12 +3618,12 @@ button::-moz-focus-inner,
                 hourInput.value = this._displayedTime.hour.toString();
             }
         }
-        const minuteInput = root.querySelector('.minute-input');
-        if (minuteInput instanceof TavenemInputHtmlElement) {
+        const minuteInput = root.querySelector<TavenemInputHtmlElement>('.minute-input');
+        if (minuteInput) {
             minuteInput.value = this._displayedTime.minute.toString();
         }
-        const secondInput = root.querySelector('.second-input');
-        if (secondInput instanceof TavenemInputHtmlElement) {
+        const secondInput = root.querySelector<TavenemInputHtmlElement>('.second-input');
+        if (secondInput) {
             secondInput.value = this._displayedTime.second.toString();
         }
         const amButton = root.querySelector('.am-button');

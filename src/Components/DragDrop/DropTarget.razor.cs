@@ -139,7 +139,7 @@ public partial class DropTarget<TDropItem> : IDisposable
     [Parameter] public EventCallback<DropEventArgs> OnDrop { get; set; }
 
     /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder("border-transparent")
+    protected override string? CssClass => new CssBuilder("droptarget")
         .Add(CanDropClass, DragDropListener.DropValid)
         .Add(NoDropClass, DragDropListener.DropValid == false)
         .Add(Class)

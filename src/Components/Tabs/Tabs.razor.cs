@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization.Metadata;
+using Tavenem.Blazor.Framework.Components.Tabs;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
@@ -44,9 +44,15 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     [Parameter] public EventCallback<int?> ActivePanelIndexChanged { get; set; }
 
     /// <summary>
-    /// Can be set to <see langword="true"/> to indicate that non-staic tabs (i.e. those generated
-    /// from <see cref="Items"/>) should have close buttons, even if <see cref="OnClose"/> has not
-    /// been configured.
+    /// <para>
+    /// Can be set to <see langword="true"/> to indicate that tabs all should have close buttons.
+    /// </para>
+    /// <para>
+    /// Overrides <see cref="TabPanel{TTabItem}.CanClose"/> if <see langword="true"/>.
+    /// </para>
+    /// <para>
+    /// Always <see langword="true"/> if <see cref="OnClose"/> is not <see langword="null"/>.
+    /// </para>
     /// </summary>
     [Parameter] public bool CanCloseTabs { get; set; }
 
@@ -297,6 +303,10 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
 
+    internal bool CanClose => OnClose.HasDelegate ? IsInteractive : CanCloseTabs;
+
+    internal bool IsInteractive { get; set; }
+
     /// <summary>
     /// The final value assigned to the class attribute, including component
     /// values and anything assigned by the user in <see
@@ -311,11 +321,9 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
 
     [Inject, NotNull] private protected DragDropListener? DragDropListener { get; set; }
 
+    private int InitialActivePanelIndex { get; set; } = -1;
+
     private protected bool NoDropTargetChildren => _dropTargetElements.Count == 0;
-
-    internal int InitialActivePanelIndex { get; set; } = -1;
-
-    internal bool IsInteractive { get; set; }
 
     private string? ToolbarCssClass => new CssBuilder("tabs-toolbar")
         .Add(CanDropClass, DragDropListener.DropValid)
@@ -376,15 +384,25 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
-        if (ActiveItem is not null
-            && Items?.Contains(ActiveItem) != true)
+        if (ActiveItem is null
+            || Items?.Contains(ActiveItem) == true)
         {
-            ActiveItem = default;
-            if (ActivePanelIndex > 0)
-            {
-                await ActivatePanelAsync(ActivePanelIndex - 1, true);
-            }
+            return;
         }
+
+        ActiveItem = default;
+        if (ActivePanelIndex <= 0)
+        {
+            return;
+        }
+
+        var index = ActivePanelIndex;
+        bool success;
+        do
+        {
+            index = Math.Min(index - 1, PanelCount - 1);
+            success = await ActivatePanelAsync(index);
+        } while (!success && index > 0);
     }
 
     /// <inheritdoc/>
@@ -438,7 +456,12 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     /// </para>
     /// </summary>
     /// <param name="item">The item to activate.</param>
-    public async Task ActivatePanelAsync(TTabItem? item)
+    /// <returns>
+    /// <see langword="true"/> if the panel with the given <paramref name="item"/> was activated;
+    /// <see langword="false"/> if it was not (e.g. because the tab collection does not contain that
+    /// index, or the tab at that index is disabled).
+    /// </returns>
+    public async Task<bool> ActivatePanelAsync(TTabItem? item)
     {
         var index = -1;
         if (item is null)
@@ -457,7 +480,7 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
                 index = Items?.IndexOf(item) ?? -1;
             }
         }
-        await ActivatePanelAsync(index, true);
+        return index != -1 && await ActivatePanelAsync(index);
     }
 
     /// <summary>
@@ -469,8 +492,83 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
     /// </para>
     /// </summary>
     /// <param name="index">The index of the panel to activate.</param>
-    public Task ActivatePanelAsync(int index)
-        => ActivatePanelAsync(index, false);
+    /// <returns>
+    /// <see langword="true"/> if the panel at the given <paramref name="index"/> was activated;
+    /// <see langword="false"/> if it was not (e.g. because the tab collection does not contain that
+    /// index, or the tab at that index is disabled).
+    /// </returns>
+    public async Task<bool> ActivatePanelAsync(int index)
+    {
+        if (index < 0
+            || index >= PanelCount)
+        {
+            if (ActivePanelIndex != 0 && PanelCount <= 1)
+            {
+                ActivePanelIndex = 0;
+            }
+            return false;
+        }
+
+        if (index < _panels.Count)
+        {
+            var panel = _panels[index];
+
+            if (panel.Disabled)
+            {
+                if (ActivePanelIndex != 0 && PanelCount <= 1)
+                {
+                    ActivePanelIndex = 0;
+                }
+                return false;
+            }
+
+            await panel.OnActivate.InvokeAsync(panel.Item);
+            await OnActivate.InvokeAsync(panel.Item);
+        }
+        else if (Items is null)
+        {
+            if (ActivePanelIndex != 0 && PanelCount <= 1)
+            {
+                ActivePanelIndex = 0;
+            }
+            return false;
+        }
+        else
+        {
+            await OnActivate.InvokeAsync(Items[index - _panels.Count]);
+        }
+
+        ActivePanelIndex = index;
+        if (PanelCount == 0)
+        {
+            ActiveItem = default;
+        }
+        else if (_panels.Count > ActivePanelIndex)
+        {
+            ActiveItem = _panels[ActivePanelIndex].Item;
+        }
+        else if (Items is null)
+        {
+            ActiveItem = default;
+        }
+        else
+        {
+            ActiveItem = Items[ActivePanelIndex - _panels.Count];
+        }
+        await ActivePanelIndexChanged.InvokeAsync(index);
+
+        StateHasChanged();
+
+        if (PersistState)
+        {
+            QueryStateService.SetPropertyValue(
+                Id,
+                ActivePanelQueryParamName,
+                ActivePanelIndex + 1);
+        }
+
+        return true;
+    }
 
     internal void AddDropTarget(string id)
     {
@@ -489,12 +587,13 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
         StateHasChanged();
         if (_panels.Count == 1)
         {
-            await ActivatePanelAsync(0, true);
+            await ActivatePanelAsync(0);
         }
         else
         {
             StateHasChanged();
         }
+
         return _panels.Count - 1;
     }
 
@@ -535,6 +634,20 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
             : DragEffect.None);
     }
 
+    internal string? GetDynamicPanelUrl(DynamicTabInfo<TTabItem>? info) => PersistState && info is not null
+        ? QueryStateService.GetUriWithPropertyValue(
+            Id,
+            ActivePanelQueryParamName,
+            _dynamicItems.IndexOf(info) + _panels.Count + 1)
+        : null;
+
+    internal string? GetPanelUrl(int index) => PersistState
+        ? QueryStateService.GetUriWithPropertyValue(
+            Id,
+            ActivePanelQueryParamName,
+            index + 1)
+        : null;
+
     internal async Task InsertItemAsync(TTabItem item, int? index)
     {
         if (index.HasValue)
@@ -551,32 +664,13 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
         StateHasChanged();
     }
 
-    internal async Task RemovePanelAsync(TabPanel<TTabItem> panel)
+    internal void RemovePanel(TabPanel<TTabItem> panel)
     {
-        if (_disposedValue)
+        if (!_disposedValue)
         {
-            return;
+            _panels.Remove(panel);
+            StateHasChanged();
         }
-
-        var index = _panels.IndexOf(panel);
-        if (index == -1)
-        {
-            return;
-        }
-        else if (index == ActivePanelIndex)
-        {
-            if (index == _panels.Count - 1
-                && index > 0)
-            {
-                await ActivatePanelAsync(index - 1, true);
-            }
-        }
-        else if (ActivePanelIndex > index)
-        {
-            await ActivatePanelAsync(ActivePanelIndex - 1, true);
-        }
-        _panels.RemoveAt(index);
-        StateHasChanged();
     }
 
     /// <inheritdoc/>
@@ -590,76 +684,10 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
         base.Dispose(disposing);
     }
 
-    private async Task ActivatePanelAsync(int index, bool ignoreDisabledState = false)
-    {
-        if (index < 0
-            || index >= PanelCount)
-        {
-            return;
-        }
-
-        if (index < _panels.Count)
-        {
-            var panel = _panels[index];
-
-            if (panel.Disabled && !ignoreDisabledState)
-            {
-                return;
-            }
-
-            await panel.OnActivate.InvokeAsync(panel.Item);
-            await OnActivate.InvokeAsync(panel.Item);
-        }
-        else if (Items is null)
-        {
-            return;
-        }
-        else
-        {
-            await OnActivate.InvokeAsync(Items[index - _panels.Count]);
-        }
-
-        ActivePanelIndex = index;
-        if (PanelCount == 0)
-        {
-            ActiveItem = default;
-        }
-        else if (_panels.Count > ActivePanelIndex)
-        {
-            ActiveItem = _panels[ActivePanelIndex].Item;
-        }
-        else if (Items is null)
-        {
-            ActiveItem = default;
-        }
-        else
-        {
-            ActiveItem = Items[ActivePanelIndex - _panels.Count];
-        }
-        await ActivePanelIndexChanged.InvokeAsync(index);
-
-        StateHasChanged();
-
-        if (PersistState)
-        {
-            QueryStateService.SetPropertyValue(
-                Id,
-                ActivePanelQueryParamName,
-                ActivePanelIndex + 1);
-        }
-    }
-
     private DragEffect GetDropEffectInternal(string[] types)
         => GetDropEffectShared(types);
 
-    private string GetPanelUrl(int index) => QueryStateService.GetUriWithPropertyValue(
-        Id,
-        ActivePanelQueryParamName,
-        index + 1);
-
-    private string? GetTabClass(int index) => new CssBuilder("tab")
-        .Add("active", index == ActivePanelIndex)
-        .Add("disabled", index != ActivePanelIndex && index < _panels.Count && _panels[index].Disabled)
+    private string? GetTabClass(int index) => new CssBuilder()
         .Add("no-drag", EnableDragDrop && index < _panels.Count && !_panels[index].GetIsDraggable())
         .ToString();
 
@@ -702,15 +730,52 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
 
         if (index == ActivePanelIndex)
         {
-            await ActivatePanelAsync(index, true);
+            var newIndex = index + 1;
+            bool success;
+            do
+            {
+                newIndex = Math.Min(newIndex - 1, PanelCount - 1);
+                success = await ActivatePanelAsync(newIndex);
+            } while (!success && newIndex > 0);
         }
         else if (ActivePanelIndex > index)
         {
-            await ActivatePanelAsync(ActivePanelIndex - 1, true);
+            var newIndex = ActivePanelIndex;
+            bool success;
+            do
+            {
+                newIndex = Math.Min(newIndex - 1, PanelCount - 1);
+                success = await ActivatePanelAsync(newIndex);
+            } while (!success && newIndex > 0);
         }
         else
         {
             StateHasChanged();
+        }
+    }
+
+    private async Task OnDeleteAsync(ValueChangeEventArgs e)
+    {
+        if (PanelCount <= 0)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(e.Value))
+        {
+            await OnCloseTabAsync(ActivePanelIndex);
+        }
+        else
+        {
+            var index = _panels.FindIndex(x => string.CompareOrdinal(x.Id, e.Value) == 0);
+            if (index == -1)
+            {
+                index = _dynamicItems.FindIndex(x => string.CompareOrdinal(x.Id, e.Value) == 0);
+            }
+            if (index != -1)
+            {
+                await OnCloseTabAsync(index);
+            }
         }
     }
 
@@ -742,7 +807,13 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
         {
             (Items ??= []).Add(item);
             await ItemsChanged.InvokeAsync(Items);
-            await ActivatePanelAsync(Items.Count - 1 + _panels.Count, true);
+
+            var newIndex = Items.Count + _panels.Count;
+            bool success;
+            do
+            {
+                success = await ActivatePanelAsync(--newIndex);
+            } while (!success && newIndex > 0);
         }
     }
 
@@ -806,81 +877,6 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
 
     private void OnDropValidChanged(object? sender, EventArgs e) => StateHasChanged();
 
-    private async Task OnKeyDownAsync(KeyboardEventArgs e)
-    {
-        switch (e.Key)
-        {
-            case "ArrowLeft":
-                if (ActivePanelIndex == 0)
-                {
-                    if (PanelCount > 0)
-                    {
-                        var index = PanelCount - 1;
-                        while (index > ActivePanelIndex
-                            && index < _panels.Count
-                            && _panels[index].Disabled)
-                        {
-                            index--;
-                        }
-                        if (index != ActivePanelIndex)
-                        {
-                            await ActivatePanelAsync(index, true);
-                        }
-                    }
-                }
-                else
-                {
-                    var index = ActivePanelIndex - 1;
-                    while (index >= 0
-                        && index < _panels.Count
-                        && _panels[index].Disabled)
-                    {
-                        index--;
-                    }
-                    if (index >= 0)
-                    {
-                        await ActivatePanelAsync(index, true);
-                    }
-                }
-                break;
-            case "ArrowRight":
-                if (ActivePanelIndex == PanelCount - 1)
-                {
-                    var index = 0;
-                    while (index < ActivePanelIndex
-                        && index < _panels.Count
-                        && _panels[index].Disabled)
-                    {
-                        index++;
-                    }
-                    if (index < ActivePanelIndex)
-                    {
-                        await ActivatePanelAsync(index, true);
-                    }
-                }
-                else if (PanelCount > 0)
-                {
-                    var index = ActivePanelIndex + 1;
-                    while (index < _panels.Count
-                        && _panels[index].Disabled)
-                    {
-                        index++;
-                    }
-                    if (index < PanelCount)
-                    {
-                        await ActivatePanelAsync(index, true);
-                    }
-                }
-                break;
-            case "Delete":
-                if (PanelCount > 0)
-                {
-                    await OnCloseTabAsync(ActivePanelIndex);
-                }
-                break;
-        }
-    }
-
     private Task OnQueryChangedAsync(QueryChangeEventArgs args)
     {
         if (int.TryParse(args.Value, out var activePanelIndex)
@@ -890,5 +886,15 @@ public partial class Tabs<TTabItem> : PersistentComponentBase
             ActivePanelIndex = activePanelIndex - 1;
         }
         return Task.CompletedTask;
+    }
+
+    private async Task OnValueChangeAsync(ValueChangeEventArgs args)
+    {
+        if (!string.IsNullOrEmpty(args.Value)
+            && int.TryParse(args.Value, out var index)
+            && index < PanelCount)
+        {
+            await ActivatePanelAsync(index);
+        }
     }
 }

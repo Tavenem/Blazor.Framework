@@ -11,9 +11,9 @@ namespace Tavenem.Blazor.Framework;
 /// Not intended for use in any other context.
 /// </para>
 /// </summary>
-public partial class TabPanel<TTabItem> : IAsyncDisposable
+public partial class TabPanel<TTabItem> : IDisposable
 {
-    private bool _asyncDisposedValue;
+    private bool _disposed;
 
     /// <summary>
     /// <para>
@@ -25,6 +25,16 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public bool Disabled { get; set; }
+
+    /// <summary>
+    /// <para>
+    /// Whether the tab can be dismissed with a close button.
+    /// </para>
+    /// <para>
+    /// Always <see langword="true"/> if <see cref="OnClose"/> is not <see langword="null"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool CanClose { get; set; }
 
     /// <summary>
     /// <para>
@@ -82,7 +92,18 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     /// </summary>
     [CascadingParameter] protected Tabs<TTabItem>? Parent { get; set; }
 
+    internal bool CanCloseTab => OnClose.HasDelegate ? Parent?.IsInteractive == true : CanClose;
+
     internal int Index { get; set; } = -1;
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        if (Parent is not null)
+        {
+            Index = await Parent.AddPanelAsync(this);
+        }
+    }
 
     internal override DragEffect GetDragEffectAllowed() => Parent?.DragEffectAllowed ?? DragEffectAllowed;
 
@@ -94,47 +115,17 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
     internal override bool GetIsDropTarget() => Parent?.EnableDragDrop == true;
 
     /// <inheritdoc />
-    protected override async Task OnInitializedAsync()
+    protected override void Dispose(bool disposing)
     {
-        if (Parent is null)
-        {
-            return;
-        }
-
-        Index = await Parent.AddPanelAsync(this);
-        if (Index == Parent.InitialActivePanelIndex
-            && !Disabled)
-        {
-            await Parent.ActivatePanelAsync(Index);
-        }
-    }
-
-    /// <inheritdoc />
-    public async ValueTask DisposeAsync()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        await DisposeAsync(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting
-    /// unmanaged resources asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task that represents the asynchronous dispose operation.
-    /// </returns>
-    protected virtual async ValueTask DisposeAsync(bool disposing)
-    {
-        if (!_asyncDisposedValue)
+        if (!_disposed)
         {
             if (disposing && Parent is not null)
             {
-                await Parent.RemovePanelAsync(this);
-                Index = -1;
+                Parent.RemovePanel(this);
             }
+            base.Dispose(disposing);
 
-            _asyncDisposedValue = true;
+            _disposed = true;
         }
     }
 
@@ -197,10 +188,9 @@ public partial class TabPanel<TTabItem> : IAsyncDisposable
             await Parent.OnDropped.InvokeAsync(e);
         }
         else if (e == DragEffect.Move
-            && Item is not null
-            && Parent is not null)
+            && Item is not null)
         {
-            await Parent.RemovePanelAsync(this);
+            Parent?.RemovePanel(this);
         }
     }
 

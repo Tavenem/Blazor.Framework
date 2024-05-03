@@ -873,15 +873,13 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
     private onMouseLeave(event: MouseEvent) {
         this._mouseOver = false;
 
-        if (this.previousSibling
-            && this.previousSibling instanceof TavenemDropdownHTMLElement) {
+        if (this.previousSibling instanceof TavenemDropdownHTMLElement) {
             this.previousSibling.onPopoverMouseLeave();
         }
 
         if (this.classList.contains('tooltip')) {
-            const tooltip = this.closest('tf-tooltip');
-            if (tooltip
-                && tooltip instanceof TavenemTooltipHTMLElement) {
+            const tooltip = this.closest<TavenemTooltipHTMLElement>('tf-tooltip');
+            if (tooltip) {
                 tooltip.onPopoverMouseLeave(this, event);
             }
         }
@@ -891,9 +889,8 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
         this._mouseOver = true;
 
         if (this.classList.contains('tooltip')) {
-            const tooltip = this.closest('tf-tooltip');
-            if (tooltip
-                && tooltip instanceof TavenemTooltipHTMLElement) {
+            const tooltip = this.closest<TavenemTooltipHTMLElement>('tf-tooltip');
+            if (tooltip) {
                 tooltip.onPopoverMouseOver();
             }
         }
@@ -1162,10 +1159,8 @@ slot {
     private onAttentionOut() {
         this._mouseOver = false;
 
-        const tooltip = this.querySelector('.tooltip');
-        if (!tooltip
-            || !(tooltip instanceof TavenemPopoverHTMLElement)
-            || !tooltip.mouseOver) {
+        const tooltip = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
+        if (!tooltip || !tooltip.mouseOver) {
             this._dismissed = false;
             clearTimeout(this._showTimer);
             this._hideTimer = setTimeout(this.hide.bind(this), 200);
@@ -1210,8 +1205,8 @@ slot {
     private show() {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const popover = this.querySelector('tf-popover');
-        if (popover instanceof TavenemPopoverHTMLElement) {
+        const popover = this.querySelector<TavenemPopoverHTMLElement>('tf-popover');
+        if (popover) {
             popover.anchor = this._anchor;
         }
         this.dataset.popoverOpen = '';
@@ -1361,8 +1356,8 @@ slot {
         if ('popoverOpen' in this.dataset) {
             this._activation = MouseEventType.None;
             this.closeInner();
-            const popover = this.querySelector('tf-popover.contained-popover');
-            if (popover && popover instanceof TavenemPopoverHTMLElement) {
+            const popover = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.contained-popover');
+            if (popover) {
                 popover.mouseOver = false;
             }
         }
@@ -1424,8 +1419,8 @@ slot {
         }
 
         if ('openAtPointer' in this.dataset) {
-            const popover = this.querySelector('tf-popover.contained-popover');
-            if (popover && popover instanceof TavenemPopoverHTMLElement) {
+            const popover = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.contained-popover');
+            if (popover) {
                 const clientX = event?.clientX;
                 if (clientX) {
                     popover.dataset.positionX = clientX.toString();
@@ -1467,8 +1462,8 @@ slot {
         }
 
         if ('openAtPointer' in this.dataset) {
-            const popover = this.querySelector('tf-popover.contained-popover');
-            if (popover && popover instanceof TavenemPopoverHTMLElement) {
+            const popover = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.contained-popover');
+            if (popover) {
                 const clientX = event?.clientX;
                 if (clientX) {
                     popover.dataset.positionX = clientX.toString();
@@ -1501,8 +1496,7 @@ slot {
     }
 
     private onPopoverFocusLost(event: Event) {
-        if (event.target
-            && event.target instanceof TavenemPopoverHTMLElement
+        if (event.target instanceof TavenemPopoverHTMLElement
             && event.target.parentElement === this) {
             this._hideTimer = setTimeout(this.close.bind(this), 100);
         }
@@ -1536,10 +1530,8 @@ slot {
                 return;
             }
 
-            const popover = this.querySelector('tf-popover.contained-popover');
-            if (!popover
-                || !(popover instanceof TavenemPopoverHTMLElement)
-                || !popover.mouseOver) {
+            const popover = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.contained-popover');
+            if (!popover || !popover.mouseOver) {
                 this.close();
             }
         }, 100);

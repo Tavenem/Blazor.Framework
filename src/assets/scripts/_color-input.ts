@@ -23,9 +23,9 @@ interface RGBA {
 }
 
 export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
-    _overlayActive = false;
-    _selectorX = 0;
-    _selectorY = overlayHeight;
+    private _overlayActive = false;
+    private _selectorX = 0;
+    private _selectorY = overlayHeight;
 
     static get observedAttributes() {
         return ['disabled', 'readonly', 'value'];
@@ -843,7 +843,7 @@ button::-moz-focus-inner {
         let anchorOrigin;
         let input: HTMLInputElement | TavenemInputHtmlElement;
         if (this.hasAttribute('button')) {
-            anchorId = this.dataset.inputId || (window.isSecureContext ? crypto.randomUUID() : randomUUID());
+            anchorId = this.dataset.inputId || randomUUID();
             anchorOrigin = 'anchor-center-center';
 
             const button = document.createElement('button');
@@ -887,7 +887,7 @@ button::-moz-focus-inner {
                 buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
             }
         } else {
-            anchorId = (window.isSecureContext ? crypto.randomUUID() : randomUUID());
+            anchorId = randomUUID();
             anchorOrigin = 'anchor-bottom-left';
 
             input = document.createElement('tf-input') as TavenemInputHtmlElement;
@@ -1354,7 +1354,6 @@ button::-moz-focus-inner {
         shadow.addEventListener('mousedown', this.onMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
         shadow.addEventListener('keyup', this.onOuterKeyUp.bind(this));
-        shadow.addEventListener('valueinput', this.onOuterValueInput.bind(this));
         document.addEventListener('mousedown', this.onDocMouseDown.bind(this));
     }
 
@@ -1371,7 +1370,6 @@ button::-moz-focus-inner {
         root.removeEventListener('mousedown', this.onMouseDown.bind(this));
         root.removeEventListener('mouseup', this.onOuterMouseUp.bind(this));
         root.removeEventListener('keyup', this.onOuterKeyUp.bind(this));
-        root.removeEventListener('valueinput', this.onOuterValueInput.bind(this));
 
         const overlayDetector = root.querySelector('color-overlay-detector') as HTMLElement;
         if (overlayDetector) {
@@ -2967,8 +2965,6 @@ button::-moz-focus-inner {
     private onOuterMouseUp(event: Event) { this.onMouseUp(event as MouseEvent); }
 
     private onOuterPopoverFocusLost(event: Event) { this.onPopoverFocusLost(event); }
-
-    private onOuterValueInput(event: Event) { this.onValueInput(event); }
 
     private onOverlayInteract(event: MouseEvent) {
         if (event.button !== 0

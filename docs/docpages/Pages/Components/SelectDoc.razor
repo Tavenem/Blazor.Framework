@@ -8,15 +8,6 @@
     The <code>Select</code> components are rich wrappers for select elements.
 </p>
 
-<p>
-    Note: on static server-side rendered pages this component falls back to a native
-    <code>select</code> element with only partial styling to match the look and feel of the rest of
-    the framework (because browsers support only limited styling for the <code>select</code> and
-    <code>option</code> elements). When <em>pre</em>rendered server-side, the component will render
-    using the native elements during the prerender pass, then be enhanced with fully styled Blazor
-    components when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -239,10 +230,21 @@
     that selects a value from a data item (row).
 </p>
 
+<p>
+    Note: on static server-side rendered pages the nested <code>DateGrid</code>'s pagination
+    controls will be disabled, since they require either interactivity, or query parameter
+    persistence (which does not apply to <code>DateGrid</code> components nested inside
+    <code>Select</code> components). If you require a <code>DataGridSelect</code> to function on a
+    static page, set its <code>RowsPerPage</code> property sufficiently high to allow all rows to
+    display on the same page, which makes pagination unnecessary. This solution will cause
+    performance issues if the value is set unreasonably high, which makes the component unsuitable
+    for static pages when the potential number of options is high.
+</p>
+
 <Collapse Id="ce-7" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row justify-content-center">
-            <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
+            <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowsPerPage="10" RowValue="@(x => x)">
                 <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
                 <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
                 <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
@@ -251,7 +253,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowValue=""@(x => x)"">
+        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowsPerPage=""10"" RowValue=""@(x => x)"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"" />

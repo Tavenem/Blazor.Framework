@@ -1,5 +1,5 @@
 export class TavenemInputHtmlElement extends HTMLElement {
-    _inputDebounce: number = -1;
+    private _inputDebounce: number = -1;
 
     static get observedAttributes() {
         return [

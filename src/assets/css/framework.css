@@ -12,6 +12,7 @@
 @import "layout.css" layer(tavenem-framework.base);
 @import "theme.css" layer(tavenem-framework.theme);
 @import "components/icon.css" layer(tavenem-framework.base-components);
+@import "components/dragdrop.css" layer(tavenem-framework.base-components);
 @import "components/field.css" layer(tavenem-framework.base-components);
 @import "components/overlay.css" layer(tavenem-framework.base-components);
 @import "components/alert.css" layer(tavenem-framework.components);

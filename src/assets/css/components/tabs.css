@@ -37,7 +37,7 @@
     &.bg-alt {
         background-color: transparent;
 
-        .tab, .tab-panels {
+        tf-tab, .tab-panels {
             background-color: var(--tavenem-theme-color-bg-alt, var(--tavenem-color-bg-alt));
         }
     }
@@ -108,7 +108,7 @@
     }
 }
 
-.tab {
+tf-tab {
     align-items: center;
     display: inline-flex;
     flex-shrink: 0;
@@ -193,7 +193,7 @@
         }
     }
 
-    &.disabled, &[inert], [inert] & {
+    &[disabled], &[inert], [inert] & {
         color: var(--tavenem-color-text-disabled);
         cursor: default;
         pointer-events: none;

@@ -22,6 +22,11 @@ import {
 } from './_progress';
 import { TavenemScrollTopHTMLElement } from './_scrolltop';
 import { TavenemSliderHTMLElement } from './_slider';
+import {
+    TavenemTabHTMLElement,
+    TavenemTabPanelHTMLElement,
+    TavenemTabsHTMLElement,
+} from './_tabs';
 
 enum ThemePreference {
     Light = 1,
@@ -659,6 +664,12 @@ slot button {
         customElements.define('tf-slider', TavenemSliderHTMLElement);
 
         customElements.define('tf-syntax-highlight', TavenemHighlightHTMLElement);
+
+        customElements.define('tf-tab', TavenemTabHTMLElement);
+
+        customElements.define('tf-tabpanel', TavenemTabPanelHTMLElement);
+
+        customElements.define('tf-tabs', TavenemTabsHTMLElement);
     }
 
     function setDarkmodeToggles(mode: string | null | undefined) {
