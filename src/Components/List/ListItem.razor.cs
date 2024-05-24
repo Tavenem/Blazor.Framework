@@ -117,56 +117,26 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
         || (Item is not null
         && ElementList?.ItemIsDisabled?.Invoke(Item) == true);
 
-    private protected string? IconClassName
-    {
-        get
-        {
-            if (ElementList is null)
-            {
-                return null;
-            }
-            if (ElementList.SelectionIcons)
-            {
-                return "outlined";
-            }
-            return (ElementList.ShowSelectionIconValue
-                && IsSelected)
-                || Item is null
-                || ElementList.Icon is null
-                || ElementList.IconClass is null
-                ? null
-                : ElementList.IconClass(Item);
-        }
-    }
+    private protected string? IconClassName => ElementList is null
+        || Item is null
+        || ElementList.Icon is null
+        || ElementList.IconClass is null
+        ? null
+        : ElementList.IconClass(Item);
 
     private protected string? IconName
     {
         get
         {
-            if (ElementList?.SelectionIcons == true)
-            {
-                return IsSelected
-                    ? DefaultIcons.CheckBox_Checked
-                    : DefaultIcons.CheckBox_Unchecked;
-            }
-            if (ElementList?.ShowSelectionIconValue == true
-                && IsSelected)
-            {
-                return DefaultIcons.Selected;
-            }
-            if (string.IsNullOrEmpty(Icon))
-            {
-                if (Item is null
-                    || ElementList?.Icon is null)
-                {
-                    return null;
-                }
-                return ElementList.Icon(Item);
-            }
-            else
+            if (!string.IsNullOrEmpty(Icon))
             {
                 return Icon;
             }
+
+            return Item is null
+                || ElementList?.Icon is null
+                ? null
+                : ElementList.Icon(Item);
         }
     }
 
@@ -300,15 +270,6 @@ public partial class ListItem<TListItem> : DraggableDropTarget<TListItem, TListI
     private protected async Task OnClickAsync()
     {
         if (ElementList is not null)
-        {
-            await ElementList.OnToggleItemSelectionAsync(Item);
-        }
-    }
-
-    private protected async Task OnClickIconAsync()
-    {
-        if (ElementList is not null
-            && ElementList.SelectionType != SelectionType.None)
         {
             await ElementList.OnToggleItemSelectionAsync(Item);
         }

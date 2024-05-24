@@ -54,7 +54,7 @@ public partial class Row<[DynamicallyAccessedMembers(
 
     [CascadingParameter] private DataGrid<TDataItem>? DataGrid { get; set; }
 
-    private string? ExpandClass => new CssBuilder("expand-row")
+    private string? ExpandClass => new CssBuilder("svg-icon expand-row")
         .Add("open", IsExpanded)
         .ToString();
 

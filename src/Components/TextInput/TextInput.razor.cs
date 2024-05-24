@@ -291,8 +291,6 @@ public partial class TextInput : InputComponentBase<string>
 
     private string? CurrentInput { get; set; }
 
-    private int EffectiveSize => Math.Max(1, Size ?? 1);
-
     private IEnumerable<KeyValuePair<string, object>> AllSuggestionValues
     {
         get
@@ -467,9 +465,26 @@ public partial class TextInput : InputComponentBase<string>
 
     private async Task OnChangeAsync(ValueChangeEventArgs e)
     {
-        if (!string.Equals(CurrentValueAsString, e.Value))
+        if (string.Equals(CurrentValueAsString, e.Value, StringComparison.Ordinal))
         {
-            await SetValueAsync(e.Value);
+            return;
+        }
+
+        CurrentInput = e.Value;
+
+        CurrentValueAsString = Mask is null
+            ? e.Value
+            : Mask.UnmaskInput(e.Value);
+
+        var display = Mask is null
+            ? e.Value
+            : Mask.FormatInput(e.Value);
+
+        DisplayString = e.Value;
+        if (!string.Equals(display, e.Value))
+        {
+            await Task.Delay(1);
+            DisplayString = display;
         }
     }
 
@@ -500,26 +515,6 @@ public partial class TextInput : InputComponentBase<string>
         if (IsValid)
         {
             await OnValidEnter.InvokeAsync();
-        }
-    }
-
-    private async Task SetValueAsync(string? value)
-    {
-        CurrentInput = value;
-
-        CurrentValueAsString = Mask is null
-            ? value
-            : Mask.UnmaskInput(value);
-
-        var display = Mask is null
-            ? value
-            : Mask.FormatInput(value);
-
-        DisplayString = value;
-        if (!string.Equals(display, value))
-        {
-            await Task.Delay(1);
-            DisplayString = display;
         }
     }
 }

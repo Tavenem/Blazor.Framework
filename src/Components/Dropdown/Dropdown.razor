@@ -9,9 +9,7 @@
              data-activation="@((int)ActivationType)"
              data-delay="@(Delay == 0 ? null : Delay)"
              data-open-at-pointer="@OpenAtPointer"
-             data-popover-container
-             disabled="@Disabled"
-             @dropdowntoggle="OnOpenChangedAsync">
+             disabled="@Disabled">
     @if (TriggerContent is null && !HideButton)
     {
         <button class="@ButtonCssClass"
@@ -29,9 +27,10 @@
     {
         @TriggerContent
     }
-    <Popover AnchorOrigin="AnchorOriginValue"
+    <Popover AnchorId="@(string.IsNullOrEmpty(AnchorId) ? Id : AnchorId)"
+             AnchorOrigin="AnchorOriginValue"
              Class="@PopoverCssClass"
-             AnchorId="@(string.IsNullOrEmpty(AnchorId) ? Id : AnchorId)"
+             DismissOnTapOutside="true"
              MatchWidth="@(!OpenAtPointer && TriggerContent is null && !HideButton)"
              MaxHeight="@MaxHeight"
              PositionX="PopoverPositionX"

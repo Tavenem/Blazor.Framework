@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using System.Diagnostics.CodeAnalysis;
-using Tavenem.Blazor.Framework.Services.Popovers;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -100,14 +99,6 @@ public partial class Dropdown
     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
-    /// Invoked when the dropdown opens or closes.
-    /// </summary>
-    /// <remarks>
-    /// Only functions when the component is rendered in an interactive mode.
-    /// </remarks>
-    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
-
-    /// <summary>
     /// <para>
     /// Sets the max-height CSS style for the popover.
     /// </para>
@@ -178,7 +169,7 @@ public partial class Dropdown
     /// The CSS class assigned to the popover, including component values.
     /// </summary>
     protected string? PopoverCssClass => new CssBuilder(PopoverClass)
-        .Add("contained-popover filled")
+        .Add("filled")
         .ToString();
 
     private Origin? AnchorOriginOverride => OpenAtPointer ? Origin.Top_Left : null;
@@ -237,7 +228,4 @@ public partial class Dropdown
             await Click.InvokeAsync();
         }
     }
-
-    private Task OnOpenChangedAsync(DropdownToggleEventArgs e)
-        => IsOpenChanged.InvokeAsync(e.Value);
 }

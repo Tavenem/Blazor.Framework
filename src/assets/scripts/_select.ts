@@ -1,5 +1,6 @@
 import { TavenemInputHtmlElement } from './_input'
 import { TavenemPickerHtmlElement } from './_picker'
+import { documentPositionComparator } from './tavenem-utility'
 
 export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
     private _searchText: string | null | undefined;
@@ -14,7 +15,7 @@ export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `:host {
@@ -36,8 +37,7 @@ slot {
                 this.onSetValue(value);
             }
         }
-
-        this.addEventListener('focuslost', this.onPopoverFocusLost.bind(this));
+        
         this.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.addEventListener('mouseup', this.onMouseUp.bind(this));
         this.addEventListener('keyup', this.onKeyUp.bind(this));
@@ -49,7 +49,6 @@ slot {
 
     disconnectedCallback() {
         clearTimeout(this._hideTimer);
-        this.removeEventListener('focuslost', this.onPopoverFocusLost.bind(this));
         this.removeEventListener('mousedown', this.onMouseDown.bind(this));
         this.removeEventListener('mouseup', this.onMouseUp.bind(this));
         this.removeEventListener('keyup', this.onKeyUp.bind(this));
@@ -59,6 +58,10 @@ slot {
     }
 
     attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (newValue == oldValue) {
+            return;
+        }
+
         if ((name === 'disabled'
             || name === 'readonly')
             && newValue) {
@@ -91,16 +94,15 @@ slot {
             return;
         }
         if (event.target !== this) {
-            let popover = this.querySelector('tf-popover.contained-popover');
+            let popover = this.querySelector('tf-popover');
             if (!popover && this.shadowRoot) {
-                popover = this.shadowRoot.querySelector('tf-popover.contained-popover');
+                popover = this.shadowRoot.querySelector('tf-popover');
             }
             if (popover
                 && event.target instanceof Node
-                && popover.contains(event.target)) {
-                if (!('popoverOpen' in this.dataset)) {
-                    return;
-                }
+                && popover.contains(event.target)
+                && !popover.matches(':popover-open')) {
+                return;
             }
         }
 
@@ -148,16 +150,15 @@ slot {
             return;
         }
         if (event.target !== this) {
-            let popover = this.querySelector('tf-popover.contained-popover');
+            let popover = this.querySelector('tf-popover');
             if (!popover && this.shadowRoot) {
-                popover = this.shadowRoot.querySelector('tf-popover.contained-popover');
+                popover = this.shadowRoot.querySelector('tf-popover');
             }
             if (popover
                 && event.target instanceof Node
-                && popover.contains(event.target)) {
-                if (!('popoverOpen' in this.dataset)) {
-                    return;
-                }
+                && popover.contains(event.target)
+                && !popover.matches(':popover-open')) {
+                return;
             }
         }
 
@@ -220,14 +221,14 @@ slot {
         }
 
         if (event.target !== this) {
-            let popover = this.querySelector('tf-popover.contained-popover');
+            let popover = this.querySelector('tf-popover');
             if (!popover && this.shadowRoot) {
-                popover = this.shadowRoot.querySelector('tf-popover.contained-popover');
+                popover = this.shadowRoot.querySelector('tf-popover');
             }
             if (popover
                 && event.target instanceof Node
                 && popover.contains(event.target)
-                && !('popoverOpen' in this.dataset)) {
+                && !popover.matches(':popover-open')) {
                 return;
             }
         }
@@ -266,16 +267,15 @@ slot {
             return;
         }
         if (event.target !== this) {
-            let popover = this.querySelector('tf-popover.contained-popover');
+            let popover = this.querySelector('tf-popover');
             if (!popover && this.shadowRoot) {
-                popover = this.shadowRoot.querySelector('tf-popover.contained-popover');
+                popover = this.shadowRoot.querySelector('tf-popover');
             }
             if (popover
                 && event.target instanceof Node
-                && popover.contains(event.target)) {
-                if (!('popoverOpen' in this.dataset)) {
-                    return;
-                }
+                && popover.contains(event.target)
+                && !popover.matches(':popover-open')) {
+                return;
             }
         }
 
@@ -323,30 +323,14 @@ slot {
         }
     }
 
-    private static documentPositionComparator(a: Node, b: Node) {
-        if (a === b) {
-            return 0;
-        }
-
-        var position = a.compareDocumentPosition(b);
-
-        if (position & Node.DOCUMENT_POSITION_FOLLOWING || position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
-            return -1;
-        } else if (position & Node.DOCUMENT_POSITION_PRECEDING || position & Node.DOCUMENT_POSITION_CONTAINS) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     private clearSearchFilter() {
         let options = Array
             .from(this.querySelectorAll('option, [data-close-picker-value]'))
-            .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+            .sort(documentPositionComparator);
         if (!options.length && this.shadowRoot) {
             options = Array
                 .from(this.shadowRoot.querySelectorAll('option, [data-close-picker-value]'))
-                .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+                .sort(documentPositionComparator);
             if (!options.length) {
                 return;
             }
@@ -379,12 +363,12 @@ slot {
         let options = Array
             .from(this.querySelectorAll('option, [data-close-picker-value]'))
             .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
-            .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+            .sort(documentPositionComparator);
         if (!options.length && this.shadowRoot) {
             options = Array
                 .from(this.shadowRoot.querySelectorAll('option, [data-close-picker-value]'))
                 .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
-                .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+                .sort(documentPositionComparator);
         }
         if (!options.length) {
             return {};
@@ -457,12 +441,12 @@ slot {
         let options = Array
             .from(this.querySelectorAll('option, [data-close-picker-value]'))
             .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
-            .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+            .sort(documentPositionComparator);
         if (!options.length && this.shadowRoot) {
             options = Array
                 .from(this.shadowRoot.querySelectorAll('option, [data-close-picker-value]'))
                 .filter<HTMLElement>((x): x is HTMLElement => x instanceof HTMLElement)
-                .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+                .sort(documentPositionComparator);
             if (!options.length) {
                 return;
             }
@@ -557,7 +541,11 @@ slot {
             return;
         }
 
-        if (!('popoverOpen' in this.dataset)) {
+        let popover = this.querySelector('tf-popover');
+        if (!popover && this.shadowRoot) {
+            popover = this.shadowRoot.querySelector('tf-popover');
+        }
+        if (popover && !popover.matches(':popover-open')) {
             if (!this.hasAttribute('disabled')
                 && !this.hasAttribute('readonly')) {
                 this.open();
@@ -619,7 +607,7 @@ slot {
             event.preventDefault();
             event.stopPropagation();
 
-            if ('popoverOpen' in this.dataset) {
+            if (popover && popover.matches(':popover-open')) {
                 match.focus();
                 match.scrollIntoView({ behavior: 'smooth' });
             }
@@ -644,15 +632,16 @@ slot {
         }
 
         if (input instanceof HTMLInputElement
-            || input instanceof TavenemInputHtmlElement) {
+            || (input instanceof TavenemInputHtmlElement
+                && input.shadowRoot)) {
             input.value = value;
-        }
-        else if (input instanceof HTMLElement) {
+        } else if (input instanceof HTMLElement) {
             input.setAttribute('value', value);
         }
 
         if (display) {
-            if (input instanceof TavenemInputHtmlElement) {
+            if (input instanceof TavenemInputHtmlElement
+                && input.shadowRoot) {
                 input.display = display;
             } else if (input && !(input instanceof HTMLInputElement)) {
                 input.setAttribute('display', display);
@@ -686,8 +675,9 @@ slot {
                         && 'closePickerDisplay' in option.dataset
                         && option.dataset.closePickerDisplay
                         && option.dataset.closePickerDisplay.length) {
-                        if (input instanceof TavenemInputHtmlElement) {
-                            input.display = display;
+                        if (input instanceof TavenemInputHtmlElement
+                            && input.shadowRoot) {
+                            input.display = option.dataset.closePickerDisplay;
                         } else if (input && !(input instanceof HTMLInputElement)) {
                             input.setAttribute('display', option.dataset.closePickerDisplay);
                         }
@@ -722,7 +712,8 @@ slot {
 
         if (input) {
             currentValue = input.value;
-            if (currentValue.startsWith('[')
+            if (currentValue
+                && currentValue.startsWith('[')
                 && currentValue.endsWith(']')) {
                 var a = JSON.parse(currentValue);
                 if (a instanceof Array) {
@@ -757,8 +748,12 @@ slot {
             currentValue = value;
         }
 
-        if (input) {
+        if (input instanceof HTMLInputElement
+            || (input instanceof TavenemInputHtmlElement
+                && input.shadowRoot)) {
             input.value = value;
+        } else if (input instanceof HTMLElement) {
+            input.setAttribute('value', value);
         }
 
         let options = Array
@@ -780,7 +775,7 @@ slot {
 
                 return false;
             })
-            .sort(TavenemSelectInputHtmlElement.documentPositionComparator);
+            .sort(documentPositionComparator);
 
         let firstSelected: HTMLElement | undefined;
         let anyUnselected = false;
@@ -862,8 +857,13 @@ slot {
             display = "1";
         }
 
-        if (display && input instanceof TavenemInputHtmlElement) {
-            input.display = display;
+        if (display) {
+            if (input instanceof TavenemInputHtmlElement
+                && input.shadowRoot) {
+                input.display = display;
+            } else if (input instanceof HTMLElement) {
+                input.setAttribute('display', display);
+            }
         }
 
         (useShadow ? this.shadowRoot! : this).querySelectorAll('[data-picker-select-all]')

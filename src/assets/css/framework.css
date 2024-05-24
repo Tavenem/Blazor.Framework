@@ -33,7 +33,6 @@
 @import "components/list.css" layer(tavenem-framework.components);
 @import "components/meter.css" layer(tavenem-framework.components);
 @import "components/pagination.css" layer(tavenem-framework.components);
-@import "components/popover.css" layer(tavenem-framework.components);
 @import "components/rating.css" layer(tavenem-framework.components);
 @import "components/select.css" layer(tavenem-framework.components);
 @import "components/skeleton.css" layer(tavenem-framework.components);

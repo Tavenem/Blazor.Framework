@@ -134,7 +134,7 @@
                 --button-inherited-padding-y-icon: 0;
             }
 
-            .field:not(.picker) {
+            .field:not(tf-select) {
                 flex-grow: 1;
                 margin-bottom: 0;
                 margin-top: 2px;

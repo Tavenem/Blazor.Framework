@@ -2,7 +2,7 @@
 
 @inherits TavenemComponentBase
 
-<div @attributes="AdditionalAttributes" id="@_elementId" class="@ContainerCssClass">
+<div @attributes="AdditionalAttributes" id="@_elementId" class="dialog-container">
     @if (!Options.NonModal)
     {
         <div class="overlay" @onclick="OnOverlayClick" @onclick:stopPropagation="true"></div>

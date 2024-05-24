@@ -48,7 +48,7 @@ export class TavenemAccordionHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `:host {

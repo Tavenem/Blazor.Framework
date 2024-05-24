@@ -6,14 +6,15 @@
             @attributes="AdditionalAttributes"
             id="@Id"
             class="@CssClass"
+            popover="@(DismissOnTapOutside ? "auto" : "manual")"
             style="@CssStyle"
             tabindex="0"
             data-anchor-id="@AnchorId"
             data-focus-id="@FocusId"
             data-offset-x="@OffsetX"
             data-offset-y="@OffsetY"
+            data-open="@IsOpen"
             data-position-x="@PositionX"
-            data-position-y="@PositionY"
-            @onfocuslost="OnFocusLostAsync">
+            data-position-y="@PositionY">
     @ChildContent
 </tf-popover>

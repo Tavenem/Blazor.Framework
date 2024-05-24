@@ -1,4 +1,7 @@
+using Tavenem.Blazor.Framework;
 using Tavenem.Blazor.Framework.Sample.Components;
+
+const string DevStartUrl = "/test";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,10 @@ builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
 builder.Services.AddTavenemFramework();
+builder.Services.ConfigureHttpJsonOptions(options
+    => options.SerializerOptions.TypeInfoResolverChain.Insert(
+        0,
+        TavenemFrameworkJsonSerializerContext.Default));
 
 var app = builder.Build();
 
@@ -34,5 +41,10 @@ app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(
         typeof(Tavenem.Blazor.Framework.DocPages.Utilities.CodeFormatter).Assembly,
         typeof(Tavenem.Blazor.Framework.Sample.Client._Imports).Assembly);
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/dev", () => Results.LocalRedirect(DevStartUrl));
+}
 
 app.Run();

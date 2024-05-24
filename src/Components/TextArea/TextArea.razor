@@ -2,9 +2,10 @@
 
 @inherits InputComponentBase<string>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
-    <div id="@InputId" class="input">
+<div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+    <div class="input">
         <textarea @ref="ElementReference"
+                  id="@InputId"
                   class="@InputCssClass"
                   style="@InputCssStyle"
                   autocomplete="@AutocompleteValue"
@@ -30,7 +31,7 @@
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {
-        <label for="@Id">@Label</label>
+        <label for="@InputId">@Label</label>
     }
     @if ((ShowLength && MaxLength.HasValue)
         || !string.IsNullOrEmpty(HelpText)

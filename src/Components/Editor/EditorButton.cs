@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace Tavenem.Blazor.Framework;
+﻿namespace Tavenem.Blazor.Framework;
 
 /// <summary>
 /// A custom button to display on the editor toolbar.
@@ -51,7 +49,7 @@ public class EditorButton
     /// When set to <see cref="EditorMode.None"/> (the default) the button is displayed in any mode.
     /// </para>
     /// </summary>
-    [Parameter] public EditorMode EditMode { get; set; }
+    public EditorMode EditMode { get; set; }
 
     /// <summary>
     /// The name of an icon to display on the button.

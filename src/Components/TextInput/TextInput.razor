@@ -6,7 +6,6 @@
            class="@CssClass"
            data-disable-autosearch
            data-has-text-input
-           data-popover-container
            data-search-filter="@(!ShowAllSuggestions)"
            style="@CssStyle">
     <tf-input @ref="ElementReference"
@@ -28,7 +27,7 @@
               placeholder="@Placeholder"
               readonly="@ReadOnly"
               required="@Required"
-              size="@EffectiveSize"
+              size="@Size"
               spellcheck="@SpellcheckValue"
               tabindex="@TabIndex"
               type="@InputType.ToCSS()"
@@ -116,14 +115,15 @@
     @ChildContent
     @if (ShowSuggestions)
     {
-        <Popover Class="contained-popover filled"
-                 AnchorId="@InputId"
+        <Popover AnchorId="@InputId"
                  AnchorOrigin="Origin.Bottom_Left"
+                 Class="suggestion-popover filled"
+                 DismissOnTapOutside="true"
                  PopoverOrigin="Origin.Top_Left"
                  MatchWidth="true"
                  MaxHeight="min(300px,90vh)">
             <menu class="@SuggestionListCssClass"
-                    @onclick:stopPropagation="true">
+                  @onclick:stopPropagation="true">
                 @if (Suggestions is not null)
                 {
                     @foreach (var suggestion in Suggestions.Order())

@@ -4,6 +4,7 @@
     --button-inherited-border-style: none;
     --button-inherited-font-size: var(--tavenem-font-size-button);
     --button-inherited-shadow: none;
+    background-color: transparent;
     border-radius: var(--tavenem-border-radius);
     display: inline-flex;
 
@@ -108,7 +109,6 @@
 }
 
 .button-group {
-    background-color: transparent;
     box-shadow: var(--tavenem-shadow-1);
     --button-inherited-active-shadow: var(--tavenem-shadow-2);
     --button-inherited-bg: var(--tavenem-color-default);
@@ -204,7 +204,6 @@
 }
 
 .button-group-text {
-    background-color: transparent;
     box-shadow: none;
     --button-inherited-active-shadow: none;
     --button-inherited-bg: transparent;

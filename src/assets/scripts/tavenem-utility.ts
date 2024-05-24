@@ -15,19 +15,21 @@ interface DotNetStreamReference {
     arrayBuffer(): Promise<ArrayBuffer>;
 }
 
-const fonts = [
-    'Arial',
-    'Arial Black',
-    'Comic Sans MS',
-    'Courier New',
-    'Georgia',
-    'Impact',
-    'Microsoft Sans Serif',
-    'Tahoma',
-    'Times New Roman',
-    'Trebuchet MS',
-    'Verdana',
-];
+export function documentPositionComparator(a: Node, b: Node) {
+    if (a === b) {
+        return 0;
+    }
+
+    var position = a.compareDocumentPosition(b);
+
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING || position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
+        return -1;
+    } else if (position & Node.DOCUMENT_POSITION_PRECEDING || position & Node.DOCUMENT_POSITION_CONTAINS) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 export async function downloadStream(fileName: string, fileType: string, streamReference: DotNetStreamReference) {
     const buffer = await streamReference.arrayBuffer();
@@ -99,16 +101,6 @@ export function getBoundingClientRect(element: HTMLElement) {
     rect.windowHeight = window.innerHeight;
     rect.windowWidth = window.innerWidth;
     return rect;
-}
-
-export function getFonts() {
-    const validFonts: string[] = [];
-    for (const font of fonts) {
-        if (document.fonts.check('1em ' + font)) {
-            validFonts.push(font);
-        }
-    }
-    return validFonts;
 }
 
 export async function openStream(fileName: string, fileType: string, streamReference: DotNetStreamReference, revoke: boolean) {

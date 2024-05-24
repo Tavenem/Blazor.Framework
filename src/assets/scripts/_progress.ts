@@ -164,6 +164,10 @@ svg:first-child circle {
     }
 
     attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (newValue == oldValue) {
+            return;
+        }
+
         if (name === 'progress') {
             if (newValue) {
                 this.setProgress(Number.parseFloat(newValue));
@@ -477,6 +481,10 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
     }
 
     attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (newValue == oldValue) {
+            return;
+        }
+
         if (name === 'progress') {
             if (newValue) {
                 this.setProgress(Number.parseFloat(newValue));

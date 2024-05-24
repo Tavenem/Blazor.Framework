@@ -15,7 +15,23 @@
      data-can-close
      draggable="@(GetIsDraggable() ? "true" : "false")"
      @onclick="OnClickAsync">
-    @if (!string.IsNullOrWhiteSpace(IconName))
+    @if (ElementList?.SelectionIcons == true)
+    {
+        if (IsSelected)
+        {
+            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m419-321 289-289-43-43-246 246-119-119-43 43 162 162ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg>
+        }
+        else
+        {
+            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Z"/></svg>
+        }
+    }
+    else if (ElementList?.ShowSelectionIconValue == true
+        && IsSelected)
+    {
+        <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+    }
+    else if (!string.IsNullOrWhiteSpace(IconName))
     {
         <tf-icon class="@IconClassName">@IconName</tf-icon>
     }

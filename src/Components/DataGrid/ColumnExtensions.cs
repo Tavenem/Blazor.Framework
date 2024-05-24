@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Microsoft.AspNetCore.Components;
+using System.Globalization;
 using System.Text;
 using Tavenem.Blazor.Framework.Components.DataGrid;
 
@@ -55,33 +56,47 @@ internal static class ColumnExtensions
                 | CompareOptions.IgnoreWidth) != -1;
     }
 
-    public static string GetBoolIcon<TDataItem>(this IColumn<TDataItem> column, TDataItem item)
+    public static MarkupString GetBoolIcon<TDataItem>(this IColumn<TDataItem> column, TDataItem item)
     {
         if (!column.IsBool)
         {
-            return DefaultIcons.Indeterminate;
+            return new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M424-320q0-81 14.5-116.5T500-514q41-36 62.5-62.5T584-637q0-41-27.5-68T480-732q-51 0-77.5 31T365-638l-103-44q21-64 77-111t141-47q105 0 161.5 58.5T698-641q0 50-21.5 85.5T609-475q-49 47-59.5 71.5T539-320H424Zm56 240q-33 0-56.5-23.5T400-160q0-33 23.5-56.5T480-240q33 0 56.5 23.5T560-160q0 33-23.5 56.5T480-80Z"/></svg>
+""");
         }
         if (column is Column<TDataItem, bool> boolColumn)
         {
             var value = boolColumn.GetCellValue(item);
             return value
-                ? DefaultIcons.True
-                : DefaultIcons.False;
+                ? new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+""")
+                : new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+""");
         }
         if (column is Column<TDataItem, bool?> nullableBoolColumn)
         {
             var value = nullableBoolColumn.GetCellValue(item);
             if (value == true)
             {
-                return DefaultIcons.True;
+                return new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+""");
             }
             if (column.IsNullable && !value.HasValue)
             {
-                return DefaultIcons.Indeterminate;
+                return new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M424-320q0-81 14.5-116.5T500-514q41-36 62.5-62.5T584-637q0-41-27.5-68T480-732q-51 0-77.5 31T365-638l-103-44q21-64 77-111t141-47q105 0 161.5 58.5T698-641q0 50-21.5 85.5T609-475q-49 47-59.5 71.5T539-320H424Zm56 240q-33 0-56.5-23.5T400-160q0-33 23.5-56.5T480-240q33 0 56.5 23.5T560-160q0 33-23.5 56.5T480-80Z"/></svg>
+""");
             }
-            return DefaultIcons.False;
+            return new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+""");
         }
-        return DefaultIcons.Indeterminate;
+        return new MarkupString("""
+<svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M424-320q0-81 14.5-116.5T500-514q41-36 62.5-62.5T584-637q0-41-27.5-68T480-732q-51 0-77.5 31T365-638l-103-44q21-64 77-111t141-47q105 0 161.5 58.5T698-641q0 50-21.5 85.5T609-475q-49 47-59.5 71.5T539-320H424Zm56 240q-33 0-56.5-23.5T400-160q0-33 23.5-56.5T480-240q33 0 56.5 23.5T560-160q0 33-23.5 56.5T480-80Z"/></svg>
+""");
     }
 
     public static string? GetCellClass<TDataItem>(this IColumn<TDataItem> column, TDataItem item)

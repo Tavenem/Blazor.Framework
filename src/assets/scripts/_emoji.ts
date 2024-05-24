@@ -217,32 +217,22 @@ export class TavenemEmojiPickerHTMLElement extends TavenemPickerHtmlElement {
     }
 
     async connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `:host {
     margin: 0;
     position: relative;
+    width: fit-content;
 }
 
 * {
     font-family: var(--tavenem-font-family);
 }
 
-[data-popover-open] {
-    --tavenem-popover-opacity: 1;
-    --tavenem-popover-events: auto;
-    --tavenem-popover-visibility: visible;
-}
-
-[data-popover-container]:not([data-popover-open]) {
-    --tavenem-popover-opacity: 0;
-    --tavenem-popover-events: none;
-    --tavenem-popover-visibility: hidden;
-}
-
 svg {
     fill: currentColor;
+    flex-shrink: 0;
     height: 1em;
     width: auto;
 }
@@ -752,7 +742,7 @@ button::-moz-focus-inner {
         shadow.appendChild(input);
 
         const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
-        popover.classList.add('contained-popover', 'filled', 'top-left', 'flip-onopen', 'anchor-center-center');
+        popover.classList.add('filled', 'top-left', 'flip-onopen', 'anchor-center-center');
         popover.dataset.anchorId = anchorId;
         shadow.appendChild(popover);
 
@@ -787,7 +777,7 @@ button::-moz-focus-inner {
             categoryButton.appendChild(categoryTooltip);
 
             const categoryTooltipPopover = document.createElement('tf-popover');
-            categoryTooltipPopover.classList.add('top-center', 'anchor-bottom-center', 'flip-onopen', 'contained-popover', 'tooltip', 'arrow');
+            categoryTooltipPopover.classList.add('top-center', 'anchor-bottom-center', 'flip-onopen', 'tooltip', 'arrow');
             categoryTooltipPopover.style.transitionDelay = '750ms';
             categoryTooltipPopover.tabIndex = 0;
             categoryTooltipPopover.textContent = emojiCategories[i].name;
@@ -831,14 +821,14 @@ button::-moz-focus-inner {
         skinTonesButton.appendChild(skinToneTooltip);
 
         const skinToneTooltipPopover = document.createElement('tf-popover');
-        skinToneTooltipPopover.classList.add('top-center', 'anchor-bottom-center', 'flip-onopen', 'contained-popover', 'tooltip', 'arrow');
+        skinToneTooltipPopover.classList.add('top-center', 'anchor-bottom-center', 'flip-onopen', 'tooltip', 'arrow');
         skinToneTooltipPopover.style.transitionDelay = '750ms';
         skinToneTooltipPopover.tabIndex = 0;
         skinToneTooltipPopover.textContent = 'Select skin tone(s)';
         skinToneTooltip.appendChild(skinToneTooltipPopover);
 
         const skinTonePopover = document.createElement('tf-popover');
-        skinTonePopover.classList.add('skin-tone-popover', 'top-center', 'anchor-bottom-center', 'flip-onopen', 'contained-popover', 'filled');
+        skinTonePopover.classList.add('skin-tone-popover', 'top-center', 'anchor-bottom-center', 'flip-onopen', 'filled');
         skinTonesPicker.appendChild(skinTonePopover);
 
         const skinTones1 = document.createElement('div');
@@ -894,8 +884,7 @@ button::-moz-focus-inner {
         cancelButton.type = 'button';
         buttonsDiv.appendChild(cancelButton);
         cancelButton.addEventListener('click', this.onCancel.bind(this));
-
-        shadow.addEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
+        
         shadow.addEventListener('mousedown', this.onOuterMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
         shadow.addEventListener('keyup', this.onOuterKeyUp.bind(this));
@@ -923,8 +912,7 @@ button::-moz-focus-inner {
         if (!root) {
             return;
         }
-
-        root.removeEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
+        
         root.removeEventListener('mousedown', this.onMouseDown.bind(this));
         root.removeEventListener('mouseup', this.onOuterMouseUp.bind(this));
         root.removeEventListener('keyup', this.onOuterKeyUp.bind(this));
@@ -1309,7 +1297,7 @@ button::-moz-focus-inner {
     private onOuterKeyUp(event: Event) { this.onKeyUp(event as KeyboardEvent); }
 
     private onOuterMouseDown(event: Event) {
-        this.onMouseDown();
+        this.onMouseDown(event);
         if (event.target
             && event.target instanceof Node) {
             const root = this.shadowRoot;
@@ -1325,8 +1313,6 @@ button::-moz-focus-inner {
     }
 
     private onOuterMouseUp(event: Event) { this.onMouseUp(event as MouseEvent); }
-
-    private onOuterPopoverFocusLost(event: Event) { this.onPopoverFocusLost(event); }
 
     private onSearch(event: Event) {
         if (!(event.target instanceof HTMLInputElement)

@@ -2046,7 +2046,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         return sorts;
     }
 
-    private string? GetColumnHeaderIconClass(IColumn<TDataItem> column) => new CssBuilder()
+    private string? GetColumnHeaderIconClass(IColumn<TDataItem> column) => new CssBuilder("svg-icon")
         .Add("active", _sortOrder.Contains(column.Id))
         .Add("desc", column.SortDescending)
         .ToString();
@@ -2434,7 +2434,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         return new MemoryStream(Encoding.UTF8.GetBytes(html));
     }
 
-    private string? GetGroupExpandClass(string key) => new CssBuilder("expand-row")
+    private string? GetGroupExpandClass(string key) => new CssBuilder("svg-icon expand-row")
         .Add("open", GetGroupIsExpanded(key))
         .ToString();
 

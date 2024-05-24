@@ -1,4 +1,8 @@
+import { randomUUID } from "./tavenem-utility";
+
 export class TavenemInputHtmlElement extends HTMLElement {
+    private _initialDisplay: string | undefined;
+    private _initialValue: string | null | undefined;
     private _inputDebounce: number = -1;
 
     static get observedAttributes() {
@@ -64,24 +68,21 @@ export class TavenemInputHtmlElement extends HTMLElement {
             return;
         }
         const input = root.querySelector('input:not([type="hidden"])');
-        if (!(input instanceof HTMLInputElement)) {
+        if (!(input instanceof HTMLInputElement)
+            || (value && value.length)) {
             return;
         }
-        if (value && value.length) {
-            input.value = value;
-        } else {
-            const hiddenInput = root.querySelector('input[type="hidden"]');
-            if (hiddenInput instanceof HTMLInputElement) {
-                const minLength = parseInt(this.dataset.minLength || '');
-                if (Number.isFinite(minLength)
-                    && minLength > hiddenInput.value.length) {
-                    input.value = hiddenInput.value.padStart(minLength, this.dataset.paddingChar);
-                } else {
-                    input.value = hiddenInput.value;
-                }
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        if (hiddenInput instanceof HTMLInputElement) {
+            const minLength = parseInt(this.dataset.minLength || '');
+            if (Number.isFinite(minLength)
+                && minLength > hiddenInput.value.length) {
+                input.value = hiddenInput.value.padStart(minLength, this.dataset.paddingChar);
             } else {
-                input.value = '';
+                input.value = hiddenInput.value;
             }
+        } else {
+            input.value = '';
         }
     }
 
@@ -97,26 +98,24 @@ export class TavenemInputHtmlElement extends HTMLElement {
         const hiddenInput = root.querySelector('input[type="hidden"]');
         const input = root.querySelector('input:not([type="hidden"])');
         if (!value && value != '0') {
+            if (hiddenInput instanceof HTMLInputElement
+                && hiddenInput.value === '') {
+                return;
+            }
             this.removeAttribute('value');
             if (input instanceof HTMLInputElement) {
                 input.value = '';
             }
-            if (hiddenInput instanceof HTMLInputElement
-                && hiddenInput.value !== '') {
-                hiddenInput.value = '';
-                this.setAttribute('empty', '');
+            if (hiddenInput instanceof HTMLInputElement) {
                 this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
             }
         } else {
-            this.setAttribute('value', value);
             if (hiddenInput instanceof HTMLInputElement
-                && hiddenInput.value !== value) {
-                hiddenInput.value = value;
-                if (!value.length) {
-                    this.setAttribute('empty', '');
-                } else {
-                    this.removeAttribute('empty');
-                }
+                && hiddenInput.value === value) {
+                return;
+            }
+            this.setAttribute('value', value);
+            if (hiddenInput instanceof HTMLInputElement) {
                 this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
             }
             if (input instanceof HTMLInputElement) {
@@ -222,7 +221,7 @@ export class TavenemInputHtmlElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `
@@ -485,7 +484,8 @@ button.clear::-moz-focus-inner {
         hiddenInput.required = this.hasAttribute('required');
         hiddenInput.type = 'hidden';
         if (this.hasAttribute('value')) {
-            hiddenInput.value = this.getAttribute('value') || '';
+            this._initialValue = this.getAttribute('value');
+            hiddenInput.value = this._initialValue || '';
         }
         shadow.appendChild(hiddenInput);
 
@@ -507,7 +507,9 @@ button.clear::-moz-focus-inner {
         input.autofocus = this.hasAttribute('autofocus');
         input.className = this.dataset.inputClass || '';
         input.disabled = hiddenInput.disabled;
-        input.id = this.dataset.inputId || '';
+
+        const inputId = this.dataset.inputId || randomUUID();
+        input.id = inputId;
         if (this.hasAttribute('inputmode')) {
             const inputModeValue = this.getAttribute('inputmode');
             if (inputModeValue) {
@@ -528,13 +530,25 @@ button.clear::-moz-focus-inner {
             input.placeholder = this.getAttribute('placeholder') || '';
         }
         input.readOnly = this.hasAttribute('readonly');
+
+        let setSize = false;
         if (this.hasAttribute('size')) {
             const sizeValue = this.getAttribute('size');
             if (sizeValue) {
                 const size = parseFloat(sizeValue);
-                input.size = size;
+                if (size >= 1) {
+                    input.size = size;
+                    setSize = true;
+                }
             }
         }
+        if (!setSize) {
+            input.size = Math.max(
+                1,
+                (this.getAttribute('placeholder') || '').length,
+                document.querySelector(`label[for="${inputId}"]`)?.textContent?.length || 0);
+        }
+
         if (this.hasAttribute('step')) {
             const stepValue = this.getAttribute('step');
             if (stepValue) {
@@ -570,6 +584,7 @@ button.clear::-moz-focus-inner {
                 input.value = hiddenInput.value;
             }
         }
+        this._initialDisplay = input.value;
 
         shadow.appendChild(input);
 
@@ -598,10 +613,12 @@ button.clear::-moz-focus-inner {
         clear.addEventListener('mouseup', this.onClearMouseUp.bind(this));
         clear.addEventListener('click', this.onClear.bind(this));
         this.addEventListener('valuechange', this.onNestedValueChange.bind(this));
+        this.addEventListener('reset', this.reset.bind(this));
     }
 
     disconnectedCallback() {
         this.removeEventListener('valuechange', this.onNestedValueChange.bind(this));
+        this.removeEventListener('reset', this.reset.bind(this));
         const root = this.shadowRoot;
         let input = this.querySelector('input:not([hidden])');
         if (!input && root) {
@@ -625,6 +642,10 @@ button.clear::-moz-focus-inner {
     }
 
     attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (newValue == oldValue) {
+            return;
+        }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
@@ -715,6 +736,28 @@ button.clear::-moz-focus-inner {
 
     increment(event?: Event) {
         this.stepValue(false, event);
+    }
+
+    reset(event?: Event) {
+        if (event
+            && (!(event.target instanceof HTMLFormElement)
+            || !event.target.contains(this))) {
+            return;
+        }
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        if (hiddenInput instanceof HTMLInputElement
+            && hiddenInput.value !== this._initialValue) {
+            hiddenInput.value = this._initialValue || '';
+            this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
+        }
+        const input = root.querySelector('input:not([type="hidden"])');
+        if (input instanceof HTMLInputElement) {
+            input.value = this._initialDisplay || '';
+        }
     }
 
     select() {
@@ -926,7 +969,7 @@ button.clear::-moz-focus-inner {
             return;
         }
         if (event.target !== this) {
-            const popover = this.querySelector('tf-popover.contained-popover');
+            const popover = this.querySelector('tf-popover.suggestion-popover');
             if (popover
                 && event.target instanceof Node
                 && popover.contains(event.target)) {
@@ -977,7 +1020,7 @@ button.clear::-moz-focus-inner {
 
         if (this.parentElement
             && typeof (this.parentElement as any).setOpen === "function"
-            && this.parentElement.querySelector('tf-popover.contained-popover > .suggestion-list')) {
+            && this.parentElement.querySelector('tf-popover.suggestion-popover > .suggestion-list')) {
             (this.parentElement as any).setOpen(false);
         }
 

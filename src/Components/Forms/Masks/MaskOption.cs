@@ -47,11 +47,7 @@ public record MaskOption
     /// <param name="pattern">
     /// A regular expression which the input must match in order for the corresponding mask to be applied.
     /// </param>
-#if NET7_0_OR_GREATER
     public MaskOption(string mask, int length, [StringSyntax(StringSyntaxAttribute.Regex)] string? pattern = null)
-#else
-    public MaskOption(string mask, int length, string? pattern = null)
-#endif
     {
         Mask = mask;
         Length = length;
@@ -69,11 +65,7 @@ public record MaskOption
     /// <param name="pattern">
     /// A regular expression which the input must match in order for the corresponding mask to be applied.
     /// </param>
-#if NET7_0_OR_GREATER
     public MaskOption(string mask, [StringSyntax(StringSyntaxAttribute.Regex)] string pattern)
-#else
-    public MaskOption(string mask, string? pattern = null)
-#endif
     {
         Mask = mask;
         Pattern = string.IsNullOrEmpty(pattern)

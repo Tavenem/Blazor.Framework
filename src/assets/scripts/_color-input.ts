@@ -32,7 +32,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `:host {
@@ -192,10 +192,6 @@ tf-input {
 .field > tf-input {
     padding-bottom: 2.5px;
     padding-top: 2.5px;
-}
-
-:host([data-popover-open]) > tf-input > .expand {
-    transform: rotate(-180deg);
 }
 
 :host(:not([disabled], [readonly])):focus-within {
@@ -374,11 +370,8 @@ svg:not(.color-selector) {
     transition: .3s cubic-bezier(.25,.8,.5,1);
 }
 
-:host(.open),
-:host([data-popover-open]) {
-    .expand {
-        transform: rotate(-180deg);
-    }
+:host(:has(tf-popover:popover-open)) .expand {
+    transform: rotate(-180deg);
 }
 
 .inputs-container {
@@ -689,6 +682,7 @@ button::-moz-focus-inner {
 
 .color-picker {
     height: 250px;
+    overflow: hidden;
     position: relative;
     width: 255px;
 }
@@ -882,9 +876,36 @@ button::-moz-focus-inner {
                 }
                 button.appendChild(swatch);
             } else {
-                const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                button.appendChild(buttonIcon);
-                buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
+                let usedIcon = false;
+                if ('icon' in this.dataset && this.dataset.icon) {
+                    if (this.dataset.icon.startsWith('&lt;svg')) {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(this.dataset.icon, 'text/html');
+                        if (!doc.querySelector('parsererror')) {
+                            const body = doc.documentElement.querySelector('body');
+                            if (body?.textContent) {
+                                const svgDocument = parser.parseFromString(body.textContent, 'image/svg+xml');
+                                if (!svgDocument.querySelector('parsererror')
+                                    && svgDocument.firstElementChild?.outerHTML) {
+                                    const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                                    button.appendChild(buttonIcon);
+                                    buttonIcon.outerHTML = svgDocument.firstElementChild.outerHTML;
+                                    usedIcon = true;
+                                }
+                            }
+                        }
+                    } else {
+                        const buttonIcon = document.createElement('tf-icon');
+                        buttonIcon.textContent = this.dataset.icon;
+                        button.appendChild(buttonIcon);
+                        usedIcon = true;
+                    }
+                }
+                if (!usedIcon) {
+                    const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                    button.appendChild(buttonIcon);
+                    buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
+                }
             }
         } else {
             anchorId = randomUUID();
@@ -958,7 +979,7 @@ button::-moz-focus-inner {
             controlContainer = shadow;
         } else {
             const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
-            popover.classList.add('contained-popover', 'filled', 'top-left', 'flip-onopen', anchorOrigin);
+            popover.classList.add('filled', 'top-left', 'flip-onopen', anchorOrigin);
             popover.dataset.anchorId = anchorId;
             shadow.appendChild(popover);
             controlContainer = popover;
@@ -1349,8 +1370,7 @@ button::-moz-focus-inner {
             buttonsDiv.appendChild(okButton);
             okButton.addEventListener('click', this.onOk.bind(this));
         }
-
-        shadow.addEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
+        
         shadow.addEventListener('mousedown', this.onMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
         shadow.addEventListener('keyup', this.onOuterKeyUp.bind(this));
@@ -1365,8 +1385,7 @@ button::-moz-focus-inner {
         if (!root) {
             return;
         }
-
-        root.removeEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
+        
         root.removeEventListener('mousedown', this.onMouseDown.bind(this));
         root.removeEventListener('mouseup', this.onOuterMouseUp.bind(this));
         root.removeEventListener('keyup', this.onOuterKeyUp.bind(this));
@@ -2963,8 +2982,6 @@ button::-moz-focus-inner {
     private onOuterKeyUp(event: Event) { this.onKeyUp(event as KeyboardEvent); }
 
     private onOuterMouseUp(event: Event) { this.onMouseUp(event as MouseEvent); }
-
-    private onOuterPopoverFocusLost(event: Event) { this.onPopoverFocusLost(event); }
 
     private onOverlayInteract(event: MouseEvent) {
         if (event.button !== 0

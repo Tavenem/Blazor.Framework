@@ -16,7 +16,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class DialogInstance
 {
-    private readonly string _elementId = string.Concat("dialog_", Guid.NewGuid().ToHtmlId());
+    private readonly string _elementId = $"dialog_{Guid.NewGuid().ToHtmlId()}";
 
     private Dialog? _dialog;
     private IJSObjectReference? _module;
@@ -61,13 +61,6 @@ public partial class DialogInstance
     /// </para>
     /// </summary>
     [Parameter] public RenderFragment? TitleContent { get; set; }
-
-    /// <summary>
-    /// The final value assigned to the container's class attribute.
-    /// </summary>
-    protected string? ContainerCssClass => new CssBuilder("dialog-container")
-        .Add(Options.Origin.ToCSS())
-        .ToString();
 
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder()

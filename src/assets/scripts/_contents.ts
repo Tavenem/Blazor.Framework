@@ -1,3 +1,5 @@
+import { documentPositionComparator } from "./tavenem-utility";
+
 interface TavenemHeadingElement extends HTMLElement {
     headingLevel: number;
     headingTitle: string;
@@ -54,7 +56,7 @@ export class TavenemContentsHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.innerHTML = `:host {
@@ -219,22 +221,6 @@ slot .default-title {
         window.removeEventListener('resize', this.handleScrollSpy.bind(this), true);
     }
 
-    private static documentPositionComparator(a: Node, b: Node) {
-        if (a === b) {
-            return 0;
-        }
-
-        var position = a.compareDocumentPosition(b);
-
-        if (position & Node.DOCUMENT_POSITION_FOLLOWING || position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
-            return -1;
-        } else if (position & Node.DOCUMENT_POSITION_PRECEDING || position & Node.DOCUMENT_POSITION_CONTAINS) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     refresh() {
         const root = this.shadowRoot;
         if (!root) {
@@ -261,7 +247,7 @@ slot .default-title {
                     || v.textContent
                     || `Heading ${i.toString()}`;
                 return heading;
-            }).sort(TavenemContentsHTMLElement.documentPositionComparator);
+            }).sort(documentPositionComparator);
 
         const children: Node[] = [];
         if (this._headings.length > 0) {

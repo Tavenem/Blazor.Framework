@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Tavenem.Blazor.Framework.Services.Popovers;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -42,6 +41,16 @@ public partial class Popover
 
     /// <summary>
     /// <para>
+    /// Whether the popover should be dismissed when clicking outside it.
+    /// </para>
+    /// <para>
+    /// Default is <see langword="false"/>.
+    /// </para>
+    /// </summary>
+    [Parameter] public bool DismissOnTapOutside { get; set; }
+
+    /// <summary>
+    /// <para>
     /// Controls how the popover behaves when there isn't enough space in the
     /// direction it would normally open.
     /// </para>
@@ -61,11 +70,6 @@ public partial class Popover
     /// </para>
     /// </summary>
     [Parameter] public string? FocusId { get; set; }
-
-    /// <summary>
-    /// Raised when the popover loses focus.
-    /// </summary>
-    [Parameter] public EventCallback<FocusLostEventArgs> FocusOut { get; set; }
 
     /// <summary>
     /// <para>
@@ -176,7 +180,6 @@ public partial class Popover
         .Add($"anchor-{AnchorOrigin.ToCSS()}")
         .Add(FlipBehavior.ToCSS())
         .Add(ThemeColor.ToCSS())
-        .Add("open", IsOpen)
         .Add("limit-width", LimitWidth)
         .Add("match-width", MatchWidth)
         .ToString();
@@ -209,13 +212,4 @@ public partial class Popover
     /// Gives focus to the popover element.
     /// </summary>
     public ValueTask FocusAsync() => ElementReference.FocusFirstAsync();
-
-    private async Task OnFocusLostAsync(FocusLostEventArgs e)
-    {
-        if (FocusOut.HasDelegate
-            && e.ParentId?.Equals(Id) == true)
-        {
-            await FocusOut.InvokeAsync(e);
-        }
-    }
 }

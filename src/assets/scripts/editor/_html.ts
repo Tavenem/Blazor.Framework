@@ -149,13 +149,19 @@ htmlCommands[CommandType.InsertLink] = params => {
             tag += ` title=${title}`;
         }
         tag += ">";
-        target.dispatch(target.state.update(target.state.changeByRange(range => ({
-            range: EditorSelection.range(range.from + tag.length, range.to + tag.length),
-            changes: [
-                { from: range.from, insert: tag },
-                { from: range.to, insert: "</a>" },
-            ],
-        }))));
+
+        if (target.state.selection.ranges.some(x => !x.empty)) {
+            target.dispatch(target.state.update(target.state.changeByRange(range => ({
+                range: EditorSelection.range(range.from + tag.length, range.to + tag.length),
+                changes: [
+                    { from: range.from, insert: tag },
+                    { from: range.to, insert: "</a>" },
+                ],
+            }))));
+        } else {
+            target.dispatch(target.state.update(target.state.replaceSelection(tag + (title || href) + "</a>")));
+        }
+
         return true;
     }
 };
@@ -183,6 +189,13 @@ htmlCommands[CommandType.AlignLeft] = setStyleCommand('text-align', 'left');
 htmlCommands[CommandType.AlignCenter] = setStyleCommand('text-align', 'center');
 htmlCommands[CommandType.AlignRight] = setStyleCommand('text-align', 'right');
 htmlCommands[CommandType.PageBreak] = setStyleCommand('page-break-after', 'always');
+htmlCommands[CommandType.Emoji] = params => (target: {
+    state: EditorState;
+    dispatch: (transaction: Transaction) => void;
+}) => {
+    target.dispatch(target.state.update(target.state.replaceSelection(params && params.length && params[0] && params[0].length ? params[0] : '')));
+    return true;
+};
 
 function setInlineStyleCommand(style: string, value?: string): ParamStateCommand {
     return (params: any[] | undefined): StateCommand => {

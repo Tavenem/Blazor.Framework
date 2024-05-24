@@ -27,7 +27,7 @@ export class TavenemSliderHTMLElement extends HTMLElement {
 
         this._value = Math.max(this._min, Math.min(this._max, this._value));
 
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `
@@ -86,6 +86,10 @@ output {
     }
 
     attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (newValue == oldValue) {
+            return;
+        }
+
         if (name === 'value') {
             this.setValue(newValue ? Number.parseFloat(newValue) : 0);
         } else if (name === 'max') {

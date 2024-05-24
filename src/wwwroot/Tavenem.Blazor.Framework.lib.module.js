@@ -13,16 +13,6 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             return {};
         }
     });
-    blazor.registerCustomEventType('focuslost', {
-        createEventArgs: (event) => {
-            return {
-                parentId: event instanceof CustomEvent
-                    && event.detail
-                    ? event.detail.parentId
-                    : undefined
-            };
-        }
-    });
     blazor.registerCustomEventType('delete', {
         createEventArgs: (event) => {
             return {
@@ -30,15 +20,6 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                     && event.detail
                     ? event.detail.value
                     : undefined
-            };
-        }
-    });
-    blazor.registerCustomEventType('dropdowntoggle', {
-        createEventArgs: (event) => {
-            return {
-                value: event instanceof CustomEvent
-                    && event.detail
-                    && event.detail.value
             };
         }
     });

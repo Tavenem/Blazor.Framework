@@ -30,7 +30,7 @@ public partial class Tooltip
     /// <summary>
     /// The delay before showing the tooltip, in milliseconds.
     /// </summary>
-    [Parameter] public int Delay { get; set; } = 0;
+    [Parameter] public int Delay { get; set; }
 
     /// <summary>
     /// <para>
@@ -100,7 +100,7 @@ public partial class Tooltip
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("contained-popover tooltip")
+        .Add("tooltip")
         .Add("arrow", Arrow)
         .ToString();
 

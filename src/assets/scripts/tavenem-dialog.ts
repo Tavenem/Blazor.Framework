@@ -1,4 +1,4 @@
-interface Dialog extends HTMLDialogElement {
+export interface Dialog extends HTMLDialogElement {
     dragStartX: number | undefined;
     dragStartY: number | undefined;
     dragCurrentX: number | undefined;
@@ -11,11 +11,11 @@ interface Dialog extends HTMLDialogElement {
 let draggedDialog: Dialog | undefined;
 
 export function initialize(elementId: string) {
-    const element = document.getElementById(elementId);
-    if (!element) {
+    const dialog = document.getElementById(elementId) as Dialog;
+    if (!dialog) {
         return;
     }
-    const headers = element.getElementsByClassName('header');
+    const headers = dialog.getElementsByClassName('header');
     if (!headers
         || !headers.length
         || !(headers[0] instanceof HTMLElement)) {
@@ -25,6 +25,16 @@ export function initialize(elementId: string) {
     headers[0].addEventListener('pointerdown', onPointerDown);
     document.addEventListener('pointerup', stopDragging);
     document.addEventListener('pointermove', drag);
+
+    const boundingRect = dialog.getBoundingClientRect();
+    dialog.dragFinalX = (window.visualViewport?.offsetLeft || window.document.documentElement.offsetLeft)
+        + ((window.visualViewport?.width || window.document.documentElement.clientWidth) / 2)
+        - (boundingRect.width / 2);
+    dialog.dragFinalY = (window.visualViewport?.offsetTop || window.document.documentElement.offsetTop)
+        + ((window.visualViewport?.height || window.document.documentElement.clientHeight) / 2)
+        - (boundingRect.height / 2);
+    dialog.style.left = `${dialog.dragFinalX}px`;
+    dialog.style.top = `${dialog.dragFinalY}px`;
 }
 
 function drag(e: PointerEvent) {
@@ -45,20 +55,20 @@ function drag(e: PointerEvent) {
         }
     }
 
-    const containerWidth = (draggedDialog.offsetParent?.clientWidth || window.innerWidth) / 2;
-    const dialogWidth = (draggedDialog.clientWidth / 2);
-    const containerHeight = (draggedDialog.offsetParent?.clientHeight || window.innerHeight) / 2;
-    const dialogHeight = (draggedDialog.clientHeight / 2);
+    const containerWidth = draggedDialog.offsetParent?.clientWidth || window.innerWidth;
+    const dialogWidth = draggedDialog.clientWidth;
+    const containerHeight = draggedDialog.offsetParent?.clientHeight || window.innerHeight;
+    const dialogHeight = draggedDialog.clientHeight;
 
     const left = Math.min(
         Math.max(
-            -containerWidth + dialogWidth,
+            0,
             (draggedDialog.dragFinalX || 0) + (e.clientX - draggedDialog.dragStartX)),
         containerWidth - dialogWidth);
 
     const top = Math.min(
         Math.max(
-            -containerHeight + dialogHeight,
+            0,
             (draggedDialog.dragFinalY || 0) + (e.clientY - draggedDialog.dragStartY)),
         containerHeight - dialogHeight);
 

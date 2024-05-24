@@ -1,80 +1,26 @@
 ﻿import { html_beautify } from 'js-beautify';
-import {
-    EditorView,
-    keymap,
-    highlightSpecialChars,
-    drawSelection,
-    highlightActiveLine,
-    dropCursor,
-    rectangularSelection,
-    crosshairCursor,
-    lineNumbers,
-    highlightActiveLineGutter,
-    placeholder,
-    Command,
-    ViewUpdate,
-} from '@codemirror/view';
+import { EditorView, placeholder } from '@codemirror/view';
 import { Extension, EditorState, Compartment, TransactionSpec } from '@codemirror/state';
-import {
-    HighlightStyle,
-    LanguageSupport,
-    StreamLanguage,
-    defaultHighlightStyle,
-    syntaxHighlighting,
-    indentOnInput,
-    bracketMatching,
-    foldGutter,
-    foldKeymap,
-    codeFolding,
-} from '@codemirror/language';
-import { defaultKeymap, history, historyKeymap, indentWithTab, redo as codeRedo, undo as codeUndo } from '@codemirror/commands';
-import { searchKeymap, highlightSelectionMatches } from '@codemirror/search';
-import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
-import { lintKeymap } from '@codemirror/lint';
-import { tags } from '@lezer/highlight';
-import { cpp } from '@codemirror/lang-cpp';
-import { csharp, objectiveC } from '@codemirror/legacy-modes/mode/clike';
-import { css } from '@codemirror/lang-css';
-import { html } from '@codemirror/lang-html';
-import { java } from '@codemirror/lang-java';
-import { javascript } from '@codemirror/lang-javascript';
-import { json } from '@codemirror/lang-json';
-import { less, sCSS } from '@codemirror/legacy-modes/mode/css';
-import { markdown } from '@codemirror/lang-markdown';
-import { php } from '@codemirror/lang-php';
-import { python } from '@codemirror/lang-python';
-import { sql } from '@codemirror/lang-sql';
-import { stex } from '@codemirror/legacy-modes/mode/stex';
-import { typescript } from '@codemirror/legacy-modes/mode/javascript';
+import { redo as codeRedo, undo as codeUndo } from '@codemirror/commands';
 
 import {
-    Command as PMCommand,
     EditorState as PMEditorState,
     Plugin,
     Selection,
-    TextSelection,
     Transaction
 } from 'prosemirror-state';
 import { Decoration, DecorationSet, EditorView as PMEditorView } from 'prosemirror-view';
-import {
-    ContentMatch,
-    DOMParser as PMDOMParser,
-    DOMSerializer,
-    Fragment,
-    Node as ProsemirrorNode,
-    Schema
-} from 'prosemirror-model';
+import { DOMParser as PMDOMParser, Node as ProsemirrorNode } from 'prosemirror-model';
 import {
     baseKeymap,
     chainCommands,
     deleteSelection,
-    exitCode,
     joinBackward,
-    selectNodeBackward
+    selectNodeBackward,
 } from 'prosemirror-commands';
 import { keymap as pmKeymap } from 'prosemirror-keymap';
 import { inputRules } from 'prosemirror-inputrules';
-import { history as pmHistory, undo, redo } from 'prosemirror-history';
+import { history as pmHistory } from 'prosemirror-history';
 import { dropCursor as pmDropCursor } from 'prosemirror-dropcursor';
 import { gapCursor } from 'prosemirror-gapcursor';
 import { buildKeymap, buildInputRules } from 'prosemirror-example-setup';
@@ -95,16 +41,28 @@ import {
     commonCommands,
     schema,
     ParamStateCommand,
-    exitDiv
-} from './_schemas';
-import { htmlCommands } from './_html';
-import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from './_markdown';
-import { cellMinWidth, columnResizing, fixTables, goToNextCell, tableEditing, TableView } from './_tables';
-
-enum ThemePreference {
-    Light = 1,
-    Dark = 2,
-}
+    exitDiv,
+    renderer,
+} from './editor/_schemas';
+import { elementStyle } from './editor/_element-style';
+import { htmlCommands } from './editor/_html';
+import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from './editor/_markdown';
+import { EditorSyntax, codeEditorLanguageMap, syntaxes, syntaxLabelMap, syntaxTextMap } from './editor/_syntax';
+import { cellMinWidth, columnResizing, fixTables, goToNextCell, tableEditing, TableView } from './editor/_tables';
+import {
+    codeEditorDarkExtension,
+    codeEditorLightTheme,
+} from './editor/_themes';
+import { toolbarButtonDefinitions, ToolbarControl, ToolbarControlStyle } from './editor/_toolbar';
+import { randomUUID } from './tavenem-utility'
+import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from './_popover';
+import { TavenemInputHtmlElement } from './_input';
+import { TavenemColorInputHtmlElement } from './_color-input';
+import { TavenemEmojiHTMLElement } from './_emoji';
+import { Dialog, initialize as initializeDialog } from './tavenem-dialog';
+import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from './editor/_code-editing';
+import { CodeBlockView } from './editor/_code-block-view';
+import { ThemePreference, getPreferredTavenemColorScheme } from './_theme';
 
 enum EditorMode {
     None = 0,
@@ -118,14 +76,14 @@ interface EditorOptions {
     mode: EditorMode;
     placeholder?: string;
     readOnly: boolean;
-    syntax: string;
+    syntax: EditorSyntax;
     updateOnInput: boolean;
 }
 
 interface EditorInfo {
     debounce?: number;
     options: EditorOptions;
-    ref: DotNet.DotNetObject;
+    tavenemEditor: TavenemEditorHtmlElement;
 }
 
 interface CodeEditorInfo extends EditorInfo {
@@ -134,340 +92,49 @@ interface CodeEditorInfo extends EditorInfo {
     readOnly: Compartment;
 }
 
-interface WysiwygEditorInfo extends EditorInfo {
-    commands: CommandSet;
-    isMarkdown: boolean;
-    view: PMEditorView;
+interface CommandInfo {
+    active: boolean,
+    enabled: boolean,
 }
 
+type CommandUpdateInfo = { [K in CommandType]?: CommandInfo }
 interface UpdateInfo {
-    commands: {
-        [type in CommandType]?: {
-            active: boolean,
-            enabled: boolean,
-        }
-    };
-    currentNode: string | null;
+    commands?: CommandUpdateInfo;
+    currentNode?: string | null;
 }
-
-const codeEditorLanguageMap: Record<string, LanguageSupport | StreamLanguage<unknown>> = {
-    "cpp": cpp(),
-    "css": css(),
-    "html": html(),
-    "java": java(),
-    "javascript": javascript(),
-    "json": json(),
-    "markdown": markdown(),
-    "php": php(),
-    "python": python(),
-    "sql": sql(),
-    "csharp": StreamLanguage.define(csharp),
-    "objectivec": StreamLanguage.define(objectiveC),
-    "less": StreamLanguage.define(less),
-    "sass": StreamLanguage.define(sCSS),
-    "latex": StreamLanguage.define(stex),
-    "typescript": StreamLanguage.define(typescript),
-};
-const codeEditorPlainText: Extension = [];
-
-const codeEditorBaseTheme = EditorView.baseTheme({
-    "&": {
-        flexGrow: "1",
-        overflowX: "auto"
-    },
-
-    "&, .cm-scroller": {
-        borderRadius: 'inherit'
-    },
-
-    "&.cm-editor.cm-focused": {
-        outline: "none",
-
-        "& .cm-selectionBackground": { backgroundColor: "var(--tavenem-color-bg-highlight-bright)" },
-    },
-
-    "&.set-height .cm-scroller": {
-        overflow: 'auto'
-    },
-
-    ".cm-content": {
-        caretColor: "var(--tavenem-color-text)"
-    },
-
-    ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--tavenem-color-text)" },
-
-    ".cm-selectionBackground, .cm-content ::selection": { backgroundColor: "var(--tavenem-color-bg-highlight-bright)" },
-
-    ".cm-panels": { backgroundColor: "var(--tavenem-color-bg-surface)", color: "var(--tavenem-color-text)" },
-    ".cm-panels.cm-panels-top": { borderBottom: "1px solid var(--field-border-color)" },
-    ".cm-panels.cm-panels-bottom": { borderTop: "1px solid var(--field-border-color)" },
-
-    ".cm-activeLine, .cm-activeLineGutter": { backgroundColor: "transparent" },
-
-    ".cm-specialChar": {
-        color: "var(--tavenem-color-danger)"
-    },
-
-    ".cm-gutters": {
-        backgroundColor: "var(--tavenem-color-bg-input)",
-        borderBottomLeftRadius: 'inherit',
-        borderRight: "1px solid var(--tavenem-color-border-input)",
-        borderTopLeftRadius: 'inherit',
-        color: "var(--tavenem-color-text-secondary)"
-    },
-
-    ".cm-textfield": {
-        backgroundColor: "var(--tavenem-color-bg-input)",
-        borderColor: "var(--tavenem-color-border-input)"
-    },
-
-    ".cm-button": {
-        backgroundImage: "linear-gradient(var(--tavenem-color-bg), var(--tavenem-color-bg-alt))",
-        borderColor: "var(--tavenem-color-border-input)",
-        borderRadius: "var(--tavenem-border-radius)",
-
-        "&:active": {
-            backgroundImage: "linear-gradient(var(--tavenem-color-bg-alt), var(--tavenem-dark-color-bg-highlight))"
-        }
-    },
-
-    ".cm-panel input[type=checkbox]": {
-        position: 'relative',
-        verticalAlign: 'middle',
-
-        "&:not(:checked):before": {
-            backgroundColor: "var(--tavenem-color-bg-input)",
-            content: "",
-            height: "calc(100% - 2px)",
-            left: "1px",
-            position: 'absolute',
-            top: "1px",
-            width: "calc(100% - 2px)"
-        }
-    }
-});
-const codeEditorLightTheme = EditorView.theme({
-    ".cm-foldPlaceholder": {
-        backgroundColor: "var(--tavenem-color-bg-alt)",
-        borderColor: "var(--tavenem-color-border-input)"
-    },
-
-    ".cm-tooltip": {
-        webkitBackdropFilter: "blur(12px)",
-        backdropFilter: "blur(12px)",
-        backgroundColor: "var(--tavenem-color-bg-surface)",
-        borderColor: "var(--tavenem-color-border-input)",
-        borderRadius: "var(--tavenem-border-radius)",
-        color: "var(--tavenem-color-text)"
-    },
-    ".cm-tooltip-autocomplete": {
-        "& > ul > li[aria-selected]": {
-            backgroundColor: "var(--tavenem-color-bg-highlight)",
-            color: "var(--tavenem-color-text)",
-
-            "&:first-child": {
-                borderTopLeftRadius: "var(--tavenem-border-radius)",
-                borderTopRightRadius: "var(--tavenem-border-radius)"
-            }
-        }
-    },
-});
-const codeEditorDarkTheme = EditorView.theme({
-    ".cm-foldPlaceholder": {
-        backgroundColor: "var(--tavenem-color-bg-alt)",
-        borderColor: "var(--tavenem-color-border-input)"
-    },
-
-    ".cm-tooltip": {
-        webkitBackdropFilter: "blur(12px)",
-        backdropFilter: "blur(12px)",
-        backgroundColor: "var(--tavenem-color-bg-surface)",
-        borderColor: "var(--tavenem-color-border-input)",
-        borderRadius: "var(--tavenem-border-radius)",
-        color: "var(--tavenem-color-text)"
-    },
-    ".cm-tooltip-autocomplete": {
-        "& > ul > li[aria-selected]": {
-            backgroundColor: "var(--tavenem-color-bg-highlight)",
-            color: "var(--tavenem-color-text)",
-
-            "&:first-child": {
-                borderTopLeftRadius: "var(--tavenem-border-radius)",
-                borderTopRightRadius: "var(--tavenem-border-radius)"
-            }
-        }
-    },
-}, { dark: true });
-const codeEditorDarkHighlightStyle = HighlightStyle.define([
-    {
-        tag: tags.keyword,
-        color: "#c678dd"
-    },
-    {
-        tag: [tags.deleted, tags.character],
-        color: "#e06c75"
-    },
-    {
-        tag: [tags.definition(tags.name), tags.propertyName, tags.macroName],
-        color: "#569cd6"
-    },
-    {
-        tag: [tags.function(tags.variableName), tags.labelName],
-        color: "#61afef"
-    },
-    {
-        tag: [tags.color, tags.constant(tags.name), tags.standard(tags.name)],
-        color: "#d19a66"
-    },
-    {
-        tag: [tags.name, tags.separator],
-        color: "#abb2bf"
-    },
-    {
-        tag: [tags.typeName, tags.className, tags.number, tags.changed, tags.annotation, tags.modifier, tags.self, tags.namespace],
-        color: "#e5c07b"
-    },
-    {
-        tag: [tags.operator, tags.operatorKeyword, tags.url, tags.escape, tags.regexp, tags.link, tags.special(tags.string)],
-        color: "#56b6c2"
-    },
-    {
-        tag: [tags.meta, tags.comment],
-        color: "#7d8799"
-    },
-    {
-        tag: tags.strong,
-        fontWeight: "bold"
-    },
-    {
-        tag: tags.emphasis,
-        fontStyle: "italic"
-    },
-    {
-        tag: tags.strikethrough,
-        textDecoration: "line-through"
-    },
-    {
-        tag: tags.link,
-        color: "#7d8799",
-        textDecoration: "underline"
-    },
-    {
-        tag: tags.heading,
-        fontWeight: "bold",
-        color: "#e06c75"
-    },
-    {
-        tag: [tags.atom, tags.bool, tags.special(tags.variableName)],
-        color: "#d19a66"
-    },
-    {
-        tag: [tags.processingInstruction, tags.string, tags.inserted],
-        color: "#98c379"
-    },
-    {
-        tag: tags.invalid,
-        color: "#ffffff"
-    },
-]);
-const codeEditorDarkExtension: Extension = [codeEditorDarkTheme, syntaxHighlighting(codeEditorDarkHighlightStyle)];
-const codeEditorThemeCompartment = new Compartment;
-
-const defaultCodeExtensions: Extension[] = [
-    lineNumbers(),
-    highlightActiveLineGutter(),
-    highlightSpecialChars(),
-    history(),
-    foldGutter(),
-    codeFolding(),
-    drawSelection(),
-    dropCursor(),
-    EditorState.allowMultipleSelections.of(true),
-    indentOnInput(),
-    syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-    bracketMatching(),
-    closeBrackets(),
-    autocompletion(),
-    rectangularSelection(),
-    crosshairCursor(),
-    highlightActiveLine(),
-    highlightSelectionMatches(),
-    keymap.of([
-        ...closeBracketsKeymap,
-        ...defaultKeymap,
-        ...searchKeymap,
-        ...historyKeymap,
-        ...foldKeymap,
-        ...completionKeymap,
-        ...lintKeymap,
-        indentWithTab,
-    ]),
-    codeEditorBaseTheme,
-];
-
-const exitCodeUp: PMCommand = (state, dispatch) => {
-    const { $head, $anchor } = state.selection;
-    if (!$head.parent.type.spec.code
-        || !$head.sameParent($anchor)) {
-        return false;
-    }
-    const above = $head.node(-1), before = $head.index(-1), type = defaultBlockAt(above.contentMatchAt(before));
-    if (!type || !above.canReplaceWith(before, before, type)) {
-        return false;
-    }
-    if (dispatch) {
-        const pos = $head.before(), tr = state.tr.replaceWith(pos, pos, type.createAndFill()!);
-        tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
-        dispatch(tr.scrollIntoView());
-    }
-    return true;
-}
-
-let codeEditorThemeExtension: Extension | undefined;
-let themePreference = getPreferredColorScheme();
 
 class TavenemCodeEditor {
-    _editors: Record<string, CodeEditorInfo> = {};
+    _editor?: CodeEditorInfo;
 
-    dispose(elementId: string) {
-        const editor = this._editors[elementId];
-        if (editor) {
-            editor.view.destroy();
+    dispose() {
+        if (this._editor) {
+            this._editor.view.destroy();
         }
-        delete this._editors[elementId];
+        delete this._editor;
     }
 
     initializeEditor(
-        elementId: string,
-        dotNetRef: DotNet.DotNetObject,
+        tavenemEditor: TavenemEditorHtmlElement,
+        element: HTMLElement,
         options: EditorOptions) {
-        const element = document.getElementById(elementId);
-        if (!(element instanceof HTMLDivElement)) {
-            return;
-        }
-
-        const existing = this._editors[elementId];
-        if (existing) {
-            existing.view.destroy();
-            delete this._editors[elementId];
+        if (this._editor) {
+            this._editor.view.destroy();
+            delete this._editor;
         }
 
         const languageExtension = options.syntax
-            ? codeEditorLanguageMap[options.syntax.toLowerCase()] || codeEditorPlainText
+            ? codeEditorLanguageMap[options.syntax] || codeEditorPlainText
             : codeEditorPlainText;
         const languageCompartment = new Compartment;
 
         const readOnlyCompartment = new Compartment;
 
-        themePreference = getPreferredColorScheme();
-        if (!codeEditorThemeExtension) {
-            codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
-                ? codeEditorDarkExtension
-                : codeEditorLightTheme);
-        }
+        const themePreference = getPreferredTavenemColorScheme();
 
         const extensions: Extension[] = defaultCodeExtensions.concat([
-            codeEditorThemeExtension,
+            codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
+                ? codeEditorDarkExtension
+                : codeEditorLightTheme),
             languageCompartment.of(languageExtension),
             readOnlyCompartment.of(EditorState.readOnly.of(options.readOnly || false)),
             EditorView.updateListener.of(update => {
@@ -475,37 +142,27 @@ class TavenemCodeEditor {
                     return;
                 }
 
-                const div = update.view.dom.parentElement;
-                if (!div) {
+                const tavenemEditorElement = update.view.dom.parentElement?.parentElement as TavenemEditorHtmlElement;
+                if (!tavenemEditorElement?._tavenemCodeEditor?._editor) {
                     return;
                 }
 
-                const editor = tavenemCodeEditor._editors[div.id];
-                if (!editor) {
-                    return;
+                if (tavenemEditorElement._tavenemCodeEditor._editor.debounce) {
+                    clearTimeout(tavenemEditorElement._tavenemCodeEditor._editor.debounce);
                 }
 
-                if (editor.debounce) {
-                    clearTimeout(editor.debounce);
-                }
-
-                editor.debounce = setTimeout(
-                    tavenemCodeEditor.onInput.bind(tavenemCodeEditor, div.id),
+                tavenemEditorElement._tavenemCodeEditor._editor.debounce = setTimeout(
+                    tavenemEditorElement._tavenemCodeEditor.onInput.bind(tavenemEditorElement._tavenemCodeEditor),
                     500);
             }),
             EditorView.domEventHandlers({
                 'blur': function (_, view) {
-                    const div = view.dom.parentElement;
-                    if (!div) {
+                    const tavenemEditorElement = view.dom.parentElement?.parentElement as TavenemEditorHtmlElement;
+                    if (!tavenemEditorElement?._tavenemCodeEditor?._editor) {
                         return;
                     }
 
-                    const editor = tavenemCodeEditor._editors[div.id];
-                    if (!editor) {
-                        return;
-                    }
-
-                    editor.ref.invokeMethodAsync("OnChangeInvoked", view.state.doc.toString());
+                    tavenemEditorElement._tavenemCodeEditor._editor.tavenemEditor.onChange(view.state.doc.toString());
                 }
             }),
         ]);
@@ -520,83 +177,80 @@ class TavenemCodeEditor {
                 extensions: extensions,
             }),
             parent: element,
+            root: tavenemEditor.shadowRoot || undefined,
         });
 
-        this._editors[elementId] = {
+        this._editor = {
             view,
             language: languageCompartment,
             options,
             readOnly: readOnlyCompartment,
-            ref: dotNetRef,
+            tavenemEditor,
         };
+
+        this.onInput();
 
         if (options.autoFocus) {
             view.focus();
         }
-
-        return this._editors[elementId];
     }
 
-    updateSelectedText(elementId: string, value?: string) {
-        const editor = this._editors[elementId];
-        if (!editor) {
+    updateSelectedText(value?: string | null) {
+        if (!this._editor) {
             return;
         }
 
         if (!value || !value.length) {
-            editor.view.dispatch(editor.view.state.replaceSelection(''));
+            this._editor.view.dispatch(this._editor.view.state.replaceSelection(''));
         } else {
-            editor.view.dispatch(editor.view.state.replaceSelection(value));
+            this._editor.view.dispatch(this._editor.view.state.replaceSelection(value));
         }
 
-        editor.ref.invokeMethodAsync(
-            "OnChangeInvoked",
-            editor.view.state.doc.toString());
+        this._editor.tavenemEditor.onChange(this._editor.view.state.doc.toString());
     }
 
-    private onInput(elementId: string) {
-        const editor = this._editors[elementId];
-        if (editor) {
-            const updateInfo: UpdateInfo = {
-                commands: {},
-                currentNode: null,
-            };
-            updateInfo.commands[CommandType.Undo] = {
-                active: false,
-                enabled: codeUndo({
-                    state: editor.view.state,
-                    dispatch: _ => {},
-                }),
-            };
-            updateInfo.commands[CommandType.Redo] = {
-                active: false,
-                enabled: codeRedo({
-                    state: editor.view.state,
-                    dispatch: _ => { },
-                }),
-            };
-            editor.ref.invokeMethodAsync("UpdateCommands", updateInfo);
+    private onInput() {
+        if (!this._editor) {
+            return;
+        }
+        const updateInfo: UpdateInfo = {
+            commands: {},
+            currentNode: null,
+        };
+        updateInfo.commands![CommandType.Undo] = {
+            active: false,
+            enabled: codeUndo({
+                state: this._editor.view.state,
+                dispatch: _ => {},
+            }),
+        };
+        updateInfo.commands![CommandType.Redo] = {
+            active: false,
+            enabled: codeRedo({
+                state: this._editor.view.state,
+                dispatch: _ => { },
+            }),
+        };
+        this._editor.tavenemEditor.update(updateInfo);
 
-            if (editor.options.updateOnInput) {
-                editor.ref.invokeMethodAsync("OnChangeInvoked", editor.view.state.doc.toString());
-            }
+        if (this._editor.options.updateOnInput) {
+            this._editor.tavenemEditor.onInput(this._editor.view.state.doc.toString());
         }
     }
 }
-const tavenemCodeEditor = new TavenemCodeEditor();
 
 class MenuView {
     _commands: CommandSet;
     _editorView: PMEditorView;
-    _ref: DotNet.DotNetObject;
+    _tavenemEditor: TavenemEditorHtmlElement;
 
     constructor(
-        dotNetRef: DotNet.DotNetObject,
+        tavenemEditor: TavenemEditorHtmlElement,
         commands: CommandSet,
         editorView: PMEditorView) {
         this._commands = commands;
         this._editorView = editorView;
-        this._ref = dotNetRef;
+        this._tavenemEditor = tavenemEditor;
         this.update();
     }
 
@@ -638,10 +292,10 @@ class MenuView {
                 update.enabled = command.isEnabled
                     ? command.isEnabled(this._editorView.state)
                     : command.command(this._editorView.state, undefined, this._editorView);
-                updateInfo.commands[commandType] = update;
+                updateInfo.commands![commandType] = update;
             }
         }
-        this._ref.invokeMethodAsync("UpdateCommands", updateInfo);
+        this._tavenemEditor.update(updateInfo);
     }
 
     private nodeName(node: ProsemirrorNode) {
@@ -650,213 +304,6 @@ class MenuView {
             name += ' ' + node.attrs.level;
         }
         return name;
-    }
-}
-
-class CodeBlockView {
-    dom: Node;
-    _cm: EditorView;
-    _languageCompartment = new Compartment;
-    _syntax: string | null;
-    _updating = false;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        if (!codeEditorThemeExtension) {
-            codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
-                ? codeEditorDarkExtension
-                : codeEditorLightTheme);
-        }
-
-        this._syntax = node.attrs.syntax;
-        const languageExtension = this._syntax
-            ? codeEditorLanguageMap[this._syntax.toLowerCase()] || codeEditorPlainText
-            : codeEditorPlainText;
-
-        const extensions: Extension[] = this.codeMirrorKeymap()
-            .concat(defaultCodeExtensions)
-            .concat([
-                codeEditorThemeExtension,
-                this._languageCompartment.of(languageExtension),
-                EditorView.updateListener.of(update => this.listen.call(this, update)),
-                EditorView.domEventHandlers({
-                    'focus': (_, view) => this.forwardSelection(view)
-                }),
-                EditorView.editorAttributes.of(_ => {
-                    if (this._syntax && this._syntax.length) {
-                        const attrs: { [name: string]: string } = {};
-                        attrs['data-language'] = this._syntax;
-                        return attrs;
-                    }
-                    return null;
-                }),
-            ]);
-        this._cm = new EditorView({
-            state: EditorState.create({
-                doc: this.node.textContent,
-                extensions: extensions,
-            }),
-        });
-        const div = document.createElement('div');
-        div.appendChild(this._cm.dom);
-        this.dom = div;
-    }
-
-    asProseMirrorSelection(view: EditorView, doc: ProsemirrorNode) {
-        const offset = (this.getPos() || 0) + 1;
-        const anchor = view.state.selection.main.anchor + offset;
-        const head = view.state.selection.main.head + offset;
-        return TextSelection.create(doc, anchor, head);
-    }
-
-    codeMirrorKeymap(): Extension[] {
-        return [keymap.of([
-            { key: "ArrowLeft", run: this.maybeEscape("char", -1), preventDefault: true, },
-            { key: "ArrowRight", run: this.maybeEscape("char", 1), preventDefault: true, },
-            { key: "ArrowUp", run: this.maybeEscape("line", -1), preventDefault: true, },
-            { key: "ArrowDown", run: this.maybeEscape("line", 1), preventDefault: true, },
-            {
-                key: "Shift-Ctrl-Enter",
-                run: () => {
-                    if (exitCodeUp(this.view.state, this.view.dispatch)) {
-                        this.view.focus();
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                key: "Ctrl-Enter",
-                run: () => {
-                    if (exitCode(this.view.state, this.view.dispatch)) {
-                        this.view.focus();
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                key: "Mod-z",
-                run: () => {
-                    undo(this.view.state, this.view.dispatch);
-                    return true;
-                }
-            },
-            {
-                key: "Mod-y",
-                mac: "Mod-Shift-z",
-                run: () => {
-                    redo(this.view.state, this.view.dispatch);
-                    return true;
-                }
-            },
-        ])];
-    }
-
-    destroy() { this._cm.destroy() }
-
-    forwardSelection(view: EditorView) {
-        if (!view.hasFocus) {
-            return;
-        }
-        const selection = this.asProseMirrorSelection(view, this.view.state.doc);
-        if (!selection.eq(this.view.state.selection)) {
-            this.view.dispatch(this.view.state.tr.setSelection(selection));
-        }
-    }
-
-    listen(update: ViewUpdate) {
-        if (update.docChanged && !this._updating) {
-            this.valueChanged(update.view);
-            this.forwardSelection(update.view);
-            return;
-        }
-
-        if (update.selectionSet && !this._updating) {
-            this.forwardSelection(update.view);
-        }
-    }
-
-    maybeEscape(unit: string, dir: number): Command {
-        return (target: EditorView) => {
-            const pos = target.state.selection.main;
-            if (!target.state.selection.main.empty) {
-                return false;
-            }
-            const line = target.state.doc.lineAt(pos.head);
-            if (line.number != (dir < 0 ? 1 : target.state.doc.lines)
-                || (unit == "char"
-                    && pos.head != (dir < 0 ? line.from : line.to))) {
-                return false;
-            }
-            this.view.focus();
-            const targetPos = (this.getPos() || 0) + (dir < 0 ? 0 : this.node.nodeSize);
-            const selection = Selection.near(this.view.state.doc.resolve(targetPos), dir);
-            this.view.dispatch(this.view.state.tr.setSelection(selection).scrollIntoView());
-            this.view.focus();
-            return true;
-        };
-    }
-
-    selectNode() { this._cm.focus() }
-
-    setSelection(anchor: number, head: number) {
-        this._cm.focus();
-        this._updating = true;
-        this._cm.dispatch({ selection: { anchor, head, } });
-        this._updating = false;
-    }
-
-    stopEvent() { return true }
-
-    update(node: ProsemirrorNode) {
-        if (node.type != this.node.type) {
-            return false;
-        }
-        this.node = node;
-
-        const spec: TransactionSpec = {};
-        const change = computeChange(this._cm.state.doc.toString(), node.textContent);
-        if (change) {
-            spec.changes = {
-                from: change.from,
-                to: change.to,
-                insert: change.text,
-            };
-        }
-
-        const syntax = node.attrs.syntax as string | null;
-        let newSyntax = false;
-        if (syntax != this._syntax) {
-            newSyntax = true;
-            this._syntax = syntax;
-            const languageExtension = syntax
-                ? codeEditorLanguageMap[syntax.toLowerCase()] || codeEditorPlainText
-                : codeEditorPlainText;
-            spec.effects = this._languageCompartment.reconfigure(languageExtension);
-        }
-
-        if (change || newSyntax) {
-            this._updating = true;
-            this._cm.dispatch(spec);
-            this._updating = false;
-        }
-        return true;
-    }
-
-    valueChanged(view: EditorView) {
-        const change = computeChange(this.node.textContent, view.state.doc.toString());
-        if (change) {
-            const start = (this.getPos() || 0) + 1;
-            this.view.dispatch(this.view.state.tr.replaceWith(
-                start + change.from,
-                start + change.to,
-                change.text
-                    ? this.view.state.schema.text(change.text)
-                    : Fragment.empty));
-        }
     }
 }
 
@@ -870,7 +317,7 @@ class HeadView {
         this.dom = this.createContent(node);
     }
 
-    stopEvent() { return true }
+    stopEvent() { return true; }
 
     update(node: ProsemirrorNode) {
         if (node.type != this.node.type) {
@@ -882,9 +329,7 @@ class HeadView {
 
     private createContent(node: ProsemirrorNode) {
         const head = document.createElement('head');
-        head.appendChild(DOMSerializer
-            .fromSchema(node.type.schema)
-            .serializeFragment(node.content));
+        head.appendChild(renderer.serializeFragment(node.content));
         const value = html_beautify(head.innerHTML, {
             extra_liners: [],
             indent_size: 2,
@@ -906,10 +351,10 @@ class ForbiddenView {
         this.dom = this.createContent(node);
     }
 
-    stopEvent() { return true }
+    stopEvent() { return true; }
 
     update(node: ProsemirrorNode) {
-        if (node.type != this.node.type) {
+        if (node.type !== this.node.type) {
             return false;
         }
         this.dom = this.createContent(node);
@@ -918,9 +363,7 @@ class ForbiddenView {
 
     private createContent(node: ProsemirrorNode) {
         const div = document.createElement('div');
-        div.appendChild(DOMSerializer
-            .fromSchema(node.type.schema)
-            .serializeNode(node));
+        div.appendChild(renderer.serializeNode(node));
         const value = html_beautify(div.innerHTML, {
             extra_liners: [],
             indent_size: 2,
@@ -939,59 +382,48 @@ const arrowHandlers = pmKeymap({
     ArrowDown: arrowHandler("down"),
 });
 
-class TavenemWysiwygEditor {
-    _editors: Record<string, WysiwygEditorInfo> = {};
+interface WysiwygEditorInfo extends EditorInfo {
+    commands: CommandSet;
+    isMarkdown: boolean;
+    view: PMEditorView;
+}
 
-    dispose(elementId: string) {
-        const editor = this._editors[elementId];
-        if (editor) {
-            editor.view.destroy();
+class TavenemWysiwygEditor {
+    _editor?: WysiwygEditorInfo;
+
+    dispose() {
+        if (this._editor) {
+            this._editor.view.destroy();
         }
-        delete this._editors[elementId];
+        delete this._editor;
     }
 
-    getContent(editor: WysiwygEditorInfo) {
-        let value;
-        if (editor.isMarkdown) {
-            value = tavenemMarkdownSerializer.serialize(editor.view.state.doc);
-        } else {
-            const div = document.createElement('div');
-            div.appendChild(DOMSerializer
-                .fromSchema(editor.view.state.schema)
-                .serializeFragment(editor.view.state.doc.content));
-            value = div.innerHTML;
-            value = html_beautify(value, {
-                extra_liners: [],
-                indent_size: 2,
-                wrap_line_length: 0,
-            });
+    getContent() {
+        if (!this._editor) {
+            return;
         }
-        return value;
+        if (this._editor.isMarkdown) {
+            return tavenemMarkdownSerializer.serialize(this._editor.view.state.doc);
+        }
+        const div = document.createElement('div');
+        div.appendChild(renderer.serializeFragment(this._editor.view.state.doc.content));
+        return html_beautify(div.innerHTML, {
+            extra_liners: [],
+            indent_size: 2,
+            wrap_line_length: 0,
+        });
     }
 
     initializeEditor(
-        elementId: string,
-        dotNetRef: DotNet.DotNetObject,
+        tavenemEditor: TavenemEditorHtmlElement,
+        element: HTMLElement,
         options: EditorOptions) {
-        const element = document.getElementById(elementId);
-        if (!(element instanceof HTMLDivElement)) {
-            return;
+        if (this._editor) {
+            this._editor.view.destroy();
+            delete this._editor;
         }
 
-        const existing = this._editors[elementId];
-        if (existing) {
-            existing.view.destroy();
-            delete this._editors[elementId];
-        }
-
-        themePreference = getPreferredColorScheme();
-        if (!codeEditorThemeExtension) {
-            codeEditorThemeExtension = codeEditorThemeCompartment.of(themePreference == ThemePreference.Dark
-                ? codeEditorDarkExtension
-                : codeEditorLightTheme);
-        }
-
-        const isMarkdown = options.syntax == 'Markdown';
+        const isMarkdown = options.syntax === 'markdown';
 
         let doc: ProsemirrorNode;
         if (isMarkdown) {
@@ -1016,11 +448,11 @@ class TavenemWysiwygEditor {
         const blockMathInputRule = makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, schema.nodes.math_display);
 
         const commands = commonCommands(schema);
-        const menu = new Plugin({
+        const menu = tavenemEditor ? new Plugin({
             view(editorView) {
-                return new MenuView(dotNetRef, commands, editorView);
+                return new MenuView(tavenemEditor, commands, editorView);
             }
-        });
+        }) : null;
 
         const placeholder = (text: string) => new Plugin({
             props: {
@@ -1042,6 +474,7 @@ class TavenemWysiwygEditor {
 
         const plugins = [
             mathPlugin,
+            tableEditing,
             arrowHandlers,
             inputRules({ rules: [inlineMathInputRule, blockMathInputRule] }),
             buildInputRules(schema),
@@ -1058,7 +491,6 @@ class TavenemWysiwygEditor {
             gapCursor(),
             pmHistory(),
             columnResizing,
-            tableEditing,
         ];
         if (options.placeholder) {
             plugins.push(placeholder(options.placeholder));
@@ -1072,11 +504,12 @@ class TavenemWysiwygEditor {
 
         const view = new PMEditorView(element, {
             state: state,
-            plugins: [menu],
+            plugins: menu ? [menu] : undefined,
             clipboardTextSerializer: slice => { return mathSerializer.serializeSlice(slice) },
+            editable: () => !options.readOnly,
             nodeViews: {
                 code_block: (node, view, getPos, _) => new CodeBlockView(node, view, getPos),
-                table: (node, view, getPos, _) => new TableView(node, cellMinWidth),
+                table: (node, _view, _getPos, _) => new TableView(node, cellMinWidth),
                 head: (node, view, getPos, _) => new HeadView(node, view, getPos),
                 iframe: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
                 noscript: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
@@ -1090,325 +523,102 @@ class TavenemWysiwygEditor {
                     return;
                 }
 
-                const div = (this as unknown as PMEditorView).dom.parentElement;
-                if (!div) {
-                    return;
-                }
-                const editor = tavenemWysiwygEditor._editors[div.id];
-                if (!editor
-                    || !editor.options.updateOnInput) {
+                const tavenemEditorElement = (this as unknown as PMEditorView).dom.parentElement?.parentElement as TavenemEditorHtmlElement;
+                if (!tavenemEditorElement?._tavenemWysiwygEditor?._editor
+                    || !tavenemEditorElement._tavenemWysiwygEditor._editor.options.updateOnInput) {
                     return;
                 }
 
-                if (editor.debounce) {
-                    clearTimeout(editor.debounce);
+                if (tavenemEditorElement._tavenemWysiwygEditor._editor.debounce) {
+                    clearTimeout(tavenemEditorElement._tavenemWysiwygEditor._editor.debounce);
                 }
 
-                editor.debounce = setTimeout(
-                    tavenemWysiwygEditor.onInput.bind(tavenemWysiwygEditor, div.id),
+                tavenemEditorElement._tavenemWysiwygEditor._editor.debounce = setTimeout(
+                    tavenemEditorElement._tavenemWysiwygEditor.onInput.bind(tavenemEditorElement._tavenemWysiwygEditor),
                     500);
             },
             handleDOMEvents: {
                 'blur': function (view, _) {
-                    const div = view.dom.parentElement;
-                    if (!div) {
+                    if (!view.dom.parentElement?.parentElement) {
                         return true;
                     }
-                    const editor = tavenemWysiwygEditor._editors[div.id];
-                    if (!editor) {
+
+                    const tavenemEditorElement = view.dom.parentElement.parentElement as TavenemEditorHtmlElement;
+                    if (!tavenemEditorElement?._tavenemWysiwygEditor?._editor) {
                         return true;
                     }
-                    editor.ref.invokeMethodAsync(
-                        "OnChangeInvoked",
-                        tavenemWysiwygEditor.getContent(editor));
+
+                    tavenemEditorElement._tavenemWysiwygEditor._editor.tavenemEditor.onChange(tavenemEditorElement._tavenemWysiwygEditor.getContent());
                     return true;
                 }
             }
         });
-        this._editors[elementId] = {
+        this._editor = {
             commands: commands,
             isMarkdown,
             view,
             options,
-            ref: dotNetRef,
+            tavenemEditor,
         };
-        if (options.readOnly) {
-            this.setReadOnly(view, options.readOnly);
-        }
-
-        return this._editors[elementId];
     }
 
-    setReadOnly(editor: PMEditorView | undefined, value: boolean) {
-        if (editor) {
-            editor.setProps({ editable: () => !value });
-        }
-    }
-
-    updateSelectedText(elementId: string, value?: string) {
-        const editor = this._editors[elementId];
-        if (!editor) {
+    updateSelectedText(value?: string | null) {
+        if (!this._editor) {
             return;
         }
 
         if (!value || !value.length) {
-            deleteSelection(editor.view.state, editor.view.dispatch);
+            deleteSelection(this._editor.view.state, this._editor.view.dispatch);
         } else {
-            const node = editor.view.state.schema.text(value);
-            const newState = editor.view.state.apply(
-                editor.view.state.tr.replaceSelectionWith(node));
-            editor.view.updateState(newState);
+            const node = this._editor.view.state.schema.text(value);
+            const newState = this._editor.view.state.apply(
+                this._editor.view.state.tr.replaceSelectionWith(node));
+            this._editor.view.updateState(newState);
         }
 
-        editor.ref.invokeMethodAsync(
-            "OnChangeInvoked",
-            this.getContent(editor));
+        this._editor.tavenemEditor.onChange(this.getContent());
     }
 
-    private onInput(elementId: string) {
-        const editor = this._editors[elementId];
-        if (editor) {
-            editor.ref.invokeMethodAsync(
-                "OnChangeInvoked",
-                this.getContent(editor));
+    private onInput() {
+        if (this._editor) {
+            this._editor.tavenemEditor.onInput(this.getContent());
         }
     }
 }
-const tavenemWysiwygEditor = new TavenemWysiwygEditor();
 
-const themeObserver = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        if (mutation.type === 'attributes'
-            && mutation.target instanceof HTMLElement) {
-            const theme = mutation.target.dataset.theme;
-            if (theme) {
-                const effect = codeEditorThemeCompartment.reconfigure(theme === 'dark'
-                    ? codeEditorDarkExtension
-                    : codeEditorLightTheme);
-                for (const elementId in tavenemCodeEditor._editors) {
-                    const editor = tavenemCodeEditor._editors[elementId];
-                    editor.view.dispatch({ effects: effect });
-                }
-            }
-        }
-    });
-});
-themeObserver.observe(document.documentElement, { attributes: true });
-
-interface ToolbarSeparator {
-    isStyle?: boolean;
-    isWysiwyg?: boolean;
-}
-
-interface ToolbarButtonDefinition extends ToolbarSeparator {
-    buttons?: ToolbarButtonDefinition[];
-    class?: string;
-    icon?: string;
-    inactiveIcon?: string;
-    parentClass?: string;
-    text?: string;
-    tooltip?: string;
-    type: CommandType;
-    params?: any[];
-}
-
-class ToolbarButton {
-    _element: HTMLButtonElement;
-    _type: CommandType;
-
-    constructor(button: HTMLButtonElement, type: CommandType) {
-        this._element = button;
-        this._type = type;
-    }
-}
-
-const toolbarButtonDefinitions: (ToolbarButtonDefinition | ToolbarSeparator)[] = [
-    {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z"/></svg>',
-        tooltip: 'undo',
-        type: CommandType.Undo,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M396-200q-97 0-166.5-63T160-420q0-94 69.5-157T396-640h252L544-744l56-56 200 200-200 200-56-56 104-104H396q-63 0-109.5 40T240-420q0 60 46.5 100T396-280h284v80H396Z"/></svg>',
-        tooltip: 'redo',
-        type: CommandType.Redo,
-    }, {
-        isStyle: true,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M272-200v-560h221q65 0 120 40t55 111q0 51-23 78.5T602-491q25 11 55.5 41t30.5 90q0 89-65 124.5T501-200H272Zm121-112h104q48 0 58.5-24.5T566-372q0-11-10.5-35.5T494-432H393v120Zm0-228h93q33 0 48-17t15-38q0-24-17-39t-44-15h-95v109Z"/></svg>',
-        isStyle: true,
-        type: CommandType.Strong,
-        buttons: [
-            {
-                parentClass: 'filled',
-                text: 'Strong',
-                type: CommandType.Strong,
-            },
-            {
-                parentClass: 'outlined',
-                text: 'Bold',
-                type: CommandType.Bold,
-            },
-        ],
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-200v-100h160l120-360H320v-100h400v100H580L460-300h140v100H200Z"/></svg>',
-        isStyle: true,
-        type: CommandType.Emphasis,
-        buttons: [
-            {
-                parentClass: 'filled',
-                text: 'Emphasis',
-                type: CommandType.Emphasis,
-            },
-            {
-                parentClass: 'outlined',
-                text: 'Italic',
-                type: CommandType.Italic,
-            },
-        ],
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120v-80h560v80H200Zm280-160q-101 0-157-63t-56-167v-330h103v336q0 56 28 91t82 35q54 0 82-35t28-91v-336h103v330q0 104-56 167t-157 63Z"/></svg>',
-        isStyle: true,
-        tooltip: 'underline',
-        type: CommandType.Underline,
-        buttons: [
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M486-160q-76 0-135-45t-85-123l88-38q14 48 48.5 79t85.5 31q42 0 76-20t34-64q0-18-7-33t-19-27h112q5 14 7.5 28.5T694-340q0 86-61.5 133T486-160ZM80-480v-80h800v80H80Zm402-326q66 0 115.5 32.5T674-674l-88 39q-9-29-33.5-52T484-710q-41 0-68 18.5T386-640h-96q2-69 54.5-117.5T482-806Z"/></svg>',
-                type: CommandType.Strikethrough,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M760-160v-80q0-17 11.5-28.5T800-280h80v-40H760v-40h120q17 0 28.5 11.5T920-320v40q0 17-11.5 28.5T880-240h-80v40h120v40H760Zm-525-80 185-291-172-269h106l124 200h4l123-200h107L539-531l186 291H618L482-457h-4L342-240H235Z"/></svg>',
-                type: CommandType.Subscript,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M760-600v-80q0-17 11.5-28.5T800-720h80v-40H760v-40h120q17 0 28.5 11.5T920-760v40q0 17-11.5 28.5T880-680h-80v40h120v40H760ZM235-160l185-291-172-269h106l124 200h4l123-200h107L539-451l186 291H618L482-377h-4L342-160H235Z"/></svg>',
-                type: CommandType.Superscript,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z"/></svg>',
-                type: CommandType.CodeInline,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M560-160v-520H360v-120h520v120H680v520H560Zm-360 0v-320H80v-120h360v120H320v320H200Z"/></svg>',
-                type: CommandType.Small,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>',
-                type: CommandType.Inserted,
-            },
-        ],
-    }, {
-        isStyle: true,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M420-160v-520H200v-120h560v120H540v520H420Z"/></svg>',
-        isStyle: true,
-        tooltip: 'block type',
-        buttons: [
-            {
-                text: 'Heading 1',
-                type: CommandType.Heading,
-                params: [1],
-            },
-            {
-                text: 'Heading 2',
-                type: CommandType.Heading,
-                params: [2],
-            },
-            {
-                text: 'Heading 3',
-                type: CommandType.Heading,
-                params: [3],
-            },
-            {
-                text: 'Heading 4',
-                type: CommandType.Heading,
-                params: [4],
-            },
-            {
-                text: 'Heading 5',
-                type: CommandType.Heading,
-                params: [5],
-            },
-            {
-                text: 'Heading 6',
-                type: CommandType.Heading,
-                params: [6],
-            },
-            {
-                text: 'Paragraph',
-                type: CommandType.Paragraph,
-            },
-            {
-                text: 'Block quote',
-                type: CommandType.BlockQuote,
-            },
-            {
-                text: 'Code block',
-                type: CommandType.CodeBlock,
-            },
-        ],
-    }, {
-        isStyle: true,
-    }, {
-        class: 'link-button',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z"/></svg>',
-        inactiveIcon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="m770-302-60-62q40-11 65-42.5t25-73.5q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 57-29.5 105T770-302ZM634-440l-80-80h86v80h-6ZM792-56 56-792l56-56 736 736-56 56ZM440-280H280q-83 0-141.5-58.5T80-480q0-69 42-123t108-71l74 74h-24q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h65l79 80H320Z"/></svg>',
-        isStyle: true,
-        tooltip: 'link',
-    }, {
-        class: 'image-button',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/></svg>',
-        isStyle: true,
-        tooltip: 'image',
-    }, {
-        isStyle: true,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M360-200v-80h480v80H360Zm0-240v-80h480v80H360Zm0-240v-80h480v80H360ZM200-160q-33 0-56.5-23.5T120-240q0-33 23.5-56.5T200-320q33 0 56.5 23.5T280-240q0 33-23.5 56.5T200-160Zm0-240q-33 0-56.5-23.5T120-480q0-33 23.5-56.5T200-560q33 0 56.5 23.5T280-480q0 33-23.5 56.5T200-400Zm0-240q-33 0-56.5-23.5T120-720q0-33 23.5-56.5T200-800q33 0 56.5 23.5T280-720q0 33-23.5 56.5T200-640Z"/></svg>',
-        isStyle: true,
-        tooltip: 'list',
-        type: CommandType.ListBullet,
-        buttons: [
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M120-80v-60h100v-30h-60v-60h60v-30H120v-60h120q17 0 28.5 11.5T280-280v40q0 17-11.5 28.5T240-200q17 0 28.5 11.5T280-160v40q0 17-11.5 28.5T240-80H120Zm0-280v-110q0-17 11.5-28.5T160-510h60v-30H120v-60h120q17 0 28.5 11.5T280-560v70q0 17-11.5 28.5T240-450h-60v30h100v60H120Zm60-280v-180h-60v-60h120v240h-60Zm180 440v-80h480v80H360Zm0-240v-80h480v80H360Zm0-240v-80h480v80H360Z"/></svg>',
-                type: CommandType.ListNumber,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M222-200 80-342l56-56 85 85 170-170 56 57-225 226Zm0-320L80-662l56-56 85 85 170-170 56 57-225 226Zm298 240v-80h360v80H520Zm0-320v-80h360v80H520Z"/></svg>',
-                type: CommandType.ListCheck,
-            },
-        ],
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M120-120v-80h720v80H120Zm320-160v-80h400v80H440Zm0-160v-80h400v80H440Zm0-160v-80h400v80H440ZM120-760v-80h720v80H120Zm160 440L120-480l160-160v320Z"/></svg>',
-        isStyle: true,
-        isWysiwyg: true,
-        tooltip: 'lift out',
-        type: CommandType.UpLevel,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M120-120v-80h720v80H120Zm320-160v-80h400v80H440Zm0-160v-80h400v80H440Zm0-160v-80h400v80H440ZM120-760v-80h720v80H120Zm0 440v-320l160 160-160 160Z"/></svg>',
-        isStyle: true,
-        isWysiwyg: true,
-        tooltip: 'indent',
-        type: CommandType.DownLevel,
-    }, {
-        isStyle: true,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M80 0v-160h800V0H80Zm504-480L480-584 320-424l103 104 161-160Zm-47-160 103 103 160-159-104-104-159 160Zm-84-29 216 216-189 190q-24 24-56.5 24T367-263l-27 23H140l126-125q-24-24-25-57.5t23-57.5l189-189Zm0 0 187-187q24-24 56.5-24t56.5 24l104 103q24 24 24 56.5T857-640L669-453 453-669Z"/></svg>',
-        isStyle: true,
-        tooltip: 'highlight',
-        type: CommandType.Marked,
-    }];
+const fonts = [
+    'Arial',
+    'Arial Black',
+    'Comic Sans MS',
+    'Courier New',
+    'Georgia',
+    'Impact',
+    'Microsoft Sans Serif',
+    'Tahoma',
+    'Times New Roman',
+    'Trebuchet MS',
+    'Verdana',
+];
 
 export class TavenemEditorHtmlElement extends HTMLElement {
-    _inputDebounce: number = -1;
-    _tavenemCodeEditor: TavenemCodeEditor | undefined;
-    _tavenemWysiwygEditor: TavenemWysiwygEditor | undefined;
-    _toolbarButtons: ToolbarButton[] = [];
+    _tavenemCodeEditor: TavenemCodeEditor = new TavenemCodeEditor();
+    _tavenemWysiwygEditor: TavenemWysiwygEditor = new TavenemWysiwygEditor();
+
+    private _fontSizeDialog?: HTMLDialogElement;
+    private _imageDialog?: HTMLDialogElement;
+    private _lineHeightDialog?: HTMLDialogElement;
+    private _linkDialog?: HTMLDialogElement;
+    private _settingMode = false;
+    private _toolbarButtons: ToolbarControl[] = [];
 
     static get observedAttributes() {
         return [
+            'data-syntax',
             'disabled',
             'readonly',
             'required',
-            'value'
+            'value',
+            'wysiwyg',
         ];
     }
 
@@ -1448,12 +658,16 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
-        const slot = document.createElement('slot');
-        shadow.appendChild(slot);
+        const style = document.createElement('style');
+        style.innerHTML = elementStyle;
+        shadow.appendChild(style);
 
         const input = document.createElement('textarea');
+        if ('inputId' in this.dataset && this.dataset.inputId) {
+            input.id = this.dataset.inputId;
+        }
         input.disabled = this.hasAttribute('disabled');
         input.hidden = true;
         if (this.hasAttribute('name')) {
@@ -1469,382 +683,1947 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         toolbar.classList.add('editor-toolbar');
         shadow.appendChild(toolbar);
 
-        const undoButton = document.createElement('button');
-        undoButton.classList.add('toolbar-button');
-        toolbar.appendChild(undoButton);
+        const font = toolbarButtonDefinitions
+            .find(x => x.tooltip === 'font');
+        if (font && font.buttons && font.buttons.length <= 5) {
+            for (const fontFamily of getFonts()) {
+                font.buttons.push({
+                    text: fontFamily,
+                    type: CommandType.SetFontFamily,
+                    params: [fontFamily],
+                });
+            }
+        }
+
+        const editor = document.createElement('div');
+        editor.classList.add('editor');
+        if (this.hasAttribute('height')) {
+            editor.style.height = this.getAttribute('height') || '';
+        }
+        if (this.hasAttribute('max-height')) {
+            editor.style.maxHeight = this.getAttribute('max-height') || '';
+        }
+        editor.spellcheck = this.spellcheck;
+        editor.tabIndex = this.tabIndex;
+        if ('editorId' in this.dataset && this.dataset.editorId) {
+            editor.id = this.dataset.editorId;
+        }
+        shadow.appendChild(editor);
+
+        const statusBar = document.createElement('small');
+        statusBar.classList.add('editor-statusbar');
+        statusBar.innerHTML = '&nbsp;';
+        shadow.appendChild(statusBar);
+
+        this.refreshState(toolbar);
+
+        const syntaxAttribute = this.dataset.syntax;
+        const syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+            ? syntaxAttribute as EditorSyntax
+            : 'none';
+        const isWysiwyg = this.hasAttribute('wysiwyg')
+            && (syntax === 'html' || syntax === 'markdown');
+        const options: EditorOptions = {
+            autoFocus: this.hasAttribute('autofocus'),
+            mode: isWysiwyg ? EditorMode.WYSIWYG : EditorMode.Text,
+            readOnly: this.hasAttribute('readonly'),
+            syntax,
+            updateOnInput: 'updateOnInput' in this.dataset,
+            initialValue: this.getAttribute('value') || undefined,
+            placeholder: this.getAttribute('placeholder') || undefined,
+        };
+        if (isWysiwyg) {
+            this._tavenemWysiwygEditor.initializeEditor(this, editor, options);
+        } else {
+            this._tavenemCodeEditor.initializeEditor(this, editor, options);
+        }
+
+        this.addEventListener('click', this.dismissTooltips.bind(this));
+    }
+
+    disconnectedCallback() {
+        for (const control of this._toolbarButtons) {
+            control._element.removeEventListener('mousedown', this.preventDefault);
+            control._element.removeEventListener('mouseup', this.onControlActivated.bind(this, control));
+            if (control._definition.tooltip) {
+                control._element.removeEventListener('focusin', this.onShowTooltip.bind(control));
+                control._element.removeEventListener('mouseover', this.onShowTooltip.bind(control));
+                control._element.removeEventListener('focusout', this.onDismissTooltip.bind(control));
+                control._element.removeEventListener('mouseout', this.onDismissTooltip.bind(control));
+            }
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const modeButton = root.querySelector('.mode-button');
+        if (modeButton) {
+            modeButton.removeEventListener('click', this.onModeSwitch.bind(this));
+        }
+
+        const showAll = root.querySelector('.editor-toolbar-show-all-btn');
+        if (showAll) {
+            showAll.removeEventListener('click', this.onShowAll.bind(this));
+            showAll.removeEventListener('focusin', this.onShowTooltip.bind(showAll));
+            showAll.removeEventListener('mouseover', this.onShowTooltip.bind(showAll));
+            showAll.removeEventListener('focusout', this.onDismissTooltip.bind(showAll));
+            showAll.removeEventListener('mouseout', this.onDismissTooltip.bind(showAll));
+        }
+
+        this.removeEventListener('click', this.dismissTooltips.bind(this));
     }
 
     attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
+        if (newValue == oldValue) {
             return;
         }
-        const input = root.querySelector('textarea');
-        if (!input) {
-            return;
-        }
-        if (name === 'disabled') {
-            input.disabled = !!newValue;
-        } else if (name === 'readonly') {
-            input.readOnly = !!newValue;
+
+        if (name === 'disabled'
+            || name === 'readonly') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const input = root.querySelector('textarea');
+            if (!input) {
+                return;
+            }
+            if (name === 'disabled') {
+                input.disabled = !!newValue;
+            } else if (name === 'readonly') {
+                input.readOnly = !!newValue;
+            }
+            this.update({});
+            if (this._tavenemWysiwygEditor._editor) {
+                this._tavenemWysiwygEditor._editor.view.setProps({ editable: () => !input.readOnly });
+            } else if (this._tavenemCodeEditor._editor) {
+                this._tavenemCodeEditor._editor.view.dispatch({
+                    effects: this._tavenemCodeEditor._editor.readOnly.reconfigure(EditorState.readOnly.of(input.readOnly)),
+                });
+            }
         } else if (name === 'required') {
-            input.required = !!newValue;
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const input = root.querySelector('textarea');
+            if (input) {
+                input.required = !!newValue;
+            }
         } else if (name === 'value') {
-            input.value = newValue || '';
+            this.setValue(newValue);
+        } else if (name === 'data-syntax') {
+            if (newValue && syntaxes.includes(newValue as any)) {
+                this.onSetSyntax(newValue as EditorSyntax);
+            }
+        } else if (name === 'wysiwyg') {
+            if (!this._settingMode) {
+                this.onSetWysiwygMode(newValue != null);
+            }
         }
     }
 
-    private onChange() {
+    dismissTooltips() {
+        if (this.shadowRoot) {
+            this.shadowRoot
+                .querySelectorAll<TavenemTooltipHTMLElement>('tf-tooltip')
+                .forEach(x => x.onAttentionOut());
+        }
+    }
+
+    focusInnerEditor() {
+        if (this._tavenemWysiwygEditor._editor) {
+            this._tavenemWysiwygEditor._editor.view.focus();
+        }
+
+        if (this._tavenemCodeEditor._editor) {
+            this._tavenemCodeEditor._editor.view.focus();
+        }
+    }
+
+    getSelectedText() {
+        if (this._tavenemWysiwygEditor._editor) {
+            const { from, to } = this._tavenemWysiwygEditor._editor.view.state.selection;
+            return this._tavenemWysiwygEditor._editor.view.state.doc.textBetween(from, to, " ");
+        }
+
+        if (this._tavenemCodeEditor._editor) {
+            return this._tavenemCodeEditor._editor.view.state.sliceDoc(
+                this._tavenemCodeEditor._editor.view.state.selection.ranges.map(v => v.from).reduce((p, v) => (p < v ? p : v)),
+                this._tavenemCodeEditor._editor.view.state.selection.ranges.map(v => v.to).reduce((p, v) => (p > v ? p : v)));
+        }
+    }
+
+    onChange(value?: string | null) {
+        this.assignValue(value);
+        this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(value || ''));
+    }
+
+    onInput(value?: string | null) {
+        this.assignValue(value);
+        this.dispatchEvent(TavenemEditorHtmlElement.newValueInputEvent(value || ''));
+    }
+
+    setValue(value?: string | null) {
+        this.assignValue(value);
+
+        if (this._tavenemWysiwygEditor._editor) {
+            if (value) {
+                let content;
+                if (this._tavenemWysiwygEditor._editor.isMarkdown) {
+                    content = tavenemMarkdownParser.parse(value);
+                } else {
+                    const div = document.createElement('div');
+                    div.innerHTML = value;
+                    content = PMDOMParser
+                        .fromSchema(this._tavenemWysiwygEditor._editor.view.state.schema)
+                        .parse(div);
+                }
+                this._tavenemWysiwygEditor._editor.view.updateState(
+                    this._tavenemWysiwygEditor._editor.view.state.apply(
+                        this._tavenemWysiwygEditor._editor.view.state.tr.replaceRangeWith(
+                            0,
+                            this._tavenemWysiwygEditor._editor.view.state.doc.content.size,
+                            content)));
+            } else {
+                this._tavenemWysiwygEditor._editor.view.updateState(
+                    this._tavenemWysiwygEditor._editor.view.state.apply(
+                        this._tavenemWysiwygEditor._editor.view.state.tr.delete(
+                            0,
+                            this._tavenemWysiwygEditor._editor.view.state.doc.content.size)));
+            }
+        } else if (this._tavenemCodeEditor._editor) {
+            this._tavenemCodeEditor._editor.view.dispatch({
+                changes: {
+                    from: 0,
+                    to: this._tavenemCodeEditor._editor.view.state.doc.length,
+                    insert: value || '',
+                }
+            });
+        }
+    }
+
+    update(data: UpdateInfo) {
+        const editorDisabled = this.hasAttribute('disabled')
+            || this.hasAttribute('readonly');
+
+        if (typeof data.currentNode !== 'undefined') {
+            const root = this.shadowRoot;
+            if (root) {
+                const status = root.querySelector('.editor-statusbar');
+                if (status) {
+                    status.innerHTML = data.currentNode || '&nbsp;';
+                }
+            }
+        }
+
+        if (data.commands) {
+            for (let t = 0; t <= 50; t++) {
+                const type = t as CommandType;
+
+                const toolbarButton = this
+                    ._toolbarButtons
+                    .find(x => x._definition.type === type);
+                if (toolbarButton?._element) {
+                    const commandInfo = data.commands[type];
+
+                    toolbarButton._active = commandInfo?.active || false;
+                    toolbarButton._disabled = !commandInfo?.enabled;
+                }
+            }
+        }
+
+        for (const toolbarButton of this._toolbarButtons) {
+            if (toolbarButton._active) {
+                toolbarButton._element.classList.add('active');
+
+                if (toolbarButton._definition.parentClass
+                    && toolbarButton._parentElement) {
+                    toolbarButton._parentElement.querySelector('button')?.classList.add(toolbarButton._definition.parentClass);
+                }
+            } else {
+                toolbarButton._element.classList.remove('active');
+
+                if (toolbarButton._definition.parentClass
+                    && toolbarButton._parentElement) {
+                    toolbarButton._parentElement.querySelector('button')?.classList.remove(toolbarButton._definition.parentClass);
+                }
+            }
+
+            if (toolbarButton._definition.buttons) {
+                const buttonsDisabled = this
+                    ._toolbarButtons
+                    .filter(x => x._parentElement?.contains(toolbarButton._element))
+                    .every(x => x._disabled || x._definition.style === ToolbarControlStyle.Separator);
+                const dropdown = toolbarButton._element.querySelector<TavenemDropdownHTMLElement>('tf-dropdown');
+                if (dropdown) {
+                    if (buttonsDisabled) {
+                        dropdown.setAttribute('disabled', '');
+                    } else {
+                        dropdown.removeAttribute('disabled');
+                    }
+                    const button = dropdown.querySelector<HTMLButtonElement>(':scope > button');
+                    if (button) {
+                        button.disabled = buttonsDisabled;
+                    }
+                }
+            }
+
+            const disabled = editorDisabled
+                || toolbarButton._disabled;
+            if (toolbarButton._element instanceof HTMLButtonElement) {
+                toolbarButton._element.disabled = disabled;
+            } else if (toolbarButton._element instanceof TavenemDropdownHTMLElement
+                || toolbarButton._element instanceof TavenemColorInputHtmlElement
+                || toolbarButton._element instanceof TavenemEmojiHTMLElement
+                || toolbarButton._parentElement) {
+                if (disabled) {
+                    toolbarButton._element.setAttribute('disabled', '');
+                } else {
+                    toolbarButton._element.removeAttribute('disabled');
+                }
+            } else {
+                const dropdownButton = toolbarButton._element.querySelector('button');
+                if (dropdownButton) {
+                    dropdownButton.disabled = disabled;
+                }
+            }
+        }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
-        this.onInput();
-        const input = root.querySelector('textarea');
-        if (input) {
-            this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(input.value));
+
+        const modeButton = root.querySelector('.mode-button');
+        if (modeButton) {
+            if (editorDisabled) {
+                modeButton.setAttribute('disabled', '');
+            } else {
+                modeButton.removeAttribute('disabled');
+            }
+        }
+
+        const syntaxSelect = root.querySelector('.syntax-select');
+        if (syntaxSelect) {
+            const syntaxInput = syntaxSelect.querySelector('tf-input');
+            if (editorDisabled) {
+                syntaxSelect.setAttribute('disabled', '');
+                if (syntaxInput) {
+                    syntaxInput.setAttribute('disabled', '');
+                }
+            } else {
+                syntaxSelect.removeAttribute('disabled');
+                if (syntaxInput) {
+                    syntaxInput.removeAttribute('disabled');
+                }
+            }
         }
     }
 
-    private onInput() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
+    updateSelectedText(value?: string | null) {
+        if (this._tavenemWysiwygEditor._editor) {
+            this._tavenemWysiwygEditor.updateSelectedText(value);
+        } else if (this._tavenemCodeEditor._editor) {
+            this._tavenemCodeEditor.updateSelectedText(value);
         }
-        const input = root.querySelector('textarea');
-        if (!input) {
-            return;
-        }
+    }
 
-        if (!input.value || !input.value.length) {
+    private assignValue(value?: string | null) {
+        if (!value || !value.length) {
             this.removeAttribute('value');
         } else {
-            this.setAttribute('value', input.value);
+            this.setAttribute('value', value);
         }
 
-        if ('inputDebounce' in this.dataset) {
-            const debounce = parseInt(this.dataset.inputDebounce || '');
-            if (Number.isFinite(debounce)
-                && debounce > 0) {
-                clearTimeout(this._inputDebounce);
-                this._inputDebounce = setTimeout(this.updateInputDebounced.bind(this), debounce);
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const input = root.querySelector('textarea');
+        if (!input) {
+            return;
+        }
+        input.value = value || '';
+    }
+
+    private getFontSizeDialog() {
+        const content: Node[] = [];
+
+        const sizeField = document.createElement('tf-select');
+        sizeField.classList.add('field', 'required', 'no-label');
+        sizeField.dataset.disableAutosearch = '';
+        sizeField.dataset.hasTextInput = '';
+        content.push(sizeField);
+
+        const sizeInputId = randomUUID();
+        const sizeInput = document.createElement('tf-input');
+        sizeInput.classList.add('input', 'picker-value', 'size-input');
+        sizeInput.dataset.inputId = sizeInputId;
+        sizeInput.setAttribute('name', 'size');
+        sizeInput.setAttribute('placeholder', 'font size');
+        sizeInput.setAttribute('required', '');
+        sizeInput.setAttribute('type', 'text');
+        sizeInput.onclick = ev => ev.stopPropagation();
+        sizeField.appendChild(sizeInput);
+
+        const sizeHelpers = document.createElement('div');
+        sizeHelpers.classList.add('field-helpers');
+        sizeField.appendChild(sizeHelpers);
+
+        const sizeSuggestions = document.createElement('tf-popover');
+        sizeSuggestions.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'suggestion-popover', 'filled', 'match-width');
+        sizeSuggestions.dataset.anchorId = sizeInputId;
+        sizeSuggestions.popover = 'auto';
+        sizeSuggestions.style.maxHeight = 'min(300px,90vh)';
+        sizeSuggestions.style.overflowY = 'auto';
+        sizeSuggestions.tabIndex = 0;
+        sizeField.appendChild(sizeSuggestions);
+
+        const menu = document.createElement('menu');
+        menu.classList.add('suggestion-list', 'list', 'clickable', 'dense');
+        menu.onclick = ev => ev.stopPropagation();
+        sizeSuggestions.appendChild(menu);
+
+        const s1 = document.createElement('li');
+        s1.textContent = 'Reset';
+        s1.dataset.closePicker = '';
+        s1.dataset.closePickerValue = 'reset';
+        s1.tabIndex = 0;
+        menu.appendChild(s1);
+
+        const s2 = document.createElement('li');
+        s2.textContent = '.75em';
+        s2.dataset.closePicker = '';
+        s2.dataset.closePickerValue = '.75em';
+        s2.tabIndex = 0;
+        menu.appendChild(s2);
+
+        const s3 = document.createElement('li');
+        s3.textContent = '.875em';
+        s3.dataset.closePicker = '';
+        s3.dataset.closePickerValue = '875em';
+        s3.tabIndex = 0;
+        menu.appendChild(s3);
+
+        const s4 = document.createElement('li');
+        s4.textContent = '1em';
+        s4.dataset.closePicker = '';
+        s4.dataset.closePickerValue = '1em';
+        s4.tabIndex = 0;
+        menu.appendChild(s4);
+
+        const s5 = document.createElement('li');
+        s5.textContent = '1.25em';
+        s5.dataset.closePicker = '';
+        s5.dataset.closePickerValue = '1.25em';
+        s5.tabIndex = 0;
+        menu.appendChild(s5);
+
+        const s6 = document.createElement('li');
+        s6.textContent = '1.5em';
+        s6.dataset.closePicker = '';
+        s6.dataset.closePickerValue = '1.5em';
+        s6.tabIndex = 0;
+        menu.appendChild(s6);
+
+        const s7 = document.createElement('li');
+        s7.textContent = '1.75em';
+        s7.dataset.closePicker = '';
+        s7.dataset.closePickerValue = '1.75em';
+        s7.tabIndex = 0;
+        menu.appendChild(s7);
+
+        const s8 = document.createElement('li');
+        s8.textContent = '2em';
+        s8.dataset.closePicker = '';
+        s8.dataset.closePickerValue = '2em';
+        s8.tabIndex = 0;
+        menu.appendChild(s8);
+
+        const s9 = document.createElement('li');
+        s9.textContent = '2.5em';
+        s9.dataset.closePicker = '';
+        s9.dataset.closePickerValue = '2.5em';
+        s9.tabIndex = 0;
+        menu.appendChild(s9);
+
+        const s10 = document.createElement('li');
+        s10.textContent = '3em';
+        s10.dataset.closePicker = '';
+        s10.dataset.closePickerValue = '3em';
+        s10.tabIndex = 0;
+        menu.appendChild(s10);
+
+        const callback = (value: unknown) => {
+            if ((value != null
+                && typeof value !== 'string')
+                || !this._tavenemWysiwygEditor._editor) {
+                return;
+            }
+
+            let size: string | null = value || null;
+            if (size?.toLowerCase() === 'reset') {
+                size = null;
+            }
+
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.SetFontSize];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [size]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        };
+
+        return getDialog(
+            'Font Size',
+            content,
+            callback.bind(this),
+            (form: HTMLFormElement) => {
+                const sizeInput = form.querySelector<TavenemInputHtmlElement>('.size-input');
+                if (!sizeInput) {
+                    return;
+                }
+                return sizeInput.value;
+            },
+            (form: HTMLFormElement) => {
+                const sizeInput = form.querySelector<TavenemInputHtmlElement>('.size-input');
+                if (!sizeInput) {
+                    return false;
+                }
+
+                const fieldHelpers = sizeInput.querySelector('.field-helpers');
+                if (!sizeInput.value
+                    || !sizeInput.value.length
+                    || sizeInput.value.toLowerCase() === 'reset'
+                    || !Number.isNaN(parseFloat(sizeInput.value))
+                    || /^(0?\.?[\d]+(\.[\d]+)?(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt))|((x+-)?small|smaller|medium|(x+-)?large|larger|inherit|initial|revert|revert-layer|unset)$/.test(sizeInput.value)) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (fieldHelpers) {
+                    const list = document.createElement('ul');
+                    list.classList.add('mr-auto', 'mb-0', 'pl-0');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = "Invalid font size";
+                    list.appendChild(listItem);
+
+                    fieldHelpers.replaceChildren(list);
+                }
+
+                return false;
+            });
+    }
+
+    private getFontSizeDialogResponse() {
+        if (!this._fontSizeDialog) {
+            this._fontSizeDialog = this.getFontSizeDialog();
+        } else {
+            const container = this._fontSizeDialog.closest<HTMLElement>('.dialog-container');
+            if (container) {
+                container.style.display = 'initial';
+            }
+        }
+
+        this._fontSizeDialog.showModal();
+    }
+
+    private getImageDialog() {
+        const content: Node[] = [];
+
+        const urlField = document.createElement('div');
+        urlField.classList.add('field', 'required');
+        content.push(urlField);
+
+        const urlInputId = randomUUID();
+        const urlInput = document.createElement('tf-input');
+        urlInput.classList.add('input', 'url-input');
+        urlInput.dataset.inputId = urlInputId;
+        urlInput.setAttribute('name', 'url');
+        urlInput.setAttribute('required', '');
+        urlInput.setAttribute('type', 'text');
+        urlField.appendChild(urlInput);
+
+        const urlLabel = document.createElement('label');
+        urlLabel.htmlFor = urlInputId;
+        urlLabel.textContent = 'URL';
+        urlField.appendChild(urlLabel);
+
+        const urlHelpers = document.createElement('div');
+        urlHelpers.classList.add('field-helpers');
+        urlField.appendChild(urlHelpers);
+
+        const titleField = document.createElement('div');
+        titleField.classList.add('field');
+        content.push(titleField);
+
+        const titleInputId = randomUUID();
+        const titleInput = document.createElement('tf-input');
+        titleInput.classList.add('input', 'title-input');
+        titleInput.dataset.inputId = titleInputId;
+        titleInput.setAttribute('name', 'url');
+        titleInput.setAttribute('type', 'text');
+        titleField.appendChild(titleInput);
+
+        const titleLabel = document.createElement('label');
+        titleLabel.htmlFor = titleInputId;
+        titleLabel.textContent = 'Title (optional)';
+        titleField.appendChild(titleLabel);
+
+        const altField = document.createElement('div');
+        altField.classList.add('field');
+        content.push(altField);
+
+        const altInputId = randomUUID();
+        const altInput = document.createElement('tf-input');
+        altInput.classList.add('input', 'alt-input');
+        altInput.dataset.inputId = altInputId;
+        altInput.setAttribute('name', 'url');
+        altInput.setAttribute('type', 'text');
+        altField.appendChild(altInput);
+
+        const altLabel = document.createElement('label');
+        altLabel.htmlFor = altInputId;
+        altLabel.textContent = 'Alt (optional)';
+        altField.appendChild(altLabel);
+
+        const callback = (value: unknown) => {
+            if (value == null
+                || typeof (value as any).url !== 'string'
+                || !this._tavenemWysiwygEditor._editor) {
+                return;
+            }
+
+            let url: string = (value as any).url;
+            if (!url.startsWith('#')
+                && !URL.canParse(url, document.baseURI)) {
+                url = 'http://' + url;
+                if (!URL.canParse(url, document.baseURI)) {
+                    return;
+                }
+            }
+
+            const title: string | null = typeof (value as any).title === 'string'
+                ? new Option((value as any).title).innerHTML
+                : null;
+
+            const alt: string | null = typeof (value as any).alt === 'string'
+                ? new Option((value as any).alt).innerHTML
+                : null;
+
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.InsertImage];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [url, title, alt]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        };
+
+        return getDialog(
+            'Image',
+            content,
+            callback.bind(this),
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput) {
+                    return;
+                }
+                const titleInput = form.querySelector<TavenemInputHtmlElement>('.title-input');
+                const altInput = form.querySelector<TavenemInputHtmlElement>('.alt-input');
+                return {
+                    url: urlInput.value,
+                    title: titleInput?.value,
+                    alt: altInput?.value,
+                };
+            },
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput || !urlInput.value) {
+                    return false;
+                }
+
+                const fieldHelpers = urlInput.querySelector('.field-helpers');
+                if (urlInput.value.startsWith('#')) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (URL.canParse(urlInput.value, document.baseURI)
+                    || URL.canParse('http://' + urlInput.value, document.baseURI)) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (fieldHelpers) {
+                    const list = document.createElement('ul');
+                    list.classList.add('mr-auto', 'mb-0', 'pl-0');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = "Must be a valid URL";
+                    list.appendChild(listItem);
+
+                    fieldHelpers.replaceChildren(list);
+                }
+
+                return false;
+            });
+    }
+
+    private getImageDialogResponse() {
+        if (!this._imageDialog) {
+            this._imageDialog = this.getImageDialog();
+        } else {
+            const container = this._imageDialog.closest<HTMLElement>('.dialog-container');
+            if (container) {
+                container.style.display = 'initial';
+            }
+        }
+
+        this._imageDialog.showModal();
+    }
+
+    private getLineHeightDialog() {
+        const content: Node[] = [];
+
+        const sizeField = document.createElement('tf-select');
+        sizeField.classList.add('field', 'required', 'no-label');
+        sizeField.dataset.disableAutosearch = '';
+        sizeField.dataset.hasTextInput = '';
+        sizeField.dataset.popoverContainer = '';
+        content.push(sizeField);
+
+        const sizeInputId = randomUUID();
+        const sizeInput = document.createElement('tf-input');
+        sizeInput.classList.add('input', 'picker-value', 'size-input');
+        sizeInput.dataset.inputId = sizeInputId;
+        sizeInput.setAttribute('name', 'size');
+        sizeInput.setAttribute('placeholder', 'line height');
+        sizeInput.setAttribute('required', '');
+        sizeInput.setAttribute('type', 'text');
+        sizeInput.onclick = ev => ev.stopPropagation();
+        sizeField.appendChild(sizeInput);
+
+        const sizeHelpers = document.createElement('div');
+        sizeHelpers.classList.add('field-helpers');
+        sizeField.appendChild(sizeHelpers);
+
+        const sizeSuggestions = document.createElement('tf-popover');
+        sizeSuggestions.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'suggestion-popover', 'filled', 'match-width');
+        sizeSuggestions.dataset.anchorId = sizeInputId;
+        sizeSuggestions.popover = 'auto';
+        sizeSuggestions.style.maxHeight = 'min(300px,90vh)';
+        sizeSuggestions.style.overflowY = 'auto';
+        sizeSuggestions.tabIndex = 0;
+        sizeField.appendChild(sizeSuggestions);
+
+        const menu = document.createElement('menu');
+        menu.classList.add('suggestion-list', 'list', 'clickable', 'dense');
+        menu.onclick = ev => ev.stopPropagation();
+        sizeSuggestions.appendChild(menu);
+
+        const s1 = document.createElement('li');
+        s1.textContent = 'Reset';
+        s1.dataset.closePicker = '';
+        s1.dataset.closePickerValue = 'reset';
+        s1.tabIndex = 0;
+        menu.appendChild(s1);
+
+        const s2 = document.createElement('li');
+        s2.textContent = 'normal';
+        s2.dataset.closePicker = '';
+        s2.dataset.closePickerValue = 'normal';
+        s2.tabIndex = 0;
+        menu.appendChild(s2);
+
+        const s3 = document.createElement('li');
+        s3.textContent = '1';
+        s3.dataset.closePicker = '';
+        s3.dataset.closePickerValue = '1';
+        s3.tabIndex = 0;
+        menu.appendChild(s3);
+
+        const s4 = document.createElement('li');
+        s4.textContent = '1.2';
+        s4.dataset.closePicker = '';
+        s4.dataset.closePickerValue = '1.2';
+        s4.tabIndex = 0;
+        menu.appendChild(s4);
+
+        const s5 = document.createElement('li');
+        s5.textContent = '1.5';
+        s5.dataset.closePicker = '';
+        s5.dataset.closePickerValue = '1.5';
+        s5.tabIndex = 0;
+        menu.appendChild(s5);
+
+        const s6 = document.createElement('li');
+        s6.textContent = '2';
+        s6.dataset.closePicker = '';
+        s6.dataset.closePickerValue = '2';
+        s6.tabIndex = 0;
+        menu.appendChild(s6);
+
+        const callback = (value: unknown) => {
+            if ((value != null
+                && typeof value !== 'string')
+                || !this._tavenemWysiwygEditor._editor) {
+                return;
+            }
+
+            let size: string | null = value || null;
+            if (size?.toLowerCase() === 'reset') {
+                size = null;
+            }
+
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.SetLineHeight];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [size]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        };
+
+        return getDialog(
+            'Line Height',
+            content,
+            callback.bind(this),
+            (form: HTMLFormElement) => {
+                const sizeInput = form.querySelector<TavenemInputHtmlElement>('.size-input');
+                if (!sizeInput) {
+                    return;
+                }
+                return sizeInput.value;
+            },
+            (form: HTMLFormElement) => {
+                const sizeInput = form.querySelector<TavenemInputHtmlElement>('.size-input');
+                if (!sizeInput) {
+                    return false;
+                }
+
+                const fieldHelpers = sizeInput.querySelector('.field-helpers');
+                if (!sizeInput.value
+                    || !sizeInput.value.length
+                    || sizeInput.value.toLowerCase() === 'reset'
+                    || !Number.isNaN(parseFloat(sizeInput.value))
+                    || /^(0?\.?[\d]+(\.[\d]+)?(%|r?em|px|pt|ch|ex|vh|vw|vmin|vmax|cm|mm|in|pc|pt)?)|(normal|inherit|initial|revert|revert-layer|unset)$/.test(sizeInput.value)) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (fieldHelpers) {
+                    const list = document.createElement('ul');
+                    list.classList.add('mr-auto', 'mb-0', 'pl-0');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = "Invalid line height";
+                    list.appendChild(listItem);
+
+                    fieldHelpers.replaceChildren(list);
+                }
+
+                return false;
+            });
+    }
+
+    private getLineHeightDialogResponse() {
+        if (!this._lineHeightDialog) {
+            this._lineHeightDialog = this.getLineHeightDialog();
+        } else {
+            const container = this._lineHeightDialog.closest<HTMLElement>('.dialog-container');
+            if (container) {
+                container.style.display = 'initial';
+            }
+        }
+
+        this._lineHeightDialog.showModal();
+    }
+
+    private getLinkDialog() {
+        const content: Node[] = [];
+
+        const urlField = document.createElement('div');
+        urlField.classList.add('field', 'required');
+        content.push(urlField);
+
+        const urlInputId = randomUUID();
+        const urlInput = document.createElement('tf-input');
+        urlInput.classList.add('input', 'url-input');
+        urlInput.dataset.inputId = urlInputId;
+        urlInput.setAttribute('name', 'url');
+        urlInput.setAttribute('required', '');
+        urlInput.setAttribute('type', 'text');
+        urlField.appendChild(urlInput);
+
+        const urlLabel = document.createElement('label');
+        urlLabel.htmlFor = urlInputId;
+        urlLabel.textContent = 'URL';
+        urlField.appendChild(urlLabel);
+
+        const urlHelpers = document.createElement('div');
+        urlHelpers.classList.add('field-helpers');
+        urlField.appendChild(urlHelpers);
+
+        const titleField = document.createElement('div');
+        titleField.classList.add('field');
+        content.push(titleField);
+
+        const titleInputId = randomUUID();
+        const titleInput = document.createElement('tf-input');
+        titleInput.classList.add('input', 'title-input');
+        titleInput.dataset.inputId = titleInputId;
+        titleInput.setAttribute('name', 'url');
+        titleInput.setAttribute('type', 'text');
+        titleField.appendChild(titleInput);
+
+        const titleLabel = document.createElement('label');
+        titleLabel.htmlFor = titleInputId;
+        titleLabel.textContent = 'Title (optional)';
+        titleField.appendChild(titleLabel);
+
+        const callback = (value: unknown) => {
+            if (value == null
+                || typeof (value as any).url !== 'string'
+                || !this._tavenemWysiwygEditor._editor) {
+                return;
+            }
+
+            let url: string = (value as any).url;
+            if (!url.startsWith('#')
+                && !URL.canParse(url, document.baseURI)) {
+                url = 'http://' + url;
+                if (!URL.canParse(url, document.baseURI)) {
+                    return;
+                }
+            }
+
+            const title: string | null = typeof (value as any).title === 'string'
+                ? new Option((value as any).title).innerHTML
+                : null;
+
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.InsertLink];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [url, title]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        };
+
+        return getDialog(
+            'Link',
+            content,
+            callback.bind(this),
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput) {
+                    return;
+                }
+                const titleInput = form.querySelector<TavenemInputHtmlElement>('.title-input');
+                return {
+                    url: urlInput.value,
+                    title: titleInput?.value,
+                };
+            },
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput || !urlInput.value) {
+                    return false;
+                }
+
+                const fieldHelpers = urlInput.querySelector('.field-helpers');
+                if (urlInput.value.startsWith('#')) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (URL.canParse(urlInput.value, document.baseURI)
+                    || URL.canParse('http://' + urlInput.value, document.baseURI)) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (fieldHelpers) {
+                    const list = document.createElement('ul');
+                    list.classList.add('mr-auto', 'mb-0', 'pl-0');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = "Must be a valid URL";
+                    list.appendChild(listItem);
+
+                    fieldHelpers.replaceChildren(list);
+                }
+
+                return false;
+            });
+    }
+
+    private getLinkDialogResponse() {
+        if (!this._linkDialog) {
+            this._linkDialog = this.getLinkDialog();
+        } else {
+            const container = this._linkDialog.closest<HTMLElement>('.dialog-container');
+            if (container) {
+                container.style.display = 'initial';
+            }
+        }
+
+        this._linkDialog.showModal();
+    }
+
+    private onColorSelected(control: ToolbarControl, event: Event) {
+        if (control._disabled
+            || !control._definition.type
+            || !(event instanceof CustomEvent)
+            || typeof event.detail.value !== 'string'
+            || !event.detail.value.length) {
+            return;
+        }
+
+        const syntaxAttribute = this.dataset.syntax;
+        const syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+            ? syntaxAttribute as EditorSyntax
+            : 'none';
+        const isWysiwyg = this.hasAttribute('wysiwyg')
+            && (syntax === 'html' || syntax === 'markdown');
+        if (!isWysiwyg
+            || !this._tavenemWysiwygEditor._editor) {
+            return;
+        }
+
+        const command = this._tavenemWysiwygEditor._editor.commands[control._definition.type];
+        if (!command) {
+            return;
+        }
+
+        command.command(
+            this._tavenemWysiwygEditor._editor.view.state,
+            this._tavenemWysiwygEditor._editor.view.dispatch,
+            this._tavenemWysiwygEditor._editor.view,
+            [event.detail.value]);
+        this._tavenemWysiwygEditor._editor.view.focus();
+    }
+
+    private onControlActivated(control: ToolbarControl, event: Event) {
+        if (event instanceof MouseEvent
+            && event.button !== 0) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (control._disabled
+            || !control._definition.type) {
+            return;
+        }
+
+        if (control._definition.type === CommandType.InsertLink) {
+            if (!control._active) {
+                this.getLinkDialogResponse();
                 return;
             }
         }
 
-        this.dispatchEvent(TavenemEditorHtmlElement.newValueInputEvent(input.value));
+        if (control._definition.type === CommandType.InsertImage) {
+            this.getImageDialogResponse();
+            return;
+        }
+
+        if (control._definition.type === CommandType.SetFontSize) {
+            this.getFontSizeDialogResponse();
+            return;
+        }
+
+        if (control._definition.type === CommandType.SetLineHeight) {
+            this.getLineHeightDialogResponse();
+            return;
+        }
+
+        if (this._tavenemWysiwygEditor._editor) {
+            const command = this._tavenemWysiwygEditor._editor.commands[control._definition.type];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    control._definition.params);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        } else if (this._tavenemCodeEditor._editor) {
+            const syntaxAttribute = this.dataset.syntax;
+            const syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+                ? syntaxAttribute as EditorSyntax
+                : 'none';
+
+            let command: ParamStateCommand | undefined;
+            if (syntax === 'html') {
+                command = htmlCommands[control._definition.type];
+            } else if (syntax === 'markdown') {
+                command = markdownCommands[control._definition.type];
+            } else if (control._definition.type === CommandType.Undo) {
+                command = _ => codeUndo;
+            } else if (control._definition.type === CommandType.Redo) {
+                command = _ => codeRedo;
+            }
+            if (command) {
+                command(control._definition.params)({
+                    state: this._tavenemCodeEditor._editor.view.state,
+                    dispatch: this._tavenemCodeEditor._editor.view.dispatch
+                });
+                this._tavenemCodeEditor._editor.view.focus();
+            }
+        }
     }
 
-    private updateInputDebounced() {
+    private onDismissTooltip() {
+        const tooltip = this.querySelector<TavenemTooltipHTMLElement>('tf-tooltip');
+        if (!tooltip) {
+            return;
+        }
+
+        tooltip.onAttentionOut();
+    }
+
+    private onEmojiSelected(control: ToolbarControl, event: Event) {
+        if (control._disabled
+            || !control._definition.type
+            || !(event instanceof CustomEvent)
+            || typeof event.detail.value !== 'string'
+            || !event.detail.value.length) {
+            return;
+        }
+
+        if (this._tavenemWysiwygEditor._editor) {
+            const command = this._tavenemWysiwygEditor._editor.commands[control._definition.type];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [event.detail.value]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        } else if (this._tavenemCodeEditor._editor) {
+            const syntaxAttribute = this.dataset.syntax;
+            const syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+                ? syntaxAttribute as EditorSyntax
+                : 'none';
+
+            let command: ParamStateCommand | undefined;
+            if (syntax === 'html') {
+                command = htmlCommands[control._definition.type];
+            } else if (syntax === 'markdown') {
+                command = markdownCommands[control._definition.type];
+            }
+            if (command) {
+                command([event.detail.value])({
+                    state: this._tavenemCodeEditor._editor.view.state,
+                    dispatch: this._tavenemCodeEditor._editor.view.dispatch
+                });
+                this._tavenemCodeEditor._editor.view.focus();
+            }
+        }
+    }
+
+    private onModeSwitch(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.onSetWysiwygMode(!this.hasAttribute('wysiwyg'));
+    }
+
+    private preventDefault(event: Event) {
+        event.preventDefault();
+    }
+
+    private onSetWysiwygMode(value: boolean) {
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
-        const input = root.querySelector('textarea');
-        if (input) {
-            input.dispatchEvent(TavenemEditorHtmlElement.newValueInputEvent(input.value));
+
+        const syntaxAttribute = this.dataset.syntax;
+        const syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+            ? syntaxAttribute as EditorSyntax
+            : 'none';
+
+        const editorElement = root.querySelector('.editor');
+        if (!(editorElement instanceof HTMLElement)) {
+            return;
+        }
+
+        const modeButton = root.querySelector('.mode-button');
+        const modeButtonIcon = modeButton?.querySelector('svg');
+        const modeButtonTooltipPopover = modeButton?.querySelector('.tooltip');
+
+        if (value) {
+            if (syntax !== 'html'
+                && syntax !== 'markdown') {
+                return;
+            }
+            const currentEditor = this._tavenemCodeEditor._editor;
+            if (!currentEditor) {
+                return;
+            }
+
+            const options = currentEditor.options;
+            options.autoFocus = true;
+            options.initialValue = currentEditor.view.state.doc.toString();
+            options.mode = EditorMode.WYSIWYG;
+
+            this._tavenemCodeEditor.dispose();
+
+            this._tavenemWysiwygEditor.initializeEditor(
+                this,
+                editorElement,
+                options);
+
+            this._settingMode = true;
+            this.setAttribute('wysiwyg', '');
+            this._settingMode = false;
+
+            if (modeButtonIcon) {
+                modeButtonIcon.innerHTML = `<path d="M344-336 200-480l144-144 56 57-87 87 87 87-56 57Zm272 0-56-57 87-87-87-87 56-57 144 144-144 144ZM200-120q-33 0-56.5-23.5T120-200v-160h80v160h160v80H200Zm400 0v-80h160v-160h80v160q0 33-23.5 56.5T760-120H600ZM120-600v-160q0-33 23.5-56.5T200-840h160v80H200v160h-80Zm640 0v-160H600v-80h160q33 0 56.5 23.5T840-760v160h-80Z"/>`;
+            }
+
+            if (modeButtonTooltipPopover) {
+                modeButtonTooltipPopover.textContent = 'Edit source code';
+            }
+
+            this.refreshState();
+        } else {
+            const currentEditor = this._tavenemWysiwygEditor._editor;
+            if (!currentEditor) {
+                return;
+            }
+
+            const options = currentEditor.options;
+            options.autoFocus = true;
+            options.initialValue = this._tavenemWysiwygEditor.getContent();
+            options.mode = EditorMode.Text;
+
+            this._tavenemWysiwygEditor.dispose();
+
+            this._tavenemCodeEditor.initializeEditor(
+                this,
+                editorElement,
+                options);
+
+            this._settingMode = true;
+            this.removeAttribute('wysiwyg');
+            this._settingMode = false;
+
+            if (modeButtonIcon) {
+                modeButtonIcon.innerHTML = `<path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm280-80q-82 0-146.5-44.5T240-440q29-71 93.5-115.5T480-600q82 0 146.5 44.5T720-440q-29 71-93.5 115.5T480-280Zm0-100q-25 0-42.5-17.5T420-440q0-25 17.5-42.5T480-500q25 0 42.5 17.5T540-440q0 25-17.5 42.5T480-380Zm0 40q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/>`;
+            }
+
+            if (modeButtonTooltipPopover) {
+                modeButtonTooltipPopover.textContent = 'Edit in rich text mode';
+            }
+
+            this.refreshState();
         }
     }
-}
 
-export function activateCommand(elementId: string, type: CommandType, params?: any[]) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        let command: ParamStateCommand | undefined;
-        if (codeEditor.options.syntax == 'HTML') {
-            command = htmlCommands[type];
-        } else if (codeEditor.options.syntax == 'Markdown') {
-            command = markdownCommands[type];
-        } else if (type == CommandType.Undo) {
-            command = _ => codeUndo;
-        } else if (type == CommandType.Redo) {
-            command = _ => codeRedo;
+    private onSetSyntax(value: EditorSyntax) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
         }
-        if (command) {
-            command(params)({
-                state: codeEditor.view.state,
-                dispatch: codeEditor.view.dispatch
-            });
-            codeEditor.view.focus();
+
+        const syntaxAttribute = this.dataset.syntax;
+        let syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+            ? syntaxAttribute as EditorSyntax
+            : 'none';
+        if (value === syntax) {
+            return;
         }
-        return;
+
+        const editorElement = root.querySelector('.editor');
+        if (!(editorElement instanceof HTMLElement)) {
+            return;
+        }
+
+        syntax = value;
+        this.dataset.syntax = value;
+
+        let mode: EditorMode = this.hasAttribute('wysiwyg')
+            ? EditorMode.WYSIWYG
+            : EditorMode.Text;
+
+        const modeButton = root.querySelector('.mode-button');
+        const modeButtonIcon = modeButton?.querySelector('svg');
+        const modeButtonTooltipPopover = modeButton?.querySelector('.tooltip');
+
+        const isWysiwygAvailable = syntax === 'html'
+            || syntax === 'markdown';
+
+        if (mode === EditorMode.WYSIWYG) {
+            if (isWysiwygAvailable
+                && this._tavenemCodeEditor._editor) {
+                const options = this._tavenemCodeEditor._editor.options;
+                options.autoFocus = true;
+                options.initialValue = this._tavenemCodeEditor._editor.view.state.doc.toString();
+                options.mode = EditorMode.WYSIWYG;
+
+                this._tavenemCodeEditor.dispose();
+
+                this._tavenemWysiwygEditor.initializeEditor(
+                    this,
+                    editorElement,
+                    options);
+
+                if (modeButtonIcon) {
+                    modeButtonIcon.innerHTML = `<path d="M344-336 200-480l144-144 56 57-87 87 87 87-56 57Zm272 0-56-57 87-87-87-87 56-57 144 144-144 144ZM200-120q-33 0-56.5-23.5T120-200v-160h80v160h160v80H200Zm400 0v-80h160v-160h80v160q0 33-23.5 56.5T760-120H600ZM120-600v-160q0-33 23.5-56.5T200-840h160v80H200v160h-80Zm640 0v-160H600v-80h160q33 0 56.5 23.5T840-760v160h-80Z"/>`;
+                }
+
+                if (modeButtonTooltipPopover) {
+                    modeButtonTooltipPopover.textContent = 'Edit source code';
+                }
+            } else if (!isWysiwygAvailable
+                && this._tavenemWysiwygEditor._editor) {
+                const options = this._tavenemWysiwygEditor._editor.options;
+                options.autoFocus = true;
+                options.initialValue = this._tavenemWysiwygEditor.getContent();
+                options.mode = EditorMode.Text;
+
+                this._tavenemWysiwygEditor.dispose();
+
+                this._tavenemCodeEditor.initializeEditor(
+                    this,
+                    editorElement,
+                    options);
+
+                if (modeButtonIcon) {
+                    modeButtonIcon.innerHTML = `<path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm280-80q-82 0-146.5-44.5T240-440q29-71 93.5-115.5T480-600q82 0 146.5 44.5T720-440q-29 71-93.5 115.5T480-280Zm0-100q-25 0-42.5-17.5T420-440q0-25 17.5-42.5T480-500q25 0 42.5 17.5T540-440q0 25-17.5 42.5T480-380Zm0 40q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/>`;
+                }
+
+                if (modeButtonTooltipPopover) {
+                    modeButtonTooltipPopover.textContent = 'Edit in rich text mode';
+                }
+
+                mode = EditorMode.Text;
+            }
+        }
+
+        if (this._tavenemWysiwygEditor._editor) {
+            const editorElement = root.querySelector('.editor');
+            if (!(editorElement instanceof HTMLElement)) {
+                return;
+            }
+
+            const options = this._tavenemWysiwygEditor._editor.options;
+
+            let text;
+            const div = document.createElement('div');
+            if (options.syntax === 'html'
+                && syntax === 'markdown') {
+                text = tavenemMarkdownSerializer.serialize(this._tavenemWysiwygEditor._editor.view.state.doc);
+            } else if (options.syntax === 'markdown'
+                && syntax === 'html') {
+                div.appendChild(renderer.serializeFragment(this._tavenemWysiwygEditor._editor.view.state.doc.content));
+                text = div.innerHTML;
+            } else {
+                text = this._tavenemWysiwygEditor.getContent();
+            }
+
+            options.initialValue = text;
+            options.syntax = syntax;
+
+            this._tavenemWysiwygEditor.initializeEditor(
+                this,
+                editorElement,
+                options);
+        } else if (this._tavenemCodeEditor._editor) {
+            const spec: TransactionSpec = {
+                effects: this._tavenemCodeEditor._editor.language.reconfigure(
+                    codeEditorLanguageMap[syntax]
+                    || codeEditorPlainText),
+            };
+
+            if ((this._tavenemCodeEditor._editor.options.syntax === 'html'
+                && syntax === 'markdown')
+                || (this._tavenemCodeEditor._editor.options.syntax === 'markdown'
+                    && syntax === 'html')) {
+                let text;
+                const div = document.createElement('div');
+                if (this._tavenemCodeEditor._editor.options.syntax === 'html'
+                    && syntax === 'markdown') {
+                    div.innerHTML = this._tavenemCodeEditor._editor.view.state.doc.toString();
+                    const node = PMDOMParser
+                        .fromSchema(schema)
+                        .parse(div);
+                    text = tavenemMarkdownSerializer.serialize(node);
+                } else {
+                    const node = tavenemMarkdownParser.parse(this._tavenemCodeEditor._editor.view.state.doc.toString());
+                    div.appendChild(renderer.serializeFragment(node.content));
+                    text = div.innerHTML;
+                }
+
+                spec.changes = {
+                    from: 0,
+                    to: this._tavenemCodeEditor._editor.view.state.doc.length,
+                    insert: text,
+                };
+            }
+
+            this._tavenemCodeEditor._editor.options.syntax = syntax;
+
+            this._tavenemCodeEditor._editor.view.dispatch(spec);
+        }
+
+        this.refreshState();
     }
 
-    const wysiwygEditor = tavenemWysiwygEditor._editors[elementId];
-    if (!wysiwygEditor) {
-        return;
+    private onShowAll(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const toolbar = root.querySelector('.editor-toolbar');
+        if (!toolbar) {
+            return;
+        }
+
+        const showAll = toolbar.classList.contains('editor-toolbar-extended');
+
+        if (showAll) {
+            toolbar.classList.remove('editor-toolbar-extended');
+        } else {
+            toolbar.classList.add('editor-toolbar-extended');
+        }
+
+        const showAllButton = root.querySelector('.editor-toolbar-show-all-btn');
+        if (!showAllButton) {
+            return;
+        }
+
+        if (showAll) {
+            showAllButton.classList.remove('filled');
+        } else {
+            showAllButton.classList.add('filled');
+        }
+
+        const showAllTooltip = showAllButton.querySelector('.tooltip');
+        if (showAllTooltip) {
+            showAllTooltip.textContent = showAll
+                ? 'show all controls'
+                : 'hide extra controls';
+        }
     }
 
-    const command = wysiwygEditor.commands[type];
-    if (command) {
-        command.command(wysiwygEditor.view.state, wysiwygEditor.view.dispatch, wysiwygEditor.view, params);
-        wysiwygEditor.view.focus();
-    }
-}
+    private onShowTooltip() {
+        const tooltip = this.querySelector<TavenemTooltipHTMLElement>('tf-tooltip');
+        if (!tooltip) {
+            return;
+        }
 
-export function disposeEditor(elementId: string) {
-    tavenemCodeEditor.dispose(elementId);
-    tavenemWysiwygEditor.dispose(elementId);
+        let popover = this.querySelector('[popover]:popover-open');
+        if (!popover
+            && 'popoverContainer' in this.dataset
+            && this.shadowRoot instanceof ShadowRoot) {
+            popover = this.shadowRoot.querySelector('[popover]:popover-open');
+        }
+        if (popover && !popover.contains(tooltip) && !tooltip.contains(popover)) {
+            return;
+        }
+
+        tooltip.showDelayed(this);
+    }
+
+    private onSyntaxSelect(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!(event instanceof CustomEvent)
+            || typeof event.detail.value !== 'string'
+            || !syntaxes.includes(event.detail.value)) {
+            return;
+        }
+
+        this.onSetSyntax(event.detail.value);
+    }
+
+    private refreshState(toolbar?: Element | null) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const syntaxAttribute = this.dataset.syntax;
+        const syntax = syntaxAttribute && syntaxes.includes(syntaxAttribute as any)
+            ? syntaxAttribute as EditorSyntax
+            : 'none';
+
+        if (!toolbar) {
+            toolbar = root.querySelector('.editor-toolbar');
+            if (!toolbar) {
+                return;
+            }
+        }
+
+        const isWysiwygAvailable = syntax === 'html' || syntax === 'markdown';
+        const isWysiwyg = this.hasAttribute('wysiwyg')
+            && isWysiwygAvailable;
+        const mode: EditorMode = isWysiwyg
+            ? EditorMode.WYSIWYG
+            : EditorMode.Text;
+
+        const disabled = this.hasAttribute('disabled')
+            || this.hasAttribute('readonly');
+        const disabledOrReadonly = disabled
+            || this.hasAttribute('readonly');
+
+        const nodes: Node[] = [];
+
+        const innerToolbar = document.createElement('div');
+        nodes.push(innerToolbar);
+
+        this._toolbarButtons = [];
+        for (const definition of toolbarButtonDefinitions) {
+            if ((definition.isStyle
+                && !isWysiwygAvailable)
+                || (definition.isWysiwyg
+                    && !isWysiwyg)
+                || (definition.isWysiwyg === false
+                    && isWysiwyg)) {
+                continue;
+            }
+
+            if (definition.style === ToolbarControlStyle.Separator) {
+                const separator = document.createElement('div');
+                separator.classList.add('vr');
+                innerToolbar.appendChild(separator);
+
+                continue;
+            }
+
+            if (definition.separatorBefore) {
+                const separator = document.createElement('div');
+                separator.classList.add('vr');
+                innerToolbar.appendChild(separator);
+            }
+
+            const isButton = definition.style === ToolbarControlStyle.Button;
+            if (isButton) {
+                if (definition.type === CommandType.ForegroundColor
+                    || definition.type === CommandType.BackgroundColor) {
+                    const colorInput = document.createElement('tf-color-input');
+                    colorInput.classList.add('field', 'no-label', 'clearable');
+                    if (definition.icon) {
+                        colorInput.dataset.icon = new Option(definition.icon).innerHTML;
+                    }
+                    colorInput.dataset.inputClass = 'rounded small';
+                    colorInput.dataset.popoverContainer = '';
+                    colorInput.setAttribute('alpha', '');
+                    colorInput.setAttribute('button', '');
+                    if (disabledOrReadonly) {
+                        colorInput.setAttribute('disabled', '');
+                    }
+
+                    const toolbarButton = new ToolbarControl(colorInput, definition);
+
+                    innerToolbar.appendChild(colorInput);
+
+                    colorInput.addEventListener('valuechange', this.onColorSelected.bind(this, toolbarButton));
+                    this._toolbarButtons.push(toolbarButton);
+
+                    if (definition.tooltip) {
+                        const buttonTooltip = document.createElement('tf-tooltip');
+                        buttonTooltip.dataset.delay = '750';
+                        buttonTooltip.dataset.popoverContainer = '';
+                        buttonTooltip.dataset.tooltipContainerTrigger = '';
+                        colorInput.appendChild(buttonTooltip);
+
+                        const buttonTooltipPopover = document.createElement('tf-popover');
+                        buttonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
+                        buttonTooltipPopover.style.transitionDelay = '750ms';
+                        buttonTooltipPopover.tabIndex = 0;
+                        buttonTooltipPopover.textContent = definition.tooltip;
+                        buttonTooltip.appendChild(buttonTooltipPopover);
+
+                        colorInput.addEventListener('focusin', this.onShowTooltip.bind(colorInput));
+                        colorInput.addEventListener('mouseover', this.onShowTooltip.bind(colorInput));
+                        colorInput.addEventListener('focusout', this.onDismissTooltip.bind(colorInput));
+                        colorInput.addEventListener('mouseout', this.onDismissTooltip.bind(colorInput));
+                    }
+
+                    continue;
+                }
+
+                if (definition.type === CommandType.Emoji) {
+                    const emojiInput = document.createElement('tf-emoji-input');
+                    emojiInput.classList.add('field', 'no-label');
+                    emojiInput.dataset.inputClass = 'rounded small';
+                    emojiInput.dataset.popoverContainer = '';
+                    if (disabledOrReadonly) {
+                        emojiInput.setAttribute('disabled', '');
+                    }
+
+                    const toolbarButton = new ToolbarControl(emojiInput, definition);
+
+                    innerToolbar.appendChild(emojiInput);
+
+                    emojiInput.addEventListener('valuechange', this.onEmojiSelected.bind(this, toolbarButton));
+                    this._toolbarButtons.push(toolbarButton);
+
+                    if (definition.tooltip) {
+                        const buttonTooltip = document.createElement('tf-tooltip');
+                        buttonTooltip.dataset.delay = '750';
+                        buttonTooltip.dataset.popoverContainer = '';
+                        buttonTooltip.dataset.tooltipContainerTrigger = '';
+                        emojiInput.appendChild(buttonTooltip);
+
+                        const buttonTooltipPopover = document.createElement('tf-popover');
+                        buttonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
+                        buttonTooltipPopover.style.transitionDelay = '750ms';
+                        buttonTooltipPopover.tabIndex = 0;
+                        buttonTooltipPopover.textContent = definition.tooltip;
+                        buttonTooltip.appendChild(buttonTooltipPopover);
+
+                        emojiInput.addEventListener('focusin', this.onShowTooltip.bind(emojiInput));
+                        emojiInput.addEventListener('mouseover', this.onShowTooltip.bind(emojiInput));
+                        emojiInput.addEventListener('focusout', this.onDismissTooltip.bind(emojiInput));
+                        emojiInput.addEventListener('mouseout', this.onDismissTooltip.bind(emojiInput));
+                    }
+
+                    continue;
+                }
+            }
+
+            let button = document.createElement('button');
+            button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+
+            let control: HTMLElement;
+            let toolbarButton: ToolbarControl;
+
+            if (!isButton) {
+                const dropdown = document.createElement('tf-dropdown');
+                dropdown.dataset.activation = definition.style === ToolbarControlStyle.DropdownButton
+                    ? '6'
+                    : '1';
+                dropdown.dataset.popoverContainer = '';
+                if (disabled) {
+                    dropdown.setAttribute('disabled', '');
+                }
+
+                dropdown.appendChild(button);
+
+                const dropdownPopover = document.createElement('tf-popover');
+                dropdownPopover.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
+                dropdownPopover.style.maxHeight = 'min(300px,90vh)';
+                dropdownPopover.style.overflowY = 'auto';
+                dropdownPopover.tabIndex = 0;
+                dropdown.appendChild(dropdownPopover);
+
+                const list = document.createElement('div');
+                list.classList.add('list');
+                dropdownPopover.appendChild(list);
+
+                if (definition.style === ToolbarControlStyle.ButtonGroup) {
+                    if (disabled) {
+                        button.disabled = true;
+                    }
+
+                    const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                    button.appendChild(buttonIcon);
+                    buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360 280-560h400L480-360Z"/></svg>`;
+                    
+                    control = document.createElement('div');
+                    toolbarButton = new ToolbarControl(control, definition);
+                    control.classList.add('button-group');
+
+                    button = document.createElement('button');
+                    button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+                    control.appendChild(button);
+
+                    dropdown.style.minWidth = '0';
+                    control.appendChild(dropdown);
+                } else {
+                    dropdown.dataset.delay = '1000';
+                    dropdown.oncontextmenu = () => { return false; }
+
+                    control = dropdown;
+                    toolbarButton = new ToolbarControl(control, definition);
+
+                    if (definition.style === ToolbarControlStyle.DropdownButton
+                        && definition.type) {
+                        dropdown.addEventListener('mousedown', this.preventDefault);
+                        dropdown.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
+                    }
+                }
+                
+                for (const childDefinition of definition.buttons!) {
+                    if (childDefinition.separatorBefore) {
+                        const separator = document.createElement('hr');
+                        list.appendChild(separator);
+                    }
+
+                    const span = document.createElement('span');
+                    if (childDefinition.icon) {
+                        const childIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                        span.appendChild(childIcon);
+                        childIcon.outerHTML = childDefinition.icon;
+                    } else if (childDefinition.text) {
+                        span.innerHTML = childDefinition.text;
+                    }
+                    list.appendChild(span);
+
+                    const toolbarButton = new ToolbarControl(span, childDefinition, control);
+                    span.addEventListener('mousedown', this.preventDefault);
+                    span.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
+                    this._toolbarButtons.push(toolbarButton);
+                }
+
+                control.id = randomUUID();
+                dropdownPopover.dataset.anchorId = control.id;
+            } else {
+                control = button;
+                toolbarButton = new ToolbarControl(control, definition);
+            }
+
+            if (definition.text) {
+                button.textContent = definition.text;
+            }
+            if (definition.icon) {
+                const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                button.appendChild(buttonIcon);
+                buttonIcon.outerHTML = definition.icon;
+
+                if (definition.text) {
+                    button.appendChild(document.createTextNode(definition.text));
+                }
+            } else if (definition.text) {
+                button.textContent = definition.text;
+            }
+            if (definition.inactiveIcon) {
+                const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                button.appendChild(buttonIcon);
+                buttonIcon.outerHTML = definition.inactiveIcon;
+            }
+            if (definition.tooltip) {
+                const buttonTooltip = document.createElement('tf-tooltip');
+                buttonTooltip.dataset.delay = '750';
+                buttonTooltip.dataset.popoverContainer = '';
+                buttonTooltip.dataset.tooltipContainerTrigger = '';
+                control.appendChild(buttonTooltip);
+
+                const buttonTooltipPopover = document.createElement('tf-popover');
+                buttonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
+                buttonTooltipPopover.style.transitionDelay = '750ms';
+                buttonTooltipPopover.tabIndex = 0;
+                buttonTooltipPopover.textContent = definition.tooltip;
+                buttonTooltip.appendChild(buttonTooltipPopover);
+                
+                control.addEventListener('focusin', this.onShowTooltip.bind(control));
+                control.addEventListener('mouseover', this.onShowTooltip.bind(control));
+                control.addEventListener('focusout', this.onDismissTooltip.bind(control));
+                control.addEventListener('mouseout', this.onDismissTooltip.bind(control));
+            }
+
+            button.disabled = disabledOrReadonly;
+
+            innerToolbar.appendChild(control);
+
+            if (definition.type) {
+                button.addEventListener('mousedown', this.preventDefault);
+                button.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
+            }
+            this._toolbarButtons.push(toolbarButton);
+        }
+
+        if (!('lockMode' in this.dataset)) {
+            if (isWysiwygAvailable) {
+                const separator = document.createElement('div');
+                separator.classList.add('vr');
+                innerToolbar.appendChild(separator);
+            }
+
+            const modeButton = document.createElement('button');
+            modeButton.classList.add('btn', 'btn-icon', 'rounded', 'small', 'mode-button');
+            if (!isWysiwygAvailable) {
+                modeButton.classList.add('hidden');
+            }
+            modeButton.disabled = disabledOrReadonly;
+            modeButton.addEventListener('click', this.onModeSwitch.bind(this));
+            innerToolbar.appendChild(modeButton);
+
+            const modeButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            modeButton.appendChild(modeButtonIcon);
+            modeButtonIcon.outerHTML = isWysiwyg
+                ? `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M344-336 200-480l144-144 56 57-87 87 87 87-56 57Zm272 0-56-57 87-87-87-87 56-57 144 144-144 144ZM200-120q-33 0-56.5-23.5T120-200v-160h80v160h160v80H200Zm400 0v-80h160v-160h80v160q0 33-23.5 56.5T760-120H600ZM120-600v-160q0-33 23.5-56.5T200-840h160v80H200v160h-80Zm640 0v-160H600v-80h160q33 0 56.5 23.5T840-760v160h-80Z"/></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm280-80q-82 0-146.5-44.5T240-440q29-71 93.5-115.5T480-600q82 0 146.5 44.5T720-440q-29 71-93.5 115.5T480-280Zm0-100q-25 0-42.5-17.5T420-440q0-25 17.5-42.5T480-500q25 0 42.5 17.5T540-440q0 25-17.5 42.5T480-380Zm0 40q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg>`;
+
+            const modeButtonTooltip = document.createElement('tf-tooltip');
+            modeButtonTooltip.dataset.delay = '750';
+            modeButtonTooltip.dataset.popoverContainer = '';
+            modeButtonTooltip.dataset.tooltipContainerTrigger = '';
+            modeButton.appendChild(modeButtonTooltip);
+
+            const modeButtonTooltipPopover = document.createElement('tf-popover');
+            modeButtonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
+            modeButtonTooltipPopover.style.transitionDelay = '750ms';
+            modeButtonTooltipPopover.tabIndex = 0;
+            modeButtonTooltipPopover.textContent = isWysiwyg
+                ? 'Edit source code'
+                : 'Edit in rich text mode';
+            modeButtonTooltip.appendChild(modeButtonTooltipPopover);
+        }
+
+        if (!('lockSyntax' in this.dataset)) {
+            if (isWysiwygAvailable && 'lockMode' in this.dataset) {
+                const separator = document.createElement('div');
+                separator.classList.add('vr');
+                innerToolbar.appendChild(separator);
+            }
+
+            const syntaxSelect = document.createElement('tf-select');
+            syntaxSelect.classList.add('select', 'field', 'no-label', 'syntax-select');
+            syntaxSelect.dataset.popoverContainer = '';
+            if (disabledOrReadonly) {
+                syntaxSelect.setAttribute('disabled', '');
+            }
+            syntaxSelect.tabIndex = -1;
+            syntaxSelect.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
+            innerToolbar.appendChild(syntaxSelect);
+
+            const syntaxInput = document.createElement('tf-input');
+            syntaxInput.classList.add('input', 'picker-value');
+            if (disabledOrReadonly) {
+                syntaxInput.setAttribute('disabled', '');
+            }
+            syntaxInput.setAttribute('readonly', '');
+            syntaxInput.setAttribute('size', '10');
+            syntaxSelect.appendChild(syntaxInput);
+
+            const syntaxExpandIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            syntaxInput.appendChild(syntaxExpandIcon);
+            syntaxExpandIcon.outerHTML = `<svg class="svg-icon expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>`;
+
+            const syntaxPopover = document.createElement('tf-popover');
+            syntaxPopover.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
+            syntaxPopover.style.maxHeight = 'min(300px,90vh)';
+            syntaxPopover.style.overflowY = 'auto';
+            syntaxPopover.tabIndex = 0;
+            syntaxSelect.appendChild(syntaxPopover);
+            
+            const list = document.createElement('div');
+            list.classList.add('list');
+            syntaxPopover.appendChild(list);
+
+            for (const syntax of syntaxes) {
+                const option = document.createElement('div');
+                option.dataset.closePicker = '';
+                option.dataset.closePickerValue = syntax;
+                option.dataset.closePickerDisplay = syntaxTextMap[syntax];
+                list.appendChild(option);
+
+                const selectedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                option.appendChild(selectedIcon);
+                selectedIcon.outerHTML = `<svg class="svg-icon selected-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+
+                const unselectedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                option.appendChild(unselectedIcon);
+                unselectedIcon.outerHTML = `<svg class="svg-icon unselected-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>`;
+
+                const label = document.createElement('span');
+                label.innerHTML = syntaxLabelMap[syntax];
+                option.appendChild(label);
+            }
+
+            syntaxSelect.setAttribute('value', syntax);
+        }
+
+        const slot = document.createElement('slot');
+        innerToolbar.appendChild(slot);
+
+        if (isWysiwygAvailable
+            || !('lockMode' in this.dataset)
+            || !('lockSyntax' in this.dataset)) {
+            const showAll = document.createElement('button');
+            showAll.classList.add('btn', 'btn-icon', 'rounded', 'small', 'editor-toolbar-show-all-btn');
+            toolbar.appendChild(showAll);
+            showAll.addEventListener('click', this.onShowAll.bind(this));
+
+            const showAllIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            showAll.appendChild(showAllIcon);
+            showAllIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg>`;
+
+            const showAllTooltip = document.createElement('tf-tooltip');
+            showAllTooltip.dataset.delay = '750';
+            showAllTooltip.dataset.popoverContainer = '';
+            showAllTooltip.dataset.tooltipContainerTrigger = '';
+            showAll.appendChild(showAllTooltip);
+
+            const showAllTooltipPopover = document.createElement('tf-popover');
+            showAllTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'select-popover', 'tooltip');
+            showAllTooltipPopover.style.transitionDelay = '750ms';
+            showAllTooltipPopover.tabIndex = 0;
+            showAllTooltipPopover.textContent = 'show all controls';
+            showAllTooltip.appendChild(showAllTooltipPopover);
+
+            showAll.addEventListener('focusin', this.onShowTooltip.bind(showAll));
+            showAll.addEventListener('mouseover', this.onShowTooltip.bind(showAll));
+            showAll.addEventListener('focusout', this.onDismissTooltip.bind(showAll));
+            showAll.addEventListener('mouseout', this.onDismissTooltip.bind(showAll));
+        }
+
+        toolbar.replaceChildren(...nodes);
+
+        const buttons = root.querySelectorAll<HTMLButtonElement>('.custom-editor-button');
+        for (const button of buttons) {
+            if ('mode' in button.dataset
+                && button.dataset.mode
+                && button.dataset.mode !== '0') {
+                if (parseInt(button.dataset.mode || '') == mode) {
+                    button.classList.remove('hidden');
+                } else {
+                    button.classList.add('hidden');
+                }
+            }
+        }
+    }
 }
 
 export function focusEditor(elementId: string) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        codeEditor.view.focus();
-        return;
-    }
-
-    const wysiwygEditor = tavenemWysiwygEditor._editors[elementId];
-    if (wysiwygEditor) {
-        wysiwygEditor.view.focus();
+    const editor = document.getElementById(elementId);
+    if (editor instanceof TavenemEditorHtmlElement) {
+        editor.focusInnerEditor();
     }
 }
 
 export function getSelectedText(elementId: string) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        return codeEditor.view.state.sliceDoc(
-            codeEditor.view.state.selection.ranges.map(v => v.from).reduce((p, v) => (p < v ? p : v)),
-            codeEditor.view.state.selection.ranges.map(v => v.to).reduce((p, v) => (p > v ? p : v)));
-    }
-
-    const wysiwygEditor = tavenemWysiwygEditor._editors[elementId];
-    if (wysiwygEditor) {
-        const { from, to } = wysiwygEditor.view.state.selection;
-        return wysiwygEditor.view.state.doc.textBetween(from, to, " ");
+    const editor = document.getElementById(elementId);
+    if (editor instanceof TavenemEditorHtmlElement) {
+        return editor.getSelectedText();
     }
 }
 
-export function initializeEditor(
-    elementId: string,
-    dotNetRef: DotNet.DotNetObject,
-    options: EditorOptions) {
-    if (options.mode == EditorMode.WYSIWYG
-        && (options.syntax == 'HTML'
-            || options.syntax == 'Markdown')) {
-        tavenemWysiwygEditor.initializeEditor(
-            elementId,
-            dotNetRef,
-            options);
-    } else {
-        tavenemCodeEditor.initializeEditor(
-            elementId,
-            dotNetRef,
-            options);
+export function updateSelectedText(elementId: string, value?: string | null) {
+    const editor = document.getElementById(elementId);
+    if (editor instanceof TavenemEditorHtmlElement) {
+        return editor.updateSelectedText(value);
     }
-}
-
-export function setEditorMode(elementId: string, value: EditorMode) {
-    if (value == EditorMode.WYSIWYG) {
-        const existingEditor = tavenemWysiwygEditor._editors[elementId];
-        if (existingEditor) {
-            return;
-        }
-
-        const editor = tavenemCodeEditor._editors[elementId];
-        if (!editor) {
-            return;
-        }
-
-        const options = editor.options;
-        options.autoFocus = true;
-        options.initialValue = editor.view.state.doc.toString();
-        options.mode = value;
-
-        tavenemCodeEditor.dispose(elementId);
-
-        tavenemWysiwygEditor.initializeEditor(
-            elementId,
-            editor.ref,
-            options);
-
-    } else {
-        const existingEditor = tavenemCodeEditor._editors[elementId];
-        if (existingEditor) {
-            return;
-        }
-
-        const editor = tavenemWysiwygEditor._editors[elementId];
-        if (!editor) {
-            return;
-        }
-
-        const options = editor.options;
-        options.autoFocus = true;
-        options.initialValue = tavenemWysiwygEditor.getContent(editor);
-        options.mode = value;
-
-        tavenemWysiwygEditor.dispose(elementId);
-
-        tavenemCodeEditor.initializeEditor(
-            elementId,
-            editor.ref,
-            options);
-    }
-}
-
-export function setReadOnly(elementId: string, value: boolean) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        codeEditor.view.dispatch({
-            effects: codeEditor.readOnly.reconfigure(EditorState.readOnly.of(value)),
-        });
-        return;
-    }
-
-    const wysiwygEditor = tavenemWysiwygEditor._editors[elementId];
-    if (!wysiwygEditor) {
-        return;
-    }
-    tavenemWysiwygEditor.setReadOnly(wysiwygEditor.view, value);
-}
-
-export async function setSyntax(elementId: string, value: string) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        if (value == codeEditor.options.syntax) {
-            return;
-        }
-
-        const spec: TransactionSpec = {
-            effects: codeEditor.language.reconfigure(
-                codeEditorLanguageMap[value.toLowerCase()]
-                || codeEditorPlainText),
-        };
-
-        if ((codeEditor.options.syntax == 'HTML'
-            && value == 'Markdown')
-            || (codeEditor.options.syntax == 'Markdown'
-                && value == 'HTML')) {
-            let text;
-            const div = document.createElement('div');
-            if (codeEditor.options.syntax == 'HTML'
-                && value == 'Markdown') {
-                div.innerHTML = codeEditor.view.state.doc.toString();
-                const node = PMDOMParser
-                    .fromSchema(schema)
-                    .parse(div);
-                text = tavenemMarkdownSerializer.serialize(node);
-            } else {
-                const node = tavenemMarkdownParser.parse(codeEditor.view.state.doc.toString());
-                div.appendChild(DOMSerializer
-                    .fromSchema(schema)
-                    .serializeFragment(node.content));
-                text = div.innerHTML;
-            }
-
-            spec.changes = {
-                from: 0,
-                to: codeEditor.view.state.doc.length,
-                insert: text,
-            };
-        }
-
-        codeEditor.options.syntax = value;
-
-        codeEditor.view.dispatch(spec);
-        return;
-    }
-
-    const wysiwygEditor = tavenemWysiwygEditor._editors[elementId];
-    if (!wysiwygEditor) {
-        return;
-    }
-
-    if (value == wysiwygEditor.options.syntax) {
-        return;
-    }
-
-    const ref = wysiwygEditor.ref;
-
-    const options = wysiwygEditor.options;
-
-    let text;
-    const div = document.createElement('div');
-    if (options.syntax == 'HTML'
-        && value == 'Markdown') {
-        text = tavenemMarkdownSerializer.serialize(wysiwygEditor.view.state.doc);
-    } else if (options.syntax == 'Markdown'
-        && value == 'HTML') {
-        div.appendChild(DOMSerializer
-            .fromSchema(wysiwygEditor.view.state.schema)
-            .serializeFragment(wysiwygEditor.view.state.doc.content));
-        text = div.innerHTML;
-    } else {
-        text = tavenemWysiwygEditor.getContent(wysiwygEditor);
-    }
-
-    options.initialValue = text;
-    options.syntax = value;
-
-    tavenemWysiwygEditor.dispose(elementId);
-
-    if (value == 'HTML'
-        || value == 'Markdown') {
-        tavenemWysiwygEditor.initializeEditor(
-            elementId,
-            ref,
-            options);
-    } else {
-        options.mode = EditorMode.Text;
-
-        tavenemCodeEditor.initializeEditor(
-            elementId,
-            ref,
-            options);
-    }
-}
-
-export function setValue(elementId: string, value?: string) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        codeEditor.view.dispatch({
-            changes: {
-                from: 0,
-                to: codeEditor.view.state.doc.length,
-                insert: value || '',
-            }
-        });
-        return;
-    }
-
-    const wysiwygEditor = tavenemWysiwygEditor._editors[elementId];
-    if (!wysiwygEditor) {
-        return;
-    }
-    if (value) {
-        let content;
-        if (wysiwygEditor.isMarkdown) {
-            content = tavenemMarkdownParser.parse(value);
-        } else {
-            const div = document.createElement('div');
-            div.innerHTML = value;
-            content = PMDOMParser
-                .fromSchema(wysiwygEditor.view.state.schema)
-                .parse(div);
-        }
-        wysiwygEditor.view.updateState(
-            wysiwygEditor.view.state.apply(
-                wysiwygEditor.view.state.tr.replaceRangeWith(
-                    0,
-                    wysiwygEditor.view.state.doc.content.size,
-                    content)));
-    } else {
-        wysiwygEditor.view.updateState(
-            wysiwygEditor.view.state.apply(
-                wysiwygEditor.view.state.tr.delete(
-                    0,
-                    wysiwygEditor.view.state.doc.content.size)));
-    }
-}
-
-export function updateSelectedText(elementId: string, value?: string) {
-    const codeEditor = tavenemCodeEditor._editors[elementId];
-    if (codeEditor) {
-        tavenemCodeEditor.updateSelectedText(elementId, value);
-    }
-
-    tavenemWysiwygEditor.updateSelectedText(elementId, value);
 }
 
 function arrowHandler(dir: 'up' | 'down' | 'left' | 'right' | 'forward' | 'backward') {
@@ -1853,11 +2632,11 @@ function arrowHandler(dir: 'up' | 'down' | 'left' | 'right' | 'forward' | 'backw
             return false;
         }
         if (state.selection.empty && view.endOfTextblock(dir)) {
-            const side = dir == 'left' || dir == 'up' ? -1 : 1,
-                $head = state.selection.$head;
+            const side = dir === 'left' || dir === 'up' ? -1 : 1;
+            const { $head } = state.selection;
             const nextPos = Selection.near(state.doc.resolve(side > 0 ? $head.after() : $head.before()), side);
             if (nextPos.$head
-                && nextPos.$head.parent.type.name == "code_block") {
+                && nextPos.$head.parent.type.name === "code_block") {
                 if (dispatch) {
                     dispatch(state.tr.setSelection(nextPos));
                 }
@@ -1868,55 +2647,180 @@ function arrowHandler(dir: 'up' | 'down' | 'left' | 'right' | 'forward' | 'backw
     };
 }
 
-function computeChange(oldVal: string, newVal: string) {
-    if (oldVal == newVal) {
-        return null;
-    }
-    let start = 0, oldEnd = oldVal.length, newEnd = newVal.length;
-    while (start < oldEnd
-        && oldVal.charCodeAt(start) == newVal.charCodeAt(start)) {
-        ++start;
-    }
-    while (oldEnd > start
-        && newEnd > start
-        && oldVal.charCodeAt(oldEnd - 1) == newVal.charCodeAt(newEnd - 1)) {
-        oldEnd--;
-        newEnd--;
-    }
-    return {
-        from: start,
-        to: oldEnd,
-        text: newVal.slice(start, newEnd),
+function getDialog(
+    title: string,
+    content: Node[],
+    callback: (value: unknown) => void,
+    value?: (form: HTMLFormElement) => unknown,
+    validity?: (form: HTMLFormElement) => boolean) {
+    const close = (ev: Event) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        if (!(ev.target instanceof HTMLElement)) {
+            return;
+        }
+
+        const dialog = ev.target.closest('dialog');
+        if (dialog) {
+            dialog.close();
+        }
     };
-}
 
-function defaultBlockAt(match: ContentMatch) {
-    for (let i = 0; i < match.edgeCount; i++) {
-        const { type } = match.edge(i);
-        if (type.isTextblock && !type.hasRequiredAttrs()) {
-            return type;
+    const container = document.createElement('div');
+    container.classList.add('dialog-container');
+    document.body.appendChild(container);
+
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay');
+    container.appendChild(overlay);
+    overlay.addEventListener('click', close);
+
+    const dialog = document.createElement('dialog') as Dialog;
+    dialog.id = randomUUID();
+    dialog.classList.add('resizable');
+    dialog.style.minWidth = 'fit-content';
+    dialog.style.width = '50vw';
+    container.appendChild(dialog);
+    dialog.addEventListener('close', ev => {
+        if (!(ev.target instanceof HTMLDialogElement)) {
+            return;
+        }
+
+        const form = ev.target.querySelector('form');
+        if (ev.target.returnValue === 'ok') {
+            if (form && !form.checkValidity()) {
+                return;
+            }
+
+            const returnValue = form && typeof value === 'function'
+                ? value(form)
+                : undefined;
+
+            callback(returnValue);
+        }
+        if (form) {
+            form.reset();
+        }
+
+        const container = ev.target.closest<HTMLElement>('.dialog-container');
+        if (container) {
+            container.style.display = 'none';
+        }
+    });
+
+    const dialogInner = document.createElement('div');
+    dialog.appendChild(dialogInner);
+
+    const header = document.createElement('div');
+    header.classList.add('header', 'draggable');
+    dialogInner.appendChild(header);
+
+    const heading = document.createElement('h6');
+    heading.textContent = title;
+    header.appendChild(heading);
+
+    const closeButton = document.createElement('tf-close');
+    header.appendChild(closeButton);
+    closeButton.addEventListener('click', close);
+
+    const body = document.createElement('div');
+    body.classList.add('body');
+    dialogInner.appendChild(body);
+
+    const form = document.createElement('form');
+    form.id = randomUUID();
+    body.appendChild(form);
+
+    const validate = (ev: Event) => {
+        if (!(ev.target instanceof HTMLElement)) {
+            return;
+        }
+
+        const form = ev.target.closest('form');
+        if (!form) {
+            return;
+        }
+
+        const okButton = ev.target.closest('dialog')?.querySelector<HTMLButtonElement>('.ok-button');
+        if (okButton) {
+            okButton.disabled = !form.checkValidity()
+                || (typeof validity === 'function' && !validity(form));
+        }
+    };
+
+    form.append(...content);
+    for (const node of content) {
+        if (node instanceof HTMLElement
+            && node.classList.contains('field')
+            && node.classList.contains('required')) {
+            const tfInput = node.querySelector('tf-input');
+            if (tfInput) {
+                tfInput.addEventListener('valueinput', validate);
+                tfInput.addEventListener('valuechange', validate);
+            } else {
+                const input = node.querySelector('input');
+                if (input) {
+                    input.addEventListener('input', validate);
+                    input.addEventListener('change', validate);
+                }
+            }
         }
     }
-    return null;
+
+    const footer = document.createElement('div');
+    footer.classList.add('footer');
+    dialogInner.appendChild(footer);
+
+    const buttons = document.createElement('div');
+    buttons.classList.add('message-box-buttons');
+    footer.appendChild(buttons);
+
+    const cancelButton = document.createElement('button');
+    cancelButton.classList.add('btn', 'btn-text');
+    cancelButton.textContent = 'Cancel';
+    buttons.appendChild(cancelButton);
+    cancelButton.addEventListener('click', close);
+
+    const okButton = document.createElement('button');
+    okButton.classList.add('btn', 'btn-text', 'primary', 'ok-button');
+    okButton.disabled = true;
+    okButton.value = 'ok';
+    okButton.formMethod = 'dialog';
+    okButton.textContent = 'OK';
+    okButton.setAttribute('form', form.id);
+    buttons.appendChild(okButton);
+
+    initializeDialog(dialog.id);
+    return dialog;
 }
 
-function getPreferredColorScheme(): ThemePreference {
-    const local = localStorage.getItem('tavenem-theme');
-    if (local) {
-        const theme = parseInt(local);
-        if (theme == ThemePreference.Light
-            || theme == ThemePreference.Dark) {
-            return theme;
+function getFonts() {
+    const validFonts: string[] = [];
+    for (const font of fonts) {
+        if (document.fonts.check('1em ' + font)) {
+            validFonts.push(font);
         }
     }
-
-    if (window.matchMedia) {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            return ThemePreference.Dark;
-        } else {
-            return ThemePreference.Light;
-        }
-    }
-
-    return ThemePreference.Light;
+    return validFonts;
 }
+
+const themeObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.type === 'attributes'
+            && mutation.target instanceof HTMLElement) {
+            const theme = mutation.target.dataset.theme;
+            if (theme) {
+                const effect = codeEditorThemeCompartment.reconfigure(theme === 'dark'
+                    ? codeEditorDarkExtension
+                    : codeEditorLightTheme);
+                for (const editor of document.querySelectorAll<TavenemEditorHtmlElement>('tf-editor')) {
+                    if (editor._tavenemCodeEditor._editor) {
+                        editor._tavenemCodeEditor._editor.view.dispatch({ effects: effect });
+                    }
+                }
+            }
+        }
+    });
+});
+themeObserver.observe(document.documentElement, { attributes: true });

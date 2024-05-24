@@ -10,28 +10,35 @@
 
 <p>
     Note: popovers work normally on static server-side rendered pages (for example, they are used by
-    <a href="./components/tooltip">Tooltip</a> components), although toggling them programmatically
-    normally depends on interactivity.
+    <a href="./components/tooltip">Tooltip</a> components).
 </p>
 
 <h2>Basics</h2>
 
 <p>
-    Use the <code>Popover</code> component to create a popover. It can contain
-    any content you wish. The <code>Open</code> property controls whether the
-    popover is visible, and can be controlled in any way you require.
+    Use the <code>Popover</code> component to create a popover. It can contain any content you wish.
+    The <code>IsOpen</code> property controls whether the popover is visible, and can be controlled in
+    any way you require.
+</p>
+
+<p>
+    To control a popover on a static server-side rendered page, add the <code>popovertarget</code>
+    attribute to a <code>button</code> (or <code>input</code> with <code>type='button'</code>) and
+    set its value to the <code>Id</code> of the popover. (Note: this behavior is provided by the
+    built-in <a href="https://developer.mozilla.org/en-US/docs/Web/API/Popover_API">Popover API</a>;
+    see that documentation for more details and additional capabilities.)
 </p>
 
 <Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
     <TitleContent>
         <div class="row align-items-center justify-content-center py-5">
-            <Popover IsOpen="_isOpen" AnchorOrigin="Origin.Top_Left" PopoverOrigin="Origin.Top_Left">
+            <Popover Id="example_popover" IsOpen="_isOpen" AnchorOrigin="Origin.Top_Left" PopoverOrigin="Origin.Top_Left">
                 <div class="d-flex flex-column p-4">
                     <p>Popovers can contain any content.</p>
-                    <button @onclick="Toggle" class="btn btn-text danger ms-auto mb-n3">Close</button>
+                    <button popovertarget="example_popover" class="btn btn-text danger ms-auto mb-n3">Close</button>
                 </div>
             </Popover>
-            <button @onclick="Toggle" class="btn primary">Toggle</button>
+            <button popovertarget="example_popover" class="btn primary">Toggle</button>
             <Switch @bind-Value="_isOpen" ThemeColor="ThemeColor.Primary" />
             <button @onclick="Toggle" class="btn btn-icon primary">
                 <tf-icon>@ToggleIcon</tf-icon>
@@ -39,10 +46,10 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Popover IsOpen=""_isOpen"" AnchorOrigin=""Origin.Top_Left"" PopoverOrigin=""Origin.Top_Left"">
+        @CodeFormatter.CodeToMarkup(@"<Popover Id=""example_popover"" AnchorOrigin=""Origin.Top_Left"" PopoverOrigin=""Origin.Top_Left"">
     <div class=""d-flex flex-column p-4"">
         <p>Popovers can contain any content.</p>
-        <button @onclick=""Toggle"" class=""btn btn-text danger ms-auto mb-n3"">Close</button>
+        <button popovertarget=""example_popover"" class=""btn btn-text danger ms-auto mb-n3"">Close</button>
     </div>
 </Popover>
 <button @onclick=""Toggle"" class=""btn primary"">Toggle</button>
@@ -171,9 +178,9 @@
         <div class="row align-items-center justify-content-center p-5">
             <Popover IsOpen="true" AnchorOrigin="Origin.Center_Center" PopoverOrigin="Origin.Center_Center">
                 <div class="d-flex flex-column p-4">
-                    <button @onclick="ToggleNested" class="btn btn-text primary ms-auto">Toggle</button>
+                    <button popovertarget="example_nested_popover" class="btn btn-text primary ms-auto">Toggle</button>
                 </div>
-                <Popover IsOpen="_isNestedOpen" AnchorOrigin="Origin.Center_Right" PopoverOrigin="Origin.Center_Left">
+                <Popover Id="example_nested_popover" AnchorOrigin="Origin.Center_Right" PopoverOrigin="Origin.Center_Left">
                     <div class="p-4">Nested content</div>
                 </Popover>
             </Popover>
@@ -182,9 +189,9 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<Popover IsOpen=""true"" AnchorOrigin=""Origin.Center_Center"" PopoverOrigin=""Origin.Center_Center"">
     <div class=""d-flex flex-column p-4"">
-        <button @onclick=""Toggle"" class=""btn btn-text primary ms-auto"">Toggle</button>
+        <button popovertarget=""example_nested_popover"" class=""btn btn-text primary ms-auto"">Toggle</button>
     </div>
-    <Popover IsOpen=""_isOpen"" AnchorOrigin=""Origin.Center_Right"" PopoverOrigin=""Origin.Center_Left"">
+    <Popover Id=""example_nested_popover"" AnchorOrigin=""Origin.Center_Right"" PopoverOrigin=""Origin.Center_Left"">
         <div class=""p-4"">
             Nested content
         </div>

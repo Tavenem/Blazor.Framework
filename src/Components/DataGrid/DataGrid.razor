@@ -29,27 +29,30 @@
                 {
                     <TextInput @bind-Value="@QuickFilter"
                                @bind-Value:after="SetFilterAsync"
-                               PostfixIcon="@DefaultIcons.Search"
                                UpdateOnInput="true"
                                UpdateOnInputDebounce="500"
-                               Class="ms-3 flex-grow-1" />
+                               Class="ms-3 flex-grow-1">
+                        <PostfixContent>
+                            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
+                        </PostfixContent>
+                    </TextInput>
                 }
                 @if (AllowAdd)
                 {
                     <button class="btn btn-icon small" @onclick="OnAddAsync">
-                        <tf-icon>@DefaultIcons.Add</tf-icon>
+                        <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
                         <Tooltip Delay="750">Add</Tooltip>
                     </button>
                 }
                 @if (AllowExport)
                 {
                     <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
-                        <tf-icon>@DefaultIcons.ImportExport</tf-icon>
+                        <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M560 0v-80h320V0H560Zm160-120L560-280l56-56 64 64v-167h80v167l64-64 56 56-160 160Zm-480-40q-33 0-56.5-23.5T160-240v-560q0-33 23.5-56.5T240-880h280l240 240v121H480v359H240Zm240-440h200L480-800v200Z"/></svg>
                         <Tooltip Delay="750">Export</Tooltip>
                     </button>
                 }
                 <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
-                    <tf-icon>@DefaultIcons.Filter</tf-icon>
+                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M440-160q-17 0-28.5-11.5T400-200v-240L168-736q-15-20-4.5-42t36.5-22h560q26 0 36.5 22t-4.5 42L560-440v240q0 17-11.5 28.5T520-160h-80Z"/></svg>
                     <Tooltip Delay="750">Change displayed columns</Tooltip>
                 </button>
             </div>
@@ -110,9 +113,7 @@
                                 }
                                 @if (IsInteractive && column.GetIsSortable())
                                 {
-                                    <tf-icon class="@GetColumnHeaderIconClass(column)">
-                                        @DefaultIcons.Sort_Ascending
-                                    </tf-icon>
+                                    <svg class="@GetColumnHeaderIconClass(column)" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-240 240-480l56-56 144 144v-368h80v368l144-144 56 56-240 240Z"/></svg>
                                 }
                             </div>
                             @if (IsInteractive && column.CanFilter)
@@ -122,10 +123,13 @@
                                     {
                                         <TextInput @bind-Value:get="@column.TextFilter"
                                                    @bind-Value:set="@(v => OnFilterChangedAsync(column, v))"
-                                                   PostfixIcon="@DefaultIcons.Search"
                                                    UpdateOnInput="true"
                                                    UpdateOnInputDebounce="Debounce"
-                                                   Class="dense" />
+                                                   Class="dense">
+                                            <PostfixContent Context="ti">
+                                                <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>
+                                            </PostfixContent>
+                                        </TextInput>
                                     }
                                     else if (column.IsBool)
                                     {
@@ -212,7 +216,7 @@
                                     @if (IsInteractive)
                                     {
                                         <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
-                                            <tf-icon>@DefaultIcons.Filter</tf-icon>
+                                            <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M440-160q-17 0-28.5-11.5T400-200v-240L168-736q-15-20-4.5-42t36.5-22h560q26 0 36.5 22t-4.5 42L560-440v240q0 17-11.5 28.5T520-160h-80Z"/></svg>
                                         </button>
                                     }
                                 </div>
@@ -263,20 +267,20 @@
                                     {
                                         <a class="btn btn-icon small"
                                            href="@GetGroupExpansionToggleUrl(group)">
-                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                            <svg class="@GetGroupExpandClass(group.Key)" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
                                         </a>
                                     }
                                     else if (IsInteractive)
                                     {
                                         <button class="btn btn-icon small"
                                                 @onclick="@(_ => OnToggleGroupExpansion(group))">
-                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                            <svg class="@GetGroupExpandClass(group.Key)" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
                                         </button>
                                     }
                                     else
                                     {
                                         <button class="btn btn-icon small" disabled>
-                                            <tf-icon class="@GetGroupExpandClass(group.Key)">@DefaultIcons.Expand</tf-icon>
+                                            <svg class="@GetGroupExpandClass(group.Key)" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
                                         </button>
                                     }
                                     @if (GroupContent is null)

@@ -113,7 +113,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             }
         }
 
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
         style.textContent = `:host {
@@ -126,20 +126,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
 
 svg {
     fill: currentColor;
+    flex-shrink: 0;
     height: 1em;
     width: auto;
-}
-
-[data-popover-open] {
-    --tavenem-popover-opacity: 1;
-    --tavenem-popover-events: auto;
-    --tavenem-popover-visibility: visible;
-}
-
-[data-popover-container]:not([data-popover-open]) {
-    --tavenem-popover-opacity: 0;
-    --tavenem-popover-events: none;
-    --tavenem-popover-visibility: hidden;
 }
 
 :host([button]) {
@@ -337,10 +326,6 @@ tf-input {
     padding-top: 2.5px;
 }
 
-:host([data-popover-open]) > tf-input > .expand {
-    transform: rotate(-180deg);
-}
-
 :host(:not([disabled], [readonly], [inert])):focus-within {
     --field-border-color: var(--field-active-border-color);
     --field-border-hover-color: var(--field-active-border-hover-color);
@@ -483,11 +468,8 @@ input::placeholder {
     transition: .3s cubic-bezier(.25,.8,.5,1);
 }
 
-:host(.open),
-:host([data-popover-open]) {
-    .expand {
-        transform: rotate(-180deg);
-    }
+:host(:has(tf-popover:popover-open)) > tf-input > .expand {
+    transform: rotate(-180deg);
 }
 
 .main-expand {
@@ -798,10 +780,8 @@ button::-moz-focus-inner,
         transition: .3s cubic-bezier(.25,.8,.5,1);
     }
 
-    &.open, &[data-popover-open] {
-        > tf-input > .expand {
-            transform: rotate(-180deg);
-        }
+    &:has(tf-popover:popover-open)) > tf-input > .expand {
+        transform: rotate(-180deg);
     }
 
     &.read-only, &[readonly] {
@@ -809,7 +789,7 @@ button::-moz-focus-inner,
         pointer-events: none;
     }
 
-    > tf-popover.contained-popover > .option-list {
+    > tf-popover.select-popover > .option-list {
         color: var(--tavenem-color-action);
         display: flex;
         flex-direction: column;
@@ -1345,7 +1325,7 @@ button::-moz-focus-inner,
 
             const expand = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             input.appendChild(expand);
-            expand.outerHTML = `<svg class="main-expand" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Z"/></svg>`;
+            expand.outerHTML = `<svg class="main-expand" data-picker-toggle xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Z"/></svg>`;
 
             const slot = document.createElement('slot');
             shadow.appendChild(slot);
@@ -1356,7 +1336,7 @@ button::-moz-focus-inner,
             controlContainer = shadow;
         } else {
             const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
-            popover.classList.add('contained-popover', 'filled', 'top-left', 'flip-onopen', anchorOrigin);
+            popover.classList.add('filled', 'top-left', 'flip-onopen', anchorOrigin);
             popover.dataset.anchorId = anchorId;
             shadow.appendChild(popover);
             controlContainer = popover;
@@ -1470,7 +1450,7 @@ button::-moz-focus-inner,
 
                 const popover = document.createElement('tf-popover');
                 popover.dataset.anchorId = inputId;
-                popover.classList.add('contained-popover', 'filled', 'top-left', 'anchor-bottom-left', 'flip-onopen', 'match-width');
+                popover.classList.add('select-popover', 'filled', 'top-left', 'anchor-bottom-left', 'flip-onopen', 'match-width');
                 popover.style.maxHeight = 'min(300px,90vh)';
                 popover.style.overflowY = 'auto';
                 select.appendChild(popover);
@@ -1554,7 +1534,7 @@ button::-moz-focus-inner,
 
                 const popover = document.createElement('tf-popover');
                 popover.dataset.anchorId = inputId;
-                popover.classList.add('contained-popover', 'filled', 'top-left', 'anchor-bottom-left', 'flip-onopen', 'match-width');
+                popover.classList.add('select-popover', 'filled', 'top-left', 'anchor-bottom-left', 'flip-onopen', 'match-width');
                 popover.style.maxHeight = 'min(300px,90vh)';
                 popover.style.overflowY = 'auto';
                 select.appendChild(popover);
@@ -1938,8 +1918,7 @@ button::-moz-focus-inner,
                 break;
         }
 
-        shadow.addEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
-        shadow.addEventListener('mousedown', this.onOuterMouseDown.bind(this));
+        shadow.addEventListener('mousedown', this.onMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
         shadow.addEventListener('keyup', this.onOuterKeyUp.bind(this));
         document.addEventListener('mousedown', this.onDocMouseDown.bind(this));
@@ -1954,8 +1933,7 @@ button::-moz-focus-inner,
             return;
         }
 
-        root.removeEventListener('focuslost', this.onOuterPopoverFocusLost.bind(this));
-        root.removeEventListener('mousedown', this.onOuterMouseDown.bind(this));
+        root.removeEventListener('mousedown', this.onMouseDown.bind(this));
         root.removeEventListener('mouseup', this.onOuterMouseUp.bind(this));
         root.removeEventListener('keyup', this.onOuterKeyUp.bind(this));
 
@@ -2618,33 +2596,7 @@ button::-moz-focus-inner,
 
     private onOuterKeyUp(event: Event) { this.onKeyUp(event as KeyboardEvent); }
 
-    private onOuterMouseDown(event: Event) {
-        if (event.target instanceof SVGElement
-            && event.target.classList.contains('main-expand')) {
-            this.onToggle(event);
-            return;
-        }
-
-        this.onMouseDown();
-        if (event.target
-            && event.target instanceof Node) {
-            const root = this.shadowRoot;
-            if (root) {
-                const pickers = root.querySelectorAll<TavenemSelectInputHtmlElement>('tf-select');
-                for (const picker of pickers) {
-                    if (!TavenemPopover.nodeContains(picker, event.target)) {
-                        picker.setOpen(false);
-                    }
-                }
-            }
-        }
-    }
-
-    private onOuterMouseUp(event: Event) {
-        this.onMouseUp(event as MouseEvent);
-    }
-
-    private onOuterPopoverFocusLost(event: Event) { this.onPopoverFocusLost(event); }
+    private onOuterMouseUp(event: Event) { this.onMouseUp(event as MouseEvent); }
 
     private onInput(event: Event) {
         if (this._settingValue
@@ -2658,11 +2610,16 @@ button::-moz-focus-inner,
 
         this.setValue(event.detail.value);
 
-        if ('popoverOpen' in this.dataset) {
-            this.setOpen(false);
-        } else {
-            this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(event.detail.value));
+        const root = this.shadowRoot;
+        if (root) {
+            const popover = root.querySelector('tf-popover');
+            if (popover && popover.matches(':popover-open')) {
+                this.setOpen(false);
+                return;
+            }
         }
+
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(event.detail.value));
     }
 
     private onNext(event: Event) {

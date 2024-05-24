@@ -114,6 +114,17 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     public ushort Hue { get; private set; }
 
     /// <summary>
+    /// When <see cref="DisplayType"/> is <see cref="PickerDisplayType.Button"/> and <see
+    /// cref="IconButton"/> is <see langword="true"/>, this property can be used to customize the
+    /// icon which is displayed.
+    /// </summary>
+    /// <remarks>
+    /// The name of an icon suitable for use in a <c>tf-icon</c> custom element can be used.
+    /// Alternatively, an SVG document can be supplied (as text properly escaped for HTML).
+    /// </remarks>
+    [Parameter] public string? Icon { get; set; }
+
+    /// <summary>
     /// When <see cref="DisplayType"/> is <see cref="PickerDisplayType.Button"/> and this is <see
     /// langword="true"/>, the button displays an icon rather than the current selected color.
     /// </summary>

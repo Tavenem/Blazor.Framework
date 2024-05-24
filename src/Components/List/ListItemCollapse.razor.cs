@@ -74,59 +74,29 @@ public partial class ListItemCollapse<TListItem>
 
     private bool IsDropTarget => ListItem?.GetIsDropTarget() ?? false;
 
-    private string? ListIconClassName
-    {
-        get
-        {
-            if (ElementList is null)
-            {
-                return null;
-            }
-            if (ElementList.SelectionIcons)
-            {
-                return "outlined";
-            }
-            return (ElementList.ShowSelectionIconValue
-                && ListItem?.IsSelected == true)
-                || ListItem is null
-                || ListItem.Item is null
-                || ElementList.Icon is null
-                || ElementList.IconClass is null
-                ? null
-                : ElementList.IconClass(ListItem.Item);
-        }
-    }
+    private string? ListIconClassName => ElementList is null
+        || ListItem is null
+        || ListItem.Item is null
+        || ElementList.Icon is null
+        || ElementList.IconClass is null
+        ? null
+        : ElementList.IconClass(ListItem.Item);
 
     private string? ListIconName
     {
         get
         {
-            if (ElementList?.SelectionIcons == true)
-            {
-                return ListItem?.IsSelected == true
-                    ? DefaultIcons.CheckBox_Checked
-                    : DefaultIcons.CheckBox_Unchecked;
-            }
-            if (ElementList?.ShowSelectionIconValue == true
-                && ListItem?.IsSelected == true)
-            {
-                return DefaultIcons.Selected;
-            }
-            if (ListItem is null
-                || string.IsNullOrEmpty(ListItem.Icon))
-            {
-                if (ListItem is null
-                    || ListItem.Item is null
-                    || ElementList?.Icon is null)
-                {
-                    return null;
-                }
-                return ElementList.Icon(ListItem.Item);
-            }
-            else
+            if (ListItem is not null
+                && !string.IsNullOrEmpty(ListItem.Icon))
             {
                 return ListItem.Icon;
             }
+
+            return ListItem is null
+                || ListItem.Item is null
+                || ElementList?.Icon is null
+                ? null
+                : ElementList.Icon(ListItem.Item);
         }
     }
 

@@ -1,11 +1,10 @@
 # Changelog
 
-## 2.39
+## 3.0
 ### Changed
-- Made `Checkbox`, `NumericInput`, `RadioButton`, `RadioGroup`, `Rating`, `Slider`, `Switch`, `TextArea`, and `TextInput` partially compatible with static server-side rendering
-  - These controls now support basic use, and should pass their input value to submitted forms
-  - Data binding, validation, and other features which operate exclusively in an interactive context will still not function
-  - `TextInput` suggestions fall back to the default `datalist` browser implementation when rendered non-interactively, which lacks some features of the interactive Blazor implementation and does not support custom styles
+- Made `Checkbox`, `ColorInput`, `DateTimeInput`, `Dropdown`, `Editor`, `EmojiInput`, `MultiSelect`, `NumericInput`, `RadioButton`, `RadioGroup`, `Rating`, `Select`, `Slider`, `Switch`, `Tabs`, `TextArea`, `TextInput`, and `Tooltip` partially compatible with static server-side rendering
+  - These controls now support most use cases even on static pages, and inputs should pass their value to submitted forms
+  - Data binding, validation, and other features which operate exclusively in an interactive context will still not function on statically rendered pages
 ### Removed
 - `RenderBodyWhenClosed` on `Collapse`
 - `LostFocus` and `ClearIcon` on `TextInput`
@@ -14,6 +13,10 @@
 - `AddIcon`, `BackIcon`, and `ForwardIcon` on `Tabs`
 - `Icon` and `OutputHexStrings` on `ColorInput`
 - `Icon` on `DateTimeInput`
+- `SetModeAsync` on `Editor` (`EditorMode` is now responsive to dynamic updates)
+- `Origin` on `DialogOptions`
+- `FocusOut` on `Popover`
+- `IsOpenChanged` on `Dropdown`
 
 ## 2.38
 ### Added

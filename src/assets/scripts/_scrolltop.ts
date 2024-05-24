@@ -8,7 +8,7 @@ export class TavenemScrollTopHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         this.classList.add('hidden');
 

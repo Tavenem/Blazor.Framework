@@ -10,12 +10,12 @@
 <tf-tooltip id="@Id"
             data-delay="@(Delay == 0 ? null : Delay)"
             data-dismiss-on-tap="@DismissOnTap"
-            data-popover-container
             data-tooltip-button="@IsButton"
             data-tooltip-container-trigger="@IsContainerTrigger">
     <Popover AdditionalAttributes="AdditionalAttributes"
              AnchorOrigin="AnchorOrigin"
              Class="@CssClass"
+             DismissOnTapOutside="true"
              FlipBehavior="FlipBehavior.Flip_Always"
              MaxHeight="@MaxHeight"
              PopoverOrigin="PopoverOrigin"

@@ -350,17 +350,4 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
     }
-
-    internal async ValueTask<string[]> GetFontsAsync()
-    {
-        try
-        {
-            var module = await _moduleTask.Value;
-            return await module.InvokeAsync<string[]>("getFonts");
-        }
-        catch (JSException) { }
-        catch (JSDisconnectedException) { }
-        catch (TaskCanceledException) { }
-        return [];
-    }
 }

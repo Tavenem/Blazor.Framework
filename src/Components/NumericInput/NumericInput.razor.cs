@@ -174,8 +174,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
             && (FormExtensions.ValuesEqual(CurrentValue, Min)
                 || FormExtensions.ValueIsLess(CurrentValue, Min)));
 
-    private int EffectiveSize => Math.Max(1, Size ?? 1);
-
     private bool IncrementDisabled => Disabled
         || ReadOnly
         || (IsInteractive

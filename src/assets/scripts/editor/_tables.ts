@@ -12,7 +12,7 @@ import {
     TextSelection,
     Transaction,
 } from "prosemirror-state";
-import { Mappable, Mapping, ReplaceAroundStep, Transform } from "prosemirror-transform";
+import { Mappable, ReplaceAroundStep, Transform } from "prosemirror-transform";
 import { Decoration, DecorationSet, EditorView, NodeView } from "prosemirror-view";
 
 export const cellMinWidth = 25;
@@ -152,7 +152,13 @@ export class CellSelection extends Selection {
      * that moves when extending the selection).
      */
     constructor(public $anchorCell: ResolvedPos, public $headCell: ResolvedPos = $anchorCell) {
-        const table = $anchorCell.node(-2), map = TableMap.get(table), start = $anchorCell.start(-2);
+        let d = $anchorCell.depth;
+        for (; d > 0; d--) {
+            if ($anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const table = $anchorCell.node(d), map = TableMap.get(table), start = $anchorCell.start(d);
         const rect = map.rectBetween($anchorCell.pos - start, $headCell.pos - start);
         const doc = $anchorCell.node(0);
         const cells = map.cellsInRect(rect).filter(p => p != $headCell.pos - start);
@@ -172,7 +178,13 @@ export class CellSelection extends Selection {
         if (pointsAtCell($anchorCell)
             && pointsAtCell($headCell)
             && inSameTable($anchorCell, $headCell)) {
-            const tableChanged = this.$anchorCell.node(-2) != $anchorCell.node(-2);
+            let d = $anchorCell.depth;
+            for (; d > 0; d--) {
+                if ($anchorCell.node(d).type.spec.tableRole == "table") {
+                    break;
+                }
+            }
+            const tableChanged = this.$anchorCell.node(d) != $anchorCell.node(d);
             if (tableChanged && this.isRowSelection()) {
                 return CellSelection.rowSelection($anchorCell, $headCell);
             } else if (tableChanged && this.isColSelection()) {
@@ -188,7 +200,13 @@ export class CellSelection extends Selection {
      * Returns a rectangular slice of table rows containing the selected cells.
      */
     content() {
-        const table = this.$anchorCell.node(-2), map = TableMap.get(table), start = this.$anchorCell.start(-2);
+        let d = this.$anchorCell.depth;
+        for (; d > 0; d--) {
+            if (this.$anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const table = this.$anchorCell.node(d), map = TableMap.get(table), start = this.$anchorCell.start(d);
         const rect = map.rectBetween(this.$anchorCell.pos - start, this.$headCell.pos - start);
         const seen: { [index: number]: boolean } = {}, rows: ProsemirrorNode[] = [];
         for (let row = rect.top; row < rect.bottom; row++) {
@@ -255,7 +273,13 @@ export class CellSelection extends Selection {
     }
 
     forEachCell(f: (node: ProsemirrorNode, pos: number) => void) {
-        const table = this.$anchorCell.node(-2), map = TableMap.get(table), start = this.$anchorCell.start(-2);
+        let d = this.$anchorCell.depth;
+        for (; d > 0; d--) {
+            if (this.$anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const table = this.$anchorCell.node(d), map = TableMap.get(table), start = this.$anchorCell.start(d);
         const cells = map.cellsInRect(map.rectBetween(this.$anchorCell.pos - start, this.$headCell.pos - start));
         for (let i = 0; i < cells.length; i++) {
             f(table.nodeAt(cells[i])!, start + cells[i]);
@@ -267,13 +291,19 @@ export class CellSelection extends Selection {
      * bottom of the table body (or table, if there is no body).
      */
     isColSelection() {
-        const anchorTop = this.$anchorCell.index(-2), headTop = this.$headCell.index(-2);
+        let d = this.$anchorCell.depth;
+        for (; d > 0; d--) {
+            if (this.$anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const anchorTop = this.$anchorCell.index(d), headTop = this.$headCell.index(d);
         if (Math.min(anchorTop, headTop) > 0) {
             return false;
         }
         const anchorBot = anchorTop + this.$anchorCell.nodeAfter!.attrs.rowspan,
             headBot = headTop + this.$headCell.nodeAfter!.attrs.rowspan;
-        return Math.max(anchorBot, headBot) == this.$headCell.node(-2).childCount;
+        return Math.max(anchorBot, headBot) == this.$headCell.node(d).childCount;
     }
 
     /**
@@ -281,7 +311,13 @@ export class CellSelection extends Selection {
      * and head cell.
      */
     static colSelection($anchorCell: ResolvedPos, $headCell: ResolvedPos = $anchorCell) {
-        const map = TableMap.get($anchorCell.node(-2)), start = $anchorCell.start(-2);
+        let d = $anchorCell.depth;
+        for (; d > 0; d--) {
+            if ($anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const map = TableMap.get($anchorCell.node(d)), start = $anchorCell.start(d);
         const anchorRect = map.findCell($anchorCell.pos - start), headRect = map.findCell($headCell.pos - start);
         const doc = $anchorCell.node(0);
         if (anchorRect.top <= headRect.top) {
@@ -307,7 +343,13 @@ export class CellSelection extends Selection {
      * right of the table.
      */
     isRowSelection() {
-        const map = TableMap.get(this.$anchorCell.node(-2)), start = this.$anchorCell.start(-2);
+        let d = this.$anchorCell.depth;
+        for (; d > 0; d--) {
+            if (this.$anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const map = TableMap.get(this.$anchorCell.node(d)), start = this.$anchorCell.start(d);
         const anchorLeft = map.colCount(this.$anchorCell.pos - start),
             headLeft = map.colCount(this.$headCell.pos - start);
         if (Math.min(anchorLeft, headLeft) > 0) {
@@ -329,7 +371,13 @@ export class CellSelection extends Selection {
      * and head cell.
      */
     static rowSelection($anchorCell: ResolvedPos, $headCell: ResolvedPos = $anchorCell) {
-        const map = TableMap.get($anchorCell.node(-2)), start = $anchorCell.start(-2);
+        let d = $anchorCell.depth;
+        for (; d > 0; d--) {
+            if ($anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const map = TableMap.get($anchorCell.node(d)), start = $anchorCell.start(d);
         const anchorRect = map.findCell($anchorCell.pos - start), headRect = map.findCell($headCell.pos - start);
         const doc = $anchorCell.node(0);
         if (anchorRect.left <= headRect.left) {
@@ -1038,24 +1086,28 @@ function arrow(axis: string, dir: number): Command {
         if (axis != "horiz" && !sel.empty) {
             return false;
         }
-        const end = atEndOfCell(view!, axis, dir);
-        if (end == null) {
+        const $cell = atEndOfCell(view!, axis, dir);
+        if ($cell == null) {
             return false;
         }
-        if (axis == "horiz") {
-            return maybeSetSelection(state, dispatch, Selection.near(state.doc.resolve(sel.head + dir), dir));
+        let newSel: Selection;
+        const $next = nextCell($cell, axis, dir);
+        if ($next) {
+            newSel = Selection.near($next, 1);
         } else {
-            const $cell = state.doc.resolve(end), $next = nextCell($cell, axis, dir);
-            let newSel: Selection;
-            if ($next) {
-                newSel = Selection.near($next, 1);
-            } else if (dir < 0) {
-                newSel = Selection.near(state.doc.resolve($cell.before(-2)), -1);
-            } else {
-                newSel = Selection.near(state.doc.resolve($cell.after(-2)), 1);
+            let d = $cell.depth;
+            for (; d > 0; d--) {
+                if ($cell.node(d).type.spec.tableRole == "table") {
+                    break;
+                }
             }
-            return maybeSetSelection(state, dispatch, newSel);
+            if (dir < 0) {
+                newSel = Selection.near(state.doc.resolve($cell.before(d)), dir);
+            } else {
+                newSel = Selection.near(state.doc.resolve($cell.after(d)), dir);
+            }
         }
+        return maybeSetSelection(state, dispatch, newSel);
     }
 }
 
@@ -1064,18 +1116,21 @@ function atEndOfCell(view: EditorView, axis: string, dir: number) {
         return null;
     }
     const { $head } = view.state.selection;
-    for (let d = $head.depth - 1; d >= 0; d--) {
-        const parent = $head.node(d), index = dir < 0 ? $head.index(d) : $head.indexAfter(d);
-        if (index != (dir < 0 ? 0 : parent.childCount)) {
+    for (let d = $head.depth; d >= 0; d--) {
+        const parent = $head.node(d);
+        const i = dir < 0 ? $head.index(d) : $head.indexAfter(d);
+        if (i !== (dir < 0 ? 0 : parent.childCount)) {
             return null;
         }
-        if (parent.type.spec.tableRole == "cell"
-            || parent.type.spec.tableRole == "header_cell") {
-            const cellPos = $head.before(d);
+
+        if (parent.type.spec.tableRole === "cell"
+            || parent.type.spec.tableRole === "header_cell") {
             const dirStr = axis == "vert"
                 ? (dir > 0 ? "down" : "up")
                 : (dir > 0 ? "right" : "left");
-            return view.endOfTextblock(dirStr) ? cellPos : null;
+            return view.endOfTextblock(dirStr)
+                ? $head
+                : null;
         }
     }
     return null;
@@ -1237,7 +1292,13 @@ function clipCells(
 }
 
 function colCount($pos: ResolvedPos) {
-    return TableMap.get($pos.node(-2)).colCount($pos.pos - $pos.start(-2));
+    let d = $pos.depth;
+    for (; d > 0; d--) {
+        if ($pos.node(d).type.spec.tableRole == "table") {
+            break;
+        }
+    }
+    return TableMap.get($pos.node(d)).colCount($pos.pos - $pos.start(d));
 }
 
 function columnIsHeader(map: TableMap, table: ProsemirrorNode, col: number) {
@@ -1577,10 +1638,22 @@ function findBadColWidths(map: TableMap, colWidths: any[], table: ProsemirrorNod
 }
 
 function findCell($pos: ResolvedPos) {
-    return TableMap.get($pos.node(-2)).findCell($pos.pos - $pos.start(-2));
+    let d = $pos.depth;
+    for (; d > 0; d--) {
+        if ($pos.node(d).type.spec.tableRole == "table") {
+            break;
+        }
+    }
+    return TableMap.get($pos.node(d)).findCell($pos.pos - $pos.start(d));
 }
 
 function findNextCell($cell: ResolvedPos, dir: number) {
+    let d = $cell.depth;
+    for (; d > 0; d--) {
+        if ($cell.node(d).type.spec.tableRole == "table") {
+            break;
+        }
+    }
     if (dir < 0) {
         const before = $cell.nodeBefore;
         if (before) {
@@ -1594,7 +1667,7 @@ function findNextCell($cell: ResolvedPos, dir: number) {
             }
             rowEnd -= rowNode.nodeSize;
         }
-        const head = $cell.node(-2).firstChild;
+        const head = $cell.node(d).firstChild;
         if (head && head != $cell.node(-1)) {
             const rowNode = head.lastChild;
             if (rowNode && rowNode.childCount) {
@@ -1614,7 +1687,7 @@ function findNextCell($cell: ResolvedPos, dir: number) {
             }
             rowStart += rowNode.nodeSize;
         }
-        const body = $cell.node(-2).lastChild;
+        const body = $cell.node(d).lastChild;
         if (body && body != $cell.node(-1)) {
             const rowNode = body.firstChild;
             if (rowNode && rowNode.childCount) {
@@ -1907,7 +1980,7 @@ function handleColumnResizeMouseDown(
         }
     }
     function move(event: MouseEvent) {
-        if (!event.which) {
+        if (!event.button) {
             return finish(event);
         }
         const pluginState = columnResizingKey.getState(view.state) as ResizeState;
@@ -2050,14 +2123,27 @@ function handlePaste(
                 rows: [Fragment.from(fitSlice(view.state.schema.nodes.table_cell, slice))]
             };
         }
-        const table = sel.$anchorCell.node(-2), start = sel.$anchorCell.start(-2);
+        let d = sel.$anchorCell.depth;
+        for (; d > 0; d--) {
+            if (sel.$anchorCell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const table = sel.$anchorCell.node(d), start = sel.$anchorCell.start(d);
         const rect = TableMap.get(table).rectBetween(sel.$anchorCell.pos - start, sel.$headCell.pos - start);
         cells = clipCells(cells, rect.right - rect.left, rect.bottom - rect.top);
         insertCells(view.state, view.dispatch, start, rect, cells);
         return true;
     } else if (cells) {
-        const $cell = selectionCell(view.state)!, start = $cell.start(-2);
-        insertCells(view.state, view.dispatch, start, TableMap.get($cell.node(-2)).findCell($cell.pos - start), cells);
+        const $cell = selectionCell(view.state)!;
+        let d = $cell.depth;
+        for (; d > 0; d--) {
+            if ($cell.node(d).type.spec.tableRole == "table") {
+                break;
+            }
+        }
+        const start = $cell.start(d);
+        insertCells(view.state, view.dispatch, start, TableMap.get($cell.node(d)).findCell($cell.pos - start), cells);
         return true;
     } else {
         return false;
@@ -2074,7 +2160,13 @@ function handleTripleClick(view: EditorView, pos: number) {
 }
 
 function inSameTable($a: ResolvedPos, $b: ResolvedPos) {
-    return $a.depth == $b.depth && $a.pos >= $b.start(-2) && $a.pos <= $b.end(-2);
+    let d = $b.depth;
+    for (; d > 0; d--) {
+        if ($b.node(d).type.spec.tableRole == "table") {
+            break;
+        }
+    }
+    return $a.depth == $b.depth && $a.pos >= $b.start(d) && $a.pos <= $b.end(d);
 }
 
 function insertCells(
@@ -2298,7 +2390,16 @@ function moveCellForward($pos: ResolvedPos) {
 }
 
 function nextCell($pos: ResolvedPos, axis: string, dir: number) {
-    const start = $pos.start(-2), map = TableMap.get($pos.node(-2));
+    let d = $pos.depth;
+    for (; d > 0; d--) {
+        if ($pos.node(d).type.spec.tableRole == "table") {
+            break;
+        }
+    }
+    if ($pos.node(d).type.spec.tableRole !== "table") {
+        return null;
+    }
+    const start = $pos.start(d), map = TableMap.get($pos.node(d));
     const moved = map.nextCell($pos.pos - start, axis, dir);
     return moved == null
         ? null
@@ -2468,7 +2569,13 @@ function rowIsHeader(map: TableMap, table: ProsemirrorNode, row: number) {
 
 function selectedRect(state: EditorState) {
     const sel = state.selection, $pos = selectionCell(state)!;
-    const table = $pos.node(-2), tableStart = $pos.start(-2), map = TableMap.get(table);
+    let d = $pos.depth;
+    for (; d > 0; d--) {
+        if ($pos.node(d).type.spec.tableRole == "table") {
+            break;
+        }
+    }
+    const table = $pos.node(d), tableStart = $pos.start(d), map = TableMap.get(table);
     let rect: SelectedRect;
     if (sel instanceof CellSelection) {
         rect = map.rectBetween(sel.$anchorCell.pos - tableStart, sel.$headCell.pos - tableStart) as SelectedRect;
@@ -2477,7 +2584,7 @@ function selectedRect(state: EditorState) {
     }
     rect.map = map;
     rect.table = table;
-    rect.tableDepth = $pos.depth - 2;
+    rect.tableDepth = d;
     rect.tableStart = tableStart;
     return rect;
 }
@@ -2527,11 +2634,11 @@ function shiftArrow(axis: string, dir: number): Command {
     return (state, dispatch, view) => {
         let sel = state.selection;
         if (!(sel instanceof CellSelection)) {
-            const end = atEndOfCell(view!, axis, dir);
-            if (end == null) {
+            const $end = atEndOfCell(view!, axis, dir);
+            if ($end == null) {
                 return false;
             }
-            sel = new CellSelection(state.doc.resolve(end));
+            sel = new CellSelection($end);
         }
         const $head = nextCell((sel as CellSelection).$headCell, axis, dir);
         if (!$head) {

@@ -26,9 +26,9 @@ import {
     htmlWrapCommand,
     schema,
     ParamStateCommand,
-    wrapCommand
+    wrapCommand,
+    renderer
 } from './_schemas';
-import { DOMSerializer } from 'prosemirror-model';
 
 declare class TextNode extends ProsemirrorNode {
     /**
@@ -197,13 +197,18 @@ markdownCommands[CommandType.InsertLink] = params => {
             text += ` "${title.replace(/"/g, '\\"')}"`;
         }
         text += ")";
-        target.dispatch(target.state.update(target.state.changeByRange(range => ({
-            range: EditorSelection.range(range.from + 1, range.to + 1),
-            changes: [
-                { from: range.from, insert: "[" },
-                { from: range.to, insert: "</a>" },
-            ],
-        }))));
+
+        if (target.state.selection.ranges.some(x => !x.empty)) {
+            target.dispatch(target.state.update(target.state.changeByRange(range => ({
+                range: EditorSelection.range(range.from + 1, range.to + 1),
+                changes: [
+                    { from: range.from, insert: "[" },
+                    { from: range.to, insert: text },
+                ],
+            }))));
+        } else {
+            target.dispatch(target.state.update(target.state.replaceSelection("[" + (title || href) + text)));
+        }
         return true;
     }
 };
@@ -231,12 +236,19 @@ markdownCommands[CommandType.AlignLeft] = setStyleCommand('text-align', 'left');
 markdownCommands[CommandType.AlignCenter] = setStyleCommand('text-align', 'center');
 markdownCommands[CommandType.AlignRight] = setStyleCommand('text-align', 'right');
 markdownCommands[CommandType.PageBreak] = setStyleCommand('page-break-after', 'always');
+markdownCommands[CommandType.Emoji] = params => (target: {
+    state: EditorState;
+    dispatch: (transaction: Transaction) => void;
+}) => {
+    target.dispatch(target.state.update(target.state.replaceSelection(params && params.length && params[0] && params[0].length ? params[0] : '')));
+    return true;
+};
 
 const container_plugin = function (md: MarkdownIt) {
     const min_markers = 3,
           marker_char = 0x3A/* : */;
 
-    function renderDefault(tokens: Token[], idx: number, options: MarkdownIt.Options, env: any, self: Renderer) {
+    function renderDefault(tokens: Token[], idx: number, options: MarkdownIt.Options, _env: any, self: Renderer) {
         // add a class to the opening tag
         if (tokens[idx].nesting === 1) {
             const className = tokens[idx].info.split(' ', 2)[0];
@@ -722,7 +734,7 @@ class MarkdownParseState {
                 const isClose = token.content.startsWith('</');
                 let tag: string;
                 if (isClose) {
-                    tag = token.content.substr(2, token.content.length - 3);
+                    tag = token.content.substring(2, token.content.length - 1);
                 } else {
                     const spaceIndex = token.content.indexOf(' ');
                     const closeIndex = token.content.indexOf('>');
@@ -732,7 +744,7 @@ class MarkdownParseState {
                             ? spaceIndex
                             : Math.min(spaceIndex, closeIndex);
                     if (endIndex == -1) {
-                        tag = token.content.substr(1, token.content.length - 2);
+                        tag = token.content.substring(1, token.content.length - 1);
                     } else {
                         tag = token.content.substring(1, endIndex);
                     }
@@ -912,9 +924,6 @@ type MarkSerializerSpec = {
     escape?: boolean
 }
 
-const htmlSerializer = DOMSerializer
-    .fromSchema(schema);
-
 class MarkdownSerializerState {
     out: string = "";
 
@@ -1016,7 +1025,7 @@ class MarkdownSerializerState {
             return;
         }
 
-        const dom = htmlSerializer.serializeNode(node);
+        const dom = renderer.serializeNode(node);
         if (dom instanceof HTMLElement) {
             this.write(dom.outerHTML);
         } else if (dom.textContent) {
@@ -1037,7 +1046,7 @@ class MarkdownSerializerState {
     renderInline(parent: ProsemirrorNode) {
         const active: Mark[] = [];
         let trailing = "";
-        const progress = (node: ProsemirrorNode | null, offset: number, index: number) => {
+        const progress = (node: ProsemirrorNode | null, _offset: number, index: number) => {
             let marks = node ? node.marks : [];
 
             // Remove marks from `hard_break` that are the last node inside

@@ -1,12 +1,12 @@
 ﻿.select {
+    --field-active-label-color: var(--tavenem-color-primary);
+
     > tf-input > .expand {
         transition: .3s cubic-bezier(.25,.8,.5,1);
     }
 
-    &.open, &[data-popover-open] {
-        > tf-input > .expand {
-            transform: rotate(-180deg);
-        }
+    :has(> tf-popover.select-popover:popover-open) > tf-input > .expand {
+        transform: rotate(-180deg);
     }
 
     &.read-only, &[readonly], &[inert], [inert] & {
@@ -14,7 +14,7 @@
         pointer-events: none;
     }
 
-    > tf-popover.contained-popover > .option-list {
+    > tf-popover.select-popover > .option-list {
         > * > .selected-icon {
             visibility: hidden;
         }
@@ -28,7 +28,7 @@
         }
     }
 
-    &[multiple] > tf-popover.contained-popover > .option-list {
+    &[multiple] > tf-popover.select-popover > .option-list {
         > * > .selected-icon {
             display: none;
         }
@@ -44,5 +44,21 @@
         > .active > .unselected-icon {
             display: none;
         }
+    }
+
+    &.primary:not(.invalid, .disabled, [inert]),
+    &.secondary:not(.invalid, .disabled, [inert]),
+    &.tertiary:not(.invalid, .disabled, [inert]),
+    &.danger:not(.invalid, .disabled, [inert]),
+    &.dark:not(.invalid, .disabled, [inert]),
+    &.default:not(.invalid, .disabled, [inert]),
+    &.info:not(.invalid, .disabled, [inert]),
+    &.success:not(.invalid, .disabled, [inert]),
+    &.warning:not(.invalid, .disabled, [inert]) {
+        --field-active-label-color: var(--tavenem-theme-color);
+    }
+
+    &.invalid {
+        --field-active-label-color: var(--tavenem-color-error);
     }
 }

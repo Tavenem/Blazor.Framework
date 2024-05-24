@@ -59,7 +59,7 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="w-100">
-                <Editor Syntax="EditorSyntax.HTML" @bind-Value="_value2" UpdateOnInput="true" Label="On Input" />
+                <Editor @bind-Value="_value2" UpdateOnInput="true" Label="On Input" />
                 <div>Bound value:</div>
                 <div>@_value2</div>
                 <button @onclick="@(_ => _value2 = "updated")">Update</button>
@@ -147,7 +147,7 @@
         </div>
     </TitleContent>
     <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Editor Label=""JavaScript"" LockSyntax=""false"" />")
+        @CodeFormatter.CodeToMarkup(@"<Editor LockSyntax=""false"" />")
     </ChildContent>
 </Collapse>
 
@@ -169,7 +169,7 @@
 <p>
     Both HTML and Markdown syntax offer a <abbr title="what you see is what you get">WYSIWYG</abbr>
     mode (enabled by default). You can set the initial mode with the <code>EditorMode</code>
-    property, and change it programmatically with the <code>SetModeAync</code> method.
+    property, and change it programmatically with the <code>SetModeAsync</code> method.
 </p>
 
 <Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

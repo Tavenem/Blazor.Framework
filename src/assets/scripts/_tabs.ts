@@ -1,3 +1,5 @@
+import { documentPositionComparator } from "./tavenem-utility";
+
 export class TavenemTabsHTMLElement extends HTMLElement {
     private _activating = false;
     private _mutationObserver: MutationObserver;
@@ -31,7 +33,7 @@ export class TavenemTabsHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const slot = document.createElement('slot');
         shadow.appendChild(slot);
@@ -66,7 +68,7 @@ export class TavenemTabsHTMLElement extends HTMLElement {
                 return;
             }
             const allTabs = Array.from(this.querySelectorAll<TavenemTabHTMLElement>('tf-tab'))
-                .sort(TavenemTabsHTMLElement.documentPositionComparator);
+                .sort(documentPositionComparator);
             const tab = allTabs.length > index
                 ? allTabs[index]
                 : null;
@@ -128,7 +130,7 @@ export class TavenemTabsHTMLElement extends HTMLElement {
 
         if (activated) {
             const allTabs = Array.from(this.querySelectorAll<Element>('tf-tab'))
-                .sort(TavenemTabsHTMLElement.documentPositionComparator);
+                .sort(documentPositionComparator);
             const activatedIndex = allTabs.findIndex(x => x.id === id);
             if (activatedIndex >= 0) {
                 const activatedIndexString = activatedIndex.toString();
@@ -141,27 +143,11 @@ export class TavenemTabsHTMLElement extends HTMLElement {
         }
 
         const tabs = Array.from(this.querySelectorAll<Element>('tf-tab[id]:not([disabled])'))
-            .sort(TavenemTabsHTMLElement.documentPositionComparator);
+            .sort(documentPositionComparator);
         if (tabs.length === 0) {
             return;
         }
         this.activate(tabs[0].id);
-    }
-
-    private static documentPositionComparator(a: Node, b: Node) {
-        if (a === b) {
-            return 0;
-        }
-
-        var position = a.compareDocumentPosition(b);
-
-        if (position & Node.DOCUMENT_POSITION_FOLLOWING || position & Node.DOCUMENT_POSITION_CONTAINED_BY) {
-            return -1;
-        } else if (position & Node.DOCUMENT_POSITION_PRECEDING || position & Node.DOCUMENT_POSITION_CONTAINS) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 
     private onKeyDown(event: KeyboardEvent) {
@@ -182,7 +168,7 @@ export class TavenemTabsHTMLElement extends HTMLElement {
         }
 
         const allTabs = Array.from(this.querySelectorAll<TavenemTabHTMLElement>('tf-tab'))
-            .sort(TavenemTabsHTMLElement.documentPositionComparator);
+            .sort(documentPositionComparator);
         const enabledTabs = allTabs.filter(x => !x.hasAttribute('disabled'));
         if (enabledTabs.length === 0) {
             return;
@@ -228,7 +214,7 @@ export class TavenemTabHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const slot = document.createElement('slot');
         shadow.appendChild(slot);
@@ -385,7 +371,7 @@ export class TavenemTabPanelHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const slot = document.createElement('slot');
         shadow.appendChild(slot);

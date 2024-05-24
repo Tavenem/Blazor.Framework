@@ -16,6 +16,7 @@ import { TavenemPickerHtmlElement } from './_picker';
 import { TavenemSelectInputHtmlElement } from './_select';
 import { TavenemColorInputHtmlElement } from './_color-input';
 import { TavenemDateTimeInputHtmlElement } from './_datetime';
+import { TavenemEditorHtmlElement } from './tavenem-editor';
 import {
     TavenemProgressCircleHTMLElement,
     TavenemProgressLinearHTMLElement
@@ -27,11 +28,11 @@ import {
     TavenemTabPanelHTMLElement,
     TavenemTabsHTMLElement,
 } from './_tabs';
-
-enum ThemePreference {
-    Light = 1,
-    Dark = 2,
-}
+import {
+    getNativePreferredColorScheme,
+    getPreferredTavenemColorScheme,
+    ThemePreference,
+} from './_theme';
 
 interface BlazorEvent extends Event { }
 
@@ -67,31 +68,6 @@ namespace Tavenem {
         registerTavenemComponents();
         initializeTavenemColorScheme();
         TavenemPopover.initialize();
-    }
-
-    function getNativeTavenemPreferredColorScheme(): ThemePreference {
-        if (window.matchMedia) {
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                return ThemePreference.Dark;
-            } else {
-                return ThemePreference.Light;
-            }
-        }
-
-        return ThemePreference.Light;
-    }
-
-    function getPreferredTavenemColorScheme(): ThemePreference {
-        const local = localStorage.getItem('tavenem-theme');
-        if (local) {
-            const theme = parseInt(local);
-            if (theme == ThemePreference.Light
-                || theme == ThemePreference.Dark) {
-                return theme;
-            }
-        }
-
-        return getNativeTavenemPreferredColorScheme();
     }
 
     function initializeTavenemColorScheme() {
@@ -482,7 +458,7 @@ slot button {
             }
 
             private change() {
-                const preferred = getNativeTavenemPreferredColorScheme();
+                const preferred = getNativePreferredColorScheme();
 
                 let newTheme: ThemePreference;
                 const local = localStorage.getItem('tavenem-theme');
@@ -661,6 +637,8 @@ slot button {
 
         customElements.define('tf-emoji-input', TavenemEmojiPickerHTMLElement);
 
+        customElements.define('tf-editor', TavenemEditorHtmlElement);
+
         customElements.define('tf-slider', TavenemSliderHTMLElement);
 
         customElements.define('tf-syntax-highlight', TavenemHighlightHTMLElement);
@@ -693,7 +671,7 @@ slot button {
             document.documentElement.dataset.theme = 'light';
         }
 
-        if (theme == getNativeTavenemPreferredColorScheme()) {
+        if (theme == getNativePreferredColorScheme()) {
             localStorage.removeItem('tavenem-theme');
         } else {
             localStorage.setItem('tavenem-theme', theme.toString());
