@@ -8,19 +8,15 @@
 }
 
 <tf-tooltip id="@Id"
+            data-anchor-origin="@AnchorOrigin"
+            data-arrow="@Arrow"
+            data-container-no-trigger="@(!IsContainerTrigger)"
             data-delay="@(Delay == 0 ? null : Delay)"
             data-dismiss-on-tap="@DismissOnTap"
-            data-tooltip-button="@IsButton"
-            data-tooltip-container-trigger="@IsContainerTrigger">
-    <Popover AdditionalAttributes="AdditionalAttributes"
-             AnchorOrigin="AnchorOrigin"
-             Class="@CssClass"
-             DismissOnTapOutside="true"
-             FlipBehavior="FlipBehavior.Flip_Always"
-             MaxHeight="@MaxHeight"
-             PopoverOrigin="PopoverOrigin"
-             Style="@CssStyle"
-             ThemeColor="ThemeColor">
-        @ChildContent
-    </Popover>
+            data-max-height="@MaxHeight"
+            data-popover-class="@CssClass"
+            data-popover-origin="@PopoverOrigin"
+            data-popover-style="@CssStyle"
+            data-tooltip-button="@IsButton">
+    @ChildContent
 </tf-tooltip>

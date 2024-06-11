@@ -206,17 +206,52 @@ slot {
 }
 
 export class TavenemEmojiPickerHTMLElement extends TavenemPickerHtmlElement {
+    static formAssociated = true;
+
     private _categorizedEmoji: Record<string, Emoji[]> = {};
     private _filteredEmoji: Record<string, Emoji[]> = {};
+    private _internals: ElementInternals;
     private _latestEmoji: Emoji[] = [];
     private _skinTone1 = 0;
     private _skinTone2 = 0;
+    private _value = '';
 
     static get observedAttributes() {
-        return ['disabled', 'readonly', 'value'];
+        return ['readonly', 'value'];
+    }
+
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
     }
 
     async connectedCallback() {
+        this.dataset.popoverContainer = '';
+
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
@@ -648,7 +683,7 @@ button::-moz-focus-inner {
     display: inline-flex;
 }
 
-:host([disabled]),
+:host(:disabled),
 :host([readonly]),
 :host([required]),
 :host([empty]) {
@@ -701,7 +736,7 @@ button::-moz-focus-inner {
 `;
         shadow.appendChild(style);
 
-        const anchorId = this.dataset.inputId || randomUUID();
+        const anchorId = randomUUID();
 
         const button = document.createElement('button');
         button.type = 'button';
@@ -728,15 +763,13 @@ button::-moz-focus-inner {
         button.appendChild(slot);
 
         const input = document.createElement('input');
-        input.classList.add('picker-value');
+        input.classList.add('input');
         input.hidden = true;
         input.readOnly = true;
-        if (this.hasAttribute('name')) {
-            input.name = this.getAttribute('name') || '';
-        }
         input.disabled = this.hasAttribute('disabled');
         if (this.hasAttribute('value')) {
-            input.value = this.getAttribute('value') || '';
+            input.value = this._value = this.getAttribute('value') || '';
+            this._internals.setFormValue(this._value);
         }
 
         shadow.appendChild(input);
@@ -771,17 +804,8 @@ button::-moz-focus-inner {
             categoryIcon.outerHTML = emojiCategories[i].svg;
 
             const categoryTooltip = document.createElement('tf-tooltip');
-            categoryTooltip.dataset.delay = '750';
-            categoryTooltip.dataset.popoverContainer = '';
-            categoryTooltip.dataset.tooltipContainerTrigger = '';
+            categoryTooltip.textContent = emojiCategories[i].name;
             categoryButton.appendChild(categoryTooltip);
-
-            const categoryTooltipPopover = document.createElement('tf-popover');
-            categoryTooltipPopover.classList.add('top-center', 'anchor-bottom-center', 'flip-onopen', 'tooltip', 'arrow');
-            categoryTooltipPopover.style.transitionDelay = '750ms';
-            categoryTooltipPopover.tabIndex = 0;
-            categoryTooltipPopover.textContent = emojiCategories[i].name;
-            categoryTooltip.appendChild(categoryTooltipPopover);
         }
 
         const searchBar = document.createElement('div');
@@ -815,17 +839,8 @@ button::-moz-focus-inner {
         skinToneIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
 
         const skinToneTooltip = document.createElement('tf-tooltip');
-        skinToneTooltip.dataset.delay = '750';
-        skinToneTooltip.dataset.popoverContainer = '';
-        skinToneTooltip.dataset.tooltipContainerTrigger = '';
+        skinToneTooltip.textContent = 'Select skin tone(s)';
         skinTonesButton.appendChild(skinToneTooltip);
-
-        const skinToneTooltipPopover = document.createElement('tf-popover');
-        skinToneTooltipPopover.classList.add('top-center', 'anchor-bottom-center', 'flip-onopen', 'tooltip', 'arrow');
-        skinToneTooltipPopover.style.transitionDelay = '750ms';
-        skinToneTooltipPopover.tabIndex = 0;
-        skinToneTooltipPopover.textContent = 'Select skin tone(s)';
-        skinToneTooltip.appendChild(skinToneTooltipPopover);
 
         const skinTonePopover = document.createElement('tf-popover');
         skinTonePopover.classList.add('skin-tone-popover', 'top-center', 'anchor-bottom-center', 'flip-onopen', 'filled');
@@ -967,72 +982,7 @@ button::-moz-focus-inner {
         if (newValue == oldValue) {
             return;
         }
-        if (name === 'disabled') {
-            const root = this.shadowRoot;
-            if (!root) {
-                return;
-            }
-
-            const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
-            if (input) {
-                if (newValue) {
-                    input.setAttribute('disabled', '');
-                } else {
-                    input.removeAttribute('disabled');
-                }
-            }
-
-            const categoryButtons = root.querySelectorAll('.category-button');
-            categoryButtons.forEach(x => {
-                if (x instanceof HTMLButtonElement) {
-                    if (newValue) {
-                        x.disabled = true;
-                    } else {
-                        x.disabled = false;
-                    }
-                }
-            });
-
-            const searchInput = root.querySelector('.search') as HTMLInputElement;
-            if (searchInput) {
-                if (newValue) {
-                    searchInput.disabled = true;
-                } else {
-                    searchInput.disabled = false;
-                }
-            }
-
-            const skinToneButton = root.querySelector('.skin-tones-button') as HTMLButtonElement;
-            if (skinToneButton) {
-                if (newValue) {
-                    skinToneButton.disabled = true;
-                } else {
-                    skinToneButton.disabled = this.hasAttribute('readonly');
-                }
-            }
-
-            const emojiButtons = root.querySelectorAll('.emoji-button');
-            emojiButtons.forEach(x => {
-                if (x instanceof HTMLButtonElement) {
-                    if (newValue) {
-                        x.disabled = true;
-                    } else {
-                        x.disabled = this.hasAttribute('readonly');
-                    }
-                }
-            });
-
-            const clearButton = root.querySelector('.emoji-clear') as HTMLButtonElement;
-            if (clearButton) {
-                if (newValue) {
-                    clearButton.disabled = true;
-                } else {
-                    clearButton.disabled = this.hasAttribute('readonly');
-                }
-            }
-
-            this.setOpen(false);
-        } else if (name === 'readonly') {
+        if (name === 'readonly') {
             const root = this.shadowRoot;
             if (!root) {
                 return;
@@ -1043,7 +993,7 @@ button::-moz-focus-inner {
                 if (newValue) {
                     skinToneButton.disabled = true;
                 } else {
-                    skinToneButton.disabled = this.hasAttribute('disabled');
+                    skinToneButton.disabled = this.matches(':disabled');
                 }
             }
 
@@ -1053,7 +1003,7 @@ button::-moz-focus-inner {
                     if (newValue) {
                         x.disabled = true;
                     } else {
-                        x.disabled = this.hasAttribute('disabled');
+                        x.disabled = this.matches(':disabled');
                     }
                 }
             });
@@ -1063,7 +1013,7 @@ button::-moz-focus-inner {
                 if (newValue) {
                     clearButton.disabled = true;
                 } else {
-                    clearButton.disabled = this.hasAttribute('disabled');
+                    clearButton.disabled = this.matches(':disabled');
                 }
             }
 
@@ -1074,15 +1024,114 @@ button::-moz-focus-inner {
         }
     }
 
+    formDisabledCallback(disabled: boolean) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
+        if (input) {
+            if (disabled) {
+                input.setAttribute('disabled', '');
+            } else {
+                input.removeAttribute('disabled');
+            }
+        }
+
+        const categoryButtons = root.querySelectorAll('.category-button');
+        categoryButtons.forEach(x => {
+            if (x instanceof HTMLButtonElement) {
+                if (disabled) {
+                    x.disabled = true;
+                } else {
+                    x.disabled = false;
+                }
+            }
+        });
+
+        const searchInput = root.querySelector('.search') as HTMLInputElement;
+        if (searchInput) {
+            if (disabled) {
+                searchInput.disabled = true;
+            } else {
+                searchInput.disabled = false;
+            }
+        }
+
+        const skinToneButton = root.querySelector('.skin-tones-button') as HTMLButtonElement;
+        if (skinToneButton) {
+            if (disabled) {
+                skinToneButton.disabled = true;
+            } else {
+                skinToneButton.disabled = this.hasAttribute('readonly');
+            }
+        }
+
+        const emojiButtons = root.querySelectorAll('.emoji-button');
+        emojiButtons.forEach(x => {
+            if (x instanceof HTMLButtonElement) {
+                if (disabled) {
+                    x.disabled = true;
+                } else {
+                    x.disabled = this.hasAttribute('readonly');
+                }
+            }
+        });
+
+        const clearButton = root.querySelector('.emoji-clear') as HTMLButtonElement;
+        if (clearButton) {
+            if (disabled) {
+                clearButton.disabled = true;
+            } else {
+                clearButton.disabled = this.hasAttribute('readonly');
+            }
+        }
+
+        this.setOpen(false);
+    }
+
+    formResetCallback() {
+        if (this.hasAttribute('value')) {
+            this._value = this.getAttribute('value') || '';
+            this._internals.setFormValue(this._value);
+        } else {
+            this._value = '';
+            this._internals.setFormValue(null);
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<HTMLInputElement>('.input');
+        if (input) {
+            input.value = this._value;
+        }
+    }
+
+    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+        if (typeof state === 'string') {
+            this.setValue(state);
+        } else if (state == null) {
+            this.clear();
+        }
+    }
+
+    checkValidity() { return this._internals.checkValidity(); }
+
+    reportValidity() { return this._internals.reportValidity(); }
+
     protected clear() {
-        this.removeAttribute('value');
+        this._value = '';
+        this._internals.setFormValue(null);
 
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
         if (input) {
             input.value = '';
         }
@@ -1258,7 +1307,7 @@ button::-moz-focus-inner {
             return;
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
         if (input) {
             input.value = value;
         }
@@ -1490,14 +1539,15 @@ button::-moz-focus-inner {
             return;
         }
 
-        this.setAttribute('value', value);
+        this._value = value;
+        this._internals.setFormValue(value);
 
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
         if (input) {
             input.value = value;
         }

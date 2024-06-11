@@ -112,11 +112,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     public TValue? InitialValue { get; private set; }
 
     /// <summary>
-    /// Custom HTML attributes for the input element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
-
-    /// <summary>
     /// Custom CSS class(es) for the inner input element (may be a hidden element).
     /// </summary>
     [Parameter] public string? InputClass { get; set; }
@@ -355,16 +350,12 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// <summary>
     /// The final value assigned to the input element's class attribute, including component values.
     /// </summary>
-    protected virtual string? InputCssClass => new CssBuilder(InputClass)
-        .AddClassFromDictionary(InputAttributes)
-        .ToString();
+    protected virtual string? InputCssClass => InputClass;
 
     /// <summary>
     /// The final value assigned to the input element's style attribute.
     /// </summary>
-    protected virtual string? InputCssStyle => new CssBuilder(InputStyle)
-        .AddStyleFromDictionary(InputAttributes)
-        .ToString();
+    protected virtual string? InputCssStyle => InputStyle;
 
     /// <summary>
     /// <para>

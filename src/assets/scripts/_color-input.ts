@@ -2,6 +2,7 @@ import { TavenemPopoverHTMLElement } from './_popover'
 import { TavenemInputHtmlElement } from './_input'
 import { TavenemPickerHtmlElement } from './_picker'
 import { randomUUID } from './tavenem-utility'
+import { TavenemInputFieldHtmlElement } from './_input-field';
 
 const halfSelectorSize = 13;
 const overlayHeight = 250;
@@ -23,12 +24,46 @@ interface RGBA {
 }
 
 export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
+    static formAssociated = true;
+
+    private _initialValue = '';
+    private _internals: ElementInternals;
     private _overlayActive = false;
     private _selectorX = 0;
     private _selectorY = overlayHeight;
+    private _settingValue = false;
+    private _value = '';
+
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
 
     static get observedAttributes() {
-        return ['disabled', 'readonly', 'value'];
+        return ['readonly', 'value'];
+    }
+
+    constructor() {
+        super();
+        this._internals = this.attachInternals();
     }
 
     connectedCallback() {
@@ -39,84 +74,94 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     position: relative;
 }
 
+* {
+    font-family: var(--tavenem-font-family);
+}
+
+svg {
+    fill: currentColor;
+    flex-shrink: 0;
+    height: 1em;
+    width: auto;
+}
+
 :host([button]) {
     margin: 0;
 }
 
 :host(:not([button])) {
-    min-width: 255px;
-}
-
-input {
-    border-radius: var(--tavenem-border-radius);
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-tf-input {
-    align-items: center;
-    border-color: var(--field-border-color);
-    border-radius: var(--tavenem-border-radius);
-    box-sizing: content-box;
-    color: var(--field-color);
-    column-gap: 8px;
-    cursor: text;
-    display: inline-flex;
+    --field-active-border-color: var(--tavenem-color-primary);
+    --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
+    --field-active-label-color: var(--tavenem-color-primary);
+    --field-border-color: var(--tavenem-color-border-input);
+    --field-border-hover-color: var(--tavenem-color-action);
+    --field-color: var(--tavenem-color-text);
+    --field-label-color: var(--tavenem-color-text-secondary);
+    border: none !important;
+    color: var(--tavenem-color-text);
+    display: flex;
+    flex-basis: auto;
+    flex-direction: column;
     flex-grow: 1;
+    flex-shrink: 1;
+    margin-bottom: .5rem;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1rem;
+    max-width: 100%;
+    min-width: 255px;
+    padding: 0;
+    position: relative;
+    vertical-align: top;
+}
+
+:host(:focus-within:not([button])) {
+    --field-border-color: var(--field-active-border-color);
+    --field-border-hover-color: var(--field-active-border-hover-color);
+}
+
+:host > label {
+    color: var(--field-label-color);
+    display: block;
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
-    line-height: 1.1875rem;
-    min-height: 1.1875rem;
-    padding-bottom: 7px;
-    padding-top: 6px;
-    position: relative;
-    transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    left: 0;
+    line-height: 1;
+    padding: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transform: translate(0, calc(1.25rem + 11px)) scale(1);
+    transform-origin: top left;
+    transition: color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    z-index: 0;
 
-    &[disabled] {
-        border-color: var(--tavenem-color-action-disabled);
-    }
-
-    input {
-        appearance: none;
-        background: none;
-        border: 0;
-        box-shadow: none;
-        box-sizing: content-box;
-        color: currentColor;
-        display: block;
-        font: inherit;
-        height: 1.1875rem;
-        margin: 0;
-        min-height: calc(1.25rem + 10px);
-        min-width: 0;
-        padding: 0;
-        position: relative;
-        width: 100%;
-        -webkit-tap-highlight-color: transparent;
-
-        &:focus {
-            outline: 0;
-        }
-
-        &:disabled {
-            opacity: 1;
-        }
-
-        &:-webkit-autofill {
-            border-radius: inherit;
-        }
-    }
-
-    > .expand {
-        cursor: pointer;
-        transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
-    }
-
-    svg {
-        min-height: 1.5em;
+    *[dir="rtl"] & {
+        left: unset;
+        right: 0;
+        transform-origin: top right;
     }
 }
 
-:host(:not(.filled, .outlined, .no-label)) > tf-input {
+:host([required]) > label:after {
+    color: var(--tavenem-color-error);
+    content: " *";
+}
+
+:host([inert]) {
+    --field-border-color: var(--tavenem-color-action-disabled);
+}
+
+tf-input > .expand {
+    cursor: pointer;
+    transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+}
+
+tf-input svg {
+    min-height: 1.5em;
+}
+
+:host(:not(.filled, .outlined)) > tf-input:has(~ label) {
     margin-top: 1rem;
 }
 
@@ -135,42 +180,59 @@ tf-input {
     }
 }
 
-:host(:not(.outlined, [disabled], [readonly])) > tf-input:hover:before {
+:host(:not(.outlined, :disabled, [readonly], [inert])) > tf-input:hover:before {
     border-bottom-color: var(--field-border-hover-color);
 }
 
-:host(.filled) > tf-input {
-    background-color: rgba(0, 0, 0, 0.09);
-    border-top-left-radius: var(--tavenem-border-radius);
-    border-top-right-radius: var(--tavenem-border-radius);
-    padding-bottom: 10px;
-    padding-left: 12px;
-    padding-right: 12px;
-    padding-top: calc(1rem + 11px);
-    position: relative;
-    transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+:host(.filled) {
+    background-color: transparent !important;
+    color: var(--tavenem-color-text) !important;
 
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.13);
+    > tf-input {
+        background-color: rgba(0, 0, 0, 0.09);
+        border-top-left-radius: var(--tavenem-border-radius);
+        border-top-right-radius: var(--tavenem-border-radius);
+        padding-bottom: 10px;
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: calc(1rem + 11px);
+        position: relative;
+        transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.13);
+        }
+
+        &:disabled,
+        &[inert],
+        [inert] & {
+            background-color: rgba(0, 0, 0, 0.12);
+        }
+
+        input:-webkit-autofill {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+        }
     }
 
-    &[disabled] {
-        background-color: rgba(0, 0, 0, 0.12);
+    > label {
+        pointer-events: none;
+        transform: translate(12px, calc(1.25rem + 16px)) scale(1);
+        z-index: 1;
+
+        *[dir="rtl"] & {
+            transform: translate(-12px, calc(1.25rem + 16px)) scale(1);
+        }
     }
 
-    input:-webkit-autofill {
-        border-top-left-radius: inherit;
-        border-top-right-radius: inherit;
+    > .field-helpers {
+        padding-left: 12px;
+        padding-right: 12px;
     }
 }
 
-:host(.filled.no-label) > tf-input {
+:host(.filled) > tf-input:not(:has(~ label)) {
     padding-top: 11px;
-}
-
-:host(.filled) > .field-helpers {
-    padding-left: 12px;
-    padding-right: 12px;
 }
 
 :host(.outlined) > tf-input {
@@ -183,39 +245,99 @@ tf-input {
     padding-top: calc(.5rem + 2.5px);
 }
 
+:host(.outlined) > label {
+    background-color: var(--tavenem-color-bg-alt);
+    padding: 0px 5px;
+    pointer-events: none;
+    transform: translate(14px, calc(.75rem + 7.5px)) scale(1);
+
+    *[dir="rtl"] & {
+        transform: translate(-14px, calc(.75rem + 7.5px)) scale(1);
+    }
+}
+
 :host(.outlined) > .field-helpers {
     padding-left: 8px;
     padding-right: 8px;
 }
 
-:host(.outlined.no-label),
-.field > tf-input {
+:host(.outlined) > tf-input:not(:has(~ label)) {
     padding-bottom: 2.5px;
     padding-top: 2.5px;
 }
 
-:host(:not([disabled], [readonly])):focus-within {
+:host(:focus-within:not(:disabled, [readonly], [inert])) {
     --field-border-color: var(--field-active-border-color);
     --field-border-hover-color: var(--field-active-border-hover-color);
 }
 
-:host(:not([disabled], [readonly])) > tf-input:hover {
+:host(:not(:disabled, [readonly], [inert])) > tf-input:hover {
     border-color: var(--field-border-hover-color);
 }
 
-:host(.dense) > tf-input {
-    padding-top: 3px;
-    padding-bottom: 3px;
+:host([inline]:not(.filled, .outlined)) > label,
+:host(:focus-within:not(.filled, .outlined)) > label,
+:host([placeholder]:not(.filled, .outlined)) > label,
+:host(:state(has-value):not(.filled, .outlined)) > label {
+    transform: translate(0, 1.5px) scale(.75);
 }
 
-:host(.dense.filled) > tf-input {
-    padding-bottom: 3px;
-    padding-left: 3px;
-    padding-right: 3px;
-    padding-top: calc(1rem + 4px);
+:host([inline].filled) > label,
+:host(.filled:focus-within) > label,
+:host([placeholder].filled) > label,
+:host(.filled:state(has-value)) > label {
+    transform: translate(12px, 10px) scale(.75);
 
-    button, svg {
-        margin-top: -4px;
+    *[dir="rtl"] & {
+        transform: translate(-12px, 10px) scale(.75);
+    }
+}
+
+:host([inline].outlined) > label,
+:host(.outlined:focus-within) > label,
+:host([placeholder].outlined) > label,
+:host(.outlined:state(has-value)) > label {
+    transform: translate(14px, -6px) scale(.75);
+
+    *[dir="rtl"] & {
+        transform: translate(-14px, -6px) scale(.75);
+    }
+}
+
+:host(.dense) {
+    margin-bottom: 2px;
+    margin-top: 3px;
+
+    > tf-input {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
+    > label {
+        transform: translate(0, calc(1.25rem + 8px)) scale(1);
+    }
+}
+
+:host(.dense.filled) {
+    --tavenem-field-input-button-margin-top: -7px;
+
+    > tf-input {
+        padding-bottom: 3px;
+        padding-left: 3px;
+        padding-right: 3px;
+        padding-top: calc(1rem + 4px);
+
+        button, svg {
+            margin-top: -4px;
+        }
+    }
+
+    > label {
+        transform: translate(3px, calc(1.25rem + 9px)) scale(1);
+
+        *[dir="rtl"] & {
+            transform: translate(-3px, calc(1.25rem + 9px)) scale(1);
+        }
     }
 }
 
@@ -226,61 +348,45 @@ tf-input {
     padding-top: calc(.5rem + 2.5px);
 }
 
-:host(.dense.outlined.no-label) > tf-input {
+:host(.dense.outlined) > label {
+    transform: translate(5px, calc(.75rem + 7.5px)) scale(1);
+
+    *[dir="rtl"] & {
+        transform: translate(-5px, calc(.75rem + 7.5px)) scale(1);
+    }
+}
+
+:host(.dense.outlined) > tf-input:not(:has(~ label)) {
     padding-bottom: 2.5px;
     padding-top: 2.5px;
 }
 
+:host([inline].dense:not(.filled, .outlined)) > label,
+:host(.dense:focus-within:not(.filled, .outlined)) > label,
+:host([placeholder].dense:not(.filled, .outlined)) > label,
+:host(.dense:not(.filled, .outlined):state(has-value)) > label {
+    transform: translate(0, 1.5px) scale(.75);
+}
 
-.field {
-    --field-border-color: var(--tavenem-color-border-input);
-    --field-border-hover-color: var(--tavenem-color-action);
-    --field-color: var(--tavenem-color-text);
-    border: 0;
-    color: var(--field-color);
-    display: flex;
-    flex-basis: auto;
-    flex-direction: column;
-    flex-grow: 1;
-    flex-shrink: 1;
-    margin: 0;
-    margin-bottom: 2px;
-    margin-top: 3px;
-    max-width: 100%;
-    padding: 0;
-    position: relative;
-    vertical-align: top;
+:host([inline].dense.filled) > label,
+:host(.dense.filled:focus-within) > label,
+:host([placeholder].dense.filled) > label,
+:host(.dense.filled:state(has-value)) > label {
+    transform: translate(3px, 4px) scale(.75);
 
-    &:focus-within {
-        --field-border-color: var(--field-active-border-color);
-        --field-border-hover-color: var(--field-active-border-hover-color);
+    *[dir="rtl"] & {
+        transform: translate(-3px, 4px) scale(.75);
     }
+}
 
-    > tf-input {
-        background-color: var(--tavenem-color-bg-alt);
-        border-style: solid;
-        border-width: 1px;
-        padding-bottom: 2.5px;
-        padding-left: 5px;
-        padding-right: 5px;
-        padding-top: 2.5px;
+:host([inline].dense.outlined) > label,
+:host(.dense.outlined:focus-within) > label,
+:host([placeholder].dense.outlined) > label,
+:host(.dense.outlined:state(has-value)) > label {
+    transform: translate(5px, -6px) scale(.75);
 
-        &:hover {
-            border-color: var(--field-border-hover-color);
-        }
-
-        > .expand {
-            transform: rotate(-180deg);
-        }
-
-        input {
-            text-align: center;
-        }
-    }
-
-    > .field-helpers {
-        padding-left: 8px;
-        padding-right: 8px;
+    *[dir="rtl"] & {
+        transform: translate(-5px, -6px) scale(.75);
     }
 }
 
@@ -290,10 +396,9 @@ input::placeholder {
     transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
-:host([disabled]) > tf-input,
-:host([readonly]) > tf-input,
-:host([disabled]) .field > tf-input,
-:host([readonly]) .field > tf-input {
+:host(:disabled) tf-input,
+:host([readonly]) tf-input,
+:host([inert]) tf-input {
     cursor: default;
 
     > svg {
@@ -306,36 +411,48 @@ input::placeholder {
     }
 }
 
-:host([disabled])
-:host([disabled]) .field {
-    --field-color: var(--tavenem-color-text-disabled);
-    --field-label-color: var(--tavenem-color-text-disabled);
-
-    > tf-input {
-        border-color: var(--tavenem-color-action-disabled);
-        color: var(--tavenem-color-text-disabled);
-    }
-}
-
-:host([disabled].filled) > tf-input {
+:host(.filled:disabled) tf-input,
+:host([inert].filled) tf-input {
     background-color: rgba(0, 0, 0, 0.12);
 }
 
-:host([disabled].outlined) > tf-input {
+:host(.outlined:disabled) tf-input,
+:host([inert].outlined) tf-input {
     border-color: var(--tavenem-color-action-disabled);
 }
 
 .field-helpers {
     color: var(--field-label-color);
-    display: flex;
+    display: contents;
     font-size: 0.75rem;
     font-weight: var(--tavenem-font-weight);
     line-height: 1.66;
-    margin-top: 3px;
     overflow: hidden;
-    padding-left: 8px;
-    padding-right: 8px;
     text-align: start;
+
+    > * {
+        margin-top: 3px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+.validation-messages {
+    display: none;
+    list-style: none;
+    margin-right: auto;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-left: 0;
+}
+
+:host(:state(touched)) .validation-messages {
+    display: initial;
+}
+
+input {
+    border-radius: var(--tavenem-border-radius);
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 .help-text {
@@ -347,8 +464,7 @@ input::placeholder {
     width: 1.5em;
 }
 
-:host(:not([value])),
-:host([value=""]) {
+:host(:state(empty)) {
     .swatch-container {
         display: none;
     }
@@ -382,19 +498,19 @@ svg:not(.color-selector) {
     margin-top: .25rem;
 }
 
-:host([data-input-mode="hex"]) .field.alpha {
+:host([data-input-mode="hex"]) .alpha {
     display: none;
 }
 
-:host(:not([data-input-mode="hex"])) .field.hex {
+:host(:not([data-input-mode="hex"])) .hex {
     display: none;
 }
 
-:host(:not([data-input-mode="hsl"])) .field.hsl {
+:host(:not([data-input-mode="hsl"])) .hsl {
     display: none;
 }
 
-:host(:not([data-input-mode="rgb"])) .field.rgb {
+:host(:not([data-input-mode="rgb"])) .rgb {
     display: none;
 }
 
@@ -491,7 +607,7 @@ tf-slider input:focus-visible::-moz-range-thumb {
     box-shadow: var(--thumb-shadow);
 }
 
-:host([disabled]) tf-slider input {
+:host(:disabled) tf-slider input {
     &, &:active, &:focus-visible {
         --thumb-color: var(--tavenem-color-action-disabled);
         --track-color: var(--tavenem-color-action-disabled-bg);
@@ -506,27 +622,27 @@ tf-slider input:focus-visible::-moz-range-thumb {
     }
 }
 
-:host([disabled]) tf-slider input::-webkit-slider-thumb {
+:host(:disabled) tf-slider input::-webkit-slider-thumb {
     box-shadow: none;
     cursor: default;
 }
-:host([disabled]) tf-slider input::-moz-range-thumb {
+:host(:disabled) tf-slider input::-moz-range-thumb {
     box-shadow: none;
     cursor: default;
 }
-:host([disabled]) tf-slider input:active::-webkit-slider-thumb {
+:host(:disabled) tf-slider input:active::-webkit-slider-thumb {
     box-shadow: none;
     cursor: default;
 }
-:host([disabled]) tf-slider input:active::-moz-range-thumb {
+:host(:disabled) tf-slider input:active::-moz-range-thumb {
     box-shadow: none;
     cursor: default;
 }
-:host([disabled]) tf-slider input:focus-visible::-webkit-slider-thumb {
+:host(:disabled) tf-slider input:focus-visible::-webkit-slider-thumb {
     box-shadow: none;
     cursor: default;
 }
-:host([disabled]) tf-slider input:focus-visible::-moz-range-thumb {
+:host(:disabled) tf-slider input:focus-visible::-moz-range-thumb {
     box-shadow: none;
     cursor: default;
 }
@@ -671,10 +787,10 @@ button::-moz-focus-inner {
     display: inline-flex;
 }
 
-:host([disabled]),
+:host(:disabled),
 :host([readonly]),
 :host([required]),
-:host([empty]) {
+:host(:state(empty)) {
     .color-clear {
         display: none;
     }
@@ -801,14 +917,90 @@ button::-moz-focus-inner {
         height: 2rem;
     }
 }
+
+:host(:disabled),
+:host([readonly]),
+:host([inert]) {
+    --tavenem-field-input-opacity: 1;
+}
+
+:host(:where(.primary,
+    .secondary,
+    .tertiary,
+    .danger,
+    .dark,
+    .default,
+    .info,
+    .success,
+    .warning):not(:invalid, :disabled, [inert])) {
+    --field-active-border-color: var(--tavenem-theme-color);
+    --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
+    --field-active-label-color: var(--tavenem-theme-color);
+    --field-border-color: var(--tavenem-theme-color);
+    --field-border-hover-color: var(--tavenem-theme-color-lighten);
+    --field-label-color: var(--tavenem-theme-color);
+}
+
+:host(.filled:where(.primary,
+    .secondary,
+    .tertiary,
+    .danger,
+    .dark,
+    .default,
+    .info,
+    .success,
+    .warning)) {
+    background-color: transparent;
+
+    > tf-input {
+        background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), .09);
+
+        &:hover {
+            background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), 0.13);
+        }
+
+        &:disabled, &[inert], [inert] & {
+            background-color: var(--tavenem-theme-color-hover-bright);
+        }
+    }
+}
+
+
+:host(:disabled),
+:host(:disabled) .field,
+:host([inert]),
+:host([inert]) .field {
+    --field-color: var(--tavenem-color-text-disabled);
+    --field-label-color: var(--tavenem-color-text-disabled);
+
+    > tf-input {
+        border-color: var(--tavenem-color-action-disabled);
+        color: var(--tavenem-color-text-disabled);
+    }
+}
+
+:host(.filled:disabled) > tf-input,
+:host([inert].filled) > tf-input {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+:host(.outlined:disabled) > tf-input,
+:host([inert].outlined) > tf-input {
+    border-color: var(--tavenem-color-action-disabled);
+}
+
+:host([inert]) * {
+    cursor: default;
+    pointer-events: none;
+}
 `;
         shadow.appendChild(style);
 
         const hasAlpha = this.hasAttribute('alpha');
-        const value = this.getAttribute('value')
+        this._initialValue = this._value = this.getAttribute('value')
             || (hasAlpha ? '#00000000' : '#000000');
 
-        const colors = TavenemColorInputHtmlElement.hexToHsla(value);
+        const colors = TavenemColorInputHtmlElement.hexToHsla(this._value);
         const hsla = colors
             ? colors.hsla
             : {
@@ -837,7 +1029,7 @@ button::-moz-focus-inner {
         let anchorOrigin;
         let input: HTMLInputElement | TavenemInputHtmlElement;
         if (this.hasAttribute('button')) {
-            anchorId = this.dataset.inputId || randomUUID();
+            anchorId = randomUUID();
             anchorOrigin = 'anchor-center-center';
 
             const button = document.createElement('button');
@@ -854,7 +1046,7 @@ button::-moz-focus-inner {
             button.appendChild(slot);
 
             input = document.createElement('input');
-            input.classList.add('picker-value');
+            input.classList.add('input');
             input.hidden = true;
             input.readOnly = true;
             if (this.hasAttribute('name')) {
@@ -916,23 +1108,17 @@ button::-moz-focus-inner {
             if (!this.hasAttribute('inline')) {
                 input.autofocus = this.hasAttribute('autofocus');
             }
-            input.classList.add('input', 'picker-value');
+            input.classList.add('input');
             if (this.classList.contains('clearable')) {
                 input.classList.add('clearable');
             }
             if (this.hasAttribute('disabled')) {
                 input.setAttribute('disabled', '');
             }
-            if (this.hasAttribute('name')) {
-                input.setAttribute('name', this.getAttribute('name') || '');
-            }
             if (this.hasAttribute('placeholder')) {
                 input.setAttribute('placeholder', this.getAttribute('placeholder') || '');
             }
             input.setAttribute('readonly', '');
-            if (this.hasAttribute('required')) {
-                input.setAttribute('required', '');
-            }
             input.setAttribute('size', "1");
             if (this.hasAttribute('inline')) {
                 input.style.display = 'none';
@@ -944,9 +1130,14 @@ button::-moz-focus-inner {
                     input.display = colorName;
                 }
             }
-            input.dataset.inputId = this.dataset.inputId;
+            if (input.value.length || (input.display && input.display.length)) {
+                this._internals.states.add('has-value');
+            } else {
+                this._internals.states.add('empty');
+            }
             input.dataset.inputClass = this.dataset.inputClass;
             input.dataset.inputStyle = this.dataset.inputStyle;
+            input.addEventListener('valuechange', this.onHexValueChange.bind(this));
             shadow.appendChild(input);
 
             const swatchContainer = document.createElement('div');
@@ -969,6 +1160,27 @@ button::-moz-focus-inner {
             const expand = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             input.appendChild(expand);
             expand.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-84 32-157t87.5-127q55.5-54 130-85T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 20 14.5 38t14.5 43q0 26-24.5 57T480-80ZM247-454q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm126-170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm214 0q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Zm131 170q20 0 35-15t15-35q0-20-15-35t-35-15q-20 0-35 15t-15 35q0 20 15 35t35 15Z"/></svg>`;
+
+            const helpers = document.createElement('div');
+            helpers.classList.add('field-helpers');
+            shadow.appendChild(helpers);
+
+            const validationList = document.createElement('ul');
+            validationList.classList.add('validation-messages');
+            helpers.appendChild(validationList);
+
+            const helperSlot = document.createElement('slot');
+            helperSlot.name = 'helpers';
+            helpers.appendChild(helperSlot);
+
+            if ('label' in this.dataset
+                && this.dataset.label
+                && this.dataset.label.length) {
+                const label = document.createElement('label');
+                label.htmlFor = anchorId;
+                label.textContent = this.dataset.label;
+                shadow.appendChild(label);
+            }
 
             const slot = document.createElement('slot');
             shadow.appendChild(slot);
@@ -1095,12 +1307,8 @@ button::-moz-focus-inner {
         inputsContainer.classList.add('inputs-container');
         colorControls.appendChild(inputsContainer);
 
-        const hexInputField = document.createElement('div');
-        hexInputField.classList.add('field', 'hex');
-        inputsContainer.appendChild(hexInputField);
-
-        const hexInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        hexInput.classList.add('input', 'hex');
+        const hexInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        hexInput.classList.add('hex');
         hexInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             hexInput.setAttribute('disabled', '');
@@ -1110,25 +1318,18 @@ button::-moz-focus-inner {
         }
         hexInput.setAttribute('size', '1');
         hexInput.setAttribute('type', 'text');
-        hexInputField.appendChild(hexInput);
-        hexInput.value = value;
+        inputsContainer.appendChild(hexInput);
+        hexInput.value = this._value;
         hexInput.addEventListener('valuechange', this.onHexValueChange.bind(this));
 
         const hexInputFieldHelpers = document.createElement('div');
-        hexInputFieldHelpers.classList.add('field-helpers');
-        hexInputField.appendChild(hexInputFieldHelpers);
-
-        const hexInputHelpText = document.createElement('div');
         hexInputFieldHelpers.classList.add('help-text');
+        hexInputFieldHelpers.slot = 'helpers';
         hexInputFieldHelpers.textContent = "HEX";
-        hexInputFieldHelpers.appendChild(hexInputHelpText);
+        hexInput.appendChild(hexInputFieldHelpers);
 
-        const hueInputField = document.createElement('div');
-        hueInputField.classList.add('field', 'hue', 'hsl');
-        inputsContainer.appendChild(hueInputField);
-
-        const hueInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        hueInput.classList.add('input', 'hue', 'hsl');
+        const hueInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        hueInput.classList.add('hue', 'hsl');
         hueInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             hueInput.setAttribute('disabled', '');
@@ -1141,25 +1342,18 @@ button::-moz-focus-inner {
         hueInput.setAttribute('min', '0');
         hueInput.setAttribute('size', '1');
         hueInput.setAttribute('step', '1');
-        hueInputField.appendChild(hueInput);
+        inputsContainer.appendChild(hueInput);
         hueInput.value = hsla.hue.toString();
         hueInput.addEventListener('valueinput', this.onHueValueInput.bind(this));
 
         const hueInputFieldHelpers = document.createElement('div');
-        hueInputFieldHelpers.classList.add('field-helpers');
-        hueInputField.appendChild(hueInputFieldHelpers);
-
-        const hueInputHelpText = document.createElement('div');
         hueInputFieldHelpers.classList.add('help-text');
+        hueInputFieldHelpers.slot = 'helpers';
         hueInputFieldHelpers.textContent = "H";
-        hueInputFieldHelpers.appendChild(hueInputHelpText);
+        hueInput.appendChild(hueInputFieldHelpers);
 
-        const saturationInputField = document.createElement('div');
-        saturationInputField.classList.add('field', 'saturation', 'hsl');
-        inputsContainer.appendChild(saturationInputField);
-
-        const saturationInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        saturationInput.classList.add('input', 'saturation', 'hsl');
+        const saturationInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        saturationInput.classList.add('saturation', 'hsl');
         saturationInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             saturationInput.setAttribute('disabled', '');
@@ -1172,25 +1366,18 @@ button::-moz-focus-inner {
         saturationInput.setAttribute('min', '0');
         saturationInput.setAttribute('size', '1');
         saturationInput.setAttribute('step', '1');
-        saturationInputField.appendChild(saturationInput);
+        inputsContainer.appendChild(saturationInput);
         saturationInput.value = hsla.saturation.toString();
         saturationInput.addEventListener('valueinput', this.onSaturationValueInput.bind(this));
 
         const saturationInputFieldHelpers = document.createElement('div');
-        saturationInputFieldHelpers.classList.add('field-helpers');
-        saturationInputField.appendChild(saturationInputFieldHelpers);
-
-        const saturationInputHelpText = document.createElement('div');
         saturationInputFieldHelpers.classList.add('help-text');
+        saturationInputFieldHelpers.slot = 'helpers';
         saturationInputFieldHelpers.textContent = "S";
-        saturationInputFieldHelpers.appendChild(saturationInputHelpText);
+        saturationInput.appendChild(saturationInputFieldHelpers);
 
-        const lightnessInputField = document.createElement('div');
-        lightnessInputField.classList.add('field', 'lightness', 'hsl');
-        inputsContainer.appendChild(lightnessInputField);
-
-        const lightnessInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        lightnessInput.classList.add('input', 'lightness', 'hsl');
+        const lightnessInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        lightnessInput.classList.add('lightness', 'hsl');
         lightnessInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             lightnessInput.setAttribute('disabled', '');
@@ -1203,25 +1390,18 @@ button::-moz-focus-inner {
         lightnessInput.setAttribute('min', '0');
         lightnessInput.setAttribute('size', '1');
         lightnessInput.setAttribute('step', '1');
-        lightnessInputField.appendChild(lightnessInput);
+        inputsContainer.appendChild(lightnessInput);
         lightnessInput.value = hsla.lightness.toString();
         lightnessInput.addEventListener('valueinput', this.onLightnessValueInput.bind(this));
 
         const lightnessInputFieldHelpers = document.createElement('div');
-        lightnessInputFieldHelpers.classList.add('field-helpers');
-        lightnessInputField.appendChild(lightnessInputFieldHelpers);
-
-        const lightnessInputHelpText = document.createElement('div');
         lightnessInputFieldHelpers.classList.add('help-text');
+        lightnessInputFieldHelpers.slot = 'helpers';
         lightnessInputFieldHelpers.textContent = "L";
-        lightnessInputFieldHelpers.appendChild(lightnessInputHelpText);
+        lightnessInput.appendChild(lightnessInputFieldHelpers);
 
-        const redInputField = document.createElement('div');
-        redInputField.classList.add('field', 'red', 'rgb');
-        inputsContainer.appendChild(redInputField);
-
-        const redInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        redInput.classList.add('input', 'red', 'rgb');
+        const redInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        redInput.classList.add('red', 'rgb');
         redInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             redInput.setAttribute('disabled', '');
@@ -1234,25 +1414,18 @@ button::-moz-focus-inner {
         redInput.setAttribute('min', '0');
         redInput.setAttribute('size', '1');
         redInput.setAttribute('step', '1');
-        redInputField.appendChild(redInput);
+        inputsContainer.appendChild(redInput);
         redInput.value = rgba.red.toString();
         redInput.addEventListener('valueinput', this.onRedValueInput.bind(this));
 
         const redInputFieldHelpers = document.createElement('div');
-        redInputFieldHelpers.classList.add('field-helpers');
-        redInputField.appendChild(redInputFieldHelpers);
-
-        const redInputHelpText = document.createElement('div');
         redInputFieldHelpers.classList.add('help-text');
+        redInputFieldHelpers.slot = 'helpers';
         redInputFieldHelpers.textContent = "R";
-        redInputFieldHelpers.appendChild(redInputHelpText);
+        redInput.appendChild(redInputFieldHelpers);
 
-        const greenInputField = document.createElement('div');
-        greenInputField.classList.add('field', 'green', 'rgb');
-        inputsContainer.appendChild(greenInputField);
-
-        const greenInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        greenInput.classList.add('input', 'green', 'rgb');
+        const greenInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        greenInput.classList.add('green', 'rgb');
         greenInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             greenInput.setAttribute('disabled', '');
@@ -1265,25 +1438,18 @@ button::-moz-focus-inner {
         greenInput.setAttribute('min', '0');
         greenInput.setAttribute('size', '1');
         greenInput.setAttribute('step', '1');
-        greenInputField.appendChild(greenInput);
+        inputsContainer.appendChild(greenInput);
         greenInput.value = rgba.green.toString();
         greenInput.addEventListener('valueinput', this.onGreenValueInput.bind(this));
 
         const greenInputFieldHelpers = document.createElement('div');
-        greenInputFieldHelpers.classList.add('field-helpers');
-        greenInputField.appendChild(greenInputFieldHelpers);
-
-        const greenInputHelpText = document.createElement('div');
         greenInputFieldHelpers.classList.add('help-text');
+        greenInputFieldHelpers.slot = 'helpers';
         greenInputFieldHelpers.textContent = "G";
-        greenInputFieldHelpers.appendChild(greenInputHelpText);
+        greenInput.appendChild(greenInputFieldHelpers);
 
-        const blueInputField = document.createElement('div');
-        blueInputField.classList.add('field', 'blue', 'rgb');
-        inputsContainer.appendChild(blueInputField);
-
-        const blueInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-        blueInput.classList.add('input', 'blue', 'rgb');
+        const blueInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        blueInput.classList.add('blue', 'rgb');
         blueInput.dataset.inputStyle = 'text-align:center';
         if (this.hasAttribute('disabled')) {
             blueInput.setAttribute('disabled', '');
@@ -1296,26 +1462,19 @@ button::-moz-focus-inner {
         blueInput.setAttribute('min', '0');
         blueInput.setAttribute('size', '1');
         blueInput.setAttribute('step', '1');
-        blueInputField.appendChild(blueInput);
+        inputsContainer.appendChild(blueInput);
         blueInput.value = rgba.blue.toString();
         blueInput.addEventListener('valueinput', this.onBlueValueInput.bind(this));
 
         const blueInputFieldHelpers = document.createElement('div');
-        blueInputFieldHelpers.classList.add('field-helpers');
-        blueInputField.appendChild(blueInputFieldHelpers);
-
-        const blueInputHelpText = document.createElement('div');
         blueInputFieldHelpers.classList.add('help-text');
+        blueInputFieldHelpers.slot = 'helpers';
         blueInputFieldHelpers.textContent = "G";
-        blueInputFieldHelpers.appendChild(blueInputHelpText);
+        blueInput.appendChild(blueInputFieldHelpers);
 
         if (hasAlpha) {
-            const alphaInputField = document.createElement('div');
-            alphaInputField.classList.add('field', 'alpha');
-            inputsContainer.appendChild(alphaInputField);
-
-            const alphaInput = document.createElement('tf-input') as TavenemInputHtmlElement;
-            alphaInput.classList.add('input', 'alpha');
+            const alphaInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+            alphaInput.classList.add('alpha');
             alphaInput.dataset.inputStyle = 'text-align:center';
             if (this.hasAttribute('disabled')) {
                 alphaInput.setAttribute('disabled', '');
@@ -1328,18 +1487,15 @@ button::-moz-focus-inner {
             alphaInput.setAttribute('min', '0');
             alphaInput.setAttribute('size', '1');
             alphaInput.setAttribute('step', '0.01');
-            alphaInputField.appendChild(alphaInput);
+            inputsContainer.appendChild(alphaInput);
             alphaInput.value = (hsla.alpha || 0).toString();
             alphaInput.addEventListener('valueinput', this.onAlphaValueInput.bind(this));
 
             const alphaInputFieldHelpers = document.createElement('div');
-            alphaInputFieldHelpers.classList.add('field-helpers');
-            alphaInputField.appendChild(alphaInputFieldHelpers);
-
-            const alphaInputHelpText = document.createElement('div');
             alphaInputFieldHelpers.classList.add('help-text');
+            alphaInputFieldHelpers.slot = 'helpers';
             alphaInputFieldHelpers.textContent = "A";
-            alphaInputFieldHelpers.appendChild(alphaInputHelpText);
+            alphaInput.appendChild(alphaInputFieldHelpers);
         }
 
         const modeButton = document.createElement('button');
@@ -1370,6 +1526,8 @@ button::-moz-focus-inner {
             buttonsDiv.appendChild(okButton);
             okButton.addEventListener('click', this.onOk.bind(this));
         }
+
+        this.setValidity();
         
         shadow.addEventListener('mousedown', this.onMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
@@ -1389,6 +1547,11 @@ button::-moz-focus-inner {
         root.removeEventListener('mousedown', this.onMouseDown.bind(this));
         root.removeEventListener('mouseup', this.onOuterMouseUp.bind(this));
         root.removeEventListener('keyup', this.onOuterKeyUp.bind(this));
+
+        const input = root.querySelector<TavenemInputHtmlElement>('.input');
+        if (input) {
+            input.removeEventListener('valuechange', this.onHexValueChange.bind(this));
+        }
 
         const overlayDetector = root.querySelector('color-overlay-detector') as HTMLElement;
         if (overlayDetector) {
@@ -1414,35 +1577,35 @@ button::-moz-focus-inner {
                 dropper.removeEventListener('click', this.onDropperClick.bind(this));
             }
         }
-        const hexInput = root.querySelector('tf-input.hex') as HTMLElement;
+        const hexInput = root.querySelector('.hex') as HTMLElement;
         if (hexInput) {
             hexInput.removeEventListener('valuechange', this.onHexValueChange.bind(this));
         }
-        const hueInput = root.querySelector('tf-input.hue') as HTMLElement;
+        const hueInput = root.querySelector('tf-input-field.hue') as HTMLElement;
         if (hueInput) {
             hueInput.removeEventListener('valueinput', this.onHueValueInput.bind(this));
         }
-        const saturationInput = root.querySelector('tf-input.saturation') as HTMLElement;
+        const saturationInput = root.querySelector('.saturation') as HTMLElement;
         if (saturationInput) {
             saturationInput.removeEventListener('valueinput', this.onSaturationValueInput.bind(this));
         }
-        const lightnessInput = root.querySelector('tf-input.lightness') as HTMLElement;
+        const lightnessInput = root.querySelector('.lightness') as HTMLElement;
         if (lightnessInput) {
             lightnessInput.removeEventListener('valueinput', this.onLightnessValueInput.bind(this));
         }
-        const redInput = root.querySelector('tf-input.red') as HTMLElement;
+        const redInput = root.querySelector('.red') as HTMLElement;
         if (redInput) {
             redInput.removeEventListener('valueinput', this.onRedValueInput.bind(this));
         }
-        const greenInput = root.querySelector('tf-input.green') as HTMLElement;
+        const greenInput = root.querySelector('.green') as HTMLElement;
         if (greenInput) {
             greenInput.removeEventListener('valueinput', this.onGreenValueInput.bind(this));
         }
-        const blueInput = root.querySelector('tf-input.blue') as HTMLElement;
+        const blueInput = root.querySelector('.blue') as HTMLElement;
         if (blueInput) {
             blueInput.removeEventListener('valueinput', this.onBlueValueInput.bind(this));
         }
-        const alphaInput = root.querySelector('tf-input.alpha') as HTMLElement;
+        const alphaInput = root.querySelector('tf-input-field.alpha') as HTMLElement;
         if (alphaInput) {
             alphaInput.removeEventListener('valueinput', this.onAlphaValueInput.bind(this));
         }
@@ -1464,131 +1627,7 @@ button::-moz-focus-inner {
         if (newValue == oldValue) {
             return;
         }
-        if (name === 'disabled') {
-            const root = this.shadowRoot;
-            if (!root) {
-                return;
-            }
-
-            const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
-            if (input) {
-                if (newValue) {
-                    input.setAttribute('disabled', '');
-                } else {
-                    input.removeAttribute('disabled');
-                }
-            }
-
-            const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
-            if (hueSlider) {
-                if (newValue) {
-                    hueSlider.disabled = true;
-                } else {
-                    hueSlider.disabled = this.hasAttribute('readonly');
-                }
-            }
-
-            const alphaSlider = root.querySelector('input.alpha') as HTMLInputElement;
-            if (alphaSlider) {
-                if (newValue) {
-                    alphaSlider.disabled = true;
-                } else {
-                    alphaSlider.disabled = this.hasAttribute('readonly');
-                }
-            }
-
-            const hexInput = root.querySelector('input.hex') as TavenemInputHtmlElement;
-            if (hexInput) {
-                if (newValue) {
-                    hexInput.setAttribute('disabled', '');
-                } else {
-                    hexInput.removeAttribute('disabled');
-                }
-            }
-
-            const hueInput = root.querySelector('input.hue') as TavenemInputHtmlElement;
-            if (hueInput) {
-                if (newValue) {
-                    hueInput.setAttribute('disabled', '');
-                } else {
-                    hueInput.removeAttribute('disabled');
-                }
-            }
-
-            const saturationInput = root.querySelector('input.saturation') as TavenemInputHtmlElement;
-            if (saturationInput) {
-                if (newValue) {
-                    saturationInput.setAttribute('disabled', '');
-                } else {
-                    saturationInput.removeAttribute('disabled');
-                }
-            }
-
-            const lightnessInput = root.querySelector('input.lightness') as TavenemInputHtmlElement;
-            if (lightnessInput) {
-                if (newValue) {
-                    lightnessInput.setAttribute('disabled', '');
-                } else {
-                    lightnessInput.removeAttribute('disabled');
-                }
-            }
-
-            const redInput = root.querySelector('input.red') as TavenemInputHtmlElement;
-            if (redInput) {
-                if (newValue) {
-                    redInput.setAttribute('disabled', '');
-                } else {
-                    redInput.removeAttribute('disabled');
-                }
-            }
-
-            const greenInput = root.querySelector('input.green') as TavenemInputHtmlElement;
-            if (greenInput) {
-                if (newValue) {
-                    greenInput.setAttribute('disabled', '');
-                } else {
-                    greenInput.removeAttribute('disabled');
-                }
-            }
-
-            const blueInput = root.querySelector('input.blue') as TavenemInputHtmlElement;
-            if (blueInput) {
-                if (newValue) {
-                    blueInput.setAttribute('disabled', '');
-                } else {
-                    blueInput.removeAttribute('disabled');
-                }
-            }
-
-            const alphaInput = root.querySelector('input.alpha') as TavenemInputHtmlElement;
-            if (alphaInput) {
-                if (newValue) {
-                    alphaInput.setAttribute('disabled', '');
-                } else {
-                    alphaInput.removeAttribute('disabled');
-                }
-            }
-
-            const modeButton = root.querySelector('.mode-button') as HTMLButtonElement;
-            if (modeButton) {
-                if (newValue) {
-                    modeButton.disabled = true;
-                } else {
-                    modeButton.disabled = false;
-                }
-            }
-
-            const clearButton = root.querySelector('.color-clear') as HTMLButtonElement;
-            if (clearButton) {
-                if (newValue) {
-                    clearButton.disabled = true;
-                } else {
-                    clearButton.disabled = this.hasAttribute('readonly');
-                }
-            }
-
-            this.setOpen(false);
-        } else if (name === 'readonly') {
+        if (name === 'readonly') {
             const root = this.shadowRoot;
             if (!root) {
                 return;
@@ -1599,7 +1638,7 @@ button::-moz-focus-inner {
                 if (newValue) {
                     hueSlider.disabled = true;
                 } else {
-                    hueSlider.disabled = this.hasAttribute('disabled');
+                    hueSlider.disabled = this.matches(':disabled');
                 }
             }
 
@@ -1608,7 +1647,7 @@ button::-moz-focus-inner {
                 if (newValue) {
                     alphaSlider.disabled = true;
                 } else {
-                    alphaSlider.disabled = this.hasAttribute('disabled');
+                    alphaSlider.disabled = this.matches(':disabled');
                 }
             }
 
@@ -1689,7 +1728,7 @@ button::-moz-focus-inner {
                 if (newValue) {
                     clearButton.disabled = true;
                 } else {
-                    clearButton.disabled = this.hasAttribute('disabled');
+                    clearButton.disabled = this.matches(':disabled');
                 }
             }
 
@@ -1697,6 +1736,156 @@ button::-moz-focus-inner {
         } else if (name === 'value'
             && newValue) {
             this.setValue(newValue);
+        }
+    }
+
+    formDisabledCallback(disabled: boolean) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
+        if (input) {
+            if (disabled) {
+                input.setAttribute('disabled', '');
+            } else {
+                input.removeAttribute('disabled');
+            }
+        }
+
+        const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
+        if (hueSlider) {
+            if (disabled) {
+                hueSlider.disabled = true;
+            } else {
+                hueSlider.disabled = this.hasAttribute('readonly');
+            }
+        }
+
+        const alphaSlider = root.querySelector('input.alpha') as HTMLInputElement;
+        if (alphaSlider) {
+            if (disabled) {
+                alphaSlider.disabled = true;
+            } else {
+                alphaSlider.disabled = this.hasAttribute('readonly');
+            }
+        }
+
+        const hexInput = root.querySelector('.hex') as TavenemInputFieldHtmlElement;
+        if (hexInput) {
+            if (disabled) {
+                hexInput.setAttribute('disabled', '');
+            } else {
+                hexInput.removeAttribute('disabled');
+            }
+        }
+
+        const hueInput = root.querySelector('tf-input-field.hue') as TavenemInputFieldHtmlElement;
+        if (hueInput) {
+            if (disabled) {
+                hueInput.setAttribute('disabled', '');
+            } else {
+                hueInput.removeAttribute('disabled');
+            }
+        }
+
+        const saturationInput = root.querySelector('.saturation') as TavenemInputFieldHtmlElement;
+        if (saturationInput) {
+            if (disabled) {
+                saturationInput.setAttribute('disabled', '');
+            } else {
+                saturationInput.removeAttribute('disabled');
+            }
+        }
+
+        const lightnessInput = root.querySelector('.lightness') as TavenemInputFieldHtmlElement;
+        if (lightnessInput) {
+            if (disabled) {
+                lightnessInput.setAttribute('disabled', '');
+            } else {
+                lightnessInput.removeAttribute('disabled');
+            }
+        }
+
+        const redInput = root.querySelector('.red') as TavenemInputFieldHtmlElement;
+        if (redInput) {
+            if (disabled) {
+                redInput.setAttribute('disabled', '');
+            } else {
+                redInput.removeAttribute('disabled');
+            }
+        }
+
+        const greenInput = root.querySelector('.green') as TavenemInputFieldHtmlElement;
+        if (greenInput) {
+            if (disabled) {
+                greenInput.setAttribute('disabled', '');
+            } else {
+                greenInput.removeAttribute('disabled');
+            }
+        }
+
+        const blueInput = root.querySelector('.blue') as TavenemInputFieldHtmlElement;
+        if (blueInput) {
+            if (disabled) {
+                blueInput.setAttribute('disabled', '');
+            } else {
+                blueInput.removeAttribute('disabled');
+            }
+        }
+
+        const alphaInput = root.querySelector('tf-input-field.alpha') as TavenemInputFieldHtmlElement;
+        if (alphaInput) {
+            if (disabled) {
+                alphaInput.setAttribute('disabled', '');
+            } else {
+                alphaInput.removeAttribute('disabled');
+            }
+        }
+
+        const modeButton = root.querySelector('.mode-button') as HTMLButtonElement;
+        if (modeButton) {
+            if (disabled) {
+                modeButton.disabled = true;
+            } else {
+                modeButton.disabled = false;
+            }
+        }
+
+        const clearButton = root.querySelector('.color-clear') as HTMLButtonElement;
+        if (clearButton) {
+            if (disabled) {
+                clearButton.disabled = true;
+            } else {
+                clearButton.disabled = this.hasAttribute('readonly');
+            }
+        }
+
+        this.setOpen(false);
+    }
+
+    formResetCallback() { this.setValue(this._initialValue); }
+
+    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+        if (typeof state === 'string') {
+            this.setValue(state);
+        } else if (state == null) {
+            this.clear();
+        }
+    }
+
+    checkValidity() { return this._internals.checkValidity(); }
+
+    reportValidity() { return this._internals.reportValidity(); }
+
+    reset() {
+        this._internals.states.delete('touched');
+        this._value = this._initialValue;
+        if (this._value) {
+            this.setValue(this._value);
+        } else {
+            this.clear();
         }
     }
 
@@ -2728,15 +2917,12 @@ button::-moz-focus-inner {
     }
 
     protected clear() {
-        this.removeAttribute('value');
-
-        this._selectorX = overlayWidth;
-        this._selectorY = overlayHeight / 2;
-
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
+
+        this._settingValue = true;
 
         const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
         if (hueSlider) {
@@ -2748,14 +2934,44 @@ button::-moz-focus-inner {
             alphaSlider.value = '0';
         }
 
-        const selector = root.querySelector('.color-selector') as SVGSVGElement;
-        if (selector) {
-            selector.style.transform = `translate(${this._selectorX.toFixed(0)}px, ${this._selectorY.toFixed(0)}px)`;
+        const hexInput = root.querySelector('.hex') as TavenemInputFieldHtmlElement;
+        if (hexInput) {
+            hexInput.value = '';
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
-        if (input) {
-            input.value = '';
+        const hueInput = root.querySelector('tf-input-field.hue') as TavenemInputFieldHtmlElement;
+        if (hueInput) {
+            hueInput.value = '0';
+        }
+
+        const saturationInput = root.querySelector('.saturation') as TavenemInputFieldHtmlElement;
+        if (saturationInput) {
+            saturationInput.value = '0';
+        }
+
+        const lightnessInput = root.querySelector('.lightness') as TavenemInputFieldHtmlElement;
+        if (lightnessInput) {
+            lightnessInput.value = '0';
+        }
+
+        const redInput = root.querySelector('.red') as TavenemInputFieldHtmlElement;
+        if (redInput) {
+            redInput.value = '0';
+        }
+
+        const greenInput = root.querySelector('.green') as TavenemInputFieldHtmlElement;
+        if (greenInput) {
+            greenInput.value = '0';
+        }
+
+        const blueInput = root.querySelector('.blue') as TavenemInputFieldHtmlElement;
+        if (blueInput) {
+            blueInput.value = '0';
+        }
+
+        const alphaInput = root.querySelector('tf-input-field.alpha') as TavenemInputHtmlElement;
+        if (alphaInput) {
+            alphaInput.value = '0';
         }
 
         const swatches = root.querySelectorAll('.swatch-fill');
@@ -2766,6 +2982,14 @@ button::-moz-focus-inner {
             }
         }
 
+        this._selectorX = overlayWidth;
+        this._selectorY = overlayHeight / 2;
+
+        const selector = root.querySelector('.color-selector') as SVGSVGElement;
+        if (selector) {
+            selector.style.transform = `translate(${this._selectorX.toFixed(0)}px, ${this._selectorY.toFixed(0)}px)`;
+        }
+
         const overlay = root.querySelector('.color-overlay');
         if (overlay instanceof HTMLElement) {
             overlay.style.backgroundColor = this.hasAttribute('disabled')
@@ -2773,51 +2997,26 @@ button::-moz-focus-inner {
                 : 'hsl(0 100 50)';
         }
 
-        const hexInput = root.querySelector('tf-input.hex') as TavenemInputHtmlElement;
-        if (hexInput) {
-            hexInput.value = '';
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
+        if (input) {
+            input.value = '';
         }
 
-        const hueInput = root.querySelector('tf-input.hue') as TavenemInputHtmlElement;
-        if (hueInput) {
-            hueInput.value = '0';
-        }
+        this._value = '';
+        this._internals.setFormValue(null);
+        this._internals.states.add('empty');
+        this._internals.states.delete('has-value');
+        this.setValidity();
 
-        const saturationInput = root.querySelector('tf-input.saturation') as TavenemInputHtmlElement;
-        if (saturationInput) {
-            saturationInput.value = '0';
-        }
-
-        const lightnessInput = root.querySelector('tf-input.lightness') as TavenemInputHtmlElement;
-        if (lightnessInput) {
-            lightnessInput.value = '0';
-        }
-
-        const redInput = root.querySelector('tf-input.red') as TavenemInputHtmlElement;
-        if (redInput) {
-            redInput.value = '0';
-        }
-
-        const greenInput = root.querySelector('tf-input.green') as TavenemInputHtmlElement;
-        if (greenInput) {
-            greenInput.value = '0';
-        }
-
-        const blueInput = root.querySelector('tf-input.blue') as TavenemInputHtmlElement;
-        if (blueInput) {
-            blueInput.value = '0';
-        }
-
-        const alphaInput = root.querySelector('tf-input.alpha') as TavenemInputHtmlElement;
-        if (alphaInput) {
-            alphaInput.value = '0';
-        }
+        this._settingValue = false;
     }
 
     private onAlphaInput(event: Event) {
-        if (!(event.target instanceof HTMLInputElement)) {
+        if (this._settingValue
+            || !(event.target instanceof HTMLInputElement)) {
             return;
         }
+        this._internals.states.add('touched');
         this.onHSLAChanged(
             undefined,
             undefined,
@@ -2826,8 +3025,10 @@ button::-moz-focus-inner {
     }
 
     private onAlphaValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onHSLAChanged(
                 undefined,
                 undefined,
@@ -2837,8 +3038,10 @@ button::-moz-focus-inner {
     }
 
     private onBlueValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onRGBChanged(undefined, undefined, event.detail.value);
         }
     }
@@ -2847,7 +3050,7 @@ button::-moz-focus-inner {
         event.preventDefault();
         event.stopPropagation();
 
-        if (!this.hasAttribute('disabled')
+        if (!this.matches(':disabled')
             && !this.hasAttribute('readonly')) {
             this.clear();
         }
@@ -2884,29 +3087,33 @@ button::-moz-focus-inner {
         new EyeDropper()
             .open()
             .then((result) => {
+                this._internals.states.add('touched');
                 this.setValue(result.sRGBHex);
             });
     }
 
     private onGreenValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onRGBChanged(undefined, event.detail.value);
         }
     }
 
     private onHexValueChange(event: Event) {
-        if (event instanceof CustomEvent
-            && event.detail
-            && event.detail.value) {
-            this.setValue(event.detail.value);
+        if (!this._settingValue) {
+            this._internals.states.add('touched');
+            this.setValue(event instanceof CustomEvent
+                ? event.detail.value
+                : null);
         }
     }
 
     private onHSLAChanged(newHue?: string, newSaturation?: string, newLightness?: string, newAlpha?: string) {
         let hsla: HSLA | null = null;
-        if (this.hasAttribute('value')) {
-            const colors = TavenemColorInputHtmlElement.hexToHsla(this.getAttribute('value'));
+        if (this._value) {
+            const colors = TavenemColorInputHtmlElement.hexToHsla(this._value);
             if (colors) {
                 hsla = colors.hsla;
             }
@@ -2953,21 +3160,27 @@ button::-moz-focus-inner {
     }
 
     private onHueInput(event: Event) {
-        if (event.target instanceof HTMLInputElement) {
+        if (!this._settingValue
+            && event.target instanceof HTMLInputElement) {
+            this._internals.states.add('touched');
             this.onHSLAChanged(event.target.value);
         }
     }
 
     private onHueValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onHSLAChanged(event.detail.value);
         }
     }
 
     private onLightnessValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onHSLAChanged(undefined, undefined, event.detail.value);
         }
     }
@@ -3000,6 +3213,7 @@ button::-moz-focus-inner {
         this._selectorX = Math.max(0, Math.min(overlayWidth, offsetX - overlayMargin));
         this._selectorY = Math.max(0, Math.min(overlayHeight, offsetY - overlayMargin));
 
+        this._internals.states.add('touched');
         this.updateColorFromSelector();
 
     }
@@ -3023,16 +3237,18 @@ button::-moz-focus-inner {
     }
 
     private onRedValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onRGBChanged(event.detail.value);
         }
     }
 
     private onRGBChanged(newRed?: string, newGreen?: string, newBlue?: string) {
         let rgba: RGBA | null = null;
-        if (this.hasAttribute('value')) {
-            rgba = TavenemColorInputHtmlElement.hexToRgba(this.getAttribute('value'));
+        if (this._value) {
+            rgba = TavenemColorInputHtmlElement.hexToRgba(this._value);
         }
         if (!rgba) {
             rgba = {
@@ -3065,8 +3281,10 @@ button::-moz-focus-inner {
     }
 
     private onSaturationValueInput(event: Event) {
-        if (event instanceof CustomEvent
+        if (!this._settingValue
+            && event instanceof CustomEvent
             && event.detail) {
+            this._internals.states.add('touched');
             this.onHSLAChanged(undefined, event.detail.value);
         }
     }
@@ -3080,7 +3298,46 @@ button::-moz-focus-inner {
         event.stopPropagation();
         this._selectorX = Math.max(0, Math.min(overlayWidth, event.offsetX - halfSelectorSize + this._selectorX));
         this._selectorY = Math.max(0, Math.min(overlayHeight, event.offsetY - halfSelectorSize + this._selectorY));
+        this._internals.states.add('touched');
         this.updateColorFromSelector();
+    }
+
+    private setValidity() {
+        const flags: ValidityStateFlags = {};
+        const messages: string[] = [];
+
+        if (!this._value) {
+            const root = this.shadowRoot;
+            const input = root ? root.querySelector('.input') as TavenemInputHtmlElement : null;
+            const value = input ? input.value : null;
+            if (value) {
+                flags.badInput = true;
+                messages.push('value cannot be converted to a color');
+            }
+            if (this.hasAttribute('required')) {
+                flags.valueMissing = true;
+                messages.push('required');
+            }
+        }
+
+        if (Object.keys(flags).length > 0) {
+            this._internals.setValidity(flags, messages.join('; '), this.shadowRoot?.querySelector('.input') || undefined);
+        } else {
+            this._internals.setValidity({});
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const validationList = root.querySelector('.validation-messages');
+        if (validationList) {
+            validationList.replaceChildren(...messages.map(m => {
+                const li = document.createElement('li');
+                li.textContent = m;
+                return li;
+            }));
+        }
     }
 
     private setValue(value?: string | null) {
@@ -3092,10 +3349,31 @@ button::-moz-focus-inner {
         const colors = TavenemColorInputHtmlElement.hexToHsla(value);
         if (!colors) {
             this.clear();
-            return;
-        }
 
-        this.setValueFromHSLA(colors.hsla, colors.rgba);
+            const root = this.shadowRoot;
+            let input: TavenemInputHtmlElement | null | undefined;
+            if (root) {
+                input = root.querySelector<TavenemInputHtmlElement>('.input');
+                if (input) {
+                    input.display = value;
+                }
+            }
+
+            this._internals.setFormValue(null);
+            this._internals.setValidity({
+                badInput: true,
+            }, 'value cannot be converted to a date/time', input || undefined);
+
+            if (value.length) {
+                this._internals.states.delete('empty');
+                this._internals.states.add('has-value');
+            } else {
+                this._internals.states.add('empty');
+                this._internals.states.delete('has-value');
+            }
+        } else {
+            this.setValueFromHSLA(colors.hsla, colors.rgba);
+        }
     }
 
     private setValueFromHSLA(hsla: HSLA, rgba?: RGBA | null) {
@@ -3104,12 +3382,16 @@ button::-moz-focus-inner {
 
         const hasAlpha = this.hasAttribute('alpha');
         const hex = TavenemColorInputHtmlElement.hslaToHex(hsla, hasAlpha) || '';
-        this.setAttribute('value', hex);
+        this._value = hex;
+        this._internals.setFormValue(hex.length ? hex : null);
 
         const root = this.shadowRoot;
         if (!root) {
+            this.setValidity();
             return;
         }
+
+        this._settingValue = true;
 
         if (!rgba) {
             rgba = TavenemColorInputHtmlElement.hexToRgba(hex)
@@ -3139,7 +3421,7 @@ button::-moz-focus-inner {
             selector.style.transform = `translate(${this._selectorX.toFixed(0)}px, ${this._selectorY.toFixed(0)}px)`;
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
         if (input) {
             input.value = hex;
 
@@ -3148,6 +3430,15 @@ button::-moz-focus-inner {
                 input.display = colorName;
             }
         }
+        if (input.value.length || (input.display && input.display.length)) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
+        } else {
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
+        }
+
+        this.setValidity();
 
         const swatches = root.querySelectorAll('.swatch-fill');
         const hslaStyle = this.hasAttribute('disabled')
@@ -3171,50 +3462,52 @@ button::-moz-focus-inner {
                 : `hsl(${hsla.hue} 100 50)`;
         }
 
-        const hexInput = root.querySelector('tf-input.hex') as TavenemInputHtmlElement;
+        const hexInput = root.querySelector('.hex') as TavenemInputFieldHtmlElement;
         if (hexInput && hexInput.value != hex) {
             hexInput.value = hex;
         }
 
-        const hueInput = root.querySelector('tf-input.hue') as TavenemInputHtmlElement;
+        const hueInput = root.querySelector('tf-input-field.hue') as TavenemInputFieldHtmlElement;
         if (hueInput && hueInput.value != hue) {
             hueInput.value = hue;
         }
 
         const saturation = hsla.saturation.toString();
-        const saturationInput = root.querySelector('tf-input.saturation') as TavenemInputHtmlElement;
+        const saturationInput = root.querySelector('.saturation') as TavenemInputFieldHtmlElement;
         if (saturationInput && saturationInput.value != saturation) {
             saturationInput.value = saturation;
         }
 
         const lightness = hsla.lightness.toString();
-        const lightnessInput = root.querySelector('tf-input.lightness') as TavenemInputHtmlElement;
+        const lightnessInput = root.querySelector('.lightness') as TavenemInputFieldHtmlElement;
         if (lightnessInput && lightnessInput.value != lightness) {
             lightnessInput.value = lightness;
         }
 
         const red = rgba.red.toString();
-        const redInput = root.querySelector('tf-input.red') as TavenemInputHtmlElement;
+        const redInput = root.querySelector('.red') as TavenemInputFieldHtmlElement;
         if (redInput && redInput.value != red) {
             redInput.value = red;
         }
 
         const green = rgba.green.toString();
-        const greenInput = root.querySelector('tf-input.green') as TavenemInputHtmlElement;
+        const greenInput = root.querySelector('.green') as TavenemInputFieldHtmlElement;
         if (greenInput && greenInput.value != green) {
             greenInput.value = green;
         }
 
         const blue = rgba.blue.toString();
-        const blueInput = root.querySelector('tf-input.blue') as TavenemInputHtmlElement;
+        const blueInput = root.querySelector('.blue') as TavenemInputFieldHtmlElement;
         if (blueInput && blueInput.value != blue) {
             blueInput.value = blue;
         }
 
-        const alphaInput = root.querySelector('tf-input.alpha') as TavenemInputHtmlElement;
+        const alphaInput = root.querySelector('tf-input-field.alpha') as TavenemInputFieldHtmlElement;
         if (alphaInput && alphaInput.value != alpha) {
             alphaInput.value = alpha;
         }
+
+        this._settingValue = false;
     }
 
     private updateColorFromSelector() {
@@ -3222,8 +3515,8 @@ button::-moz-focus-inner {
         const y = Math.max(0, Math.min(1, this._selectorY / overlayHeight));
 
         let hue = 0, alpha = 1;
-        if (this.hasAttribute('value')) {
-            const colors = TavenemColorInputHtmlElement.hexToHsla(this.getAttribute('value'));
+        if (this._value) {
+            const colors = TavenemColorInputHtmlElement.hexToHsla(this._value);
             if (colors) {
                 hue = colors.hsla.hue;
                 alpha = colors.hsla.alpha || 1;

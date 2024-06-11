@@ -55,6 +55,11 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     [Parameter] public List<string?>? HashLabels { get; set; }
 
     /// <summary>
+    /// Custom HTML attributes for the input element.
+    /// </summary>
+    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
+
+    /// <summary>
     /// <para>
     /// The maximum value.
     /// </para>
@@ -108,6 +113,16 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("slider")
         .Add("hash-labels", HashLabels?.Count > 0)
+        .ToString();
+
+    /// <inheritdoc/>
+    protected override string? InputCssClass => new CssBuilder(InputClass)
+        .AddClassFromDictionary(InputAttributes)
+        .ToString();
+
+    /// <inheritdoc/>
+    protected override string? InputCssStyle => new CssBuilder(InputStyle)
+        .AddStyleFromDictionary(InputAttributes)
         .ToString();
 
     private double BarWidth { get; set; }

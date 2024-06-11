@@ -4,122 +4,84 @@
 
 @inherits InputComponentBase<TValue>
 
-<div @attributes="AdditionalAttributes" id="@ContainerId" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
-    <tf-input @ref="ElementReference"
-              @attributes="InputAttributes"
-              id="@InputId"
-              autocomplete="@AutocompleteValue"
-              autofocus="@AutoFocus"
-              class="input"
-              data-input-class="@InputCssClass"
-              data-input-debounce="@UpdateOnInputDebounce"
-              data-input-id="@Id"
-              data-input-style="@InputCssStyle"
-              disabled="@Disabled"
-              display="@DisplayString"
-              inputmode="@InputMode"
-              max="@MaxString"
-              min="@MinString"
-              name="@NameValue"
-              readonly="@ReadOnly"
-              required="@Required"
-              size="@Size"
-              step="@StepString"
-              tabindex="@TabIndex"
-              value="@CurrentValueAsString"
-              @valuechange="OnValueChange"
-              @valueinput="OnValueInput">
-        @if (PrefixContent is not null)
-        {
-            <div slot="prefix" style="display:contents">
-                @PrefixContent(Value)
-            </div>
-        }
-        else
-        {
-            if (!string.IsNullOrEmpty(PrefixIcon))
-            {
-                <tf-icon slot="prefix">@PrefixIcon</tf-icon>
-            }
-            if (!string.IsNullOrEmpty(PrefixText))
-            {
-                <span slot="prefix">@PrefixText</span>
-            }
-        }
-        @if (PostfixContent is not null)
-        {
-            @PostfixContent(Value)
-        }
-        else if (!string.IsNullOrEmpty(PostfixIcon) || !string.IsNullOrEmpty(PostfixText))
-        {
-            @if (!string.IsNullOrEmpty(PostfixIcon))
-            {
-                <tf-icon>@PostfixIcon</tf-icon>
-            }
-            @if (!string.IsNullOrEmpty(PostfixText))
-            {
-                <span>@PostfixText</span>
-            }
-        }
-        @if (ShowStepButtons && !ReadOnly)
-        {
-            <div class="numeric-spin">
-                @if (IsInteractive)
-                {
-                    <button @onclick="Increment" class="btn btn-text" disabled="@IncrementDisabled" tabindex="-1">
-                        <svg class="@StepIconClass" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
-                    </button>
-                    <button @onclick="Decrement" class="btn btn-text" disabled="@DecrementDisabled" tabindex="-1">
-                        <svg class="@StepIconClass" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-                    </button>
-                }
-                else
-                {
-                    <button class="btn btn-text"
-                            disabled="@IncrementDisabled"
-                            tabindex="-1"
-                            onclick="document.getElementById('@InputId').increment()">
-                        <svg class="@StepIconClass" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
-                    </button>
-                    <button class="btn btn-text"
-                            disabled="@DecrementDisabled"
-                            tabindex="-1"
-                            onclick="document.getElementById('@InputId').decrement()">
-                        <svg class="@StepIconClass" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-                    </button>
-                }
-            </div>
-        }
-    </tf-input>
-    @if (!string.IsNullOrEmpty(Label))
+<tf-numeric-input @ref="ElementReference"
+                  @attributes="AdditionalAttributes"
+                  id="@Id"
+                  autocomplete="@AutocompleteValue"
+                  autofocus="@AutoFocus"
+                  class="@CssClass"
+                  data-hide-steppers="@(!ShowStepButtons)"
+                  data-input-class="@InputCssClass"
+                  data-input-debounce="@UpdateOnInputDebounce"
+                  data-input-style="@InputCssStyle"
+                  data-label="@Label"
+                  disabled="@Disabled"
+                  display="@DisplayString"
+                  inputmode="@InputMode"
+                  max="@MaxString"
+                  min="@MinString"
+                  name="@NameValue"
+                  readonly="@ReadOnly"
+                  required="@Required"
+                  size="@Size"
+                  step="@StepString"
+                  style="@CssStyle"
+                  tabindex="@TabIndex"
+                  value="@CurrentValueAsString"
+                  @valuechange="OnValueChange"
+                  @valueinput="OnValueInput">
+    @if (PrefixContent is not null)
     {
-        <label for="@Id">@Label</label>
-    }
-    @if (!string.IsNullOrEmpty(HelpText)
-        || HelpTextContent.HasValue
-        || IsInvalidAndTouched)
-    {
-        <div class="@HelpersClass">
-            @if (IsInvalidAndTouched)
-            {
-                <ul class="mr-auto mb-0 pl-0">
-                    @foreach (var message in GetValidationMessages())
-                    {
-                        <li>@message</li>
-                    }
-                </ul>
-            }
-            else if (HelpTextContent.HasValue)
-            {
-                <div class="mr-auto">@HelpTextContent.Value</div>
-            }
-            else if (!string.IsNullOrEmpty(HelpText))
-            {
-                <div class="mr-auto">@HelpText</div>
-            }
+        <div slot="prefix" style="display:contents">
+            @PrefixContent(Value)
         </div>
     }
+    else
+    {
+        if (!string.IsNullOrEmpty(PrefixIcon))
+        {
+            <tf-icon slot="prefix">@PrefixIcon</tf-icon>
+        }
+        if (!string.IsNullOrEmpty(PrefixText))
+        {
+            <span slot="prefix">@PrefixText</span>
+        }
+    }
+    @if (PostfixContent is not null)
+    {
+        <div slot="postfix" style="display:contents">
+            @PostfixContent(Value)
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(PostfixIcon) || !string.IsNullOrEmpty(PostfixText))
+    {
+        @if (!string.IsNullOrEmpty(PostfixIcon))
+        {
+            <tf-icon slot="postfix">@PostfixIcon</tf-icon>
+        }
+        @if (!string.IsNullOrEmpty(PostfixText))
+        {
+            <span slot="postfix">@PostfixText</span>
+        }
+    }
+    @if (IsInvalidAndTouched)
+    {
+        <ul slot="helpers" class="mr-auto mb-0 pl-0">
+            @foreach (var message in GetValidationMessages())
+            {
+                <li>@message</li>
+            }
+        </ul>
+    }
+    else if (HelpTextContent.HasValue)
+    {
+        <div slot="helpers" class="@HelpTextClass">@HelpTextContent.Value</div>
+    }
+    else if (!string.IsNullOrEmpty(HelpText))
+    {
+        <div slot="helpers" class="@HelpTextClass">@HelpText</div>
+    }
     @ChildContent
-</div>
+</tf-numeric-input>
 
 

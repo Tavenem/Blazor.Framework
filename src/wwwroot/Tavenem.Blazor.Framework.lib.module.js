@@ -32,6 +32,16 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             };
         }
     });
+    blazor.registerCustomEventType('inputtoggle', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    ? event.detail.value
+                    : null
+            };
+        }
+    });
     blazor.registerCustomEventType('valuechange', {
         createEventArgs: (event) => {
             return {
@@ -101,13 +111,6 @@ function addHeadContent() {
 
 }
 
-function fixCheckboxes() {
-    const cbs = document.querySelectorAll('.checkbox[data-allow-null].indeterminate input:is([type="checkbox"])');
-    for (var cb of cbs) {
-        cb.indeterminate = true;
-    }
-}
-
 function fixTablesOfContents() {
     document
         .querySelectorAll('tf-contents')
@@ -136,7 +139,6 @@ function onEnhancedLoad() {
     addHeadContent();
     fixTablesOfContents();
     scrollToTopOnLoad();
-    fixCheckboxes();
 }
 
 Blazor.addEventListener('enhancedload', onEnhancedLoad);

@@ -106,6 +106,11 @@ public partial class TextInput : InputComponentBase<string>
     [Parameter] public int? MaxLength { get; set; }
 
     /// <summary>
+    /// The minimum length of the input string.
+    /// </summary>
+    [Parameter] public int? MinLength { get; set; }
+
+    /// <summary>
     /// Invoked when the enter key is pressed, and the input is valid.
     /// </summary>
     [Parameter] public EventCallback OnValidEnter { get; set; }
@@ -260,10 +265,40 @@ public partial class TextInput : InputComponentBase<string>
     /// </summary>
     [Parameter] public IEnumerable<KeyValuePair<string, object>>? SuggestionValues { get; set; }
 
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("clearable", Clearable)
+        .ToString();
+
     /// <summary>
     /// The text displayed and edited in the input.
     /// </summary>
     protected string? DisplayString { get; set; }
+
+    private IEnumerable<KeyValuePair<string, object>> AllSuggestionValues
+    {
+        get
+        {
+            if (SuggestionValues is null
+                && LoadedSuggestions is null)
+            {
+                return [];
+            }
+            if (SuggestionValues is null)
+            {
+                return LoadedSuggestions!
+                    .OrderBy(x => x.Key);
+            }
+            if (LoadedSuggestions is null)
+            {
+                return SuggestionValues!
+                    .OrderBy(x => x.Key);
+            }
+            return SuggestionValues
+                .Concat(LoadedSuggestions)
+                .OrderBy(x => x.Key);
+        }
+    }
 
     private string? AutocompleteValue
     {
@@ -291,37 +326,14 @@ public partial class TextInput : InputComponentBase<string>
 
     private string? CurrentInput { get; set; }
 
-    private IEnumerable<KeyValuePair<string, object>> AllSuggestionValues
-    {
-        get
-        {
-            if (SuggestionValues is null
-                && LoadedSuggestions is null)
-            {
-                return [];
-            }
-            if (SuggestionValues is null)
-            {
-                return LoadedSuggestions!
-                    .OrderBy(x => x.Key);
-            }
-            if (LoadedSuggestions is null)
-            {
-                return SuggestionValues!
-                    .OrderBy(x => x.Key);
-            }
-            return SuggestionValues
-                .Concat(LoadedSuggestions)
-                .OrderBy(x => x.Key);
-        }
-    }
-
-    /// <inheritdoc/>
-    protected string? OuterInputCssClass => new CssBuilder("input picker-value")
-        .Add("clearable", Clearable)
+    /// <summary>
+    /// The CSS class(es) for the field helpers section.
+    /// </summary>
+    private string? HelpTextClass => new CssBuilder("mr-auto")
+        .Add("onfocus", DisplayHelpTextOnFocus)
         .ToString();
 
-    private string? SuggestionListCssClass => new CssBuilder("suggestion-list list clickable dense")
+    private string? SuggestionListCssClass => new CssBuilder("list clickable dense")
         .Add((ThemeColor == ThemeColor.None ? ThemeColor.Primary : ThemeColor).ToCSS())
         .ToString();
 
@@ -330,7 +342,7 @@ public partial class TextInput : InputComponentBase<string>
     private bool LoadingSuggestions { get; set; }
 
     private bool ShowSuggestions => InputType != InputType.Password
-        && (LoadingSuggestions
+        && (LoadSuggestions is not null
         || Suggestions?.Any() == true
         || SuggestionValues?.Any() == true
         || LoadedSuggestions?.Any() == true);

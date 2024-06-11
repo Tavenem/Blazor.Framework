@@ -1,4 +1,5 @@
 import { TavenemAccordionHTMLElement } from './_accordion';
+import { TavenemCheckboxHtmlElement } from './_checkbox';
 import { TavenemContentsHTMLElement } from './_contents';
 import {
     TavenemEmojiHTMLElement,
@@ -12,6 +13,8 @@ import {
     TavenemTooltipHTMLElement
 } from './_popover';
 import { TavenemInputHtmlElement } from './_input';
+import { TavenemInputFieldHtmlElement } from './_input-field';
+import { TavenemNumericInputHtmlElement } from './_numeric-input';
 import { TavenemPickerHtmlElement } from './_picker';
 import { TavenemSelectInputHtmlElement } from './_select';
 import { TavenemColorInputHtmlElement } from './_color-input';
@@ -194,6 +197,8 @@ namespace Tavenem {
         });
 
         customElements.define('tf-accordion', TavenemAccordionHTMLElement);
+
+        customElements.define('tf-checkbox', TavenemCheckboxHtmlElement);
 
         customElements.define('tf-contents', TavenemContentsHTMLElement);
 
@@ -618,6 +623,10 @@ slot button {
         customElements.define('tf-scroll-top', TavenemScrollTopHTMLElement);
 
         customElements.define('tf-input', TavenemInputHtmlElement);
+
+        customElements.define('tf-input-field', TavenemInputFieldHtmlElement);
+
+        customElements.define('tf-numeric-input', TavenemNumericInputHtmlElement);
 
         customElements.define('tf-popover', TavenemPopoverHTMLElement);
 

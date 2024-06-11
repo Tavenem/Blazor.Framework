@@ -138,6 +138,8 @@ public abstract class SelectBase<TValue, TOption>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")
+        .Add("clearable", ShowClear)
+        .Add("clearable-readonly", ShowClear)
         .ToString();
 
     /// <summary>

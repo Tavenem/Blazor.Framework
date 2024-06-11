@@ -9,6 +9,7 @@ namespace Tavenem.Blazor.Framework.Utilities;
 [EventHandler("delete", typeof(ValueChangeEventArgs))]
 [EventHandler("enter", typeof(EventArgs))]
 [EventHandler("searchinput", typeof(ValueChangeEventArgs))]
+[EventHandler("inputtoggle", typeof(ToggleEventArgs))]
 [EventHandler("valuechange", typeof(ValueChangeEventArgs))]
 [EventHandler("valueinput", typeof(ValueChangeEventArgs))]
 public static class EventHandlers;

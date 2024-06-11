@@ -556,3 +556,8 @@ progress {
 [hidden] {
     display: none !important;
 }
+
+[inert] * {
+    cursor: default;
+    pointer-events: none;
+}

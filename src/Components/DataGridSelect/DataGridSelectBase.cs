@@ -108,6 +108,8 @@ public abstract class DataGridSelectBase<
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")
+        .Add("clearable", ShowClear)
+        .Add("clearable-readonly", ShowClear)
         .ToString();
 
     /// <inheritdoc />

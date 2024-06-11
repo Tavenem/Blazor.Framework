@@ -48,25 +48,21 @@
         content: " *";
     }
 
-    &:not(.filled, .outlined, .no-label) {
-        > .input, > .input-content {
-            margin-top: 1rem;
-        }
+    &:not(.filled, .outlined, .no-label) > .input {
+        margin-top: 1rem;
     }
 
-    &:not(.outlined) > .input {
-        &:before {
-            border-color: var(--field-border-color);
-            border-bottom-style: solid;
-            border-bottom-width: 1px;
-            bottom: 0;
-            content: "\00a0";
-            left: 0;
-            right: 0;
-            pointer-events: none;
-            position: absolute;
-            transition: border-bottom 0.2s, border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 0.2s;
-        }
+    &:not(.outlined) > .input:before {
+        border-color: var(--field-border-color);
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        bottom: 0;
+        content: "\00a0";
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        position: absolute;
+        transition: border-bottom 0.2s, border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 0.2s;
     }
 
     &:not(.outlined, .disabled, [disabled], .read-only, [readonly], [inert]) > .input:hover:before {
@@ -181,15 +177,11 @@
     }
 
     &.shrink,
-    &.invalid-value,
     &:focus-within,
     &[placeholder],
-    &[value]:not([value=""]),
+    &:state(has-value),
     &:has(textarea.has-placeholder),
-    &:has(textarea:not(.has-placeholder, :placeholder-shown)),
-    &:has(tf-input[placeholder]),
-    &:has(tf-input[value]:not([value=""])),
-    &:has(tf-input > *[slot="prefix"]) {
+    &:has(textarea:not(.has-placeholder, :placeholder-shown)) {
         &:not(.filled, .outlined) > label {
             transform: translate(0, 1.5px) scale(.75);
         }
@@ -211,7 +203,10 @@
         }
     }
 
-    &:focus-within, &.invalid {
+    &:focus-within,
+    &.invalid,
+    &:invalid,
+    &:has(textarea:invalid) {
         > .field-helpers.onfocus {
             opacity: 1;
             pointer-events: auto;
@@ -289,23 +284,12 @@
         &.shrink,
         &:focus-within,
         &:has(textarea.has-placeholder),
-        &:has(textarea:not(.has-placeholder, :placeholder-shown)),
-        &:has(tf-input[placeholder]),
-        &:has(tf-input[value]:not([value=""])),
-        &:has(tf-input > *[slot="prefix"]) {
+        &:has(textarea:not(.has-placeholder, :placeholder-shown)) {
             &:not(.filled, .outlined) > label {
                 transform: translate(0, 1.5px) scale(.75);
             }
 
             &.filled > label {
-                transform: translate(12px, 7px) scale(.75);
-
-                *[dir="rtl"] & {
-                    transform: translate(-12px, 7px) scale(.75);
-                }
-            }
-
-            &.filled.dense > label {
                 transform: translate(3px, 4px) scale(.75);
 
                 *[dir="rtl"] & {
@@ -314,14 +298,6 @@
             }
 
             &.outlined > label {
-                transform: translate(14px, -6px) scale(.75);
-
-                *[dir="rtl"] & {
-                    transform: translate(-14px, -6px) scale(.75);
-                }
-            }
-
-            &.outlined.dense > label {
                 transform: translate(5px, -6px) scale(.75);
 
                 *[dir="rtl"] & {
@@ -331,7 +307,11 @@
         }
     }
 
-    &.invalid {
+    &.invalid,
+    &:invalid,
+    &:has(textarea:invalid),
+    &:has(input:invalid),
+    &:has(tf-numeric-input:invalid) {
         --field-active-border-color: var(--tavenem-color-error);
         --field-active-border-hover-color: var(--tavenem-color-error);
         --field-active-label-color: var(--tavenem-color-error);
@@ -342,6 +322,7 @@
     }
 
     &.disabled,
+    &:disabled,
     &[disabled],
     &.read-only,
     &[readonly],
@@ -379,7 +360,7 @@
     &.info,
     &.success,
     &.warning {
-        &:not(.invalid, .disabled, [inert]) {
+        &:not(.invalid, :invalid, .disabled, :disabled, [inert]) {
             --field-active-border-color: var(--tavenem-theme-color);
             --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
             --field-active-label-color: var(--tavenem-theme-color);
@@ -388,78 +369,23 @@
             --field-label-color: var(--tavenem-theme-color);
         }
 
+        > .input {
+        }
+
         &.filled {
             background-color: transparent;
             
             > .input {
+                background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), .09);
+
+                &:hover {
+                    background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), 0.13);
+                }
+
                 &:disabled, &[inert], [inert] & {
                     background-color: var(--tavenem-theme-color-hover-bright);
                 }
             }
-        }
-    }
-
-    &.primary.filled > .input {
-        background-color: hsla(var(--tavenem-color-primary-hue), var(--tavenem-color-primary-saturation), var(--tavenem-color-primary-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-primary-hue), var(--tavenem-color-primary-saturation), var(--tavenem-color-primary-lightness), 0.13);
-        }
-    }
-    &.secondary.filled > .input {
-        background-color: hsla(var(--tavenem-color-secondary-hue), var(--tavenem-color-secondary-saturation), var(--tavenem-color-secondary-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-secondary-hue), var(--tavenem-color-secondary-saturation), var(--tavenem-color-secondary-lightness), 0.13);
-        }
-    }
-    &.tertiary.filled > .input {
-        background-color: hsla(var(--tavenem-color-tertiary-hue), var(--tavenem-color-tertiary-saturation), var(--tavenem-color-tertiary-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-tertiary-hue), var(--tavenem-color-tertiary-saturation), var(--tavenem-color-tertiary-lightness), 0.13);
-        }
-    }
-    &.danger.filled > .input {
-        background-color: hsla(var(--tavenem-color-danger-hue), var(--tavenem-color-danger-saturation), var(--tavenem-color-danger-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-danger-hue), var(--tavenem-color-danger-saturation), var(--tavenem-color-danger-lightness), 0.13);
-        }
-    }
-    &.dark.filled > .input {
-        background-color: hsla(var(--tavenem-color-dark-hue), var(--tavenem-color-dark-saturation), var(--tavenem-color-dark-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-dark-hue), var(--tavenem-color-dark-saturation), var(--tavenem-color-dark-lightness), 0.13);
-        }
-    }
-    &.default.filled > .input {
-        background-color: hsla(var(--tavenem-color-default-hue), var(--tavenem-color-default-saturation), var(--tavenem-color-default-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-default-hue), var(--tavenem-color-default-saturation), var(--tavenem-color-default-lightness), 0.13);
-        }
-    }
-    &.info.filled > .input {
-        background-color: hsla(var(--tavenem-color-info-hue), var(--tavenem-color-info-saturation), var(--tavenem-color-info-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-info-hue), var(--tavenem-color-info-saturation), var(--tavenem-color-info-lightness), 0.13);
-        }
-    }
-    &.success.filled > .input {
-        background-color: hsla(var(--tavenem-color-success-hue), var(--tavenem-color-success-saturation), var(--tavenem-color-success-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-success-hue), var(--tavenem-color-success-saturation), var(--tavenem-color-success-lightness), 0.13);
-        }
-    }
-    &.warning.filled > .input {
-        background-color: hsla(var(--tavenem-color-warning-hue), var(--tavenem-color-warning-saturation), var(--tavenem-color-warning-lightness), .09);
-
-        &:hover {
-            background-color: hsla(var(--tavenem-color-warning-hue), var(--tavenem-color-warning-saturation), var(--tavenem-color-warning-lightness), 0.13);
         }
     }
 
@@ -488,18 +414,18 @@
     }
 }
 
-.input, .input-content {
+.field:has(> label),
+tf-datetime-input:has(label) {
+    --field-labeled: true;
+}
+
+.input {
     color: var(--field-color);
     display: inline-flex;
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
     padding-top: 6px;
     position: relative;
-}
-
-.input-content {
-    align-self: flex-start;
-    flex-direction: column;
 }
 
 .input {
@@ -603,4 +529,8 @@
         transform: translateY(-100%);
         transition: opacity 50ms cubic-bezier(0,0,.2,1) 0ms,color 200ms cubic-bezier(0,0,.2,1) 0ms,transform 200ms cubic-bezier(0,0,.2,1) 0ms;
     }
+}
+
+tf-select[data-search-filter] .search-nonmatch {
+    display: none;
 }

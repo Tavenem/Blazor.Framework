@@ -75,18 +75,39 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     }
 
     protected clear() {
-        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
-        if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
         }
+        const input = root.querySelector<TavenemInputHtmlElement>('.input');
         if (input) {
             input.value = '';
         }
     }
 
-    protected onArrowDown(event: KeyboardEvent) { }
+    protected onArrowDown(event: KeyboardEvent) {
+        const popover = this.shadowRoot
+            ? this.shadowRoot.querySelector('tf-popover')
+            || this.querySelector('tf-popover')
+            : this.querySelector('tf-popover');
+        if (popover && !popover.matches(':popover-open')) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.open();
+        }
+    }
 
-    protected onArrowUp(event: KeyboardEvent) { }
+    protected onArrowUp(event: KeyboardEvent) {
+        const popover = this.shadowRoot
+            ? this.shadowRoot.querySelector('tf-popover')
+            || this.querySelector('tf-popover')
+            : this.querySelector('tf-popover');
+        if (popover && popover.matches(':popover-open')) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.open();
+        }
+    }
 
     protected onClosing() { }
 
@@ -137,7 +158,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
                 if (popover && popover.matches(':popover-open')) {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.close();
+                    this.open();
                 }
             } else {
                 this.onArrowUp(event);
@@ -214,7 +235,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     private closeInner() {
         const popover = this.shadowRoot
             ? this.shadowRoot.querySelector<TavenemPopoverHTMLElement>('tf-popover')
-            || this.querySelector<TavenemPopoverHTMLElement>('tf-popover')
+                || this.querySelector<TavenemPopoverHTMLElement>('tf-popover')
             : this.querySelector<TavenemPopoverHTMLElement>('tf-popover');
         if (!popover || !popover.matches(':popover-open')) {
             return;
@@ -223,12 +244,15 @@ export class TavenemPickerHtmlElement extends HTMLElement {
 
         this._closed = true;
 
-        let input = this.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
-        if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector<HTMLInputElement | TavenemInputHtmlElement>('.picker-value');
-        }
-        if (input) {
-            this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(input.value));
+        const root = this.shadowRoot;
+        if (root) {
+            const input = root.querySelector<TavenemInputHtmlElement>('.input');
+            if (input) {
+                const value = input.shadowRoot
+                    ? input.value
+                    : input.getAttribute('value') || '';
+                this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(value));
+            }
         }
 
         clearTimeout(this._closeCooldownTimer);
@@ -335,22 +359,24 @@ export class TavenemPickerHtmlElement extends HTMLElement {
 
         const popover = this.shadowRoot
             ? this.shadowRoot.querySelector<TavenemPopoverHTMLElement>('tf-popover')
-            || this.querySelector<TavenemPopoverHTMLElement>('tf-popover')
+                || this.querySelector<TavenemPopoverHTMLElement>('tf-popover')
             : this.querySelector<TavenemPopoverHTMLElement>('tf-popover');
         if (!popover || popover.matches(':popover-open')) {
             return;
         }
-        popover.show();
-
-        let input = this.querySelector('.picker-value');
-        if (!input && this.shadowRoot) {
-            input = this.shadowRoot.querySelector('.picker-value');
+        if (typeof popover.show === 'function') {
+            popover.show();
         }
-        if (input) {
-            if (input instanceof TavenemInputHtmlElement) {
-                input.focusInnerInput();
-            } else if (input instanceof HTMLElement) {
-                input.focus();
+
+        const root = this.shadowRoot;
+        if (root) {
+            const input = root.querySelector<TavenemInputHtmlElement>('.input');
+            if (input) {
+                if (input.shadowRoot) {
+                    input.focusInnerInput();
+                } else {
+                    input.focus();
+                }
             }
         }
 

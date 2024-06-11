@@ -87,11 +87,6 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
         .Add("onfocus", DisplayHelpTextOnFocus)
         .ToString();
 
-    /// <summary>
-    /// The HTML <c>id</c> value for the <c>input</c> element.
-    /// </summary>
-    protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
-
     /// <inheritdoc/>
     protected override void OnParametersSet()
     {

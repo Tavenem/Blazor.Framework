@@ -6,7 +6,7 @@
 
 <tf-datetime-input @ref="ElementReference"
                    @attributes="AdditionalAttributes"
-                   id="@ContainerId"
+                   id="@Id"
                    autofocus="@AutoFocus"
                    button="@(DisplayType == PickerDisplayType.Button)"
                    class="@CssClass"
@@ -14,9 +14,9 @@
                    data-calendar="@Calendar"
                    data-has-text-input
                    data-hour12="@IsTwelveHour"
-                   data-input-id="@Id"
                    data-input-class="@InputCssClass"
                    data-input-style="@InputCssStyle"
+                   data-label="@Label"
                    data-locale="@Culture.Name"
                    data-pm="@PMString"
                    data-popover-container
@@ -42,28 +42,18 @@
                    @valuechange="OnValueChange">
     @if (DisplayType != PickerDisplayType.Button)
     {
-        if (!string.IsNullOrEmpty(Label))
+        @if (IsInvalidAndTouched)
         {
-            <label for="@Id">@Label</label>
+            <ul slot="helpers" class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
         }
-        @if (!string.IsNullOrEmpty(HelpText)
-            || IsInvalidAndTouched)
+        else if (!string.IsNullOrEmpty(HelpText))
         {
-            <div class="field-helpers">
-                @if (IsInvalidAndTouched)
-                {
-                    <ul class="mr-auto mb-0 pl-0">
-                        @foreach (var message in GetValidationMessages())
-                        {
-                            <li>@message</li>
-                        }
-                    </ul>
-                }
-                else if (!string.IsNullOrEmpty(HelpText))
-                {
-                    <div class="mr-auto">@HelpText</div>
-                }
-            </div>
+            <div slot="helpers" class="mr-auto">@HelpText</div>
         }
     }
     @ChildContent

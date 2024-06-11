@@ -1,6 +1,4 @@
-﻿import { documentPositionComparator } from "./tavenem-utility";
-
-enum MouseEventType {
+﻿enum MouseEventType {
     None = 0,
     LeftClick = 1 << 0,
     RightClick = 1 << 1,
@@ -679,7 +677,6 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
 
 export class TavenemTooltipHTMLElement extends HTMLElement {
     private _anchor: Element | null | undefined;
-    private _button: HTMLButtonElement | undefined;
     private _hideTimer: number;
     private _mouseOver: boolean;
     private _showTimer: number;
@@ -772,7 +769,6 @@ button {
             button.addEventListener('mouseover', this.onAttentionOnButton.bind(this));
             button.addEventListener('mouseleave', this.onAttentionOutButton.bind(this));
             shadow.appendChild(button);
-            this._button = button;
 
             const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             icon.setAttributeNS(null, 'viewBox', "0 0 24 24");
@@ -790,13 +786,172 @@ button {
             shadow.appendChild(style);
         }
 
-        document.addEventListener('focusin', this.onAttentionOnTarget.bind(this));
-        document.addEventListener('focusout', this.onAttentionOutTarget.bind(this));
-        document.addEventListener('mouseover', this.onAttentionOnTarget.bind(this));
-        document.addEventListener('mouseout', this.onAttentionOutTarget.bind(this));
+        style.innerHTML += `
+tf-poopover {
+    --tooltip-color: var(--tavenem-color-text);
+    --tooltip-color-bg: var(--tavenem-color-bg-surface);
+    align-items: center;
+    background-color: var(--tooltip-color-bg);
+    border-radius: var(--tavenem-border-radius);
+    color: var(--tooltip-color);
+    cursor: auto;
+    font-size: .75rem;
+    font-weight: var(--tavenem-font-weight-semibold);
+    justify-content: center;
+    line-height: 1.4rem;
+    padding: .25rem .5rem;
+    pointer-events: auto;
+    text-align: center;
+    text-transform: none;
+    user-select: text;
+    z-index: var(--tavenem-zindex-tooltip);
+
+    &.top-center,
+    &.bottom-center,
+    &.center-left,
+    &.center-right {
+        &.arrow:after {
+            border-color: var(--tooltip-color-bg) transparent transparent transparent;
+            border-style: solid;
+            border-width: 6px;
+            content: "";
+            position: absolute;
+        }
+    }
+
+    &.bottom-center, &.top-center {
+        &.arrow:after {
+            left: calc(50% - 3px);
+        }
+    }
+
+    &.center-right, &.center-left {
+        &.arrow:after {
+            top: calc(50% - 3px);
+        }
+    }
+
+    &.bottom-center:not([data-popover-flip]), &.top-center[data-popover-flip] {
+        transform: translateY(-10px);
+
+        &.arrow:after {
+            top: 100%;
+            transform: rotate(0deg);
+        }
+    }
+
+    &.center-right:not([data-popover-flip]), &.center-left[data-popover-flip] {
+        transform: translateX(-10px);
+
+        &.arrow:after {
+            left: 100%;
+            transform: rotate(270deg);
+        }
+    }
+
+    &.center-left:not([data-popover-flip]), &.center-right[data-popover-flip] {
+        transform: translateX(10px);
+
+        &.arrow:after {
+            right: 100%;
+            transform: rotate(90deg);
+        }
+    }
+
+    &.top-center:not([data-popover-flip]), &.bottom-center[data-popover-flip] {
+        transform: translateY(10px);
+
+        &.arrow:after {
+            bottom: 100%;
+            transform: rotate(180deg);
+        }
+    }
+
+    &.filled {
+        --tooltip-color: var(--tavenem-theme-color-text, var(--tavenem-color-text));
+        --tooltip-color-bg: var(--tavenem-theme-color, var(--tavenem-color-bg-alt));
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --tooltip-color: var(--tavenem-theme-color-text);
+        --tooltip-color-bg: var(--tavenem-theme-color-darken);
+    }
+}
+`;
+
+        const root = this.getRootNode();
+        root.addEventListener('focusin', this.onAttentionOnTarget.bind(this));
+        root.addEventListener('focusout', this.onAttentionOutTarget.bind(this));
+        root.addEventListener('mouseover', this.onAttentionOnTarget.bind(this));
+        root.addEventListener('mouseout', this.onAttentionOutTarget.bind(this));
+
+        const popover = document.createElement('tf-popover');
+        popover.popover = 'auto';
+
+        if ('popoverClass' in this.dataset
+            && this.dataset.popoverClass
+            && this.dataset.popoverClass.length) {
+            popover.classList.add(...this.dataset.popoverClass.split(' '));
+        }
+        if ('popoverOrigin' in this.dataset
+            && this.dataset.popoverOrigin
+            && this.dataset.popoverOrigin.length) {
+            popover.classList.add(this.dataset.popoverOrigin);
+        } else {
+            popover.classList.add('top-center');
+        }
+        if ('anchorOrigin' in this.dataset
+            && this.dataset.anchorOrigin
+            && this.dataset.anchorOrigin.length) {
+            popover.classList.add(this.dataset.anchorOrigin);
+        } else {
+            popover.classList.add('anchor-bottom-center');
+        }
+        popover.classList.add('flip-always');
+        if ('arrow' in this.dataset) {
+            popover.classList.add('arrow');
+        }
+
+        if ('popoverStyle' in this.dataset
+            && this.dataset.popoverStyle
+            && this.dataset.popoverStyle.length) {
+            popover.style.cssText = this.dataset.popoverStyle;
+        }
+        if ('maxHeight' in this.dataset
+            && this.dataset.maxHeight
+            && this.dataset.maxHeight.length) {
+            popover.style.maxHeight = this.dataset.maxHeight;
+            popover.style.overflowY = 'auto';
+        }
+
+        if ('delay' in this.dataset
+            && this.dataset.delay
+            && this.dataset.delay.length) {
+            popover.style.transitionDelay = this.dataset.delay + 'ms';
+        } else {
+            popover.style.transitionDelay = '750ms';
+        }
+
+        popover.tabIndex = -1;
+        shadow.appendChild(popover);
 
         const slot = document.createElement('slot');
-        shadow.appendChild(slot);
+        popover.appendChild(slot);
+
+        if (this.childElementCount === 0
+            && this.textContent
+            && this.textContent.length) {
+            slot.textContent = this.textContent;
+        }
 
         this.addEventListener('mousedown', this.stopEvent.bind(this));
         this.addEventListener('mouseup', this.stopEvent.bind(this));
@@ -807,28 +962,36 @@ button {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
 
-        document.removeEventListener('focusin', this.onAttentionOnTarget.bind(this));
-        document.removeEventListener('focusout', this.onAttentionOutTarget.bind(this));
-        document.removeEventListener('mouseover', this.onAttentionOnTarget.bind(this));
-        document.removeEventListener('mouseout', this.onAttentionOutTarget.bind(this));
+        const root = this.getRootNode();
+        root.removeEventListener('focusin', this.onAttentionOnTarget.bind(this));
+        root.removeEventListener('focusout', this.onAttentionOutTarget.bind(this));
+        root.removeEventListener('mouseover', this.onAttentionOnTarget.bind(this));
+        root.removeEventListener('mouseout', this.onAttentionOutTarget.bind(this));
 
         this.removeEventListener('mousedown', this.stopEvent.bind(this));
         this.removeEventListener('mouseup', this.stopEvent.bind(this));
         this.removeEventListener('click', this.onClick.bind(this));
 
-        if (this._button) {
-            this._button.removeEventListener('click', this.toggle.bind(this));
-            this._button.removeEventListener('focusin', this.onAttentionOnButton.bind(this));
-            this._button.removeEventListener('focusout', this.onAttentionOutButton.bind(this));
-            this._button.removeEventListener('mouseover', this.onAttentionOnButton.bind(this));
-            this._button.removeEventListener('mouseleave', this.onAttentionOutButton.bind(this));
+        const button = this.shadowRoot
+            ? this.shadowRoot.querySelector('button')
+            : null;
+        if (button) {
+            button.removeEventListener('click', this.toggle.bind(this));
+            button.removeEventListener('focusin', this.onAttentionOnButton.bind(this));
+            button.removeEventListener('focusout', this.onAttentionOutButton.bind(this));
+            button.removeEventListener('mouseover', this.onAttentionOnButton.bind(this));
+            button.removeEventListener('mouseleave', this.onAttentionOutButton.bind(this));
         }
     }
 
     onAttentionOut() {
         this._mouseOver = false;
 
-        const tooltip = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
         if (!tooltip || !tooltip.mouseOver) {
             clearTimeout(this._showTimer);
             this._hideTimer = setTimeout(this.hide.bind(this), 200);
@@ -836,7 +999,9 @@ button {
     }
 
     onPopoverMouseLeave(popover: TavenemPopoverHTMLElement, event: MouseEvent) {
-        if (this.contains(popover)
+        const root = this.shadowRoot;
+        if (root
+            && root.contains(popover)
             && (!(event.relatedTarget instanceof Node)
                 || !this.contains(event.relatedTarget))) {
             this._mouseOver = false;
@@ -874,7 +1039,11 @@ button {
     toggleVisibility() {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const tooltip = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
         if (tooltip) {
             tooltip.toggle();
         }
@@ -883,11 +1052,15 @@ button {
     private hide() {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const tooltip = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
+        this._anchor = null;
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
         if (tooltip) {
             tooltip.hide();
         }
-        this._anchor = null;
     }
 
     private onAttentionOn() {
@@ -897,7 +1070,7 @@ button {
 
     private onAttentionOnButton(event: Event) {
         event.stopPropagation();
-        this._anchor = this._button;
+        this._anchor = event.target instanceof Element ? event.target : null;
         this.onAttentionOn();
     }
 
@@ -948,7 +1121,11 @@ button {
     private show(element?: Element) {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const tooltip = this.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
         if (tooltip) {
             tooltip.anchor = element || this._anchor;
             tooltip.show();
@@ -980,7 +1157,7 @@ button {
                 : null;
         }
 
-        if (!('tooltipContainerTrigger' in this.dataset)) {
+        if ('containerNoTrigger' in this.dataset) {
             return null;
         }
 

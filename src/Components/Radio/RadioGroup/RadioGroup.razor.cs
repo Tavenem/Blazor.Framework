@@ -64,6 +64,11 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     [Parameter] public IFormatProvider? FormatProvider { get; set; }
 
     /// <summary>
+    /// Custom HTML attributes for the input element.
+    /// </summary>
+    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
+
+    /// <summary>
     /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
     /// </summary>
     [Parameter] public bool IsCheckedIconOutlined { get; set; }
@@ -114,6 +119,16 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("radio-group")
+        .ToString();
+
+    /// <inheritdoc/>
+    protected override string? InputCssClass => new CssBuilder(InputClass)
+        .AddClassFromDictionary(InputAttributes)
+        .ToString();
+
+    /// <inheritdoc/>
+    protected override string? InputCssStyle => new CssBuilder(InputStyle)
+        .AddStyleFromDictionary(InputAttributes)
         .ToString();
 
     [CascadingParameter] private RadioContext<TValue>? CascadingContext { get; set; }

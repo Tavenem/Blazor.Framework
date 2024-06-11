@@ -9,8 +9,9 @@ export enum ToolbarControlStyle {
     ButtonGroup = 4,
 }
 
-interface ToolbarControlDefinition {
+export interface ToolbarControlDefinition {
     buttons?: ToolbarControlDefinition[];
+    dropdownTooltip?: string;
     icon?: string;
     inactiveIcon?: string;
     isStyle?: boolean;
@@ -87,41 +88,73 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
             },
         ],
     }, {
+        dropdownTooltip: 'underline',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120v-80h560v80H200Zm280-160q-101 0-157-63t-56-167v-330h103v336q0 56 28 91t82 35q54 0 82-35t28-91v-336h103v330q0 104-56 167t-157 63Z"/></svg>',
         isStyle: true,
-        tooltip: 'underline',
+        tooltip: 'inline style',
         type: CommandType.Underline,
         style: ToolbarControlStyle.ButtonGroup,
         buttons: [
             {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M486-160q-76 0-135-45t-85-123l88-38q14 48 48.5 79t85.5 31q42 0 76-20t34-64q0-18-7-33t-19-27h112q5 14 7.5 28.5T694-340q0 86-61.5 133T486-160ZM80-480v-80h800v80H80Zm402-326q66 0 115.5 32.5T674-674l-88 39q-9-29-33.5-52T484-710q-41 0-68 18.5T386-640h-96q2-69 54.5-117.5T482-806Z"/></svg>',
-                tooltip: 'strikethrough',
-                type: CommandType.Strikethrough,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M760-160v-80q0-17 11.5-28.5T800-280h80v-40H760v-40h120q17 0 28.5 11.5T920-320v40q0 17-11.5 28.5T880-240h-80v40h120v40H760Zm-525-80 185-291-172-269h106l124 200h4l123-200h107L539-531l186 291H618L482-457h-4L342-240H235Z"/></svg>',
-                tooltip: 'subscript',
-                type: CommandType.Subscript,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M760-600v-80q0-17 11.5-28.5T800-720h80v-40H760v-40h120q17 0 28.5 11.5T920-760v40q0 17-11.5 28.5T880-680h-80v40h120v40H760ZM235-160l185-291-172-269h106l124 200h4l123-200h107L539-451l186 291H618L482-377h-4L342-160H235Z"/></svg>',
-                tooltip: 'superscript',
-                type: CommandType.Superscript,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z"/></svg>',
-                tooltip: 'code',
-                type: CommandType.CodeInline,
-            },
-            {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M560-160v-520H360v-120h520v120H680v520H560Zm-360 0v-320H80v-120h360v120H320v320H200Z"/></svg>',
-                tooltip: 'small',
+                text: 'Small',
                 type: CommandType.Small,
             },
             {
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>',
-                tooltip: 'inserted',
-                type: CommandType.Inserted,
+                text: 'Strikethrough',
+                type: CommandType.Strikethrough,
+            },
+            {
+                text: 'Subscript',
+                type: CommandType.Subscript,
+            },
+            {
+                text: 'Superscript',
+                type: CommandType.Superscript,
+            },
+            {
+                text: 'Advanced',
+                buttons: [
+                    {
+                        text: 'Abbreviation',
+                        type: CommandType.Abbreviation,
+                    },
+                    {
+                        text: 'Cite',
+                        type: CommandType.Cite,
+                    },
+                    {
+                        text: 'Code',
+                        type: CommandType.CodeInline,
+                    },
+                    {
+                        text: 'Definition',
+                        type: CommandType.Definition,
+                    },
+                    {
+                        text: 'Inserted',
+                        type: CommandType.Inserted,
+                    },
+                    {
+                        text: 'Keyboard',
+                        type: CommandType.Keyboard,
+                    },
+                    {
+                        text: 'Marked',
+                        type: CommandType.Marked,
+                    },
+                    {
+                        text: 'Quote',
+                        type: CommandType.Quote,
+                    },
+                    {
+                        text: 'Sample',
+                        type: CommandType.Sample,
+                    },
+                    {
+                        text: 'Variable',
+                        type: CommandType.Variable,
+                    },
+                ],
             },
         ],
     }, {
@@ -134,46 +167,96 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         style: ToolbarControlStyle.Dropdown,
         buttons: [
             {
-                text: 'Heading 1',
-                type: CommandType.Heading,
-                params: [1],
-            },
-            {
-                text: 'Heading 2',
-                type: CommandType.Heading,
-                params: [2],
-            },
-            {
-                text: 'Heading 3',
-                type: CommandType.Heading,
-                params: [3],
-            },
-            {
-                text: 'Heading 4',
-                type: CommandType.Heading,
-                params: [4],
-            },
-            {
-                text: 'Heading 5',
-                type: CommandType.Heading,
-                params: [5],
-            },
-            {
-                text: 'Heading 6',
-                type: CommandType.Heading,
-                params: [6],
-            },
-            {
-                text: 'Paragraph',
-                type: CommandType.Paragraph,
+                text: 'Heading',
+                buttons: [
+                    {
+                        text: 'Heading 1',
+                        type: CommandType.Heading,
+                        params: [1],
+                    },
+                    {
+                        text: 'Heading 2',
+                        type: CommandType.Heading,
+                        params: [2],
+                    },
+                    {
+                        text: 'Heading 3',
+                        type: CommandType.Heading,
+                        params: [3],
+                    },
+                    {
+                        text: 'Heading 4',
+                        type: CommandType.Heading,
+                        params: [4],
+                    },
+                    {
+                        text: 'Heading 5',
+                        type: CommandType.Heading,
+                        params: [5],
+                    },
+                    {
+                        text: 'Heading 6',
+                        type: CommandType.Heading,
+                        params: [6],
+                    },
+                ],
             },
             {
                 text: 'Block quote',
                 type: CommandType.BlockQuote,
             },
             {
-                text: 'Code block',
-                type: CommandType.CodeBlock,
+                text: 'Paragraph',
+                type: CommandType.Paragraph,
+            },
+            {
+                text: 'Advanced',
+                buttons: [
+                    {
+                        text: 'Address',
+                        type: CommandType.Address,
+                    },
+                    {
+                        text: 'Article',
+                        type: CommandType.Article,
+                    },
+                    {
+                        text: 'Aside',
+                        type: CommandType.Aside,
+                    },
+                    {
+                        text: 'Code block',
+                        type: CommandType.CodeBlock,
+                    },
+                    {
+                        text: 'Details',
+                        type: CommandType.Details,
+                    },
+                    {
+                        text: 'Figure',
+                        type: CommandType.Figure,
+                    },
+                    {
+                        text: 'Figure Caption',
+                        type: CommandType.FigureCaption,
+                    },
+                    {
+                        text: 'Footer',
+                        type: CommandType.Footer,
+                    },
+                    {
+                        text: 'Header',
+                        type: CommandType.Header,
+                    },
+                    {
+                        text: 'Heading Group',
+                        type: CommandType.HeadingGroup,
+                    },
+                    {
+                        text: 'Section',
+                        type: CommandType.Section,
+                    },
+                ],
             },
         ],
     }, {
@@ -187,11 +270,22 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         type: CommandType.InsertLink,
         style: ToolbarControlStyle.Button,
     }, {
+        dropdownTooltip: 'image',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/></svg>',
         isStyle: true,
-        tooltip: 'image',
+        tooltip: 'insert media',
         type: CommandType.InsertImage,
-        style: ToolbarControlStyle.Button,
+        style: ToolbarControlStyle.ButtonGroup,
+        buttons: [
+            {
+                text: 'Audio',
+                type: CommandType.InsertAudio,
+            },
+            {
+                text: 'Video',
+                type: CommandType.InsertVideo,
+            },
+        ],
     }, {
         isStyle: true,
         style: ToolbarControlStyle.Separator,
@@ -365,6 +459,11 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
             {
                 text: 'Split Cell',
                 type: CommandType.TableSplitCell,
+            },
+            {
+                separatorBefore: true,
+                text: 'Add Caption',
+                type: CommandType.TableAddCaption,
             },
             {
                 separatorBefore: true,

@@ -15,7 +15,7 @@ namespace Tavenem.Blazor.Framework;
 /// </typeparam>
 public partial class NumericInput<TValue> : InputComponentBase<TValue>
 {
-    private static readonly bool _isFloatingPoint;
+    private static readonly bool _isClearable, _isFloatingPoint;
     private static readonly TValue _maxDefault, _minDefault, _one, _zero;
 
     /// <summary>
@@ -141,15 +141,15 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// </summary>
     [Parameter] public TValue? Step { get; set; }
 
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(base.Class)
+        .Add("clearable", _isClearable)
+        .ToString();
+
     /// <summary>
     /// The text displayed and edited in the input.
     /// </summary>
     protected string? DisplayString { get; set; }
-
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("number-field")
-        .ToString();
 
     private static string InputMode => _isFloatingPoint ? "decimal" : "numeric";
 
@@ -165,21 +165,12 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         }
     }
 
-    private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    private bool DecrementDisabled => Disabled
-        || ReadOnly
-        || (IsInteractive
-            && CurrentValue is not null
-            && (FormExtensions.ValuesEqual(CurrentValue, Min)
-                || FormExtensions.ValueIsLess(CurrentValue, Min)));
-
-    private bool IncrementDisabled => Disabled
-        || ReadOnly
-        || (IsInteractive
-            && CurrentValue is not null
-            && (FormExtensions.ValuesEqual(CurrentValue, Max)
-                || FormExtensions.ValueIsMore(CurrentValue, Max)));
+    /// <summary>
+    /// The CSS class(es) for the field helpers section.
+    /// </summary>
+    private string? HelpTextClass => new CssBuilder("mr-auto")
+        .Add("onfocus", DisplayHelpTextOnFocus)
+        .ToString();
 
     private protected string? MaxString
         => FormExtensions.ValuesEqual(Max, _maxDefault)
@@ -190,10 +181,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         => FormExtensions.ValuesEqual(Min, _minDefault)
         ? null
         : FormExtensions.SuppressScientificFormat(Min);
-
-    private string? StepIconClass => new CssBuilder("svg-icon")
-        .Add(ThemeColor.ToCSS(), ThemeColor != ThemeColor.None)
-        .ToString();
 
     private protected string? StepString
     {
@@ -223,7 +210,10 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
             || typeof(TValue) == typeof(float)
             || typeof(TValue) == typeof(float?);
 
-        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+        var nullableType = Nullable.GetUnderlyingType(typeof(TValue));
+        _isClearable = nullableType is not null;
+        var targetType = nullableType ?? typeof(TValue);
+
         if (targetType == typeof(byte))
         {
             _minDefault = (TValue)(object)byte.MinValue;

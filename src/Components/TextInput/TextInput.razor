@@ -2,40 +2,42 @@
 
 @inherits InputComponentBase<string>
 
-<tf-select @attributes="AdditionalAttributes"
-           class="@CssClass"
-           data-disable-autosearch
-           data-has-text-input
-           data-search-filter="@(!ShowAllSuggestions)"
-           style="@CssStyle">
-    <tf-input @ref="ElementReference"
-              @attributes="InputAttributes"
-              id="@InputId"
-              autocomplete="@AutocompleteValue"
-              autocorrect="@AutocorrectValue"
-              autofocus="@AutoFocus"
-              class="@OuterInputCssClass"
-              data-input-class="@InputCssClass"
-              data-input-debounce="@UpdateOnInputDebounce"
-              data-input-id="@Id"
-              data-input-style="@InputCssStyle"
-              disabled="@Disabled"
-              display="@DisplayString"
-              maxlength="@MaxLength"
-              name="@NameValue"
-              pattern="@Pattern"
-              placeholder="@Placeholder"
-              readonly="@ReadOnly"
-              required="@Required"
-              size="@Size"
-              spellcheck="@SpellcheckValue"
-              tabindex="@TabIndex"
-              type="@InputType.ToCSS()"
-              value="@CurrentValue"
-              @onclick:stopPropagation="true"
-              @valueinput="OnInputAsync"
-              @valuechange="OnChangeAsync"
-              @enter="OnEnterAsync">
+@if (ShowSuggestions) {
+    <tf-select @ref="ElementReference"
+               @attributes="AdditionalAttributes"
+               id="@Id"
+               autocomplete="@AutocompleteValue"
+               autocorrect="@AutocorrectValue"
+               autofocus="@AutoFocus"
+               class="@CssClass"
+               data-disable-autosearch
+               data-has-text-input
+               data-hide-expand
+               data-input-class="@InputCssClass"
+               data-input-debounce="@UpdateOnInputDebounce"
+               data-input-style="@InputCssStyle"
+               data-label="@Label"
+               data-popover-limit-height
+               data-search-filter="@(!ShowAllSuggestions)"
+               data-show-emoji="@ShowEmoji"
+               disabled="@Disabled"
+               display="@DisplayString"
+               maxlength="@MaxLength"
+               minlength="@MinLength"
+               name="@NameValue"
+               pattern="@Pattern"
+               placeholder="@Placeholder"
+               readonly="@ReadOnly"
+               required="@Required"
+               size="@Size"
+               spellcheck="@SpellcheckValue"
+               style="@CssStyle"
+               tabindex="@TabIndex"
+               type="@InputType.ToCSS()"
+               value="@CurrentValue"
+               @valueinput="OnInputAsync"
+               @valuechange="OnChangeAsync"
+               @enter="OnEnterAsync">
         @if (PrefixContent is not null)
         {
             <div slot="prefix" style="display:content">
@@ -53,115 +55,181 @@
                 <span slot="prefix">@PrefixText</span>
             }
         }
-        @if (ShowEmoji)
-        {
-            <EmojiInput Class="nested m-0" IconButton="true">
-                <Tooltip Delay="750">insert emoji</Tooltip>
-            </EmojiInput>
-        }
         @if (PostfixContent is not null)
         {
-            @PostfixContent(Value)
+            <div slot="postfix" style="display:content">
+                @PostfixContent(Value)
+            </div>
         }
         else if (!string.IsNullOrEmpty(PostfixIcon) || !string.IsNullOrEmpty(PostfixText))
         {
             @if (!string.IsNullOrEmpty(PostfixIcon))
             {
-                <tf-icon>@PostfixIcon</tf-icon>
+                <tf-icon slot="postfix">@PostfixIcon</tf-icon>
             }
             @if (!string.IsNullOrEmpty(PostfixText))
             {
-                <span>@PostfixText</span>
+                <span slot="postfix">@PostfixText</span>
             }
         }
-    </tf-input>
-    @if (!string.IsNullOrEmpty(Label))
-    {
-        <label for="@Id">@Label</label>
-    }
-    @if ((ShowLength && MaxLength.HasValue)
-        || !string.IsNullOrEmpty(HelpText)
-        || HelpTextContent.HasValue
-        || IsInvalidAndTouched)
-    {
-        <div class="@HelpersClass">
-            @if (IsInvalidAndTouched)
-            {
-                <ul class="mr-auto mb-0 pl-0">
-                    @foreach (var message in GetValidationMessages())
-                    {
-                        <li>@message</li>
-                    }
-                </ul>
-            }
-            else if (HelpTextContent.HasValue)
-            {
-                <div class="mr-auto">@HelpTextContent.Value</div>
-            }
-            else if (!string.IsNullOrEmpty(HelpText))
-            {
-                <div class="mr-auto">@HelpText</div>
-            }
-            @if (ShowLength && MaxLength.HasValue)
-            {
-                <div class="ml-auto">
-                    <span class="current-length">@(CurrentValue?.Length ?? 0)</span>
-                    <span>/</span>
-                    <span>@MaxLength</span>
-                </div>
-            }
-        </div>
-    }
-    @ChildContent
-    @if (ShowSuggestions)
-    {
-        <Popover AnchorId="@InputId"
-                 AnchorOrigin="Origin.Bottom_Left"
-                 Class="suggestion-popover filled"
-                 DismissOnTapOutside="true"
-                 PopoverOrigin="Origin.Top_Left"
-                 MatchWidth="true"
-                 MaxHeight="min(300px,90vh)">
-            <menu class="@SuggestionListCssClass"
-                  @onclick:stopPropagation="true">
-                @if (Suggestions is not null)
+        @if (IsInvalidAndTouched)
+        {
+            <ul slot="helpers" class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
                 {
-                    @foreach (var suggestion in Suggestions.Order())
-                    {
-                        <li @key="suggestion"
-                            data-close-picker
-                            data-close-picker-value="@suggestion"
-                            tabindex="0">@suggestion</li>
-                    }
+                    <li>@message</li>
                 }
-                @if (SuggestionTemplate is null)
+            </ul>
+        }
+        else if (HelpTextContent.HasValue)
+        {
+            <div slot="helpers" class="@HelpTextClass">@HelpTextContent.Value</div>
+        }
+        else if (!string.IsNullOrEmpty(HelpText))
+        {
+            <div slot="helpers" class="@HelpTextClass">@HelpText</div>
+        }
+        @if (ShowLength && MaxLength.HasValue)
+        {
+            <div slot="helpers" class="ml-auto">
+                <span class="current-length">@(CurrentValue?.Length ?? 0)</span>
+                <span>/</span>
+                <span>@MaxLength</span>
+            </div>
+        }
+        @ChildContent
+        <menu class="@SuggestionListCssClass" slot="popover">
+            @if (Suggestions is not null)
+            {
+                @foreach (var suggestion in Suggestions.Order())
                 {
-                    @foreach (var suggestion in AllSuggestionValues)
-                    {
-                        <li @key="suggestion.Key"
-                            data-close-picker
-                            data-close-picker-value="@suggestion.Key"
-                            data-close-picker-display="@suggestion.Value.ToString()"
-                            tabindex="0">@suggestion.Value.ToString()</li>
-                    }
+                    <li @key="suggestion"
+                        data-close-picker
+                        data-close-picker-value="@suggestion"
+                        tabindex="0">@suggestion</li>
                 }
-                else
+            }
+            @if (SuggestionTemplate is null)
+            {
+                @foreach (var suggestion in AllSuggestionValues)
                 {
-                    @foreach (var suggestion in AllSuggestionValues)
-                    {
-                        <li @key="suggestion.Key"
-                            data-close-picker
-                            data-close-picker-value="@suggestion.Key"
-                            tabindex="0">
-                            @SuggestionTemplate(suggestion.Value)
-                        </li>
-                    }
+                    <li @key="suggestion.Key"
+                        data-close-picker
+                        data-close-picker-value="@suggestion.Key"
+                        data-close-picker-display="@suggestion.Value.ToString()"
+                        tabindex="0">@suggestion.Value.ToString()</li>
                 }
-                @if (LoadingSuggestions)
+            }
+            else
+            {
+                @foreach (var suggestion in AllSuggestionValues)
                 {
-                    <tf-progress-circle></tf-progress-circle>
+                    <li @key="suggestion.Key"
+                        data-close-picker
+                        data-close-picker-value="@suggestion.Key"
+                        tabindex="0">
+                        @SuggestionTemplate(suggestion.Value)
+                    </li>
                 }
-            </menu>
-        </Popover>
-    }
-</tf-select>
+            }
+        </menu>
+        @if (LoadingSuggestions)
+        {
+            <tf-progress-circle slot="popover"></tf-progress-circle>
+        }
+    </tf-select>
+}
+else
+{
+    <tf-input-field @ref="ElementReference"
+                    @attributes="AdditionalAttributes"
+                    id="@Id"
+                    autocomplete="@AutocompleteValue"
+                    autocorrect="@AutocorrectValue"
+                    autofocus="@AutoFocus"
+                    class="@CssClass"
+                    data-input-class="@InputCssClass"
+                    data-input-debounce="@UpdateOnInputDebounce"
+                    data-input-style="@InputCssStyle"
+                    data-label="@Label"
+                    data-show-emoji="@ShowEmoji"
+                    disabled="@Disabled"
+                    display="@DisplayString"
+                    maxlength="@MaxLength"
+                    minlength="@MinLength"
+                    name="@NameValue"
+                    pattern="@Pattern"
+                    placeholder="@Placeholder"
+                    readonly="@ReadOnly"
+                    required="@Required"
+                    size="@Size"
+                    spellcheck="@SpellcheckValue"
+                    style="@CssStyle"
+                    tabindex="@TabIndex"
+                    type="@InputType.ToCSS()"
+                    value="@CurrentValue"
+                    @valueinput="OnInputAsync"
+                    @valuechange="OnChangeAsync"
+                    @enter="OnEnterAsync">
+        @if (PrefixContent is not null)
+        {
+            <div slot="prefix" style="display:content">
+                @PrefixContent(Value)
+            </div>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(PrefixIcon))
+            {
+                <tf-icon slot="prefix">@PrefixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PrefixText))
+            {
+                <span slot="prefix">@PrefixText</span>
+            }
+        }
+        @if (PostfixContent is not null)
+        {
+            <div slot="postfix" style="display:content">
+                @PostfixContent(Value)
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(PostfixIcon) || !string.IsNullOrEmpty(PostfixText))
+        {
+            @if (!string.IsNullOrEmpty(PostfixIcon))
+            {
+                <tf-icon slot="postfix">@PostfixIcon</tf-icon>
+            }
+            @if (!string.IsNullOrEmpty(PostfixText))
+            {
+                <span slot="postfix">@PostfixText</span>
+            }
+        }
+        @if (IsInvalidAndTouched)
+        {
+            <ul slot="helpers" class="mr-auto mb-0 pl-0">
+                @foreach (var message in GetValidationMessages())
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        }
+        else if (HelpTextContent.HasValue)
+        {
+            <div slot="helpers" class="@HelpTextClass">@HelpTextContent.Value</div>
+        }
+        else if (!string.IsNullOrEmpty(HelpText))
+        {
+            <div slot="helpers" class="@HelpTextClass">@HelpText</div>
+        }
+        @if (ShowLength && MaxLength.HasValue)
+        {
+            <div slot="helpers" class="ml-auto">
+                <span class="current-length">@(CurrentValue?.Length ?? 0)</span>
+                <span>/</span>
+                <span>@MaxLength</span>
+            </div>
+        }
+        @ChildContent
+    </tf-input-field>
+}

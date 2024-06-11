@@ -53,33 +53,11 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
         .Add("shrink", ShrinkWhen)
         .ToString();
 
-    /// <inheritdoc/>
-    protected string? OuterInputCssClass => new CssBuilder("input picker-value")
-        .Add("clearable", ShowClear)
-        .Add("clearable-readonly", ShowClear)
-        .ToString();
-
     private protected bool Clearable { get; set; }
-
-    private protected string ContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    private protected string InputId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     private protected virtual bool ShowClear => AllowClear && Clearable;
 
     private protected virtual bool ShrinkWhen => false;
-
-    /// <inheritdoc/>
-    protected override void OnParametersSet()
-    {
-        if (AdditionalAttributes is not null
-            && AdditionalAttributes.TryGetValue("id", out var id)
-            && id is string idString
-            && !string.IsNullOrEmpty(idString))
-        {
-            ContainerId = idString;
-        }
-    }
 
     /// <summary>
     /// <para>

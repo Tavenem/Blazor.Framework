@@ -13,6 +13,7 @@ hr {
     border: 0;
     color: inherit;
     flex-shrink: 0;
+    height: 1px;
     margin: 1rem 0;
     width: 100%;
 }
@@ -545,35 +546,30 @@ svg {
     display: none;
 }
 
-.select {
-    --field-active-label-color: var(--tavenem-color-primary);
+.checkbox {
+    --button-inherited-padding-y-icon: 6px;
+    --checkbox-inherited-color: var(--tavenem-color-action);
+    --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
+    display: inline-flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    margin: 0;
 
-    > tf-input > .expand {
-        transition: .3s cubic-bezier(.25,.8,.5,1);
+    &:has(:focus-visible):not(.disabled, [inert]) {
+        background-color: var(--tavenem-color-action-hover-bg);
     }
 
-    &.open, &[data-popover-open] {
-        > tf-input > .expand {
-            transform: rotate(-180deg);
-        }
+    &.disabled, &[inert], [inert] & {
+        --checkbox-inherited-color: var(--tavenem-color-action-disabled);
+        --checkbox-inherited-hover-bg: transparent;
     }
 
-    &.read-only, &[readonly], &[inert], [inert] & {
-        cursor: default;
-        pointer-events: none;
-    }
+    &.read-only, &.read-only:hover {
+        --checkbox-inherited-hover-bg: transparent;
 
-    > tf-popover.select-popover > .list {
-        > * > .selected-icon {
-            visibility: hidden;
-        }
-
-        > * > .unselected-icon {
-            display: none;
-        }
-
-        > .active > .selected-icon {
-            visibility: visible;
+        &, * {
+            cursor: default;
+            pointer-events: none;
         }
     }
 }

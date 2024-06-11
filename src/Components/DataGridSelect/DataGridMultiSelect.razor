@@ -8,61 +8,39 @@
 
 @inherits DataGridSelectBase<TDataItem, IEnumerable<TValue>, TValue>
 
-<tf-select @attributes="AdditionalAttributes"
-           id="@ContainerId"
+<tf-select @ref="ElementReference"
+           @attributes="AdditionalAttributes"
+           id="@Id"
+           autofocus="@AutoFocus"
            class="@CssClass"
+           data-input-class="@InputCssClass"
+           data-input-readonly
+           data-input-style="@InputCssStyle"
+           data-label="@Label"
            disabled="@Disabled"
            multiple
+           name="@NameValue"
+           placeholder="@Placeholder"
            readonly="@ReadOnly"
+           required="@Required"
            style="@CssStyle"
-           tabindex="-1"
+           tabindex="@TabIndex"
            value="@CurrentValueAsString"
            @valuechange="OnPickerValueChangeAsync">
-    <tf-input @ref="ElementReference"
-              @attributes="InputAttributes"
-              id="@InputId"
-              autofocus="@AutoFocus"
-              class="@OuterInputCssClass"
-              data-input-class="@InputCssClass"
-              data-input-id="@Id"
-              data-input-style="@InputCssStyle"
-              disabled="@Disabled"
-              name="@NameValue"
-              placeholder="@Placeholder"
-              readonly
-              required="@Required"
-              tabindex="@TabIndex">
-        <svg class="svg-icon expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>
-    </tf-input>
-    @if (!string.IsNullOrEmpty(Label))
+    @if (IsInvalidAndTouched)
     {
-        <label for="@Id">@Label</label>
+        <ul slot="helpers" class="mr-auto mb-0 pl-0">
+            @foreach (var message in GetValidationMessages())
+            {
+                <li>@message</li>
+            }
+        </ul>
     }
-    @if (!string.IsNullOrEmpty(HelpText)
-        || IsInvalidAndTouched)
+    else if (!string.IsNullOrEmpty(HelpText))
     {
-        <div class="field-helpers">
-            @if (IsInvalidAndTouched)
-            {
-                <ul class="mr-auto mb-0 pl-0">
-                    @foreach (var message in GetValidationMessages())
-                    {
-                        <li>@message</li>
-                    }
-                </ul>
-            }
-            else if (!string.IsNullOrEmpty(HelpText))
-            {
-                <div class="mr-auto">@HelpText</div>
-            }
-        </div>
+        <div slot="helpers" class="mr-auto">@HelpText</div>
     }
-    <Popover Class="select-popover filled"
-             AnchorId="@InputId"
-             AnchorOrigin="Origin.Bottom_Left"
-             DismissOnTapOutside="true"
-             PopoverOrigin="Origin.Top_Left"
-             MatchWidth="true">
+    <div style="display:content" slot="popover">
         <CascadingValue Value="this" TValue="IDataGridSelect<TDataItem>" IsFixed="true">
             @ChildContent
             <DataGrid @ref="DataGrid"
@@ -77,5 +55,5 @@
                       ThemeColor="ThemeColor"
                       MaxHeight="min(332px,90vh)" />
         </CascadingValue>
-    </Popover>
+    </div>
 </tf-select>

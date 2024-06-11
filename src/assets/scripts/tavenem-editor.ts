@@ -53,7 +53,7 @@ import {
     codeEditorDarkExtension,
     codeEditorLightTheme,
 } from './editor/_themes';
-import { toolbarButtonDefinitions, ToolbarControl, ToolbarControlStyle } from './editor/_toolbar';
+import { toolbarButtonDefinitions, ToolbarControl, ToolbarControlDefinition, ToolbarControlStyle } from './editor/_toolbar';
 import { randomUUID } from './tavenem-utility'
 import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from './_popover';
 import { TavenemInputHtmlElement } from './_input';
@@ -63,6 +63,9 @@ import { Dialog, initialize as initializeDialog } from './tavenem-dialog';
 import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from './editor/_code-editing';
 import { CodeBlockView } from './editor/_code-block-view';
 import { ThemePreference, getPreferredTavenemColorScheme } from './_theme';
+import { TavenemCheckboxHtmlElement } from './_checkbox';
+import { TavenemInputFieldHtmlElement } from './_input-field';
+import { TavenemSelectInputHtmlElement } from './_select';
 
 enum EditorMode {
     None = 0,
@@ -341,6 +344,103 @@ class HeadView {
     }
 }
 
+class CheckboxView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    destroy() {
+        if (this.dom) {
+            this.dom.removeEventListener('change', this.onChange.bind(this));
+            this.dom.removeEventListener('input', this.onChange.bind(this));
+        }
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = document.createElement('input');
+        for (const a of Object.keys(node.attrs)) {
+            if (FormView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        element.type = 'checkbox';
+        if (element.hasAttribute('indeterminate')) {
+            element.indeterminate = true;
+        }
+        element.addEventListener('change', this.onChange.bind(this));
+        element.addEventListener('input', this.onChange.bind(this));
+        return element;
+    }
+
+    private onChange(event: Event) {
+        event.stopPropagation();
+
+        if (!(this.dom instanceof HTMLInputElement)) {
+            return;
+        }
+        if (this.dom.checked) {
+            this.dom.setAttribute('checked', '');
+        } else {
+            this.dom.removeAttribute('checked');
+        }
+    }
+}
+
+class DisabledInputView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = document.createElement('input');
+        for (const a of Object.keys(node.attrs)) {
+            if (FormView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        element.setAttribute('disabled', '');
+        return element;
+    }
+}
+
 class ForbiddenView {
     dom: Node;
 
@@ -372,6 +472,368 @@ class ForbiddenView {
         const dom = document.createElement('div');
         dom.appendChild(document.createComment(value));
         return dom;
+    }
+}
+
+class FormView {
+    dom: Node;
+    contentDom?: HTMLElement;
+
+    static ForbiddenAttributes = [
+        'action',
+        'capture',
+        'form',
+        'formaction',
+        'formenctype',
+        'formmethod',
+        'formnovalidate',
+        'formtarget',
+        'name',
+        'popovertarget',
+        'popovertargetaction',
+        'required',
+        'target',
+    ];
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
+        return true;
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = node.type.spec.parseDOM && node.type.spec.parseDOM.length
+            ? document.createElement(node.type.spec.parseDOM[0].tag)
+            : document.createElement('div');
+        for (const a of Object.keys(node.attrs)) {
+            if (FormView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                && (typeof node.attrs[a] !== 'number'
+                    || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        element.setAttribute('disabled', '');
+        return element;
+    }
+}
+
+class InputView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    destroy() {
+        if (this.dom) {
+            this.dom.removeEventListener('change', this.onChange.bind(this));
+            this.dom.removeEventListener('input', this.onChange.bind(this));
+        }
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = document.createElement('input');
+        for (const a of Object.keys(node.attrs)) {
+            if (FormView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        element.addEventListener('change', this.onChange.bind(this));
+        element.addEventListener('input', this.onChange.bind(this));
+        return element;
+    }
+
+    private onChange(event: Event) {
+        event.stopPropagation();
+
+        if (!(this.dom instanceof HTMLInputElement)
+            || !(event.target instanceof HTMLInputElement)) {
+            return;
+        }
+        this.dom.setAttribute('value', event.target.value);
+    }
+}
+
+class RadioView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    destroy() {
+        if (this.dom) {
+            this.dom.removeEventListener('change', this.onChange.bind(this));
+            this.dom.removeEventListener('input', this.onChange.bind(this));
+        }
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = document.createElement('input');
+        for (const a of Object.keys(node.attrs)) {
+            if (FormView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        element.type = 'radio';
+        element.addEventListener('change', this.onChange.bind(this));
+        element.addEventListener('input', this.onChange.bind(this));
+        return element;
+    }
+
+    private onChange(event: Event) {
+        event.stopPropagation();
+
+        if (!(this.dom instanceof HTMLInputElement)) {
+            return;
+        }
+        if (this.dom.checked) {
+            this.dom.setAttribute('checked', '');
+        } else {
+            this.dom.removeAttribute('checked');
+        }
+    }
+}
+
+class ResetInputView {
+    dom: Node;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    destroy() {
+        if (this.dom) {
+            this.dom.removeEventListener('click', this.onClick.bind(this));
+        }
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = document.createElement('input');
+        for (const a of Object.keys(node.attrs)) {
+            if (FormView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        // replace with normal button to prevent the automatic reset behavior from affecting any containing form
+        element.type = 'button';
+        if (!element.value.length) {
+            element.value = 'Reset';
+        }
+        element.addEventListener('click', this.onClick.bind(this));
+        return element;
+    }
+
+    private onClick(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}
+
+class SelectView {
+    dom: Node;
+
+    static ForbiddenAttributes = [
+        'form',
+        'name',
+        'required',
+    ];
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        return true;
+    }
+
+    destroy() {
+        if (this.dom) {
+            this.dom.removeEventListener('change', this.onChange.bind(this));
+            this.dom.removeEventListener('input', this.onChange.bind(this));
+        }
+    }
+
+    private addChildren(node: ProsemirrorNode, element: HTMLElement) {
+        node.forEach(child => {
+            const childElement = child.type.name === 'horizontal_rule'
+                ? document.createElement('hr')
+                : document.createElement(child.type.name);
+            for (const a of Object.keys(child.attrs)) {
+                if (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0)) {
+                    continue;
+                }
+                childElement.setAttribute(a, node.attrs[a]);
+            }
+            element.appendChild(childElement);
+
+            this.addChildren(child, childElement);
+        });
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = document.createElement('select');
+        for (const a of Object.keys(node.attrs)) {
+            if (SelectView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                    && (typeof node.attrs[a] !== 'number'
+                        || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+
+        this.addChildren(node, element);
+
+        element.addEventListener('change', this.onChange.bind(this));
+        element.addEventListener('input', this.onChange.bind(this));
+
+        return element;
+    }
+
+    private onChange(event: Event) {
+        event.stopPropagation();
+
+        if (!(this.dom instanceof HTMLSelectElement)
+            || !(event.target instanceof HTMLSelectElement)) {
+            return;
+        }
+        this.dom
+            .querySelectorAll('[selected]')
+            .forEach(x => {
+                x.removeAttribute('selected');
+            });
+        if (event.target.value) {
+            for (const option of this.dom.querySelectorAll('option')) {
+                if (option.value == event.target.value) {
+                    option.setAttribute('selected', '');
+                    break;
+                }
+            }
+        }
+    }
+}
+
+class TextAreaView {
+    dom: Node;
+    contentDom?: HTMLElement;
+
+    static ForbiddenAttributes = [
+        'form',
+        'name',
+        'required',
+    ];
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.createContent(node);
+        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
+    }
+
+    stopEvent() { return true; }
+
+    update(node: ProsemirrorNode) {
+        if (node.type !== this.node.type) {
+            return false;
+        }
+        this.dom = this.createContent(node);
+        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
+        return true;
+    }
+
+    private createContent(node: ProsemirrorNode) {
+        const element = node.type.spec.parseDOM && node.type.spec.parseDOM.length
+            ? document.createElement(node.type.spec.parseDOM[0].tag)
+            : document.createElement('div');
+        for (const a of Object.keys(node.attrs)) {
+            if (TextAreaView.ForbiddenAttributes.includes(a)
+                || (!node.attrs[a]
+                && (typeof node.attrs[a] !== 'number'
+                    || node.attrs[a] !== 0))) {
+                continue;
+            }
+            element.setAttribute(a, node.attrs[a]);
+        }
+        return element;
     }
 }
 
@@ -508,13 +970,28 @@ class TavenemWysiwygEditor {
             clipboardTextSerializer: slice => { return mathSerializer.serializeSlice(slice) },
             editable: () => !options.readOnly,
             nodeViews: {
+                button: (node, view, getPos, _) => new FormView(node, view, getPos),
+                canvas: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                checkbox: (node, view, getPos, _) => new CheckboxView(node, view, getPos),
                 code_block: (node, view, getPos, _) => new CodeBlockView(node, view, getPos),
-                table: (node, _view, _getPos, _) => new TableView(node, cellMinWidth),
+                dialog: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                fieldset: (node, view, getPos, _) => new FormView(node, view, getPos),
+                file_input: (node, view, getPos, _) => new DisabledInputView(node, view, getPos),
+                form: (node, view, getPos, _) => new FormView(node, view, getPos),
                 head: (node, view, getPos, _) => new HeadView(node, view, getPos),
                 iframe: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                image_input: (node, view, getPos, _) => new DisabledInputView(node, view, getPos),
+                input: (node, view, getPos, _) => new InputView(node, view, getPos),
                 noscript: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
                 object: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                option: (node, view, getPos, _) => new FormView(node, view, getPos),
+                radio: (node, view, getPos, _) => new RadioView(node, view, getPos),
+                reset_input: (node, view, getPos, _) => new ResetInputView(node, view, getPos),
                 script: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
+                select: (node, view, getPos, _) => new SelectView(node, view, getPos),
+                submit_input: (node, view, getPos, _) => new DisabledInputView(node, view, getPos),
+                table: (node, _view, _getPos, _) => new TableView(node, cellMinWidth),
+                textarea: (node, view, getPos, _) => new TextAreaView(node, view, getPos),
             },
             dispatchTransaction(tr) {
                 (this as unknown as PMEditorView).updateState(this.state.apply(tr));
@@ -604,12 +1081,14 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     _tavenemCodeEditor: TavenemCodeEditor = new TavenemCodeEditor();
     _tavenemWysiwygEditor: TavenemWysiwygEditor = new TavenemWysiwygEditor();
 
+    private _audioDialog?: HTMLDialogElement;
     private _fontSizeDialog?: HTMLDialogElement;
     private _imageDialog?: HTMLDialogElement;
     private _lineHeightDialog?: HTMLDialogElement;
     private _linkDialog?: HTMLDialogElement;
     private _settingMode = false;
     private _toolbarButtons: ToolbarControl[] = [];
+    private _videoDialog?: HTMLDialogElement;
 
     static get observedAttributes() {
         return [
@@ -745,12 +1224,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         for (const control of this._toolbarButtons) {
             control._element.removeEventListener('mousedown', this.preventDefault);
             control._element.removeEventListener('mouseup', this.onControlActivated.bind(this, control));
-            if (control._definition.tooltip) {
-                control._element.removeEventListener('focusin', this.onShowTooltip.bind(control));
-                control._element.removeEventListener('mouseover', this.onShowTooltip.bind(control));
-                control._element.removeEventListener('focusout', this.onDismissTooltip.bind(control));
-                control._element.removeEventListener('mouseout', this.onDismissTooltip.bind(control));
-            }
         }
 
         const root = this.shadowRoot;
@@ -766,10 +1239,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         const showAll = root.querySelector('.editor-toolbar-show-all-btn');
         if (showAll) {
             showAll.removeEventListener('click', this.onShowAll.bind(this));
-            showAll.removeEventListener('focusin', this.onShowTooltip.bind(showAll));
-            showAll.removeEventListener('mouseover', this.onShowTooltip.bind(showAll));
-            showAll.removeEventListener('focusout', this.onDismissTooltip.bind(showAll));
-            showAll.removeEventListener('mouseout', this.onDismissTooltip.bind(showAll));
         }
 
         this.removeEventListener('click', this.dismissTooltips.bind(this));
@@ -923,14 +1392,15 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             for (let t = 0; t <= 50; t++) {
                 const type = t as CommandType;
 
-                const toolbarButton = this
+                for (const toolbarButton of this
                     ._toolbarButtons
-                    .find(x => x._definition.type === type);
-                if (toolbarButton?._element) {
-                    const commandInfo = data.commands[type];
+                    .filter(x => x._definition.type === type)) {
+                    if (toolbarButton?._element) {
+                        const commandInfo = data.commands[type];
 
-                    toolbarButton._active = commandInfo?.active || false;
-                    toolbarButton._disabled = !commandInfo?.enabled;
+                        toolbarButton._active = commandInfo?.active || false;
+                        toolbarButton._disabled = !commandInfo?.enabled;
+                    }
                 }
             }
         }
@@ -957,7 +1427,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                     ._toolbarButtons
                     .filter(x => x._parentElement?.contains(toolbarButton._element))
                     .every(x => x._disabled || x._definition.style === ToolbarControlStyle.Separator);
-                const dropdown = toolbarButton._element.querySelector<TavenemDropdownHTMLElement>('tf-dropdown');
+                const dropdown = toolbarButton._element instanceof TavenemDropdownHTMLElement
+                    ? toolbarButton._element
+                    : toolbarButton._element.querySelector<TavenemDropdownHTMLElement>('tf-dropdown');
                 if (dropdown) {
                     if (buttonsDisabled) {
                         dropdown.setAttribute('disabled', '');
@@ -1008,17 +1480,10 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
         const syntaxSelect = root.querySelector('.syntax-select');
         if (syntaxSelect) {
-            const syntaxInput = syntaxSelect.querySelector('tf-input');
             if (editorDisabled) {
                 syntaxSelect.setAttribute('disabled', '');
-                if (syntaxInput) {
-                    syntaxInput.setAttribute('disabled', '');
-                }
             } else {
                 syntaxSelect.removeAttribute('disabled');
-                if (syntaxInput) {
-                    syntaxInput.removeAttribute('disabled');
-                }
             }
         }
     }
@@ -1050,43 +1515,144 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         input.value = value || '';
     }
 
+    private getAudioDialog() {
+        const content: Node[] = [];
+
+        const urlInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        urlInput.classList.add('url-input');
+        urlInput.dataset.label = 'URL';
+        urlInput.setAttribute('name', 'url');
+        urlInput.setAttribute('required', '');
+        urlInput.setAttribute('type', 'text');
+        content.push(urlInput);
+
+        const controlsInput = document.createElement('tf-checkbox');
+        controlsInput.classList.add('controls-input');
+        controlsInput.setAttribute('name', 'controls');
+        controlsInput.setAttribute('checked', '');
+        controlsInput.dataset.label = 'Controls';
+        content.push(controlsInput);
+
+        const loopInput = document.createElement('tf-checkbox');
+        loopInput.classList.add('loop-input');
+        loopInput.setAttribute('name', 'loop');
+        loopInput.setAttribute('checked', '');
+        loopInput.dataset.label = 'Loop';
+        content.push(loopInput);
+
+        const callback = (value: unknown) => {
+            if (value == null
+                || typeof (value as any).url !== 'string'
+                || !this._tavenemWysiwygEditor._editor) {
+                return;
+            }
+
+            let url: string = (value as any).url;
+            if (!url.startsWith('#')
+                && !URL.canParse(url, document.baseURI)) {
+                url = 'http://' + url;
+                if (!URL.canParse(url, document.baseURI)) {
+                    return;
+                }
+            }
+
+            const controls = !!((value as any).controls);
+            const loop = !!((value as any).loop);
+
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.InsertAudio];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [url, controls, loop]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        };
+
+        return getDialog(
+            'Audio',
+            content,
+            callback.bind(this),
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput) {
+                    return;
+                }
+                const controlsInput = form.querySelector<TavenemCheckboxHtmlElement>('.controls-input');
+                const loopInput = form.querySelector<TavenemCheckboxHtmlElement>('.loop-input');
+                return {
+                    url: urlInput.value,
+                    controls: controlsInput?.checked === true,
+                    loop: loopInput?.checked === true,
+                };
+            },
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput || !urlInput.value) {
+                    return false;
+                }
+
+                const fieldHelpers = urlInput.querySelector('.field-helpers');
+                if (urlInput.value.startsWith('#')) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (URL.canParse(urlInput.value, document.baseURI)
+                    || URL.canParse('http://' + urlInput.value, document.baseURI)) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (fieldHelpers) {
+                    const list = document.createElement('ul');
+                    list.classList.add('mr-auto', 'mb-0', 'pl-0');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = "Must be a valid URL";
+                    list.appendChild(listItem);
+
+                    fieldHelpers.replaceChildren(list);
+                }
+
+                return false;
+            });
+    }
+
+    private getAudioDialogResponse() {
+        if (!this._audioDialog) {
+            this._audioDialog = this.getAudioDialog();
+        } else {
+            const container = this._audioDialog.closest<HTMLElement>('.dialog-container');
+            if (container) {
+                container.style.display = 'initial';
+            }
+        }
+
+        this._audioDialog.showModal();
+    }
+
     private getFontSizeDialog() {
         const content: Node[] = [];
 
-        const sizeField = document.createElement('tf-select');
-        sizeField.classList.add('field', 'required', 'no-label');
-        sizeField.dataset.disableAutosearch = '';
-        sizeField.dataset.hasTextInput = '';
-        content.push(sizeField);
-
-        const sizeInputId = randomUUID();
-        const sizeInput = document.createElement('tf-input');
-        sizeInput.classList.add('input', 'picker-value', 'size-input');
-        sizeInput.dataset.inputId = sizeInputId;
+        const sizeInput = document.createElement('tf-select');
+        sizeInput.classList.add('size-input');
+        sizeInput.dataset.disableAutosearch = '';
+        sizeInput.dataset.inputReadonly = '';
+        sizeInput.dataset.hasTextInput = '';
+        sizeInput.dataset.hideExpand = '';
+        sizeInput.dataset.popoverLimitHeight = '';
         sizeInput.setAttribute('name', 'size');
         sizeInput.setAttribute('placeholder', 'font size');
         sizeInput.setAttribute('required', '');
         sizeInput.setAttribute('type', 'text');
-        sizeInput.onclick = ev => ev.stopPropagation();
-        sizeField.appendChild(sizeInput);
-
-        const sizeHelpers = document.createElement('div');
-        sizeHelpers.classList.add('field-helpers');
-        sizeField.appendChild(sizeHelpers);
-
-        const sizeSuggestions = document.createElement('tf-popover');
-        sizeSuggestions.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'suggestion-popover', 'filled', 'match-width');
-        sizeSuggestions.dataset.anchorId = sizeInputId;
-        sizeSuggestions.popover = 'auto';
-        sizeSuggestions.style.maxHeight = 'min(300px,90vh)';
-        sizeSuggestions.style.overflowY = 'auto';
-        sizeSuggestions.tabIndex = 0;
-        sizeField.appendChild(sizeSuggestions);
+        content.push(sizeInput);
 
         const menu = document.createElement('menu');
-        menu.classList.add('suggestion-list', 'list', 'clickable', 'dense');
-        menu.onclick = ev => ev.stopPropagation();
-        sizeSuggestions.appendChild(menu);
+        menu.classList.add('list', 'clickable', 'dense');
+        menu.slot = 'popover';
+        sizeInput.appendChild(menu);
 
         const s1 = document.createElement('li');
         s1.textContent = 'Reset';
@@ -1239,61 +1805,27 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getImageDialog() {
         const content: Node[] = [];
 
-        const urlField = document.createElement('div');
-        urlField.classList.add('field', 'required');
-        content.push(urlField);
-
-        const urlInputId = randomUUID();
-        const urlInput = document.createElement('tf-input');
-        urlInput.classList.add('input', 'url-input');
-        urlInput.dataset.inputId = urlInputId;
+        const urlInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        urlInput.classList.add('url-input');
+        urlInput.dataset.label = 'URL';
         urlInput.setAttribute('name', 'url');
         urlInput.setAttribute('required', '');
         urlInput.setAttribute('type', 'text');
-        urlField.appendChild(urlInput);
+        content.push(urlInput);
 
-        const urlLabel = document.createElement('label');
-        urlLabel.htmlFor = urlInputId;
-        urlLabel.textContent = 'URL';
-        urlField.appendChild(urlLabel);
-
-        const urlHelpers = document.createElement('div');
-        urlHelpers.classList.add('field-helpers');
-        urlField.appendChild(urlHelpers);
-
-        const titleField = document.createElement('div');
-        titleField.classList.add('field');
-        content.push(titleField);
-
-        const titleInputId = randomUUID();
-        const titleInput = document.createElement('tf-input');
-        titleInput.classList.add('input', 'title-input');
-        titleInput.dataset.inputId = titleInputId;
-        titleInput.setAttribute('name', 'url');
+        const titleInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        titleInput.classList.add('title-input');
+        titleInput.dataset.label = 'Title (optional)';
+        titleInput.setAttribute('name', 'title');
         titleInput.setAttribute('type', 'text');
-        titleField.appendChild(titleInput);
+        content.push(titleInput);
 
-        const titleLabel = document.createElement('label');
-        titleLabel.htmlFor = titleInputId;
-        titleLabel.textContent = 'Title (optional)';
-        titleField.appendChild(titleLabel);
-
-        const altField = document.createElement('div');
-        altField.classList.add('field');
-        content.push(altField);
-
-        const altInputId = randomUUID();
-        const altInput = document.createElement('tf-input');
-        altInput.classList.add('input', 'alt-input');
-        altInput.dataset.inputId = altInputId;
-        altInput.setAttribute('name', 'url');
+        const altInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        altInput.classList.add('alt-input');
+        titleInput.dataset.label = 'Alt (optional)';
+        altInput.setAttribute('name', 'alt');
         altInput.setAttribute('type', 'text');
-        altField.appendChild(altInput);
-
-        const altLabel = document.createElement('label');
-        altLabel.htmlFor = altInputId;
-        altLabel.textContent = 'Alt (optional)';
-        altField.appendChild(altLabel);
+        content.push(altInput);
 
         const callback = (value: unknown) => {
             if (value == null
@@ -1396,41 +1928,23 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getLineHeightDialog() {
         const content: Node[] = [];
 
-        const sizeField = document.createElement('tf-select');
-        sizeField.classList.add('field', 'required', 'no-label');
-        sizeField.dataset.disableAutosearch = '';
-        sizeField.dataset.hasTextInput = '';
-        sizeField.dataset.popoverContainer = '';
-        content.push(sizeField);
-
-        const sizeInputId = randomUUID();
-        const sizeInput = document.createElement('tf-input');
-        sizeInput.classList.add('input', 'picker-value', 'size-input');
-        sizeInput.dataset.inputId = sizeInputId;
+        const sizeInput = document.createElement('tf-select');
+        sizeInput.classList.add('size-input');
+        sizeInput.dataset.disableAutosearch = '';
+        sizeInput.dataset.inputReadonly = '';
+        sizeInput.dataset.hasTextInput = '';
+        sizeInput.dataset.hideExpand = '';
+        sizeInput.dataset.popoverLimitHeight = '';
         sizeInput.setAttribute('name', 'size');
         sizeInput.setAttribute('placeholder', 'line height');
         sizeInput.setAttribute('required', '');
         sizeInput.setAttribute('type', 'text');
-        sizeInput.onclick = ev => ev.stopPropagation();
-        sizeField.appendChild(sizeInput);
-
-        const sizeHelpers = document.createElement('div');
-        sizeHelpers.classList.add('field-helpers');
-        sizeField.appendChild(sizeHelpers);
-
-        const sizeSuggestions = document.createElement('tf-popover');
-        sizeSuggestions.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'suggestion-popover', 'filled', 'match-width');
-        sizeSuggestions.dataset.anchorId = sizeInputId;
-        sizeSuggestions.popover = 'auto';
-        sizeSuggestions.style.maxHeight = 'min(300px,90vh)';
-        sizeSuggestions.style.overflowY = 'auto';
-        sizeSuggestions.tabIndex = 0;
-        sizeField.appendChild(sizeSuggestions);
+        content.push(sizeInput);
 
         const menu = document.createElement('menu');
-        menu.classList.add('suggestion-list', 'list', 'clickable', 'dense');
-        menu.onclick = ev => ev.stopPropagation();
-        sizeSuggestions.appendChild(menu);
+        menu.classList.add('list', 'clickable', 'dense');
+        menu.slot = 'popover';
+        sizeInput.appendChild(menu);
 
         const s1 = document.createElement('li');
         s1.textContent = 'Reset';
@@ -1555,44 +2069,20 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getLinkDialog() {
         const content: Node[] = [];
 
-        const urlField = document.createElement('div');
-        urlField.classList.add('field', 'required');
-        content.push(urlField);
-
-        const urlInputId = randomUUID();
-        const urlInput = document.createElement('tf-input');
-        urlInput.classList.add('input', 'url-input');
-        urlInput.dataset.inputId = urlInputId;
+        const urlInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        urlInput.classList.add('url-input');
+        urlInput.dataset.label = 'URL';
         urlInput.setAttribute('name', 'url');
         urlInput.setAttribute('required', '');
         urlInput.setAttribute('type', 'text');
-        urlField.appendChild(urlInput);
+        content.push(urlInput);
 
-        const urlLabel = document.createElement('label');
-        urlLabel.htmlFor = urlInputId;
-        urlLabel.textContent = 'URL';
-        urlField.appendChild(urlLabel);
-
-        const urlHelpers = document.createElement('div');
-        urlHelpers.classList.add('field-helpers');
-        urlField.appendChild(urlHelpers);
-
-        const titleField = document.createElement('div');
-        titleField.classList.add('field');
-        content.push(titleField);
-
-        const titleInputId = randomUUID();
-        const titleInput = document.createElement('tf-input');
-        titleInput.classList.add('input', 'title-input');
-        titleInput.dataset.inputId = titleInputId;
-        titleInput.setAttribute('name', 'url');
+        const titleInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        titleInput.classList.add('title-input');
+        titleInput.dataset.label = 'Title (optional)';
+        titleInput.setAttribute('name', 'title');
         titleInput.setAttribute('type', 'text');
-        titleField.appendChild(titleInput);
-
-        const titleLabel = document.createElement('label');
-        titleLabel.htmlFor = titleInputId;
-        titleLabel.textContent = 'Title (optional)';
-        titleField.appendChild(titleLabel);
+        content.push(titleInput);
 
         const callback = (value: unknown) => {
             if (value == null
@@ -1686,6 +2176,124 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         this._linkDialog.showModal();
     }
 
+    private getVideoDialog() {
+        const content: Node[] = [];
+
+        const urlInput = document.createElement('tf-input-field') as TavenemInputFieldHtmlElement;
+        urlInput.classList.add('url-input');
+        urlInput.dataset.label = 'URL';
+        urlInput.setAttribute('name', 'url');
+        urlInput.setAttribute('required', '');
+        urlInput.setAttribute('type', 'text');
+        content.push(urlInput);
+
+        const controlsInput = document.createElement('tf-checkbox');
+        controlsInput.classList.add('controls-input');
+        controlsInput.setAttribute('name', 'controls');
+        controlsInput.setAttribute('checked', '');
+        controlsInput.dataset.label = 'Controls';
+        content.push(controlsInput);
+
+        const loopInput = document.createElement('tf-checkbox');
+        loopInput.classList.add('loop-input');
+        loopInput.setAttribute('name', 'loop');
+        loopInput.setAttribute('checked', '');
+        loopInput.dataset.label = 'Loop';
+        content.push(loopInput);
+
+        const callback = (value: unknown) => {
+            if (value == null
+                || typeof (value as any).url !== 'string'
+                || !this._tavenemWysiwygEditor._editor) {
+                return;
+            }
+
+            let url: string = (value as any).url;
+            if (!url.startsWith('#')
+                && !URL.canParse(url, document.baseURI)) {
+                url = 'http://' + url;
+                if (!URL.canParse(url, document.baseURI)) {
+                    return;
+                }
+            }
+
+            const controls = !!((value as any).controls);
+            const loop = !!((value as any).loop);
+
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.InsertAudio];
+            if (command) {
+                command.command(
+                    this._tavenemWysiwygEditor._editor.view.state,
+                    this._tavenemWysiwygEditor._editor.view.dispatch,
+                    this._tavenemWysiwygEditor._editor.view,
+                    [url, controls, loop]);
+                this._tavenemWysiwygEditor._editor.view.focus();
+            }
+        };
+
+        return getDialog(
+            'Video',
+            content,
+            callback.bind(this),
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput) {
+                    return;
+                }
+                const controlsInput = form.querySelector<TavenemCheckboxHtmlElement>('.controls-input');
+                const loopInput = form.querySelector<TavenemCheckboxHtmlElement>('.loop-input');
+                return {
+                    url: urlInput.value,
+                    controls: controlsInput?.checked === true,
+                    loop: loopInput?.checked === true,
+                };
+            },
+            (form: HTMLFormElement) => {
+                const urlInput = form.querySelector<TavenemInputHtmlElement>('.url-input');
+                if (!urlInput || !urlInput.value) {
+                    return false;
+                }
+
+                const fieldHelpers = urlInput.querySelector('.field-helpers');
+                if (urlInput.value.startsWith('#')) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (URL.canParse(urlInput.value, document.baseURI)
+                    || URL.canParse('http://' + urlInput.value, document.baseURI)) {
+                    fieldHelpers?.replaceChildren();
+                    return true;
+                }
+
+                if (fieldHelpers) {
+                    const list = document.createElement('ul');
+                    list.classList.add('mr-auto', 'mb-0', 'pl-0');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = "Must be a valid URL";
+                    list.appendChild(listItem);
+
+                    fieldHelpers.replaceChildren(list);
+                }
+
+                return false;
+            });
+    }
+
+    private getVideoDialogResponse() {
+        if (!this._videoDialog) {
+            this._videoDialog = this.getVideoDialog();
+        } else {
+            const container = this._videoDialog.closest<HTMLElement>('.dialog-container');
+            if (container) {
+                container.style.display = 'initial';
+            }
+        }
+
+        this._videoDialog.showModal();
+    }
+
     private onColorSelected(control: ToolbarControl, event: Event) {
         if (control._disabled
             || !control._definition.type
@@ -1745,6 +2353,16 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             return;
         }
 
+        if (control._definition.type === CommandType.InsertAudio) {
+            this.getAudioDialogResponse();
+            return;
+        }
+
+        if (control._definition.type === CommandType.InsertVideo) {
+            this.getVideoDialogResponse();
+            return;
+        }
+
         if (control._definition.type === CommandType.SetFontSize) {
             this.getFontSizeDialogResponse();
             return;
@@ -1789,15 +2407,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 this._tavenemCodeEditor._editor.view.focus();
             }
         }
-    }
-
-    private onDismissTooltip() {
-        const tooltip = this.querySelector<TavenemTooltipHTMLElement>('tf-tooltip');
-        if (!tooltip) {
-            return;
-        }
-
-        tooltip.onAttentionOut();
     }
 
     private onEmojiSelected(control: ToolbarControl, event: Event) {
@@ -2132,25 +2741,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
     }
 
-    private onShowTooltip() {
-        const tooltip = this.querySelector<TavenemTooltipHTMLElement>('tf-tooltip');
-        if (!tooltip) {
-            return;
-        }
-
-        let popover = this.querySelector('[popover]:popover-open');
-        if (!popover
-            && 'popoverContainer' in this.dataset
-            && this.shadowRoot instanceof ShadowRoot) {
-            popover = this.shadowRoot.querySelector('[popover]:popover-open');
-        }
-        if (popover && !popover.contains(tooltip) && !tooltip.contains(popover)) {
-            return;
-        }
-
-        tooltip.showDelayed(this);
-    }
-
     private onSyntaxSelect(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2162,6 +2752,308 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
 
         this.onSetSyntax(event.detail.value);
+    }
+
+    private applyToolbarButtonDefinition(
+        button: HTMLButtonElement,
+        tooltipControl: HTMLElement,
+        definition: ToolbarControlDefinition,
+        disabledOrReadonly: boolean,
+        toolbarButton: ToolbarControl) {
+        if (definition.icon) {
+            const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            button.appendChild(buttonIcon);
+            buttonIcon.outerHTML = definition.icon;
+
+            if (definition.text) {
+                button.appendChild(document.createTextNode(definition.text));
+            }
+        } else if (definition.text) {
+            button.textContent = definition.text;
+        }
+        if (definition.inactiveIcon) {
+            const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            button.appendChild(buttonIcon);
+            buttonIcon.outerHTML = definition.inactiveIcon;
+        }
+        if (definition.tooltip) {
+            const buttonTooltip = document.createElement('tf-tooltip');
+            buttonTooltip.textContent = definition.tooltip;
+            button.appendChild(buttonTooltip);
+        }
+
+        button.disabled = disabledOrReadonly;
+
+        if (definition.type) {
+            button.addEventListener('mousedown', this.preventDefault);
+            button.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
+        }
+    }
+
+    private getToolbarEmojiControl(
+        definition: ToolbarControlDefinition,
+        disabledOrReadonly: boolean,
+        controls: HTMLElement[]) {
+        const emojiInput = document.createElement('tf-emoji-input');
+        emojiInput.classList.add('field', 'no-label');
+        emojiInput.dataset.inputClass = 'rounded small';
+        emojiInput.dataset.popoverContainer = '';
+        if (disabledOrReadonly) {
+            emojiInput.setAttribute('disabled', '');
+        }
+
+        const toolbarButton = new ToolbarControl(emojiInput, definition);
+
+        emojiInput.addEventListener('valuechange', this.onEmojiSelected.bind(this, toolbarButton));
+
+        if (definition.tooltip) {
+            const buttonTooltip = document.createElement('tf-tooltip');
+            buttonTooltip.textContent = definition.tooltip;
+            emojiInput.appendChild(buttonTooltip);
+        }
+
+        controls.push(emojiInput);
+        return {
+            controls,
+            toolbarButton,
+        };
+    }
+
+    private getToolbarColorControl(
+        definition: ToolbarControlDefinition,
+        disabledOrReadonly: boolean,
+        controls: HTMLElement[]): { controls?: HTMLElement[], toolbarButton?: ToolbarControl } {
+        const colorInput = document.createElement('tf-color-input');
+        colorInput.classList.add('field', 'no-label', 'clearable');
+        if (definition.icon) {
+            colorInput.dataset.icon = new Option(definition.icon).innerHTML;
+        }
+        colorInput.dataset.inputClass = 'rounded small';
+        colorInput.dataset.popoverContainer = '';
+        colorInput.setAttribute('alpha', '');
+        colorInput.setAttribute('button', '');
+        if (disabledOrReadonly) {
+            colorInput.setAttribute('disabled', '');
+        }
+
+        const toolbarButton = new ToolbarControl(colorInput, definition);
+
+        colorInput.addEventListener('valuechange', this.onColorSelected.bind(this, toolbarButton));
+
+        if (definition.tooltip) {
+            const buttonTooltip = document.createElement('tf-tooltip');
+            buttonTooltip.textContent = definition.tooltip;
+            colorInput.appendChild(buttonTooltip);
+        }
+
+        controls.push(colorInput);
+        return {
+            controls,
+            toolbarButton,
+        };
+    }
+
+    private getToolbarControl(
+        definition: ToolbarControlDefinition,
+        isWysiwygAvailable: boolean,
+        isWysiwyg: boolean,
+        disabled: boolean,
+        disabledOrReadonly: boolean): { controls?: HTMLElement[], toolbarButtons?: ToolbarControl[] } {
+        if ((definition.isStyle
+            && !isWysiwygAvailable)
+            || (definition.isWysiwyg
+                && !isWysiwyg)
+            || (definition.isWysiwyg === false
+                && isWysiwyg)) {
+            return {};
+        }
+
+        if (definition.style === ToolbarControlStyle.Separator) {
+            const separator = document.createElement('div');
+            separator.classList.add('vr');
+            return {
+                controls: [separator],
+            };
+        }
+
+        const controls: HTMLElement[] = [];
+        const toolbarButtons: ToolbarControl[] = [];
+
+        if (definition.separatorBefore) {
+            const separator = document.createElement('div');
+            separator.classList.add('vr');
+            controls.push(separator);
+        }
+
+        if (definition.type === CommandType.ForegroundColor
+            || definition.type === CommandType.BackgroundColor) {
+            return this.getToolbarColorControl(definition, disabledOrReadonly, controls);
+        }
+        if (definition.type === CommandType.Emoji) {
+            return this.getToolbarEmojiControl(definition, disabledOrReadonly, controls);
+        }
+
+        if (definition.style === ToolbarControlStyle.Button) {
+            let button = document.createElement('button');
+            button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+
+            const toolbarButton = new ToolbarControl(button, definition);
+            this.applyToolbarButtonDefinition(button, button, definition, disabledOrReadonly, toolbarButton);
+
+            controls.push(button);
+            toolbarButtons.push(toolbarButton);
+        } else {
+            const dropdown = this.getToolbarDropdownControl(
+                definition,
+                disabled,
+                disabledOrReadonly,
+                controls,
+                false);
+            if (dropdown.toolbarButtons) {
+                toolbarButtons.push(...dropdown.toolbarButtons);
+            }
+        }
+
+        return {
+            controls,
+            toolbarButtons,
+        };
+    }
+
+    private getToolbarDropdownControl(
+        definition: ToolbarControlDefinition,
+        disabled: boolean,
+        disabledOrReadonly: boolean,
+        controls: HTMLElement[],
+        child: boolean): { controls?: HTMLElement[], toolbarButtons?: ToolbarControl[] } {
+        let button = document.createElement('button');
+        button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+
+        let control: HTMLElement;
+
+        const toolbarButtons: ToolbarControl[] = [];
+        let toolbarButton: ToolbarControl;
+
+        const dropdown = document.createElement('tf-dropdown');
+        if (child) {
+            dropdown.dataset.activation = '4';
+        } else {
+            dropdown.dataset.activation = definition.style === ToolbarControlStyle.DropdownButton
+                ? '6'
+                : '1';
+        }
+        dropdown.dataset.popoverContainer = '';
+        if (disabled) {
+            dropdown.setAttribute('disabled', '');
+        }
+
+        dropdown.appendChild(button);
+
+        const dropdownPopover = document.createElement('tf-popover');
+        dropdownPopover.classList.add('top-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
+        if (child) {
+            dropdownPopover.classList.add('anchor-top-right');
+        } else {
+            dropdownPopover.classList.add('anchor-bottom-left');
+        }
+        dropdownPopover.style.maxHeight = 'min(300px,90vh)';
+        dropdownPopover.style.overflowY = 'auto';
+        dropdownPopover.tabIndex = 0;
+        dropdown.appendChild(dropdownPopover);
+
+        const list = document.createElement('div');
+        list.classList.add('list');
+        dropdownPopover.appendChild(list);
+
+        if (definition.style === ToolbarControlStyle.ButtonGroup) {
+            if (disabled) {
+                button.disabled = true;
+            }
+
+            const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            button.appendChild(buttonIcon);
+            buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360 280-560h400L480-360Z"/></svg>`;
+
+            control = document.createElement('div');
+            toolbarButton = new ToolbarControl(control, definition);
+            control.classList.add('button-group');
+
+            button = document.createElement('button');
+            button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+            control.appendChild(button);
+
+            if (definition.dropdownTooltip) {
+                const dropdownButtonTooltip = document.createElement('tf-tooltip');
+                dropdownButtonTooltip.textContent = definition.dropdownTooltip;
+                button.appendChild(dropdownButtonTooltip);
+            }
+
+            dropdown.style.minWidth = '0';
+            control.appendChild(dropdown);
+        } else {
+            dropdown.dataset.delay = '1000';
+
+            control = dropdown;
+            toolbarButton = new ToolbarControl(control, definition);
+
+            if (definition.style === ToolbarControlStyle.DropdownButton
+                && definition.type) {
+                dropdown.addEventListener('mousedown', this.preventDefault);
+                dropdown.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
+            }
+        }
+
+        for (const childDefinition of definition.buttons!) {
+            const childControls: HTMLElement[] = [];
+
+            if (childDefinition.separatorBefore) {
+                const separator = document.createElement('hr');
+                childControls.push(separator);
+            }
+
+            if (childDefinition.buttons) {
+                const childControl = this.getToolbarDropdownControl(
+                    childDefinition,
+                    disabled,
+                    disabledOrReadonly,
+                    childControls,
+                    true);
+                if (childControl.toolbarButtons) {
+                    toolbarButtons.push(...childControl.toolbarButtons);
+                }
+            } else {
+                const span = document.createElement('span');
+                if (childDefinition.icon) {
+                    const childIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+                    span.appendChild(childIcon);
+                    childIcon.outerHTML = childDefinition.icon;
+                } else if (childDefinition.text) {
+                    span.innerHTML = childDefinition.text;
+                }
+                childControls.push(span);
+
+                const toolbarButton = new ToolbarControl(span, childDefinition, control);
+                span.addEventListener('mousedown', this.preventDefault);
+                span.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
+                toolbarButtons.push(toolbarButton);
+            }
+
+            for (const childControl of childControls) {
+                list.appendChild(childControl);
+            }
+        }
+
+        control.id = randomUUID();
+        dropdownPopover.dataset.anchorId = control.id;
+
+        this.applyToolbarButtonDefinition(button, control, definition, disabledOrReadonly, toolbarButton);
+
+        controls.push(control);
+
+        return {
+            controls,
+            toolbarButtons,
+        };
     }
 
     private refreshState(toolbar?: Element | null) {
@@ -2201,255 +3093,20 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
         this._toolbarButtons = [];
         for (const definition of toolbarButtonDefinitions) {
-            if ((definition.isStyle
-                && !isWysiwygAvailable)
-                || (definition.isWysiwyg
-                    && !isWysiwyg)
-                || (definition.isWysiwyg === false
-                    && isWysiwyg)) {
-                continue;
-            }
-
-            if (definition.style === ToolbarControlStyle.Separator) {
-                const separator = document.createElement('div');
-                separator.classList.add('vr');
-                innerToolbar.appendChild(separator);
-
-                continue;
-            }
-
-            if (definition.separatorBefore) {
-                const separator = document.createElement('div');
-                separator.classList.add('vr');
-                innerToolbar.appendChild(separator);
-            }
-
-            const isButton = definition.style === ToolbarControlStyle.Button;
-            if (isButton) {
-                if (definition.type === CommandType.ForegroundColor
-                    || definition.type === CommandType.BackgroundColor) {
-                    const colorInput = document.createElement('tf-color-input');
-                    colorInput.classList.add('field', 'no-label', 'clearable');
-                    if (definition.icon) {
-                        colorInput.dataset.icon = new Option(definition.icon).innerHTML;
-                    }
-                    colorInput.dataset.inputClass = 'rounded small';
-                    colorInput.dataset.popoverContainer = '';
-                    colorInput.setAttribute('alpha', '');
-                    colorInput.setAttribute('button', '');
-                    if (disabledOrReadonly) {
-                        colorInput.setAttribute('disabled', '');
-                    }
-
-                    const toolbarButton = new ToolbarControl(colorInput, definition);
-
-                    innerToolbar.appendChild(colorInput);
-
-                    colorInput.addEventListener('valuechange', this.onColorSelected.bind(this, toolbarButton));
-                    this._toolbarButtons.push(toolbarButton);
-
-                    if (definition.tooltip) {
-                        const buttonTooltip = document.createElement('tf-tooltip');
-                        buttonTooltip.dataset.delay = '750';
-                        buttonTooltip.dataset.popoverContainer = '';
-                        buttonTooltip.dataset.tooltipContainerTrigger = '';
-                        colorInput.appendChild(buttonTooltip);
-
-                        const buttonTooltipPopover = document.createElement('tf-popover');
-                        buttonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
-                        buttonTooltipPopover.style.transitionDelay = '750ms';
-                        buttonTooltipPopover.tabIndex = 0;
-                        buttonTooltipPopover.textContent = definition.tooltip;
-                        buttonTooltip.appendChild(buttonTooltipPopover);
-
-                        colorInput.addEventListener('focusin', this.onShowTooltip.bind(colorInput));
-                        colorInput.addEventListener('mouseover', this.onShowTooltip.bind(colorInput));
-                        colorInput.addEventListener('focusout', this.onDismissTooltip.bind(colorInput));
-                        colorInput.addEventListener('mouseout', this.onDismissTooltip.bind(colorInput));
-                    }
-
-                    continue;
-                }
-
-                if (definition.type === CommandType.Emoji) {
-                    const emojiInput = document.createElement('tf-emoji-input');
-                    emojiInput.classList.add('field', 'no-label');
-                    emojiInput.dataset.inputClass = 'rounded small';
-                    emojiInput.dataset.popoverContainer = '';
-                    if (disabledOrReadonly) {
-                        emojiInput.setAttribute('disabled', '');
-                    }
-
-                    const toolbarButton = new ToolbarControl(emojiInput, definition);
-
-                    innerToolbar.appendChild(emojiInput);
-
-                    emojiInput.addEventListener('valuechange', this.onEmojiSelected.bind(this, toolbarButton));
-                    this._toolbarButtons.push(toolbarButton);
-
-                    if (definition.tooltip) {
-                        const buttonTooltip = document.createElement('tf-tooltip');
-                        buttonTooltip.dataset.delay = '750';
-                        buttonTooltip.dataset.popoverContainer = '';
-                        buttonTooltip.dataset.tooltipContainerTrigger = '';
-                        emojiInput.appendChild(buttonTooltip);
-
-                        const buttonTooltipPopover = document.createElement('tf-popover');
-                        buttonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
-                        buttonTooltipPopover.style.transitionDelay = '750ms';
-                        buttonTooltipPopover.tabIndex = 0;
-                        buttonTooltipPopover.textContent = definition.tooltip;
-                        buttonTooltip.appendChild(buttonTooltipPopover);
-
-                        emojiInput.addEventListener('focusin', this.onShowTooltip.bind(emojiInput));
-                        emojiInput.addEventListener('mouseover', this.onShowTooltip.bind(emojiInput));
-                        emojiInput.addEventListener('focusout', this.onDismissTooltip.bind(emojiInput));
-                        emojiInput.addEventListener('mouseout', this.onDismissTooltip.bind(emojiInput));
-                    }
-
-                    continue;
+            const { controls, toolbarButtons } = this.getToolbarControl(
+                definition,
+                isWysiwygAvailable,
+                isWysiwyg,
+                disabled,
+                disabledOrReadonly);
+            if (controls) {
+                for (const control of controls) {
+                    innerToolbar.appendChild(control);
                 }
             }
-
-            let button = document.createElement('button');
-            button.classList.add('btn', 'btn-icon', 'rounded', 'small');
-
-            let control: HTMLElement;
-            let toolbarButton: ToolbarControl;
-
-            if (!isButton) {
-                const dropdown = document.createElement('tf-dropdown');
-                dropdown.dataset.activation = definition.style === ToolbarControlStyle.DropdownButton
-                    ? '6'
-                    : '1';
-                dropdown.dataset.popoverContainer = '';
-                if (disabled) {
-                    dropdown.setAttribute('disabled', '');
-                }
-
-                dropdown.appendChild(button);
-
-                const dropdownPopover = document.createElement('tf-popover');
-                dropdownPopover.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
-                dropdownPopover.style.maxHeight = 'min(300px,90vh)';
-                dropdownPopover.style.overflowY = 'auto';
-                dropdownPopover.tabIndex = 0;
-                dropdown.appendChild(dropdownPopover);
-
-                const list = document.createElement('div');
-                list.classList.add('list');
-                dropdownPopover.appendChild(list);
-
-                if (definition.style === ToolbarControlStyle.ButtonGroup) {
-                    if (disabled) {
-                        button.disabled = true;
-                    }
-
-                    const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                    button.appendChild(buttonIcon);
-                    buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360 280-560h400L480-360Z"/></svg>`;
-                    
-                    control = document.createElement('div');
-                    toolbarButton = new ToolbarControl(control, definition);
-                    control.classList.add('button-group');
-
-                    button = document.createElement('button');
-                    button.classList.add('btn', 'btn-icon', 'rounded', 'small');
-                    control.appendChild(button);
-
-                    dropdown.style.minWidth = '0';
-                    control.appendChild(dropdown);
-                } else {
-                    dropdown.dataset.delay = '1000';
-                    dropdown.oncontextmenu = () => { return false; }
-
-                    control = dropdown;
-                    toolbarButton = new ToolbarControl(control, definition);
-
-                    if (definition.style === ToolbarControlStyle.DropdownButton
-                        && definition.type) {
-                        dropdown.addEventListener('mousedown', this.preventDefault);
-                        dropdown.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
-                    }
-                }
-                
-                for (const childDefinition of definition.buttons!) {
-                    if (childDefinition.separatorBefore) {
-                        const separator = document.createElement('hr');
-                        list.appendChild(separator);
-                    }
-
-                    const span = document.createElement('span');
-                    if (childDefinition.icon) {
-                        const childIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                        span.appendChild(childIcon);
-                        childIcon.outerHTML = childDefinition.icon;
-                    } else if (childDefinition.text) {
-                        span.innerHTML = childDefinition.text;
-                    }
-                    list.appendChild(span);
-
-                    const toolbarButton = new ToolbarControl(span, childDefinition, control);
-                    span.addEventListener('mousedown', this.preventDefault);
-                    span.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
-                    this._toolbarButtons.push(toolbarButton);
-                }
-
-                control.id = randomUUID();
-                dropdownPopover.dataset.anchorId = control.id;
-            } else {
-                control = button;
-                toolbarButton = new ToolbarControl(control, definition);
+            if (toolbarButtons) {
+                this._toolbarButtons.push(...toolbarButtons);
             }
-
-            if (definition.text) {
-                button.textContent = definition.text;
-            }
-            if (definition.icon) {
-                const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                button.appendChild(buttonIcon);
-                buttonIcon.outerHTML = definition.icon;
-
-                if (definition.text) {
-                    button.appendChild(document.createTextNode(definition.text));
-                }
-            } else if (definition.text) {
-                button.textContent = definition.text;
-            }
-            if (definition.inactiveIcon) {
-                const buttonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                button.appendChild(buttonIcon);
-                buttonIcon.outerHTML = definition.inactiveIcon;
-            }
-            if (definition.tooltip) {
-                const buttonTooltip = document.createElement('tf-tooltip');
-                buttonTooltip.dataset.delay = '750';
-                buttonTooltip.dataset.popoverContainer = '';
-                buttonTooltip.dataset.tooltipContainerTrigger = '';
-                control.appendChild(buttonTooltip);
-
-                const buttonTooltipPopover = document.createElement('tf-popover');
-                buttonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
-                buttonTooltipPopover.style.transitionDelay = '750ms';
-                buttonTooltipPopover.tabIndex = 0;
-                buttonTooltipPopover.textContent = definition.tooltip;
-                buttonTooltip.appendChild(buttonTooltipPopover);
-                
-                control.addEventListener('focusin', this.onShowTooltip.bind(control));
-                control.addEventListener('mouseover', this.onShowTooltip.bind(control));
-                control.addEventListener('focusout', this.onDismissTooltip.bind(control));
-                control.addEventListener('mouseout', this.onDismissTooltip.bind(control));
-            }
-
-            button.disabled = disabledOrReadonly;
-
-            innerToolbar.appendChild(control);
-
-            if (definition.type) {
-                button.addEventListener('mousedown', this.preventDefault);
-                button.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
-            }
-            this._toolbarButtons.push(toolbarButton);
         }
 
         if (!('lockMode' in this.dataset)) {
@@ -2475,19 +3132,10 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 : `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm280-80q-82 0-146.5-44.5T240-440q29-71 93.5-115.5T480-600q82 0 146.5 44.5T720-440q-29 71-93.5 115.5T480-280Zm0-100q-25 0-42.5-17.5T420-440q0-25 17.5-42.5T480-500q25 0 42.5 17.5T540-440q0 25-17.5 42.5T480-380Zm0 40q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Z"/></svg>`;
 
             const modeButtonTooltip = document.createElement('tf-tooltip');
-            modeButtonTooltip.dataset.delay = '750';
-            modeButtonTooltip.dataset.popoverContainer = '';
-            modeButtonTooltip.dataset.tooltipContainerTrigger = '';
-            modeButton.appendChild(modeButtonTooltip);
-
-            const modeButtonTooltipPopover = document.createElement('tf-popover');
-            modeButtonTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'tooltip');
-            modeButtonTooltipPopover.style.transitionDelay = '750ms';
-            modeButtonTooltipPopover.tabIndex = 0;
-            modeButtonTooltipPopover.textContent = isWysiwyg
+            modeButtonTooltip.textContent = isWysiwyg
                 ? 'Edit source code'
                 : 'Edit in rich text mode';
-            modeButtonTooltip.appendChild(modeButtonTooltipPopover);
+            modeButton.appendChild(modeButtonTooltip);
         }
 
         if (!('lockSyntax' in this.dataset)) {
@@ -2497,39 +3145,24 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 innerToolbar.appendChild(separator);
             }
 
-            const syntaxSelect = document.createElement('tf-select');
-            syntaxSelect.classList.add('select', 'field', 'no-label', 'syntax-select');
-            syntaxSelect.dataset.popoverContainer = '';
-            if (disabledOrReadonly) {
-                syntaxSelect.setAttribute('disabled', '');
-            }
-            syntaxSelect.tabIndex = -1;
-            syntaxSelect.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
-            innerToolbar.appendChild(syntaxSelect);
-
-            const syntaxInput = document.createElement('tf-input');
-            syntaxInput.classList.add('input', 'picker-value');
+            const syntaxInput = document.createElement('tf-select');
+            syntaxInput.classList.add('syntax-select');
+            syntaxInput.dataset.inputReadonly = '';
+            syntaxInput.dataset.popoverLimitHeight = '';
             if (disabledOrReadonly) {
                 syntaxInput.setAttribute('disabled', '');
             }
-            syntaxInput.setAttribute('readonly', '');
+            syntaxInput.setAttribute('placeholder', 'font size');
+            syntaxInput.setAttribute('required', '');
             syntaxInput.setAttribute('size', '10');
-            syntaxSelect.appendChild(syntaxInput);
-
-            const syntaxExpandIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            syntaxInput.appendChild(syntaxExpandIcon);
-            syntaxExpandIcon.outerHTML = `<svg class="svg-icon expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>`;
-
-            const syntaxPopover = document.createElement('tf-popover');
-            syntaxPopover.classList.add('top-left', 'anchor-bottom-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
-            syntaxPopover.style.maxHeight = 'min(300px,90vh)';
-            syntaxPopover.style.overflowY = 'auto';
-            syntaxPopover.tabIndex = 0;
-            syntaxSelect.appendChild(syntaxPopover);
+            syntaxInput.setAttribute('type', 'text');
+            innerToolbar.appendChild(syntaxInput);
+            syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
             
             const list = document.createElement('div');
             list.classList.add('list');
-            syntaxPopover.appendChild(list);
+            list.slot = 'popover';
+            syntaxInput.appendChild(list);
 
             for (const syntax of syntaxes) {
                 const option = document.createElement('div');
@@ -2551,7 +3184,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 option.appendChild(label);
             }
 
-            syntaxSelect.setAttribute('value', syntax);
+            syntaxInput.setAttribute('value', syntax);
         }
 
         const slot = document.createElement('slot');
@@ -2570,22 +3203,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             showAllIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"/></svg>`;
 
             const showAllTooltip = document.createElement('tf-tooltip');
-            showAllTooltip.dataset.delay = '750';
-            showAllTooltip.dataset.popoverContainer = '';
-            showAllTooltip.dataset.tooltipContainerTrigger = '';
+            showAllTooltip.textContent = 'show all controls';
             showAll.appendChild(showAllTooltip);
-
-            const showAllTooltipPopover = document.createElement('tf-popover');
-            showAllTooltipPopover.classList.add('bottom-center', 'anchor-top-center', 'flip-onopen', 'select-popover', 'tooltip');
-            showAllTooltipPopover.style.transitionDelay = '750ms';
-            showAllTooltipPopover.tabIndex = 0;
-            showAllTooltipPopover.textContent = 'show all controls';
-            showAllTooltip.appendChild(showAllTooltipPopover);
-
-            showAll.addEventListener('focusin', this.onShowTooltip.bind(showAll));
-            showAll.addEventListener('mouseover', this.onShowTooltip.bind(showAll));
-            showAll.addEventListener('focusout', this.onDismissTooltip.bind(showAll));
-            showAll.addEventListener('mouseout', this.onDismissTooltip.bind(showAll));
         }
 
         toolbar.replaceChildren(...nodes);
@@ -2751,16 +3370,22 @@ function getDialog(
 
     form.append(...content);
     for (const node of content) {
-        if (node instanceof HTMLElement
-            && node.classList.contains('field')
-            && node.classList.contains('required')) {
-            const tfInput = node.querySelector('tf-input');
+        if ((node instanceof TavenemInputHtmlElement
+            || node instanceof TavenemInputFieldHtmlElement
+            || node instanceof TavenemSelectInputHtmlElement)
+            && node.required) {
+            node.addEventListener('valueinput', validate);
+            node.addEventListener('valuechange', validate);
+        } else if (node instanceof Element) {
+            const tfInput = node.querySelector<TavenemInputHtmlElement | TavenemInputFieldHtmlElement | TavenemSelectInputHtmlElement>('tf-input, tf-input-field, tf-select');
             if (tfInput) {
-                tfInput.addEventListener('valueinput', validate);
-                tfInput.addEventListener('valuechange', validate);
+                if (tfInput.required) {
+                    tfInput.addEventListener('valueinput', validate);
+                    tfInput.addEventListener('valuechange', validate);
+                }
             } else {
                 const input = node.querySelector('input');
-                if (input) {
+                if (input && input.required) {
                     input.addEventListener('input', validate);
                     input.addEventListener('change', validate);
                 }

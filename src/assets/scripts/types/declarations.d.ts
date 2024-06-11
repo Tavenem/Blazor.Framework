@@ -19,6 +19,23 @@ interface Window {
     EyeDropper?: EyeDropper | undefined
 }
 
+interface CustomStateSet {
+    size: number;
+
+    add: (value: string) => void;
+    clear: () => void;
+    delete: (value: string) => boolean;
+    entries: () => Iterator<[string, string], string, string>;
+    forEach: (callbackFn: (value: string, key: string, set: CustomStateSet) => void, thisArg: any) => void;
+    has: (value: string) => boolean;
+    keys: () => Iterator<string, string, string>;
+    values: () => Iterator<string, string, string>;
+}
+
+interface ElementInternals {
+    states: CustomStateSet;
+}
+
 declare module 'markdown-it-attrs' {
     export default function attributes(md, options: { leftDelimiter?: string, rightDelimiter?: string, allowedAttributes?: string[] }): void;
 }

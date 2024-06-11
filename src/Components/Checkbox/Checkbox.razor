@@ -4,86 +4,47 @@
 
 @inherits BoolInputComponentBase<TValue>
 
-<div @attributes="AdditionalAttributes"
-     class="@CssClass"
-     data-allow-null="@(AllowNull && CanBeNull)"
-     style="@CssStyle">
-    <label>
-        <span class="@IconClass">
-            <input @ref="ElementReference"
-                   @attributes="InputAttributes"
-                   id="@Id"
-                   type="checkbox"
-                   class="@InputCssClass"
-                   style="@InputCssStyle"
-                   autofocus="@AutoFocus"
-                   checked="@IsChecked"
-                   disabled="@Disabled"
-                   name="@NameValue"
-                   readonly="@ReadOnly"
-                   required="@Required"
-                   tabindex="@TabIndex"
-                   value="@bool.TrueString"
-                   @onchange="OnChange"
-                   @onclick:preventDefault="ReadOnly"
-                   onclick="@(AllowNull && CanBeNull ? "if (this.multiple) this.checked=this.multiple=false; else if (!this.checked) this.multiple=this.indeterminate=true;" : null)"/>
-            @if (!string.IsNullOrEmpty(CheckedIcon))
-            {
-                <tf-icon class="@CheckedIconClass">@CheckedIcon</tf-icon>
-            }
-            else if (IsCheckedIconOutlined)
-            {
-                <svg class="svg-icon checked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m419-321 289-289-43-43-246 246-119-119-43 43 162 162ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg>
-            }
-            else
-            {
-                <svg class="svg-icon checked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m419-321 289-290-43-43-246 247-119-119-43 43 162 162ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Z"/></svg>
-            }
-            @if (!string.IsNullOrEmpty(UncheckedIcon))
-            {
-                <tf-icon class="@UncheckedIconClass">@UncheckedIcon</tf-icon>
-            }
-            else
-            {
-                <svg class="svg-icon unchecked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Z"/></svg>
-            }
-            @if (!string.IsNullOrEmpty(IndeterminateIcon))
-            {
-                <tf-icon class="@IndeterminateIconClass">@IndeterminateIcon</tf-icon>
-            }
-            else if (IsCheckedIconOutlined)
-            {
-                <svg class="svg-icon indeterminate" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M250-452h461v-60H250v60Zm-70 332q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg>
-            }
-            else
-            {
-                <svg class="svg-icon indeterminate" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M250-452h461v-60H250v60Zm-70 332q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Z"/></svg>
-            }
-        </span>
-        @if (IsChecked is null)
-        {
-            <script type="text/javascript">
-                (() => {
-                    const cb = document.getElementById('@Id');
-                    cb.indeterminate = true;
-                })();
-            </script>
-        }
-        @if (!string.IsNullOrEmpty(Label))
-        {
-            <label class="label" for="@Id">@Label</label>
-        }
-    </label>
+<tf-checkbox @ref="ElementReference"
+             @attributes="AdditionalAttributes"
+             id="@Id"
+             class="@CssClass"
+             data-allow-null="@(AllowNull && CanBeNull)"
+             data-checked-outlined="@IsCheckedIconOutlined"
+             data-indeterminate-outlined="@IsIndeterminateIconOutlined"
+             data-input-class="@InputCssClass"
+             data-input-style="@InputCssStyle"
+             data-label="@Label"
+             data-requires-true="@RequiresTrue"
+             autofocus="@AutoFocus"
+             checked="@IsChecked"
+             disabled="@Disabled"
+             indeterminate="@(IsChecked is null)"
+             name="@NameValue"
+             readonly="@ReadOnly"
+             required="@Required"
+             style="@CssStyle"
+             tabindex="@TabIndex"
+             @inputtoggle="OnToggle">
+    @if (!string.IsNullOrEmpty(CheckedIcon))
+    {
+        <tf-icon slot="checked" class="@CheckedIconClass">@CheckedIcon</tf-icon>
+    }
+    @if (!string.IsNullOrEmpty(UncheckedIcon))
+    {
+        <tf-icon slot="unchecked" class="@UncheckedIconClass">@UncheckedIcon</tf-icon>
+    }
+    @if (!string.IsNullOrEmpty(IndeterminateIcon))
+    {
+        <tf-icon slot="indeterminate" class="@IndeterminateIconClass">@IndeterminateIcon</tf-icon>
+    }
     @if (IsInvalidAndTouched)
     {
-        <div class="field-helpers">
-            <ul class="mr-auto mb-0 pl-0">
-                @foreach (var message in GetValidationMessages())
-                {
-                    <li>@message</li>
-                }
-            </ul>
-        </div>
+        <ul slot="helpers" class="mr-auto mb-0 pl-0">
+            @foreach (var message in GetValidationMessages())
+            {
+                <li>@message</li>
+            }
+        </ul>
     }
     @ChildContent
-</div>
+</tf-checkbox>

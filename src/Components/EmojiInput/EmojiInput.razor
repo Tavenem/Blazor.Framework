@@ -4,13 +4,11 @@
 
 <tf-emoji-input @ref="ElementReference"
                 @attributes="AdditionalAttributes"
-                id="@ContainerId"
+                id="@Id"
                 autofocus="@AutoFocus"
                 class="@CssClass"
-                data-input-id="@Id"
                 data-input-class="@InputCssClass"
                 data-input-style="@InputCssStyle"
-                data-popover-container
                 data-show-emoji="@(!IconButton)"
                 disabled="@Disabled"
                 name="@NameValue"
@@ -19,4 +17,6 @@
                 style="@CssStyle"
                 tabindex="@TabIndex"
                 value="@CurrentValueAsString"
-                @valuechange="OnValueChange"></tf-emoji-input>
+                @valuechange="OnValueChange">
+    @ChildContent
+</tf-emoji-input>

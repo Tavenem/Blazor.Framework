@@ -32,6 +32,9 @@ html, body * {
 
 a.primary:not(.disabled, :disabled),
 :where(.primary) {
+    --tavenem-theme-color-hue: var(--tavenem-color-primary-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-primary-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-primary-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-primary);
     --tavenem-theme-color-darken-base: var(--tavenem-color-primary-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-primary-darken-2);
@@ -48,6 +51,9 @@ a.primary:not(.disabled, :disabled),
 
 a.secondary:not(.disabled, :disabled),
 :where(.secondary) {
+    --tavenem-theme-color-hue: var(--tavenem-color-secondary-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-secondary-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-secondary-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-secondary);
     --tavenem-theme-color-darken-base: var(--tavenem-color-secondary-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-secondary-darken-2);
@@ -64,6 +70,9 @@ a.secondary:not(.disabled, :disabled),
 
 a.tertiary:not(.disabled, :disabled),
 :where(.tertiary) {
+    --tavenem-theme-color-hue: var(--tavenem-color-tertiary-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-tertiary-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-tertiary-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-tertiary);
     --tavenem-theme-color-darken-base: var(--tavenem-color-tertiary-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-tertiary-darken-2);
@@ -80,6 +89,9 @@ a.tertiary:not(.disabled, :disabled),
 
 a.danger:not(.disabled, :disabled),
 :where(.danger) {
+    --tavenem-theme-color-hue: var(--tavenem-color-danger-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-danger-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-danger-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-danger);
     --tavenem-theme-color-darken-base: var(--tavenem-color-danger-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-danger-darken-2);
@@ -96,6 +108,9 @@ a.danger:not(.disabled, :disabled),
 
 a.dark:not(.disabled, :disabled),
 :where(.dark) {
+    --tavenem-theme-color-hue: var(--tavenem-color-dark-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-dark-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-dark-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-dark);
     --tavenem-theme-color-darken-base: var(--tavenem-color-dark-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-dark-darken-2);
@@ -112,6 +127,9 @@ a.dark:not(.disabled, :disabled),
 
 a.default:not(.disabled, :disabled),
 :where(.default) {
+    --tavenem-theme-color-hue: var(--tavenem-color-default-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-default-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-default-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-default);
     --tavenem-theme-color-darken-base: var(--tavenem-color-default-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-default-darken-2);
@@ -128,6 +146,9 @@ a.default:not(.disabled, :disabled),
 
 a.info:not(.disabled, :disabled),
 :where(.info) {
+    --tavenem-theme-color-hue: var(--tavenem-color-info-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-info-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-info-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-info);
     --tavenem-theme-color-darken-base: var(--tavenem-color-info-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-info-darken-2);
@@ -144,6 +165,9 @@ a.info:not(.disabled, :disabled),
 
 a.success:not(.disabled, :disabled),
 :where(.success) {
+    --tavenem-theme-color-hue: var(--tavenem-color-success-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-success-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-success-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-success);
     --tavenem-theme-color-darken-base: var(--tavenem-color-success-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-success-darken-2);
@@ -160,6 +184,9 @@ a.success:not(.disabled, :disabled),
 
 a.warning:not(.disabled, :disabled),
 :where(.warning) {
+    --tavenem-theme-color-hue: var(--tavenem-color-warning-hue);
+    --tavenem-theme-color-saturation: var(--tavenem-color-warning-saturation);
+    --tavenem-theme-color-lightness: var(--tavenem-color-warning-lightness);
     --tavenem-theme-color-base: var(--tavenem-color-warning);
     --tavenem-theme-color-darken-base: var(--tavenem-color-warning-darken);
     --tavenem-theme-color-darken-2: var(--tavenem-color-warning-darken-2);

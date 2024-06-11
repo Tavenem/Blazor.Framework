@@ -2,10 +2,10 @@
 
 @inherits InputComponentBase<string>
 
-<div @attributes="AdditionalAttributes" id="@Id" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
+<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle" @onclick="FocusAsync">
     <div class="input">
         <textarea @ref="ElementReference"
-                  id="@InputId"
+                  id="@Id"
                   class="@InputCssClass"
                   style="@InputCssStyle"
                   autocomplete="@AutocompleteValue"
@@ -25,13 +25,13 @@
         @if (ShowEmoji)
         {
             <EmojiInput Class="nested m-0" IconButton="true">
-                <Tooltip Delay="750">insert emoji</Tooltip>
+                <Tooltip>insert emoji</Tooltip>
             </EmojiInput>
         }
     </div>
     @if (!string.IsNullOrEmpty(Label))
     {
-        <label for="@InputId">@Label</label>
+        <label for="@Id">@Label</label>
     }
     @if ((ShowLength && MaxLength.HasValue)
         || !string.IsNullOrEmpty(HelpText)

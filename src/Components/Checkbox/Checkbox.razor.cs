@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -58,19 +59,14 @@ public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("checkbox")
-        .Add("indeterminate", IsChecked is null)
-        .ToString();
-
-    private string? CheckedIconClass => IsCheckedIconOutlined ? "checked outlined" : "checked";
-
-    private string? IconClass => new CssBuilder("btn btn-icon")
         .Add(ThemeColor.ToCSS())
         .ToString();
 
-    private string? IndeterminateIconClass => IsIndeterminateIconOutlined ? "indeterminate outlined" : "indeterminate";
+    private string? CheckedIconClass => IsCheckedIconOutlined ? "outlined" : null;
 
-    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "unchecked outlined" : "unchecked";
+    private string? IndeterminateIconClass => IsIndeterminateIconOutlined ? "outlined" : null;
 
-    private void OnChange(ChangeEventArgs e) => Toggle();
+    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "outlined" : null;
+
+    private void OnToggle(ToggleEventArgs e) => SetValue(e.Value);
 }

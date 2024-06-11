@@ -245,8 +245,13 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
     /// </summary>
     [Parameter] public TimeZoneInfo? TimeZoneInfo { get; set; }
 
-    private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline
-        || CurrentValue is not null;
+    /// <inheritdoc/>
+    protected override string? CssClass => new CssBuilder(Class)
+        .AddClassFromDictionary(AdditionalAttributes)
+        .Add("clearable", ShowClear)
+        .Add("clearable-readonly", ShowClear)
+        .Add(ThemeColor.ToCSS())
+        .ToString();
 
     private string AMString => Culture.DateTimeFormat.AMDesignator;
 

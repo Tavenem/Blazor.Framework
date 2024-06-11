@@ -1,7 +1,7 @@
 using Tavenem.Blazor.Framework;
 using Tavenem.Blazor.Framework.Sample.Components;
 
-const string DevStartUrl = "/test";
+const string DevStartUrl = "/components/datetime-input";// "/test";
 
 var builder = WebApplication.CreateBuilder(args);
 

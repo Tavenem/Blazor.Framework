@@ -1,4 +1,3 @@
-import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover'
 import { TavenemInputHtmlElement } from './_input'
 import { TavenemPickerHtmlElement } from './_picker'
 import { TavenemSelectInputHtmlElement } from './_select'
@@ -41,6 +40,7 @@ import {
     parseDateTime as parseDateTimeString,
     parseTime as parseTimeString
 } from './_datetime-parser'
+import { TavenemPopoverHTMLElement } from './_popover'
 
 const internationalizedCalendars = ['buddhist', 'ethiopic', 'ethioaa', 'coptic', 'hebrew', 'indian', 'islamic-civil', 'islamic-tbla', 'islamic-umalqura', 'japanese', 'persian', 'roc', 'gregory'];
 const supportedCalendars = Intl
@@ -69,12 +69,19 @@ interface DateButton extends HTMLButtonElement {
 }
 
 export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
+    static formAssociated = true;
+
     _max: CalendarDate | CalendarDateTime | ZonedDateTime | Time = new CalendarDate(9999, 12, 31);
+    _maxDisplay: string | null | undefined;
     _min: CalendarDate | CalendarDateTime | ZonedDateTime | Time = new CalendarDate('BC', 9999, 12, 31);
+    _minDisplay: string | null | undefined;
     _value: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
 
     private _displayedDate: CalendarDate;
     private _displayedTime: Time;
+    private _formValue = '';
+    private _initialValue: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
+    private _internals: ElementInternals;
     private _localTimeZone: string | undefined;
     private _settingValue = false;
     private _type: DateTimeType = DateTimeType.Date;
@@ -82,8 +89,71 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
     private _yearStep: number = 1;
 
     static get observedAttributes() {
-        return ['disabled', 'max', 'min', 'readonly', 'value'];
+        return ['max', 'min', 'readonly', 'value'];
     }
+
+    get form() { return this._internals.form; }
+
+    get max() {
+        if (!this._maxDisplay) {
+            const { display, value } = this.getValueAndDisplay(this._max);
+            this._maxDisplay = display || value;
+        }
+        return this._maxDisplay;
+    }
+    set max(v: string | null | undefined) {
+        let newMax: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
+        if (v && v.length) {
+            newMax = this.parseValue(v);
+        }
+        if (!newMax) {
+            newMax = fromDate(new Date(8.64e15), this.getOptions().timeZone);
+        }
+        this._max = newMax;
+        delete this._maxDisplay;
+        this.setValidity();
+    }
+
+    get min() {
+        if (!this._minDisplay) {
+            const { display, value } = this.getValueAndDisplay(this._min);
+            this._minDisplay = display || value;
+        }
+        return this._minDisplay;
+    }
+    set min(v: string | null | undefined) {
+        let newMin: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
+        if (v && v.length) {
+            newMin = this.parseValue(v);
+        }
+        if (!newMin) {
+            newMin = fromDate(new Date(-8.64e15), this.getOptions().timeZone);
+        }
+        this._min = newMin;
+        delete this._minDisplay;
+        this.setValidity();
+    }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._formValue; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
 
     constructor() {
         super();
@@ -91,6 +161,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         const nowDateTime = now(new Intl.DateTimeFormat().resolvedOptions().timeZone);
         this._displayedDate = toCalendarDate(nowDateTime);
         this._displayedTime = toTime(nowDateTime);
+        this._internals = this.attachInternals();
     }
 
     connectedCallback() {
@@ -135,118 +206,94 @@ svg {
     margin: 0;
 }
 
-:host(:not([button])) {
-    min-width: 255px;
-}
-
 input {
     border-radius: var(--tavenem-border-radius);
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
+:host(:not([button])),
 .field {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
+    --field-active-label-color: var(--tavenem-color-primary);
     --field-border-color: var(--tavenem-color-border-input);
     --field-border-hover-color: var(--tavenem-color-action);
     --field-color: var(--tavenem-color-text);
+    --field-label-color: var(--tavenem-color-text-secondary);
     border: 0;
-    color: var(--field-color);
+    color: var(--tavenem-color-text);
     display: flex;
     flex-basis: auto;
     flex-direction: column;
     flex-grow: 1;
     flex-shrink: 1;
     margin: 0;
-    margin-bottom: 2px;
-    margin-top: 3px;
     max-width: 100%;
     padding: 0;
     position: relative;
     vertical-align: top;
-
-    &:focus-within {
-        --field-border-color: var(--field-active-border-color);
-        --field-border-hover-color: var(--field-active-border-hover-color);
-    }
-
-    > .field-helpers {
-        padding-left: 8px;
-        padding-right: 8px;
-    }
 }
 
-tf-input {
-    align-items: center;
-    border-color: var(--field-border-color);
-    border-radius: var(--tavenem-border-radius);
-    box-sizing: content-box;
-    color: var(--field-color);
-    column-gap: 8px;
-    cursor: text;
-    display: inline-flex;
-    flex-grow: 1;
+:host(:focus-within:not([button])),
+.field:focus-within {
+    --field-border-color: var(--field-active-border-color);
+    --field-border-hover-color: var(--field-active-border-hover-color);
+}
+
+:host(:not([button])) {
+    border: none !important;
+    margin-bottom: .5rem;
+    margin-top: 1rem;
+    min-width: 255px;
+}
+
+.field {
+    margin-bottom: 2px;
+    margin-top: 3px;
+}
+
+:host > label {
+    color: var(--field-label-color);
+    display: block;
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
-    line-height: 1.1875rem;
-    min-height: 1.1875rem;
-    padding-bottom: 7px;
-    padding-top: 6px;
-    position: relative;
-    transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    left: 0;
+    line-height: 1;
+    padding: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transform: translate(0, calc(1.25rem + 11px)) scale(1);
+    transform-origin: top left;
+    transition: color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    z-index: 0;
 
-    &.field {
-        flex-direction: row;
-    }
-
-    &[disabled],
-    &[inert],
-    [inert] & {
-        border-color: var(--tavenem-color-action-disabled);
-    }
-
-    input {
-        appearance: none;
-        background: none;
-        border: 0;
-        box-shadow: none;
-        box-sizing: content-box;
-        color: currentColor;
-        display: block;
-        font: inherit;
-        height: 1.1875rem;
-        margin: 0;
-        min-height: calc(1.25rem + 10px);
-        min-width: 0;
-        padding: 0;
-        position: relative;
-        width: 100%;
-        -webkit-tap-highlight-color: transparent;
-
-        &:focus {
-            outline: 0;
-        }
-
-        &:disabled {
-            opacity: 1;
-        }
-
-        &:-webkit-autofill {
-            border-radius: inherit;
-        }
-    }
-
-    > .expand {
-        cursor: pointer;
-        transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
-    }
-
-    svg {
-        min-height: 1.5em;
+    *[dir="rtl"] & {
+        left: unset;
+        right: 0;
+        transform-origin: top right;
     }
 }
 
-:host(:not(.filled, .outlined, .no-label)) > tf-input {
+:host([required]) > label:after {
+    color: var(--tavenem-color-error);
+    content: " *";
+}
+
+:host([inert]) {
+    --field-border-color: var(--tavenem-color-action-disabled);
+}
+
+tf-input > .expand {
+    cursor: pointer;
+    transition: .3s cubic-bezier(.25,.8,.5,1),visibility 0s;
+}
+
+tf-input svg {
+    min-height: 1.5em;
+}
+
+:host(:not(.filled, .outlined)) > tf-input:has(~ label) {
     margin-top: 1rem;
 }
 
@@ -265,44 +312,59 @@ tf-input {
     }
 }
 
-:host(:not(.outlined, [disabled], [readonly], [inert])) > tf-input:hover:before {
+:host(:not(.outlined, :disabled, [readonly], [inert])) > tf-input:hover:before {
     border-bottom-color: var(--field-border-hover-color);
 }
 
-:host(.filled) > tf-input {
-    background-color: rgba(0, 0, 0, 0.09);
-    border-top-left-radius: var(--tavenem-border-radius);
-    border-top-right-radius: var(--tavenem-border-radius);
-    padding-bottom: 10px;
-    padding-left: 12px;
-    padding-right: 12px;
-    padding-top: calc(1rem + 11px);
-    position: relative;
-    transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+:host(.filled) {
+    background-color: transparent !important;
+    color: var(--tavenem-color-text) !important;
 
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.13);
+    > tf-input {
+        background-color: rgba(0, 0, 0, 0.09);
+        border-top-left-radius: var(--tavenem-border-radius);
+        border-top-right-radius: var(--tavenem-border-radius);
+        padding-bottom: 10px;
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: calc(1rem + 11px);
+        position: relative;
+        transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.13);
+        }
+
+        &:disabled,
+        &[inert],
+        [inert] & {
+            background-color: rgba(0, 0, 0, 0.12);
+        }
+
+        input:-webkit-autofill {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+        }
     }
 
-    &[disabled],
-    &[inert],
-    [inert] & {
-        background-color: rgba(0, 0, 0, 0.12);
+    > label {
+        pointer-events: none;
+        transform: translate(12px, calc(1.25rem + 16px)) scale(1);
+        z-index: 1;
+
+        *[dir="rtl"] & {
+            transform: translate(-12px, calc(1.25rem + 16px)) scale(1);
+        }
     }
 
-    input:-webkit-autofill {
-        border-top-left-radius: inherit;
-        border-top-right-radius: inherit;
+    > .field-helpers {
+        padding-left: 12px;
+        padding-right: 12px;
     }
 }
 
-:host(.filled.no-label) > tf-input {
+:host(.filled) > tf-input:not(:has(~ label)) {
     padding-top: 11px;
-}
-
-:host(.filled) > .field-helpers {
-    padding-left: 12px;
-    padding-right: 12px;
 }
 
 :host(.outlined) > tf-input {
@@ -315,39 +377,103 @@ tf-input {
     padding-top: calc(.5rem + 2.5px);
 }
 
+:host(.outlined) > label {
+    background-color: var(--tavenem-color-bg-alt);
+    padding: 0px 5px;
+    pointer-events: none;
+    transform: translate(14px, calc(.75rem + 7.5px)) scale(1);
+
+    *[dir="rtl"] & {
+        transform: translate(-14px, calc(.75rem + 7.5px)) scale(1);
+    }
+}
+
 :host(.outlined) > .field-helpers {
     padding-left: 8px;
     padding-right: 8px;
 }
 
-:host(.outlined.no-label),
+:host(.outlined) > tf-input:not(:has(~ label)) {
+    padding-bottom: 2.5px;
+    padding-top: 2.5px;
+}
 .field > tf-input {
     padding-bottom: 2.5px;
     padding-top: 2.5px;
 }
 
-:host(:not([disabled], [readonly], [inert])):focus-within {
+:host(:focus-within:not(:disabled, [readonly], [inert])) {
     --field-border-color: var(--field-active-border-color);
     --field-border-hover-color: var(--field-active-border-hover-color);
 }
 
-:host(:not([disabled], [readonly], [inert])) > tf-input:hover {
+:host(:not(:disabled, [readonly], [inert])) > tf-input:hover {
     border-color: var(--field-border-hover-color);
 }
 
-:host(.dense) > tf-input {
-    padding-top: 3px;
-    padding-bottom: 3px;
+:host([inline]:not(.filled, .outlined)) > label,
+:host(:focus-within:not(.filled, .outlined)) > label,
+:host([placeholder]:not(.filled, .outlined)) > label,
+:host(:state(has-value):not(.filled, .outlined)) > label {
+    transform: translate(0, 1.5px) scale(.75);
 }
 
-:host(.dense.filled) > tf-input {
-    padding-bottom: 3px;
-    padding-left: 3px;
-    padding-right: 3px;
-    padding-top: calc(1rem + 4px);
+:host([inline].filled) > label,
+:host(.filled:focus-within) > label,
+:host([placeholder].filled) > label,
+:host(.filled:state(has-value)) > label {
+    transform: translate(12px, 10px) scale(.75);
 
-    button, svg {
-        margin-top: -4px;
+    *[dir="rtl"] & {
+        transform: translate(-12px, 10px) scale(.75);
+    }
+}
+
+:host([inline].outlined) > label,
+:host(.outlined:focus-within) > label,
+:host([placeholder].outlined) > label,
+:host(.outlined:state(has-value)) > label {
+    transform: translate(14px, -6px) scale(.75);
+
+    *[dir="rtl"] & {
+        transform: translate(-14px, -6px) scale(.75);
+    }
+}
+
+:host(.dense) {
+    margin-bottom: 2px;
+    margin-top: 3px;
+
+    > tf-input {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
+    > label {
+        transform: translate(0, calc(1.25rem + 8px)) scale(1);
+    }
+}
+
+:host(.dense.filled) {
+    --tavenem-field-input-button-margin-top: -7px;
+
+    > tf-input {
+        padding-bottom: 3px;
+        padding-left: 3px;
+        padding-right: 3px;
+        padding-top: calc(1rem + 4px);
+
+        button, svg {
+            margin-top: -4px;
+        }
+    }
+
+    > label {
+        transform: translate(3px, calc(1.25rem + 9px)) scale(1);
+
+        *[dir="rtl"] & {
+            transform: translate(-3px, calc(1.25rem + 9px)) scale(1);
+        }
     }
 }
 
@@ -358,9 +484,46 @@ tf-input {
     padding-top: calc(.5rem + 2.5px);
 }
 
-:host(.dense.outlined.no-label) > tf-input {
+:host(.dense.outlined) > label {
+    transform: translate(5px, calc(.75rem + 7.5px)) scale(1);
+
+    *[dir="rtl"] & {
+        transform: translate(-5px, calc(.75rem + 7.5px)) scale(1);
+    }
+}
+
+:host(.dense.outlined) > tf-input:not(:has(~ label)) {
     padding-bottom: 2.5px;
     padding-top: 2.5px;
+}
+
+:host([inline].dense:not(.filled, .outlined)) > label,
+:host(.dense:focus-within:not(.filled, .outlined)) > label,
+:host([placeholder].dense:not(.filled, .outlined)) > label,
+:host(.dense:not(.filled, .outlined):state(has-value)) > label {
+    transform: translate(0, 1.5px) scale(.75);
+}
+
+:host([inline].dense.filled) > label,
+:host(.dense.filled:focus-within) > label,
+:host([placeholder].dense.filled) > label,
+:host(.dense.filled:state(has-value)) > label {
+    transform: translate(3px, 4px) scale(.75);
+
+    *[dir="rtl"] & {
+        transform: translate(-3px, 4px) scale(.75);
+    }
+}
+
+:host([inline].dense.outlined) > label,
+:host(.dense.outlined:focus-within) > label,
+:host([placeholder].dense.outlined) > label,
+:host(.dense.outlined:state(has-value)) > label {
+    transform: translate(5px, -6px) scale(.75);
+
+    *[dir="rtl"] & {
+        transform: translate(-5px, -6px) scale(.75);
+    }
 }
 
 tf-input.field,
@@ -405,7 +568,7 @@ input::placeholder {
     transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
-:host([disabled]) tf-input,
+:host(:disabled) tf-input,
 :host([readonly]) tf-input,
 :host([inert]) tf-input {
     cursor: default;
@@ -420,46 +583,43 @@ input::placeholder {
     }
 }
 
-:host([disabled]),
-:host([disabled]) .field,
-:host([inert]),
-:host([inert]) .field {
-    --field-color: var(--tavenem-color-text-disabled);
-    --field-label-color: var(--tavenem-color-text-disabled);
-}
-
-:host([disabled]) tf-input,
-:host([inert]) tf-input {
-    border-color: var(--tavenem-color-action-disabled);
-    color: var(--tavenem-color-text-disabled);
-}
-
-:host([disabled].filled) tf-input,
-:host([inert].filled) tf-input{
+:host(.filled:disabled) tf-input,
+:host([inert].filled) tf-input {
     background-color: rgba(0, 0, 0, 0.12);
 }
 
-:host([disabled].outlined) tf-input,
-:host([inert].outlined) tf-input{
+:host(.outlined:disabled) tf-input,
+:host([inert].outlined) tf-input {
     border-color: var(--tavenem-color-action-disabled);
 }
 
 .field-helpers {
     color: var(--field-label-color);
-    display: flex;
+    display: contents;
     font-size: 0.75rem;
     font-weight: var(--tavenem-font-weight);
     line-height: 1.66;
-    margin-top: 3px;
     overflow: hidden;
-    padding-left: 8px;
-    padding-right: 8px;
     text-align: start;
+
+    > * {
+        margin-top: 3px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
 }
 
-.help-text {
-    margin-left: auto;
+.validation-messages {
+    display: none;
+    list-style: none;
     margin-right: auto;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-left: 0;
+}
+
+:host(:state(touched)) .validation-messages {
+    display: initial;
 }
 
 .expand {
@@ -591,10 +751,6 @@ button::-moz-focus-inner,
     align-self: center;
 }
 
-:host(.invalid) > .picker-btn {
-    border-color: var(--tavenem-color-error);
-}
-
 .input-content {
     --date-picker-active-color-darken: var(--tavenem-color-primary-hover-dark);
     --date-picker-active-color-hover: var(--tavenem-color-primary-hover);
@@ -606,19 +762,103 @@ button::-moz-focus-inner,
     }
 }
 
-:host([disabled]) .input-content,
-:host([inert]) .input-content {
-    --date-picker-active-color-darken: var(--tavenem-color-default-hover-dark);
-    --date-picker-active-color-hover: var(--tavenem-color-default-hover);
-    --date-picker-active-color-text: var(--tavenem-color-default-text);
-    --date-picker-active-color: var(--tavenem-color-default);
+:host(:invalid:state(touched)) {
+    --field-active-border-color: var(--tavenem-color-error);
+    --field-active-border-hover-color: var(--tavenem-color-error);
+    --field-active-label-color: var(--tavenem-color-error);
+    --field-border-color: var(--tavenem-color-error);
+    --field-border-hover-color: var(--tavenem-color-error);
+    --field-color: var(--tavenem-color-error);
+    --field-label-color: var(--tavenem-color-error);
+
+    > .picker-btn {
+        border-color: var(--tavenem-color-error);
+    }
+
+    .input-content {
+        --date-picker-active-color-darken: var(--tavenem-color-error-hover-dark);
+        --date-picker-active-color-hover: var(--tavenem-color-error-hover);
+        --date-picker-active-color-text: var(--tavenem-color-error-text);
+        --date-picker-active-color: var(--tavenem-color-error);
+    }
 }
 
-:host(.invalid) .input-content {
-    --date-picker-active-color-darken: var(--tavenem-color-error-hover-dark);
-    --date-picker-active-color-hover: var(--tavenem-color-error-hover);
-    --date-picker-active-color-text: var(--tavenem-color-error-text);
-    --date-picker-active-color: var(--tavenem-color-error);
+:host(:disabled),
+:host([readonly]),
+:host([inert]) {
+    --tavenem-field-input-opacity: 1;
+
+    .input-content {
+        --date-picker-active-color-darken: var(--tavenem-color-default-hover-dark);
+        --date-picker-active-color-hover: var(--tavenem-color-default-hover);
+        --date-picker-active-color-text: var(--tavenem-color-default-text);
+        --date-picker-active-color: var(--tavenem-color-default);
+    }
+}
+
+:host(:where(.primary,
+    .secondary,
+    .tertiary,
+    .danger,
+    .dark,
+    .default,
+    .info,
+    .success,
+    .warning):not(:invalid, :disabled, [inert])) {
+    --field-active-border-color: var(--tavenem-theme-color);
+    --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
+    --field-active-label-color: var(--tavenem-theme-color);
+    --field-border-color: var(--tavenem-theme-color);
+    --field-border-hover-color: var(--tavenem-theme-color-lighten);
+    --field-label-color: var(--tavenem-theme-color);
+}
+
+:host(.filled:where(.primary,
+    .secondary,
+    .tertiary,
+    .danger,
+    .dark,
+    .default,
+    .info,
+    .success,
+    .warning)) {
+    background-color: transparent;
+
+    > tf-input {
+        background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), .09);
+
+        &:hover {
+            background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), 0.13);
+        }
+
+        &:disabled, &[inert], [inert] & {
+            background-color: var(--tavenem-theme-color-hover-bright);
+        }
+    }
+}
+
+
+:host(:disabled),
+:host(:disabled) .field,
+:host([inert]),
+:host([inert]) .field {
+    --field-color: var(--tavenem-color-text-disabled);
+    --field-label-color: var(--tavenem-color-text-disabled);
+
+    > tf-input {
+        border-color: var(--tavenem-color-action-disabled);
+        color: var(--tavenem-color-text-disabled);
+    }
+}
+
+:host(.filled:disabled) > tf-input,
+:host([inert].filled) > tf-input {
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+:host(.outlined:disabled) > tf-input,
+:host([inert].outlined) > tf-input {
+    border-color: var(--tavenem-color-action-disabled);
 }
 
 .header {
@@ -646,12 +886,6 @@ button::-moz-focus-inner,
     .inactive {
         color: var(--tavenem-color-text-disabled);
     }
-
-    .select {
-        &, tf-input {
-            margin-top: 0;
-        }
-    }
 }
 
 .current-date-button {
@@ -672,195 +906,9 @@ button::-moz-focus-inner,
     display: flex;
 }
 
-.checkbox {
-    --button-inherited-padding-y-icon: 6px;
-    --checkbox-inherited-color: var(--tavenem-color-action);
-    --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-    display: inline-flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    margin: 0;
-
-    &:has(:focus-visible):not(.disabled, [inert]) {
-        background-color: var(--tavenem-color-action-hover-bg);
-    }
-
-    > label {
-        align-items: center;
-        color: var(--tavenem-color-action);
-        cursor: pointer;
-        display: inline-flex;
-        pointer-events: auto;
-        position: relative;
-        transform: none;
-        vertical-align: middle;
-        z-index: auto;
-        -webkit-tap-highlight-color: transparent;
-
-        > .btn {
-            background-color: transparent;
-            color: inherit;
-            cursor: pointer;
-            display: inline-flex;
-            vertical-align: middle;
-
-            &:hover,
-            &:focus-visible {
-                background-color: var(--checkbox-inherited-hover-bg);
-            }
-
-            > input[type="checkbox"] {
-                -webkit-appearance: none;
-                appearance: none;
-                background: none;
-                border: none;
-                color: inherit;
-                cursor: inherit;
-                height: 100%;
-                left: 0;
-                margin: 0;
-                padding: 0;
-                position: absolute;
-                top: 0;
-                width: 100%;
-                z-index: 1;
-
-                ~ .checked {
-                    display: none;
-                }
-
-                &:checked {
-                    ~ .checked {
-                        display: inline-block;
-                    }
-
-                    ~ .unchecked {
-                        display: none;
-                    }
-                }
-            }
-
-            > svg {
-                color: var(--checkbox-inherited-color);
-
-                &:hover {
-                    background-color: var(--checkbox-inherited-hover-bg);
-                }
-            }
-        }
-    }
-
-    &[inert], [inert] & {
-        --checkbox-inherited-color: var(--tavenem-color-action-disabled);
-        --checkbox-inherited-hover-bg: transparent;
-
-        label {
-            &, &:hover, &:focus-visible {
-                color: var(--tavenem-color-action-disabled);
-
-                &, * {
-                    background-color: transparent;
-                    cursor: default;
-                }
-
-                * {
-                    color: var(--tavenem-color-text-disabled);
-                }
-
-                svg {
-                    color: var(--tavenem-color-action-disabled);
-                }
-            }
-        }
-    }
-}
-
-.select {
-    > tf-input > .expand {
-        transition: .3s cubic-bezier(.25,.8,.5,1);
-    }
-
-    &:has(tf-popover:popover-open)) > tf-input > .expand {
-        transform: rotate(-180deg);
-    }
-
-    &.read-only, &[readonly] {
-        cursor: default;
-        pointer-events: none;
-    }
-
-    > tf-popover.select-popover > .option-list {
-        color: var(--tavenem-color-action);
-        display: flex;
-        flex-direction: column;
-        list-style: none;
-        margin: 0;
-        overflow: auto;
-        padding-bottom: .25em;
-        padding-left: .75em;
-        padding-right: .75em;
-        padding-top: .25em;
-        position: relative;
-        scrollbar-gutter: stable;
-        transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-        > * {
-            align-items: center;
-            background-color: transparent;
-            border: 0;
-            border-radius: 0;
-            box-sizing: border-box;
-            color: inherit;
-            column-gap: .5em;
-            cursor: pointer;
-            display: flex;
-            flex: 0 0 auto;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            list-style: none;
-            margin: 0;
-            outline: 0;
-            overflow: hidden;
-            padding-bottom: .25em;
-            padding-inline-end: .25em;
-            padding-inline-start: .25em;
-            padding-top: .25em;
-            position: relative;
-            text-align: start;
-            text-decoration: none;
-            transition: background-color 150ms cubic-bezier(.4,0,.2,1) 0ms;
-            user-select: none;
-            vertical-align: middle;
-            -webkit-appearance: none;
-            -webkit-tap-highlight-color: transparent;
-
-            &:after {
-                background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
-                background-position: 50%;
-                background-repeat: no-repeat;
-                content: "";
-                display: block;
-                height: 100%;
-                left: 0;
-                opacity: 0;
-                pointer-events: none;
-                position: absolute;
-                top: 0;
-                transform: scale(10,10);
-                transition: transform .3s,opacity 1s;
-                width: 100%;
-            }
-
-            &:focus-visible, &:hover {
-                background-color: transparent;
-                color: inherit;
-            }
-
-            &:hover, &:focus {
-                background-color: var(--list-hover-bg);
-            }
-        }
-    }
+:host([inert]) * {
+    cursor: default;
+    pointer-events: none;
 }
 
 .number-field input[type=number] {
@@ -1047,11 +1095,11 @@ button::-moz-focus-inner,
     display: inline-flex;
 }
 
-:host([disabled]),
+:host(:disabled),
 :host([readonly]),
 :host([inert]),
 :host([required]),
-:host([empty]) {
+:host(:state(empty)) {
     .clear-button {
         display: none;
     }
@@ -1201,47 +1249,36 @@ button::-moz-focus-inner,
             if (hasTime) {
                 if (hasDate) {
                     if (parsedValue instanceof ZonedDateTime) {
-                        this._max = parsedValue;
-                        hasMax = true;
+                        this._initialValue = this._value = parsedValue;
                     } else if (parsedValue instanceof CalendarDate
                         || parsedValue instanceof CalendarDateTime) {
-                        this._max = toZoned(parsedValue, timeZone);
-                        hasMax = true;
+                        this._initialValue = this._value = toZoned(parsedValue, timeZone);
                     }
                 } else if (parsedValue instanceof Time) {
-                    this._max = parsedValue;
-                    hasMax = true;
+                    this._initialValue = this._value = parsedValue;
                 } else if (parsedValue instanceof ZonedDateTime) {
-                    this._max = toTime(parsedValue);
-                    hasMax = true;
+                    this._initialValue = this._value = toTime(parsedValue);
                 }
             } else if (parsedValue instanceof CalendarDate) {
-                this._max = parsedValue;
-                hasMax = true;
+                this._initialValue = this._value = parsedValue;
             } else if (parsedValue instanceof ZonedDateTime
                 || parsedValue instanceof CalendarDateTime) {
-                this._max = toCalendarDate(parsedValue);
-                hasMax = true;
+                this._initialValue = this._value = toCalendarDate(parsedValue);
             }
         }
 
         let display = this.getValueAndDisplay(this._value);
-
-        if ((hasValue && this._value == null)
-            || (this._value
-                && (this._value > this._max
-                || this._value < this._min))) {
-            this.classList.add('invalid');
-            if (display.value && display.value.length) {
-                this.classList.add('invalid-value');
-            }
+        if (this._value && display.value.length) {
+            this._internals.setFormValue(display.value);
+        } else {
+            this._internals.setFormValue(null);
         }
 
         let anchorId;
         let anchorOrigin;
         let input: HTMLInputElement | TavenemInputHtmlElement;
         if (this.hasAttribute('button')) {
-            anchorId = this.dataset.inputId || randomUUID();
+            anchorId = randomUUID();
             anchorOrigin = 'anchor-center-center';
 
             const button = document.createElement('button');
@@ -1258,12 +1295,9 @@ button::-moz-focus-inner,
             button.appendChild(slot);
 
             input = document.createElement('input');
-            input.classList.add('picker-value');
+            input.classList.add('input');
             input.hidden = true;
             input.readOnly = true;
-            if (this.hasAttribute('name')) {
-                input.name = this.getAttribute('name') || '';
-            }
             input.disabled = this.hasAttribute('disabled');
             if (this._value) {
                 input.value = display.value;
@@ -1283,24 +1317,18 @@ button::-moz-focus-inner,
             if (!this.hasAttribute('inline')) {
                 input.autofocus = this.hasAttribute('autofocus');
             }
-            input.classList.add('input', 'picker-value');
+            input.classList.add('input');
             if (this.classList.contains('clearable')) {
                 input.classList.add('clearable');
             }
             if (this.hasAttribute('disabled')) {
                 input.setAttribute('disabled', '');
             }
-            if (this.hasAttribute('name')) {
-                input.setAttribute('name', this.getAttribute('name') || '');
-            }
             if (this.hasAttribute('placeholder')) {
                 input.setAttribute('placeholder', this.getAttribute('placeholder') || '');
             }
             if (this.hasAttribute('readonly')) {
                 input.setAttribute('readonly', '');
-            }
-            if (this.hasAttribute('required')) {
-                input.setAttribute('required', '');
             }
             input.setAttribute('size', "1");
             if (this.hasAttribute('inline')) {
@@ -1312,7 +1340,6 @@ button::-moz-focus-inner,
                     input.display = display.display;
                 }
             }
-            input.dataset.inputId = this.dataset.inputId;
             if ('inputClass' in this.dataset) {
                 input.dataset.inputClass = this.dataset.inputClass;
             }
@@ -1323,9 +1350,39 @@ button::-moz-focus-inner,
             shadow.appendChild(input);
             input.addEventListener('valuechange', this.onInput.bind(this));
 
+            if ((display.display && display.display.length)
+                || display.value.length) {
+                this._internals.states.delete('empty');
+                this._internals.states.add('has-value');
+            } else {
+                this._internals.states.add('empty');
+                this._internals.states.delete('has-value');
+            }
+
             const expand = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             input.appendChild(expand);
             expand.outerHTML = `<svg class="main-expand" data-picker-toggle xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M480-400q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240ZM180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-60h65v60h340v-60h65v60h65q24 0 42 18t18 42v620q0 24-18 42t-42 18H180Zm0-60h600v-430H180v430Z"/></svg>`;
+
+            const helpers = document.createElement('div');
+            helpers.classList.add('field-helpers');
+            shadow.appendChild(helpers);
+
+            const validationList = document.createElement('ul');
+            validationList.classList.add('validation-messages');
+            helpers.appendChild(validationList);
+
+            const helperSlot = document.createElement('slot');
+            helperSlot.name = 'helpers';
+            helpers.appendChild(helperSlot);
+
+            if ('label' in this.dataset
+                && this.dataset.label
+                && this.dataset.label.length) {
+                const label = document.createElement('label');
+                label.htmlFor = anchorId;
+                label.textContent = this.dataset.label;
+                shadow.appendChild(label);
+            }
 
             const slot = document.createElement('slot');
             shadow.appendChild(slot);
@@ -1428,36 +1485,19 @@ button::-moz-focus-inner,
                 const dn = new Intl.DisplayNames("en", { type: "calendar" });
 
                 const select = document.createElement('tf-select') as TavenemSelectInputHtmlElement;
-                select.classList.add('field', 'select', 'calendar-select');
-                select.dataset.popoverContainer = '';
-                select.tabIndex = -1;
+                select.classList.add('dense', 'calendar-select');
+                select.dataset.inputStyle = `min-width: ${calendars.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
+                select.dataset.popoverLimitHeight = '';
                 select.setAttribute('value', calendar.identifier);
                 calendarContainer.appendChild(select);
+                select.value = calendar.identifier;
+                select.display = dn.of(calendar.identifier);
                 select.addEventListener('valuechange', this.onCalendarChange.bind(this));
-
-                const inputId = randomUUID();
-                const input = document.createElement('tf-input') as TavenemInputHtmlElement;
-                input.id = inputId;
-                input.classList.add('picker-value', 'calendar-input');
-                input.dataset.inputStyle = `min-width: ${calendars.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
-                select.appendChild(input);
-                input.value = calendar.identifier;
-                input.display = dn.of(calendar.identifier);
-
-                const icon = document.createElementNS("", 'svg');
-                input.appendChild(icon);
-                icon.outerHTML = `<svg class="expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>`;
-
-                const popover = document.createElement('tf-popover');
-                popover.dataset.anchorId = inputId;
-                popover.classList.add('select-popover', 'filled', 'top-left', 'anchor-bottom-left', 'flip-onopen', 'match-width');
-                popover.style.maxHeight = 'min(300px,90vh)';
-                popover.style.overflowY = 'auto';
-                select.appendChild(popover);
 
                 const list = document.createElement('div');
                 list.classList.add('option-list', 'calendars-option-list');
-                popover.appendChild(list);
+                list.slot = 'popover';
+                select.appendChild(list);
 
                 for (const c of calendars) {
                     const option = document.createElement('div');
@@ -1512,36 +1552,18 @@ button::-moz-focus-inner,
                     localeControls.appendChild(timeZoneContainer);
                 }
 
-                const select = document.createElement('tf-select');
-                select.classList.add('field', 'select', 'timezone-select');
-                select.dataset.popoverContainer = '';
-                select.tabIndex = -1;
-                select.setAttribute('value', timeZone);
+                const select = document.createElement('tf-select') as TavenemSelectInputHtmlElement;
+                select.classList.add('dense', 'timezone-select');
+                select.dataset.inputStyle = `min-width: ${timeZones.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
+                select.dataset.popoverLimitHeight = '';
                 timeZoneContainer.appendChild(select);
+                select.value = timeZone;
                 select.addEventListener('valuechange', this.onTimeZoneChange.bind(this));
-
-                const inputId = randomUUID();
-                const input = document.createElement('tf-input');
-                input.id = inputId;
-                input.classList.add('picker-value', 'timezone-input');
-                input.setAttribute('value', timeZone);
-                input.dataset.inputStyle = `min-width: ${timeZones.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
-                select.appendChild(input);
-
-                const icon = document.createElementNS("", 'svg');
-                input.appendChild(icon);
-                icon.outerHTML = `<svg class="expand" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>`;
-
-                const popover = document.createElement('tf-popover');
-                popover.dataset.anchorId = inputId;
-                popover.classList.add('select-popover', 'filled', 'top-left', 'anchor-bottom-left', 'flip-onopen', 'match-width');
-                popover.style.maxHeight = 'min(300px,90vh)';
-                popover.style.overflowY = 'auto';
-                select.appendChild(popover);
 
                 const list = document.createElement('div');
                 list.classList.add('option-list', 'timezone-option-list');
-                popover.appendChild(list);
+                list.slot = 'popover';
+                select.appendChild(list);
 
                 for (const z of timeZones) {
                     const option = document.createElement('div');
@@ -1657,7 +1679,7 @@ button::-moz-focus-inner,
                     hourInput.setAttribute('value', this._displayedTime.hour.toString());
                 }
             } else {
-                hourInput.dataset.minLength = '2';
+                hourInput.dataset.padLength = '2';
                 hourInput.dataset.paddingChar = '0';
                 hourInput.setAttribute('value', this._displayedTime.hour.toString());
             }
@@ -1702,7 +1724,7 @@ button::-moz-focus-inner,
             minuteInput.setAttribute('min', '-1');
             minuteInput.setAttribute('size', '2');
             minuteInput.setAttribute('step', '1');
-            minuteInput.dataset.minLength = '2';
+            minuteInput.dataset.padLength = '2';
             minuteInput.dataset.paddingChar = '0';
             minuteInput.setAttribute('value', this._displayedTime.minute.toString());
             currentTime.appendChild(minuteInput);
@@ -1747,7 +1769,7 @@ button::-moz-focus-inner,
                 secondInput.setAttribute('min', '-1');
                 secondInput.setAttribute('size', '2');
                 secondInput.setAttribute('step', '1');
-                secondInput.dataset.minLength = '2';
+                secondInput.dataset.padLength = '2';
                 secondInput.dataset.paddingChar = '0';
                 secondInput.setAttribute('value', this._displayedTime.second.toString());
                 currentTime.appendChild(secondInput);
@@ -1918,6 +1940,8 @@ button::-moz-focus-inner,
                 break;
         }
 
+        this.setValidity();
+
         shadow.addEventListener('mousedown', this.onMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
         shadow.addEventListener('keyup', this.onOuterKeyUp.bind(this));
@@ -1937,7 +1961,7 @@ button::-moz-focus-inner,
         root.removeEventListener('mouseup', this.onOuterMouseUp.bind(this));
         root.removeEventListener('keyup', this.onOuterKeyUp.bind(this));
 
-        const input = root.querySelector('.picker-value');
+        const input = root.querySelector('.input');
         if (input) {
             input.removeEventListener('valuechange', this.onInput.bind(this));
         }
@@ -2047,75 +2071,17 @@ button::-moz-focus-inner,
         if (newValue == oldValue) {
             return;
         }
-        if (name === 'disabled') {
-            const root = this.shadowRoot;
-            if (!root) {
-                return;
-            }
-
-            const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
-            if (input) {
-                if (newValue) {
-                    input.setAttribute('disabled', '');
-                } else {
-                    input.removeAttribute('disabled');
-                }
-            }
-
-            const header = root.querySelector('.header');
-            if (header instanceof HTMLElement) {
-                if (newValue) {
-                    header.inert = true;
-                } else {
-                    header.inert = this.hasAttribute('readonly');
-                }
-            }
-
-            const clearButton = root.querySelector('.color-clear') as HTMLButtonElement;
-            if (clearButton) {
-                if (newValue) {
-                    clearButton.disabled = true;
-                } else {
-                    clearButton.disabled = this.hasAttribute('readonly');
-                }
-            }
-
-            this.setOpen(false);
-        } else if (name === 'max') {
-            let newMax: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
-            if (newValue && newValue.length) {
-                newMax = this.parseValue(newValue);
-            }
-            if (!newMax) {
-                newMax = fromDate(new Date(8.64e15), this.getOptions().timeZone);
-            }
-            this._max = newMax;
-            if (this._value && this._value > this._max) {
-                this.classList.remove('valid');
-                this.classList.add('invalid');
-                this.classList.add('invalid-value');
-            }
+        if (name === 'max') {
+            this.max = newValue;
         } else if (name === 'min') {
-            let newMin: CalendarDate | CalendarDateTime | ZonedDateTime | Time | null | undefined;
-            if (newValue && newValue.length) {
-                newMin = this.parseValue(newValue);
-            }
-            if (!newMin) {
-                newMin = fromDate(new Date(-8.64e15), this.getOptions().timeZone);
-            }
-            this._min = newMin;
-            if (this._value && this._value < this._min) {
-                this.classList.remove('valid');
-                this.classList.add('invalid');
-                this.classList.add('invalid-value');
-            }
+            this.min = newValue;
         } else if (name === 'readonly') {
             const root = this.shadowRoot;
             if (!root) {
                 return;
             }
 
-            const input = root.querySelector<TavenemInputHtmlElement>('.picker-value');
+            const input = root.querySelector<TavenemInputHtmlElement>('.input');
             if (input) {
                 if (newValue) {
                     input.setAttribute('readonly', '');
@@ -2129,7 +2095,7 @@ button::-moz-focus-inner,
                 if (newValue) {
                     header.inert = true;
                 } else {
-                    header.inert = this.hasAttribute('disabled');
+                    header.inert = this.matches(':disabled');
                 }
             }
 
@@ -2138,7 +2104,7 @@ button::-moz-focus-inner,
                 if (newValue) {
                     clearButton.disabled = true;
                 } else {
-                    clearButton.disabled = this.hasAttribute('disabled');
+                    clearButton.disabled = this.matches(':disabled');
                 }
             }
 
@@ -2149,27 +2115,90 @@ button::-moz-focus-inner,
         }
     }
 
-    protected clear() {
-        if (!this._value) {
-            return;
-        }
-
-        this._value = null;
-
-        this.removeAttribute('value');
-        this.classList.remove('valid');
-        this.classList.remove('invalid');
-        this.classList.remove('invalid-value');
-
+    formDisabledCallback(disabled: boolean) {
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
 
-        const input = root.querySelector<TavenemInputHtmlElement>('.picker-value');
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
         if (input) {
-            input.value = '';
+            if (disabled) {
+                input.setAttribute('disabled', '');
+            } else {
+                input.removeAttribute('disabled');
+            }
         }
+
+        const header = root.querySelector('.header');
+        if (header instanceof HTMLElement) {
+            if (disabled) {
+                header.inert = true;
+            } else {
+                header.inert = this.hasAttribute('readonly');
+            }
+        }
+
+        const clearButton = root.querySelector('.color-clear') as HTMLButtonElement;
+        if (clearButton) {
+            if (disabled) {
+                clearButton.disabled = true;
+            } else {
+                clearButton.disabled = this.hasAttribute('readonly');
+            }
+        }
+
+        this.setOpen(false);
+    }
+
+    formResetCallback() { this.reset(); }
+
+    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+        if (typeof state === 'string') {
+            this.setValue(state);
+        } else if (state == null) {
+            this.clear();
+        }
+    }
+
+    checkValidity() { return this._internals.checkValidity(); }
+
+    reportValidity() { return this._internals.reportValidity(); }
+
+    reset() {
+        this._internals.states.delete('touched');
+        this._value = this._initialValue;
+        let display = this.getValueAndDisplay(this._value);
+        if (this._value && display.value.length) {
+            this._internals.setFormValue(display.value);
+        } else {
+            this._internals.setFormValue(null);
+        }
+        this.setValidity();
+    }
+
+    protected clear() {
+        if (!this._value) {
+            return;
+        }
+
+        this._settingValue = true;
+
+        const root = this.shadowRoot;
+        if (root) {
+            const input = root.querySelector<TavenemInputHtmlElement>('.input');
+            if (input) {
+                input.value = '';
+            }
+        }
+
+        this._value = null;
+        this._internals.setFormValue(null);
+        this._internals.states.add('empty');
+        this._internals.states.delete('has-value');
+        this.setValidity();
+
+        this._settingValue = false;
     }
 
     protected onClosing() {
@@ -2205,14 +2234,14 @@ button::-moz-focus-inner,
         let timeZone = this.dataset.timeZone;
         const root = this.shadowRoot;
         if (root) {
-            const calendarInput = root.querySelector<TavenemInputHtmlElement>('.calendar-input');
+            const calendarInput = root.querySelector<TavenemSelectInputHtmlElement>('.calendar-select');
             if (calendarInput
                 && calendarInput.value
                 && calendarInput.value.length) {
                 calendar = calendarInput.value;
             }
 
-            const timeZoneInput = root.querySelector<TavenemInputHtmlElement>('.timezone-input');
+            const timeZoneInput = root.querySelector<TavenemSelectInputHtmlElement>('.timezone-select');
             if (timeZoneInput
                 && timeZoneInput.value
                 && timeZoneInput.value.length) {
@@ -2292,6 +2321,12 @@ button::-moz-focus-inner,
                         hour: 'numeric',
                         minute: 'numeric',
                     };
+                    if ('showTimeZone' in this.dataset) {
+                        options = {
+                            ...options,
+                            timeZoneName: "short",
+                        }
+                    }
                     if (this.hasAttribute('seconds')) {
                         options = {
                             ...options,
@@ -2369,6 +2404,7 @@ button::-moz-focus-inner,
         if (this._value instanceof CalendarDate) {
             return;
         }
+        this._internals.states.add('touched');
         const value = this._value
             ? this._value
             : this._displayedTime;
@@ -2412,6 +2448,8 @@ button::-moz-focus-inner,
             return;
         }
 
+        this._internals.states.add('touched');
+
         let timeZone = this.dataset.timeZone?.toLowerCase()
             || getLocalTimeZone();
         const options = new DateFormatter(this.dataset.locale || 'en-US', {
@@ -2451,8 +2489,9 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
-        if (!this.hasAttribute('disabled')
+        if (!this.matches(':disabled')
             && !this.hasAttribute('readonly')) {
+            this._internals.states.add('touched');
             this.clear();
         }
         this.setOpen(false);
@@ -2480,6 +2519,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.subtract({ hours: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2507,6 +2547,7 @@ button::-moz-focus-inner,
             return;
         }
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.set({ hour: value }));
         } else if (this.hasAttribute('date')) {
@@ -2521,7 +2562,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
-
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.add({ hours: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2536,6 +2577,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.subtract({ minutes: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2563,6 +2605,7 @@ button::-moz-focus-inner,
             return;
         }
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.set({ minute: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2577,6 +2620,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.add({ minutes: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2608,6 +2652,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         this.setValue(event.detail.value);
 
         const root = this.shadowRoot;
@@ -2645,6 +2690,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         const hasTime = this._type === DateTimeType.Date && this.hasAttribute('time');
         const hasDate = !hasTime || this.hasAttribute('date');
         if (hasTime) {
@@ -2665,6 +2711,7 @@ button::-moz-focus-inner,
         if (this._value instanceof CalendarDate) {
             return;
         }
+        this._internals.states.add('touched');
         const value = this._value
             ? this._value
             : this._displayedTime;
@@ -2706,6 +2753,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.subtract({ seconds: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2733,6 +2781,7 @@ button::-moz-focus-inner,
             return;
         }
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.set({ second: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2747,6 +2796,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         if (this._value) {
             this.setDateTimeValue(this._value.add({ seconds: 1 }));
         } else if (this.hasAttribute('date')) {
@@ -2769,6 +2819,7 @@ button::-moz-focus-inner,
         event.preventDefault();
         event.stopPropagation();
 
+        this._internals.states.add('touched');
         if (this._value) {
             if (this._value instanceof ZonedDateTime) {
                 this.setDateTimeValue(toZoned(toCalendarDateTime(value, toTime(this._value)), this._value.timeZone), true);
@@ -2959,11 +3010,12 @@ button::-moz-focus-inner,
                 && event.detail
                 && typeof event.detail.value === 'string'
                 && event.detail.value.length) {
+                this._internals.states.add('touched');
                 this.setDateTimeValue(toTimeZone(this._value, event.detail.value));
             } else {
                 const root = this.shadowRoot;
                 if (root) {
-                    const timeZoneInput = root.querySelector<TavenemInputHtmlElement>('.timezone-input');
+                    const timeZoneInput = root.querySelector<TavenemSelectInputHtmlElement>('.timezone-select');
                     if (timeZoneInput
                         && timeZoneInput.value
                         && timeZoneInput.value.length) {
@@ -3124,7 +3176,7 @@ button::-moz-focus-inner,
         
         const firstOfMonth = startOfMonth(this._displayedDate);
         let displayedDate = startOfWeek(firstOfMonth, locale);
-        const { weekYear, weekNumber, weekday } = getWeek(firstOfMonth);
+        const { weekNumber } = getWeek(firstOfMonth);
         const weeks = getWeeksInMonth(this._displayedDate, locale);
         for (let week = 0; week < weeks; week++) {
             if (this._type === DateTimeType.Week) {
@@ -3481,34 +3533,19 @@ button::-moz-focus-inner,
 
         const display = this.getValueAndDisplay(this._value);
 
-        if (this._value instanceof Time) {
-            if ((this._max instanceof Time && this._value.compare(this._max) > 0)
-                || (this._min instanceof Time && this._value.compare(this._min) < 0)) {
-                this.classList.remove('valid');
-                this.classList.add('invalid');
-                if (display.value && display.value.length) {
-                    this.classList.add('invalid-value');
-                }
-            } else {
-                this.classList.remove('invalid');
-                this.classList.remove('invalid-value');
-            }
-        } else if ((!(this._max instanceof Time) && this._value.compare(this._max) > 0)
-            || (!(this._min instanceof Time) && this._value.compare(this._min) < 0)) {
-            this.classList.remove('valid');
-            this.classList.add('invalid');
-            if (display.value && display.value.length) {
-                this.classList.add('invalid-value');
-            }
+        if (this._value && display.value.length) {
+            this._internals.setFormValue(display.value);
         } else {
-            this.classList.remove('invalid');
-            this.classList.remove('invalid-value');
+            this._internals.setFormValue(null);
         }
 
-        if (display.value.length) {
-            this.setAttribute('value', display.value);
+        if ((display.display && display.display.length)
+            || display.value.length) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
         } else {
-            this.removeAttribute('value');
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
         }
 
         if (!preserveView) {
@@ -3517,10 +3554,11 @@ button::-moz-focus-inner,
 
         const root = this.shadowRoot;
         if (!root) {
+            this.setValidity();
             return;
         }
 
-        const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+        const input = root.querySelector('.input') as TavenemInputHtmlElement;
         if (input) {
             this._settingValue = true;
             input.value = display.value;
@@ -3529,6 +3567,8 @@ button::-moz-focus-inner,
             }
             this._settingValue = false;
         }
+
+        this.setValidity();
 
         const options = this.getOptions();
         const calendar = options.calendar;
@@ -3682,6 +3722,75 @@ button::-moz-focus-inner,
         }
     }
 
+    private setValidity() {
+        const flags: ValidityStateFlags = {};
+        const messages: string[] = [];
+
+        if (!this._value) {
+            const root = this.shadowRoot;
+            const input = root ? root.querySelector('.input') as TavenemInputHtmlElement : null;
+            const value = input ? input.value : null;
+            if (value) {
+                flags.badInput = true;
+                messages.push('value cannot be converted to a date/time');
+            }
+            if (this.hasAttribute('required')) {
+                flags.valueMissing = true;
+                messages.push('required');
+            }
+        } else {
+            if (this._value instanceof Time) {
+                if (this._max instanceof Time) {
+                    if (this._value.compare(this._max) > 0) {
+                        flags.rangeOverflow = true;
+                        messages.push('value above maximum');
+                    }
+                }
+                if (this._min instanceof Time) {
+                    if (this._value.compare(this._min) < 0) {
+                        flags.rangeUnderflow = true;
+                        messages.push('value below minimum');
+                    }
+                }
+            } else {
+                if (!(this._max instanceof Time)) {
+                    if (this._value.compare(this._max) > 0) {
+                        flags.rangeOverflow = true;
+                        messages.push('value above maximum');
+                    }
+                }
+                if (!(this._min instanceof Time)) {
+                    if (this._value.compare(this._min) < 0) {
+                        flags.rangeUnderflow = true;
+                        messages.push('value below minimum');
+                    }
+                }
+            }
+        }
+
+        const root = this.shadowRoot;
+        if (Object.keys(flags).length > 0) {
+            this._internals.setValidity(
+                flags,
+                messages.join('; '),
+                root?.querySelector('.input') || undefined);
+        } else {
+            this._internals.setValidity({});
+        }
+
+        if (!root) {
+            return;
+        }
+        const validationList = root.querySelector('.validation-messages');
+        if (validationList) {
+            validationList.replaceChildren(...messages.map(m => {
+                const li = document.createElement('li');
+                li.textContent = m;
+                return li;
+            }));
+        }
+    }
+
     private setValue(value?: string | null) {
         if (!value || !value.length) {
             this.clear();
@@ -3691,15 +3800,27 @@ button::-moz-focus-inner,
         const dateTimeValue = this.parseValue(value);
         if (!dateTimeValue) {
             this.clear();
-            this.classList.add('invalid');
-            this.classList.add('invalid-value');
 
             const root = this.shadowRoot;
+            let input: TavenemInputHtmlElement | null | undefined;
             if (root) {
-                const input = root.querySelector('.picker-value') as TavenemInputHtmlElement;
+                input = root.querySelector<TavenemInputHtmlElement>('.input');
                 if (input) {
                     input.display = value;
                 }
+            }
+
+            this._internals.setFormValue(null);
+            this._internals.setValidity({
+                badInput: true,
+            }, 'value cannot be converted to a date/time', input || undefined);
+
+            if (value.length) {
+                this._internals.states.delete('empty');
+                this._internals.states.add('has-value');
+            } else {
+                this._internals.states.add('empty');
+                this._internals.states.delete('has-value');
             }
         } else {
             this.setDateTimeValue(dateTimeValue);

@@ -41,19 +41,19 @@
                 {
                     <button class="btn btn-icon small" @onclick="OnAddAsync">
                         <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
-                        <Tooltip Delay="750">Add</Tooltip>
+                        <Tooltip>Add</Tooltip>
                     </button>
                 }
                 @if (AllowExport)
                 {
                     <button class="btn btn-icon small" @onclick="ShowExportDialogAsync">
                         <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M560 0v-80h320V0H560Zm160-120L560-280l56-56 64 64v-167h80v167l64-64 56 56-160 160Zm-480-40q-33 0-56.5-23.5T160-240v-560q0-33 23.5-56.5T240-880h280l240 240v121H480v359H240Zm240-440h200L480-800v200Z"/></svg>
-                        <Tooltip Delay="750">Export</Tooltip>
+                        <Tooltip>Export</Tooltip>
                     </button>
                 }
                 <button class="btn btn-icon small" @onclick="ShowColumnFilterDialogAsync">
                     <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M440-160q-17 0-28.5-11.5T400-200v-240L168-736q-15-20-4.5-42t36.5-22h560q26 0 36.5 22t-4.5 42L560-440v240q0 17-11.5 28.5T520-160h-80Z"/></svg>
-                    <Tooltip Delay="750">Change displayed columns</Tooltip>
+                    <Tooltip>Change displayed columns</Tooltip>
                 </button>
             </div>
         }
@@ -394,8 +394,8 @@
                         ThemeColor="ThemeColor" />
         </div>
     }
-    <Tooltip Id="datagrid-cancel-tooltip" Delay="750" IsContainerTrigger="false">Cancel</Tooltip>
-    <Tooltip Id="datagrid-delete-tooltip" Delay="750" IsContainerTrigger="false">Delete</Tooltip>
-    <Tooltip Id="datagrid-edit-tooltip" Delay="750" IsContainerTrigger="false">Edit</Tooltip>
-    <Tooltip Id="datagrid-save-tooltip" Delay="750" IsContainerTrigger="false">Save</Tooltip>
+    <Tooltip Id="datagrid-cancel-tooltip" IsContainerTrigger="false">Cancel</Tooltip>
+    <Tooltip Id="datagrid-delete-tooltip" IsContainerTrigger="false">Delete</Tooltip>
+    <Tooltip Id="datagrid-edit-tooltip" IsContainerTrigger="false">Edit</Tooltip>
+    <Tooltip Id="datagrid-save-tooltip" IsContainerTrigger="false">Save</Tooltip>
 </div>

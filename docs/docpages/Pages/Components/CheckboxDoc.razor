@@ -33,27 +33,6 @@
 </Collapse>
 
 <p>
-    You can add the <code>dense</code> class to reduce the space around the icon.
-</p>
-
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row center-items gap-2">
-                <Checkbox TValue="bool" Label="Normal" />
-                <Checkbox TValue="bool" Label="Dense" Class="dense" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row center-items gap-2"">
-    <Checkbox TValue=""bool"" Label=""Normal"" />
-    <Checkbox TValue=""bool"" Label=""Dense"" Class=""dense"" />
-</div>")
-    </ChildContent>
-</Collapse>
-
-<p>
     A checkbox's <code>Value</code> property can be bound to either a <code>bool</code> or nullable
     <code>bool?</code> expression.
 </p>
@@ -284,29 +263,6 @@
     <Checkbox TValue=""bool?"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
     <Checkbox TValue=""bool?"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
     <Checkbox TValue=""bool?"" Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />
-</div>")
-    </ChildContent>
-</Collapse>
-
-<p>
-    Use the <code>small</code> or <code>large</code> classes to change the size of the checkbox.
-</p>
-
-<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row center-items gap-2">
-                <Checkbox TValue="bool" Label="Small" Class="small" />
-                <Checkbox TValue="bool" Label="Normal" />
-                <Checkbox TValue="bool" Label="Large" Class="large" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row center-items gap-2"">
-    <Checkbox TValue=""bool"" Label=""Small"" Class=""small"" />
-    <Checkbox TValue=""bool"" Label=""Normal"" />
-    <Checkbox TValue=""bool"" Label=""Large"" Class=""large"" />
 </div>")
     </ChildContent>
 </Collapse>

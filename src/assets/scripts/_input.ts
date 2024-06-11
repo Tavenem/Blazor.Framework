@@ -1,20 +1,24 @@
+import { TavenemPopover, TavenemPopoverHTMLElement } from "./_popover";
 import { randomUUID } from "./tavenem-utility";
 
 export class TavenemInputHtmlElement extends HTMLElement {
-    private _initialDisplay: string | undefined;
+    static formAssociated = true;
+
+    private _display: string | null | undefined;
+    private _initialDisplay: string | null | undefined;
     private _initialValue: string | null | undefined;
     private _inputDebounce: number = -1;
+    private _internals: ElementInternals;
+    private _value = '';
 
     static get observedAttributes() {
         return [
             'data-input-class',
             'data-input-style',
-            'disabled',
             'display',
-            'max',
-            'min',
             'readonly',
-            'value'
+            'required',
+            'value',
         ];
     }
 
@@ -31,102 +35,51 @@ export class TavenemInputHtmlElement extends HTMLElement {
     }
 
     get display() {
-        const display = this.getAttribute('display');
-        if (display) {
-            return display;
-        }
-
-        const root = this.shadowRoot;
-        if (!root) {
-            return this.getAttribute('value');
-        }
-
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement
-            && input.value) {
-            return input.value;
-        } else {
-            const input = root.querySelector('input');
-            if (input instanceof HTMLInputElement
-                && input.value) {
-                return input.value;
-            }
-        }
-
-        return this.getAttribute('value');
+        return this._display && this._display.length
+            ? this._display
+            : this._value;
     }
-
     set display(value: string | null | undefined) {
-        if (value) {
-            this.setAttribute('display', value);
-        } else {
-            this.removeAttribute('display');
-        }
+        this._display = value;
 
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!(input instanceof HTMLInputElement)
-            || (value && value.length)) {
-            return;
-        }
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        if (hiddenInput instanceof HTMLInputElement) {
-            const minLength = parseInt(this.dataset.minLength || '');
-            if (Number.isFinite(minLength)
-                && minLength > hiddenInput.value.length) {
-                input.value = hiddenInput.value.padStart(minLength, this.dataset.paddingChar);
+        let newValue = value;
+        if (value == null || !value.length) {
+            const padLength = parseInt(this.dataset.padLength || '');
+            if (Number.isFinite(padLength)
+                && padLength > this._value.length) {
+                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
             } else {
-                input.value = hiddenInput.value;
+                newValue = this._value;
             }
-        } else {
-            input.value = '';
         }
-    }
 
-    get value() {
-        return this.getAttribute('value') || '';
-    }
+        if (newValue!.length) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
+        } else {
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
+        }
 
-    set value(value: string) {
         const root = this.shadowRoot;
-        if (!root) {
-            return;
+        if (root) {
+            const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+            if (input) {
+                input.value = newValue!;
+            }
         }
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!value && value != '0') {
-            if (hiddenInput instanceof HTMLInputElement
-                && hiddenInput.value === '') {
-                return;
-            }
-            this.removeAttribute('value');
-            if (input instanceof HTMLInputElement) {
-                input.value = '';
-            }
-            if (hiddenInput instanceof HTMLInputElement) {
-                this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
-            }
+    }
+
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
         } else {
-            if (hiddenInput instanceof HTMLInputElement
-                && hiddenInput.value === value) {
-                return;
-            }
-            this.setAttribute('value', value);
-            if (hiddenInput instanceof HTMLInputElement) {
-                this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
-            }
-            if (input instanceof HTMLInputElement) {
-                const minLength = parseInt(this.dataset.minLength || '');
-                if (Number.isFinite(minLength)
-                    && minLength > value.length) {
-                    input.value = value.padStart(minLength, this.dataset.paddingChar);
-                } else {
-                    input.value = value;
-                }
-            }
+            this.removeAttribute('required');
         }
     }
 
@@ -144,7 +97,6 @@ export class TavenemInputHtmlElement extends HTMLElement {
 
         return null;
     }
-
     set suggestion(value: string | null | undefined) {
         const root = this.shadowRoot;
         if (!root) {
@@ -168,12 +120,11 @@ export class TavenemInputHtmlElement extends HTMLElement {
         if (suggestion instanceof HTMLElement
             && suggestion.dataset.display
             && suggestion.dataset.display.length) {
-            return suggestion.dataset.value;
+            return suggestion.dataset.display;
         }
 
         return null;
     }
-
     set suggestionDisplay(value: string | null | undefined) {
         const root = this.shadowRoot;
         if (!root) {
@@ -204,7 +155,6 @@ export class TavenemInputHtmlElement extends HTMLElement {
 
         return null;
     }
-
     set suggestionValue(value: string | null | undefined) {
         const root = this.shadowRoot;
         if (!root) {
@@ -220,6 +170,22 @@ export class TavenemInputHtmlElement extends HTMLElement {
         }
     }
 
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
+    }
+
     connectedCallback() {
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
@@ -227,11 +193,14 @@ export class TavenemInputHtmlElement extends HTMLElement {
         style.textContent = `
 :host {
     align-items: center;
+    border-color: var(--field-border-color);
+    border-radius: var(--tavenem-border-radius);
     box-sizing: content-box;
     color: var(--field-color);
     column-gap: 8px;
     cursor: text;
     display: inline-flex;
+    flex-grow: 1;
     font-size: 1rem;
     font-weight: var(--tavenem-font-weight);
     line-height: 1.1875rem;
@@ -239,11 +208,16 @@ export class TavenemInputHtmlElement extends HTMLElement {
     padding-bottom: 7px;
     padding-top: 6px;
     position: relative;
+    transition: border-width,border-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
 }
 
-:host(.input-content) {
-    align-self: flex-start;
-    flex-direction: column;
+:host(.field) {
+    flex-direction: row;
+}
+
+:host(:disabled),
+:host([inert]) {
+    border-color: var(--tavenem-color-action-disabled);
 }
 
 input {
@@ -256,6 +230,7 @@ input {
     color: currentColor;
     display: block;
     font: inherit;
+    height: 1.1875rem;
     margin: 0;
     min-height: calc(1.25rem + 10px);
     min-width: 0;
@@ -462,7 +437,7 @@ button.clear {
     :host(:disabled) &,
     :host([readonly]):not(.clearable-readonly) &,
     :host(:required) &,
-    :host([empty]) & {
+    :host(:state(empty)) & {
         display: none;
     }
 }
@@ -472,32 +447,22 @@ button.clear::-moz-focus-inner {
         shadow.appendChild(style);
 
         const prefixSlot = document.createElement('slot');
-        prefixSlot.name = 'prefix'
+        prefixSlot.name = 'prefix';
         shadow.appendChild(prefixSlot);
 
         const hiddenInput = document.createElement('input');
-        hiddenInput.disabled = this.hasAttribute('disabled');
+        hiddenInput.disabled = this.matches(':disabled');
         hiddenInput.hidden = true;
-        if (this.hasAttribute('name')) {
-            hiddenInput.name = this.getAttribute('name') || '';
-        }
-        hiddenInput.required = this.hasAttribute('required');
         hiddenInput.type = 'hidden';
-        if (this.hasAttribute('value')) {
-            this._initialValue = this.getAttribute('value');
-            hiddenInput.value = this._initialValue || '';
-        }
         shadow.appendChild(hiddenInput);
-
-        if (!hiddenInput.value || !hiddenInput.value.length) {
-            this.setAttribute('empty', '');
-        }
 
         const suggestion = document.createElement('span');
         suggestion.classList.add('suggestion');
         shadow.appendChild(suggestion);
 
+        const inputId = randomUUID();
         const input = document.createElement('input');
+        input.id = inputId;
         if (this.hasAttribute('autocomplete')) {
             input.autocomplete = this.getAttribute('autocomplete') as AutoFill || 'off';
         }
@@ -508,8 +473,6 @@ button.clear::-moz-focus-inner {
         input.className = this.dataset.inputClass || '';
         input.disabled = hiddenInput.disabled;
 
-        const inputId = this.dataset.inputId || randomUUID();
-        input.id = inputId;
         if (this.hasAttribute('inputmode')) {
             const inputModeValue = this.getAttribute('inputmode');
             if (inputModeValue) {
@@ -521,6 +484,13 @@ button.clear::-moz-focus-inner {
             if (maxLengthValue) {
                 const maxLength = parseInt(maxLengthValue);
                 input.maxLength = maxLength;
+            }
+        }
+        if (this.hasAttribute('minlength')) {
+            const minLengthValue = this.getAttribute('minlength');
+            if (minLengthValue) {
+                const minLength = parseInt(minLengthValue);
+                input.minLength = minLength;
             }
         }
         if (this.hasAttribute('pattern')) {
@@ -546,51 +516,20 @@ button.clear::-moz-focus-inner {
             input.size = Math.max(
                 1,
                 (this.getAttribute('placeholder') || '').length,
-                document.querySelector(`label[for="${inputId}"]`)?.textContent?.length || 0);
+                this.hasAttribute('id') ? document.querySelector(`label[for="${this.getAttribute('id')}"]`)?.textContent?.length || 0 : 0);
         }
 
-        if (this.hasAttribute('step')) {
-            const stepValue = this.getAttribute('step');
-            if (stepValue) {
-                input.step = stepValue;
-            }
-        }
         if (this.hasAttribute('spellcheck')) {
             input.spellcheck = this.hasAttribute('spellcheck');
         } else {
             input.spellcheck = false;
         }
         input.style.cssText = this.dataset.inputStyle || '';
-        if (this.hasAttribute('tabindex')) {
-            const tabIndexValue = this.getAttribute('tabindex');
-            if (tabIndexValue) {
-                const tabIndex = parseInt(tabIndexValue);
-                input.tabIndex = tabIndex;
-            }
-        }
         if (this.hasAttribute('type')) {
             input.type = this.getAttribute('type') || 'text';
         }
 
-        const display = this.getAttribute('display');
-        if (display && display.length) {
-            input.value = display;
-        } else if (hiddenInput.value && hiddenInput.value.length) {
-            const minLength = parseInt(this.dataset.minLength || '');
-            if (Number.isFinite(minLength)
-                && minLength > hiddenInput.value.length) {
-                input.value = hiddenInput.value.padStart(minLength, this.dataset.paddingChar);
-            } else {
-                input.value = hiddenInput.value;
-            }
-        }
-        this._initialDisplay = input.value;
-
         shadow.appendChild(input);
-
-        if (display && !display.length) {
-            this.setAttribute('empty', '');
-        }
 
         const clear = document.createElement('button');
         clear.classList.add('clear');
@@ -604,40 +543,59 @@ button.clear::-moz-focus-inner {
         icon.innerHTML = '<path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>';
         clear.appendChild(icon);
 
+        if ('showEmoji' in this.dataset) {
+            const emoji = document.createElement('tf-emoji-input');
+            emoji.classList.add('nested');
+            emoji.style.margin = '0';
+            emoji.tabIndex = -1;
+            shadow.appendChild(emoji);
+            emoji.addEventListener('valuechange', this.onEmoji.bind(this));
+
+            const emojiTooltip = document.createElement('tf-tooltip');
+            emojiTooltip.textContent = 'insert emoji';
+            emoji.appendChild(emojiTooltip);
+        }
+
         const slot = document.createElement('slot');
         shadow.appendChild(slot);
+
+        if (this.hasAttribute('value')) {
+            this.setValue(this.getAttribute('value'));
+            this._initialValue = this._value;
+        }
+
+        if (this.hasAttribute('display')) {
+            this.display = this.getAttribute('display');
+            this._initialDisplay = this._display;
+        }
 
         input.addEventListener('change', this.onChange.bind(this));
         input.addEventListener('input', this.onInput.bind(this));
         input.addEventListener('keydown', this.onKeyDown.bind(this));
         clear.addEventListener('mouseup', this.onClearMouseUp.bind(this));
         clear.addEventListener('click', this.onClear.bind(this));
-        this.addEventListener('valuechange', this.onNestedValueChange.bind(this));
-        this.addEventListener('reset', this.reset.bind(this));
     }
 
     disconnectedCallback() {
-        this.removeEventListener('valuechange', this.onNestedValueChange.bind(this));
-        this.removeEventListener('reset', this.reset.bind(this));
         const root = this.shadowRoot;
-        let input = this.querySelector('input:not([hidden])');
-        if (!input && root) {
-            input = root.querySelector('input:not([hidden])');
+        if (!root) {
+            return;
         }
+        const input = root.querySelector<HTMLInputElement>('input:not([hidden])');
         if (input) {
             input.removeEventListener('change', this.onChange.bind(this));
             input.removeEventListener('input', this.onInput.bind(this));
-            if (input instanceof HTMLElement) {
-                input.removeEventListener('keydown', this.onKeyDown.bind(this));
-            }
+            input.removeEventListener('keydown', this.onKeyDown.bind(this));
         }
-        let clear = this.querySelector('button.clear');
-        if (!clear && root) {
-            clear = root.querySelector('button.clear');
-        }
+        const clear = root.querySelector('button.clear');
         if (clear) {
             clear.removeEventListener('mousedown', this.onClearMouseUp.bind(this));
             clear.removeEventListener('click', this.onClear.bind(this));
+        }
+
+        const emoji = root.querySelector('tf-emoji-input');
+        if (emoji) {
+            emoji.removeEventListener('valuechange', this.onEmoji.bind(this));
         }
     }
 
@@ -650,75 +608,61 @@ button.clear::-moz-focus-inner {
         if (!root) {
             return;
         }
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!hiddenInput
-            || !(hiddenInput instanceof HTMLInputElement)
-            || !input
-            || !(input instanceof HTMLInputElement)) {
+        const hiddenInput = root.querySelector<HTMLInputElement>('input[type="hidden"]');
+        const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+        if (!hiddenInput || !input) {
             return;
         }
         if (name === 'data-input-class') {
             input.className = newValue || '';
         } else if (name === 'data-input-style') {
             input.style.cssText = newValue || '';
-        } else if (name === 'disabled') {
-            input.disabled = hiddenInput.disabled = !!newValue;
         } else if (name === 'display') {
-            input.value = newValue || '';
-            if (!newValue
-                || !newValue.length) {
-                this.setAttribute('empty', '');
-            } else {
-                this.removeAttribute('empty');
-            }
-        } else if (name === 'max') {
-            if (newValue) {
-                const max = parseFloat(newValue);
-                if (!Number.isNaN(max)) {
-                    const value = parseFloat(hiddenInput.value);
-                    if (!Number.isNaN(value) && value > max) {
-                        input.value = hiddenInput.value = max.toString();
-                        this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
-                    }
-                }
-            }
-        } else if (name === 'min') {
-            if (newValue) {
-                const min = parseFloat(newValue);
-                if (!Number.isNaN(min)) {
-                    const value = parseFloat(hiddenInput.value);
-                    if (!Number.isNaN(value) && value < min) {
-                        input.value = hiddenInput.value = min.toString();
-                        this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
-                    }
-                }
+            if (this._display !== newValue) {
+                this.display = newValue;
             }
         } else if (name === 'readonly') {
             input.readOnly = !!newValue;
         } else if (name === 'required') {
-            hiddenInput.required = !!newValue;
+            this.setValidity();
         } else if (name === 'value') {
-            hiddenInput.value = newValue || '';
-            const display = this.getAttribute('display');
-            if (!display || !display.length) {
-                input.value = hiddenInput.value;
-                if (!input.value
-                    || !input.value.length) {
-                    this.setAttribute('empty', '');
-                } else {
-                    this.removeAttribute('empty');
-                }
-            } else if (!hiddenInput.value
-                || !hiddenInput.value.length) {
-                this.setAttribute('empty', '');
-            }
+            this.setValue(newValue);
         }
     }
 
-    decrement(event?: Event) {
-        this.stepValue(true, event);
+    formDisabledCallback(disabled: boolean) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const hiddenInput = root.querySelector('input[type="hidden"]');
+        if (hiddenInput instanceof HTMLInputElement) {
+            hiddenInput.disabled = disabled;
+        }
+
+        const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+        if (input) {
+            input.disabled = disabled;
+        }
+
+        const clear = root.querySelector<HTMLButtonElement>('button.clear');
+        if (clear) {
+            clear.disabled = disabled;
+        }
     }
+
+    formResetCallback() { this.reset(); }
+
+    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+        if (typeof state === 'string') {
+            this.value = state;
+        } else if (state == null) {
+            this.setValue(null);
+        }
+    }
+
+    checkValidity() { return this._internals.checkValidity(); }
 
     focusInnerInput() {
         const root = this.shadowRoot;
@@ -734,29 +678,13 @@ button.clear::-moz-focus-inner {
         this.focus();
     }
 
-    increment(event?: Event) {
-        this.stepValue(false, event);
-    }
+    reportValidity() { return this._internals.reportValidity(); }
 
-    reset(event?: Event) {
-        if (event
-            && (!(event.target instanceof HTMLFormElement)
-            || !event.target.contains(this))) {
-            return;
-        }
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        if (hiddenInput instanceof HTMLInputElement
-            && hiddenInput.value !== this._initialValue) {
-            hiddenInput.value = this._initialValue || '';
-            this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(hiddenInput.value));
-        }
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement) {
-            input.value = this._initialDisplay || '';
+    reset() {
+        this.setValue(this._initialValue);
+        if (this._initialDisplay
+            && this._initialDisplay.length) {
+            this.display = this._initialDisplay;
         }
     }
 
@@ -783,36 +711,21 @@ button.clear::-moz-focus-inner {
         }
     }
 
-    private static getPrecision(value: number) {
-        if (isNaN(value)
-            || value % 1 === 0) {
-            return 0;
-        }
-
-        let [i, p, d, e, n] = value.toString().split(/(\.|[eE][\-+])/g);
-        if (e) {
-            e = e.toLowerCase();
-        }
-        if (p && p !== '.') {
-            p = p.toLowerCase();
-        }
-        const f = e === 'e-';
-        return (+(p === '.'
-            && (!e || f)
-            && d.length)
-            + +(f && parseInt(n)))
-            || (p === 'e-' && parseInt(d))
-            || 0;
-    }
-
     private onChange(event: Event) {
+        if (event instanceof InputEvent
+            && event.isComposing) {
+            return;
+        }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
-        this.onInput(event);
+
         const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement) {
+        if (input instanceof HTMLInputElement
+            && this._value !== input.value
+            && this._display !== input.value) {
             this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
         }
     }
@@ -821,29 +734,10 @@ button.clear::-moz-focus-inner {
         event.preventDefault();
         event.stopPropagation();
 
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (hiddenInput instanceof HTMLInputElement
-            && input instanceof HTMLInputElement) {
-            hiddenInput.value = input.value = '';
-            this.removeAttribute('value');
-            this.setAttribute('empty', '');
-
-            let currentLengthDisplay = this.querySelector('.current-length');
-            if (!currentLengthDisplay
-                && this.parentElement
-                && this.parentElement.classList.contains('field')) {
-                currentLengthDisplay = this.parentElement.querySelector('.current-length');
-            }
-            if (currentLengthDisplay instanceof HTMLElement) {
-                currentLengthDisplay.innerText = '0';
-            }
-
-            this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(''));
+        if ((this._value && this._value.length)
+            || (this._display && this._display.length)) {
+            this.setValue(null);
+            this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(this._value));
         }
     }
 
@@ -853,7 +747,8 @@ button.clear::-moz-focus-inner {
     }
 
     private onInput(event?: Event) {
-        if (!this.onInputInner(event)) {
+        if (event instanceof InputEvent
+            && event.isComposing) {
             return;
         }
 
@@ -873,117 +768,66 @@ button.clear::-moz-focus-inner {
         }
 
         const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement) {
-            this.dispatchEvent(TavenemInputHtmlElement.newValueInputEvent(input.value));
-            return;
+        if (input instanceof HTMLInputElement
+            && this._value !== input.value
+            && this._display !== input.value) {
+            this.value = input.value;
         }
-    }
-
-    private onInputInner(event?: Event) {
-        if (event instanceof InputEvent
-            && event.isComposing) {
-            return false;
-        }
-
-        const root = this.shadowRoot;
-        if (!root) {
-            return false;
-        }
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!(hiddenInput instanceof HTMLInputElement)
-            || !(input instanceof HTMLInputElement)
-            || hiddenInput.value === input.value
-            || input.value === this.getAttribute('display')) {
-            return false;
-        }
-
-        hiddenInput.value = input.value;
-        if ((!input.value || !input.value.length)
-            && input.value != '0') {
-            this.removeAttribute('value');
-            this.setAttribute('empty', '');
-        } else {
-            this.setAttribute('value', input.value);
-            this.removeAttribute('empty');
-        }
-
-        let currentLengthDisplay = this.querySelector('.current-length');
-        if (!currentLengthDisplay
-            && this.parentElement
-            && this.parentElement.classList.contains('field')) {
-            currentLengthDisplay = this.parentElement.querySelector('.current-length');
-        }
-        if (currentLengthDisplay instanceof HTMLElement) {
-            currentLengthDisplay.innerText = hiddenInput.value.length.toString();
-        }
-
-        return true;
     }
 
     private onKeyDown(event: KeyboardEvent) {
         if (event.isComposing) {
             return;
         }
-        if (event.key === "ArrowDown") {
-            this.decrement();
-        } else if (event.key === "ArrowUp") {
-            this.increment();
-        } else if (event.key === "Enter") {
+        if (event.key === "Enter") {
             event.preventDefault();
             event.stopPropagation();
-            this.dispatchEvent(TavenemInputHtmlElement.newEnterEvent());
             this.onChange(event);
+            this.dispatchEvent(TavenemInputHtmlElement.newEnterEvent());
         } else if (event.key === "Tab") {
             this.onTab(event);
         }
     }
 
-    private onNestedValueChange(event: Event) {
-        if (event.target === this
-            || !(event instanceof CustomEvent)
+    private onEmoji(event: Event) {
+        event.stopPropagation();
+
+        if (!(event instanceof CustomEvent)
             || !event.detail
             || !event.detail.value
             || typeof event.detail.value !== 'string') {
             return;
         }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!input
-            || !(input instanceof HTMLInputElement)) {
-            return;
+
+        const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+        if (input) {
+            this.value = input.value + event.detail.value;
         }
-
-        input.value += event.detail.value;
-        this.onInput(event);
-
-        event.preventDefault();
-        event.stopPropagation();
     }
 
     private onTab(event: KeyboardEvent) {
         if (!event.target) {
             return;
         }
-        if (event.target !== this) {
-            const popover = this.querySelector('tf-popover.suggestion-popover');
-            if (popover
-                && event.target instanceof Node
-                && popover.contains(event.target)) {
-                return;
-            }
-        }
 
         const root = this.shadowRoot;
         if (!root) {
-            return null;
+            return;
         }
 
-        const suggestion = root.querySelector('.suggestion');
-        if (!(suggestion instanceof HTMLElement)) {
+        const hiddenInput = root.querySelector<HTMLInputElement>('input[type="hidden"]');
+        const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+        if (!hiddenInput || !input) {
+            return;
+        }
+
+        const suggestion = root.querySelector<HTMLElement>('.suggestion');
+        if (!suggestion) {
             return;
         }
 
@@ -994,96 +838,99 @@ button.clear::-moz-focus-inner {
         const suggestionValue = suggestion.dataset.value && suggestion.dataset.value.length
             ? suggestion.dataset.value
             : suggestionDisplay;
-        if (!suggestionValue
-            || !suggestionValue.length) {
-            return;
-        }
-
-        const hiddenInput = root.querySelector('input[type="hidden"]');
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!hiddenInput
-            || !(hiddenInput instanceof HTMLInputElement)
-            || !input
-            || !(input instanceof HTMLInputElement)) {
-            return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.setAttribute('value', suggestionValue);
-        hiddenInput.value = suggestionValue;
-        input.value = suggestionDisplay || suggestionValue;
-        this.removeAttribute('empty');
-
-        suggestion.textContent = null;
-
-        if (this.parentElement
-            && typeof (this.parentElement as any).setOpen === "function"
-            && this.parentElement.querySelector('tf-popover.suggestion-popover > .suggestion-list')) {
-            (this.parentElement as any).setOpen(false);
-        }
-
-        this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(suggestionValue));
-    }
-
-    private stepValue(down: boolean, event?: Event) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector('input:not([type="hidden"])');
-        if (!input
-            || !(input instanceof HTMLInputElement)) {
-            return;
-        }
-
-        let value = parseFloat(input.value);
-        if (Number.isNaN(value)) {
-            return;
-        }
-
-        let stepString = this.getAttribute('step') || 'any';
-        if (stepString === 'any') {
-            stepString = '1';
-        }
-        let step = parseFloat(stepString);
-        if (!Number.isFinite(step)
-            || step <= 0) {
-            step = 1;
-        }
-
-        if (down) {
-            value -= step;
-        } else {
-            value += step;
-        }
-
-        const precision = TavenemInputHtmlElement.getPrecision(step);
-        if (precision === 0) {
-            value = Math.round(value);
-        } else {
-            const factor = precision * 10;
-            value = Math.round(value * factor) / factor;
-        }
-
-        const max = parseFloat(this.getAttribute('max') || '');
-        if (!Number.isNaN(max)) {
-            value = Math.min(max, value);
-        }
-
-        const min = parseFloat(this.getAttribute('min') || '');
-        if (!Number.isNaN(min)) {
-            value = Math.max(min, value);
-        }
-
-        input.value = value.toString();
-        this.onInput(event);
-
-        if (event) {
+        if (suggestionValue
+            && suggestionValue.length) {
             event.preventDefault();
             event.stopPropagation();
+
+            this.value = suggestionValue;
+            if (suggestionDisplay && suggestionDisplay.length) {
+                this.display = suggestionDisplay;
+            }
+
+            delete suggestion.dataset.display;
+            delete suggestion.dataset.value;
+            suggestion.textContent = null;
+            return;
         }
+    }
+
+    private setValidity() {
+        const flags: ValidityStateFlags = {};
+        let message: string | undefined;
+
+        if (!this._value || !this._value.length) {
+            if (this.hasAttribute('required')) {
+                flags.valueMissing = true;
+                message = 'value required';
+            }
+        } else {
+            if (this.hasAttribute('minlength')) {
+                const minLengthValue = this.getAttribute('minlength');
+                if (minLengthValue) {
+                    const minLength = parseInt(minLengthValue);
+                    if (Number.isFinite(minLength)
+                        && this._value.length < minLength) {
+                        flags.tooShort = true;
+                        message = `value must have at least ${minLength} characters`;
+                    }
+                }
+            }
+            if (this.hasAttribute('maxlength')) {
+                const maxLengthValue = this.getAttribute('maxlength');
+                if (maxLengthValue) {
+                    const maxLength = parseInt(maxLengthValue);
+                    if (Number.isFinite(maxLength)
+                        && this._value.length > maxLength) {
+                        flags.tooLong = true;
+                        message = `value must have no more than ${maxLength} characters`;
+                    }
+                }
+            }
+        }
+
+        if (Object.keys(flags).length > 0) {
+            let input: HTMLInputElement | null | undefined;
+            const root = this.shadowRoot;
+            if (root) {
+                input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+            }
+            this._internals.setValidity(flags, message, input || undefined);
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+
+    private setValue(value?: string | null) {
+        if (value == null) {
+            if (this._value == null) {
+                return;
+            }
+        } else if (this._value === value) {
+            return;
+        }
+
+        this._value = value == null ? '' : value;
+
+        if (this._value.length) {
+            this._internals.setFormValue(this._value);
+        } else {
+            this._internals.setFormValue(null);
+        }
+
+        this.display = null;
+
+        this.setValidity();
+
+        const root = this.shadowRoot;
+        if (root) {
+            const hiddenInput = root.querySelector<HTMLInputElement>('input[type="hidden"]');
+            if (hiddenInput) {
+                hiddenInput.value = this._value;
+            }
+        }
+
+        this.dispatchEvent(TavenemInputHtmlElement.newValueInputEvent(this._value));
     }
 
     private updateInputDebounced() {
@@ -1092,9 +939,10 @@ button.clear::-moz-focus-inner {
             return;
         }
         const input = root.querySelector('input:not([type="hidden"])');
-        if (input
-            && input instanceof HTMLInputElement) {
-            input.dispatchEvent(TavenemInputHtmlElement.newValueInputEvent(input.value));
+        if (input instanceof HTMLInputElement
+            && this._value !== input.value
+            && this._display !== input.value) {
+            this.value = input.value;
         }
     }
 }

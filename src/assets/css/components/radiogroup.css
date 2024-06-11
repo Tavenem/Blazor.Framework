@@ -1,0 +1,111 @@
+.radio-group {
+    --button-inherited-padding-y-icon: 6px;
+    --checkbox-inherited-color: var(--tavenem-color-action);
+    --radio-group-text-color: var(--tavenem-color-text);
+    display: inline-flex;
+    flex-direction: column;
+    margin: 0;
+
+    .content {
+        display: inline-flex;
+        flex-direction: column;
+    }
+
+    legend {
+        color: var(--radio-group-text-color);
+    }
+
+    .options {
+        display: inline-flex;
+        flex-direction: column;
+        gap: .25rem;
+    }
+
+    &.inline {
+        .content {
+            align-items: center;
+            flex-direction: row;
+        }
+
+        legend {
+            margin-bottom: 0;
+            margin-right: .5rem;
+        }
+
+        .options {
+            align-items: center;
+            flex-direction: row;
+            min-width: fit-content;
+        }
+    }
+
+    .field-helpers {
+        color: var(--radio-group-text-color);
+        padding-inline-start: var(--button-inherited-padding-y-icon);
+    }
+
+    &.small {
+        --button-inherited-font-size-icon: 1.25rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.large {
+        --button-inherited-font-size-icon: 2rem;
+        --button-inherited-padding-y-icon: 5px;
+    }
+
+    &.dense {
+        --button-inherited-padding-x-icon: 2px;
+        --button-inherited-padding-y-icon: 2px;
+
+        .options {
+            gap: 0;
+        }
+    }
+
+    &.disabled, &[inert], [inert] & {
+        legend {
+            color: var(--tavenem-color-text-disabled);
+        }
+    }
+
+    &.filled {
+        background-color: transparent;
+        color: var(--tavenem-color-action);
+    }
+
+    &.outlined {
+        border-style: none;
+    }
+
+    &.required legend:after {
+        color: var(--tavenem-color-error);
+        content: " *";
+    }
+
+    &.bg-alt {
+        background-color: transparent;
+    }
+
+    &.invalid {
+        --checkbox-inherited-color: var(--tavenem-color-error);
+        --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
+        --radio-group-text-color: var(--tavenem-color-error);
+    }
+
+    &:where(
+        .primary,
+        .secondary,
+        .tertiary,
+        .danger,
+        .dark,
+        .default,
+        .info,
+        .success,
+        .warning) {
+        --checkbox-inherited-color: var(--tavenem-theme-color);
+        --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        --radio-group-text-color: var(--tavenem-theme-color);
+        color: var(--tavenem-color-action);
+    }
+}

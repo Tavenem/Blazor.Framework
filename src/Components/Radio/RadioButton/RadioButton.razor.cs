@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -11,8 +12,6 @@ namespace Tavenem.Blazor.Framework;
 public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
     : BoolInputComponentBase<TValue>
 {
-    private bool _trueValueToggle;
-
     /// <summary>
     /// The icon to use for the checked state.
     /// </summary>
@@ -45,9 +44,7 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("checkbox")
-        .Add("disabled", IsDisabled)
-        .Add("read-only", IsReadOnly)
+        .Add(ThemeColor.ToCSS())
         .ToString();
 
     /// <inheritdoc/>
@@ -78,18 +75,9 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
 
     [CascadingParameter] private RadioContext<TValue>? CascadingContext { get; set; }
 
-    private string? CheckedIconClass => IsCheckedIconOutlined ? "checked outlined" : "checked";
+    private string? CheckedIconClass => IsCheckedIconOutlined ? "outlined" : null;
 
-    private string? IconClass => new CssBuilder("btn btn-icon")
-        .Add(ThemeColor.ToCSS())
-        .ToString();
-
-    private string? IsCheckedString
-        => Context?.CurrentValue?.Equals(Value) == true
-        ? GetToggledTrueValue()
-        : IsChecked?.ToString();
-
-    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "unchecked outlined" : "unchecked";
+    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "outlined" : null;
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
@@ -101,21 +89,15 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
         base.OnParametersSet();
     }
 
-    private string GetToggledTrueValue()
-    {
-        _trueValueToggle = !_trueValueToggle;
-        return _trueValueToggle ? "a" : "b";
-    }
-
-    private async Task OnChangeAsync(ChangeEventArgs e)
+    private async Task OnToggleAsync(ToggleEventArgs e)
     {
         if (Context is null)
         {
-            Toggle();
+            SetValue(e.Value);
         }
         else
         {
-            await Context.ChangeEventCallback.InvokeAsync(e);
+            await Context.ChangeEventCallback.InvokeAsync(new ChangeEventArgs { Value = Value?.ToString() });
         }
     }
 }
