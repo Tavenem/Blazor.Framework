@@ -41,6 +41,7 @@ import {
     parseTime as parseTimeString
 } from './_datetime-parser'
 import { TavenemPopoverHTMLElement } from './_popover'
+import { TavenemCheckboxHtmlElement } from './_checkbox'
 
 const internationalizedCalendars = ['buddhist', 'ethiopic', 'ethioaa', 'coptic', 'hebrew', 'indian', 'islamic-civil', 'islamic-tbla', 'islamic-umalqura', 'japanese', 'persian', 'roc', 'gregory'];
 const supportedCalendars = Intl
@@ -211,8 +212,7 @@ input {
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-:host(:not([button])),
-.field {
+:host(:not([button])) {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
     --field-active-label-color: var(--tavenem-color-primary);
@@ -234,8 +234,7 @@ input {
     vertical-align: top;
 }
 
-:host(:focus-within:not([button])),
-.field:focus-within {
+:host(:focus-within:not([button])) {
     --field-border-color: var(--field-active-border-color);
     --field-border-hover-color: var(--field-active-border-hover-color);
 }
@@ -245,11 +244,6 @@ input {
     margin-bottom: .5rem;
     margin-top: 1rem;
     min-width: 255px;
-}
-
-.field {
-    margin-bottom: 2px;
-    margin-top: 3px;
 }
 
 :host > label {
@@ -397,10 +391,6 @@ tf-input svg {
     padding-bottom: 2.5px;
     padding-top: 2.5px;
 }
-.field > tf-input {
-    padding-bottom: 2.5px;
-    padding-top: 2.5px;
-}
 
 :host(:focus-within:not(:disabled, [readonly], [inert])) {
     --field-border-color: var(--field-active-border-color);
@@ -523,42 +513,6 @@ tf-input svg {
 
     *[dir="rtl"] & {
         transform: translate(-5px, -6px) scale(.75);
-    }
-}
-
-tf-input.field,
-.field > tf-input {
-    background-color: var(--tavenem-color-bg-alt);
-    border-style: solid;
-    border-width: 1px;
-    padding-bottom: 2.5px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 2.5px;
-
-    &:hover {
-        border-color: var(--field-border-hover-color);
-    }
-
-    > .expand {
-        transform: rotate(-180deg);
-    }
-
-    input {
-        text-align: center;
-    }
-
-    &:before {
-        border-color: var(--field-border-color);
-        border-bottom-style: solid;
-        border-bottom-width: 1px;
-        bottom: 0;
-        content: "\xa0";
-        left: 0;
-        right: 0;
-        pointer-events: none;
-        position: absolute;
-        transition: border-bottom 0.2s, border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 0.2s;
     }
 }
 
@@ -839,9 +793,7 @@ button::-moz-focus-inner,
 
 
 :host(:disabled),
-:host(:disabled) .field,
-:host([inert]),
-:host([inert]) .field {
+:host([inert]) {
     --field-color: var(--tavenem-color-text-disabled);
     --field-label-color: var(--tavenem-color-text-disabled);
 
@@ -862,8 +814,11 @@ button::-moz-focus-inner,
 }
 
 .header {
+    --checkbox-inherited-color: var(--date-picker-active-color-text);
+    --checkbox-inherited-hover-bg: var(--date-picker-active-color-hover);
     align-items: start;
     background-color: var(--date-picker-active-color);
+    color: var(--date-picker-active-color-text);
     display: flex;
     flex-direction: column;
     padding-bottom: .25rem;
@@ -911,41 +866,6 @@ button::-moz-focus-inner,
     pointer-events: none;
 }
 
-.number-field input[type=number] {
-    -moz-appearance: textfield;
-}
-.number-field input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-.number-field input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.numeric-spin {
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: space-between;
-    order: 9999;
-
-    button {
-        background-color: transparent;
-        color: inherit;
-        flex-shrink: 1;
-        font-size: 1rem;
-        max-height: .9375rem;
-        min-height: unset;
-        min-width: unset;
-        padding: 2px 0;
-
-        &:hover,
-        &:focus-visible {
-            background-color: var(--tavenem-color-action-hover-bg);
-        }
-    }
-}
-
 .current-value {
     align-self: stretch;
     display: flex;
@@ -973,10 +893,6 @@ button::-moz-focus-inner,
     flex-grow: 1;
     justify-content: center;
     padding-bottom: 6px;
-
-    .field {
-        padding-bottom: 0;
-    }
 }
 
 .am-button {
@@ -1489,6 +1405,7 @@ button::-moz-focus-inner,
                 select.dataset.inputStyle = `min-width: ${calendars.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
                 select.dataset.popoverLimitHeight = '';
                 select.setAttribute('value', calendar.identifier);
+                select.style.backgroundColor = 'var(--tavenem-color-bg-input)';
                 calendarContainer.appendChild(select);
                 select.value = calendar.identifier;
                 select.display = dn.of(calendar.identifier);
@@ -1509,38 +1426,11 @@ button::-moz-focus-inner,
                 }
 
                 if (calendars.length < supportedCalendars.length) {
-                    const allCalendarsCheckbox = document.createElement('div');
-                    allCalendarsCheckbox.classList.add('checkbox');
+                    const allCalendarsCheckbox = document.createElement('tf-checkbox');
+                    allCalendarsCheckbox.dataset.label = 'Show All';
+                    allCalendarsCheckbox.classList.add('all-calendars-input');
                     calendarContainer.appendChild(allCalendarsCheckbox);
-
-                    const allCalendarsCheckboxLabel = document.createElement('label');
-                    allCalendarsCheckbox.appendChild(allCalendarsCheckboxLabel);
-
-                    const allCalendarsCheckboxSpan = document.createElement('span');
-                    allCalendarsCheckboxSpan.classList.add('btn');
-                    allCalendarsCheckboxLabel.appendChild(allCalendarsCheckboxSpan);
-
-                    const allCalendarsCheckboxInputId = randomUUID();
-                    const allCalendarsCheckboxInput = document.createElement('input');
-                    allCalendarsCheckboxInput.id = allCalendarsCheckboxInputId;
-                    allCalendarsCheckboxInput.type = 'checkbox';
-                    allCalendarsCheckboxInput.classList.add('all-calendars-input');
-                    allCalendarsCheckboxSpan.appendChild(allCalendarsCheckboxInput);
-                    allCalendarsCheckboxInput.addEventListener('change', this.onShowAllCalendars.bind(this));
-
-                    const allCalendarsCheckboxCheckedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                    allCalendarsCheckboxSpan.appendChild(allCalendarsCheckboxCheckedIcon);
-                    allCalendarsCheckboxCheckedIcon.outerHTML = `<svg class="checked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m419-321 289-289-43-43-246 246-119-119-43 43 162 162ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg>`;
-
-                    const allCalendarsCheckboxUncheckedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                    allCalendarsCheckboxSpan.appendChild(allCalendarsCheckboxUncheckedIcon);
-                    allCalendarsCheckboxUncheckedIcon.outerHTML = `<svg class="unchecked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Z"/></svg>`;
-
-                    const allCalendarsCheckboxInnerLabel = document.createElement('label');
-                    allCalendarsCheckboxInnerLabel.classList.add('label');
-                    allCalendarsCheckboxInnerLabel.htmlFor = allCalendarsCheckboxInputId;
-                    allCalendarsCheckboxInnerLabel.textContent = 'Show All';
-                    allCalendarsCheckboxLabel.appendChild(allCalendarsCheckboxInnerLabel);
+                    allCalendarsCheckbox.addEventListener('inputtoggle', this.onShowAllCalendars.bind(this));
                 }
             }
 
@@ -1556,6 +1446,7 @@ button::-moz-focus-inner,
                 select.classList.add('dense', 'timezone-select');
                 select.dataset.inputStyle = `min-width: ${timeZones.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
                 select.dataset.popoverLimitHeight = '';
+                select.style.backgroundColor = 'var(--tavenem-color-bg-input)';
                 timeZoneContainer.appendChild(select);
                 select.value = timeZone;
                 select.addEventListener('valuechange', this.onTimeZoneChange.bind(this));
@@ -1574,38 +1465,11 @@ button::-moz-focus-inner,
                 }
 
                 if (allTimeZones.length) {
-                    const allTimeZonesCheckbox = document.createElement('div');
-                    allTimeZonesCheckbox.classList.add('checkbox');
+                    const allTimeZonesCheckbox = document.createElement('tf-checkbox');
+                    allTimeZonesCheckbox.dataset.label = 'Show All';
+                    allTimeZonesCheckbox.classList.add('all-time-zones-input');
                     timeZoneContainer.appendChild(allTimeZonesCheckbox);
-
-                    const allTimeZonesCheckboxLabel = document.createElement('label');
-                    allTimeZonesCheckbox.appendChild(allTimeZonesCheckboxLabel);
-
-                    const allTimeZonesCheckboxSpan = document.createElement('span');
-                    allTimeZonesCheckboxSpan.classList.add('btn');
-                    allTimeZonesCheckboxLabel.appendChild(allTimeZonesCheckboxSpan);
-
-                    const allTimeZonesCheckboxInputId = randomUUID();
-                    const allTimeZonesCheckboxInput = document.createElement('input');
-                    allTimeZonesCheckboxInput.id = allTimeZonesCheckboxInputId;
-                    allTimeZonesCheckboxInput.type = 'checkbox';
-                    allTimeZonesCheckboxInput.classList.add('all-time-zones-input');
-                    allTimeZonesCheckboxSpan.appendChild(allTimeZonesCheckboxInput);
-                    allTimeZonesCheckboxInput.addEventListener('change', this.onShowAllTimeZones.bind(this));
-
-                    const allTimeZonesCheckboxCheckedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                    allTimeZonesCheckboxSpan.appendChild(allTimeZonesCheckboxCheckedIcon);
-                    allTimeZonesCheckboxCheckedIcon.outerHTML = `<svg class="checked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="m419-321 289-289-43-43-246 246-119-119-43 43 162 162ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg>`;
-
-                    const allTimeZonesCheckboxUncheckedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                    allTimeZonesCheckboxSpan.appendChild(allTimeZonesCheckboxUncheckedIcon);
-                    allTimeZonesCheckboxUncheckedIcon.outerHTML = `<svg class="unchecked" xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48"><path d="M180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Z"/></svg>`;
-
-                    const allTimeZonesCheckboxInnerLabel = document.createElement('label');
-                    allTimeZonesCheckboxInnerLabel.classList.add('label');
-                    allTimeZonesCheckboxInnerLabel.htmlFor = allTimeZonesCheckboxInputId;
-                    allTimeZonesCheckboxInnerLabel.textContent = 'Show All';
-                    allTimeZonesCheckboxLabel.appendChild(allTimeZonesCheckboxInnerLabel);
+                    allTimeZonesCheckbox.addEventListener('inputtoggle', this.onShowAllTimeZones.bind(this));
                 }
             }
         }
@@ -1662,8 +1526,9 @@ button::-moz-focus-inner,
             currentTime.classList.add('current-time');
             currentValueSection.appendChild(currentTime);
 
-            const hourInput = document.createElement('tf-input');
-            hourInput.classList.add('field', 'number-field', 'hour-input');
+            const hourInput = document.createElement('tf-numeric-input');
+            hourInput.classList.add('hour-input', 'dense');
+            hourInput.dataset.inputStyle = 'text-align:right';
             hourInput.setAttribute('inputmode', 'numeric');
             const hour12 = 'hour12' in this.dataset;
             hourInput.setAttribute('max', hour12 ? '13' : '24');
@@ -1683,42 +1548,17 @@ button::-moz-focus-inner,
                 hourInput.dataset.paddingChar = '0';
                 hourInput.setAttribute('value', this._displayedTime.hour.toString());
             }
+            hourInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
             currentTime.appendChild(hourInput);
             hourInput.addEventListener('valueinput', this.onHourInput.bind(this));
-
-            const hourInputSpin = document.createElement('div');
-            hourInputSpin.classList.add('numeric-spin');
-            hourInput.appendChild(hourInputSpin);
-
-            const hourInputSpinUp = document.createElement('button');
-            hourInputSpinUp.type = 'button';
-            hourInputSpinUp.classList.add('hour-up', 'btn-text');
-            hourInputSpinUp.tabIndex = -1;
-            hourInputSpin.appendChild(hourInputSpinUp);
-            hourInputSpinUp.addEventListener('click', this.onHourUp.bind(this));
-
-            const hourInputSpinUpIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            hourInputSpinUp.appendChild(hourInputSpinUpIcon);
-            hourInputSpinUpIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>`;
-
-            const hourInputSpinDown = document.createElement('button');
-            hourInputSpinDown.type = 'button';
-            hourInputSpinDown.classList.add('hour-down', 'btn-text');
-            hourInputSpinDown.tabIndex = -1;
-            hourInputSpin.appendChild(hourInputSpinDown);
-            hourInputSpinDown.addEventListener('click', this.onHourDown.bind(this));
-
-            const hourInputSpinDownIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            hourInputSpinDown.appendChild(hourInputSpinDownIcon);
-            hourInputSpinDownIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>`;
 
             const timeSeparator = document.createElement('span');
             timeSeparator.classList.add('centered-grid');
             timeSeparator.textContent = this.dataset.timeSeparator || ':';
             currentTime.appendChild(timeSeparator);
 
-            const minuteInput = document.createElement('tf-input');
-            minuteInput.classList.add('field', 'number-field', 'minute-input');
+            const minuteInput = document.createElement('tf-numeric-input');
+            minuteInput.classList.add('minute-input', 'dense');
             minuteInput.setAttribute('inputmode', 'numeric');
             minuteInput.setAttribute('max', '60');
             minuteInput.setAttribute('min', '-1');
@@ -1726,35 +1566,10 @@ button::-moz-focus-inner,
             minuteInput.setAttribute('step', '1');
             minuteInput.dataset.padLength = '2';
             minuteInput.dataset.paddingChar = '0';
+            minuteInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
             minuteInput.setAttribute('value', this._displayedTime.minute.toString());
             currentTime.appendChild(minuteInput);
             minuteInput.addEventListener('valueinput', this.onMinuteInput.bind(this));
-
-            const minuteInputSpin = document.createElement('div');
-            minuteInputSpin.classList.add('numeric-spin');
-            minuteInput.appendChild(minuteInputSpin);
-
-            const minuteInputSpinUp = document.createElement('button');
-            minuteInputSpinUp.type = 'button';
-            minuteInputSpinUp.classList.add('minute-up', 'btn-text');
-            minuteInputSpinUp.tabIndex = -1;
-            minuteInputSpin.appendChild(minuteInputSpinUp);
-            minuteInputSpinUp.addEventListener('click', this.onMinuteUp.bind(this));
-
-            const minuteInputSpinUpIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            minuteInputSpinUp.appendChild(minuteInputSpinUpIcon);
-            minuteInputSpinUpIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>`;
-
-            const minuteInputSpinDown = document.createElement('button');
-            minuteInputSpinDown.type = 'button';
-            minuteInputSpinDown.classList.add('minute-down', 'btn-text');
-            minuteInputSpinDown.tabIndex = -1;
-            minuteInputSpin.appendChild(minuteInputSpinDown);
-            minuteInputSpinDown.addEventListener('click', this.onMinuteDown.bind(this));
-
-            const minuteInputSpinDownIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            minuteInputSpinDown.appendChild(minuteInputSpinDownIcon);
-            minuteInputSpinDownIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>`;
 
             if (this.hasAttribute('seconds')) {
                 const secondSeparator = document.createElement('span');
@@ -1762,8 +1577,8 @@ button::-moz-focus-inner,
                 secondSeparator.textContent = this.dataset.timeSeparator || ':';
                 currentTime.appendChild(secondSeparator);
 
-                const secondInput = document.createElement('tf-input');
-                secondInput.classList.add('field', 'number-field', 'second-input');
+                const secondInput = document.createElement('tf-numeric-input');
+                secondInput.classList.add('second-input', 'dense');
                 secondInput.setAttribute('inputmode', 'numeric');
                 secondInput.setAttribute('max', '60');
                 secondInput.setAttribute('min', '-1');
@@ -1771,35 +1586,10 @@ button::-moz-focus-inner,
                 secondInput.setAttribute('step', '1');
                 secondInput.dataset.padLength = '2';
                 secondInput.dataset.paddingChar = '0';
+                secondInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
                 secondInput.setAttribute('value', this._displayedTime.second.toString());
                 currentTime.appendChild(secondInput);
                 secondInput.addEventListener('valueinput', this.onSecondInput.bind(this));
-
-                const secondInputSpin = document.createElement('div');
-                secondInputSpin.classList.add('numeric-spin');
-                secondInput.appendChild(secondInputSpin);
-
-                const secondInputSpinUp = document.createElement('button');
-                secondInputSpinUp.type = 'button';
-                secondInputSpinUp.classList.add('second-up', 'btn-text');
-                secondInputSpinUp.tabIndex = -1;
-                secondInputSpin.appendChild(secondInputSpinUp);
-                secondInputSpinUp.addEventListener('click', this.onSecondUp.bind(this));
-
-                const secondInputSpinUpIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                secondInputSpinUp.appendChild(secondInputSpinUpIcon);
-                secondInputSpinUpIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>`;
-
-                const secondInputSpinDown = document.createElement('button');
-                secondInputSpinDown.type = 'button';
-                secondInputSpinDown.classList.add('second-down', 'btn-text');
-                secondInputSpinDown.tabIndex = -1;
-                secondInputSpin.appendChild(secondInputSpinDown);
-                secondInputSpinDown.addEventListener('click', this.onSecondDown.bind(this));
-
-                const secondInputSpinDownIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-                secondInputSpinDown.appendChild(secondInputSpinDownIcon);
-                secondInputSpinDownIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>`;
             }
 
             if (hour12) {
@@ -1993,37 +1783,13 @@ button::-moz-focus-inner,
         if (hourInput) {
             hourInput.removeEventListener('valueinput', this.onHourInput.bind(this));
         }
-        const hourInputSpinUp = root.querySelector('hour-up');
-        if (hourInputSpinUp) {
-            hourInputSpinUp.removeEventListener('click', this.onHourUp.bind(this));
-        }
-        const hourInputSpinDown = root.querySelector('hour-down');
-        if (hourInputSpinDown) {
-            hourInputSpinDown.removeEventListener('click', this.onHourDown.bind(this));
-        }
         const minuteInput = root.querySelector('.minute-input');
         if (minuteInput) {
             minuteInput.removeEventListener('valueinput', this.onMinuteInput.bind(this));
         }
-        const minuteInputSpinUp = root.querySelector('minute-up');
-        if (minuteInputSpinUp) {
-            minuteInputSpinUp.removeEventListener('click', this.onMinuteUp.bind(this));
-        }
-        const minuteInputSpinDown = root.querySelector('minute-down');
-        if (minuteInputSpinDown) {
-            minuteInputSpinDown.removeEventListener('click', this.onMinuteDown.bind(this));
-        }
         const secondInput = root.querySelector('.second-input');
         if (secondInput) {
             secondInput.removeEventListener('valueinput', this.onSecondInput.bind(this));
-        }
-        const secondInputSpinUp = root.querySelector('second-up');
-        if (secondInputSpinUp) {
-            secondInputSpinUp.removeEventListener('click', this.onSecondUp.bind(this));
-        }
-        const secondInputSpinDown = root.querySelector('second-down');
-        if (secondInputSpinDown) {
-            secondInputSpinDown.removeEventListener('click', this.onSecondDown.bind(this));
         }
         const amButton = root.querySelector('.am-button');
         if (amButton) {
@@ -2515,21 +2281,6 @@ button::-moz-focus-inner,
         }
     }
 
-    private onHourDown(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this._internals.states.add('touched');
-        if (this._value) {
-            this.setDateTimeValue(this._value.subtract({ hours: 1 }));
-        } else if (this.hasAttribute('date')) {
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
-            this.setDateTimeValue(dateTime.subtract({ hours: 1 }));
-        } else {
-            this.setDateTimeValue(this._displayedTime.subtract({ hours: 1 }));
-        }
-    }
-
     private onHourInput(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2558,36 +2309,6 @@ button::-moz-focus-inner,
         }
     }
 
-    private onHourUp(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this._internals.states.add('touched');
-        if (this._value) {
-            this.setDateTimeValue(this._value.add({ hours: 1 }));
-        } else if (this.hasAttribute('date')) {
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
-            this.setDateTimeValue(dateTime.add({ hours: 1 }));
-        } else {
-            this.setDateTimeValue(this._displayedTime.add({ hours: 1 }));
-        }
-    }
-
-    private onMinuteDown(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this._internals.states.add('touched');
-        if (this._value) {
-            this.setDateTimeValue(this._value.subtract({ minutes: 1 }));
-        } else if (this.hasAttribute('date')) {
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
-            this.setDateTimeValue(dateTime.subtract({ minutes: 1 }));
-        } else {
-            this.setDateTimeValue(this._displayedTime.subtract({ minutes: 1 }));
-        }
-    }
-
     private onMinuteInput(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2613,21 +2334,6 @@ button::-moz-focus-inner,
             this.setDateTimeValue(dateTime.set({ minute: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.set({ minute: 1 }));
-        }
-    }
-
-    private onMinuteUp(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this._internals.states.add('touched');
-        if (this._value) {
-            this.setDateTimeValue(this._value.add({ minutes: 1 }));
-        } else if (this.hasAttribute('date')) {
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
-            this.setDateTimeValue(dateTime.add({ minutes: 1 }));
-        } else {
-            this.setDateTimeValue(this._displayedTime.add({ minutes: 1 }));
         }
     }
 
@@ -2749,21 +2455,6 @@ button::-moz-focus-inner,
         this.refreshView();
     }
 
-    private onSecondDown(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this._internals.states.add('touched');
-        if (this._value) {
-            this.setDateTimeValue(this._value.subtract({ seconds: 1 }));
-        } else if (this.hasAttribute('date')) {
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
-            this.setDateTimeValue(dateTime.subtract({ seconds: 1 }));
-        } else {
-            this.setDateTimeValue(this._displayedTime.subtract({ seconds: 1 }));
-        }
-    }
-
     private onSecondInput(event: Event) {
         event.preventDefault();
         event.stopPropagation();
@@ -2789,21 +2480,6 @@ button::-moz-focus-inner,
             this.setDateTimeValue(dateTime.set({ second: 1 }));
         } else {
             this.setDateTimeValue(this._displayedTime.set({ second: 1 }));
-        }
-    }
-
-    private onSecondUp(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this._internals.states.add('touched');
-        if (this._value) {
-            this.setDateTimeValue(this._value.add({ seconds: 1 }));
-        } else if (this.hasAttribute('date')) {
-            const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
-            this.setDateTimeValue(dateTime.add({ seconds: 1 }));
-        } else {
-            this.setDateTimeValue(this._displayedTime.add({ seconds: 1 }));
         }
     }
 
@@ -2852,22 +2528,20 @@ button::-moz-focus-inner,
             || supportedCalendars.length === 0) {
             return;
         }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
-        const allCalendarsCheckboxInput = root.querySelector<HTMLInputElement>('.all-calendars-input');
-        if (!allCalendarsCheckboxInput) {
-            return;
-        }
-
         const list = root.querySelector('.calendars-option-list');
         if (!list) {
             return;
         }
 
         let calendars: string[] = [];
-        if (allCalendarsCheckboxInput.checked) {
+        if (event instanceof CustomEvent
+            && event.detail
+            && event.detail.value) {
             calendars = supportedCalendars;
         } else {
             let calendarName = this.dataset.calendar?.toLowerCase();
@@ -2922,22 +2596,20 @@ button::-moz-focus-inner,
             || !('showTimeZone' in this.dataset)) {
             return;
         }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
-        const allTimeZonesCheckboxInput = root.querySelector<HTMLInputElement>('.all-time-zones-input');
-        if (!allTimeZonesCheckboxInput) {
-            return;
-        }
-
         const list = root.querySelector('.timezone-option-list');
         if (!list) {
             return;
         }
 
         let timeZones: string[] = [];
-        if (allTimeZonesCheckboxInput.checked) {
+        if (event instanceof CustomEvent
+            && event.detail
+            && event.detail.value) {
             timeZones = Intl.supportedValuesOf('timeZone');
         } else {
             if ('locale' in this.dataset

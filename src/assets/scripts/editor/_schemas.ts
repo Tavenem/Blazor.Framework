@@ -15,6 +15,7 @@ import {
     Schema,
     DOMSerializer,
     Fragment,
+    NodeRange,
 } from 'prosemirror-model';
 import { findWrapping, RemoveMarkStep } from 'prosemirror-transform';
 import { chainCommands, deleteSelection, lift, liftEmptyBlock, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
@@ -121,6 +122,7 @@ export enum CommandType {
     Superscript = 71,
     Underline = 72,
     Variable = 73,
+    WordBreak = 74,
 }
 
 interface ParamCommand {
@@ -2325,10 +2327,10 @@ export function commonCommands(schema: Schema) {
         }
     };
     commands[CommandType.Paragraph] = blockTypeMenuItem(schema.nodes.paragraph);
-    commands[CommandType.Address] = wrapInMenuItem(schema.nodes.address);
-    commands[CommandType.Article] = wrapInMenuItem(schema.nodes.article);
-    commands[CommandType.Aside] = wrapInMenuItem(schema.nodes.aside);
-    commands[CommandType.BlockQuote] = wrapInMenuItem(schema.nodes.blockquote);
+    commands[CommandType.Address] = wrapInPhrasingOrFlowMenuItem(schema.nodes.address_text, schema.nodes.address);
+    commands[CommandType.Article] = wrapInPhrasingOrFlowMenuItem(schema.nodes.article_text, schema.nodes.article);
+    commands[CommandType.Aside] = wrapInPhrasingOrFlowMenuItem(schema.nodes.aside_text, schema.nodes.aside);
+    commands[CommandType.BlockQuote] = wrapInPhrasingOrFlowMenuItem(schema.nodes.blockquote_text, schema.nodes.blockquote);
     commands[CommandType.CodeBlock] = blockTypeMenuItem(schema.nodes.code_block);
     commands[CommandType.CodeInline] = markMenuItem(schema.marks.code);
     commands[CommandType.Strong] = markMenuItem(schema.marks.strong);
@@ -2338,9 +2340,9 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Emphasis] = markMenuItem(schema.marks.em);
     commands[CommandType.FieldSet] = wrapInMenuItem(schema.nodes.fieldset);
     commands[CommandType.Figure] = wrapInMenuItem(schema.nodes.figure);
-    commands[CommandType.FigureCaption] = blockTypeMenuItem(schema.nodes.figure_caption);
-    commands[CommandType.Footer] = wrapInMenuItem(schema.nodes.footer);
-    commands[CommandType.Header] = wrapInMenuItem(schema.nodes.header);
+    commands[CommandType.FigureCaption] = phrasingOrFlowBlockTypeMenuItem(schema.nodes.figcaption_text, schema.nodes.figure_caption);
+    commands[CommandType.Footer] = wrapInPhrasingOrFlowMenuItem(schema.nodes.footer_text, schema.nodes.footer);
+    commands[CommandType.Header] = wrapInPhrasingOrFlowMenuItem(schema.nodes.header_text, schema.nodes.header);
     commands[CommandType.HeadingGroup] = wrapInMenuItem(schema.nodes.hgroup);
     commands[CommandType.Italic] = markMenuItem(schema.marks.italic);
     commands[CommandType.Keyboard] = markMenuItem(schema.marks.kbd);
@@ -2355,8 +2357,19 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Marked] = markMenuItem(schema.marks.mark);
     commands[CommandType.Quote] = markMenuItem(schema.marks.quote);
     commands[CommandType.Sample] = markMenuItem(schema.marks.samp);
-    commands[CommandType.Section] = wrapInMenuItem(schema.nodes.section);
+    commands[CommandType.Section] = wrapInPhrasingOrFlowMenuItem(schema.nodes.section_text, schema.nodes.section);
     commands[CommandType.Variable] = markMenuItem(schema.marks.variable);
+    commands[CommandType.WordBreak] = {
+        command(state, dispatch) {
+            if (!canInsert(state, schema.nodes.wbr)) {
+                return false;
+            }
+            if (dispatch) {
+                dispatch(state.tr.replaceSelectionWith(schema.nodes.wbr.create()));
+            }
+            return true;
+        }
+    };
     commands[CommandType.ForegroundColor] = toggleInlineStyleMenuItem('color');
     commands[CommandType.BackgroundColor] = toggleInlineStyleMenuItem('background-color');
     commands[CommandType.InsertImage] = {
@@ -2806,7 +2819,7 @@ function alignMenuItem(value: string): CommandInfo {
 
 function blockTypeMenuItem(
     nodeType: NodeType,
-    attrs?: { [key: string]: any }): CommandInfo {
+    attrs?: Attrs | null): CommandInfo {
     return {
         command: setBlockType(nodeType),
         isActive(state) {
@@ -2914,6 +2927,67 @@ function markMenuItem(type: MarkType): CommandInfo {
         isActive(state, type) { return isMarkActive(state, type) },
         markType: type,
     }
+}
+
+function phrasingOrFlowBlockTypeMenuItem(
+    phrasingNodeType: NodeType,
+    flowNodeType: NodeType,
+    attrs?: Attrs | null): CommandInfo {
+    return {
+        command: (state, dispatch) => {
+            let phrasingApplicable = false;
+            let flowApplicable = false;
+            for (let i = 0; i < state.selection.ranges.length && !phrasingApplicable && !flowApplicable; i++) {
+                const { $from: { pos: from }, $to: { pos: to } } = state.selection.ranges[i];
+                state.doc.nodesBetween(from, to, (node, pos) => {
+                    if (phrasingApplicable || flowApplicable) {
+                        return false;
+                    }
+                    if (!node.isTextblock
+                        || node.hasMarkup(phrasingNodeType, attrs)
+                        || node.hasMarkup(flowNodeType, attrs)) {
+                        return;
+                    }
+                    if (node.type == phrasingNodeType) {
+                        phrasingApplicable = true;
+                    } else if (node.type == flowNodeType) {
+                        flowApplicable = true;
+                    } else {
+                        const $pos = state.doc.resolve(pos), index = $pos.index();
+                        phrasingApplicable = $pos.parent.canReplaceWith(index, index + 1, phrasingNodeType);
+                        flowApplicable = $pos.parent.canReplaceWith(index, index + 1, flowNodeType);
+                    }
+                })
+            }
+            if (!phrasingApplicable && !flowApplicable) {
+                return false;
+            }
+            if (dispatch) {
+                const tr = state.tr;
+                for (let i = 0; i < state.selection.ranges.length; i++) {
+                    const { $from: { pos: from }, $to: { pos: to } } = state.selection.ranges[i];
+                    if (phrasingApplicable) {
+                        tr.setBlockType(from, to, phrasingNodeType, attrs);
+                    } else {
+                        tr.setBlockType(from, to, flowNodeType, attrs);
+                    }
+                }
+                dispatch(tr.scrollIntoView());
+            }
+            return true;
+        },
+        isActive(state) {
+            if (state.selection instanceof NodeSelection
+                && state.selection.node) {
+                return state.selection.node.hasMarkup(phrasingNodeType, attrs)
+                    || state.selection.node.hasMarkup(flowNodeType, attrs);
+            }
+            const { $from, to } = state.selection;
+            return to <= $from.end()
+                && ($from.parent.hasMarkup(phrasingNodeType, attrs)
+                || $from.parent.hasMarkup(flowNodeType, attrs));
+        }
+    };
 }
 
 function plusCommonAttributes(attrs: { [key: string]: any }) {
@@ -3107,7 +3181,7 @@ function toggleLink(markType: MarkType, state: EditorState, dispatch?: (tr: Tran
 
 function wrapAndExitDiv(
     nodeType: NodeType,
-    attrs?: Attrs): Command {
+    attrs?: Attrs | null): Command {
     return function (state, dispatch) {
         const { $from, $to } = state.selection;
         const range = $from.blockRange($to), wrapping = range && findWrapping(range, nodeType, attrs);
@@ -3148,7 +3222,7 @@ function wrapAndExitDiv(
 
 function wrapInMenuItem(
     nodeType: NodeType,
-    attrs?: { [key: string]: any }): CommandInfo {
+    attrs?: Attrs | null): CommandInfo {
     return {
         command: wrapIn(nodeType),
         isActive(state) {
@@ -3159,6 +3233,45 @@ function wrapInMenuItem(
             const { $from, to } = state.selection;
             return to <= $from.end()
                 && $from.parent.type.name == nodeType.name;
+        }
+    };
+}
+
+function wrapInPhrasingOrFlowMenuItem(
+    phrasingNodeType: NodeType,
+    flowNodeType: NodeType,
+    attrs?: Attrs | null): CommandInfo {
+    return {
+        command: (state, dispatch) => {
+            const { $from, $to } = state.selection;
+            const range = $from.blockRange($to);
+            if (!range) {
+                return false;
+            }
+            const phrasingWrapping = findWrapping(range, phrasingNodeType, attrs);
+            const flowWrapping = findWrapping(range, flowNodeType, attrs);
+            if (!phrasingWrapping && !flowWrapping) {
+                return false;
+            }
+            if (dispatch) {
+                if (phrasingWrapping) {
+                    dispatch(state.tr.wrap(range, phrasingWrapping).scrollIntoView());
+                } else {
+                    dispatch(state.tr.wrap(range, flowWrapping!).scrollIntoView());
+                }
+            }
+            return true;
+        },
+        isActive(state) {
+            if (state.selection instanceof NodeSelection
+                && state.selection.node) {
+                return state.selection.node.type.name == phrasingNodeType.name
+                    || state.selection.node.type.name == flowNodeType.name;
+            }
+            const { $from, to } = state.selection;
+            return to <= $from.end()
+                && ($from.parent.type.name == phrasingNodeType.name
+                || $from.parent.type.name == flowNodeType.name);
         }
     };
 }

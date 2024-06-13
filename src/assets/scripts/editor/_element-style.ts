@@ -546,34 +546,6 @@ svg {
     display: none;
 }
 
-.checkbox {
-    --button-inherited-padding-y-icon: 6px;
-    --checkbox-inherited-color: var(--tavenem-color-action);
-    --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-    display: inline-flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    margin: 0;
-
-    &:has(:focus-visible):not(.disabled, [inert]) {
-        background-color: var(--tavenem-color-action-hover-bg);
-    }
-
-    &.disabled, &[inert], [inert] & {
-        --checkbox-inherited-color: var(--tavenem-color-action-disabled);
-        --checkbox-inherited-hover-bg: transparent;
-    }
-
-    &.read-only, &.read-only:hover {
-        --checkbox-inherited-hover-bg: transparent;
-
-        &, * {
-            cursor: default;
-            pointer-events: none;
-        }
-    }
-}
-
 .list {
     --list-active-bg: var(--tavenem-color-primary-hover);
     --list-active-color: var(--tavenem-color-primary);

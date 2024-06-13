@@ -430,7 +430,7 @@ button.clear {
         transition: 0s;
     }
 
-    :host(.clearable) & {
+    :host(.clearable:state(has-value)) & {
         display: inline-flex;
     }
 

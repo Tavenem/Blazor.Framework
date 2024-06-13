@@ -484,17 +484,22 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         type: CommandType.InsertTable,
         style: ToolbarControlStyle.Button,
     }, {
+        dropdownTooltip: 'horizontal rule',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M160-440v-80h640v80H160Z"/></svg>',
         isStyle: true,
-        tooltip: 'horizontal rule',
+        tooltip: 'insert separator',
         type: CommandType.HorizontalRule,
-        style: ToolbarControlStyle.Button,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M240-80q-33 0-56.5-23.5T160-160v-120h640v120q0 33-23.5 56.5T720-80H240Zm280-520h200L520-800v200ZM360-360v-80h240v80H360Zm320 0v-80h240v80H680Zm-640 0v-80h240v80H40Zm120-160v-280q0-33 23.5-56.5T240-880h320l240 240v120H160Z"/></svg>',
-        isStyle: true,
-        tooltip: 'page break',
-        type: CommandType.PageBreak,
-        style: ToolbarControlStyle.Button,
+        style: ToolbarControlStyle.ButtonGroup,
+        buttons: [
+            {
+                text: 'Page Break',
+                type: CommandType.PageBreak,
+            },
+            {
+                icon: 'Word Break',
+                type: CommandType.WordBreak,
+            },
+        ],
     }, {
         isStyle: true,
         tooltip: 'insert emoji',

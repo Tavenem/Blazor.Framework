@@ -30,6 +30,14 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
         return new CustomEvent('enter', { bubbles: true, composed: true });
     }
 
+    private static newStepDownEvent(value: number) {
+        return new CustomEvent('stepdown', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
+    private static newStepUpEvent(value: number) {
+        return new CustomEvent('stepup', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
     private static newValueChangeEvent(value: string) {
         return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
     }
@@ -1000,7 +1008,7 @@ button::-moz-focus-inner {
         if (!('hideSteppers' in this.dataset)) {
             const spinButtons = document.createElement('div');
             spinButtons.classList.add('spin-buttons');
-            shadow.appendChild(spinButtons);
+            outerInput.appendChild(spinButtons);
 
             const spinUpButton = document.createElement('button');
             spinUpButton.classList.add('spin-up');
@@ -1385,7 +1393,7 @@ button::-moz-focus-inner {
         const flags: ValidityStateFlags = {};
         const messages: string[] = [];
 
-        if (!this._numericValue) {
+        if (this._numericValue == null) {
             if (this.hasAttribute('value')
                 && this.getAttribute('value')?.length) {
                 flags.badInput = true;

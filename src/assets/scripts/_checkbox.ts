@@ -29,7 +29,7 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
     }
 
     private static newToggleEvent(value: boolean | null) {
-        return new CustomEvent('toggle', { bubbles: true, composed: true, detail: { value: value } });
+        return new CustomEvent('inputtoggle', { bubbles: true, composed: true, detail: { value: value } });
     }
 
     get checked() {
@@ -263,8 +263,6 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
         style.textContent = `
 :host {
     --button-inherited-padding-y-icon: 6px;
-    --checkbox-inherited-color: var(--tavenem-color-action);
-    --checkbox-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
     border: 0;
     color: var(--tavenem-color-text);
     display: inline-flex;
@@ -273,8 +271,6 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
     flex-grow: 0;
     flex-shrink: 0;
     margin: 0;
-    margin-bottom: .5rem;
-    margin-top: 1rem;
     max-width: 100%;
     padding: 0;
     position: relative;
@@ -282,7 +278,7 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
 }
 
 :host(:has(:focus-visible):not(.disabled, [inert])) {
-    background-color: var(--tavenem-color-action-hover-bg);
+    background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
 }
 
 :host(.small) {
@@ -296,9 +292,7 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
 }
 
 :host(.dense) {
-    --button-inherited-padding-x-icon: 2px;
     --button-inherited-padding-y-icon: 2px;
-    margin: 0;
 }
 
 :host(:disabled, [inert]) {
@@ -455,7 +449,7 @@ input:-webkit-autofill {
 
     &:hover,
     &:focus-visible {
-        background-color: var(--checkbox-inherited-hover-bg);
+        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
         color: var(--button-hover-color);
     }
 
@@ -483,16 +477,16 @@ input:-webkit-autofill {
 }
 
 ::slotted(tf-icon) {
-    color: var(--checkbox-inherited-color) !important;
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action)) !important;
     font-size: inherit !important;
 
     &:hover {
-        background-color: var(--checkbox-inherited-hover-bg) !important;
+        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg)) !important;
     }
 }
 
 svg {
-    color: var(--checkbox-inherited-color);
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
     height: 1.5em;
     fill: currentColor;
     flex-shrink: 0;
@@ -500,7 +494,7 @@ svg {
     width: auto;
 
     &:hover {
-        background-color: var(--checkbox-inherited-hover-bg);
+        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
     }
 }
 
@@ -534,7 +528,7 @@ label {
 }
 
 .field-helpers {
-    color: var(--checkbox-inherited-color);
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
     display: none;
     font-size: 0.75rem;
     font-weight: var(--tavenem-font-weight);
