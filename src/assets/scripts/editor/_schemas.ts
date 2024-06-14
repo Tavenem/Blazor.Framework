@@ -209,6 +209,20 @@ const nodeToDomWithCommonAttrs: (node: ProsemirrorNode, tag: string, extraClass?
         return [tag, domAttrs, 0];
     }
 };
+const nodeToDomWithHeadingAttrs: (node: ProsemirrorNode, tag: string) => DOMOutputSpec = (node, tag) => {
+    const domAttrs: { [key: string]: any } = {};
+    for (const a of Object.keys(node.attrs)) {
+        if (a === 'level'
+            || (!node.attrs[a]
+            && (typeof node.attrs[a] !== 'number'
+                || node.attrs[a] !== 0))) {
+            continue;
+        }
+        domAttrs[a] = node.attrs[a];
+    }
+
+    return [tag, domAttrs, 0];
+};
 const nodeToDomWithAttrs: (node: ProsemirrorNode, tag: string, attrs: { [key: string]: any }, extraClass?: string, children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, attrs, extraClass, children) => {
     const domAttrs: { [key: string]: any } = {};
     for (const a of Object.keys(attrs)) {
@@ -313,10 +327,11 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "p") }
     },
     blockquote_text: {
+        alternate: 'blockquote',
         attrs: plusCommonAttributes({
             cite: { default: null }
         }),
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)+",
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
         defining: true,
         parseDOM: [{
@@ -328,9 +343,10 @@ const commonNodes: { [name in string]: NodeSpec } = {
                 return getCommonAttrs(node);
             }
         }],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote") }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote") },
     },
     blockquote: {
+        alternate: 'blockquote_text',
         attrs: plusCommonAttributes({
             cite: { default: null }
         }),
@@ -402,7 +418,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
             { tag: "h5", getAttrs(p) { return getCommonAttrs(p, { level: 5 }) } },
             { tag: "h6", getAttrs(p) { return getCommonAttrs(p, { level: 6 }) } }
         ],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "h" + node.attrs.level) }
+        toDOM(node) { return nodeToDomWithHeadingAttrs(node, "h" + node.attrs.level) }
     },
     code_block: {
         attrs: plusCommonAttributes({ syntax: { default: null } }),
@@ -578,8 +594,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dl") }
     },
     term_text: {
+        alternate: 'term',
         attrs: commonAttrs,
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)+",
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         parseDOM: [{
             tag: "dt",
@@ -593,6 +610,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dt") }
     },
     term: {
+        alternate: 'term_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content)+",
         defining: true,
@@ -600,8 +618,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dt") }
     },
     definition_text: {
+        alternate: 'definition',
         attrs: commonAttrs,
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)+",
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         parseDOM: [{
             tag: "dd",
@@ -615,13 +634,15 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dd") }
     },
     definition: {
+        alternate: 'definition_text',
         attrs: commonAttrs,
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)+",
+        content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         parseDOM: [{ tag: "dd", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dd") }
     },
     task_list_item_text: {
+        alternate: 'task_list_item',
         attrs: commonAttrs,
         content: "checkbox (phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -642,6 +663,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "li", "task-list-item") }
     },
     task_list_item: {
+        alternate: 'task_list_item_text',
         attrs: plusCommonAttributes({ complete: { default: false } }),
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -666,8 +688,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "li", "task-list-item", [["div", ["checkbox"]], ["div", 0]]) }
     },
     list_item_text: {
+        alternate: 'list_item',
         attrs: commonAttrs,
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)+",
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         parseDOM: [{
             tag: "li",
@@ -681,6 +704,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "li") }
     },
     list_item: {
+        alternate: 'list_item_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -833,6 +857,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tr") }
     },
     table_cell_text: {
+        alternate: 'table_cell',
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         attrs: plusCommonAttributes({
             align: { default: null },
@@ -887,6 +912,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }
     },
     table_cell: {
+        alternate: 'table_cell_text',
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)*",
         attrs: plusCommonAttributes({
             align: { default: null },
@@ -938,6 +964,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }
     },
     table_header_text: {
+        alternate: 'table_header',
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         attrs: plusCommonAttributes({
             abbr: { default: null },
@@ -996,6 +1023,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }
     },
     table_header: {
+        alternate: 'table_header_text',
         content: "(flow | form | address_content)*",
         attrs: plusCommonAttributes({
             abbr: { default: null },
@@ -1075,6 +1103,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "math-display", "math-node") }
     },
     div_text: {
+        alternate: 'div',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
@@ -1090,6 +1119,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "div") }
     },
     div: {
+        alternate: 'div_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         group: "flow",
@@ -1097,6 +1127,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "div") }
     },
     address_text: {
+        alternate: 'address',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1113,6 +1144,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "address") }
     },
     address: {
+        alternate: 'address_text',
         attrs: commonAttrs,
         content: "flow+",
         defining: true,
@@ -1137,6 +1169,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "area") }
     },
     article_text: {
+        alternate: 'article',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1153,6 +1186,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "article") }
     },
     article: {
+        alternate: 'article_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1161,6 +1195,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "article") }
     },
     aside_text: {
+        alternate: 'aside',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1177,6 +1212,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "aside") }
     },
     aside: {
+        alternate: 'aside_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1208,6 +1244,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return contentlessToDomWithCommonAttrs(node, "base") }
     },
     body_text: {
+        alternate: 'body',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1223,6 +1260,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "body") }
     },
     body: {
+        alternate: 'body_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
@@ -1247,6 +1285,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "button") }
     },
     canvas_text: {
+        alternate: 'canvas',
         attrs: plusCommonAttributes({
             height: { default: null },
             width: { default: null },
@@ -1265,6 +1304,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "canvas") }
     },
     canvas: {
+        alternate: 'canvas_text',
         attrs: plusCommonAttributes({
             height: { default: null },
             width: { default: null },
@@ -1275,6 +1315,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "canvas") }
     },
     caption_text: {
+        alternate: 'caption',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1290,6 +1331,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "caption") }
     },
     caption: {
+        alternate: 'caption_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1310,6 +1352,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "colgroup") }
     },
     datalist_text: {
+        alternate: 'datalist',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
@@ -1325,6 +1368,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "datalist") }
     },
     datalist: {
+        alternate: 'datalist_text',
         attrs: commonAttrs,
         content: "option+",
         group: "flow",
@@ -1333,7 +1377,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     details: {
         attrs: plusCommonAttributes({ open: { default: null } }),
-        content: "summary (div | flow | form | address_content | headerfooter | heading_content | sectioning)+",
+        content: "(summary_text | summary) (div | flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         group: "flow",
         parseDOM: [{ tag: "details", getAttrs: getCommonAttrs }],
@@ -1358,6 +1402,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "fieldset") }
     },
     figcaption_text: {
+        alternate: 'figcaption',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1374,6 +1419,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "figcaption") }
     },
     figcaption: {
+        alternate: 'figcaption_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1390,6 +1436,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "figure") }
     },
     footer_text: {
+        alternate: 'footer',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1406,6 +1453,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "footer") }
     },
     footer: {
+        alternate: 'footer_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | heading_content | sectioning)+",
         defining: true,
@@ -1438,6 +1486,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "head") }
     },
     header_text: {
+        alternate: 'header',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1454,6 +1503,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "header") }
     },
     header: {
+        alternate: 'header_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | heading_content | sectioning)+",
         defining: true,
@@ -1542,6 +1592,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "label") }
     },
     legend_text: {
+        alternate: 'legend',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         parseDOM: [{
@@ -1556,6 +1607,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "legend") }
     },
     legend: {
+        alternate: 'legend_text',
         attrs: commonAttrs,
         content: "heading_content+",
         parseDOM: [{ tag: "legend", getAttrs: getCommonAttrs }],
@@ -1582,6 +1634,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return contentlessToDomWithCommonAttrs(node, "link") }
     },
     main_text: {
+        alternate: 'main',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1597,6 +1650,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "main") }
     },
     main: {
+        alternate: 'main_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1620,7 +1674,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
             name: { default: null },
         }),
         parseDOM: [{ tag: "meta", getAttrs: getCommonAttrs }],
-        toDOM(node) {  return contentlessToDomWithCommonAttrs(node, "meta") }
+        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "meta") }
     },
     meter: {
         attrs: plusCommonAttributes({
@@ -1638,6 +1692,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "meter") }
     },
     nav_text: {
+        alternate: 'nav',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1654,6 +1709,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "nav") }
     },
     nav: {
+        alternate: 'nav_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1662,6 +1718,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "nav") }
     },
     noscript_text: {
+        alternate: 'noscript',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
@@ -1677,6 +1734,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "noscript") }
     },
     noscript: {
+        alternate: 'noscript_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning | link | meta | style)+",
         group: "flow",
@@ -1759,7 +1817,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     rt: {
         attrs: commonAttrs,
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)+",
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         inline: true,
         parseDOM: [{ tag: "rt", getAttrs: getCommonAttrs }],
@@ -1767,7 +1825,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     ruby: {
         attrs: commonAttrs,
-        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image | rp | rt)+",
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image | rp | rt)*",
         defining: true,
         inline: true,
         group: "phrasing",
@@ -1807,6 +1865,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "search") }
     },
     section_text: {
+        alternate: 'section',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1823,6 +1882,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "section") }
     },
     section: {
+        alternate: 'section_text',
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
@@ -1876,6 +1936,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "style") }
     },
     summary_text: {
+        alternate: 'summary',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -1891,6 +1952,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "summary") }
     },
     summary: {
+        alternate: 'summary_text',
         attrs: commonAttrs,
         content: "heading_content",
         defining: true,
@@ -2287,7 +2349,8 @@ class Renderer {
                 const original = nodes[name];
                 nodes[name] = (node) => {
                     const dom = original(node);
-                    if (node.content.size === 0 && Array.isArray(dom)) {
+                    if (node.content.size === 0
+                        && Array.isArray(dom)) {
                         const holeIndex = dom.findIndex(x => x === 0);
                         if (holeIndex !== -1) {
                             dom[holeIndex] = ['br', {}];
@@ -2327,10 +2390,10 @@ export function commonCommands(schema: Schema) {
         }
     };
     commands[CommandType.Paragraph] = blockTypeMenuItem(schema.nodes.paragraph);
-    commands[CommandType.Address] = wrapInPhrasingOrFlowMenuItem(schema.nodes.address_text, schema.nodes.address);
-    commands[CommandType.Article] = wrapInPhrasingOrFlowMenuItem(schema.nodes.article_text, schema.nodes.article);
-    commands[CommandType.Aside] = wrapInPhrasingOrFlowMenuItem(schema.nodes.aside_text, schema.nodes.aside);
-    commands[CommandType.BlockQuote] = wrapInPhrasingOrFlowMenuItem(schema.nodes.blockquote_text, schema.nodes.blockquote);
+    commands[CommandType.Address] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.address_text, schema.nodes.address);
+    commands[CommandType.Article] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.article_text, schema.nodes.article);
+    commands[CommandType.Aside] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.aside_text, schema.nodes.aside);
+    commands[CommandType.BlockQuote] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.blockquote_text, schema.nodes.blockquote);
     commands[CommandType.CodeBlock] = blockTypeMenuItem(schema.nodes.code_block);
     commands[CommandType.CodeInline] = markMenuItem(schema.marks.code);
     commands[CommandType.Strong] = markMenuItem(schema.marks.strong);
@@ -2338,17 +2401,17 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Cite] = markMenuItem(schema.marks.cite);
     commands[CommandType.Definition] = markMenuItem(schema.marks.dfn);
     commands[CommandType.Emphasis] = markMenuItem(schema.marks.em);
-    commands[CommandType.FieldSet] = wrapInMenuItem(schema.nodes.fieldset);
-    commands[CommandType.Figure] = wrapInMenuItem(schema.nodes.figure);
-    commands[CommandType.FigureCaption] = phrasingOrFlowBlockTypeMenuItem(schema.nodes.figcaption_text, schema.nodes.figure_caption);
-    commands[CommandType.Footer] = wrapInPhrasingOrFlowMenuItem(schema.nodes.footer_text, schema.nodes.footer);
-    commands[CommandType.Header] = wrapInPhrasingOrFlowMenuItem(schema.nodes.header_text, schema.nodes.header);
-    commands[CommandType.HeadingGroup] = wrapInMenuItem(schema.nodes.hgroup);
+    commands[CommandType.FieldSet] = wrapOrInsertMenuItem(schema.nodes.fieldset);
+    commands[CommandType.Figure] = wrapOrInsertMenuItem(schema.nodes.figure);
+    commands[CommandType.FigureCaption] = phrasingOrFlowBlockTypeMenuItem(schema.nodes.figcaption_text, schema.nodes.figcaption);
+    commands[CommandType.Footer] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.footer_text, schema.nodes.footer);
+    commands[CommandType.Header] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.header_text, schema.nodes.header);
+    commands[CommandType.HeadingGroup] = wrapOrInsertMenuItem(schema.nodes.hgroup);
     commands[CommandType.Italic] = markMenuItem(schema.marks.italic);
     commands[CommandType.Keyboard] = markMenuItem(schema.marks.kbd);
     commands[CommandType.Underline] = markMenuItem(schema.marks.underline);
     commands[CommandType.Deleted] = markMenuItem(schema.marks.del);
-    commands[CommandType.Details] = wrapInMenuItem(schema.nodes.details);
+    commands[CommandType.Details] = wrapOrInsertMenuItem(schema.nodes.details);
     commands[CommandType.Strikethrough] = markMenuItem(schema.marks.strikethrough);
     commands[CommandType.Small] = markMenuItem(schema.marks.small);
     commands[CommandType.Subscript] = markMenuItem(schema.marks.sub);
@@ -2357,7 +2420,7 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Marked] = markMenuItem(schema.marks.mark);
     commands[CommandType.Quote] = markMenuItem(schema.marks.quote);
     commands[CommandType.Sample] = markMenuItem(schema.marks.samp);
-    commands[CommandType.Section] = wrapInPhrasingOrFlowMenuItem(schema.nodes.section_text, schema.nodes.section);
+    commands[CommandType.Section] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.section_text, schema.nodes.section);
     commands[CommandType.Variable] = markMenuItem(schema.marks.variable);
     commands[CommandType.WordBreak] = {
         command(state, dispatch) {
@@ -2825,11 +2888,11 @@ function blockTypeMenuItem(
         isActive(state) {
             if (state.selection instanceof NodeSelection
                 && state.selection.node) {
-                return state.selection.node.hasMarkup(nodeType, attrs);
+                return state.selection.node.type.name == nodeType.name;
             }
             const { $from, to } = state.selection;
             return to <= $from.end()
-                && $from.parent.hasMarkup(nodeType, attrs);
+                && $from.parent.type.name == nodeType.name;
         }
     };
 }
@@ -2979,13 +3042,13 @@ function phrasingOrFlowBlockTypeMenuItem(
         isActive(state) {
             if (state.selection instanceof NodeSelection
                 && state.selection.node) {
-                return state.selection.node.hasMarkup(phrasingNodeType, attrs)
-                    || state.selection.node.hasMarkup(flowNodeType, attrs);
+                return state.selection.node.type.name == phrasingNodeType.name
+                    || state.selection.node.type.name == flowNodeType.name;
             }
             const { $from, to } = state.selection;
             return to <= $from.end()
-                && ($from.parent.hasMarkup(phrasingNodeType, attrs)
-                || $from.parent.hasMarkup(flowNodeType, attrs));
+                && ($from.parent.type.name == phrasingNodeType.name
+                    || $from.parent.type.name == flowNodeType.name);
         }
     };
 }
@@ -3075,7 +3138,7 @@ function toggleInlineStyleMenuItem(style: string): CommandInfo {
                 if (marks && marks.length) {
                     marks.forEach(m => anyStyleSet = anyStyleSet
                         || (m.attrs.style
-                        && m.attrs.style.indexOf(styleAttr) != -1));
+                            && m.attrs.style.indexOf(styleAttr) != -1));
                 }
 
                 if (!anyStyleSet) {
@@ -3220,11 +3283,73 @@ function wrapAndExitDiv(
     }
 }
 
-function wrapInMenuItem(
+function wrapOrInsertMenuItem(
     nodeType: NodeType,
     attrs?: Attrs | null): CommandInfo {
     return {
-        command: wrapIn(nodeType),
+        command: (state, dispatch) => {
+            const { $from, $to } = state.selection;
+            const range = $from.blockRange($to);
+            if (!range) {
+                return false;
+            }
+
+            if ($from.sameParent($to)) {
+                if ($from.parent.type.name == nodeType.name) {
+                    return true;
+                }
+
+                const fromIndex = $from.index(),
+                    toIndex = $to.index();
+
+                if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
+                    if (range.parent.type.name == nodeType.name) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth - 1);
+                            dispatch(state.tr.replaceWith(
+                                start,
+                                start + range.parent.nodeSize,
+                                nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        }
+                        return true;
+                    }
+
+                    if (range.parent.canReplaceWith($from.index(), $to.index(), nodeType, $from.parent.marks)) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth);
+                            dispatch(state.tr.replaceWith(
+                                start,
+                                start + $from.parent.nodeSize,
+                                nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)));
+                        }
+                        return true;
+                    }
+                }
+
+                if ($from.pos === $to.pos
+                    && $from.parent.canReplaceWith(fromIndex, toIndex, nodeType)) {
+                    if (dispatch) {
+                        const start = $from.start(range.depth);
+                        dispatch(state.tr.replaceWith(
+                            $from.pos,
+                            $to.pos,
+                            nodeType.createAndFill(attrs)).scrollIntoView());
+                    }
+                    return true;
+                }
+            }
+
+            const wrapping = findWrapping(range, nodeType, attrs);
+            if (!wrapping) {
+                return false;
+            }
+
+            if (dispatch) {
+                dispatch(state.tr.wrap(range!, wrapping).scrollIntoView());
+            }
+
+            return true;
+        },
         isActive(state) {
             if (state.selection instanceof NodeSelection
                 && state.selection.node) {
@@ -3237,7 +3362,7 @@ function wrapInMenuItem(
     };
 }
 
-function wrapInPhrasingOrFlowMenuItem(
+function wrapOrInsertPhrasingOrFlowMenuItem(
     phrasingNodeType: NodeType,
     flowNodeType: NodeType,
     attrs?: Attrs | null): CommandInfo {
@@ -3248,11 +3373,133 @@ function wrapInPhrasingOrFlowMenuItem(
             if (!range) {
                 return false;
             }
+
+            if ($from.sameParent($to)) {
+                if ($from.parent.type.name == phrasingNodeType.name
+                    || $from.parent.type.name == flowNodeType.name) {
+                    return true;
+                }
+
+                const fromIndex = $from.index(),
+                    toIndex = $to.index();
+
+                if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
+                    if (range.parent.type.name == flowNodeType.name) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth - 1);
+                            dispatch(state.tr.replaceWith(
+                                start,
+                                start + range.parent.nodeSize,
+                                phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        }
+                        return true;
+                    }
+
+                    if (range.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType, $from.parent.marks)) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth);
+                            dispatch(state.tr.replaceWith(
+                                start,
+                                start + $from.parent.nodeSize,
+                                phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        }
+                        return true;
+                    }
+
+                    if (range.parent.canReplaceWith(fromIndex, toIndex, flowNodeType, $from.parent.marks)) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth);
+                            dispatch(state.tr.replaceWith(
+                                start,
+                                start + $from.parent.nodeSize,
+                                flowNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        }
+                        return true;
+                    }
+                }
+
+                if ($from.pos === $to.pos) {
+                    if ($from.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType)) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth);
+                            dispatch(state.tr.replaceWith(
+                                $from.pos,
+                                $to.pos,
+                                phrasingNodeType.createAndFill(attrs)).scrollIntoView());
+                        }
+                        return true;
+                    }
+
+                    if ($from.parent.canReplaceWith(fromIndex, toIndex, flowNodeType)) {
+                        if (dispatch) {
+                            const start = $from.start(range.depth);
+                            dispatch(state.tr.replaceWith(
+                                $from.pos,
+                                $to.pos,
+                                flowNodeType.createAndFill(attrs)).scrollIntoView());
+                        }
+                        return true;
+                    }
+
+                    const alternate = $from.parent.type.spec.alternate
+                        ? state.schema.nodes[$from.parent.type.spec.alternate]
+                        : null;
+                    if (alternate
+                        && range.parent.canReplaceWith(fromIndex, toIndex, alternate, $from.parent.marks)) {
+                        if ($from.parent.content.size === 0) {
+                            if (alternate.contentMatch.matchType(phrasingNodeType)) {
+                                const node = alternate.createAndFill(attrs, phrasingNodeType.createAndFill(attrs), $from.parent.marks);
+                                if (node) {
+                                    if (dispatch) {
+                                        const start = $from.start(range.depth);
+                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node).scrollIntoView());
+                                    }
+                                    return true;
+                                }
+                            } else if (alternate.contentMatch.matchType(flowNodeType)) {
+                                const node = alternate.createAndFill(attrs, flowNodeType.createAndFill(attrs), $from.parent.marks);
+                                if (node) {
+                                    if (dispatch) {
+                                        const start = $from.start(range.depth);
+                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node).scrollIntoView());
+                                    }
+                                    return true;
+                                }
+                            }
+                        } else {
+                            const node = alternate.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                            if (node) {
+                                if (node.canReplaceWith(0, 0, phrasingNodeType)) {
+                                    if (dispatch) {
+                                        const start = $from.start(range.depth);
+                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
+                                            .replaceWith($from.pos, $to.pos, phrasingNodeType.createAndFill(attrs))
+                                            .scrollIntoView());
+                                    }
+                                    return true;
+                                }
+
+                                if (node.canReplaceWith(0, 0, flowNodeType)) {
+                                    if (dispatch) {
+                                        const start = $from.start(range.depth);
+                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
+                                            .replaceWith($from.pos, $to.pos, flowNodeType.createAndFill(attrs))
+                                            .scrollIntoView());
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             const phrasingWrapping = findWrapping(range, phrasingNodeType, attrs);
             const flowWrapping = findWrapping(range, flowNodeType, attrs);
             if (!phrasingWrapping && !flowWrapping) {
                 return false;
             }
+
             if (dispatch) {
                 if (phrasingWrapping) {
                     dispatch(state.tr.wrap(range, phrasingWrapping).scrollIntoView());
@@ -3260,6 +3507,7 @@ function wrapInPhrasingOrFlowMenuItem(
                     dispatch(state.tr.wrap(range, flowWrapping!).scrollIntoView());
                 }
             }
+
             return true;
         },
         isActive(state) {
@@ -3271,7 +3519,7 @@ function wrapInPhrasingOrFlowMenuItem(
             const { $from, to } = state.selection;
             return to <= $from.end()
                 && ($from.parent.type.name == phrasingNodeType.name
-                || $from.parent.type.name == flowNodeType.name);
+                    || $from.parent.type.name == flowNodeType.name);
         }
     };
 }

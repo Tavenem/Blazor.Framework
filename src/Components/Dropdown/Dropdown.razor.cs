@@ -182,6 +182,7 @@ public partial class Dropdown
     private string? ButtonCssClass => new CssBuilder(ButtonClass)
         .Add("btn")
         .Add("btn-icon", !string.IsNullOrEmpty(Icon) && string.IsNullOrEmpty(Text))
+        .Add("dropdown-trigger")
         .Add(ThemeColor.ToCSS())
         .ToString();
 

@@ -5,8 +5,7 @@ export enum ToolbarControlStyle {
     Separator = 0,
     Button = 1,
     Dropdown = 2,
-    DropdownButton = 3,
-    ButtonGroup = 4,
+    ButtonGroup = 3,
 }
 
 export interface ToolbarControlDefinition {
@@ -17,7 +16,6 @@ export interface ToolbarControlDefinition {
     isStyle?: boolean;
     isWysiwyg?: boolean;
     params?: any[];
-    parentClass?: string;
     separatorBefore?: boolean;
     style?: ToolbarControlStyle;
     text?: string;
@@ -56,45 +54,31 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
     }, {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M272-200v-560h221q65 0 120 40t55 111q0 51-23 78.5T602-491q25 11 55.5 41t30.5 90q0 89-65 124.5T501-200H272Zm121-112h104q48 0 58.5-24.5T566-372q0-11-10.5-35.5T494-432H393v120Zm0-228h93q33 0 48-17t15-38q0-24-17-39t-44-15h-95v109Z"/></svg>',
         isStyle: true,
+        tooltip: 'strong',
         type: CommandType.Strong,
-        style: ToolbarControlStyle.DropdownButton,
-        buttons: [
-            {
-                parentClass: 'filled',
-                text: 'Strong',
-                type: CommandType.Strong,
-            },
-            {
-                parentClass: 'outlined',
-                text: 'Bold',
-                type: CommandType.Bold,
-            },
-        ],
+        style: ToolbarControlStyle.Button,
     }, {
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-200v-100h160l120-360H320v-100h400v100H580L460-300h140v100H200Z"/></svg>',
         isStyle: true,
+        tooltip: 'emphasis',
         type: CommandType.Emphasis,
-        style: ToolbarControlStyle.DropdownButton,
-        buttons: [
-            {
-                parentClass: 'filled',
-                text: 'Emphasis',
-                type: CommandType.Emphasis,
-            },
-            {
-                parentClass: 'outlined',
-                text: 'Italic',
-                type: CommandType.Italic,
-            },
-        ],
+        style: ToolbarControlStyle.Button,
     }, {
-        dropdownTooltip: 'underline',
+        dropdownTooltip: 'inline style',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120v-80h560v80H200Zm280-160q-101 0-157-63t-56-167v-330h103v336q0 56 28 91t82 35q54 0 82-35t28-91v-336h103v330q0 104-56 167t-157 63Z"/></svg>',
         isStyle: true,
-        tooltip: 'inline style',
+        tooltip: 'underline',
         type: CommandType.Underline,
         style: ToolbarControlStyle.ButtonGroup,
         buttons: [
+            {
+                text: 'Bold',
+                type: CommandType.Bold,
+            },
+            {
+                text: 'Italic',
+                type: CommandType.Italic,
+            },
             {
                 text: 'Small',
                 type: CommandType.Small,
@@ -114,10 +98,6 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
             {
                 text: 'Advanced',
                 buttons: [
-                    {
-                        text: 'Abbreviation',
-                        type: CommandType.Abbreviation,
-                    },
                     {
                         text: 'Cite',
                         type: CommandType.Cite,
@@ -270,10 +250,10 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         type: CommandType.InsertLink,
         style: ToolbarControlStyle.Button,
     }, {
-        dropdownTooltip: 'image',
+        dropdownTooltip: 'insert media',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/></svg>',
         isStyle: true,
-        tooltip: 'insert media',
+        tooltip: 'image',
         type: CommandType.InsertImage,
         style: ToolbarControlStyle.ButtonGroup,
         buttons: [
@@ -484,10 +464,10 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         type: CommandType.InsertTable,
         style: ToolbarControlStyle.Button,
     }, {
-        dropdownTooltip: 'horizontal rule',
+        dropdownTooltip: 'insert separator',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M160-440v-80h640v80H160Z"/></svg>',
         isStyle: true,
-        tooltip: 'insert separator',
+        tooltip: 'horizontal rule',
         type: CommandType.HorizontalRule,
         style: ToolbarControlStyle.ButtonGroup,
         buttons: [

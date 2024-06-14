@@ -166,6 +166,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     connectedCallback() {
+        this.dataset.popoverContainer = '';
+        this.dataset.hasTextInput = '';
+
         if (this.hasAttribute('type')) {
             const type = this.getAttribute('type');
             if (type && type.length) {

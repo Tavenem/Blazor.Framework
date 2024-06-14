@@ -100,7 +100,6 @@ public partial class Tooltip
     /// <inheritdoc />
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("tooltip")
         .Add("arrow", Arrow)
         .ToString();
 

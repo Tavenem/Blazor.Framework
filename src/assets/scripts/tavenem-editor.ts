@@ -9,7 +9,7 @@ import {
     Selection,
     Transaction
 } from 'prosemirror-state';
-import { Decoration, DecorationSet, EditorView as PMEditorView } from 'prosemirror-view';
+import { Decoration, DecorationSet, EditorView as PMEditorView, NodeView } from 'prosemirror-view';
 import { DOMParser as PMDOMParser, Node as ProsemirrorNode } from 'prosemirror-model';
 import {
     baseKeymap,
@@ -242,7 +242,7 @@ class TavenemCodeEditor {
     }
 }
 
-class MenuView {
+class MenuView implements NodeView {
     _commands: CommandSet;
     _editorView: PMEditorView;
     _tavenemEditor: TavenemEditorHtmlElement;
@@ -310,7 +310,7 @@ class MenuView {
     }
 }
 
-class HeadView {
+class HeadView implements NodeView {
     dom: Node;
 
     constructor(
@@ -344,7 +344,7 @@ class HeadView {
     }
 }
 
-class CheckboxView {
+class CheckboxView implements NodeView {
     dom: Node;
 
     constructor(
@@ -405,7 +405,46 @@ class CheckboxView {
     }
 }
 
-class DisabledInputView {
+class DetailsView implements NodeView {
+    dom: HTMLDetailsElement;
+    contentDOM: HTMLDetailsElement;
+
+    constructor(
+        public node: ProsemirrorNode,
+        public view: PMEditorView,
+        public getPos: () => number | undefined) {
+        this.dom = this.contentDOM = document.createElement('details');
+        if (node.attrs['open']) {
+            this.dom.open = true;
+        }
+
+        this.dom.addEventListener('click', this.onClick.bind(this));
+    }
+
+    destroy() {
+        this.dom.removeEventListener('click', this.onClick.bind(this));
+    }
+
+    update(node: ProsemirrorNode) {
+        return node.type.name === 'details';
+    }
+
+    private onClick(event: MouseEvent) {
+        if (event.target instanceof HTMLDetailsElement
+            || (event.target instanceof HTMLElement
+                && event.target.closest('summary')) {
+            this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                this.getPos(),
+                undefined,
+                {
+                    ...this.node.attrs,
+                    open: !this.node.attrs.open,
+                }));
+        }
+    }
+}
+
+class DisabledInputView implements NodeView {
     dom: Node;
 
     constructor(
@@ -441,7 +480,7 @@ class DisabledInputView {
     }
 }
 
-class ForbiddenView {
+class ForbiddenView implements NodeView {
     dom: Node;
 
     constructor(
@@ -475,7 +514,7 @@ class ForbiddenView {
     }
 }
 
-class FormView {
+class FormView implements NodeView {
     dom: Node;
     contentDom?: HTMLElement;
 
@@ -532,7 +571,7 @@ class FormView {
     }
 }
 
-class InputView {
+class InputView implements NodeView {
     dom: Node;
 
     constructor(
@@ -586,7 +625,7 @@ class InputView {
     }
 }
 
-class RadioView {
+class RadioView implements NodeView {
     dom: Node;
 
     constructor(
@@ -644,7 +683,7 @@ class RadioView {
     }
 }
 
-class ResetInputView {
+class ResetInputView implements NodeView {
     dom: Node;
 
     constructor(
@@ -696,7 +735,7 @@ class ResetInputView {
     }
 }
 
-class SelectView {
+class SelectView implements NodeView {
     dom: Node;
 
     static ForbiddenAttributes = [
@@ -791,7 +830,7 @@ class SelectView {
     }
 }
 
-class TextAreaView {
+class TextAreaView implements NodeView {
     dom: Node;
     contentDom?: HTMLElement;
 
@@ -974,6 +1013,7 @@ class TavenemWysiwygEditor {
                 canvas: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
                 checkbox: (node, view, getPos, _) => new CheckboxView(node, view, getPos),
                 code_block: (node, view, getPos, _) => new CodeBlockView(node, view, getPos),
+                details: (node, view, getPos, _) => new DetailsView(node, view, getPos),
                 dialog: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
                 fieldset: (node, view, getPos, _) => new FormView(node, view, getPos),
                 file_input: (node, view, getPos, _) => new DisabledInputView(node, view, getPos),
@@ -1389,7 +1429,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
 
         if (data.commands) {
-            for (let t = 0; t <= 50; t++) {
+            for (let t = 0; t <= 74; t++) {
                 const type = t as CommandType;
 
                 for (const toolbarButton of this
@@ -1408,18 +1448,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         for (const toolbarButton of this._toolbarButtons) {
             if (toolbarButton._active) {
                 toolbarButton._element.classList.add('active');
-
-                if (toolbarButton._definition.parentClass
-                    && toolbarButton._parentElement) {
-                    toolbarButton._parentElement.querySelector('button')?.classList.add(toolbarButton._definition.parentClass);
-                }
             } else {
                 toolbarButton._element.classList.remove('active');
-
-                if (toolbarButton._definition.parentClass
-                    && toolbarButton._parentElement) {
-                    toolbarButton._parentElement.querySelector('button')?.classList.remove(toolbarButton._definition.parentClass);
-                }
             }
 
             if (toolbarButton._definition.buttons) {
@@ -2333,9 +2363,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             return;
         }
 
-        event.preventDefault();
-        event.stopPropagation();
-
         if (control._disabled
             || !control._definition.type) {
             return;
@@ -2936,11 +2963,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
         const dropdown = document.createElement('tf-dropdown');
         if (child) {
-            dropdown.dataset.activation = '4';
+            dropdown.dataset.activation = '5'; // left-click or hover
         } else {
-            dropdown.dataset.activation = definition.style === ToolbarControlStyle.DropdownButton
-                ? '6'
-                : '1';
+            dropdown.dataset.activation = '1'; // left-click
         }
         dropdown.dataset.popoverContainer = '';
         if (disabled) {
@@ -2974,6 +2999,12 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             button.appendChild(buttonIcon);
             buttonIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-360 280-560h400L480-360Z"/></svg>`;
 
+            if (definition.dropdownTooltip || definition.tooltip) {
+                const dropdownButtonTooltip = document.createElement('tf-tooltip');
+                dropdownButtonTooltip.textContent = (definition.dropdownTooltip || definition.tooltip)!;
+                button.appendChild(dropdownButtonTooltip);
+            }
+
             control = document.createElement('div');
             toolbarButton = new ToolbarControl(control, definition);
             control.classList.add('button-group');
@@ -2982,12 +3013,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             button.classList.add('btn', 'btn-icon', 'rounded', 'small');
             control.appendChild(button);
 
-            if (definition.dropdownTooltip) {
-                const dropdownButtonTooltip = document.createElement('tf-tooltip');
-                dropdownButtonTooltip.textContent = definition.dropdownTooltip;
-                button.appendChild(dropdownButtonTooltip);
-            }
-
             dropdown.style.minWidth = '0';
             control.appendChild(dropdown);
         } else {
@@ -2995,12 +3020,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
             control = dropdown;
             toolbarButton = new ToolbarControl(control, definition);
-
-            if (definition.style === ToolbarControlStyle.DropdownButton
-                && definition.type) {
-                dropdown.addEventListener('mousedown', this.preventDefault);
-                dropdown.addEventListener('mouseup', this.onControlActivated.bind(this, toolbarButton));
-            }
         }
 
         for (const childDefinition of definition.buttons!) {

@@ -8,14 +8,14 @@
 }
 
 <tf-tooltip id="@Id"
-            data-anchor-origin="@AnchorOrigin"
+            data-anchor-origin="@AnchorOrigin.ToCSS()"
             data-arrow="@Arrow"
             data-container-no-trigger="@(!IsContainerTrigger)"
             data-delay="@(Delay == 0 ? null : Delay)"
             data-dismiss-on-tap="@DismissOnTap"
             data-max-height="@MaxHeight"
             data-popover-class="@CssClass"
-            data-popover-origin="@PopoverOrigin"
+            data-popover-origin="@PopoverOrigin.ToCSS()"
             data-popover-style="@CssStyle"
             data-tooltip-button="@IsButton">
     @ChildContent

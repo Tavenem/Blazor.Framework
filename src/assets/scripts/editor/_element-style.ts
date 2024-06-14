@@ -3,6 +3,20 @@ export const elementStyle = `
     box-sizing: border-box;
 }
 
+* {
+    font-family: var(--tavenem-font-family);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--tavenem-font-family-title);
+}
+
+pre, code, kbd, samp {
+    --tavenem-mono: 1;
+    font-family: var(--tavenem-font-family-monospace);
+}
+
 :host {
     display: flex;
     flex-direction: column;
@@ -675,6 +689,32 @@ svg {
 
     svg {
         font-size: 1.25em;
+    }
+
+    > tf-dropdown {
+        margin-right: max(-24px, -.75em);
+        padding-right: 0;
+
+        > button {
+            font-size: 1em;
+            justify-content: space-between;
+            padding: 0;
+            text-transform: none;
+            width: 100%;
+
+            &:after {
+                background-color: currentColor;
+                background-image: none;
+                content: '';
+                height: 24px;
+                mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M400-280v-400l200 200-200 200Z"/></svg>') no-repeat 50% 50%;
+                mask-size: cover;
+                opacity: inherit;
+                position: relative;
+                transform: none;
+                width: 24px;
+            }
+        }
     }
 }
 

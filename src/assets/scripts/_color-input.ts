@@ -67,6 +67,8 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     connectedCallback() {
+        this.dataset.popoverContainer = '';
+
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
