@@ -4,6 +4,8 @@ import { Extension, EditorState, Compartment, TransactionSpec } from '@codemirro
 import { redo as codeRedo, undo as codeUndo } from '@codemirror/commands';
 
 import {
+    Command,
+    NodeSelection,
     EditorState as PMEditorState,
     Plugin,
     Selection,
@@ -43,6 +45,7 @@ import {
     ParamStateCommand,
     exitDiv,
     renderer,
+    exitBlock,
 } from './editor/_schemas';
 import { elementStyle } from './editor/_element-style';
 import { htmlCommands } from './editor/_html';
@@ -242,7 +245,7 @@ class TavenemCodeEditor {
     }
 }
 
-class MenuView implements NodeView {
+class MenuView {
     _commands: CommandSet;
     _editorView: PMEditorView;
     _tavenemEditor: TavenemEditorHtmlElement;
@@ -402,6 +405,16 @@ class CheckboxView implements NodeView {
         } else {
             this.dom.removeAttribute('checked');
         }
+        const pos = this.getPos();
+        if (pos != null) {
+            this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                pos,
+                undefined,
+                {
+                    ...this.node.attrs,
+                    checked: this.dom.checked,
+                }));
+        }
     }
 }
 
@@ -426,20 +439,28 @@ class DetailsView implements NodeView {
     }
 
     update(node: ProsemirrorNode) {
-        return node.type.name === 'details';
+        if (node.type.name === 'details') {
+            this.dom.open = !!node.attrs.open;
+            return true;
+        }
+        return false;
     }
 
     private onClick(event: MouseEvent) {
-        if (event.target instanceof HTMLDetailsElement
+        if (event.button === 0
+            && (event.target instanceof HTMLDetailsElement
             || (event.target instanceof HTMLElement
-                && event.target.closest('summary')) {
-            this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                this.getPos(),
-                undefined,
-                {
-                    ...this.node.attrs,
-                    open: !this.node.attrs.open,
-                }));
+                && event.target.closest('summary')))) {
+            const pos = this.getPos();
+            if (pos != null) {
+                this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                    pos,
+                    undefined,
+                    {
+                        ...this.node.attrs,
+                        open: !this.node.attrs.open,
+                    }));
+            }
         }
     }
 }
@@ -622,6 +643,16 @@ class InputView implements NodeView {
             return;
         }
         this.dom.setAttribute('value', event.target.value);
+        const pos = this.getPos();
+        if (pos != null) {
+            this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                pos,
+                undefined,
+                {
+                    ...this.node.attrs,
+                    value: event.target.value,
+                }));
+        }
     }
 }
 
@@ -679,6 +710,16 @@ class RadioView implements NodeView {
             this.dom.setAttribute('checked', '');
         } else {
             this.dom.removeAttribute('checked');
+        }
+        const pos = this.getPos();
+        if (pos != null) {
+            this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                pos,
+                undefined,
+                {
+                    ...this.node.attrs,
+                    checked: this.dom.checked,
+                }));
         }
     }
 }
@@ -827,6 +868,40 @@ class SelectView implements NodeView {
                 }
             }
         }
+        const pos = this.getPos();
+        if (pos) {
+            this.setSelected(this.node, pos, event.target.value);
+        }
+    }
+
+    private setSelected(node: ProsemirrorNode, pos: number, value: string) {
+        node.forEach((child, offset) => {
+            if (child.type.name === 'option') {
+                if (value && child.attrs.value === value) {
+                    this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                        pos + offset,
+                        undefined,
+                        {
+                            ...child.attrs,
+                            selected: true,
+                        }));
+                    return true;
+                } else if (child.attrs.selected) {
+                    this.view.dispatch(this.view.state.tr.setNodeMarkup(
+                        pos + offset,
+                        undefined,
+                        {
+                            ...child.attrs,
+                            selected: false,
+                        }));
+                }
+                return false;
+            }
+            if (this.setSelected(child, pos + offset, value)) {
+                return true;
+            }
+        });
+        return false;
     }
 }
 
@@ -882,6 +957,65 @@ const arrowHandlers = pmKeymap({
     ArrowUp: arrowHandler("up"),
     ArrowDown: arrowHandler("down"),
 });
+
+const detailsBackspaceCommand: Command = (state, dispatch) => {
+    const { $from, $to } = state.selection;
+    let details = $from.parent;
+    let depth = $from.depth;
+    let summary: ProsemirrorNode | undefined;
+    while (details
+        && depth > 0
+        && details.type.name !== "details") {
+        if (details.type.name === "summary"
+            || details.type.name === "summary_text") {
+            summary = details;
+        }
+        details = $from.node(--depth);
+    }
+    if (!details) {
+        return false;
+    }
+
+    // verify start and end of selection are within the same details
+    let toDetails = $to.parent;
+    depth = $to.depth;
+    while (toDetails
+        && depth > 0
+        && toDetails.type.name !== "details") {
+        toDetails = $to.node(--depth);
+    }
+    if (!toDetails || !details.eq(toDetails)) {
+        return false;
+    }
+
+    // if details is empty, remove it
+    if (isEmpty(details)) {
+        if (dispatch) {
+            dispatch(state.tr
+                .deleteRange($from.start(depth), $from.end(depth))
+                .scrollIntoView());
+        }
+        return true;
+    }
+
+    // if selection is within an empty summary, and the details is closed, open it
+    if (dispatch
+        && summary
+        && summary.childCount === 0
+        && (!summary.text || !summary.text.length)
+        && !details.attrs.open) {
+        dispatch(state.tr.setNodeMarkup(
+            $from.start(depth) - 1,
+            undefined,
+            {
+                ...details.attrs,
+                open: true,
+            }).scrollIntoView());
+        return true;
+    }
+
+    return false;
+};
 
 interface WysiwygEditorInfo extends EditorInfo {
     commands: CommandSet;
@@ -981,13 +1115,16 @@ class TavenemWysiwygEditor {
             buildInputRules(schema),
             pmKeymap({
                 "Mod-Space": insertMathCmd(schema.nodes.math_inline),
-                "Backspace": chainCommands(deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
+                "Backspace": chainCommands(detailsBackspaceCommand, deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
                 "Tab": goToNextCell(1),
                 "Shift-Tab": goToNextCell(-1),
                 "Ctrl-Enter": exitDiv,
             }),
             pmKeymap(buildKeymap(schema)),
             pmKeymap(baseKeymap),
+            pmKeymap({
+                "Enter": exitBlock, // last resort for cases when a new <p> or block split are both invalid, to exit the current block
+            }),
             pmDropCursor(),
             gapCursor(),
             pmHistory(),
@@ -1577,11 +1714,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 return;
             }
 
-            let url: string = (value as any).url;
-            if (!url.startsWith('#')
-                && !URL.canParse(url, document.baseURI)) {
-                url = 'http://' + url;
-                if (!URL.canParse(url, document.baseURI)) {
+            let src: string = (value as any).url;
+            if (!src.startsWith('#')
+                && !URL.canParse(src, document.baseURI)) {
+                src = 'http://' + src;
+                if (!URL.canParse(src, document.baseURI)) {
                     return;
                 }
             }
@@ -1595,7 +1732,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                     this._tavenemWysiwygEditor._editor.view.state,
                     this._tavenemWysiwygEditor._editor.view.dispatch,
                     this._tavenemWysiwygEditor._editor.view,
-                    [url, controls, loop]);
+                    [src, controls, loop]);
                 this._tavenemWysiwygEditor._editor.view.focus();
             }
         };
@@ -1864,11 +2001,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 return;
             }
 
-            let url: string = (value as any).url;
-            if (!url.startsWith('#')
-                && !URL.canParse(url, document.baseURI)) {
-                url = 'http://' + url;
-                if (!URL.canParse(url, document.baseURI)) {
+            let src: string = (value as any).url;
+            if (!src.startsWith('#')
+                && !URL.canParse(src, document.baseURI)) {
+                src = 'http://' + src;
+                if (!URL.canParse(src, document.baseURI)) {
                     return;
                 }
             }
@@ -1887,7 +2024,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                     this._tavenemWysiwygEditor._editor.view.state,
                     this._tavenemWysiwygEditor._editor.view.dispatch,
                     this._tavenemWysiwygEditor._editor.view,
-                    [url, title, alt]);
+                    [src, title, alt]);
                 this._tavenemWysiwygEditor._editor.view.focus();
             }
         };
@@ -2121,11 +2258,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 return;
             }
 
-            let url: string = (value as any).url;
-            if (!url.startsWith('#')
-                && !URL.canParse(url, document.baseURI)) {
-                url = 'http://' + url;
-                if (!URL.canParse(url, document.baseURI)) {
+            let href: string = (value as any).url;
+            if (!href.startsWith('#')
+                && !URL.canParse(href, document.baseURI)) {
+                href = 'http://' + href;
+                if (!URL.canParse(href, document.baseURI)) {
                     return;
                 }
             }
@@ -2140,7 +2277,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                     this._tavenemWysiwygEditor._editor.view.state,
                     this._tavenemWysiwygEditor._editor.view.dispatch,
                     this._tavenemWysiwygEditor._editor.view,
-                    [url, title]);
+                    [href, title]);
                 this._tavenemWysiwygEditor._editor.view.focus();
             }
         };
@@ -2238,11 +2375,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 return;
             }
 
-            let url: string = (value as any).url;
-            if (!url.startsWith('#')
-                && !URL.canParse(url, document.baseURI)) {
-                url = 'http://' + url;
-                if (!URL.canParse(url, document.baseURI)) {
+            let src: string = (value as any).url;
+            if (!src.startsWith('#')
+                && !URL.canParse(src, document.baseURI)) {
+                src = 'http://' + src;
+                if (!URL.canParse(src, document.baseURI)) {
                     return;
                 }
             }
@@ -2250,13 +2387,13 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             const controls = !!((value as any).controls);
             const loop = !!((value as any).loop);
 
-            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.InsertAudio];
+            const command = this._tavenemWysiwygEditor._editor.commands[CommandType.InsertVideo];
             if (command) {
                 command.command(
                     this._tavenemWysiwygEditor._editor.view.state,
                     this._tavenemWysiwygEditor._editor.view.dispatch,
                     this._tavenemWysiwygEditor._editor.view,
-                    [url, controls, loop]);
+                    [src, controls, loop]);
                 this._tavenemWysiwygEditor._editor.view.focus();
             }
         };
@@ -3447,6 +3584,18 @@ function getFonts() {
         }
     }
     return validFonts;
+}
+
+function isEmpty(node: ProsemirrorNode) {
+    if (node.text && node.text.length) {
+        return false;
+    }
+    for (let i = 0; i < node.childCount; i++) {
+        if (!isEmpty(node.child(i))) {
+            return false;
+        }
+    }
+    return true;
 }
 
 const themeObserver = new MutationObserver(function (mutations) {

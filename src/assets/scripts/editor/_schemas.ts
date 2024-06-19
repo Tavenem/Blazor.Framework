@@ -16,9 +16,10 @@ import {
     DOMSerializer,
     Fragment,
     NodeRange,
+    Slice,
 } from 'prosemirror-model';
-import { findWrapping, RemoveMarkStep } from 'prosemirror-transform';
-import { chainCommands, deleteSelection, lift, liftEmptyBlock, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
+import { canJoin, canSplit, findWrapping, liftTarget, RemoveMarkStep, ReplaceAroundStep, ReplaceStep } from 'prosemirror-transform';
+import { autoJoin, chainCommands, deleteSelection, lift, liftEmptyBlock, setBlockType, toggleMark, wrapIn } from 'prosemirror-commands';
 import { redo, undo } from 'prosemirror-history';
 import { liftListItem, sinkListItem, wrapInList } from 'prosemirror-schema-list';
 
@@ -567,7 +568,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     task_list: {
         attrs: commonAttrs,
-        content: "(task_list_item_text | task_list_item | list_item_text | list_item)+",
+        content: "(task_list_item | list_item_text | list_item)+",
         group: "flow",
         parseDOM: [{ tag: "ul", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "ul") }
@@ -641,8 +642,8 @@ const commonNodes: { [name in string]: NodeSpec } = {
         parseDOM: [{ tag: "dd", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dd") }
     },
-    task_list_item_text: {
-        alternate: 'task_list_item',
+    task_list_item: {
+        alternate: 'list_item',
         attrs: commonAttrs,
         content: "checkbox (phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
@@ -661,31 +662,6 @@ const commonNodes: { [name in string]: NodeSpec } = {
             }
         }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "li", "task-list-item") }
-    },
-    task_list_item: {
-        alternate: 'task_list_item_text',
-        attrs: plusCommonAttributes({ complete: { default: false } }),
-        content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
-        defining: true,
-        parseDOM: [{
-            tag: "li",
-            getAttrs: node => {
-                if (!(node instanceof HTMLLIElement)
-                    || !node.firstChild) {
-                    return false;
-                }
-                let child: ChildNode | null = node.firstChild;
-                if (child && !(node.firstChild instanceof HTMLInputElement)) {
-                    child = node.firstChild.firstChild;
-                }
-                if (!(child instanceof HTMLInputElement)
-                    || child.type !== 'checkbox') {
-                    return false;
-                }
-                return getCommonAttrs(node);
-            }
-        }],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "li", "task-list-item", [["div", ["checkbox"]], ["div", 0]]) }
     },
     list_item_text: {
         alternate: 'list_item',
@@ -2390,10 +2366,10 @@ export function commonCommands(schema: Schema) {
         }
     };
     commands[CommandType.Paragraph] = blockTypeMenuItem(schema.nodes.paragraph);
-    commands[CommandType.Address] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.address_text, schema.nodes.address);
-    commands[CommandType.Article] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.article_text, schema.nodes.article);
-    commands[CommandType.Aside] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.aside_text, schema.nodes.aside);
-    commands[CommandType.BlockQuote] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.blockquote_text, schema.nodes.blockquote);
+    commands[CommandType.Address] = wrapOrInsertPhrasingOrFlow(schema.nodes.address_text, schema.nodes.address);
+    commands[CommandType.Article] = wrapOrInsertPhrasingOrFlow(schema.nodes.article_text, schema.nodes.article);
+    commands[CommandType.Aside] = wrapOrInsertPhrasingOrFlow(schema.nodes.aside_text, schema.nodes.aside);
+    commands[CommandType.BlockQuote] = wrapOrInsertPhrasingOrFlow(schema.nodes.blockquote_text, schema.nodes.blockquote);
     commands[CommandType.CodeBlock] = blockTypeMenuItem(schema.nodes.code_block);
     commands[CommandType.CodeInline] = markMenuItem(schema.marks.code);
     commands[CommandType.Strong] = markMenuItem(schema.marks.strong);
@@ -2401,17 +2377,17 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Cite] = markMenuItem(schema.marks.cite);
     commands[CommandType.Definition] = markMenuItem(schema.marks.dfn);
     commands[CommandType.Emphasis] = markMenuItem(schema.marks.em);
-    commands[CommandType.FieldSet] = wrapOrInsertMenuItem(schema.nodes.fieldset);
-    commands[CommandType.Figure] = wrapOrInsertMenuItem(schema.nodes.figure);
-    commands[CommandType.FigureCaption] = phrasingOrFlowBlockTypeMenuItem(schema.nodes.figcaption_text, schema.nodes.figcaption);
-    commands[CommandType.Footer] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.footer_text, schema.nodes.footer);
-    commands[CommandType.Header] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.header_text, schema.nodes.header);
-    commands[CommandType.HeadingGroup] = wrapOrInsertMenuItem(schema.nodes.hgroup);
+    commands[CommandType.FieldSet] = wrapOrInsert(schema.nodes.fieldset);
+    commands[CommandType.Figure] = wrapOrInsert(schema.nodes.figure);
+    commands[CommandType.FigureCaption] = wrapOrInsertInlinePhrasingOrFlow(schema.nodes.figcaption_text, schema.nodes.figcaption);
+    commands[CommandType.Footer] = wrapOrInsertPhrasingOrFlow(schema.nodes.footer_text, schema.nodes.footer);
+    commands[CommandType.Header] = wrapOrInsertPhrasingOrFlow(schema.nodes.header_text, schema.nodes.header);
+    commands[CommandType.HeadingGroup] = wrapOrInsert(schema.nodes.hgroup);
     commands[CommandType.Italic] = markMenuItem(schema.marks.italic);
     commands[CommandType.Keyboard] = markMenuItem(schema.marks.kbd);
     commands[CommandType.Underline] = markMenuItem(schema.marks.underline);
     commands[CommandType.Deleted] = markMenuItem(schema.marks.del);
-    commands[CommandType.Details] = wrapOrInsertMenuItem(schema.nodes.details);
+    commands[CommandType.Details] = wrapOrInsert(schema.nodes.details);
     commands[CommandType.Strikethrough] = markMenuItem(schema.marks.strikethrough);
     commands[CommandType.Small] = markMenuItem(schema.marks.small);
     commands[CommandType.Subscript] = markMenuItem(schema.marks.sub);
@@ -2420,7 +2396,7 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Marked] = markMenuItem(schema.marks.mark);
     commands[CommandType.Quote] = markMenuItem(schema.marks.quote);
     commands[CommandType.Sample] = markMenuItem(schema.marks.samp);
-    commands[CommandType.Section] = wrapOrInsertPhrasingOrFlowMenuItem(schema.nodes.section_text, schema.nodes.section);
+    commands[CommandType.Section] = wrapOrInsertPhrasingOrFlow(schema.nodes.section_text, schema.nodes.section);
     commands[CommandType.Variable] = markMenuItem(schema.marks.variable);
     commands[CommandType.WordBreak] = {
         command(state, dispatch) {
@@ -2433,8 +2409,8 @@ export function commonCommands(schema: Schema) {
             return true;
         }
     };
-    commands[CommandType.ForegroundColor] = toggleInlineStyleMenuItem('color');
-    commands[CommandType.BackgroundColor] = toggleInlineStyleMenuItem('background-color');
+    commands[CommandType.ForegroundColor] = toggleInlineStyle('color');
+    commands[CommandType.BackgroundColor] = toggleInlineStyle('background-color');
     commands[CommandType.InsertImage] = {
         command(state, dispatch, _, params) {
             if (!canInsert(state, schema.nodes.image)) {
@@ -2503,6 +2479,42 @@ export function commonCommands(schema: Schema) {
         isActive(state, type) { return isMarkActive(state, type) },
         markType: schema.marks.anchor as MarkType
     };
+    commands[CommandType.InsertAudio] = {
+        command(state, dispatch, _, params) {
+            if (!canInsert(state, schema.nodes.audio)) {
+                return false;
+            }
+            if (dispatch) {
+                if (!params || !params.length) {
+                    return true;
+                }
+                let attrs: { [key: string]: any } | null = null;
+                if (state.selection instanceof NodeSelection
+                    && state.selection.node.type.name == schema.nodes.audio.name) {
+                    attrs = { ...state.selection.node.attrs };
+                }
+                attrs = {...attrs, ...params };
+                attrs.src = params[0];
+                if (params.length > 1) {
+                    attrs.controls = params[1];
+                }
+                if (params.length > 2 && params[2]) {
+                    attrs.loop = params[2];
+                }
+                dispatch(state.tr.replaceSelectionWith(schema.nodes.audio.createAndFill(attrs)!));
+            }
+            return true;
+        },
+        isActive(state) {
+            if (state.selection instanceof NodeSelection
+                && state.selection.node) {
+                return state.selection.node.hasMarkup(schema.nodes.audio);
+            }
+            const { $from, to } = state.selection;
+            return to <= $from.end()
+                && $from.parent.hasMarkup(schema.nodes.audio);
+        },
+    };
     commands[CommandType.InsertVideo] = {
         command(state, dispatch, _, params) {
             if (!canInsert(state, schema.nodes.video)) {
@@ -2520,10 +2532,10 @@ export function commonCommands(schema: Schema) {
                 attrs = attrs || {};
                 attrs.src = params[0];
                 if (params.length > 1) {
-                    attrs.title = params[1];
+                    attrs.controls = params[1];
                 }
                 if (params.length > 2 && params[2]) {
-                    attrs.alt = params[2];
+                    attrs.loop = params[2];
                 }
                 dispatch(state.tr.replaceSelectionWith(schema.nodes.video.createAndFill(attrs)!));
             }
@@ -2539,20 +2551,17 @@ export function commonCommands(schema: Schema) {
                 && $from.parent.hasMarkup(schema.nodes.video);
         },
     };
-    commands[CommandType.ListBullet] = { command: wrapInList(schema.nodes.bullet_list) };
-    commands[CommandType.ListNumber] = { command: wrapInList(schema.nodes.ordered_list) };
-    commands[CommandType.ListCheck] = { command: wrapInList(schema.nodes.task_list) };
+    commands[CommandType.ListBullet] = wrapInPhrasingOrFlowList(schema.nodes.bullet_list, schema.nodes.list_item_text);
+    commands[CommandType.ListNumber] = wrapInPhrasingOrFlowList(schema.nodes.ordered_list, schema.nodes.list_item_text);
+    commands[CommandType.ListCheck] = wrapInPhrasingOrFlowList(schema.nodes.task_list, schema.nodes.task_list_item);
     commands[CommandType.UpLevel] = {
         command: chainCommands(
-            liftListItem(schema.nodes.task_list_item),
-            liftListItem(schema.nodes.list_item),
+            liftListItemTypes([schema.nodes.task_list_item, schema.nodes.list_item_text, schema.nodes.list_item]),
             lift,
             liftEmptyBlock)
     };
     commands[CommandType.DownLevel] = {
-        command: chainCommands(
-            sinkListItem(schema.nodes.task_list_item),
-            sinkListItem(schema.nodes.list_item))
+        command: sinkListItemTypes([schema.nodes.task_list_item, schema.nodes.list_item_text, schema.nodes.list_item])
     };
     commands[CommandType.InsertTable] = {
         command(state, dispatch, _, params) {
@@ -2656,9 +2665,9 @@ export function commonCommands(schema: Schema) {
             return true;
         }
     };
-    commands[CommandType.SetFontFamily] = toggleInlineStyleMenuItem('font-family');
-    commands[CommandType.SetFontSize] = toggleInlineStyleMenuItem('font-size');
-    commands[CommandType.SetLineHeight] = toggleInlineStyleMenuItem('line-height');
+    commands[CommandType.SetFontFamily] = toggleInlineStyle('font-family');
+    commands[CommandType.SetFontSize] = toggleInlineStyle('font-size');
+    commands[CommandType.SetLineHeight] = toggleInlineStyle('line-height');
     commands[CommandType.AlignLeft] = alignMenuItem('left');
     commands[CommandType.AlignCenter] = alignMenuItem('center');
     commands[CommandType.AlignRight] = alignMenuItem('right');
@@ -2741,6 +2750,44 @@ export function commonCommands(schema: Schema) {
     return commands;
 }
 
+export const exitBlock: Command = (state, dispatch) => {
+    const { $head, $anchor } = state.selection;
+    if ($head.pos !== $anchor.pos
+        || !$head.sameParent($anchor)) {
+        return false;
+    }
+
+    // if at the beginning of the current node, see if a default block can be inserted before it
+    if ($head.start() === $head.pos) {
+        const above = $head.node($head.depth - 1),
+            before = $head.index($head.depth - 1),
+            type = defaultBlockAt(above.contentMatchAt(before));
+        if (type && above.canReplaceWith(before, before, type)) {
+            if (dispatch) {
+                const pos = $head.before(),
+                    tr = state.tr.replaceWith(
+                        pos, pos,
+                        type.isText
+                            ? state.schema.nodes.hard_break.createAndFill()! // can't create an empty text node; instead add a break
+                            : type.createAndFill()!);
+                dispatch(tr
+                    .setSelection(Selection.near(tr.doc.resolve(pos)))
+                    .scrollIntoView());
+            }
+            return true;
+        }
+    }
+
+    const nextPos = Selection.near(state.doc.resolve($head.after()));
+    if (!nextPos.$head) {
+        return false;
+    }
+    if (dispatch) {
+        dispatch(state.tr.setSelection(nextPos).scrollIntoView());
+    }
+    return true;
+}
+
 export const exitDiv: Command = (state, dispatch) => {
     const { $head, $anchor } = state.selection;
     if (!$head.sameParent($anchor)) {
@@ -2758,12 +2805,19 @@ export const exitDiv: Command = (state, dispatch) => {
     if (!div) {
         return false;
     }
-    const above = $head.node(depth - 1), after = $head.indexAfter(depth - 1), type = defaultBlockAt(above.contentMatchAt(after));
+    const above = $head.node(depth - 1),
+        after = $head.indexAfter(depth - 1),
+        type = defaultBlockAt(above.contentMatchAt(after));
     if (!type || !above.canReplaceWith(after, after, type)) {
         return false;
     }
     if (dispatch) {
-        const pos = $head.after(depth), tr = state.tr.replaceWith(pos, pos, type.createAndFill()!);
+        const pos = $head.after(depth),
+            tr = state.tr.replaceWith(
+                pos, pos,
+                type.isText
+                    ? state.schema.nodes.hard_break.createAndFill()! // can't create an empty text node; instead add a break
+                    : type.createAndFill()!);
         tr.setSelection(Selection.near(tr.doc.resolve(pos), 1));
         dispatch(tr.scrollIntoView());
     }
@@ -2884,7 +2938,7 @@ function blockTypeMenuItem(
     nodeType: NodeType,
     attrs?: Attrs | null): CommandInfo {
     return {
-        command: setBlockType(nodeType),
+        command: setBlockType(nodeType, attrs),
         isActive(state) {
             if (state.selection instanceof NodeSelection
                 && state.selection.node) {
@@ -2913,11 +2967,102 @@ function canInsert(
 function defaultBlockAt(match: ContentMatch) {
     for (let i = 0; i < match.edgeCount; i++) {
         const { type } = match.edge(i);
-        if (type.isTextblock && !type.hasRequiredAttrs()) {
+        if ((type.isTextblock || type.isText) && !type.hasRequiredAttrs()) {
             return type;
         }
     }
     return null;
+}
+
+function doWrapInList(
+    state: EditorState,
+    tr: Transaction,
+    range: NodeRange,
+    wrappers: { type: NodeType, attrs?: Attrs | null }[],
+    joinBefore: boolean,
+    listType: NodeType,
+    phrasingItemType: NodeType) {
+    let content = Fragment.empty;
+    for (let i = wrappers.length - 1; i >= 0; i--) {
+        content = Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content));
+    }
+
+    tr.step(new ReplaceAroundStep(
+        range.start - (joinBefore ? 2 : 0),
+        range.end,
+        range.start,
+        range.end,
+        new Slice(content, 0, 0),
+        wrappers.length,
+        true));
+
+    let found = 0;
+    for (let i = 0; i < wrappers.length; i++) {
+        if (wrappers[i].type == listType) {
+            found = i + 1;
+        }
+    }
+    let splitDepth = wrappers.length - found;
+
+    let splitPos = range.start + wrappers.length - (joinBefore ? 2 : 0),
+        parent = range.parent;
+    for (let i = range.startIndex,
+        e = range.endIndex,
+        first = true;
+        i < e;
+        i++,
+        first = false) {
+        if (!first && canSplit(tr.doc, splitPos, splitDepth)) {
+            tr.split(splitPos, splitDepth);
+
+            let start = splitPos + splitDepth;
+            splitPos += (2 * splitDepth) + parent.child(i).nodeSize;
+
+            const $start = tr.doc.resolve(start);
+            const nodeBefore = $start.nodeBefore;
+            const nodeAfter = $start.nodeAfter;
+            let replaced = false;
+            if (nodeBefore
+                && nodeBefore.firstChild
+                && nodeBefore.firstChild.type.name === state.schema.nodes.paragraph.name
+                && (nodeBefore.firstChild.childCount === 0
+                    || (nodeBefore.firstChild.childCount === 1
+                        && nodeBefore.firstChild.firstChild!.isText))) {
+                tr.step(new ReplaceAroundStep(
+                    start - nodeBefore.nodeSize,
+                    start,
+                    start - nodeBefore.nodeSize + 2,
+                    start - 2,
+                    new Slice(Fragment.from(phrasingItemType.create()), 0, 0),
+                    1));
+                replaced = true;
+                start -= 2;
+            }
+
+            if (nodeAfter
+                && nodeAfter.firstChild
+                && nodeAfter.firstChild.type.name === state.schema.nodes.paragraph.name
+                && (nodeAfter.firstChild.childCount === 0
+                    || (nodeAfter.firstChild.childCount === 1
+                        && nodeAfter.firstChild.firstChild!.isText))) {
+                tr.step(new ReplaceAroundStep(
+                    start,
+                    start + nodeAfter.nodeSize,
+                    start + 2,
+                    start + nodeAfter.nodeSize - 2,
+                    new Slice(Fragment.from(phrasingItemType.create()), 0, 0),
+                    1));
+                replaced = true;
+            }
+
+            if (replaced) {
+                splitPos = tr.mapping.map(splitPos);
+            }
+        } else {
+            splitPos += parent.child(i).nodeSize;
+        }
+    }
+    return tr;
 }
 
 function isMarkActive(
@@ -2932,6 +3077,142 @@ function isMarkActive(
     } else {
         return state.doc.rangeHasMark(from, to, type);
     }
+}
+
+function liftOutOfList(
+    state: EditorState,
+    dispatch: (tr: Transaction) => void,
+    range: NodeRange) {
+    const tr = state.tr,
+        list = range.parent,
+        $start = tr.doc.resolve(range.start),
+        start = $start.pos,
+        $end = tr.doc.resolve(range.end),
+        end = $end.pos,
+        atStart = range.startIndex == 0,
+        atEnd = range.endIndex == list.childCount,
+        parent = $start.node(-1);
+
+    // Flatten the list items
+    let content = Fragment.empty;
+    for (let i = range.startIndex,
+        e = range.endIndex;
+        i < e;
+        i++) {
+        const child = list.child(i);
+
+        // Convert text list items to paragraphs
+        if (child.type.spec.alternate == 'list_item') {
+            content = content.append(Fragment.from(state.schema.nodes.paragraph.create(null, child.content)));
+        } else if (!parent.type.validContent(child.content)) {
+            // wrap invalid content in a div (which should always fit where the list would fit)
+            content = content.append(Fragment.from(state.schema.nodes.div.create(null, child.content)));
+        } else {
+            content = content.append(Fragment.from(child.content));
+        }
+    }
+
+    // Strip off the surrounding list. At the sides where we're not at
+    // the end of the list, the existing list is closed. At sides where
+    // this is the end, it is overwritten to its end.
+    tr.step(new ReplaceStep(
+        start - (atStart ? 1 : 0),
+        end + (atEnd ? 1 : 0),
+        new Slice((atStart ? Fragment.empty : Fragment.from(list.copy(Fragment.empty)))
+            .append(content)
+            .append(atEnd ? Fragment.empty : Fragment.from(list.copy(Fragment.empty))),
+            atStart ? 0 : 1,
+            atEnd ? 0 : 1)));
+    dispatch(tr.scrollIntoView());
+    return true;
+}
+
+function liftListItemTypes(listItemTypes: NodeType[]): Command {
+    return (state, dispatch) => {
+        const { $from, $to } = state.selection;
+        const range = $from.blockRange(
+            $to,
+            node => node.childCount > 0
+                && listItemTypes.includes(node.firstChild!.type));
+        if (!range) {
+            return false;
+        }
+        if (!dispatch) {
+            return true;
+        }
+        const node = $from.node(range.depth - 1);
+        if (listItemTypes.includes(node.type)) { // Inside a parent list item
+            return liftToOuterList(state, dispatch, node.type, range);
+        } else { // Outer list item
+            return liftOutOfList(state, dispatch, range);
+        }
+    };
+}
+
+function liftToOuterList(
+    state: EditorState,
+    dispatch: (tr: Transaction) => void,
+    itemType: NodeType,
+    range: NodeRange) {
+    const tr = state.tr;
+    let end = range.end,
+        endOfList = range.$to.end(range.depth);
+    // There are siblings after the lifted items, which must become
+    // children of the last item
+    if (end < endOfList) {
+        const lastItem = range.parent.child(range.endIndex - 1);
+        // If the last item does not permit a nested list, it must be replaced
+        if (!lastItem.type.validContent(Fragment.from(range.parent))) {
+            if (!lastItem.type.spec.alternate) {
+                return false;
+            }
+            const lastItemStart = range.$from.posAtIndex(range.endIndex - 1) - 1,
+                lastItemEnd = lastItemStart + lastItem.nodeSize;
+            if (lastItem.childCount > 0) {
+                tr.step(new ReplaceAroundStep(
+                    lastItemStart,
+                    lastItemEnd,
+                    lastItemStart + 1,
+                    lastItemEnd - 1,
+                    new Slice(Fragment.from(state.schema.nodes[lastItem.type.spec.alternate].create(null, state.schema.nodes.paragraph.create())), 0, 0),
+                    2));
+            } else {
+                tr.step(new ReplaceAroundStep(
+                    lastItemStart,
+                    lastItemEnd,
+                    lastItemStart + 1,
+                    lastItemEnd - 1,
+                    new Slice(Fragment.from(state.schema.nodes[lastItem.type.spec.alternate].create()), 0, 0),
+                    1));
+            }
+            end = tr.mapping.map(end),
+                endOfList = tr.mapping.map(endOfList);
+        }
+
+        tr.step(new ReplaceAroundStep(
+            end - 1,
+            endOfList,
+            end,
+            endOfList,
+            new Slice(Fragment.from(itemType.create(null, range.parent.copy())), 1, 0),
+            1,
+            true));
+        range = new NodeRange(
+            tr.doc.resolve(tr.mapping.map(range.$from.pos)),
+            tr.doc.resolve(endOfList),
+            range.depth);
+    }
+    const target = liftTarget(range);
+    if (target == null) {
+        return false;
+    }
+    tr.lift(range, target);
+    const after = tr.mapping.map(end, -1) - 1;
+    if (canJoin(tr.doc, after)) {
+        tr.join(after);
+    }
+    dispatch(tr.scrollIntoView());
+    return true;
 }
 
 function markApplies(
@@ -2990,67 +3271,6 @@ function markMenuItem(type: MarkType): CommandInfo {
         isActive(state, type) { return isMarkActive(state, type) },
         markType: type,
     }
-}
-
-function phrasingOrFlowBlockTypeMenuItem(
-    phrasingNodeType: NodeType,
-    flowNodeType: NodeType,
-    attrs?: Attrs | null): CommandInfo {
-    return {
-        command: (state, dispatch) => {
-            let phrasingApplicable = false;
-            let flowApplicable = false;
-            for (let i = 0; i < state.selection.ranges.length && !phrasingApplicable && !flowApplicable; i++) {
-                const { $from: { pos: from }, $to: { pos: to } } = state.selection.ranges[i];
-                state.doc.nodesBetween(from, to, (node, pos) => {
-                    if (phrasingApplicable || flowApplicable) {
-                        return false;
-                    }
-                    if (!node.isTextblock
-                        || node.hasMarkup(phrasingNodeType, attrs)
-                        || node.hasMarkup(flowNodeType, attrs)) {
-                        return;
-                    }
-                    if (node.type == phrasingNodeType) {
-                        phrasingApplicable = true;
-                    } else if (node.type == flowNodeType) {
-                        flowApplicable = true;
-                    } else {
-                        const $pos = state.doc.resolve(pos), index = $pos.index();
-                        phrasingApplicable = $pos.parent.canReplaceWith(index, index + 1, phrasingNodeType);
-                        flowApplicable = $pos.parent.canReplaceWith(index, index + 1, flowNodeType);
-                    }
-                })
-            }
-            if (!phrasingApplicable && !flowApplicable) {
-                return false;
-            }
-            if (dispatch) {
-                const tr = state.tr;
-                for (let i = 0; i < state.selection.ranges.length; i++) {
-                    const { $from: { pos: from }, $to: { pos: to } } = state.selection.ranges[i];
-                    if (phrasingApplicable) {
-                        tr.setBlockType(from, to, phrasingNodeType, attrs);
-                    } else {
-                        tr.setBlockType(from, to, flowNodeType, attrs);
-                    }
-                }
-                dispatch(tr.scrollIntoView());
-            }
-            return true;
-        },
-        isActive(state) {
-            if (state.selection instanceof NodeSelection
-                && state.selection.node) {
-                return state.selection.node.type.name == phrasingNodeType.name
-                    || state.selection.node.type.name == flowNodeType.name;
-            }
-            const { $from, to } = state.selection;
-            return to <= $from.end()
-                && ($from.parent.type.name == phrasingNodeType.name
-                    || $from.parent.type.name == flowNodeType.name);
-        }
-    };
 }
 
 function plusCommonAttributes(attrs: { [key: string]: any }) {
@@ -3125,7 +3345,73 @@ function removeMarkStyle(
     return tr.ensureMarks(newSet);
 }
 
-function toggleInlineStyleMenuItem(style: string): CommandInfo {
+function sinkListItemTypes(listItemTypes: NodeType[]): Command {
+    return (state, dispatch) => {
+        const { $from, $to } = state.selection;
+        const range = $from.blockRange(
+            $to,
+            node => node.childCount > 0
+                && listItemTypes.includes(node.firstChild!.type));
+        if (!range) {
+            return false;
+        }
+        const startIndex = range.startIndex;
+        if (startIndex == 0) {
+            return false;
+        }
+        const parent = range.parent,
+            nodeBefore = parent.child(startIndex - 1),
+            nodeAfter = parent.maybeChild(range.endIndex);
+        if (!listItemTypes.includes(nodeBefore.type)) {
+            return false;
+        }
+
+        const nestedBefore = nodeBefore.lastChild
+            && nodeBefore.lastChild.type == parent.type;
+        const nestedAfter = nodeAfter
+            && nodeAfter.lastChild
+            && nodeAfter.lastChild.type == parent.type;
+        const list = Fragment.from(parent.type.create());
+        let itemType: NodeType | undefined;
+        let useNestedAfter = !!nestedAfter;
+        if (nestedBefore) {
+            itemType = nodeBefore.type;
+            useNestedAfter = useNestedAfter
+                && !!nodeAfter
+                && nodeAfter.type == itemType;
+        } else {
+            for (let i = 0; i < listItemTypes.length; i++) {
+                if (listItemTypes[i].validContent(list)) {
+                    itemType = listItemTypes[i];
+                    break;
+                }
+            }
+        }
+        if (!itemType) {
+            return false;
+        }
+
+        if (dispatch) {
+            const slice = new Slice(
+                Fragment.from(itemType.create(null, list)),
+                nestedBefore ? 2 : 0,
+                useNestedAfter ? 2 : 0);
+            const before = range.start,
+                after = range.end;
+            dispatch(state.tr.step(new ReplaceAroundStep(
+                before - (nestedBefore ? 2 : 0),
+                after + (useNestedAfter ? 2 : 0),
+                before,
+                after,
+                slice,
+                nestedBefore ? 0 : 2,
+                true)).scrollIntoView());
+        }
+        return true;
+    };
+}
+
+function toggleInlineStyle(style: string): CommandInfo {
     const styleAttr = style + ':';
     return {
         command(state, dispatch, _, params) {
@@ -3283,7 +3569,71 @@ function wrapAndExitDiv(
     }
 }
 
-function wrapOrInsertMenuItem(
+function wrapInPhrasingOrFlowList(
+    listType: NodeType,
+    phrasingItemType: NodeType,
+    attrs?: Attrs | null): CommandInfo {
+    return {
+        command: autoJoin((state, dispatch) => {
+            const { $from, $to } = state.selection;
+            let range = $from.blockRange($to), doJoin = false, outerRange = range;
+            if (!range) {
+                return false;
+            }
+            // This is an existing list of the same type
+            if (range.depth >= 1
+                && $from.node(range.depth).type.name === listType.name) {
+                if (dispatch) {
+                    return liftOutOfList(state, dispatch, range);
+                } else {
+                    return true;
+                }
+            }
+            // This is at the top of an existing list item
+            if (range.depth >= 2
+                && $from.node(range.depth - 1).type.compatibleContent(listType)
+                && range.startIndex == 0) {
+                // Don't do anything if this is the top of the list
+                if ($from.index(range.depth - 1) == 0) {
+                    return false;
+                }
+                const $insert = state.doc.resolve(range.start - 2);
+                outerRange = new NodeRange($insert, $insert, range.depth);
+                if (range.endIndex < range.parent.childCount) {
+                    range = new NodeRange($from, state.doc.resolve($to.end(range.depth)), range.depth);
+                }
+                doJoin = true;
+            }
+            if (range.$from.parent.type.name === state.schema.nodes.paragraph.name
+                && range.$from.sameParent(range.$to)
+                && (range.$from.parent.childCount === 0
+                    || (range.$from.parent.childCount === 1
+                        && range.$from.parent.firstChild!.isText))) {
+                const content = listType.createAndFill(attrs, phrasingItemType.createAndFill(null, range.$from.parent.content, range.$from.parent.marks));
+                if (content) {
+                    if (dispatch) {
+                        const start = range.$from.start() - 1;
+                        dispatch(state.tr.replaceWith(
+                            start,
+                            start + range.$from.parent.nodeSize,
+                            content).scrollIntoView());
+                    }
+                    return true;
+                }
+            }
+            const wrap = findWrapping(outerRange!, listType, attrs, range);
+            if (!wrap) {
+                return false;
+            }
+            if (dispatch) {
+                dispatch(doWrapInList(state, state.tr, range, wrap, doJoin, listType, phrasingItemType).scrollIntoView());
+            }
+            return true;
+        }, ['ordered_list', 'task_list', 'bullet_list'])
+    };
+}
+
+function wrapOrInsert(
     nodeType: NodeType,
     attrs?: Attrs | null): CommandInfo {
     return {
@@ -3304,36 +3654,41 @@ function wrapOrInsertMenuItem(
 
                 if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
                     if (range.parent.type.name == nodeType.name) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth - 1);
-                            dispatch(state.tr.replaceWith(
-                                start,
-                                start + range.parent.nodeSize,
-                                nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        const content = nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth - 1);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + range.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
                     }
 
                     if (range.parent.canReplaceWith($from.index(), $to.index(), nodeType, $from.parent.marks)) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth);
-                            dispatch(state.tr.replaceWith(
-                                start,
-                                start + $from.parent.nodeSize,
-                                nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)));
+                        const content = nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + $from.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
                     }
                 }
 
                 if ($from.pos === $to.pos
                     && $from.parent.canReplaceWith(fromIndex, toIndex, nodeType)) {
                     if (dispatch) {
-                        const start = $from.start(range.depth);
                         dispatch(state.tr.replaceWith(
                             $from.pos,
                             $to.pos,
-                            nodeType.createAndFill(attrs)).scrollIntoView());
+                            nodeType.createAndFill(attrs)!).scrollIntoView());
                     }
                     return true;
                 }
@@ -3362,7 +3717,7 @@ function wrapOrInsertMenuItem(
     };
 }
 
-function wrapOrInsertPhrasingOrFlowMenuItem(
+function wrapOrInsertInlinePhrasingOrFlow(
     phrasingNodeType: NodeType,
     flowNodeType: NodeType,
     attrs?: Attrs | null): CommandInfo {
@@ -3385,60 +3740,276 @@ function wrapOrInsertPhrasingOrFlowMenuItem(
 
                 if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
                     if (range.parent.type.name == flowNodeType.name) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth - 1);
-                            dispatch(state.tr.replaceWith(
-                                start,
-                                start + range.parent.nodeSize,
-                                phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth - 1);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + range.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
                     }
 
                     if (range.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType, $from.parent.marks)) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth);
-                            dispatch(state.tr.replaceWith(
-                                start,
-                                start + $from.parent.nodeSize,
-                                phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + $from.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
                     }
 
                     if (range.parent.canReplaceWith(fromIndex, toIndex, flowNodeType, $from.parent.marks)) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth);
-                            dispatch(state.tr.replaceWith(
-                                start,
-                                start + $from.parent.nodeSize,
-                                flowNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks)).scrollIntoView());
+                        const content = flowNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + $from.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
                     }
                 }
 
                 if ($from.pos === $to.pos) {
                     if ($from.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType)) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth);
-                            dispatch(state.tr.replaceWith(
-                                $from.pos,
-                                $to.pos,
-                                phrasingNodeType.createAndFill(attrs)).scrollIntoView());
+                        const content = phrasingNodeType.createAndFill(attrs, state.schema.text(' '));
+                        if (content) {
+                            if (dispatch) {
+                                const tr = state.tr.replaceWith(
+                                    $from.pos,
+                                    $to.pos,
+                                    content);
+                                dispatch(tr
+                                    .setSelection(TextSelection.between(tr.doc.resolve($from.pos + 1), tr.doc.resolve($from.pos + 2)))
+                                    .scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
                     }
 
                     if ($from.parent.canReplaceWith(fromIndex, toIndex, flowNodeType)) {
-                        if (dispatch) {
-                            const start = $from.start(range.depth);
-                            dispatch(state.tr.replaceWith(
-                                $from.pos,
-                                $to.pos,
-                                flowNodeType.createAndFill(attrs)).scrollIntoView());
+                        const content = flowNodeType.createAndFill(attrs);
+                        if (content) {
+                            if (dispatch) {
+                                const tr = state.tr.replaceWith(
+                                    $from.pos,
+                                    $to.pos,
+                                    content);
+                                dispatch(tr
+                                    .setSelection(Selection.near(tr.doc.resolve($from.pos + 1)))
+                                    .scrollIntoView());
+                            }
+                            return true;
                         }
-                        return true;
+                    }
+
+                    const alternate = $from.parent.type.spec.alternate
+                        ? state.schema.nodes[$from.parent.type.spec.alternate]
+                        : null;
+                    if (alternate
+                        && range.parent.canReplaceWith(fromIndex, toIndex, alternate, $from.parent.marks)) {
+                        if ($from.parent.content.size === 0) {
+                            if (alternate.contentMatch.matchType(phrasingNodeType)) {
+                                const node = alternate.createAndFill(attrs, phrasingNodeType.createAndFill(attrs, state.schema.text(' ')), $from.parent.marks);
+                                if (node) {
+                                    if (dispatch) {
+                                        const start = $from.start(range.depth);
+                                        const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node);
+                                        dispatch(tr
+                                            .setSelection(TextSelection.between(tr.doc.resolve(start + 2), tr.doc.resolve(start + 3)))
+                                            .scrollIntoView());
+                                    }
+                                    return true;
+                                }
+                            } else if (alternate.contentMatch.matchType(flowNodeType)) {
+                                const node = alternate.createAndFill(attrs, flowNodeType.createAndFill(attrs), $from.parent.marks);
+                                if (node) {
+                                    if (dispatch) {
+                                        const start = $from.start(range.depth);
+                                        const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node);
+                                        dispatch(tr
+                                            .setSelection(Selection.near(tr.doc.resolve(start + 2)))
+                                            .scrollIntoView());
+                                    }
+                                    return true;
+                                }
+                            }
+                        } else {
+                            const node = alternate.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                            if (node) {
+                                if (node.canReplaceWith(0, 0, phrasingNodeType)) {
+                                    const content = phrasingNodeType.createAndFill(attrs, state.schema.text(' '));
+                                    if (content) {
+                                        if (dispatch) {
+                                            const start = $from.start(range.depth);
+                                            const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
+                                                .replaceWith($from.pos, $to.pos, content);
+                                            dispatch(tr
+                                                .setSelection(TextSelection.between(tr.doc.resolve($from.pos + 1), tr.doc.resolve($from.pos + 2)))
+                                                .scrollIntoView());
+                                        }
+                                        return true;
+                                    }
+                                }
+
+                                if (node.canReplaceWith(0, 0, flowNodeType)) {
+                                    const content = flowNodeType.createAndFill(attrs);
+                                    if (content) {
+                                        if (dispatch) {
+                                            const start = $from.start(range.depth);
+                                            const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
+                                                .replaceWith($from.pos, $to.pos, content);
+                                            dispatch(tr
+                                                .setSelection(Selection.near(tr.doc.resolve($from.pos + 1)))
+                                                .scrollIntoView());
+                                        }
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            const phrasingWrapping = findWrapping(range, phrasingNodeType, attrs);
+            const flowWrapping = findWrapping(range, flowNodeType, attrs);
+            if (!phrasingWrapping && !flowWrapping) {
+                return false;
+            }
+
+            if (dispatch) {
+                if (phrasingWrapping) {
+                    dispatch(state.tr.wrap(range, phrasingWrapping).scrollIntoView());
+                } else {
+                    dispatch(state.tr.wrap(range, flowWrapping!).scrollIntoView());
+                }
+            }
+
+            return true;
+        },
+        isActive(state) {
+            if (state.selection instanceof NodeSelection
+                && state.selection.node) {
+                return state.selection.node.type.name == phrasingNodeType.name
+                    || state.selection.node.type.name == flowNodeType.name;
+            }
+            const { $from, to } = state.selection;
+            return to <= $from.end()
+                && ($from.parent.type.name == phrasingNodeType.name
+                    || $from.parent.type.name == flowNodeType.name);
+        }
+    };
+}
+
+function wrapOrInsertPhrasingOrFlow(
+    phrasingNodeType: NodeType,
+    flowNodeType: NodeType,
+    attrs?: Attrs | null): CommandInfo {
+    return {
+        command: (state, dispatch) => {
+            const { $from, $to } = state.selection;
+            const range = $from.blockRange($to);
+            if (!range) {
+                return false;
+            }
+
+            if ($from.sameParent($to)) {
+                if ($from.parent.type.name == phrasingNodeType.name
+                    || $from.parent.type.name == flowNodeType.name) {
+                    return true;
+                }
+
+                const fromIndex = $from.index(),
+                    toIndex = $to.index();
+
+                if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
+                    if (range.parent.type.name == flowNodeType.name) {
+                        const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth - 1);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + range.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
+                        }
+                    }
+
+                    if (range.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType, $from.parent.marks)) {
+                        const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + $from.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
+                        }
+                    }
+
+                    if (range.parent.canReplaceWith(fromIndex, toIndex, flowNodeType, $from.parent.marks)) {
+                        const content = flowNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
+                        if (content) {
+                            if (dispatch) {
+                                const start = $from.start(range.depth);
+                                dispatch(state.tr.replaceWith(
+                                    start,
+                                    start + $from.parent.nodeSize,
+                                    content).scrollIntoView());
+                            }
+                            return true;
+                        }
+                    }
+                }
+
+                if ($from.pos === $to.pos) {
+                    if ($from.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType)) {
+                        const content = phrasingNodeType.createAndFill(attrs);
+                        if (content) {
+                            if (dispatch) {
+                                const tr = state.tr.replaceWith(
+                                    $from.pos,
+                                    $to.pos,
+                                    content);
+                                dispatch(tr
+                                    .setSelection(Selection.near(tr.doc.resolve($from.pos + 1)))
+                                    .scrollIntoView());
+                            }
+                            return true;
+                        }
+                    }
+
+                    if ($from.parent.canReplaceWith(fromIndex, toIndex, flowNodeType)) {
+                        const content = flowNodeType.createAndFill(attrs);
+                        if (content) {
+                            if (dispatch) {
+                                const tr = state.tr.replaceWith(
+                                    $from.pos,
+                                    $to.pos,
+                                    content);
+                                dispatch(tr
+                                    .setSelection(Selection.near(tr.doc.resolve($from.pos + 1)))
+                                    .scrollIntoView());
+                            }
+                            return true;
+                        }
                     }
 
                     const alternate = $from.parent.type.spec.alternate
@@ -3452,7 +4023,10 @@ function wrapOrInsertPhrasingOrFlowMenuItem(
                                 if (node) {
                                     if (dispatch) {
                                         const start = $from.start(range.depth);
-                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node).scrollIntoView());
+                                        const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node);
+                                        dispatch(tr
+                                            .setSelection(Selection.near(tr.doc.resolve(start + 2)))
+                                            .scrollIntoView());
                                     }
                                     return true;
                                 }
@@ -3461,7 +4035,10 @@ function wrapOrInsertPhrasingOrFlowMenuItem(
                                 if (node) {
                                     if (dispatch) {
                                         const start = $from.start(range.depth);
-                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node).scrollIntoView());
+                                        const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node);
+                                        dispatch(tr
+                                            .setSelection(Selection.near(tr.doc.resolve(start + 2)))
+                                            .scrollIntoView());
                                     }
                                     return true;
                                 }
@@ -3470,23 +4047,33 @@ function wrapOrInsertPhrasingOrFlowMenuItem(
                             const node = alternate.createAndFill(attrs, $from.parent.content, $from.parent.marks);
                             if (node) {
                                 if (node.canReplaceWith(0, 0, phrasingNodeType)) {
-                                    if (dispatch) {
-                                        const start = $from.start(range.depth);
-                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
-                                            .replaceWith($from.pos, $to.pos, phrasingNodeType.createAndFill(attrs))
-                                            .scrollIntoView());
+                                    const content = phrasingNodeType.createAndFill(attrs);
+                                    if (content) {
+                                        if (dispatch) {
+                                            const start = $from.start(range.depth);
+                                            const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
+                                                .replaceWith($from.pos, $to.pos, content);
+                                            dispatch(tr
+                                                .setSelection(Selection.near(tr.doc.resolve($from.pos + 1)))
+                                                .scrollIntoView());
+                                        }
+                                        return true;
                                     }
-                                    return true;
                                 }
 
                                 if (node.canReplaceWith(0, 0, flowNodeType)) {
-                                    if (dispatch) {
-                                        const start = $from.start(range.depth);
-                                        dispatch(state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
-                                            .replaceWith($from.pos, $to.pos, flowNodeType.createAndFill(attrs))
-                                            .scrollIntoView());
+                                    const content = flowNodeType.createAndFill(attrs);
+                                    if (content) {
+                                        if (dispatch) {
+                                            const start = $from.start(range.depth);
+                                            const tr = state.tr.replaceWith(start, start + $from.parent.nodeSize, node)
+                                                .replaceWith($from.pos, $to.pos, content);
+                                            dispatch(tr
+                                                .setSelection(Selection.near(tr.doc.resolve($from.pos + 1)))
+                                                .scrollIntoView());
+                                        }
+                                        return true;
                                     }
-                                    return true;
                                 }
                             }
                         }

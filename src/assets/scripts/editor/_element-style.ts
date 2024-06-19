@@ -827,6 +827,14 @@ svg {
         list-style: disc;
     }
 
+    ul ul {
+        list-style: circle;
+    }
+
+    ul ul ul {
+        list-style: square;
+    }
+
     .cm-panel input[type=checkbox]:not(:checked):before {
         background-color: var(--tavenem-color-bg-input);
         content: "";
