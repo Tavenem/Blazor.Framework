@@ -13,6 +13,7 @@
     @if (TriggerContent is null && !HideButton)
     {
         <button class="@ButtonCssClass"
+                aria-haspopup="true"
                 disabled="@Disabled"
                 @onclick="OnButtonClickAsync"
                 @onclick:stopPropagation="@(!ActivationType.HasFlag(MouseEvent.LeftClick))">

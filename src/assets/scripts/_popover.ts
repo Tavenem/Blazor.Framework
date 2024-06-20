@@ -765,6 +765,7 @@ button {
             shadow.appendChild(style);
 
             const button = document.createElement('button');
+            button.ariaHasPopup = 'true';
             button.tabIndex = -1;
             button.addEventListener('click', this.toggle.bind(this));
             button.addEventListener('focusin', this.onAttentionOnButton.bind(this));

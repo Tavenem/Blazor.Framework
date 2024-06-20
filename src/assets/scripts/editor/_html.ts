@@ -6,7 +6,7 @@ import {
     htmlWrapCommand,
     ParamStateCommand,
     wrapCommand
-} from './_schemas';
+} from './_commands';
 
 export const htmlCommands: CodeCommandSet = {};
 htmlCommands[CommandType.Undo] = _ => undo;

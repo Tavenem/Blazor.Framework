@@ -30,14 +30,6 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
         return new CustomEvent('enter', { bubbles: true, composed: true });
     }
 
-    private static newStepDownEvent(value: number) {
-        return new CustomEvent('stepdown', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
-    private static newStepUpEvent(value: number) {
-        return new CustomEvent('stepup', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
     private static newValueChangeEvent(value: string) {
         return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
     }

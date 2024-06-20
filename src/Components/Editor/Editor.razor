@@ -2,73 +2,69 @@
 
 @inherits FormComponentBase<string>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
+<tf-editor @ref="ElementReference"
+           @attributes="AdditionalAttributes"
+           id="@Id"
+           class="@CssClass"
+           data-input-class="@InputCssClass"
+           data-input-style="@InputCssStyle"
+           data-label="@Label"
+           data-lock-mode="@LockEditMode"
+           data-lock-syntax="@LockSyntax"
+           data-syntax="@Syntax.ToCSS()"
+           data-update-on-input="@UpdateOnInput"
+           disabled="@Disabled"
+           name="@NameValue"
+           height="@Height"
+           max-height="@MaxHeight"
+           placeholder="@Placeholder"
+           readonly="@ReadOnly"
+           required="@Required"
+           spellcheck="@SpellcheckValue"
+           style="@CssStyle"
+           tabindex="@TabIndex"
+           value="@Value"
+           wysiwyg="@(EditorMode == EditorMode.WYSIWYG)"
+           @valueinput="OnInput"
+           @valuechange="OnChange">
     @ChildContent
-    @if (!string.IsNullOrEmpty(Label))
+    @if (CustomToolbarButtons is not null)
     {
-        <label for="@InputId">@Label</label>
-    }
-    <tf-editor @ref="ElementReference"
-               data-editor-id="@Id"
-               data-input-id="@InputId"
-               data-input-class="@InputCssClass"
-               data-input-style="@InputCssStyle"
-               data-lock-mode="@LockEditMode"
-               data-lock-syntax="@LockSyntax"
-               data-syntax="@Syntax.ToCSS()"
-               data-update-on-input="@UpdateOnInput"
-               disabled="@Disabled"
-               name="@NameValue"
-               height="@Height"
-               max-height="@MaxHeight"
-               placeholder="@Placeholder"
-               readonly="@ReadOnly"
-               required="@Required"
-               spellcheck="@SpellcheckValue"
-               tabindex="@TabIndex"
-               value="@Value"
-               wysiwyg="@(EditorMode == EditorMode.WYSIWYG)"
-               @valueinput="OnInput"
-               @valuechange="OnChange">
-        @if (CustomToolbarButtons is not null)
+        foreach (var customButton in CustomToolbarButtons)
         {
-            foreach (var customButton in CustomToolbarButtons)
-            {
-                var buttonClass = string.IsNullOrEmpty(customButton.Text)
-                    ? "btn btn-icon rounded small custom-editor-button"
-                    : "btn btn-text rounded small custom-editor-button";
-                <button id="@customButton.Id"
-                        class="@buttonClass"
-                        data-mode="@customButton.EditMode"
-                        @onclick="@(_ => OnCustomButtonAsync(customButton))">
-                    @if (!string.IsNullOrEmpty(customButton.Icon))
-                    {
-                        <tf-icon>@customButton.Icon</tf-icon>
-                    }
-                    @if (!string.IsNullOrEmpty(customButton.Text))
-                    {
-                        var spanClass = string.IsNullOrEmpty(customButton.Icon)
-                            ? null
-                            : "ms-1";
-                        <span class="@spanClass">@customButton.Text</span>
-                    }
-                    @if (!string.IsNullOrEmpty(customButton.Tooltip))
-                    {
-                        <Tooltip>@customButton.Tooltip</Tooltip>
-                    }
-                </button>
-            }
+            var buttonClass = string.IsNullOrEmpty(customButton.Text)
+                ? "btn btn-icon rounded small custom-editor-button"
+                : "btn btn-text rounded small custom-editor-button";
+            <button id="@customButton.Id"
+                    class="@buttonClass"
+                    data-mode="@customButton.EditMode"
+                    slot="buttons"
+                    @onclick="@(_ => OnCustomButtonAsync(customButton))">
+                @if (!string.IsNullOrEmpty(customButton.Icon))
+                {
+                    <tf-icon>@customButton.Icon</tf-icon>
+                }
+                @if (!string.IsNullOrEmpty(customButton.Text))
+                {
+                    var spanClass = string.IsNullOrEmpty(customButton.Icon)
+                        ? null
+                        : "ms-1";
+                    <span class="@spanClass">@customButton.Text</span>
+                }
+                @if (!string.IsNullOrEmpty(customButton.Tooltip))
+                {
+                    <Tooltip>@customButton.Tooltip</Tooltip>
+                }
+            </button>
         }
-    </tf-editor>
+    }
     @if (!ReadOnly && IsInvalidAndTouched)
     {
-        <div class="field-helpers">
-            <ul class="mr-auto mb-0 pl-0">
-                @foreach (var message in GetValidationMessages())
-                {
-                    <li>@message</li>
-                }
-            </ul>
-        </div>
+        <ul slot="helpers" class="mr-auto mb-0 pl-0">
+            @foreach (var message in GetValidationMessages())
+            {
+                <li>@message</li>
+            }
+        </ul>
     }
-</div>
+</tf-editor>

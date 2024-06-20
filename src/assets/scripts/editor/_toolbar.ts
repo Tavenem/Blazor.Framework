@@ -1,4 +1,4 @@
-import { CommandType } from "./_schemas";
+import { CommandType } from "./_commands";
 import { syntaxLabelMap, syntaxes } from "./_syntax";
 
 export enum ToolbarControlStyle {

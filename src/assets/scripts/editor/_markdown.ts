@@ -20,15 +20,14 @@ import {
     Fragment,
     NodeType
 } from 'prosemirror-model';
+import { renderer, schema } from './_schema';
 import {
     CodeCommandSet,
     CommandType,
     htmlWrapCommand,
-    schema,
     ParamStateCommand,
     wrapCommand,
-    renderer
-} from './_schemas';
+} from './_commands';
 
 declare class TextNode extends ProsemirrorNode {
     /**

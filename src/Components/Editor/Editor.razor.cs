@@ -130,16 +130,6 @@ public partial class Editor : FormComponentBase<string>, IAsyncDisposable
     /// </summary>
     [Parameter] public bool UpdateOnInput { get; set; }
 
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("editor-field")
-        .ToString();
-
-    /// <summary>
-    /// The HTML <c>id</c> value for the <c>input</c> element.
-    /// </summary>
-    protected string InputId { get; } = Guid.NewGuid().ToHtmlId();
-
     [Inject, NotNull] private IJSRuntime? JSRuntime { get; set; }
 
     private string? SpellcheckValue

@@ -18,8 +18,87 @@ pre, code, kbd, samp {
 }
 
 :host {
+    --field-active-border-color: var(--tavenem-color-primary);
+    --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
+    --field-active-label-color: var(--tavenem-color-primary);
+    --field-border-color: var(--tavenem-color-border-input);
+    --field-border-hover-color: var(--tavenem-color-action);
+    --field-color: var(--tavenem-color-text);
+    --field-label-color: var(--tavenem-color-text-secondary);
+    border: 0;
+    color: var(--tavenem-color-text);
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
+    margin: 0;
+    margin-bottom: .5rem;
+    margin-top: 1rem;
+    max-width: 100%;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+:host > label {
+    color: var(--field-label-color);
+    display: block;
+    font-size: .75rem;
+    font-weight: var(--tavenem-font-weight);
+    line-height: 1;
+    padding: 0;
+    pointer-events: auto;
+    position: initial;
+    transform: none;
+    transition: color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    z-index: auto;
+}
+
+:host([required]) > label:after {
+    color: var(--tavenem-color-error);
+    content: " *";
+}
+
+:host(:focus-within:not([readonly], [disabled])) {
+    --field-border-color: var(--field-active-border-color);
+    --field-border-hover-color: var(--field-active-border-hover-color);
+    --field-label-color: var(--field-active-label-color);
+}
+
+:host(.primary:not(:invalid:state(touched)),
+    .secondary:not(:invalid:state(touched)),
+    .tertiary:not(:invalid:state(touched)),
+    .danger:not(:invalid:state(touched)),
+    .dark:not(:invalid:state(touched)),
+    .default:not(:invalid:state(touched)),
+    .info:not(:invalid:state(touched)),
+    .success:not(:invalid:state(touched)),
+    .warning:not(:invalid:state(touched))) {
+    --field-active-border-color: var(--tavenem-theme-color);
+    --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
+    --field-active-label-color: var(--tavenem-theme-color);
+}
+
+:host(:invalid:state(touched)) {
+    --field-active-border-color: var(--tavenem-color-error);
+    --field-active-border-hover-color: var(--tavenem-color-error);
+    --field-active-label-color: var(--tavenem-color-error);
+    --field-border-color: var(--tavenem-color-error);
+    --field-border-hover-color: var(--tavenem-color-error);
+    --field-color: var(--tavenem-color-error);
+    --field-label-color: var(--tavenem-color-error);
+}
+
+:host(.bg-alt,
+    .primary.filled,
+    .secondary.filled,
+    .tertiary.filled,
+    .danger.filled,
+    .dark.filled,
+    .default.filled,
+    .info.filled,
+    .success.filled,
+    .warning.filled) {
+    background-color: transparent !important;
 }
 
 hr {
@@ -1011,5 +1090,34 @@ svg {
 :host(:not([wysiwyg])) .editor-statusbar,
 :host(:not([data-syntax="html"], [data-syntax="markdown"])) .editor-statusbar {
     display: none;
+}
+
+.field-helpers {
+    color: var(--field-label-color);
+    display: contents;
+    font-size: 0.75rem;
+    font-weight: var(--tavenem-font-weight);
+    line-height: 1.66;
+    overflow: hidden;
+    text-align: start;
+
+    > * {
+        margin-top: 3px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+.validation-messages {
+    display: none;
+    list-style: none;
+    margin-right: auto;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-left: 0;
+}
+
+:host(:state(touched)) .validation-messages {
+    display: initial;
 }
 `;

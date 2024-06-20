@@ -534,3 +534,7 @@ tf-datetime-input:has(label) {
 tf-select[data-search-filter] .search-nonmatch {
     display: none;
 }
+
+tf-editor .custom-editor-button.hidden {
+    display: none;
+}

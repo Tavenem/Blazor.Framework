@@ -5,7 +5,6 @@ import { redo as codeRedo, undo as codeUndo } from '@codemirror/commands';
 
 import {
     Command,
-    NodeSelection,
     EditorState as PMEditorState,
     Plugin,
     Selection,
@@ -37,16 +36,22 @@ import {
     mathSerializer
 } from "@benrbray/prosemirror-math";
 
+import { randomUUID } from './tavenem-utility'
+import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from './_popover';
+import { TavenemInputHtmlElement } from './_input';
+import { TavenemColorInputHtmlElement } from './_color-input';
+import { TavenemEmojiHTMLElement } from './_emoji';
+import { Dialog, initialize as initializeDialog } from './tavenem-dialog';
+import { ThemePreference, getPreferredTavenemColorScheme } from './_theme';
+import { renderer, schema } from './editor/_schema';
 import {
     CommandSet,
     CommandType,
     commonCommands,
-    schema,
     ParamStateCommand,
     exitDiv,
-    renderer,
     exitBlock,
-} from './editor/_schemas';
+} from './editor/_commands';
 import { elementStyle } from './editor/_element-style';
 import { htmlCommands } from './editor/_html';
 import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from './editor/_markdown';
@@ -57,15 +62,21 @@ import {
     codeEditorLightTheme,
 } from './editor/_themes';
 import { toolbarButtonDefinitions, ToolbarControl, ToolbarControlDefinition, ToolbarControlStyle } from './editor/_toolbar';
-import { randomUUID } from './tavenem-utility'
-import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from './_popover';
-import { TavenemInputHtmlElement } from './_input';
-import { TavenemColorInputHtmlElement } from './_color-input';
-import { TavenemEmojiHTMLElement } from './_emoji';
-import { Dialog, initialize as initializeDialog } from './tavenem-dialog';
 import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from './editor/_code-editing';
+import {
+    CheckboxView,
+    DetailsView,
+    DisabledInputView,
+    ForbiddenView,
+    FormView,
+    HeadView,
+    InputView,
+    RadioView,
+    ResetInputView,
+    SelectView,
+    TextAreaView,
+} from './editor/_views';
 import { CodeBlockView } from './editor/_code-block-view';
-import { ThemePreference, getPreferredTavenemColorScheme } from './_theme';
 import { TavenemCheckboxHtmlElement } from './_checkbox';
 import { TavenemInputFieldHtmlElement } from './_input-field';
 import { TavenemSelectInputHtmlElement } from './_select';
@@ -310,644 +321,6 @@ class MenuView {
             name += ' ' + node.attrs.level;
         }
         return name;
-    }
-}
-
-class HeadView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type != this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const head = document.createElement('head');
-        head.appendChild(renderer.serializeFragment(node.content));
-        const value = html_beautify(head.innerHTML, {
-            extra_liners: [],
-            indent_size: 2,
-            wrap_line_length: 0,
-        });
-        const dom = document.createElement('head');
-        dom.appendChild(document.createComment(value));
-        return dom;
-    }
-}
-
-class CheckboxView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    destroy() {
-        if (this.dom) {
-            this.dom.removeEventListener('change', this.onChange.bind(this));
-            this.dom.removeEventListener('input', this.onChange.bind(this));
-        }
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = document.createElement('input');
-        for (const a of Object.keys(node.attrs)) {
-            if (FormView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        element.type = 'checkbox';
-        if (element.hasAttribute('indeterminate')) {
-            element.indeterminate = true;
-        }
-        element.addEventListener('change', this.onChange.bind(this));
-        element.addEventListener('input', this.onChange.bind(this));
-        return element;
-    }
-
-    private onChange(event: Event) {
-        event.stopPropagation();
-
-        if (!(this.dom instanceof HTMLInputElement)) {
-            return;
-        }
-        if (this.dom.checked) {
-            this.dom.setAttribute('checked', '');
-        } else {
-            this.dom.removeAttribute('checked');
-        }
-        const pos = this.getPos();
-        if (pos != null) {
-            this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                pos,
-                undefined,
-                {
-                    ...this.node.attrs,
-                    checked: this.dom.checked,
-                }));
-        }
-    }
-}
-
-class DetailsView implements NodeView {
-    dom: HTMLDetailsElement;
-    contentDOM: HTMLDetailsElement;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.contentDOM = document.createElement('details');
-        if (node.attrs['open']) {
-            this.dom.open = true;
-        }
-
-        this.dom.addEventListener('click', this.onClick.bind(this));
-    }
-
-    destroy() {
-        this.dom.removeEventListener('click', this.onClick.bind(this));
-    }
-
-    update(node: ProsemirrorNode) {
-        if (node.type.name === 'details') {
-            this.dom.open = !!node.attrs.open;
-            return true;
-        }
-        return false;
-    }
-
-    private onClick(event: MouseEvent) {
-        if (event.button === 0
-            && (event.target instanceof HTMLDetailsElement
-            || (event.target instanceof HTMLElement
-                && event.target.closest('summary')))) {
-            const pos = this.getPos();
-            if (pos != null) {
-                this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                    pos,
-                    undefined,
-                    {
-                        ...this.node.attrs,
-                        open: !this.node.attrs.open,
-                    }));
-            }
-        }
-    }
-}
-
-class DisabledInputView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = document.createElement('input');
-        for (const a of Object.keys(node.attrs)) {
-            if (FormView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        element.setAttribute('disabled', '');
-        return element;
-    }
-}
-
-class ForbiddenView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const div = document.createElement('div');
-        div.appendChild(renderer.serializeNode(node));
-        const value = html_beautify(div.innerHTML, {
-            extra_liners: [],
-            indent_size: 2,
-            wrap_line_length: 0,
-        });
-        const dom = document.createElement('div');
-        dom.appendChild(document.createComment(value));
-        return dom;
-    }
-}
-
-class FormView implements NodeView {
-    dom: Node;
-    contentDom?: HTMLElement;
-
-    static ForbiddenAttributes = [
-        'action',
-        'capture',
-        'form',
-        'formaction',
-        'formenctype',
-        'formmethod',
-        'formnovalidate',
-        'formtarget',
-        'name',
-        'popovertarget',
-        'popovertargetaction',
-        'required',
-        'target',
-    ];
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
-        return true;
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = node.type.spec.parseDOM && node.type.spec.parseDOM.length
-            ? document.createElement(node.type.spec.parseDOM[0].tag)
-            : document.createElement('div');
-        for (const a of Object.keys(node.attrs)) {
-            if (FormView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                && (typeof node.attrs[a] !== 'number'
-                    || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        element.setAttribute('disabled', '');
-        return element;
-    }
-}
-
-class InputView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    destroy() {
-        if (this.dom) {
-            this.dom.removeEventListener('change', this.onChange.bind(this));
-            this.dom.removeEventListener('input', this.onChange.bind(this));
-        }
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = document.createElement('input');
-        for (const a of Object.keys(node.attrs)) {
-            if (FormView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        element.addEventListener('change', this.onChange.bind(this));
-        element.addEventListener('input', this.onChange.bind(this));
-        return element;
-    }
-
-    private onChange(event: Event) {
-        event.stopPropagation();
-
-        if (!(this.dom instanceof HTMLInputElement)
-            || !(event.target instanceof HTMLInputElement)) {
-            return;
-        }
-        this.dom.setAttribute('value', event.target.value);
-        const pos = this.getPos();
-        if (pos != null) {
-            this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                pos,
-                undefined,
-                {
-                    ...this.node.attrs,
-                    value: event.target.value,
-                }));
-        }
-    }
-}
-
-class RadioView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    destroy() {
-        if (this.dom) {
-            this.dom.removeEventListener('change', this.onChange.bind(this));
-            this.dom.removeEventListener('input', this.onChange.bind(this));
-        }
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = document.createElement('input');
-        for (const a of Object.keys(node.attrs)) {
-            if (FormView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        element.type = 'radio';
-        element.addEventListener('change', this.onChange.bind(this));
-        element.addEventListener('input', this.onChange.bind(this));
-        return element;
-    }
-
-    private onChange(event: Event) {
-        event.stopPropagation();
-
-        if (!(this.dom instanceof HTMLInputElement)) {
-            return;
-        }
-        if (this.dom.checked) {
-            this.dom.setAttribute('checked', '');
-        } else {
-            this.dom.removeAttribute('checked');
-        }
-        const pos = this.getPos();
-        if (pos != null) {
-            this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                pos,
-                undefined,
-                {
-                    ...this.node.attrs,
-                    checked: this.dom.checked,
-                }));
-        }
-    }
-}
-
-class ResetInputView implements NodeView {
-    dom: Node;
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    destroy() {
-        if (this.dom) {
-            this.dom.removeEventListener('click', this.onClick.bind(this));
-        }
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = document.createElement('input');
-        for (const a of Object.keys(node.attrs)) {
-            if (FormView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        // replace with normal button to prevent the automatic reset behavior from affecting any containing form
-        element.type = 'button';
-        if (!element.value.length) {
-            element.value = 'Reset';
-        }
-        element.addEventListener('click', this.onClick.bind(this));
-        return element;
-    }
-
-    private onClick(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
-}
-
-class SelectView implements NodeView {
-    dom: Node;
-
-    static ForbiddenAttributes = [
-        'form',
-        'name',
-        'required',
-    ];
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        return true;
-    }
-
-    destroy() {
-        if (this.dom) {
-            this.dom.removeEventListener('change', this.onChange.bind(this));
-            this.dom.removeEventListener('input', this.onChange.bind(this));
-        }
-    }
-
-    private addChildren(node: ProsemirrorNode, element: HTMLElement) {
-        node.forEach(child => {
-            const childElement = child.type.name === 'horizontal_rule'
-                ? document.createElement('hr')
-                : document.createElement(child.type.name);
-            for (const a of Object.keys(child.attrs)) {
-                if (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0)) {
-                    continue;
-                }
-                childElement.setAttribute(a, node.attrs[a]);
-            }
-            element.appendChild(childElement);
-
-            this.addChildren(child, childElement);
-        });
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = document.createElement('select');
-        for (const a of Object.keys(node.attrs)) {
-            if (SelectView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                    && (typeof node.attrs[a] !== 'number'
-                        || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-
-        this.addChildren(node, element);
-
-        element.addEventListener('change', this.onChange.bind(this));
-        element.addEventListener('input', this.onChange.bind(this));
-
-        return element;
-    }
-
-    private onChange(event: Event) {
-        event.stopPropagation();
-
-        if (!(this.dom instanceof HTMLSelectElement)
-            || !(event.target instanceof HTMLSelectElement)) {
-            return;
-        }
-        this.dom
-            .querySelectorAll('[selected]')
-            .forEach(x => {
-                x.removeAttribute('selected');
-            });
-        if (event.target.value) {
-            for (const option of this.dom.querySelectorAll('option')) {
-                if (option.value == event.target.value) {
-                    option.setAttribute('selected', '');
-                    break;
-                }
-            }
-        }
-        const pos = this.getPos();
-        if (pos) {
-            this.setSelected(this.node, pos, event.target.value);
-        }
-    }
-
-    private setSelected(node: ProsemirrorNode, pos: number, value: string) {
-        node.forEach((child, offset) => {
-            if (child.type.name === 'option') {
-                if (value && child.attrs.value === value) {
-                    this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                        pos + offset,
-                        undefined,
-                        {
-                            ...child.attrs,
-                            selected: true,
-                        }));
-                    return true;
-                } else if (child.attrs.selected) {
-                    this.view.dispatch(this.view.state.tr.setNodeMarkup(
-                        pos + offset,
-                        undefined,
-                        {
-                            ...child.attrs,
-                            selected: false,
-                        }));
-                }
-                return false;
-            }
-            if (this.setSelected(child, pos + offset, value)) {
-                return true;
-            }
-        });
-        return false;
-    }
-}
-
-class TextAreaView implements NodeView {
-    dom: Node;
-    contentDom?: HTMLElement;
-
-    static ForbiddenAttributes = [
-        'form',
-        'name',
-        'required',
-    ];
-
-    constructor(
-        public node: ProsemirrorNode,
-        public view: PMEditorView,
-        public getPos: () => number | undefined) {
-        this.dom = this.createContent(node);
-        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
-    }
-
-    stopEvent() { return true; }
-
-    update(node: ProsemirrorNode) {
-        if (node.type !== this.node.type) {
-            return false;
-        }
-        this.dom = this.createContent(node);
-        this.contentDom = this.dom instanceof HTMLElement ? this.dom : undefined;
-        return true;
-    }
-
-    private createContent(node: ProsemirrorNode) {
-        const element = node.type.spec.parseDOM && node.type.spec.parseDOM.length
-            ? document.createElement(node.type.spec.parseDOM[0].tag)
-            : document.createElement('div');
-        for (const a of Object.keys(node.attrs)) {
-            if (TextAreaView.ForbiddenAttributes.includes(a)
-                || (!node.attrs[a]
-                && (typeof node.attrs[a] !== 'number'
-                    || node.attrs[a] !== 0))) {
-                continue;
-            }
-            element.setAttribute(a, node.attrs[a]);
-        }
-        return element;
     }
 }
 
@@ -1255,22 +628,27 @@ const fonts = [
 ];
 
 export class TavenemEditorHtmlElement extends HTMLElement {
+    static formAssociated = true;
+
     _tavenemCodeEditor: TavenemCodeEditor = new TavenemCodeEditor();
     _tavenemWysiwygEditor: TavenemWysiwygEditor = new TavenemWysiwygEditor();
 
     private _audioDialog?: HTMLDialogElement;
     private _fontSizeDialog?: HTMLDialogElement;
     private _imageDialog?: HTMLDialogElement;
+    private _initialValue: string | null | undefined;
+    private _internals: ElementInternals;
     private _lineHeightDialog?: HTMLDialogElement;
     private _linkDialog?: HTMLDialogElement;
     private _settingMode = false;
+    private _themeObserver: MutationObserver;
     private _toolbarButtons: ToolbarControl[] = [];
+    private _value = '';
     private _videoDialog?: HTMLDialogElement;
 
     static get observedAttributes() {
         return [
             'data-syntax',
-            'disabled',
             'readonly',
             'required',
             'value',
@@ -1286,31 +664,34 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         return new CustomEvent('valueinput', { bubbles: true, composed: true, detail: { value: value } });
     }
 
-    get value() {
-        return this.getAttribute('value') || '';
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
     }
 
-    set value(value: string) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector('textarea');
-        if (!value || !value.length) {
-            this.removeAttribute('value');
-            if (input
-                && input instanceof HTMLTextAreaElement) {
-                input.value = '';
-                this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(input.value));
-            }
-        } else {
-            this.setAttribute('value', value);
-            if (input
-                && input instanceof HTMLTextAreaElement) {
-                input.value = value;
-                this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(input.value));
-            }
-        }
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
+        this._themeObserver = new MutationObserver(this.themeChange.bind(this));
     }
 
     connectedCallback() {
@@ -1321,13 +702,14 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         shadow.appendChild(style);
 
         const input = document.createElement('textarea');
-        if ('inputId' in this.dataset && this.dataset.inputId) {
-            input.id = this.dataset.inputId;
-        }
+        const inputId = randomUUID();
+        input.id = inputId;
         input.disabled = this.hasAttribute('disabled');
         input.hidden = true;
         if (this.hasAttribute('name')) {
             input.name = this.getAttribute('name') || '';
+            this._value = this.getAttribute('value') || '';
+            this._initialValue = this._value;
         }
         input.required = this.hasAttribute('required');
         if (this.hasAttribute('value')) {
@@ -1335,8 +717,18 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
         shadow.appendChild(input);
 
+        if ('label' in this.dataset
+            && this.dataset.label
+            && this.dataset.label.length) {
+            const label = document.createElement('label');
+            label.htmlFor = inputId;
+            label.textContent = this.dataset.label;
+            shadow.appendChild(label);
+        }
+
         const toolbar = document.createElement('div');
         toolbar.classList.add('editor-toolbar');
+        toolbar.role = 'menubar';
         shadow.appendChild(toolbar);
 
         const font = toolbarButtonDefinitions
@@ -1361,15 +753,27 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
         editor.spellcheck = this.spellcheck;
         editor.tabIndex = this.tabIndex;
-        if ('editorId' in this.dataset && this.dataset.editorId) {
-            editor.id = this.dataset.editorId;
-        }
         shadow.appendChild(editor);
 
         const statusBar = document.createElement('small');
         statusBar.classList.add('editor-statusbar');
         statusBar.innerHTML = '&nbsp;';
         shadow.appendChild(statusBar);
+
+        const helpers = document.createElement('div');
+        helpers.classList.add('field-helpers');
+        shadow.appendChild(helpers);
+
+        const validationList = document.createElement('ul');
+        validationList.classList.add('validation-messages');
+        helpers.appendChild(validationList);
+
+        const helperSlot = document.createElement('slot');
+        helperSlot.name = 'helpers';
+        helpers.appendChild(helperSlot);
+
+        const slot = document.createElement('slot');
+        shadow.appendChild(slot);
 
         this.refreshState(toolbar);
 
@@ -1385,7 +789,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             readOnly: this.hasAttribute('readonly'),
             syntax,
             updateOnInput: 'updateOnInput' in this.dataset,
-            initialValue: this.getAttribute('value') || undefined,
+            initialValue: this._value.length ? this._value : undefined,
             placeholder: this.getAttribute('placeholder') || undefined,
         };
         if (isWysiwyg) {
@@ -1395,6 +799,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
 
         this.addEventListener('click', this.dismissTooltips.bind(this));
+
+        this._themeObserver.observe(document.documentElement, { attributes: true });
     }
 
     disconnectedCallback() {
@@ -1426,8 +832,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             return;
         }
 
-        if (name === 'disabled'
-            || name === 'readonly') {
+        if (name === 'readonly') {
             const root = this.shadowRoot;
             if (!root) {
                 return;
@@ -1436,18 +841,19 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             if (!input) {
                 return;
             }
-            if (name === 'disabled') {
-                input.disabled = !!newValue;
-            } else if (name === 'readonly') {
-                input.readOnly = !!newValue;
+            const wasReadonly = input.readOnly;
+            if (name === 'readonly') {
+                input.readOnly = !!newValue || this.matches(':disabled');
             }
-            this.update({});
-            if (this._tavenemWysiwygEditor._editor) {
-                this._tavenemWysiwygEditor._editor.view.setProps({ editable: () => !input.readOnly });
-            } else if (this._tavenemCodeEditor._editor) {
-                this._tavenemCodeEditor._editor.view.dispatch({
-                    effects: this._tavenemCodeEditor._editor.readOnly.reconfigure(EditorState.readOnly.of(input.readOnly)),
-                });
+            if (input.readOnly != wasReadonly) {
+                this.update({});
+                if (this._tavenemWysiwygEditor._editor) {
+                    this._tavenemWysiwygEditor._editor.view.setProps({ editable: () => !input.readOnly });
+                } else if (this._tavenemCodeEditor._editor) {
+                    this._tavenemCodeEditor._editor.view.dispatch({
+                        effects: this._tavenemCodeEditor._editor.readOnly.reconfigure(EditorState.readOnly.of(input.readOnly)),
+                    });
+                }
             }
         } else if (name === 'required') {
             const root = this.shadowRoot;
@@ -1458,7 +864,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             if (input) {
                 input.required = !!newValue;
             }
-        } else if (name === 'value') {
+            this.setValidity();
+        } else if (name === 'value' && newValue) {
             this.setValue(newValue);
         } else if (name === 'data-syntax') {
             if (newValue && syntaxes.includes(newValue as any)) {
@@ -1470,6 +877,35 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
         }
     }
+
+    formDisabledCallback(disabled: boolean) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const input = root.querySelector('textarea');
+        if (!input) {
+            return;
+        }
+        const wasReadonly = input.readOnly;
+        input.readOnly = disabled || this.hasAttribute('readonly');
+        if (input.readOnly == wasReadonly) {
+            return;
+        }
+        this.update({});
+        if (this._tavenemWysiwygEditor._editor) {
+            this._tavenemWysiwygEditor._editor.view.setProps({ editable: () => !input.readOnly });
+        } else if (this._tavenemCodeEditor._editor) {
+            this._tavenemCodeEditor._editor.view.dispatch({
+                effects: this._tavenemCodeEditor._editor.readOnly.reconfigure(EditorState.readOnly.of(input.readOnly)),
+            });
+        }
+    }
+
+    formResetCallback() { this.reset(); }
+
+    checkValidity() { return this._internals.checkValidity(); }
 
     dismissTooltips() {
         if (this.shadowRoot) {
@@ -1503,13 +939,22 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     }
 
     onChange(value?: string | null) {
+        this._internals.states.add('touched');
         this.assignValue(value);
         this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(value || ''));
     }
 
     onInput(value?: string | null) {
+        this._internals.states.add('touched');
         this.assignValue(value);
         this.dispatchEvent(TavenemEditorHtmlElement.newValueInputEvent(value || ''));
+    }
+
+    reportValidity() { return this._internals.reportValidity(); }
+
+    reset() {
+        this.setValue(this._initialValue);
+        this._internals.states.delete('touched');
     }
 
     setValue(value?: string | null) {
@@ -1549,6 +994,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 }
             });
         }
+
+        this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(this._value));
     }
 
     update(data: UpdateInfo) {
@@ -1664,22 +1111,31 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     }
 
     private assignValue(value?: string | null) {
-        if (!value || !value.length) {
-            this.removeAttribute('value');
-        } else {
-            this.setAttribute('value', value);
+        if (value == null) {
+            if (this._value == null) {
+                return;
+            }
+        } else if (this._value === value) {
+            return;
         }
+
+        this._value = value || '';
+
+        if (this._value.length) {
+            this._internals.setFormValue(this._value);
+        } else {
+            this._internals.setFormValue(null);
+        }
+
+        this.setValidity();
 
         const root = this.shadowRoot;
-        if (!root) {
-            return;
+        if (root) {
+            const input = root.querySelector('textarea');
+            if (input) {
+                input.value = value || '';
+            }
         }
-
-        const input = root.querySelector('textarea');
-        if (!input) {
-            return;
-        }
-        input.value = value || '';
     }
 
     private getAudioDialog() {
@@ -2920,7 +2376,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
     private applyToolbarButtonDefinition(
         button: HTMLButtonElement,
-        tooltipControl: HTMLElement,
         definition: ToolbarControlDefinition,
         disabledOrReadonly: boolean,
         toolbarButton: ToolbarControl) {
@@ -2959,9 +2414,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         disabledOrReadonly: boolean,
         controls: HTMLElement[]) {
         const emojiInput = document.createElement('tf-emoji-input');
+        emojiInput.role = 'menuitem';
         emojiInput.classList.add('field', 'no-label');
         emojiInput.dataset.inputClass = 'rounded small';
         emojiInput.dataset.popoverContainer = '';
+        emojiInput.tabIndex = -1;
         if (disabledOrReadonly) {
             emojiInput.setAttribute('disabled', '');
         }
@@ -2989,6 +2446,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         controls: HTMLElement[]): { controls?: HTMLElement[], toolbarButton?: ToolbarControl } {
         const colorInput = document.createElement('tf-color-input');
         colorInput.classList.add('field', 'no-label', 'clearable');
+        colorInput.role = 'menuitem';
+        colorInput.tabIndex = -1;
         if (definition.icon) {
             colorInput.dataset.icon = new Option(definition.icon).innerHTML;
         }
@@ -3035,6 +2494,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         if (definition.style === ToolbarControlStyle.Separator) {
             const separator = document.createElement('div');
             separator.classList.add('vr');
+            separator.role = 'separator';
             return {
                 controls: [separator],
             };
@@ -3046,6 +2506,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         if (definition.separatorBefore) {
             const separator = document.createElement('div');
             separator.classList.add('vr');
+            separator.role = 'separator';
             controls.push(separator);
         }
 
@@ -3060,9 +2521,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         if (definition.style === ToolbarControlStyle.Button) {
             let button = document.createElement('button');
             button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+            button.role = 'menuitem';
+            button.tabIndex = -1;
 
             const toolbarButton = new ToolbarControl(button, definition);
-            this.applyToolbarButtonDefinition(button, button, definition, disabledOrReadonly, toolbarButton);
+            this.applyToolbarButtonDefinition(button, definition, disabledOrReadonly, toolbarButton);
 
             controls.push(button);
             toolbarButtons.push(toolbarButton);
@@ -3092,6 +2555,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         child: boolean): { controls?: HTMLElement[], toolbarButtons?: ToolbarControl[] } {
         let button = document.createElement('button');
         button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+        button.role = 'menuitem';
+        button.ariaHasPopup = 'menu';
+        button.tabIndex = -1;
 
         let control: HTMLElement;
 
@@ -3126,6 +2592,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         const list = document.createElement('div');
         list.classList.add('list');
         dropdownPopover.appendChild(list);
+        list.addEventListener('keydown', this.onDropdownKeyDown.bind(this, list));
 
         if (definition.style === ToolbarControlStyle.ButtonGroup) {
             if (disabled) {
@@ -3148,6 +2615,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
             button = document.createElement('button');
             button.classList.add('btn', 'btn-icon', 'rounded', 'small');
+            button.role = 'menuitem';
+            button.tabIndex = -1;
             control.appendChild(button);
 
             dropdown.style.minWidth = '0';
@@ -3179,6 +2648,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 }
             } else {
                 const span = document.createElement('span');
+                span.tabIndex = -1;
+                span.role = 'menuitem';
                 if (childDefinition.icon) {
                     const childIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     span.appendChild(childIcon);
@@ -3202,7 +2673,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         control.id = randomUUID();
         dropdownPopover.dataset.anchorId = control.id;
 
-        this.applyToolbarButtonDefinition(button, control, definition, disabledOrReadonly, toolbarButton);
+        this.applyToolbarButtonDefinition(button, definition, disabledOrReadonly, toolbarButton);
 
         controls.push(control);
 
@@ -3210,6 +2681,10 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             controls,
             toolbarButtons,
         };
+    }
+
+    private onDropdownKeyDown(list: HTMLDivElement, event: KeyboardEvent) {
+
     }
 
     private refreshState(toolbar?: Element | null) {
@@ -3344,6 +2819,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
 
         const slot = document.createElement('slot');
+        slot.name = 'buttons';
         innerToolbar.appendChild(slot);
 
         if (isWysiwygAvailable
@@ -3363,9 +2839,14 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             showAll.appendChild(showAllTooltip);
         }
 
+        const firstElement = innerToolbar.querySelector<HTMLElement>('[tabIndex]');
+        if (firstElement) {
+            firstElement.tabIndex = 0;
+        }
+
         toolbar.replaceChildren(...nodes);
 
-        const buttons = root.querySelectorAll<HTMLButtonElement>('.custom-editor-button');
+        const buttons = this.querySelectorAll<HTMLButtonElement>('.custom-editor-button');
         for (const button of buttons) {
             if ('mode' in button.dataset
                 && button.dataset.mode
@@ -3377,6 +2858,57 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 }
             }
         }
+    }
+
+    private setValidity() {
+        const flags: ValidityStateFlags = {};
+        const messages: string[] = [];
+
+        if (!this._value || !this._value.length) {
+            if (this.hasAttribute('required')) {
+                flags.valueMissing = true;
+                messages.push('value required');
+            }
+        }
+
+        const root = this.shadowRoot;
+        if (Object.keys(flags).length > 0) {
+            this._internals.setValidity(
+                flags,
+                messages.join('; '),
+                root?.querySelector('.editor') || undefined);
+        } else {
+            this._internals.setValidity({});
+        }
+
+        if (!root) {
+            return;
+        }
+        const validationList = root.querySelector('.validation-messages');
+        if (validationList) {
+            validationList.replaceChildren(...messages.map(m => {
+                const li = document.createElement('li');
+                li.textContent = m;
+                return li;
+            }));
+        }
+    }
+
+    private themeChange(mutations: MutationRecord[]) {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes'
+                && mutation.target instanceof HTMLElement) {
+                const theme = mutation.target.dataset.theme;
+                if (theme) {
+                    const effect = codeEditorThemeCompartment.reconfigure(theme === 'dark'
+                        ? codeEditorDarkExtension
+                        : codeEditorLightTheme);
+                    if (this._tavenemCodeEditor._editor) {
+                        this._tavenemCodeEditor._editor.view.dispatch({ effects: effect });
+                    }
+                }
+            }
+        }, this);
     }
 }
 
@@ -3597,23 +3129,3 @@ function isEmpty(node: ProsemirrorNode) {
     }
     return true;
 }
-
-const themeObserver = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        if (mutation.type === 'attributes'
-            && mutation.target instanceof HTMLElement) {
-            const theme = mutation.target.dataset.theme;
-            if (theme) {
-                const effect = codeEditorThemeCompartment.reconfigure(theme === 'dark'
-                    ? codeEditorDarkExtension
-                    : codeEditorLightTheme);
-                for (const editor of document.querySelectorAll<TavenemEditorHtmlElement>('tf-editor')) {
-                    if (editor._tavenemCodeEditor._editor) {
-                        editor._tavenemCodeEditor._editor.view.dispatch({ effects: effect });
-                    }
-                }
-            }
-        }
-    });
-});
-themeObserver.observe(document.documentElement, { attributes: true });
