@@ -604,11 +604,11 @@ input::placeholder {
     display: initial;
 }
 
-slot([name="helpers"])::slotted(.onfocus) {
+slot[name="helpers"]::slotted(.onfocus) {
     display: none;
 }
 
-:host(:focus-within) slot([name="helpers"])::slotted(.onfocus) {
+:host(:focus-within) slot[name="helpers"]::slotted(.onfocus) {
     display: initial;
 }
 

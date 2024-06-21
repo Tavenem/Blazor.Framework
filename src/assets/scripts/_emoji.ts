@@ -417,6 +417,12 @@ button {
     }
 }
 
+:host(.small) > button,
+button.small {
+    font-size: 1.25rem;
+    padding: 5px;
+}
+
 button::-moz-focus-inner {
     border-style: none;
 }
@@ -459,7 +465,7 @@ button::-moz-focus-inner {
     font-size: 1.25em;
 }
 
-.skin-tone-popover {
+.skin-tone-popover > div {
     display: flex;
     flex-direction: column;
     gap: .25rem;
@@ -778,6 +784,7 @@ button::-moz-focus-inner {
         popover.classList.add('filled', 'top-left', 'flip-onopen', 'anchor-center-center');
         popover.dataset.anchorId = anchorId;
         shadow.appendChild(popover);
+        this._popover = popover;
 
         const inputContent = document.createElement('div');
         inputContent.classList.add('input-content');
@@ -833,6 +840,7 @@ button::-moz-focus-inner {
         skinTonesButton.classList.add('skin-tones-button');
         skinTonesButton.dataset.popoverContainer = '';
         skinTonesPicker.appendChild(skinTonesButton);
+        skinTonesButton.addEventListener('click', this.onToggleSkinTones.bind(this));
 
         const skinToneIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         skinTonesButton.appendChild(skinToneIcon);
@@ -846,9 +854,12 @@ button::-moz-focus-inner {
         skinTonePopover.classList.add('skin-tone-popover', 'top-center', 'anchor-bottom-center', 'flip-onopen', 'filled');
         skinTonesPicker.appendChild(skinTonePopover);
 
+        const skinTonePopoverContainer = document.createElement('div');
+        skinTonePopover.appendChild(skinTonePopoverContainer);
+
         const skinTones1 = document.createElement('div');
         skinTones1.classList.add('skin-tones');
-        skinTonePopover.appendChild(skinTones1);
+        skinTonePopoverContainer.appendChild(skinTones1);
 
         for (let i = 0; i < 6; i++) {
             const skinToneButton = document.createElement('button');
@@ -863,7 +874,7 @@ button::-moz-focus-inner {
 
         const skinTones2 = document.createElement('div');
         skinTones2.classList.add('skin-tones');
-        skinTonePopover.appendChild(skinTones2);
+        skinTonePopoverContainer.appendChild(skinTones2);
 
         for (let i = 0; i < 6; i++) {
             const skinToneButton = document.createElement('button');
@@ -945,6 +956,11 @@ button::-moz-focus-inner {
         const searchInput = root.querySelector('.search');
         if (searchInput) {
             searchInput.removeEventListener('input', this.onSearch.bind(this));
+        }
+
+        const skinTonesButton = root.querySelector('skin-tones-button');
+        if (skinTonesButton) {
+            skinTonesButton.removeEventListener('click', this.onToggleSkinTones.bind(this));
         }
 
         const skinTone1Buttons = root.querySelectorAll('.skin-tone1-button');
@@ -1152,6 +1168,8 @@ button::-moz-focus-inner {
             }
         }
     }
+
+    protected stringValue() { return this._value; }
 
     private static getSkinTone(value: number) {
         switch (value) {
@@ -1401,9 +1419,23 @@ button::-moz-focus-inner {
 
     }
 
+    private onToggleSkinTones() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+
+        const picker = root.querySelector<TavenemPickerHtmlElement>('.skin-tone-popover');
+        if (picker) {
+            picker.toggle();
+        }
+    }
+
     private onSkinTone1(event: Event) {
         event.preventDefault();
         event.stopPropagation();
+
+        this.onToggleSkinTones();
 
         if (!(event.currentTarget instanceof HTMLElement)
             || !('tone1' in event.currentTarget.dataset)) {
@@ -1448,6 +1480,8 @@ button::-moz-focus-inner {
     private onSkinTone2(event: Event) {
         event.preventDefault();
         event.stopPropagation();
+
+        this.onToggleSkinTones();
 
         if (!(event.currentTarget instanceof HTMLElement)
             || !('tone1' in event.currentTarget.dataset)) {

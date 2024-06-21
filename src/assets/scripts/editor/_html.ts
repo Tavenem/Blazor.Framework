@@ -36,20 +36,45 @@ htmlCommands[CommandType.Heading] = params => {
     }
 };
 htmlCommands[CommandType.Paragraph] = wrapCommand("\n<p>\n", "\n</p>\n");
+htmlCommands[CommandType.Address] = wrapCommand("\n<address>\n", "\n</address>\n");
+htmlCommands[CommandType.Article] = wrapCommand("\n<article>\n", "\n</article>\n");
+htmlCommands[CommandType.Aside] = wrapCommand("\n<aside>\n", "\n</aside>\n");
 htmlCommands[CommandType.BlockQuote] = wrapCommand("\n<blockquote>\n", "\n</blockquote>\n");
 htmlCommands[CommandType.CodeBlock] = wrapCommand("\n<pre>\n<code>", "</code>\n</pre>\n");
+htmlCommands[CommandType.CodeInline] = htmlWrapCommand("code");
 htmlCommands[CommandType.Strong] = htmlWrapCommand("strong");
 htmlCommands[CommandType.Bold] = htmlWrapCommand("b");
+htmlCommands[CommandType.Cite] = htmlWrapCommand("cite");
+htmlCommands[CommandType.Definition] = htmlWrapCommand("dfn");
 htmlCommands[CommandType.Emphasis] = htmlWrapCommand("em");
+htmlCommands[CommandType.FieldSet] = wrapCommand("\n<fieldset>\n", "\n</fieldset>\n");
+htmlCommands[CommandType.Figure] = wrapCommand("\n<figure>\n", "\n</figure>\n");
+htmlCommands[CommandType.FigureCaption] = htmlWrapCommand("figcaption");
+htmlCommands[CommandType.Footer] = wrapCommand("\n<footer>\n", "\n</footer>\n");
+htmlCommands[CommandType.Header] = wrapCommand("\n<header>\n", "\n</header>\n");
+htmlCommands[CommandType.HeadingGroup] = wrapCommand("\n<hgroup>\n", "\n</hgroup>\n");
 htmlCommands[CommandType.Italic] = htmlWrapCommand("i");
+htmlCommands[CommandType.Keyboard] = htmlWrapCommand("kbd");
 htmlCommands[CommandType.Underline] = htmlWrapCommand("u");
+htmlCommands[CommandType.Deleted] = htmlWrapCommand("del");
+htmlCommands[CommandType.Details] = wrapCommand("\n<details>\n<summary>\n</summary>\n", "\n</details>\n");
 htmlCommands[CommandType.Small] = htmlWrapCommand("small");
-htmlCommands[CommandType.Strikethrough] = htmlWrapCommand("del");
+htmlCommands[CommandType.Strikethrough] = htmlWrapCommand("s");
 htmlCommands[CommandType.Subscript] = htmlWrapCommand("sub");
 htmlCommands[CommandType.Superscript] = htmlWrapCommand("sup");
 htmlCommands[CommandType.Inserted] = htmlWrapCommand("ins");
 htmlCommands[CommandType.Marked] = htmlWrapCommand("mark");
-htmlCommands[CommandType.CodeInline] = htmlWrapCommand("code");
+htmlCommands[CommandType.Quote] = htmlWrapCommand("quote");
+htmlCommands[CommandType.Sample] = htmlWrapCommand("samp");
+htmlCommands[CommandType.Section] = wrapCommand("\n<section>\n", "\n</section>\n");
+htmlCommands[CommandType.Variable] = htmlWrapCommand("var");
+htmlCommands[CommandType.WordBreak] = _ => (target: {
+    state: EditorState;
+    dispatch: (transaction: Transaction) => void;
+}) => {
+    target.dispatch(target.state.update(target.state.replaceSelection("<wbr>")));
+    return true;
+};
 htmlCommands[CommandType.ForegroundColor] = params => {
     if (!params || !params.length) {
         return _ => false;
@@ -165,21 +190,73 @@ htmlCommands[CommandType.InsertLink] = params => {
         return true;
     }
 };
+htmlCommands[CommandType.InsertAudio] = params => {
+    if (!params || !params.length) {
+        return _ => false;
+    }
+    const src = params[0] as string | null;
+    if (!src) {
+        return _ => false;
+    }
+    const controls = params.length > 1 && params[1];
+    const loop = params.length > 2 && params[2];
+    return (target: {
+        state: EditorState;
+        dispatch: (transaction: Transaction) => void;
+    }) => {
+        let text = `<audio src="${src}"`;
+        if (controls) {
+            text += ' controls';
+        }
+        if (loop) {
+            text += ' loop';
+        }
+        text += ">";
+        target.dispatch(target.state.update(target.state.replaceSelection(text)));
+        return true;
+    }
+};
+htmlCommands[CommandType.InsertVideo] = params => {
+    if (!params || !params.length) {
+        return _ => false;
+    }
+    const src = params[0] as string | null;
+    if (!src) {
+        return _ => false;
+    }
+    const controls = params.length > 1 && params[1];
+    const loop = params.length > 2 && params[2];
+    return (target: {
+        state: EditorState;
+        dispatch: (transaction: Transaction) => void;
+    }) => {
+        let text = `<video src="${src}"`;
+        if (controls) {
+            text += ' controls';
+        }
+        if (loop) {
+            text += ' loop';
+        }
+        text += ">";
+        target.dispatch(target.state.update(target.state.replaceSelection(text)));
+        return true;
+    }
+};
 htmlCommands[CommandType.ListBullet] = wrapCommand("\n<ul>\n<li>", "</li>\n</ul>\n");
 htmlCommands[CommandType.ListNumber] = wrapCommand("\n<ol>\n<li>", "</li>\n</ol>\n");
 htmlCommands[CommandType.ListCheck] = wrapCommand('\n<ul>\n<li><input type="checkbox">', "</li>\n</ul>\n");
-htmlCommands[CommandType.HorizontalRule] = _ => (target: {
-    state: EditorState;
-    dispatch: (transaction: Transaction) => void;
-}) => {
-    target.dispatch(target.state.update(target.state.replaceSelection("<hr>")));
-    return true;
-};
 htmlCommands[CommandType.InsertTable] = _ => (target: {
     state: EditorState;
     dispatch: (transaction: Transaction) => void;
 }) => {
     target.dispatch(target.state.update(target.state.replaceSelection("\n<table>\n<thead>\n<tr>\n<th></th>\n<th></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td></td>\n</tr>\n</tbody>\n</table>\n")));
+    return true;
+};
+htmlCommands[CommandType.HorizontalRule] = _ => (target: {
+    state: EditorState;
+    dispatch: (transaction: Transaction) => void;
+}) => {
+    target.dispatch(target.state.update(target.state.replaceSelection("<hr>")));
     return true;
 };
 htmlCommands[CommandType.SetFontFamily] = setInlineStyleCommand('font-family');
@@ -188,7 +265,7 @@ htmlCommands[CommandType.SetLineHeight] = setInlineStyleCommand('line-height');
 htmlCommands[CommandType.AlignLeft] = setStyleCommand('text-align', 'left');
 htmlCommands[CommandType.AlignCenter] = setStyleCommand('text-align', 'center');
 htmlCommands[CommandType.AlignRight] = setStyleCommand('text-align', 'right');
-htmlCommands[CommandType.PageBreak] = setStyleCommand('page-break-after', 'always');
+htmlCommands[CommandType.PageBreak] = setStyleCommand('break-after', 'page');
 htmlCommands[CommandType.Emoji] = params => (target: {
     state: EditorState;
     dispatch: (transaction: Transaction) => void;

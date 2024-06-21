@@ -82,20 +82,45 @@ markdownCommands[CommandType.Heading] = params => {
     }
 };
 markdownCommands[CommandType.Paragraph] = wrapCommand("\n", "\n");
+markdownCommands[CommandType.Address] = wrapCommand("\n<address>\n", "\n</address>\n");
+markdownCommands[CommandType.Article] = wrapCommand("\n<article>\n", "\n</article>\n");
+markdownCommands[CommandType.Aside] = wrapCommand("\n<aside>\n", "\n</aside>\n");
 markdownCommands[CommandType.BlockQuote] = prefixCommand("\n> ");
 markdownCommands[CommandType.CodeBlock] = standardWrapMarkdownBlockCommand("```");
+markdownCommands[CommandType.CodeInline] = standardWrapMarkdownCommand("`");
 markdownCommands[CommandType.Strong] = standardWrapMarkdownCommand("**");
 markdownCommands[CommandType.Bold] = standardWrapMarkdownCommand("__");
+markdownCommands[CommandType.Cite] = htmlWrapCommand("cite");
+markdownCommands[CommandType.Definition] = htmlWrapCommand("dfn");
 markdownCommands[CommandType.Emphasis] = standardWrapMarkdownCommand("*");
+markdownCommands[CommandType.FieldSet] = wrapCommand("\n<fieldset>\n", "\n</fieldset>\n");
+markdownCommands[CommandType.Figure] = wrapCommand("\n<figure>\n", "\n</figure>\n");
+markdownCommands[CommandType.FigureCaption] = htmlWrapCommand("figcaption");
+markdownCommands[CommandType.Footer] = wrapCommand("\n<footer>\n", "\n</footer>\n");
+markdownCommands[CommandType.Header] = wrapCommand("\n<header>\n", "\n</header>\n");
+markdownCommands[CommandType.HeadingGroup] = wrapCommand("\n<hgroup>\n", "\n</hgroup>\n");
 markdownCommands[CommandType.Italic] = standardWrapMarkdownCommand("_");
+markdownCommands[CommandType.Keyboard] = htmlWrapCommand("kbd");
 markdownCommands[CommandType.Underline] = htmlWrapCommand("u");
+markdownCommands[CommandType.Deleted] = standardWrapMarkdownCommand("~~");
+markdownCommands[CommandType.Details] = wrapCommand("\n<details>\n<summary>\n</summary>\n", "\n</details>\n");
 markdownCommands[CommandType.Strikethrough] = standardWrapMarkdownCommand("~~");
 markdownCommands[CommandType.Small] = htmlWrapCommand("small");
 markdownCommands[CommandType.Subscript] = standardWrapMarkdownCommand("~");
 markdownCommands[CommandType.Superscript] = standardWrapMarkdownCommand("^");
 markdownCommands[CommandType.Inserted] = standardWrapMarkdownCommand("++");
 markdownCommands[CommandType.Marked] = standardWrapMarkdownCommand("==");
-markdownCommands[CommandType.CodeInline] = standardWrapMarkdownCommand("`");
+markdownCommands[CommandType.Quote] = htmlWrapCommand("quote");
+markdownCommands[CommandType.Sample] = htmlWrapCommand("samp");
+markdownCommands[CommandType.Section] = wrapCommand("\n<section>\n", "\n</section>\n");
+markdownCommands[CommandType.Variable] = htmlWrapCommand("var");
+markdownCommands[CommandType.WordBreak] = _ => (target: {
+    state: EditorState;
+    dispatch: (transaction: Transaction) => void;
+}) => {
+    target.dispatch(target.state.update(target.state.replaceSelection("<wbr>")));
+    return true;
+};
 markdownCommands[CommandType.ForegroundColor] = params => {
     if (!params || !params.length) {
         return _ => false;
@@ -211,6 +236,58 @@ markdownCommands[CommandType.InsertLink] = params => {
         return true;
     }
 };
+markdownCommands[CommandType.InsertAudio] = params => {
+    if (!params || !params.length) {
+        return _ => false;
+    }
+    const src = params[0] as string | null;
+    if (!src) {
+        return _ => false;
+    }
+    const controls = params.length > 1 && params[1];
+    const loop = params.length > 2 && params[2];
+    return (target: {
+        state: EditorState;
+        dispatch: (transaction: Transaction) => void;
+    }) => {
+        let text = `<audio src="${src}"`;
+        if (controls) {
+            text += ' controls';
+        }
+        if (loop) {
+            text += ' loop';
+        }
+        text += ">";
+        target.dispatch(target.state.update(target.state.replaceSelection(text)));
+        return true;
+    }
+};
+markdownCommands[CommandType.InsertVideo] = params => {
+    if (!params || !params.length) {
+        return _ => false;
+    }
+    const src = params[0] as string | null;
+    if (!src) {
+        return _ => false;
+    }
+    const controls = params.length > 1 && params[1];
+    const loop = params.length > 2 && params[2];
+    return (target: {
+        state: EditorState;
+        dispatch: (transaction: Transaction) => void;
+    }) => {
+        let text = `<video src="${src}"`;
+        if (controls) {
+            text += ' controls';
+        }
+        if (loop) {
+            text += ' loop';
+        }
+        text += ">";
+        target.dispatch(target.state.update(target.state.replaceSelection(text)));
+        return true;
+    }
+};
 markdownCommands[CommandType.ListBullet] = prefixCommand("\n* ");
 markdownCommands[CommandType.ListNumber] = prefixCommand("\n1. ");
 markdownCommands[CommandType.ListCheck] = prefixCommand("\n* [ ] ");
@@ -234,7 +311,7 @@ markdownCommands[CommandType.SetLineHeight] = setInlineStyleCommand('line-height
 markdownCommands[CommandType.AlignLeft] = setStyleCommand('text-align', 'left');
 markdownCommands[CommandType.AlignCenter] = setStyleCommand('text-align', 'center');
 markdownCommands[CommandType.AlignRight] = setStyleCommand('text-align', 'right');
-markdownCommands[CommandType.PageBreak] = setStyleCommand('page-break-after', 'always');
+markdownCommands[CommandType.PageBreak] = setStyleCommand('break-after', 'page');
 markdownCommands[CommandType.Emoji] = params => (target: {
     state: EditorState;
     dispatch: (transaction: Transaction) => void;

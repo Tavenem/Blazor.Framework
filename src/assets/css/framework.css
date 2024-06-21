@@ -26,7 +26,6 @@
 @import "components/collapse.css" layer(tavenem-framework.components);
 @import "components/dialog.css" layer(tavenem-framework.components);
 @import "components/drawer.css" layer(tavenem-framework.components);
-@import "components/editor.css" layer(tavenem-framework.components);
 @import "components/imageeditor.css" layer(tavenem-framework.components);
 @import "components/list.css" layer(tavenem-framework.components);
 @import "components/meter.css" layer(tavenem-framework.components);

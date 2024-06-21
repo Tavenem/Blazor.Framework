@@ -1,5 +1,4 @@
 import { CommandType } from "./_commands";
-import { syntaxLabelMap, syntaxes } from "./_syntax";
 
 export enum ToolbarControlStyle {
     Separator = 0,
@@ -15,6 +14,7 @@ export interface ToolbarControlDefinition {
     inactiveIcon?: string;
     isStyle?: boolean;
     isWysiwyg?: boolean;
+    label?: string;
     params?: any[];
     separatorBefore?: boolean;
     style?: ToolbarControlStyle;
@@ -278,10 +278,12 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         buttons: [
             {
                 icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M120-80v-60h100v-30h-60v-60h60v-30H120v-60h120q17 0 28.5 11.5T280-280v40q0 17-11.5 28.5T240-200q17 0 28.5 11.5T280-160v40q0 17-11.5 28.5T240-80H120Zm0-280v-110q0-17 11.5-28.5T160-510h60v-30H120v-60h120q17 0 28.5 11.5T280-560v70q0 17-11.5 28.5T240-450h-60v30h100v60H120Zm60-280v-180h-60v-60h120v240h-60Zm180 440v-80h480v80H360Zm0-240v-80h480v80H360Zm0-240v-80h480v80H360Z"/></svg>',
+                label: 'ordered list',
                 type: CommandType.ListNumber,
             },
             {
                 icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M222-200 80-342l56-56 85 85 170-170 56 57-225 226Zm0-320L80-662l56-56 85 85 170-170 56 57-225 226Zm298 240v-80h360v80H520Zm0-320v-80h360v80H520Z"/></svg>',
+                label: 'checklist',
                 type: CommandType.ListCheck,
             },
         ],
@@ -485,18 +487,4 @@ export const toolbarButtonDefinitions: ToolbarControlDefinition[] = [
         tooltip: 'insert emoji',
         type: CommandType.Emoji,
         style: ToolbarControlStyle.Button,
-    }, {
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M320-240 80-480l240-240 57 57-184 184 183 183-56 56Zm320 0-57-57 184-184-183-183 56-56 240 240-240 240Z"/></svg>',
-        isStyle: true,
-        isWysiwyg: true,
-        separatorBefore: true,
-        tooltip: 'set code block syntax',
-        style: ToolbarControlStyle.Dropdown,
-        buttons: syntaxes.map(x => {
-            return {
-                text: syntaxLabelMap[x],
-                type: CommandType.SetCodeSyntax,
-                params: [x],
-            };
-        }),
     }];

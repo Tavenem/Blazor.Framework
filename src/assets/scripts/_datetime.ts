@@ -688,6 +688,12 @@ button, .btn {
     }
 }
 
+:host(.small) > button,
+button.small {
+    font-size: 1.25rem;
+    padding: 5px;
+}
+
 button::-moz-focus-inner,
 .btn::-moz-focus-inner {
     border-style: none;
@@ -1316,6 +1322,7 @@ button::-moz-focus-inner,
             popover.dataset.anchorId = anchorId;
             shadow.appendChild(popover);
             controlContainer = popover;
+            this._popover = popover;
         }
 
         const inputContent = document.createElement('div');
@@ -1994,6 +2001,8 @@ button::-moz-focus-inner,
         }
     }
 
+    protected stringValue() { return this._formValue; }
+
     private getNow() {
         return now(this.getOptions().timeZone);
     }
@@ -2364,13 +2373,9 @@ button::-moz-focus-inner,
         this._internals.states.add('touched');
         this.setValue(event.detail.value);
 
-        const root = this.shadowRoot;
-        if (root) {
-            const popover = root.querySelector('tf-popover');
-            if (popover && popover.matches(':popover-open')) {
-                this.setOpen(false);
-                return;
-            }
+        if (this._popover && this._popover.matches(':popover-open')) {
+            this.setOpen(false);
+            return;
         }
 
         this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(event.detail.value));

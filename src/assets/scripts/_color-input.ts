@@ -738,6 +738,12 @@ button {
     }
 }
 
+:host(.small) button,
+button.small {
+    font-size: 1.25rem;
+    padding: 5px;
+}
+
 button::-moz-focus-inner {
     border-style: none;
 }
@@ -1197,6 +1203,7 @@ button::-moz-focus-inner {
             popover.dataset.anchorId = anchorId;
             shadow.appendChild(popover);
             controlContainer = popover;
+            this._popover = popover;
         }
 
         const colorPicker = document.createElement('div');
@@ -3012,6 +3019,8 @@ button::-moz-focus-inner {
 
         this._settingValue = false;
     }
+
+    protected stringValue() { return this._value; }
 
     private onAlphaInput(event: Event) {
         if (this._settingValue

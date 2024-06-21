@@ -1,4 +1,3 @@
-import { TavenemPopover, TavenemPopoverHTMLElement } from "./_popover";
 import { randomUUID } from "./tavenem-utility";
 
 export class TavenemInputHtmlElement extends HTMLElement {
@@ -201,7 +200,7 @@ export class TavenemInputHtmlElement extends HTMLElement {
     cursor: text;
     display: inline-flex;
     flex-grow: 1;
-    font-size: 1rem;
+    font-size: var(--field-font-size, 1rem);
     font-weight: var(--tavenem-font-weight);
     line-height: 1.1875rem;
     min-height: 1.1875rem;

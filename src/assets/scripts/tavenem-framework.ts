@@ -19,7 +19,7 @@ import { TavenemPickerHtmlElement } from './_picker';
 import { TavenemSelectInputHtmlElement } from './_select';
 import { TavenemColorInputHtmlElement } from './_color-input';
 import { TavenemDateTimeInputHtmlElement } from './_datetime';
-import { TavenemEditorHtmlElement } from './tavenem-editor';
+import { TavenemEditorHtmlElement } from './editor/_editor';
 import {
     TavenemProgressCircleHTMLElement,
     TavenemProgressLinearHTMLElement

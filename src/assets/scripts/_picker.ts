@@ -3,9 +3,11 @@ import { TavenemInputHtmlElement } from './_input'
 
 export class TavenemPickerHtmlElement extends HTMLElement {
     protected _hideTimer: number;
+    protected _popover: TavenemPopoverHTMLElement | undefined;
 
     private _closeCooldownTimer: number;
     private _closed: boolean;
+    private _validClick = false;
 
     static get observedAttributes() {
         return ['disabled', 'readonly'];
@@ -58,15 +60,11 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     }
 
     toggle() {
-        const popover = this.shadowRoot
-            ? this.shadowRoot.querySelector('tf-popover')
-                || this.querySelector('tf-popover')
-            : this.querySelector('tf-popover');
-        if (!popover) {
+        if (!this._popover) {
             return;
         }
 
-        if (popover.matches(':popover-open')) {
+        if (this._popover.matches(':popover-open')) {
             this.close();
         } else if (!this.hasAttribute('disabled')
             && !this.hasAttribute('readonly')) {
@@ -86,11 +84,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     }
 
     protected onArrowDown(event: KeyboardEvent) {
-        const popover = this.shadowRoot
-            ? this.shadowRoot.querySelector('tf-popover')
-            || this.querySelector('tf-popover')
-            : this.querySelector('tf-popover');
-        if (popover && !popover.matches(':popover-open')) {
+        if (this._popover && !this._popover.matches(':popover-open')) {
             event.preventDefault();
             event.stopPropagation();
             this.open();
@@ -98,11 +92,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     }
 
     protected onArrowUp(event: KeyboardEvent) {
-        const popover = this.shadowRoot
-            ? this.shadowRoot.querySelector('tf-popover')
-            || this.querySelector('tf-popover')
-            : this.querySelector('tf-popover');
-        if (popover && popover.matches(':popover-open')) {
+        if (this._popover && this._popover.matches(':popover-open')) {
             event.preventDefault();
             event.stopPropagation();
             this.open();
@@ -137,11 +127,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
             }
         } else if (event.key === "ArrowDown") {
             if (event.altKey) {
-                const popover = this.shadowRoot
-                    ? this.shadowRoot.querySelector('tf-popover')
-                        || this.querySelector('tf-popover')
-                    : this.querySelector('tf-popover');
-                if (popover && !popover.matches(':popover-open')) {
+                if (this._popover && !this._popover.matches(':popover-open')) {
                     event.preventDefault();
                     event.stopPropagation();
                     this.open();
@@ -151,11 +137,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
             }
         } else if (event.key === "ArrowUp") {
             if (event.altKey) {
-                const popover = this.shadowRoot
-                    ? this.shadowRoot.querySelector('tf-popover')
-                        || this.querySelector('tf-popover')
-                    : this.querySelector('tf-popover');
-                if (popover && popover.matches(':popover-open')) {
+                if (this._popover && this._popover.matches(':popover-open')) {
                     event.preventDefault();
                     event.stopPropagation();
                     this.open();
@@ -172,11 +154,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
                 this.onClear(event);
             }
         } else if (event.key === "Escape") {
-            const popover = this.shadowRoot
-                ? this.shadowRoot.querySelector('tf-popover')
-                    || this.querySelector('tf-popover')
-                : this.querySelector('tf-popover');
-            if (popover && popover.matches(':popover-open')) {
+            if (this._popover && this._popover.matches(':popover-open')) {
                 event.preventDefault();
                 event.stopPropagation();
                 this.close();
@@ -227,32 +205,35 @@ export class TavenemPickerHtmlElement extends HTMLElement {
         this.openInner();
     }
 
+    protected stringValue(): string | null { return null; }
+
     private close() {
         clearTimeout(this._hideTimer);
         this.closeInner();
     }
 
     private closeInner() {
-        const popover = this.shadowRoot
-            ? this.shadowRoot.querySelector<TavenemPopoverHTMLElement>('tf-popover')
-                || this.querySelector<TavenemPopoverHTMLElement>('tf-popover')
-            : this.querySelector<TavenemPopoverHTMLElement>('tf-popover');
-        if (!popover || !popover.matches(':popover-open')) {
+        this._validClick = false;
+
+        if (!this._popover || !this._popover.matches(':popover-open')) {
             return;
         }
-        popover.hide();
+        this._popover.hide();
 
         this._closed = true;
 
-        const root = this.shadowRoot;
-        if (root) {
-            const input = root.querySelector<TavenemInputHtmlElement>('.input');
-            if (input) {
-                const value = input.shadowRoot
-                    ? input.value
-                    : input.getAttribute('value') || '';
-                this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(value));
+        let value = this.stringValue();
+        if (value == null) {
+            const root = this.shadowRoot;
+            if (root) {
+                const input = root.querySelector<TavenemInputHtmlElement>('.input');
+                if (input) {
+                    value = input.getAttribute('value') || '';
+                }
             }
+        }
+        if (value != null) {
+            this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(value));
         }
 
         clearTimeout(this._closeCooldownTimer);
@@ -265,17 +246,12 @@ export class TavenemPickerHtmlElement extends HTMLElement {
         if (!event.target) {
             return;
         }
-        if (event.target !== this) {
-            const popover = this.shadowRoot
-                ? this.shadowRoot.querySelector('tf-popover')
-                    || this.querySelector('tf-popover')
-                : this.querySelector('tf-popover');
-            if (popover
-                && event.target instanceof Node
-                && popover.contains(event.target)) {
-                if (!popover.matches(':popover-open')) {
-                    return;
-                }
+        if (event.target !== this
+            && this._popover
+            && event.target instanceof Node
+            && this._popover.contains(event.target)) {
+            if (!this._popover.matches(':popover-open')) {
+                return;
             }
         }
 
@@ -307,28 +283,24 @@ export class TavenemPickerHtmlElement extends HTMLElement {
             }
         }
 
-        const popover = this.shadowRoot
-            ? this.shadowRoot.querySelector('tf-popover')
-                || this.querySelector('tf-popover')
-            : this.querySelector('tf-popover');
-        if (!popover) {
+        if (!this._popover) {
             return;
         }
 
         if (event.target !== this
             && (event.target instanceof HTMLElement
                 || event.target instanceof SVGElement)
-            && popover.contains(event.target)) {
+            && TavenemPopover.nodeContains(this._popover, event.target)) {
             event.preventDefault();
             event.stopPropagation();
 
-            if (!popover.matches(':popover-open')) {
+            if (!this._popover.matches(':popover-open')) {
                 return;
             }
 
             let e: HTMLElement | SVGElement | null = event.target;
             let closePicker = false;
-            while (e && e !== popover) {
+            while (e && e !== this._popover) {
                 if ('closePicker' in e.dataset
                     || e instanceof HTMLOptionElement) {
                     closePicker = true;
@@ -346,26 +318,24 @@ export class TavenemPickerHtmlElement extends HTMLElement {
         event.preventDefault();
         event.stopPropagation();
 
-        if (!popover.matches(':popover-open')
+        if (!this._popover.matches(':popover-open')
             || !this.hasAttribute('multiple')) {
             this.toggle();
         }
     }
 
     private openInner() {
+        this._validClick = false;
+
         if (this._closed) {
             return;
         }
 
-        const popover = this.shadowRoot
-            ? this.shadowRoot.querySelector<TavenemPopoverHTMLElement>('tf-popover')
-                || this.querySelector<TavenemPopoverHTMLElement>('tf-popover')
-            : this.querySelector<TavenemPopoverHTMLElement>('tf-popover');
-        if (!popover || popover.matches(':popover-open')) {
+        if (!this._popover || this._popover.matches(':popover-open')) {
             return;
         }
-        if (typeof popover.show === 'function') {
-            popover.show();
+        if (typeof this._popover.show === 'function') {
+            this._popover.show();
         }
 
         const root = this.shadowRoot;

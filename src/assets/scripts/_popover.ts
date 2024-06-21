@@ -682,6 +682,7 @@ export class TavenemTooltipHTMLElement extends HTMLElement {
     private _anchor: Element | null | undefined;
     private _hideTimer: number;
     private _mouseOver: boolean;
+    private _popover: TavenemPopoverHTMLElement | undefined;
     private _showTimer: number;
 
     constructor() {
@@ -912,9 +913,10 @@ tf-popover {
             }
         }
 
-        const popover = document.createElement('tf-popover');
+        const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
         popover.classList.add('tooltip');
         popover.popover = 'auto';
+        this._popover = popover;
 
         if ('popoverClass' in this.dataset
             && this.dataset.popoverClass
@@ -1016,12 +1018,7 @@ tf-popover {
     onAttentionOut() {
         this._mouseOver = false;
 
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
-        if (!tooltip || !tooltip.mouseOver) {
+        if (!this._popover || !this._popover.mouseOver) {
             clearTimeout(this._showTimer);
             this._hideTimer = setTimeout(this.hide.bind(this), 200);
         }
@@ -1056,22 +1053,17 @@ tf-popover {
         if (delay > 0) {
             clearTimeout(this._showTimer);
             clearTimeout(this._hideTimer);
-            this._showTimer = setTimeout(this.show.bind(this, element), delay);
+            this._showTimer = setTimeout(this.showChecked.bind(this, element), delay);
         } else {
-            this.show(element);
+            this.showChecked(element);
         }
     }
 
     toggleVisibility() {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
-        if (tooltip) {
-            tooltip.toggle();
+        if (this._popover) {
+            this._popover.toggle();
         }
     }
 
@@ -1079,13 +1071,8 @@ tf-popover {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
         this._anchor = null;
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover.tooltip');
-        if (tooltip) {
-            tooltip.hide();
+        if (this._popover) {
+            this._popover.hide();
         }
     }
 
@@ -1113,16 +1100,6 @@ tf-popover {
             ? event.target
             : null;
         if (!target) {
-            return;
-        }
-
-        let popover = target.querySelector('[popover]:popover-open');
-        if (!popover
-            && 'popoverContainer' in target.dataset
-            && target.shadowRoot instanceof ShadowRoot) {
-            popover = target.shadowRoot.querySelector('[popover]:popover-open');
-        }
-        if (popover && !this.contains(popover) && !popover.contains(this)) {
             return;
         }
 
@@ -1160,12 +1137,7 @@ tf-popover {
 
         this._mouseOver = false;
 
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
-        if (!tooltip || !tooltip.mouseOver) {
+        if (!this._popover || !this._popover.mouseOver) {
             clearTimeout(this._showTimer);
             this._hideTimer = setTimeout(this.hide.bind(this), 200);
         }
@@ -1184,15 +1156,26 @@ tf-popover {
     private show(element?: Element) {
         clearTimeout(this._hideTimer);
         clearTimeout(this._showTimer);
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
+        if (this._popover) {
+            this._popover.anchor = element || this._anchor;
+            this._popover.show();
         }
-        const tooltip = root.querySelector<TavenemPopoverHTMLElement>('tf-popover');
-        if (tooltip) {
-            tooltip.anchor = element || this._anchor;
-            tooltip.show();
+    }
+
+    private showChecked(element?: Element) {
+        if (this._anchor) {
+            let popover = this._anchor.querySelector('[popover]:popover-open');
+            if (!popover
+                && this._anchor instanceof HTMLElement
+                && 'popoverContainer' in this._anchor.dataset
+                && this._anchor.shadowRoot instanceof ShadowRoot) {
+                popover = this._anchor.shadowRoot.querySelector('[popover]:popover-open');
+            }
+            if (popover && !this.contains(popover) && !popover.contains(this)) {
+                return;
+            }
         }
+        this.show(element);
     }
 
     private stopEvent(event: Event) {

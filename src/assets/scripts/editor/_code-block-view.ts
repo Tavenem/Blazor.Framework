@@ -4,8 +4,8 @@ import { setBlockType, exitCode, selectAll } from "prosemirror-commands";
 import { undo, redo } from "prosemirror-history";
 import { ContentMatch, Fragment, Node as ProsemirrorNode } from "prosemirror-model";
 import { Command as PMCommand, Selection, TextSelection } from "prosemirror-state";
-import { EditorView as PMEditorView } from "prosemirror-view";
-import { EditorSyntax, codeEditorLanguageMap } from "./_syntax";
+import { NodeView, EditorView as PMEditorView } from "prosemirror-view";
+import { EditorSyntax, codeEditorLanguageMap, syntaxLabelMap, syntaxTextMap, syntaxes } from "./_syntax";
 import { codeEditorDarkExtension, codeEditorLightTheme } from "./_themes";
 import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from "./_code-editing";
 import { ThemePreference, getPreferredTavenemColorScheme } from "../_theme";
@@ -29,10 +29,11 @@ const exitCodeUp: PMCommand = (state, dispatch) => {
     return true;
 }
 
-export class CodeBlockView {
+export class CodeBlockView implements NodeView {
     dom: Node;
     _cm: EditorView;
     _languageCompartment = new Compartment;
+    _readOnlyCompartment = new Compartment;
     _syntax: EditorSyntax | null;
     _updating = false;
 
@@ -40,6 +41,9 @@ export class CodeBlockView {
         public node: ProsemirrorNode,
         public view: PMEditorView,
         public getPos: () => number | undefined) {
+        const readOnly = !!this.view.props.editable
+            && !this.view.props.editable(this.view.state);
+
         const themePreference = getPreferredTavenemColorScheme();
 
         this._syntax = node.attrs.syntax;
@@ -54,6 +58,7 @@ export class CodeBlockView {
                     ? codeEditorDarkExtension
                     : codeEditorLightTheme),
                 this._languageCompartment.of(languageExtension),
+                this._readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
                 EditorView.domEventHandlers({
                     'blur': (_, view) => { setTimeout(() => view.dispatch({ selection: { anchor: 0 } }), 0); },
                 }),
@@ -83,8 +88,49 @@ export class CodeBlockView {
                 }
             }
         });
-        this.dom = document.createElement('div');
-        this.dom.appendChild(this._cm.dom);
+
+        const div = document.createElement('div');
+        div.classList.add('code-block-view');
+
+        const syntaxInput = document.createElement('tf-select');
+        syntaxInput.classList.add('syntax-select', 'dense');
+        syntaxInput.dataset.inputReadonly = '';
+        syntaxInput.dataset.popoverLimitHeight = '';
+        if (this.view.props.editable
+            && !this.view.props.editable(this.view.state)) {
+            syntaxInput.setAttribute('disabled', '');
+        }
+        syntaxInput.setAttribute('size', '10');
+        div.appendChild(syntaxInput);
+        syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
+
+        const list = document.createElement('div');
+        list.classList.add('list');
+        list.slot = 'popover';
+        syntaxInput.appendChild(list);
+
+        for (const syntax of syntaxes) {
+            const option = document.createElement('div');
+            option.dataset.closePicker = '';
+            option.dataset.closePickerValue = syntax;
+            option.dataset.closePickerDisplay = syntaxTextMap[syntax];
+            list.appendChild(option);
+
+            const selectedIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+            option.appendChild(selectedIcon);
+            selectedIcon.outerHTML = `<svg class="svg-icon selected-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+
+            const label = document.createElement('span');
+            label.innerHTML = syntaxLabelMap[syntax];
+            option.appendChild(label);
+        }
+
+        syntaxInput.setAttribute('value', this._syntax && this._syntax.length ? this._syntax : 'none');
+        syntaxInput.setAttribute('display', this._syntax ? syntaxTextMap[this._syntax] : 'Plain text');
+
+        div.appendChild(this._cm.dom);
+
+        this.dom = div;
     }
 
     backspaceHandler() {
@@ -225,6 +271,22 @@ export class CodeBlockView {
 
     selectNode() { this._cm.focus() }
 
+    setReadOnly(value: boolean) {
+        this._readOnlyCompartment.reconfigure(EditorState.readOnly.of(value));
+        if (!(this.dom instanceof Element)) {
+            return;
+        }
+        const syntaxInput = this.dom.querySelector('.syntax-select');
+        if (!syntaxInput) {
+            return;
+        }
+        if (value) {
+            syntaxInput.setAttribute('disabled', '');
+        } else {
+            syntaxInput.removeAttribute('disabled');
+        }
+    }
+
     setSelection(anchor: number, head: number) {
         this._cm.focus();
         this.forwardSelection();
@@ -306,6 +368,28 @@ export class CodeBlockView {
             to: oldEnd,
             text: newVal.slice(start, newEnd),
         };
+    }
+
+    private onSyntaxSelect(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!(event instanceof CustomEvent)
+            || typeof event.detail.value !== 'string'
+            || !syntaxes.includes(event.detail.value)
+            || this._syntax == event.detail.value) {
+            return;
+        }
+
+        this._syntax = event.detail.value;
+
+        const spec: TransactionSpec = {
+            effects: this._languageCompartment.reconfigure(
+                codeEditorLanguageMap[this._syntax!]
+                || codeEditorPlainText),
+        };
+
+        this._cm.dispatch(spec);
     }
 }
 

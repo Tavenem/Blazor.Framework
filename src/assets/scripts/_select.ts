@@ -617,44 +617,12 @@ tf-input svg {
     display: initial;
 }
 
-slot([name="helpers"])::slotted(.onfocus) {
+slot[name="helpers"]::slotted(.onfocus) {
     display: none;
 }
 
-:host(:focus-within) slot([name="helpers"])::slotted(.onfocus) {
+:host(:focus-within) slot[name="helpers"]::slotted(.onfocus) {
     display: initial;
-}
-
-slot:not([name])::slotted(.option-list) {
-    > * > .selected-icon {
-        visibility: hidden;
-    }
-
-    > * > .unselected-icon {
-        display: none;
-    }
-
-    > .active > .selected-icon {
-        visibility: visible;
-    }
-}
-
-:host([multiple]) slot:not([name])::slotted(.option-list) {
-    > * > .selected-icon {
-        display: none;
-    }
-
-    > * > .unselected-icon {
-        display: inline-block;
-    }
-
-    > .active > .selected-icon {
-        display: inline-block;
-    }
-
-    > .active > .unselected-icon {
-        display: none;
-    }
 }
 
 :host(.primary:not(:invalid, :disabled, [inert])),
@@ -806,19 +774,20 @@ slot {
         const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
         popover.classList.add('filled', 'top-left', 'flip-onopen', 'anchor-bottom-left', 'match-width');
         popover.dataset.anchorId = anchorId;
-        popover.popover = 'auto';
+        popover.popover = 'manual';
         if ('popoverLimitHeight' in this.dataset) {
             popover.style.maxHeight = 'min(300px,90vh)';
             popover.style.overflowY = 'auto';
         }
         shadow.appendChild(popover);
+        this._popover = popover;
 
         const popoverSlot = document.createElement('slot');
         popoverSlot.name = 'popover';
         popover.appendChild(popoverSlot);
 
         if (this.hasAttribute('value')) {
-            this.setValue(this.getAttribute('value'), this.getAttribute('display'));
+            this.setValue(this.getAttribute('value'), this.getAttribute('display'), true);
             this._initialValue = this._value;
             this._initialDisplay = this._display;
         } else if (this.hasAttribute('display')) {
@@ -1013,14 +982,12 @@ slot {
             return;
         }
         const root = this.shadowRoot;
-        if (event.target !== this) {
-            const popover = root ? root.querySelector('tf-popover') : null;
-            if (popover
-                && event.target instanceof Node
-                && !popover.matches(':popover-open')
-                && TavenemPopover.nodeContains(popover, event.target)) {
-                return;
-            }
+        if (event.target !== this
+            && this._popover
+            && event.target instanceof Node
+            && !this._popover.matches(':popover-open')
+            && TavenemPopover.nodeContains(this._popover, event.target)) {
+            return;
         }
 
         const selectedIndices = this.getSelectedIndices();
@@ -1067,14 +1034,12 @@ slot {
             return;
         }
         const root = this.shadowRoot;
-        if (event.target !== this) {
-            const popover = root ? root.querySelector('tf-popover') : null;
-            if (popover
-                && event.target instanceof Node
-                && !popover.matches(':popover-open')
-                && TavenemPopover.nodeContains(popover, event.target)) {
-                return;
-            }
+        if (event.target !== this
+            && this._popover
+            && event.target instanceof Node
+            && !this._popover.matches(':popover-open')
+            && TavenemPopover.nodeContains(this._popover, event.target)) {
+            return;
         }
 
         const selectedIndices = this.getSelectedIndices();
@@ -1136,14 +1101,12 @@ slot {
             return;
         }
 
-        if (event.target !== this) {
-            const popover = root ? root.querySelector('tf-popover') : null;
-            if (popover
-                && event.target instanceof Node
-                && !popover.matches(':popover-open')
-                && TavenemPopover.nodeContains(popover, event.target)) {
-                return;
-            }
+        if (event.target !== this
+            && this._popover
+            && event.target instanceof Node
+            && !this._popover.matches(':popover-open')
+            && TavenemPopover.nodeContains(this._popover, event.target)) {
+            return;
         }
 
         clearTimeout(this._searchTimer);
@@ -1179,15 +1142,12 @@ slot {
         if (!event.target) {
             return;
         }
-        if (event.target !== this) {
-            const root = this.shadowRoot;
-            const popover = root ? root.querySelector('tf-popover') : null;
-            if (popover
-                && event.target instanceof Node
-                && !popover.matches(':popover-open')
-                && TavenemPopover.nodeContains(popover, event.target)) {
-                return;
-            }
+        if (event.target !== this
+            && this._popover
+            && event.target instanceof Node
+            && !this._popover.matches(':popover-open')
+            && TavenemPopover.nodeContains(this._popover, event.target)) {
+            return;
         }
 
         event.preventDefault();
@@ -1233,6 +1193,8 @@ slot {
             this.onSubmitValue(value, display);
         }
     }
+
+    protected stringValue() { return this._value; }
 
     private clearSearchFilter() {
         const shadowOptions = this.shadowRoot?.querySelectorAll('option, [data-close-picker-value]');
@@ -1432,8 +1394,7 @@ slot {
             return;
         }
 
-        const popover = root ? root.querySelector('tf-popover') : null;
-        if (popover && !popover.matches(':popover-open')) {
+        if (this._popover && !this._popover.matches(':popover-open')) {
             if (!this.matches(':disabled')
                 && !this.hasAttribute('readonly')) {
                 this.open();
@@ -1495,7 +1456,7 @@ slot {
             event.preventDefault();
             event.stopPropagation();
 
-            if (popover && popover.matches(':popover-open')) {
+            if (this._popover && this._popover.matches(':popover-open')) {
                 match.focus();
                 match.scrollIntoView({ behavior: 'smooth' });
             }
@@ -1760,12 +1721,12 @@ slot {
         }
     }
 
-    private setValue(value?: string | null, display?: string | null) {
+    private setValue(value?: string | null, display?: string | null, initialize?: boolean) {
         if (value == null) {
             if (this._value == null) {
                 return;
             }
-        } else if (this._value === value) {
+        } else if (this._value === value && !initialize) {
             return;
         }
 
@@ -1795,8 +1756,6 @@ slot {
             input = root.querySelector<TavenemInputHtmlElement>('tf-input');
         }
 
-        this.display = display;
-
         this.setValidity();
 
         if (input) {
@@ -1806,6 +1765,8 @@ slot {
                 input.setAttribute('value', this._value);
             }
         }
+
+        this.display = display;
 
         this.setOptions(input, this._value, this.display);
 

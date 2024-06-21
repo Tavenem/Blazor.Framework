@@ -186,8 +186,8 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.Underline] = markMenuItem(schema.marks.underline);
     commands[CommandType.Deleted] = markMenuItem(schema.marks.del);
     commands[CommandType.Details] = wrapOrInsert(schema.nodes.details);
-    commands[CommandType.Strikethrough] = markMenuItem(schema.marks.strikethrough);
     commands[CommandType.Small] = markMenuItem(schema.marks.small);
+    commands[CommandType.Strikethrough] = markMenuItem(schema.marks.strikethrough);
     commands[CommandType.Subscript] = markMenuItem(schema.marks.sub);
     commands[CommandType.Superscript] = markMenuItem(schema.marks.sup);
     commands[CommandType.Inserted] = markMenuItem(schema.marks.ins);
@@ -471,8 +471,8 @@ export function commonCommands(schema: Schema) {
     commands[CommandType.AlignRight] = alignMenuItem('right');
     commands[CommandType.PageBreak] = {
         command(state, dispatch, _view, _params) {
-            const styleAttr = 'page-break-after:';
-            const style = 'page-break-after:always';
+            const styleAttr = 'break-after:';
+            const style = 'break-after:page';
 
             if (dispatch) {
                 const { from, $from, to } = state.selection;
@@ -523,8 +523,8 @@ export function commonCommands(schema: Schema) {
                 if (node
                     && node.type.name == state.schema.nodes.div.name
                     && node.attrs.style
-                    && node.attrs.style.indexOf('page-break-after:') != -1) {
-                    return node.attrs.style.indexOf('page-break-after:always') != -1;
+                    && node.attrs.style.indexOf('break-after:') != -1) {
+                    return node.attrs.style.indexOf('break-after:page') != -1;
                 }
             }
             return false;

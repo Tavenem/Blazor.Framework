@@ -1,4 +1,14 @@
 export const elementStyle = `
+@keyframes expand {
+    from {
+        height: calc(2.25rem + 12px);
+    }
+
+    to {
+        height: 100%;
+    }
+}
+
 *, *::before, *::after {
     box-sizing: border-box;
 }
@@ -770,6 +780,14 @@ svg {
         font-size: 1.25em;
     }
 
+    .selected-icon {
+        visibility: hidden;
+    }
+
+    .active > .selected-icon {
+        visibility: visible;
+    }
+
     > tf-dropdown {
         margin-right: max(-24px, -.75em);
         padding-right: 0;
@@ -836,6 +854,10 @@ svg {
         height: auto;
     }
 
+    &:focus-within > div:first-child {
+        animation: .5s ease-in 1s expand;
+    }
+
     .btn svg.active {
         display: none;
     }
@@ -852,6 +874,8 @@ svg {
 
     .field {
         flex-grow: 0;
+        margin-bottom: 0;
+        margin-top: 0;
 
         > .input {
             margin-top: 0;
@@ -1010,20 +1034,6 @@ svg {
             position: absolute;
             z-index: 2;
         }
-
-        .cm-editor[data-language]:after {
-            background-color: rgba(0,128,255,.2);
-            border-bottom-left-radius: var(--tavenem-border-radius);
-            border-bottom-right-radius: var(--tavenem-border-radius);
-            color: var(--tavenem-color-text);
-            content: attr(data-language);
-            font-size: .75em;
-            line-height: 1;
-            padding: 2px 4px;
-            position: absolute;
-            right: .5rem;
-            top: 1px;
-        }
     }
 }
 .ProseMirror::selection {
@@ -1041,6 +1051,24 @@ svg {
     .ProseMirror {
         overflow: auto;
     }
+}
+
+.syntax-select {
+    --tavenem-color-bg-alt: transparent;
+    --field-active-border-color: transparent;
+    --field-active-border-hover-color: transparent;
+    --field-active-label-color: transparent;
+    --field-border-color: transparent;
+    --field-border-hover-color: transparent;
+    --field-font-size: .75em;
+    background-color: rgba(0,128,255,.2);
+    border-radius: var(--tavenem-border-radius);
+    padding-left: 4px;
+    padding-right: 4px;
+    position: absolute;
+    right: .5rem;
+    top: 2px;
+    z-index: 1;
 }
 
 :host([disabled]) .editor,
