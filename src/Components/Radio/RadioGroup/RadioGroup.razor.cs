@@ -118,6 +118,14 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("field")
+        .Add("disabled", Disabled)
+        .Add("read-only", ReadOnly)
+        .Add("required", Required)
+        .Add("no-label", string.IsNullOrEmpty(Label))
+        .Add("modified", IsTouched)
+        .Add("valid", IsValid)
+        .Add("invalid", IsInvalidAndTouched)
         .Add("radio-group")
         .ToString();
 

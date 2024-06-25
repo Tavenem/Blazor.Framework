@@ -202,8 +202,8 @@ export class TavenemInputHtmlElement extends HTMLElement {
     flex-grow: 1;
     font-size: var(--field-font-size, 1rem);
     font-weight: var(--tavenem-font-weight);
-    line-height: 1.1875rem;
-    min-height: 1.1875rem;
+    line-height: calc(1.1875 * var(--field-font-size, 1rem));
+    min-height: calc(1.1875 * var(--field-font-size, 1rem));
     padding-bottom: 7px;
     padding-top: 6px;
     position: relative;
@@ -229,9 +229,9 @@ input {
     color: currentColor;
     display: block;
     font: inherit;
-    height: 1.1875rem;
+    height: calc(1.1875 * var(--field-font-size, 1rem));
     margin: 0;
-    min-height: calc(1.25rem + 10px);
+    min-height: calc((1.1875 * var(--field-font-size, 1rem)) + 10px);
     min-width: 0;
     opacity: var(--tavenem-field-input-opacity, unset);
     overflow: visible;
@@ -299,6 +299,17 @@ input[type="file"]::file-selector-button {
 }
 input[type="file"]::file-selector-button:hover {
     background: var(--tavenem-color-default-darken);
+}
+
+:host(.clearable:state(has-value)) input {
+    min-height: calc(1.25rem + 10px);
+}
+
+:host(:disabled) input,
+:host([readonly]):not(.clearable-readonly) input,
+:host(:required) input,
+:host(:state(empty)) input {
+    min-height: calc((1.1875 * var(--field-font-size, 1rem)) + 10px);
 }
 
 input[type="color"] {

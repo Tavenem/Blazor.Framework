@@ -172,8 +172,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
         .Add("clearable", ShowClear)
         .ToString();
 
-    private protected override bool ShrinkWhen => DisplayType == PickerDisplayType.Inline;
-
     private ColorFormatConverter Color { get; set; }
 
     /// <summary>

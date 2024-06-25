@@ -17,6 +17,9 @@ public enum EditorSyntax
     /// <summary>CSS</summary>
     CSS = 3,
 
+    /// <summary>Handlebars</summary>
+    Handlebars = 4,
+
     /// <summary>
     /// <para>
     /// HTML
@@ -25,22 +28,19 @@ public enum EditorSyntax
     /// Supports WYSIWYG editing.
     /// </para>
     /// </summary>
-    HTML = 4,
+    HTML = 5,
 
     /// <summary>Java</summary>
-    Java = 5,
+    Java = 6,
 
     /// <summary>JavaScript</summary>
-    JavaScript = 6,
+    JavaScript = 7,
 
     /// <summary>JSON</summary>
-    JSON = 7,
+    JSON = 8,
 
     /// <summary>LaTeX</summary>
-    LaTeX = 8,
-
-    /// <summary>Less</summary>
-    Less = 9,
+    LaTeX = 9,
 
     /// <summary>
     /// <para>
@@ -55,18 +55,21 @@ public enum EditorSyntax
     /// <summary>Objective-C</summary>
     ObjectiveC = 11,
 
-    /// <summary>PHP</summary>
-    PHP = 12,
-
     /// <summary>Python</summary>
-    Python = 13,
+    Python = 12,
 
     /// <summary>Sass</summary>
-    Sass = 14,
+    Sass = 13,
 
     /// <summary>SQL</summary>
-    SQL = 15,
+    SQL = 14,
 
     /// <summary>TypeScript</summary>
-    TypeScript = 16,
+    TypeScript = 15,
+
+    /// <summary>XML</summary>
+    XML = 16,
+
+    /// <summary>YAML</summary>
+    YAML = 17,
 }

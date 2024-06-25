@@ -7,7 +7,8 @@
 <p>
     The accordion <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components">web
     component</a> is intended to hold a collection of <a href="./components/collapse">Collapse</a>
-    components. There are two main versions of the component: one where only one collapse is
+    components, or <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details">details</a>
+    elements. There are two main versions of the component: one where only one collapse is
     permitted to be open at a time, and one where any collapse can be open or closed without regard
     for the others.
 </p>
@@ -15,8 +16,10 @@
 <h2>Any number open</h2>
 
 <p>
-    The version where any component can be open is the simplest. Just wrap a set of <a
-    href="./components/collapse">Collapse</a> components in a <code>tf-accordion</code> element.
+    The version where any component can be open is the simplest. Just wrap a set of
+    <a href="./components/collapse">Collapse</a> components or
+    <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details">details</a>
+    elements in a <code>tf-accordion</code> element.
 </p>
 
 <Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
@@ -24,7 +27,7 @@
         <div class="row justify-content-center">
             <tf-accordion>
                 <Collapse Id="a-1-c1" Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Id="a-1-c2" Title="Collapse #2">Collapsed content #2</Collapse>
+                <details><summary>Details #2</summary>Collapsed content #2</details>
                 <Collapse Id="a-1-c3" Title="Collapse #3">Collapsed content #3</Collapse>
             </tf-accordion>
         </div>
@@ -32,7 +35,7 @@
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<tf-accordion>
     <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
-    <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
+    <details><summary>Details #2</summary>Collapsed content #2</details>
     <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
 </tf-accordion>")
     </ChildContent>

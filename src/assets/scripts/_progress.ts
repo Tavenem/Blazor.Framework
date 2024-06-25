@@ -159,7 +159,6 @@ svg:first-child circle {
         shadow.appendChild(div);
 
         const slot = document.createElement('slot');
-        slot.name = "label";
         shadow.appendChild(slot);
     }
 
@@ -474,7 +473,6 @@ export class TavenemProgressLinearHTMLElement extends HTMLElement {
         shadow.appendChild(div);
 
         const slot = document.createElement('slot');
-        slot.name = "label";
         shadow.appendChild(slot);
 
         this.setProgress(progressValue);

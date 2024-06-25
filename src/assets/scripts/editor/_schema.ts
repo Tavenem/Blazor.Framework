@@ -2,19 +2,26 @@
     AttributeSpec,
     Attrs,
     DOMOutputSpec,
+    DOMParser as PMDOMParser,
+    DOMSerializer,
+    Fragment,
     Mark,
     MarkSpec,
     Node as ProsemirrorNode,
     NodeSpec,
+    ParseOptions,
     Schema,
-    DOMSerializer,
-    Fragment,
 } from 'prosemirror-model';
+import { TavenemCheckboxHtmlElement } from '../_checkbox';
 
 const commonAttrs: { [name: string]: AttributeSpec } = {
     id: { default: null },
-    className: { default: null },
+    autofocus: { default: null },
+    'class': { default: null },
     dir: { default: null },
+    draggable: { default: null },
+    hidden: { default: null },
+    inert: { default: null },
     itemid: { default: null },
     itemprop: { default: null },
     itemref: { default: null },
@@ -23,6 +30,7 @@ const commonAttrs: { [name: string]: AttributeSpec } = {
     lang: { default: null },
     popover: { default: null },
     role: { default: null },
+    slot: { default: null },
     style: { default: null },
     title: { default: null },
     translate: { default: null },
@@ -186,12 +194,17 @@ const isBlock: (node: HTMLElement) => boolean = (node) => {
 const commonNodes: { [name in string]: NodeSpec } = {
     doc: { content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+ | html" },
     text: { group: "phrasing" },
+    phrasing_wrapper: {
+        content: "text* | phrasing | audio | button | input_content | video | progress | meter | output | label | image",
+        group: "flow",
+        toDOM() { return ['phrasing-wrapper', 0]; },
+    },
     paragraph: {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
         parseDOM: [{ tag: "p", getAttrs: getCommonAttrs }],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "p") }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "p"); }
     },
     blockquote_text: {
         alternate: 'blockquote',
@@ -210,7 +223,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
                 return getCommonAttrs(node);
             }
         }],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote") },
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote"); },
     },
     blockquote: {
         alternate: 'blockquote_text',
@@ -221,7 +234,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         group: "flow",
         defining: true,
         parseDOM: [{ tag: "blockquote", getAttrs: getCommonAttrs }],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote") }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote"); }
     },
     checkbox: {
         attrs: plusCommonAttributes({
@@ -264,13 +277,13 @@ const commonNodes: { [name in string]: NodeSpec } = {
         group: "input_content",
         inline: true,
         parseDOM: [{ tag: 'input[type="checkbox"]', getAttrs: getCommonAttrs }],
-        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "input") }
+        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "input"); }
     },
     horizontal_rule: {
         attrs: commonAttrs,
         group: "flow",
         parseDOM: [{ tag: "hr", getAttrs: getCommonAttrs }],
-        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "hr") }
+        toDOM(node) { return contentlessToDomWithCommonAttrs(node, "hr"); }
     },
     heading: {
         attrs: plusCommonAttributes({ level: { default: 1 } }),
@@ -419,8 +432,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     hard_break: {
         attrs: commonAttrs,
-        inline: true,
         group: "phrasing",
+        inline: true,
+        linebreakReplacement: true,
         selectable: false,
         parseDOM: [{ tag: "br", getAttrs: getCommonAttrs }],
         toDOM(node) { return contentlessToDomWithCommonAttrs(node, "br") }
@@ -511,7 +525,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     task_list_item: {
         alternate: 'list_item',
         attrs: commonAttrs,
-        content: "checkbox (phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        content: "(checkbox | tfcheckbox) (phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         parseDOM: [{
             tag: "li",
@@ -520,8 +534,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
                     return false;
                 }
                 if (!(node instanceof HTMLLIElement)
-                    || !(node.firstChild instanceof HTMLInputElement)
-                    || node.firstChild.type !== 'checkbox') {
+                    || ((!(node.firstChild instanceof HTMLInputElement)
+                    || node.firstChild.type !== 'checkbox')
+                    && !(node.firstChild instanceof TavenemCheckboxHtmlElement))) {
                     return false;
                 }
                 return getCommonAttrs(node);
@@ -922,7 +937,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     math_inline: {
         attrs: commonAttrs,
-        group: "inline math",
+        group: "phrasing math",
         content: "text*",
         inline: true,
         atom: true,
@@ -934,7 +949,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     },
     math_display: {
         attrs: commonAttrs,
-        group: "block math",
+        group: "flow math",
         content: "text*",
         atom: true,
         code: true,
@@ -1396,12 +1411,14 @@ const commonNodes: { [name in string]: NodeSpec } = {
             capture: { default: null },
             checked: { default: null },
             dirname: { default: null },
+            enterkeyhint: { default: null },
             formaction: { default: null },
             formenctype: { default: null },
             formmethod: { default: null },
             formnovalidate: { default: null },
             formtarget: { default: null },
             height: { default: null },
+            inputmode: { default: null },
             list: { default: null },
             max: { default: null },
             maxlength: { default: null },
@@ -1416,6 +1433,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
             required: { default: null },
             size: { default: null },
             src: { default: null },
+            spellcheck: { default: null },
             step: { default: null },
             width: { default: null },
         }),
@@ -1747,6 +1765,34 @@ const commonNodes: { [name in string]: NodeSpec } = {
         parseDOM: [{ tag: "select", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "select") }
     },
+    slot_text: {
+        alternate: 'slot',
+        attrs: plusCommonAttributes({
+            name: { default: null },
+        }),
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "flow",
+        parseDOM: [{
+            tag: "slot",
+            getAttrs(node) {
+                if (isBlock(node)) {
+                    return false;
+                }
+                return getCommonAttrs(node);
+            }
+        }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "slot") }
+    },
+    slot: {
+        alternate: 'slot_text',
+        attrs: plusCommonAttributes({
+            name: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning | tftab | tftabpanel)+",
+        group: "flow",
+        parseDOM: [{ tag: "slot", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "slot") }
+    },
     source: {
         attrs: plusCommonAttributes({
             src: {},
@@ -1861,6 +1907,8 @@ const commonNodes: { [name in string]: NodeSpec } = {
             autofocus: { default: null },
             cols: { default: null },
             dirname: { default: null },
+            enterkeyhint: { default: null },
+            inputmode: { default: null },
             maxlength: { default: null },
             minlength: { default: null },
             placeholder: { default: null },
@@ -1939,6 +1987,587 @@ const commonNodes: { [name in string]: NodeSpec } = {
         selectable: false,
         parseDOM: [{ tag: "wbr", getAttrs: getCommonAttrs }],
         toDOM(node) { return contentlessToDomWithCommonAttrs(node, "wbr") }
+    },
+    tfaccordion: {
+        attrs: plusCommonAttributes({
+            'data-only-one': { default: null },
+        }),
+        content: "(tfcontents | flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        group: "flow",
+        parseDOM: [{ tag: "tf-accordion", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-accordion") }
+    },
+    tfcheckbox: {
+        attrs: plusFormAttributes({
+            accept: { default: null },
+            autofocus: { default: null },
+            checked: { default: null },
+            'data-allow-null': { default: null },
+            'data-checked-outlined': { default: null },
+            'data-indeterminate-outlined': { default: null },
+            'data-input-class': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            'data-requires-true': { default: null },
+            'data-unchecked-outlined': { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            indeterminate: { default: null },
+            radio: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+        }),
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-checkbox", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-checkbox") }
+    },
+    tfclose: {
+        attrs: commonAttrs,
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-close", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-close") }
+    },
+    tfcolorinput: {
+        attrs: plusFormAttributes({
+            alpha: { default: null },
+            autofocus: { default: null },
+            button: { default: null },
+            'data-icon': { default: null },
+            'data-input-class': { default: null },
+            'data-input-mode': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            'data-show-swatch': { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            inline: { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-color-input", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-color-input") }
+    },
+    tfcontents: {
+        attrs: commonAttrs,
+        group: "flow",
+        parseDOM: [{ tag: "tf-contents", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-contents") }
+    },
+    tfdarkmodetoggle: {
+        attrs: commonAttrs,
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-darkmode-toggle", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-darkmode-toggle") }
+    },
+    tfdatetimeinput: {
+        attrs: plusFormAttributes({
+            autofocus: { default: null },
+            button: { default: null },
+            'data-am': { default: null },
+            'data-calendar': { default: null },
+            'data-hour12': { default: null },
+            'data-input-class': { default: null },
+            'data-input-mode': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            'data-locale': { default: null },
+            'data-pm': { default: null },
+            'data-show-calendar': { default: null },
+            'data-show-time-zone': { default: null },
+            'data-time-separator': { default: null },
+            'data-time-zone': { default: null },
+            date: { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            inline: { default: null },
+            max: { default: null },
+            min: { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+            seconds: { default: null },
+            size: { default: null },
+            time: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-datetime-input", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-datetime-input") }
+    },
+    tfdrawerclose: {
+        attrs: plusCommonAttributes({
+            'data-side': { default: null },
+        }),
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-drawer-close", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-drawer-close") }
+    },
+    tfdraweroverlay: {
+        attrs: plusCommonAttributes({
+            'data-side': { default: null },
+        }),
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-drawer-overlay", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-drawer-overlay") }
+    },
+    tfdrawertoggle: {
+        attrs: plusCommonAttributes({
+            'data-side': { default: null },
+        }),
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-drawer-toggle", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-drawer-toggle") }
+    },
+    tfdropdown: {
+        attrs: plusCommonAttributes({
+            'data-activation': { default: null },
+            'data-delay': { default: null },
+            'data-open-at-pointer': { default: null },
+            'disabled': { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "tf-dropdown", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-dropdown") }
+    },
+    tfeditor: {
+        attrs: plusFormAttributes({
+            autocomplete: { default: null },
+            autocorrect: { default: null },
+            autofocus: { default: null },
+            'data-input-class': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            'data-lock-mode': { default: null },
+            'data-lock-syntax': { default: null },
+            'data-syntax': { default: null },
+            'data-update-on-input': { default: null },
+            display: { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            height: { default: null },
+            inputmode: { default: null },
+            'max-height': { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+            spellcheck: { default: null },
+            wysiwyg: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-editor", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-editor") }
+    },
+    tfemoji: {
+        attrs: commonAttrs,
+        content: "text*",
+        defining: true,
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-emoji", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-emoji") }
+    },
+    tfemojiinput: {
+        attrs: plusFormAttributes({
+            autofocus: { default: null },
+            'data-input-class': { default: null },
+            'data-input-style': { default: null },
+            'data-show-emoji': { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-emoji-input", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-emoji-input") }
+    },
+    tficon: {
+        attrs: commonAttrs,
+        content: "text*",
+        defining: true,
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-icon", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-icon") }
+    },
+    tfinput: {
+        attrs: plusFormAttributes({
+            autocomplete: { default: null },
+            autocorrect: { default: null },
+            autofocus: { default: null },
+            'data-input-class': { default: null },
+            'data-input-debounce': { default: null },
+            'data-input-style': { default: null },
+            'data-show-emoji': { default: null },
+            display: { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            inputmode: { default: null },
+            maxlength: { default: null },
+            minlength: { default: null },
+            pattern: { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+            size: { default: null },
+            spellcheck: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-input", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-input") }
+    },
+    tfinputfield: {
+        attrs: plusFormAttributes({
+            autocomplete: { default: null },
+            autocorrect: { default: null },
+            autofocus: { default: null },
+            'data-input-class': { default: null },
+            'data-input-debounce': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            'data-show-emoji': { default: null },
+            display: { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            inputmode: { default: null },
+            maxlength: { default: null },
+            minlength: { default: null },
+            pattern: { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+            size: { default: null },
+            spellcheck: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-input-field", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-input-field") }
+    },
+    tfnumericinput: {
+        attrs: plusFormAttributes({
+            autocomplete: { default: null },
+            autofocus: { default: null },
+            'data-hide-steppers': { default: null },
+            'data-input-class': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            display: { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            inputmode: { default: null },
+            max: { default: null },
+            maxlength: { default: null },
+            min: { default: null },
+            minlength: { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+            size: { default: null },
+            step: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-numeric-input", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-numeric-input") }
+    },
+    tfpicker: {
+        attrs: plusCommonAttributes({
+            disabled: { default: null },
+            readonly: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "tf-picker", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-picker") }
+    },
+    tfpopover_text: {
+        alternate: 'tfpopover',
+        attrs: plusCommonAttributes({
+            'data-anchor-id': { default: null },
+            'data-focus-id': { default: null },
+            'data-offset-x': { default: null },
+            'data-offset-y': { default: null },
+            'data-open': { default: null },
+            'data-position-x': { default: null },
+            'data-position-y': { default: null },
+        }),
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        defining: true,
+        group: "flow",
+        parseDOM: [{
+            tag: "tf-popover",
+            getAttrs(node) {
+                if (isBlock(node)) {
+                    return false;
+                }
+                return getCommonAttrs(node);
+            }
+        }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-popover") }
+    },
+    tfpopover: {
+        alternate: 'tfpopover_text',
+        attrs: plusCommonAttributes({
+            'data-anchor-id': { default: null },
+            'data-focus-id': { default: null },
+            'data-offset-x': { default: null },
+            'data-offset-y': { default: null },
+            'data-open': { default: null },
+            'data-position-x': { default: null },
+            'data-position-y': { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "tf-popover", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-popover") }
+    },
+    tfprogresscircle: {
+        attrs: plusCommonAttributes({
+            'data-progress': { default: null },
+            'data-stroke': { default: null },
+        }),
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-progress-circle", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-progress-circle") }
+    },
+    tfprogresslinear: {
+        attrs: plusCommonAttributes({
+            'data-vertical': { default: null },
+            'data-progress': { default: null },
+            'data-stroke': { default: null },
+        }),
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-progress-linear", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-progress-linear") }
+    },
+    tfscrolltop: {
+        attrs: commonAttrs,
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: "tf-scroll-top", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-scroll-top") }
+    },
+    tfselect: {
+        attrs: plusFormAttributes({
+            autocomplete: { default: null },
+            autocorrect: { default: null },
+            autofocus: { default: null },
+            'data-disable-autosearch': { default: null },
+            'data-has-text-input': { default: null },
+            'data-hide-expand': { default: null },
+            'data-input-class': { default: null },
+            'data-input-debounce': { default: null },
+            'data-input-readonly': { default: null },
+            'data-input-style': { default: null },
+            'data-label': { default: null },
+            'data-popover-limit-height': { default: null },
+            'data-search-filter': { default: null },
+            'data-show-emoji': { default: null },
+            display: { default: null },
+            formaction: { default: null },
+            formenctype: { default: null },
+            formmethod: { default: null },
+            formnovalidate: { default: null },
+            formtarget: { default: null },
+            inputmode: { default: null },
+            maxlength: { default: null },
+            minlength: { default: null },
+            pattern: { default: null },
+            placeholder: { default: null },
+            readonly: { default: null },
+            required: { default: null },
+            size: { default: null },
+            spellcheck: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-select", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-select") }
+    },
+    tfslider: {
+        attrs: plusCommonAttributes({
+            'data-max': { default: null },
+            'data-min': { default: null },
+            'data-value': { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "input_content",
+        inline: true,
+        parseDOM: [{ tag: "tf-slider", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-slider") }
+    },
+    tfsyntaxhighlight: {
+        attrs: commonAttrs,
+        content: "(code_block | flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "tf-syntax-highlight", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-syntax-highlight") }
+    },
+    tftab: {
+        attrs: plusCommonAttributes({
+            'data-can-close': { default: null },
+            'data-url': { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "tf-tab", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tab") }
+    },
+    tftabpanel: {
+        attrs: plusCommonAttributes({
+            'data-can-close': { default: null },
+            disabled: { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "tf-tabpanel", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tabpanel") }
+    },
+    tftabs: {
+        attrs: plusCommonAttributes({
+            'data-active-index': { default: null },
+            disabled: { default: null },
+        }),
+        content: "(tftab | tftabpanel | flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        parseDOM: [{ tag: "tf-tabs", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tabs") }
+    },
+    tftooltip_text: {
+        alternate: 'tftooltip',
+        attrs: plusCommonAttributes({
+            'data-anchor-origin': { default: null },
+            'data-arrow': { default: null },
+            'data-container-no-trigger': { default: null },
+            'data-delay': { default: null },
+            'data-dismiss-on-tap': { default: null },
+            'data-max-height': { default: null },
+            'data-popover-class': { default: null },
+            'data-popover-origin': { default: null },
+            'data-popover-style': { default: null },
+            'data-tooltip-button': { default: null },
+        }),
+        content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        defining: true,
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{
+            tag: "tf-tooltip",
+            getAttrs(node) {
+                if (isBlock(node)) {
+                    return false;
+                }
+                return getCommonAttrs(node);
+            }
+        }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tooltip") }
+    },
+    tftooltip: {
+        alternate: 'tftooltip_text',
+        attrs: plusCommonAttributes({
+            'data-anchor-origin': { default: null },
+            'data-arrow': { default: null },
+            'data-container-no-trigger': { default: null },
+            'data-delay': { default: null },
+            'data-dismiss-on-tap': { default: null },
+            'data-max-height': { default: null },
+            'data-popover-class': { default: null },
+            'data-popover-origin': { default: null },
+            'data-popover-style': { default: null },
+            'data-tooltip-button': { default: null },
+        }),
+        content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
+        defining: true,
+        group: "flow",
+        parseDOM: [{ tag: "tf-tooltip", getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tooltip") }
+    },
+    template: {
+        attrs: {
+            leadingWhitespace: { default: null },
+            trailingWhitespace: { default: null },
+        },
+        atom: true,
+        content: "text*",
+        marks: "",
+        group: "phrasing",
+        inline: true,
+        defining: true,
+    },
+    whitespace: {
+        content: "text*",
+        group: "phrasing",
+        inline: true,
+        defining: true,
+        whitespace: "pre",
+        toDOM() { return ["whitespace-view", 0]; },
     },
     other: {
         atom: true,
@@ -2175,42 +2804,91 @@ const commonMarks: { [name in string]: MarkSpec } = {
     },
 };
 
-export const schema = new Schema({
+interface ExtendedSchema<Nodes extends string = any, Marks extends string = any> extends Schema<Nodes, Marks> {
+    baseText?(text: string, marks?: readonly Mark[] | null): ProsemirrorNode;
+}
+
+export const schema: ExtendedSchema = new Schema({
     nodes: commonNodes,
-    marks: commonMarks
+    marks: commonMarks,
 });
+schema.baseText = schema.text;
+schema.text = function (text: string, marks?: readonly Mark[] | null): ProsemirrorNode {
+    let trimmed = text.trimStart();
+    const leadingWhitespace = text.length > trimmed.length
+        ? text.substring(0, text.length - trimmed.length)
+        : null;
+    const trimmedEnd = trimmed.trimEnd();
+    const trailingWhitespace = trimmed.length > trimmedEnd.length
+        ? trimmed.substring(trimmedEnd.length)
+        : null;
+    trimmed = trimmedEnd;
+    if (trimmed.length === 0) {
+        if (typeof this.baseText === 'function') {
+            return this.node(
+                'whitespace',
+                null,
+                Fragment.from(this.baseText(text, marks)));
+        }
+        throw Error('Error: failed to call baseText');
+    }
+    if (trimmed.length > 4
+        && trimmed.startsWith('{{')
+        && trimmed.endsWith('}}')) {
+        return this.node(
+            'template',
+            leadingWhitespace || trailingWhitespace
+                ? {
+                    leadingWhitespace,
+                    trailingWhitespace,
+                }
+                : null,
+            Fragment.from(this.text(trimmed.substring(2, trimmed.length - 2), null)));
+    }
+    if (typeof this.baseText === 'function') {
+        return this.baseText(text, marks);
+    }
+    throw Error('Error: failed to call baseText');
+}
+
+interface ExtendedDOMSerializer extends DOMSerializer {
+    baseSerializeNodeInner?(node: ProsemirrorNode, options: { document?: Document }): globalThis.Node;
+    serializeNodeInner?(node: ProsemirrorNode, options: { document?: Document }): globalThis.Node;
+}
 
 class Renderer {
-    private _serializer: DOMSerializer;
+    private _serializer: ExtendedDOMSerializer;
 
     constructor() {
-        const baseSerializer = DOMSerializer.fromSchema(schema);
-        const nodes = { ...baseSerializer.nodes };
-        for (const name of Object.keys(schema.nodes)) {
-            if (schema.nodes[name].isTextblock) {
-                const original = nodes[name];
-                nodes[name] = (node) => {
-                    const dom = original(node);
-                    if (node.content.size === 0
-                        && Array.isArray(dom)) {
-                        const holeIndex = dom.findIndex(x => x === 0);
-                        if (holeIndex !== -1) {
-                            dom[holeIndex] = ['br', {}];
-                        }
-                    }
-                    return dom;
+        this._serializer = DOMSerializer.fromSchema(schema);
+        this._serializer.baseSerializeNodeInner = this._serializer.serializeNodeInner;
+        this._serializer.serializeNodeInner = function (node: ProsemirrorNode, options: { document?: Document }) {
+            if (node.type.name === 'phrasing_wrapper') {
+                const child = this.serializeFragment(node.content, options).firstChild;
+                if (child) {
+                    return child;
                 }
+                throw new Error("Error: failed to serialize phrasing wrapper");
             }
+            if (node.type.name === 'whitespace') {
+                return (options.document || window.document).createTextNode(node.textContent);
+            }
+            if (node.type.name === 'template') {
+                return (options.document || window.document).createTextNode(`${node.attrs?.leadingWhitespace || ''}{{${node.textContent}}}${node.attrs?.trailingWhitespace || ''}`);
+            }
+            if (typeof this.baseSerializeNodeInner === 'function') {
+                return this.baseSerializeNodeInner(node, options);
+            }
+            throw new Error("Error: failed to call baseSerializeNodeInner");
         }
-        this._serializer = new DOMSerializer({ ...nodes }, baseSerializer.marks);
     }
 
-    serializeFragment(fragment: Fragment) {
-        return this._serializer.serializeFragment(fragment);
+    serializeFragment(fragment: Fragment, options?: { document?: Document }, target?: HTMLElement | DocumentFragment) {
+        return this._serializer.serializeFragment(fragment, options, target);
     }
 
-    serializeNode(node: ProsemirrorNode) {
-        return this._serializer.serializeNode(node);
+    serializeNode(node: ProsemirrorNode, options?: { document?: Document }) {
+        return this._serializer.serializeNode(node, options);
     }
 }
 export const renderer = new Renderer();

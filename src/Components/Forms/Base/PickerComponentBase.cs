@@ -48,16 +48,9 @@ public class PickerComponentBase<TValue> : FormComponentBase<TValue>
     /// </summary>
     [Parameter] public string? Placeholder { get; set; }
 
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("shrink", ShrinkWhen)
-        .ToString();
-
     private protected bool Clearable { get; set; }
 
     private protected virtual bool ShowClear => AllowClear && Clearable;
-
-    private protected virtual bool ShrinkWhen => false;
 
     /// <summary>
     /// <para>

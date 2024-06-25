@@ -38,7 +38,7 @@ export class HeadView implements NodeView {
 }
 
 export class CheckboxView implements NodeView {
-    dom: Node;
+    dom: HTMLInputElement;
 
     constructor(
         public node: ProsemirrorNode,
@@ -156,7 +156,7 @@ export class DetailsView implements NodeView {
 }
 
 export class DisabledInputView implements NodeView {
-    dom: Node;
+    dom: HTMLInputElement;
 
     constructor(
         public node: ProsemirrorNode,
@@ -192,7 +192,7 @@ export class DisabledInputView implements NodeView {
 }
 
 export class ForbiddenView implements NodeView {
-    dom: Node;
+    dom: HTMLDivElement;
 
     constructor(
         public node: ProsemirrorNode,
@@ -226,7 +226,7 @@ export class ForbiddenView implements NodeView {
 }
 
 export class FormView implements NodeView {
-    dom: Node;
+    dom: HTMLElement;
     contentDom?: HTMLElement;
 
     static ForbiddenAttributes = [
@@ -283,7 +283,7 @@ export class FormView implements NodeView {
 }
 
 export class InputView implements NodeView {
-    dom: Node;
+    dom: HTMLInputElement;
 
     constructor(
         public node: ProsemirrorNode,
@@ -347,7 +347,7 @@ export class InputView implements NodeView {
 }
 
 export class RadioView implements NodeView {
-    dom: Node;
+    dom: HTMLInputElement;
 
     constructor(
         public node: ProsemirrorNode,
@@ -415,7 +415,7 @@ export class RadioView implements NodeView {
 }
 
 export class ResetInputView implements NodeView {
-    dom: Node;
+    dom: HTMLInputElement;
 
     constructor(
         public node: ProsemirrorNode,
@@ -467,7 +467,7 @@ export class ResetInputView implements NodeView {
 }
 
 export class SelectView implements NodeView {
-    dom: Node;
+    dom: HTMLSelectElement;
 
     static ForbiddenAttributes = [
         'form',
@@ -596,7 +596,7 @@ export class SelectView implements NodeView {
 }
 
 export class TextAreaView implements NodeView {
-    dom: Node;
+    dom: HTMLElement;
     contentDom?: HTMLElement;
 
     static ForbiddenAttributes = [

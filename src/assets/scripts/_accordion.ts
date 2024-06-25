@@ -119,14 +119,8 @@ export class TavenemAccordionHTMLElement extends HTMLElement {
         }
 
         this._details = Array
-            .from(this.getElementsByClassName('collapse'))
-            .map(x => {
-                const details = Array.from(x.getElementsByTagName('details'))
-                    .filter(y => y.parentNode === x);
-                if (details && details.length) {
-                    return details[0];
-                }
-            }).filter((x): x is HTMLDetailsElement => !!x);
+            .from(this.querySelectorAll(':scope > .collapse > details, :scope > details'))
+            .filter((x): x is HTMLDetailsElement => !!x);
         for (const details of this._details) {
             details.addEventListener('toggle', this.toggle.bind(this));
         }

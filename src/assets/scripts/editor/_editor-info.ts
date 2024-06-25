@@ -26,7 +26,7 @@ interface CommandInfo {
 type CommandUpdateInfo = { [K in CommandType]?: CommandInfo }
 export interface UpdateInfo {
     commands?: CommandUpdateInfo;
-    currentNode?: string | null;
+    currentStatus?: string | null;
 }
 
 export interface EditorInfo {

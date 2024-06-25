@@ -612,7 +612,7 @@ label {
         input.className = this.dataset.inputClass || '';
         input.disabled = this.hasAttribute('disabled');
 
-        const inputId = this.dataset.inputId || randomUUID();
+        const inputId = randomUUID();
         input.id = inputId;
 
         input.readOnly = this.hasAttribute('readonly');

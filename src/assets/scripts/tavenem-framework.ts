@@ -282,7 +282,6 @@ button {
                 shadow.appendChild(style);
 
                 const slot = document.createElement('slot');
-                slot.name = "content";
                 shadow.appendChild(slot);
 
                 const button = document.createElement('button');

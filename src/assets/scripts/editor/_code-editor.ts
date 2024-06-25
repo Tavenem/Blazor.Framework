@@ -252,9 +252,10 @@ export class TavenemCodeEditor implements Editor {
         if (!this._editor) {
             return;
         }
+        const line = this._editor.view.state.doc.lineAt(this._editor.view.state.selection.main.head);
         const updateInfo: UpdateInfo = {
             commands: {},
-            currentNode: null,
+            currentStatus: `line ${line.number} column ${this._editor.view.state.selection.main.head - line.from}`,
         };
         updateInfo.commands![CommandType.Undo] = {
             active: false,

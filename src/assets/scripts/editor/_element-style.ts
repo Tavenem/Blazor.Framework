@@ -840,6 +840,7 @@ svg {
         display: flex;
         flex-wrap: wrap;
         height: calc(2.25rem + 12px);
+        min-height: calc(2.25rem + 12px);
         padding: .5rem calc(2.75rem + 10px) .5rem 1rem;
         row-gap: .25rem;
 
@@ -1046,6 +1047,19 @@ svg {
     background-color: var(--tavenem-color-bg-highlight-bright);
 }
 
+.ProseMirror .nested-editor-view .ProseMirror {
+    display: inline-block;
+    padding: 0;
+}
+
+.ProseMirror .nested-editor-view.ProseMirror-selectednode .render {
+    display: none;
+}
+
+.ProseMirror .template-view-bracket {
+    color: #e5c07b;
+}
+
 :host([height]),
 :host([max-height]) {
     .ProseMirror {
@@ -1053,7 +1067,12 @@ svg {
     }
 }
 
-.syntax-select {
+.editor-toolbar .syntax-select {
+    --field-font-size: .875em;
+    flex-grow: 0;
+}
+
+.editor .syntax-select {
     --tavenem-color-bg-alt: transparent;
     --field-active-border-color: transparent;
     --field-active-border-hover-color: transparent;
@@ -1106,17 +1125,13 @@ svg {
 }
 
 :host([disabled]),
-:host([readonly]),
-:host(:not([wysiwyg])),
-:host(:not([data-syntax="html"], [data-syntax="markdown"])) {
+:host([readonly]) {
     border-bottom-left-radius: var(--tavenem-border-radius);
     border-bottom-right-radius: var(--tavenem-border-radius);
 }
 
 :host([disabled]) .editor-statusbar,
-:host([readonly]) .editor-statusbar,
-:host(:not([wysiwyg])) .editor-statusbar,
-:host(:not([data-syntax="html"], [data-syntax="markdown"])) .editor-statusbar {
+:host([readonly]) .editor-statusbar .editor-statusbar {
     display: none;
 }
 

@@ -200,14 +200,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// </summary>
     protected new virtual string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add("field")
-        .Add("disabled", Disabled)
-        .Add("read-only", ReadOnly)
-        .Add("required", Required)
-        .Add("no-label", string.IsNullOrEmpty(Label))
-        .Add("modified", IsTouched)
-        .Add("valid", IsValid)
-        .Add("invalid", IsInvalidAndTouched)
         .Add(EffectiveThemeColor.ToCSS())
         .ToString();
 

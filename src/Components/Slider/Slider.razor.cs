@@ -111,6 +111,14 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
+        .Add("field")
+        .Add("disabled", Disabled)
+        .Add("read-only", ReadOnly)
+        .Add("required", Required)
+        .Add("no-label", string.IsNullOrEmpty(Label))
+        .Add("modified", IsTouched)
+        .Add("valid", IsValid)
+        .Add("invalid", IsInvalidAndTouched)
         .Add("slider")
         .Add("hash-labels", HashLabels?.Count > 0)
         .ToString();

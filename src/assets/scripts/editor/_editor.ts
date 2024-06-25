@@ -187,7 +187,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             : 'none';
         this._isWYSIWYG = this.hasAttribute('wysiwyg');
         const isWysiwyg = this._isWYSIWYG
-            && (syntax === 'html' || syntax === 'markdown');
+            && (syntax === 'handlebars' || syntax === 'html' || syntax === 'markdown');
         this._options = this.getOptions(isWysiwyg, syntax);
         if (isWysiwyg) {
             this._wysiwygEditor.initializeEditor(
@@ -359,12 +359,12 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         const editorDisabled = this.hasAttribute('disabled')
             || this.hasAttribute('readonly');
 
-        if (typeof data.currentNode !== 'undefined') {
+        if (typeof data.currentStatus !== 'undefined') {
             const root = this.shadowRoot;
             if (root) {
                 const status = root.querySelector('.editor-statusbar');
                 if (status) {
-                    status.innerHTML = data.currentNode || '&nbsp;';
+                    status.innerHTML = data.currentStatus || '&nbsp;';
                 }
             }
         }
@@ -1123,7 +1123,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         }
         if (isWysiwyg == null) {
             isWysiwyg = this._isWYSIWYG
-                && (syntax === 'html' || syntax === 'markdown');
+                && (syntax === 'handlebars' || syntax === 'html' || syntax === 'markdown');
         }
         return {
             autoFocus: this.hasAttribute('autofocus'),
@@ -1359,7 +1359,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             return;
         }
 
-        const isWysiwygSyntax = syntax === 'html' || syntax === 'markdown';
+        const isWysiwygSyntax = syntax === 'handlebars' || syntax === 'html' || syntax === 'markdown';
         this._options = this._options || this.getOptions(this._isWYSIWYG && isWysiwygSyntax, syntax);
         this._options.autoFocus = true;
         this._options.initialValue = this._activeEditor?.getContent();
@@ -1474,7 +1474,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         controls: HTMLElement[]) {
         const emojiInput = document.createElement('tf-emoji-input');
         emojiInput.role = 'menuitem';
-        emojiInput.classList.add('field', 'no-label', 'small');
+        emojiInput.classList.add('field', 'small');
         emojiInput.dataset.inputClass = 'rounded small';
         emojiInput.dataset.popoverContainer = '';
         emojiInput.tabIndex = -1;
@@ -1505,7 +1505,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         disabledOrReadonly: boolean,
         controls: HTMLElement[]): { controls?: HTMLElement[], toolbarButton?: ToolbarControl } {
         const colorInput = document.createElement('tf-color-input');
-        colorInput.classList.add('field', 'no-label', 'clearable', 'small');
+        colorInput.classList.add('field', 'clearable', 'small');
         colorInput.role = 'menuitem';
         colorInput.tabIndex = -1;
         if (definition.icon) {
@@ -1821,7 +1821,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
         }
 
-        const isWysiwygAvailable = syntax === 'html' || syntax === 'markdown';
+        const isWysiwygAvailable = syntax === 'handlebars' || syntax === 'html' || syntax === 'markdown';
         const isWysiwyg = this._isWYSIWYG
             && isWysiwygAvailable;
         const mode: EditorMode = isWysiwyg
@@ -1893,7 +1893,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
 
             const syntaxInput = document.createElement('tf-select');
-            syntaxInput.classList.add('syntax-select');
+            syntaxInput.classList.add('syntax-select', 'compact');
             syntaxInput.dataset.inputReadonly = '';
             syntaxInput.dataset.popoverLimitHeight = '';
             if (disabledOrReadonly) {
@@ -1925,6 +1925,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
 
             syntaxInput.setAttribute('value', syntax);
+            syntaxInput.setAttribute('display', syntaxTextMap[syntax]);
         }
 
         const slot = document.createElement('slot');
@@ -1988,7 +1989,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
         this._options = this._options || this.getOptions();
 
-        const isWysiwygSyntax = this._options.syntax === 'html'
+        const isWysiwygSyntax = this._options.syntax === 'handlebars'
+            || this._options.syntax === 'html'
             || this._options.syntax === 'markdown';
 
         if (wysiwyg && !isWysiwygSyntax) {

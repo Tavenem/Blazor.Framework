@@ -393,6 +393,16 @@ export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
     }
 }
 
+:host(.compact) {
+    margin-bottom: 0;
+    margin-top: 0;
+
+    > tf-input {
+        padding-top: 0;
+        padding-bottom: 1px;
+    }
+}
+
 :host(.dense.filled) {
     --tavenem-field-input-button-margin-top: -7px;
 

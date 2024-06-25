@@ -1,7 +1,7 @@
 import { html_beautify } from "js-beautify";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
-import { DOMParser as PMDOMParser, Node } from 'prosemirror-model';
+import { DOMParser as PMDOMParser, Node, Slice, Fragment } from 'prosemirror-model';
 import { Command, EditorState, Plugin, Selection, Transaction } from "prosemirror-state";
 import { inputRules } from "prosemirror-inputrules";
 import { buildInputRules, buildKeymap } from "prosemirror-example-setup";
@@ -47,6 +47,7 @@ import {
     TextAreaView,
 } from "./_views";
 import { EditorSyntax } from "./_syntax";
+import { tavenemComponentPlugin } from "./_component-plugin";
 
 class MenuView {
     _commands: CommandSet;
@@ -66,25 +67,31 @@ class MenuView {
     update() {
         const updateInfo: UpdateInfo = {
             commands: {},
-            currentNode: null,
+            currentStatus: null,
         };
 
         const head = this._editorView.state.selection.$head;
         const depth = head.sharedDepth(this._editorView.state.selection.anchor);
         if (depth == 0) {
-            updateInfo.currentNode = 'document';
+            updateInfo.currentStatus = 'document';
         } else {
             let path = '';
             for (let i = 1; i <= depth; i++) {
+                const node = head.node(i);
+                if (node.type.name === 'phrasing_wrapper') {
+                    continue;
+                }
                 if (path.length) {
                     path += ' > ';
                 }
-                path += this.nodeName(head.node(i));
+                path += this.nodeName(node);
             }
             if (path.length == 0) {
-                path = this.nodeName(this._editorView.state.selection.$head.parent);
+                path = this._editorView.state.selection.$head.parent.type.name === 'phrasing_wrapper'
+                    ? 'document'
+                    : this.nodeName(this._editorView.state.selection.$head.parent);
             }
-            updateInfo.currentNode = path;
+            updateInfo.currentStatus = path;
         }
 
         for (const type in this._commands) {
@@ -318,6 +325,7 @@ export class TavenemWysiwygEditor implements Editor {
         });
 
         const plugins = [
+            tavenemComponentPlugin,
             mathPlugin,
             tableEditing,
             arrowHandlers,
@@ -379,6 +387,7 @@ export class TavenemWysiwygEditor implements Editor {
                 submit_input: (node, view, getPos, _) => new DisabledInputView(node, view, getPos),
                 table: (node, _view, _getPos, _) => new TableView(node, cellMinWidth),
                 textarea: (node, view, getPos, _) => new TextAreaView(node, view, getPos),
+                tfeditor: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
             },
             dispatchTransaction: this.onUpdate.bind(this),
             handleDOMEvents: { 'blur': this.onBlur.bind(this) }

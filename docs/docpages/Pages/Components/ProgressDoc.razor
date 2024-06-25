@@ -96,18 +96,17 @@
 </p>
 
 <p>
-    You can also add text or other elements above the progress indicator, by adding them to the named
-    slot <code>label</code>:
+    You can also add text or other elements above the progress indicator:
 </p>
 
 <CodeExample Id="ce-6" RowClass="align-items-center" Code="@(@"<div class=""d-flex w-100 align-items-center justify-content-space-around"" style=""height:10rem"">
     <tf-progress-circle class=""info"">
-        <span slot=""label"" class=""text-color-reset""><strong>Loading&hellip;</strong></span>
+        <span class=""text-color-reset""><strong>Loading&hellip;</strong></span>
     </tf-progress-circle>
     <tf-progress-linear class=""danger"" data-progress=""75"" data-vertical>
-        <span slot=""label"" class=""warning text-center""><strong>Danger level</strong></span>
+        <span class=""warning text-center""><strong>Danger level</strong></span>
     </tf-progress-linear>
 </div>
 <tf-progress-linear class=""warning"" data-progress=""25"">
-    <span slot=""label"" class=""text-color-reset"">25%</span>
+    <span class=""text-color-reset"">25%</span>
 </tf-progress-linear>")" />

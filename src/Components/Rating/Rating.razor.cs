@@ -97,8 +97,7 @@ public partial class Rating : FormComponentBase<byte>
     [Parameter] public string? RatingItemStyle { get; set; }
 
     /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(Class)
-        .AddClassFromDictionary(AdditionalAttributes)
+    protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("field")
         .Add("disabled", Disabled)
         .Add("read-only", ReadOnly)
@@ -107,7 +106,6 @@ public partial class Rating : FormComponentBase<byte>
         .Add("modified", IsTouched)
         .Add("valid", IsValid)
         .Add("invalid", IsInvalidAndTouched)
-        .Add(EffectiveThemeColor.ToCSS())
         .Add("rating")
         .ToString();
 
