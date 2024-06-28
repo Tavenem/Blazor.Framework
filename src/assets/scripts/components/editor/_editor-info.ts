@@ -1,4 +1,4 @@
-import { CommandType } from "./_commands";
+import { CommandType } from "./commands/_commands";
 import { EditorSyntax } from "./_syntax";
 import { ToolbarControl } from "./_toolbar";
 

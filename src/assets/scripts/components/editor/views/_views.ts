@@ -1,7 +1,7 @@
 import { html_beautify } from 'js-beautify';
 import { EditorView as PMEditorView, NodeView } from 'prosemirror-view';
 import { Node as ProsemirrorNode } from 'prosemirror-model';
-import { renderer } from './_schema';
+import { renderer } from '../schema/_schema';
 
 export class HeadView implements NodeView {
     dom: Node;

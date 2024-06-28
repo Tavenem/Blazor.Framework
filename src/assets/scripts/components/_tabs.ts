@@ -1,4 +1,4 @@
-import { documentPositionComparator } from "./tavenem-utility";
+import { documentPositionComparator } from "../tavenem-utility";
 
 export class TavenemTabsHTMLElement extends HTMLElement {
     private _activating = false;

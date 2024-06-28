@@ -5,10 +5,10 @@ import { undo, redo } from "prosemirror-history";
 import { ContentMatch, Fragment, Node as ProsemirrorNode } from "prosemirror-model";
 import { Command as PMCommand, Selection, TextSelection } from "prosemirror-state";
 import { NodeView, EditorView as PMEditorView } from "prosemirror-view";
-import { EditorSyntax, codeEditorLanguageMap, syntaxLabelMap, syntaxTextMap, syntaxes } from "./_syntax";
-import { codeEditorDarkExtension, codeEditorLightTheme } from "./_themes";
-import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from "./_code-editing";
-import { ThemePreference, getPreferredTavenemColorScheme } from "../_theme";
+import { EditorSyntax, codeEditorLanguageMap, syntaxLabelMap, syntaxTextMap, syntaxes } from "../_syntax";
+import { codeEditorDarkExtension, codeEditorLightTheme } from "../_themes";
+import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from "../_code-editing";
+import { ThemePreference, getPreferredTavenemColorScheme } from "../../../_theme";
 import { selectNextOccurrence } from "@codemirror/search";
 
 const exitCodeUp: PMCommand = (state, dispatch) => {

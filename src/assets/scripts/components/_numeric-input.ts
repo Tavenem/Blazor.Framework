@@ -1,4 +1,4 @@
-import { randomUUID } from "./tavenem-utility";
+import { randomUUID } from "../tavenem-utility";
 
 export class TavenemNumericInputHtmlElement extends HTMLElement {
     static formAssociated = true;

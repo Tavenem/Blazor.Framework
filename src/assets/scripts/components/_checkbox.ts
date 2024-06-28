@@ -1,4 +1,4 @@
-import { documentPositionComparator, randomUUID } from "./tavenem-utility";
+import { documentPositionComparator, randomUUID } from "../tavenem-utility";
 
 export class TavenemCheckboxHtmlElement extends HTMLElement {
     static formAssociated = true;

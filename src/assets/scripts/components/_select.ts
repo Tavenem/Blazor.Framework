@@ -1,7 +1,7 @@
 import { TavenemInputHtmlElement } from './_input'
 import { TavenemPickerHtmlElement } from './_picker'
 import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover';
-import { documentPositionComparator, randomUUID } from './tavenem-utility'
+import { documentPositionComparator, randomUUID } from '../tavenem-utility'
 
 export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
     static formAssociated = true;

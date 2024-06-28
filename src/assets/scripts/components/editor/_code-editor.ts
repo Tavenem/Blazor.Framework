@@ -2,16 +2,16 @@ import { DOMParser as PMDOMParser } from 'prosemirror-model';
 import { EditorView, ViewUpdate, placeholder } from "@codemirror/view";
 import { Compartment, EditorState, Extension, TransactionSpec } from "@codemirror/state";
 import { redo, undo } from "@codemirror/commands";
-import { ThemePreference, getPreferredTavenemColorScheme } from "../_theme";
+import { ThemePreference, getPreferredTavenemColorScheme } from "../../_theme";
 import { codeEditorPlainText, codeEditorThemeCompartment, defaultCodeExtensions } from "./_code-editing";
 import { Editor, EditorInfo, EditorMode, EditorOptions, UpdateInfo } from "./_editor-info";
 import { codeEditorDarkExtension, codeEditorLightTheme } from "./_themes";
-import { CommandType, ParamStateCommand } from "./_commands";
-import { htmlCommands } from "./_html";
-import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from "./_markdown";
+import { CommandType, ParamStateCommand } from "./commands/_commands";
+import { htmlCommands } from "./commands/_html";
+import { markdownCommands, tavenemMarkdownParser, tavenemMarkdownSerializer } from "./commands/_markdown";
 import { EditorSyntax, codeEditorLanguageMap } from "./_syntax";
 import { ToolbarControl } from "./_toolbar";
-import { renderer, schema } from "./_schema";
+import { renderer, schema } from "./schema/_schema";
 
 interface CodeEditorInfo extends EditorInfo {
     view: EditorView;

@@ -4,8 +4,8 @@ import { keymap } from 'prosemirror-keymap';
 import { chainCommands, deleteSelection, newlineInCode } from 'prosemirror-commands';
 import { Node as ProsemirrorNode } from 'prosemirror-model';
 import { EditorView, NodeView, NodeViewConstructor } from 'prosemirror-view';
-import { TavenemCheckboxHtmlElement } from '../_checkbox';
-import { TavenemInputHtmlElement } from '../_input';
+import { TavenemCheckboxHtmlElement } from '../../_checkbox';
+import { TavenemInputHtmlElement } from '../../_input';
 
 interface ITavenemPluginState { prevCursorPos: number; }
 
@@ -436,7 +436,7 @@ function createInputView(tag: string): NodeViewConstructor {
     };
 }
 
-class TemplateView implements NodeView {
+class HandlebarsView implements NodeView {
     dom: HTMLElement;
     private _innerView: EditorView | undefined;
     private _isEditing = false;
@@ -448,11 +448,11 @@ class TemplateView implements NodeView {
         public view: EditorView,
         public getPos: () => number | undefined,
         private pluginKey: PluginKey<ITavenemPluginState>) {
-        this.dom = document.createElement('template-view');
+        this.dom = document.createElement('handlebars-view');
         this.dom.classList.add('nested-editor-view');
 
         const openingBrackets = document.createElement('span');
-        openingBrackets.classList.add('template-view-bracket');
+        openingBrackets.classList.add('handlebars-bracket');
         openingBrackets.textContent = '{{';
         this.dom.appendChild(openingBrackets);
 
@@ -465,7 +465,7 @@ class TemplateView implements NodeView {
         this.dom.appendChild(this._srcElement);
 
         const closingBrackets = document.createElement('span');
-        closingBrackets.classList.add('template-view-bracket');
+        closingBrackets.classList.add('handlebars-bracket');
         closingBrackets.textContent = '}}';
         this.dom.appendChild(closingBrackets);
 
@@ -604,7 +604,7 @@ class TemplateView implements NodeView {
 
     private openEditor() {
         if (this._innerView) {
-            console.warn("TemplateView editor already open when openEditor was called");
+            console.warn("HandlebarsView editor already open when openEditor was called");
             return;
         }
 
@@ -666,13 +666,13 @@ class TemplateView implements NodeView {
     }
 }
 
-function createTemplateView(): NodeViewConstructor {
+function createHandlebarsView(): NodeViewConstructor {
     return (node: ProsemirrorNode, view: EditorView, getPos: () => number | undefined) => {
         let pluginState = TAVENEM_PLUGIN_KEY.getState(view.state);
         if (!pluginState) {
             throw new Error("no plugin");
         }
-        return new TemplateView(node, view, getPos, TAVENEM_PLUGIN_KEY);
+        return new HandlebarsView(node, view, getPos, TAVENEM_PLUGIN_KEY);
     };
 }
 
@@ -707,7 +707,7 @@ const tavenemPluginSpec: PluginSpec<ITavenemPluginState> = {
             'tfinputfield': createInputView('tf-input-field'),
             'tfnumericinput': createInputView('tf-numeric-input'),
             'tfselect': createInputView('tf-select'),
-            'template': createTemplateView(),
+            'handlebars': createHandlebarsView(),
         }
     }
 };

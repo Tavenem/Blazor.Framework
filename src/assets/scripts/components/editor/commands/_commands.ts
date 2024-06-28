@@ -33,6 +33,10 @@ import {
     Transaction,
 } from "prosemirror-state";
 import {
+    findWrapping,
+    RemoveMarkStep,
+} from "prosemirror-transform";
+import {
     CellSelection,
     addCaption,
     addColumnAfter,
@@ -49,11 +53,7 @@ import {
     toggleFullWidth,
     toggleHeaderColumn,
     toggleHeaderRow,
-} from "./_tables";
-import {
-    findWrapping,
-    RemoveMarkStep,
-} from "prosemirror-transform";
+} from "../views/_tables";
 import {
     CommandInfo,
     liftListItemTypes,
@@ -548,6 +548,65 @@ export function commonCommands(schema: Schema) {
     return commands;
 }
 
+export const detailsBackspaceCommand: Command = (state, dispatch) => {
+    const { $from, $to } = state.selection;
+    let details = $from.parent;
+    let depth = $from.depth;
+    let summary: ProsemirrorNode | undefined;
+    while (details
+        && depth > 0
+        && details.type.name !== "details") {
+        if (details.type.name === "summary"
+            || details.type.name === "summary_text") {
+            summary = details;
+        }
+        details = $from.node(--depth);
+    }
+    if (!details) {
+        return false;
+    }
+
+    // verify start and end of selection are within the same details
+    let toDetails = $to.parent;
+    depth = $to.depth;
+    while (toDetails
+        && depth > 0
+        && toDetails.type.name !== "details") {
+        toDetails = $to.node(--depth);
+    }
+    if (!toDetails || !details.eq(toDetails)) {
+        return false;
+    }
+
+    // if details is empty, remove it
+    if (isEmpty(details)) {
+        if (dispatch) {
+            dispatch(state.tr
+                .deleteRange($from.start(depth), $from.end(depth))
+                .scrollIntoView());
+        }
+        return true;
+    }
+
+    // if selection is within an empty summary, and the details is closed, open it
+    if (dispatch
+        && summary
+        && summary.childCount === 0
+        && (!summary.text || !summary.text.length)
+        && !details.attrs.open) {
+        dispatch(state.tr.setNodeMarkup(
+            $from.start(depth) - 1,
+            undefined,
+            {
+                ...details.attrs,
+                open: true,
+            }).scrollIntoView());
+        return true;
+    }
+
+    return false;
+};
+
 export const exitBlock: Command = (state, dispatch) => {
     const { $head, $anchor } = state.selection;
     if ($head.pos !== $anchor.pos
@@ -625,6 +684,44 @@ export const exitDiv: Command = (state, dispatch) => {
 export function htmlWrapCommand(tag: string) {
     return wrapCommand(`<${tag}>`, `</${tag}>`);
 }
+
+export const phrasingWrapperBackspaceCommand: Command = (state, dispatch) => {
+    const { $from, $to } = state.selection;
+    let wrapper = $from.parent;
+    let depth = $from.depth;
+    while (wrapper
+        && depth > 0
+        && wrapper.type.name !== "phrasing_wrapper") {
+        wrapper = $from.node(--depth);
+    }
+    if (!wrapper) {
+        return false;
+    }
+
+    // verify start and end of selection are within the same wrapper
+    let toWrapper = $to.parent;
+    depth = $to.depth;
+    while (toWrapper
+        && depth > 0
+        && toWrapper.type.name !== "phrasing_wrapper") {
+        toWrapper = $to.node(--depth);
+    }
+    if (!toWrapper || !wrapper.eq(toWrapper)) {
+        return false;
+    }
+
+    // if wrapper is empty, remove it
+    if (isEmpty(wrapper)) {
+        if (dispatch) {
+            dispatch(state.tr
+                .deleteRange($from.start(depth), $from.end(depth))
+                .scrollIntoView());
+        }
+        return true;
+    }
+
+    return false;
+};
 
 export function wrapCommand(tag: string, closeTag: string) {
     return (_params?: any[]) => (target: {
@@ -770,6 +867,18 @@ function defaultBlockAt(match: ContentMatch) {
         }
     }
     return null;
+}
+
+function isEmpty(node: ProsemirrorNode) {
+    if (node.text && node.text.length) {
+        return false;
+    }
+    for (let i = 0; i < node.childCount; i++) {
+        if (!isEmpty(node.child(i))) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function isMarkActive(

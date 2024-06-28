@@ -1,5 +1,5 @@
 import { TavenemInputHtmlElement } from './_input'
-import { randomUUID } from './tavenem-utility'
+import { randomUUID } from '../tavenem-utility'
 
 export class TavenemInputFieldHtmlElement extends HTMLElement {
     static formAssociated = true;

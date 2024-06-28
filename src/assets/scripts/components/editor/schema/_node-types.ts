@@ -1,20 +1,13 @@
-﻿import {
+import {
     AttributeSpec,
     Attrs,
     DOMOutputSpec,
-    DOMParser as PMDOMParser,
-    DOMSerializer,
-    Fragment,
-    Mark,
-    MarkSpec,
-    Node as ProsemirrorNode,
     NodeSpec,
-    ParseOptions,
-    Schema,
-} from 'prosemirror-model';
-import { TavenemCheckboxHtmlElement } from '../_checkbox';
+    Node as ProsemirrorNode,
+} from "prosemirror-model";
+import { TavenemCheckboxHtmlElement } from '../../_checkbox';
 
-const commonAttrs: { [name: string]: AttributeSpec } = {
+export const commonAttrs: { [name: string]: AttributeSpec } = {
     id: { default: null },
     autofocus: { default: null },
     'class': { default: null },
@@ -42,7 +35,7 @@ const formAttrs: { [name: string]: AttributeSpec } = {
     type: { default: null },
     value: { default: null },
 };
-const getCommonAttrs = (
+export const getCommonAttrs = (
     node: Node | string,
     attrs?: { [key: string]: any },
     filterClass?: (x: string) => boolean) => {
@@ -60,7 +53,11 @@ const getCommonAttrs = (
     }
     return attrs as Attrs;
 };
-const nodeToDomWithCommonAttrs: (node: ProsemirrorNode, tag: string, extraClass?: string, children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, extraClass, children) => {
+const nodeToDomWithCommonAttrs: (
+    node: ProsemirrorNode,
+    tag: string,
+    extraClass?: string,
+    children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, extraClass, children) => {
     const domAttrs: { [key: string]: any } = {};
     for (const a of Object.keys(node.attrs)) {
         if (!node.attrs[a]
@@ -89,8 +86,8 @@ const nodeToDomWithHeadingAttrs: (node: ProsemirrorNode, tag: string) => DOMOutp
     for (const a of Object.keys(node.attrs)) {
         if (a === 'level'
             || (!node.attrs[a]
-            && (typeof node.attrs[a] !== 'number'
-                || node.attrs[a] !== 0))) {
+                && (typeof node.attrs[a] !== 'number'
+                    || node.attrs[a] !== 0))) {
             continue;
         }
         domAttrs[a] = node.attrs[a];
@@ -98,7 +95,12 @@ const nodeToDomWithHeadingAttrs: (node: ProsemirrorNode, tag: string) => DOMOutp
 
     return [tag, domAttrs, 0];
 };
-const nodeToDomWithAttrs: (node: ProsemirrorNode, tag: string, attrs: { [key: string]: any }, extraClass?: string, children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, attrs, extraClass, children) => {
+const nodeToDomWithAttrs: (
+    node: ProsemirrorNode,
+    tag: string,
+    attrs: { [key: string]: any },
+    extraClass?: string,
+    children?: (DOMOutputSpec | 0)[]) => DOMOutputSpec = (node, tag, attrs, extraClass, children) => {
     const domAttrs: { [key: string]: any } = {};
     for (const a of Object.keys(attrs)) {
         if (!attrs[a]
@@ -191,11 +193,11 @@ const isBlock: (node: HTMLElement) => boolean = (node) => {
     return false;
 };
 
-const commonNodes: { [name in string]: NodeSpec } = {
-    doc: { content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+ | html" },
+export const commonNodes: { [name in string]: NodeSpec } = {
+    doc: { content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+ | html", whitespace: "pre" },
     text: { group: "phrasing" },
     phrasing_wrapper: {
-        content: "text* | phrasing | audio | button | input_content | video | progress | meter | output | label | image",
+        content: "(text | phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
         toDOM() { return ['phrasing-wrapper', 0]; },
     },
@@ -203,6 +205,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "p", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "p"); }
     },
@@ -214,6 +217,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "blockquote",
             getAttrs(node) {
@@ -233,6 +237,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         group: "flow",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "blockquote", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "blockquote"); }
     },
@@ -290,6 +295,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "heading_content",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [
             { tag: "h1", getAttrs(p) { return getCommonAttrs(p, { level: 1 }) } },
             { tag: "h2", getAttrs(p) { return getCommonAttrs(p, { level: 2 }) } },
@@ -443,6 +449,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: plusCommonAttributes({ start: { default: null } }),
         content: "(list_item_text | list_item)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "ol", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "ol") }
     },
@@ -450,6 +457,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(task_list_item | list_item_text | list_item)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "ul", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "ul") }
     },
@@ -457,6 +465,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(list_item_text | list_item)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "ul", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "ul") }
     },
@@ -464,6 +473,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "list_item+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "menu", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "menu") }
     },
@@ -471,6 +481,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "((term_text | term) (definition_text | definition))+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "dl", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dl") }
     },
@@ -479,6 +490,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "dt",
             getAttrs(node) {
@@ -495,6 +507,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "dt", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dt") }
     },
@@ -503,6 +516,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "dd",
             getAttrs(node) {
@@ -519,6 +533,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "dd", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dd") }
     },
@@ -527,6 +542,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(checkbox | tfcheckbox) (phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "li",
             getAttrs: node => {
@@ -535,8 +551,8 @@ const commonNodes: { [name in string]: NodeSpec } = {
                 }
                 if (!(node instanceof HTMLLIElement)
                     || ((!(node.firstChild instanceof HTMLInputElement)
-                    || node.firstChild.type !== 'checkbox')
-                    && !(node.firstChild instanceof TavenemCheckboxHtmlElement))) {
+                        || node.firstChild.type !== 'checkbox')
+                        && !(node.firstChild instanceof TavenemCheckboxHtmlElement))) {
                     return false;
                 }
                 return getCommonAttrs(node);
@@ -549,6 +565,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "li",
             getAttrs(node) {
@@ -565,6 +582,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "li", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "li") }
     },
@@ -964,6 +982,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "div",
             getAttrs(node) {
@@ -980,6 +999,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "div", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "div") }
     },
@@ -989,6 +1009,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "address_content",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "address",
             getAttrs(node) {
@@ -1006,6 +1027,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "flow+",
         defining: true,
         group: "address_content",
+        //whitespace: "pre",
         parseDOM: [{ tag: "address", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "address") }
     },
@@ -1031,6 +1053,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "article",
             getAttrs(node) {
@@ -1048,6 +1071,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{ tag: "article", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "article") }
     },
@@ -1057,6 +1081,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "aside",
             getAttrs(node) {
@@ -1074,6 +1099,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{ tag: "aside", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "aside") }
     },
@@ -1105,6 +1131,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "body",
             getAttrs(node) {
@@ -1121,6 +1148,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "body", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "body") }
     },
@@ -1149,6 +1177,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(phrasing | audio | video | progress | meter | output | image)*",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "canvas",
             getAttrs(node) {
@@ -1168,6 +1197,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "canvas", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "canvas") }
     },
@@ -1176,6 +1206,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "caption",
             getAttrs(node) {
@@ -1192,6 +1223,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "caption", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "caption") }
     },
@@ -1213,6 +1245,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "datalist",
             getAttrs(node) {
@@ -1229,6 +1262,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "option+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "datalist", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "datalist") }
     },
@@ -1237,6 +1271,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(summary_text | summary) (div | flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "details", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "details") }
     },
@@ -1244,6 +1279,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: plusCommonAttributes({ open: { default: null } }),
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "dialog", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "dialog") }
     },
@@ -1255,6 +1291,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "legend? (flow | form | address_content | headerfooter | heading_content | sectioning)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "fieldset", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "fieldset") }
     },
@@ -1289,6 +1326,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)* (figcaption_text | figcaption)? (phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "figure", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "figure") }
     },
@@ -1298,6 +1336,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "headerfooter",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "footer",
             getAttrs(node) {
@@ -1315,6 +1354,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | heading_content | sectioning)+",
         defining: true,
         group: "headerfooter",
+        //whitespace: "pre",
         parseDOM: [{ tag: "footer", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "footer") }
     },
@@ -1332,6 +1372,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
             target: { default: null },
         }),
         content: "(flow | address_content | headerfooter | heading_content | sectioning)+",
+        //whitespace: "pre",
         parseDOM: [{ tag: "form", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "form") }
     },
@@ -1339,6 +1380,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(meta | link | style)* title (meta | link | style)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "head", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "head") }
     },
@@ -1348,6 +1390,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "headerfooter",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "header",
             getAttrs(node) {
@@ -1365,6 +1408,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | heading_content | sectioning)+",
         defining: true,
         group: "headerfooter",
+        //whitespace: "pre",
         parseDOM: [{ tag: "header", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "header") }
     },
@@ -1372,6 +1416,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "paragraph* heading paragraph*",
         group: "heading_content",
+        //whitespace: "pre",
         parseDOM: [{ tag: "hgroup", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "hgroup") }
     },
@@ -1455,6 +1500,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         alternate: 'legend',
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "legend",
             getAttrs(node) {
@@ -1470,6 +1516,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         alternate: 'legend_text',
         attrs: commonAttrs,
         content: "heading_content+",
+        //whitespace: "pre",
         parseDOM: [{ tag: "legend", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "legend") }
     },
@@ -1498,6 +1545,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "main",
             getAttrs(node) {
@@ -1514,6 +1562,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "main", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "main") }
     },
@@ -1557,6 +1606,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "nav",
             getAttrs(node) {
@@ -1574,6 +1624,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{ tag: "nav", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "nav") }
     },
@@ -1582,6 +1633,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "noscript",
             getAttrs(node) {
@@ -1598,6 +1650,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning | link | meta | style)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "noscript", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "noscript") }
     },
@@ -1621,6 +1674,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
             label: { default: null },
         }),
         content: "option+",
+        //whitespace: "pre",
         parseDOM: [{ tag: "optgroup", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "optgroup") }
     },
@@ -1721,6 +1775,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "search", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "search") }
     },
@@ -1730,6 +1785,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "section",
             getAttrs(node) {
@@ -1747,6 +1803,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | sectioning)+",
         defining: true,
         group: "sectioning",
+        //whitespace: "pre",
         parseDOM: [{ tag: "section", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "section") }
     },
@@ -1772,6 +1829,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "slot",
             getAttrs(node) {
@@ -1790,6 +1848,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning | tftab | tftabpanel)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "slot", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "slot") }
     },
@@ -1828,6 +1887,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{
             tag: "summary",
             getAttrs(node) {
@@ -1844,6 +1904,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         attrs: commonAttrs,
         content: "heading_content",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "summary", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "summary") }
     },
@@ -1923,6 +1984,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         group: "input_content",
         inline: true,
         marks: "",
+        //whitespace: "pre",
         parseDOM: [{ tag: "textarea", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "textarea") }
     },
@@ -1988,14 +2050,26 @@ const commonNodes: { [name in string]: NodeSpec } = {
         parseDOM: [{ tag: "wbr", getAttrs: getCommonAttrs }],
         toDOM(node) { return contentlessToDomWithCommonAttrs(node, "wbr") }
     },
+    handlebars: {
+        attrs: {
+            'data-prefix-br': { default: null },
+            'data-postfix-br': { default: null },
+        },
+        content: "text*",
+        group: "phrasing",
+        inline: true,
+        parseDOM: [{ tag: 'handlebars', getAttrs: getCommonAttrs }],
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, 'handlebars'); },
+    },
     tfaccordion: {
         attrs: plusCommonAttributes({
             'data-only-one': { default: null },
         }),
         content: "(tfcontents | flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-accordion", getAttrs: getCommonAttrs }],
-        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-accordion") }
+        toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-accordion"); },
     },
     tfcheckbox: {
         attrs: plusFormAttributes({
@@ -2153,6 +2227,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-dropdown", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-dropdown") }
     },
@@ -2334,6 +2409,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-picker", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-picker") }
     },
@@ -2351,6 +2427,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{
             tag: "tf-popover",
             getAttrs(node) {
@@ -2376,6 +2453,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-popover", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-popover") }
     },
@@ -2467,6 +2545,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(code_block | flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-syntax-highlight", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-syntax-highlight") }
     },
@@ -2477,6 +2556,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-tab", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tab") }
     },
@@ -2487,6 +2567,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-tabpanel", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tabpanel") }
     },
@@ -2497,6 +2578,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         }),
         content: "(tftab | tftabpanel | flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-tabs", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tabs") }
     },
@@ -2546,28 +2628,9 @@ const commonNodes: { [name in string]: NodeSpec } = {
         content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+",
         defining: true,
         group: "flow",
+        //whitespace: "pre",
         parseDOM: [{ tag: "tf-tooltip", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "tf-tooltip") }
-    },
-    template: {
-        attrs: {
-            leadingWhitespace: { default: null },
-            trailingWhitespace: { default: null },
-        },
-        atom: true,
-        content: "text*",
-        marks: "",
-        group: "phrasing",
-        inline: true,
-        defining: true,
-    },
-    whitespace: {
-        content: "text*",
-        group: "phrasing",
-        inline: true,
-        defining: true,
-        whitespace: "pre",
-        toDOM() { return ["whitespace-view", 0]; },
     },
     other: {
         atom: true,
@@ -2575,6 +2638,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
         code: true,
         content: "text*",
         group: "flow",
+        whitespace: "pre",
         parseDOM: [{
             tag: "*",
             getAttrs(node) {
@@ -2606,294 +2670,7 @@ const commonNodes: { [name in string]: NodeSpec } = {
     }
 };
 
-const markToDomWithCommonAttrs: (mark: Mark, tag: string) => DOMOutputSpec = (mark: Mark, tag: string) => {
-    const domAttrs: { [key: string]: any } = {};
-    for (const a of Object.keys(mark.attrs)) {
-        if (!mark.attrs[a] || !mark.attrs[a].length) {
-            continue;
-        }
-        domAttrs[a] = mark.attrs[a];
-    }
-
-    return [tag, domAttrs, 0];
-};
-const commonMarks: { [name in string]: MarkSpec } = {
-    anchor: {
-        attrs: plusCommonAttributes({
-            href: {},
-            download: { default: null },
-            rel: { default: null },
-            target: { default: null },
-        }),
-        inclusive: false,
-        parseDOM: [{ tag: "a[href]", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "a"); }
-    },
-    em: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "em", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "em") }
-    },
-    italic: {
-        attrs: commonAttrs,
-        parseDOM: [
-            { tag: "i", getAttrs: getCommonAttrs },
-            { style: "font-style=italic" }
-        ],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "i") }
-    },
-    strong: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "strong", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "strong") }
-    },
-    bold: {
-        attrs: commonAttrs,
-        parseDOM: [
-            {
-                tag: "b",
-                getAttrs: node => {
-                    if (node instanceof HTMLElement) {
-                        // This works around a Google Docs misbehavior where
-                        // pasted content will be inexplicably wrapped in `<b>`
-                        // tags with a font-weight normal.
-                        if (node.style.fontWeight == "normal") {
-                            return false;
-                        } else {
-                            const attrs: { [key: string]: any } = {};
-
-                            for (const a of node.attributes) {
-                                attrs[a.name] = a.value;
-                            }
-                            return attrs as Attrs;
-                        }
-                    } else {
-                        return null;
-                    }
-                }
-            },
-            { style: "font-weight", getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value as string) && null }
-        ],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "b") }
-    },
-    underline: {
-        attrs: commonAttrs,
-        parseDOM: [
-            { tag: "u", getAttrs: getCommonAttrs },
-            { style: "text-decoration-line=underline" },
-        ],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "u") }
-    },
-    code: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "code", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "code") }
-    },
-    ins: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "ins", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "ins") }
-    },
-    mark: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "mark", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "mark") }
-    },
-    del: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "del", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "del") }
-    },
-    strikethrough: {
-        attrs: commonAttrs,
-        parseDOM: [
-            { tag: "s", getAttrs: getCommonAttrs },
-            { tag: "strike", getAttrs: getCommonAttrs },
-            { style: "text-decoration-line=line-through" },
-        ],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "s") }
-    },
-    small: {
-        attrs: commonAttrs,
-        parseDOM: [
-            { tag: "small", getAttrs: getCommonAttrs },
-            { style: "font-size=smaller" },
-        ],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "small") }
-    },
-    sub: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "sub", getAttrs: getCommonAttrs }, { style: "vertical-align=sub" }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "sub") }
-    },
-    sup: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "sup", getAttrs: getCommonAttrs }, { style: "vertical-align=super" }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "sup") }
-    },
-    abbr: {
-        attrs: {
-            title: {},
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
-        parseDOM: [{ tag: "abbr[title]", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "abbr") }
-    },
-    bdi: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "bdi", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "bdi") }
-    },
-    bdo: {
-        attrs: {
-            dir: {},
-            id: { default: null },
-            className: { default: null },
-            style: { default: null },
-        },
-        parseDOM: [{ tag: "bdo", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "bdo"); }
-    },
-    cite: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "cite", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "cite") }
-    },
-    data: {
-        attrs: plusCommonAttributes({ value: {} }),
-        parseDOM: [{ tag: "data[value]", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "data"); }
-    },
-    dfn: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "dfn", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "dfn") }
-    },
-    kbd: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "kbd", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "kbd") }
-    },
-    quote: {
-        attrs: plusCommonAttributes({ cite: { default: null } }),
-        parseDOM: [{ tag: "q", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "q"); }
-    },
-    samp: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "samp", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "samp") }
-    },
-    time: {
-        attrs: plusCommonAttributes({ datetime: {} }),
-        parseDOM: [{ tag: "time[datetime]", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "time"); }
-    },
-    variable: {
-        attrs: commonAttrs,
-        parseDOM: [{ tag: "var", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "var") }
-    },
-    span: {
-        attrs: commonAttrs,
-        excludes: '',
-        parseDOM: [{ tag: "span", getAttrs: getCommonAttrs }],
-        toDOM(mark) { return markToDomWithCommonAttrs(mark, "span") }
-    },
-};
-
-interface ExtendedSchema<Nodes extends string = any, Marks extends string = any> extends Schema<Nodes, Marks> {
-    baseText?(text: string, marks?: readonly Mark[] | null): ProsemirrorNode;
-}
-
-export const schema: ExtendedSchema = new Schema({
-    nodes: commonNodes,
-    marks: commonMarks,
-});
-schema.baseText = schema.text;
-schema.text = function (text: string, marks?: readonly Mark[] | null): ProsemirrorNode {
-    let trimmed = text.trimStart();
-    const leadingWhitespace = text.length > trimmed.length
-        ? text.substring(0, text.length - trimmed.length)
-        : null;
-    const trimmedEnd = trimmed.trimEnd();
-    const trailingWhitespace = trimmed.length > trimmedEnd.length
-        ? trimmed.substring(trimmedEnd.length)
-        : null;
-    trimmed = trimmedEnd;
-    if (trimmed.length === 0) {
-        if (typeof this.baseText === 'function') {
-            return this.node(
-                'whitespace',
-                null,
-                Fragment.from(this.baseText(text, marks)));
-        }
-        throw Error('Error: failed to call baseText');
-    }
-    if (trimmed.length > 4
-        && trimmed.startsWith('{{')
-        && trimmed.endsWith('}}')) {
-        return this.node(
-            'template',
-            leadingWhitespace || trailingWhitespace
-                ? {
-                    leadingWhitespace,
-                    trailingWhitespace,
-                }
-                : null,
-            Fragment.from(this.text(trimmed.substring(2, trimmed.length - 2), null)));
-    }
-    if (typeof this.baseText === 'function') {
-        return this.baseText(text, marks);
-    }
-    throw Error('Error: failed to call baseText');
-}
-
-interface ExtendedDOMSerializer extends DOMSerializer {
-    baseSerializeNodeInner?(node: ProsemirrorNode, options: { document?: Document }): globalThis.Node;
-    serializeNodeInner?(node: ProsemirrorNode, options: { document?: Document }): globalThis.Node;
-}
-
-class Renderer {
-    private _serializer: ExtendedDOMSerializer;
-
-    constructor() {
-        this._serializer = DOMSerializer.fromSchema(schema);
-        this._serializer.baseSerializeNodeInner = this._serializer.serializeNodeInner;
-        this._serializer.serializeNodeInner = function (node: ProsemirrorNode, options: { document?: Document }) {
-            if (node.type.name === 'phrasing_wrapper') {
-                const child = this.serializeFragment(node.content, options).firstChild;
-                if (child) {
-                    return child;
-                }
-                throw new Error("Error: failed to serialize phrasing wrapper");
-            }
-            if (node.type.name === 'whitespace') {
-                return (options.document || window.document).createTextNode(node.textContent);
-            }
-            if (node.type.name === 'template') {
-                return (options.document || window.document).createTextNode(`${node.attrs?.leadingWhitespace || ''}{{${node.textContent}}}${node.attrs?.trailingWhitespace || ''}`);
-            }
-            if (typeof this.baseSerializeNodeInner === 'function') {
-                return this.baseSerializeNodeInner(node, options);
-            }
-            throw new Error("Error: failed to call baseSerializeNodeInner");
-        }
-    }
-
-    serializeFragment(fragment: Fragment, options?: { document?: Document }, target?: HTMLElement | DocumentFragment) {
-        return this._serializer.serializeFragment(fragment, options, target);
-    }
-
-    serializeNode(node: ProsemirrorNode, options?: { document?: Document }) {
-        return this._serializer.serializeNode(node, options);
-    }
-}
-export const renderer = new Renderer();
-
-function plusCommonAttributes(attrs: { [key: string]: any }) {
+export function plusCommonAttributes(attrs: { [key: string]: any }) {
     for (const prop in commonAttrs) {
         attrs[prop] = { default: commonAttrs[prop].default };
     }

@@ -1056,8 +1056,14 @@ svg {
     display: none;
 }
 
-.ProseMirror .template-view-bracket {
+.ProseMirror .handlebars-bracket {
     color: #e5c07b;
+}
+
+.ProseMirror phrasing-wrapper {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
 }
 
 :host([height]),

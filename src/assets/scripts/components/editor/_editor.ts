@@ -1,13 +1,13 @@
-import { documentPositionComparator, randomUUID } from '../tavenem-utility'
+import { documentPositionComparator, randomUUID } from '../../tavenem-utility'
 import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from '../_popover';
 import { TavenemInputHtmlElement } from '../_input';
 import { TavenemColorInputHtmlElement } from '../_color-input';
 import { TavenemEmojiHTMLElement } from '../_emoji';
-import { Dialog, initialize as initializeDialog } from '../tavenem-dialog';
+import { Dialog, initialize as initializeDialog } from '../../tavenem-dialog';
 import { TavenemCheckboxHtmlElement } from '../_checkbox';
 import { TavenemInputFieldHtmlElement } from '../_input-field';
 import { TavenemSelectInputHtmlElement } from '../_select';
-import { CommandType } from './_commands';
+import { CommandType } from './commands/_commands';
 import { elementStyle } from './_element-style';
 import { EditorSyntax, syntaxes, syntaxLabelMap, syntaxTextMap } from './_syntax';
 import { toolbarButtonDefinitions, ToolbarControl, ToolbarControlDefinition, ToolbarControlStyle } from './_toolbar';

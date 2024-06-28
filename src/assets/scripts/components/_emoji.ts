@@ -1,7 +1,7 @@
 ﻿import { TavenemPopover, TavenemPopoverHTMLElement } from './_popover'
 import { TavenemInputHtmlElement } from './_input'
 import { TavenemPickerHtmlElement } from './_picker'
-import { randomUUID } from './tavenem-utility'
+import { randomUUID } from '../tavenem-utility'
 
 interface Emoji {
     category: string;

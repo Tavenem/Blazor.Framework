@@ -20,7 +20,7 @@ import {
     Fragment,
     NodeType
 } from 'prosemirror-model';
-import { renderer, schema } from './_schema';
+import { renderer, schema } from '../schema/_schema';
 import {
     CodeCommandSet,
     CommandType,
@@ -1509,7 +1509,6 @@ export const tavenemMarkdownParser = new MarkdownParser(
             ignoreClass: "math-node"
         },
         container: { block: "div" },
-
         hr: { node: "horizontal_rule" },
         image: {
             node: "image",
@@ -1520,7 +1519,6 @@ export const tavenemMarkdownParser = new MarkdownParser(
             })
         },
         hardbreak: { node: "hard_break" },
-
         em: {
             getMark(token) {
                 if (token.markup === '_') {
@@ -1701,7 +1699,6 @@ export const tavenemMarkdownSerializer = new MarkdownSerializer({
         state.write(":::", true);
         state.closeBlock(node);
     },
-
     image(state, node) {
         state.write("!["
             + state.esc(node.attrs.alt || "")

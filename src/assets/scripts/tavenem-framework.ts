@@ -1,36 +1,36 @@
-import { TavenemAccordionHTMLElement } from './_accordion';
-import { TavenemCheckboxHtmlElement } from './_checkbox';
-import { TavenemContentsHTMLElement } from './_contents';
+import { TavenemAccordionHTMLElement } from './components/_accordion';
+import { TavenemCheckboxHtmlElement } from './components/_checkbox';
+import { TavenemContentsHTMLElement } from './components/_contents';
 import {
     TavenemEmojiHTMLElement,
     TavenemEmojiPickerHTMLElement,
-} from './_emoji';
-import { TavenemHighlightHTMLElement } from './_highlight';
+} from './components/_emoji';
+import { TavenemHighlightHTMLElement } from './components/_highlight';
 import {
     TavenemDropdownHTMLElement,
     TavenemPopoverHTMLElement,
     TavenemPopover,
     TavenemTooltipHTMLElement
-} from './_popover';
-import { TavenemInputHtmlElement } from './_input';
-import { TavenemInputFieldHtmlElement } from './_input-field';
-import { TavenemNumericInputHtmlElement } from './_numeric-input';
-import { TavenemPickerHtmlElement } from './_picker';
-import { TavenemSelectInputHtmlElement } from './_select';
-import { TavenemColorInputHtmlElement } from './_color-input';
-import { TavenemDateTimeInputHtmlElement } from './_datetime';
-import { TavenemEditorHtmlElement } from './editor/_editor';
+} from './components/_popover';
+import { TavenemInputHtmlElement } from './components/_input';
+import { TavenemInputFieldHtmlElement } from './components/_input-field';
+import { TavenemNumericInputHtmlElement } from './components/_numeric-input';
+import { TavenemPickerHtmlElement } from './components/_picker';
+import { TavenemSelectInputHtmlElement } from './components/_select';
+import { TavenemColorInputHtmlElement } from './components/_color-input';
+import { TavenemDateTimeInputHtmlElement } from './components/_datetime';
+import { TavenemEditorHtmlElement } from './components/editor/_editor';
 import {
     TavenemProgressCircleHTMLElement,
     TavenemProgressLinearHTMLElement
-} from './_progress';
-import { TavenemScrollTopHTMLElement } from './_scrolltop';
-import { TavenemSliderHTMLElement } from './_slider';
+} from './components/_progress';
+import { TavenemScrollTopHTMLElement } from './components/_scrolltop';
+import { TavenemSliderHTMLElement } from './components/_slider';
 import {
     TavenemTabHTMLElement,
     TavenemTabPanelHTMLElement,
     TavenemTabsHTMLElement,
-} from './_tabs';
+} from './components/_tabs';
 import {
     getNativePreferredColorScheme,
     getPreferredTavenemColorScheme,

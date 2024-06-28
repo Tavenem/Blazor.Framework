@@ -1,4 +1,4 @@
-import { documentPositionComparator } from "./tavenem-utility";
+import { documentPositionComparator } from "../tavenem-utility";
 
 interface TavenemHeadingElement extends HTMLElement {
     headingLevel: number;

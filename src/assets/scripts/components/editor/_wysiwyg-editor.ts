@@ -1,8 +1,8 @@
 import { html_beautify } from "js-beautify";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
-import { DOMParser as PMDOMParser, Node, Slice, Fragment } from 'prosemirror-model';
-import { Command, EditorState, Plugin, Selection, Transaction } from "prosemirror-state";
+import { DOMParser as PMDOMParser, Node } from 'prosemirror-model';
+import { EditorState, Plugin, Selection, Transaction } from "prosemirror-state";
 import { inputRules } from "prosemirror-inputrules";
 import { buildInputRules, buildKeymap } from "prosemirror-example-setup";
 import { baseKeymap, chainCommands, deleteSelection, joinBackward, selectNodeBackward } from "prosemirror-commands";
@@ -19,11 +19,19 @@ import {
     REGEX_BLOCK_MATH_DOLLARS,
     REGEX_INLINE_MATH_DOLLARS,
 } from "@benrbray/prosemirror-math";
-import { CodeBlockView } from "./_code-block-view";
-import { CommandSet, CommandType, commonCommands, exitBlock, exitDiv } from "./_commands";
-import { Editor, EditorInfo, EditorMode, EditorOptions, UpdateInfo } from "./_editor-info";
-import { tavenemMarkdownParser, tavenemMarkdownSerializer } from "./_markdown";
-import { renderer, schema } from "./_schema";
+import { CodeBlockView } from "./views/_code-block-view";
+import {
+    CommandSet,
+    CommandType,
+    commonCommands,
+    detailsBackspaceCommand,
+    exitBlock,
+    exitDiv,
+    phrasingWrapperBackspaceCommand,
+} from "./commands/_commands";
+import { Editor, EditorInfo, EditorOptions, UpdateInfo } from "./_editor-info";
+import { tavenemMarkdownParser, tavenemMarkdownSerializer } from "./commands/_markdown";
+import { renderer, schema } from "./schema/_schema";
 import {
     cellMinWidth,
     columnResizing,
@@ -31,7 +39,7 @@ import {
     goToNextCell,
     tableEditing,
     TableView,
-} from "./_tables";
+} from "./views/_tables";
 import { ToolbarControl } from "./_toolbar";
 import {
     FormView,
@@ -45,9 +53,10 @@ import {
     ResetInputView,
     SelectView,
     TextAreaView,
-} from "./_views";
+} from "./views/_views";
 import { EditorSyntax } from "./_syntax";
-import { tavenemComponentPlugin } from "./_component-plugin";
+import { tavenemComponentPlugin } from "./views/_component-plugin";
+import { preprocessHandlebars } from "./schema/_handlebars-preprocessor";
 
 class MenuView {
     _commands: CommandSet;
@@ -130,65 +139,6 @@ const arrowHandlers = keymap({
     ArrowDown: arrowHandler("down"),
 });
 
-const detailsBackspaceCommand: Command = (state, dispatch) => {
-    const { $from, $to } = state.selection;
-    let details = $from.parent;
-    let depth = $from.depth;
-    let summary: Node | undefined;
-    while (details
-        && depth > 0
-        && details.type.name !== "details") {
-        if (details.type.name === "summary"
-            || details.type.name === "summary_text") {
-            summary = details;
-        }
-        details = $from.node(--depth);
-    }
-    if (!details) {
-        return false;
-    }
-
-    // verify start and end of selection are within the same details
-    let toDetails = $to.parent;
-    depth = $to.depth;
-    while (toDetails
-        && depth > 0
-        && toDetails.type.name !== "details") {
-        toDetails = $to.node(--depth);
-    }
-    if (!toDetails || !details.eq(toDetails)) {
-        return false;
-    }
-
-    // if details is empty, remove it
-    if (isEmpty(details)) {
-        if (dispatch) {
-            dispatch(state.tr
-                .deleteRange($from.start(depth), $from.end(depth))
-                .scrollIntoView());
-        }
-        return true;
-    }
-
-    // if selection is within an empty summary, and the details is closed, open it
-    if (dispatch
-        && summary
-        && summary.childCount === 0
-        && (!summary.text || !summary.text.length)
-        && !details.attrs.open) {
-        dispatch(state.tr.setNodeMarkup(
-            $from.start(depth) - 1,
-            undefined,
-            {
-                ...details.attrs,
-                open: true,
-            }).scrollIntoView());
-        return true;
-    }
-
-    return false;
-};
-
 interface WysiwygEditorInfo extends EditorInfo {
     commands: CommandSet;
     isMarkdown: boolean;
@@ -251,7 +201,8 @@ export class TavenemWysiwygEditor implements Editor {
         div.appendChild(renderer.serializeFragment(this._editor.view.state.doc.content));
         return html_beautify(div.innerHTML, {
             extra_liners: [],
-            indent_size: 2,
+            preserve_newlines: true,
+            wrap_attributes: 'preserve',
             wrap_line_length: 0,
         });
     }
@@ -293,7 +244,10 @@ export class TavenemWysiwygEditor implements Editor {
             }
             doc = PMDOMParser
                 .fromSchema(schema)
-                .parse(div);
+                .parse(options?.syntax === 'handlebars'
+                    ? preprocessHandlebars(div)
+                    : div);
+                    //{ preserveWhitespace: 'full' });
         }
 
         const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline);
@@ -333,7 +287,13 @@ export class TavenemWysiwygEditor implements Editor {
             buildInputRules(schema),
             keymap({
                 "Mod-Space": insertMathCmd(schema.nodes.math_inline),
-                "Backspace": chainCommands(detailsBackspaceCommand, deleteSelection, mathBackspaceCmd, joinBackward, selectNodeBackward),
+                "Backspace": chainCommands(
+                    phrasingWrapperBackspaceCommand,
+                    detailsBackspaceCommand,
+                    deleteSelection,
+                    mathBackspaceCmd,
+                    joinBackward,
+                    selectNodeBackward),
                 "Tab": goToNextCell(1),
                 "Shift-Tab": goToNextCell(-1),
                 "Ctrl-Enter": exitDiv,
@@ -518,16 +478,4 @@ function arrowHandler(dir: 'up' | 'down' | 'left' | 'right' | 'forward' | 'backw
         }
         return false;
     };
-}
-
-function isEmpty(node: Node) {
-    if (node.text && node.text.length) {
-        return false;
-    }
-    for (let i = 0; i < node.childCount; i++) {
-        if (!isEmpty(node.child(i))) {
-            return false;
-        }
-    }
-    return true;
 }
