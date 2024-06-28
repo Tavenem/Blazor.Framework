@@ -1,13 +1,7 @@
 ﻿import {
-    AttributeSpec,
-    Attrs,
-    DOMOutputSpec,
     DOMSerializer,
     Fragment,
-    Mark,
-    MarkSpec,
     Node as ProsemirrorNode,
-    NodeSpec,
     Schema,
 } from 'prosemirror-model';
 import { commonNodes } from './_node-types';

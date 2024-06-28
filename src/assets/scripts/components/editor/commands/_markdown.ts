@@ -1603,6 +1603,16 @@ export const tavenemMarkdownSerializer = new MarkdownSerializer({
         writeCommonAttributes(state, node);
         state.closeBlock(node);
     },
+    phrasing_wrapper(state, node, parent, index) {
+        state.renderInline(node);
+        if (index == parent.childCount - 1
+            && node.childCount == 0
+            || (node.childCount == 1
+                && !node.firstChild!.text)) {
+            state.write();
+        }
+        state.closeBlock(node);
+    },
     table(state, node) {
         const host = node.firstChild as ProsemirrorNode | null;
         if (!host) {
@@ -1717,6 +1727,12 @@ export const tavenemMarkdownSerializer = new MarkdownSerializer({
                 return;
             }
     },
+    handlebars(state, node) {
+        state.write("{{");
+        state.text(node.textContent, false);
+        state.write("}}");
+        state.closeBlock(node);
+    },
     text(state, node) {
         if (node.text) {
             state.text(node.text);
@@ -1779,6 +1795,12 @@ export const tavenemMarkdownSerializer = new MarkdownSerializer({
     mark: {
         open: "==",
         close(_state, mark) { return closeWithCommonAttributes(mark, "==") },
+        mixable: true,
+        expelEnclosingWhitespace: true
+    },
+    del: {
+        open: "~~",
+        close(_state, mark) { return closeWithCommonAttributes(mark, "~~") },
         mixable: true,
         expelEnclosingWhitespace: true
     },

@@ -35,57 +35,8 @@ function processTextNode(node: Text): Node {
     const omitPrefixWhitespace = node.nodeValue[startOffset] === '~';
     const omitPostfixWhitespace = node.nodeValue[closeIndex - 1] === '~';
 
-    let tag: HTMLElement | undefined;
-
-    //if (!escaped
-    //    && (node.nodeValue[startOffset] === '#'
-    //        || (node.nodeValue[startOffset] === '~'
-    //        && node.nodeValue[startOffset + 1] === '#'))) {
-    //    const commandOffset = node.nodeValue[startOffset] === '~'
-    //        ? startOffset + 2
-    //        : startOffset + 1;
-    //    let command: string | undefined;
-    //    const spaceIndex = node.nodeValue.indexOf(' ', commandOffset);
-    //    command = spaceIndex > 0 && spaceIndex < closeIndex
-    //        ? node.nodeValue.substring(commandOffset, spaceIndex)
-    //        : node.nodeValue.substring(commandOffset, closeIndex);
-    //    if (command && command.length) {
-    //        let closeTagIndex = node.nodeValue.indexOf(`{{/${command}`, closeOffset);
-    //        if (closeTagIndex < 0) {
-    //            closeTagIndex = node.nodeValue.indexOf(`{{~/${command}`, closeOffset);
-    //        }
-    //        let closeTagOffset = node.nodeValue[closeTagIndex + 2] === '~'
-    //            ? closeTagIndex + command.length + 3
-    //            : closeTagIndex + command.length + 4;
-    //        if (closeTagIndex >= 0
-    //            && node.nodeValue.length > closeTagOffset + 1
-    //            && node.nodeValue[closeTagOffset] === '}'
-    //            && node.nodeValue[closeTagOffset + 1] === '}}') {
-    //            tag = document.createElement('handlebars-block');
-
-    //            tag.dataset.command = command;
-
-    //            const content = node.nodeValue.substring(
-    //                commandOffset + command.length,
-    //                closeIndex);
-    //            if (content.length) {
-    //                tag.dataset.content = content;
-    //            }
-
-    //            if (closeTagIndex > closeOffset) {
-    //                tag.appendChild(processTextNode(new Text(node.nodeValue.substring(closeOffset, closeTagIndex))));
-    //            }
-
-    //            closeIndex = closeTagOffset;
-    //            closeOffset = closeTagOffset + 2;
-    //        }
-    //    }
-    //}
-
-    if (!tag) {
-        tag = document.createElement('handlebars');
-        tag.textContent = node.nodeValue.substring(startOffset, closeIndex);
-    }
+    const tag = document.createElement('handlebars');
+    tag.textContent = node.nodeValue.substring(startOffset, closeIndex);
 
     if (startIndex === 0 && closeOffset === node.nodeValue.length) {
         return tag;

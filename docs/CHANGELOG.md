@@ -5,6 +5,10 @@
 - Made `Checkbox`, `ColorInput`, `DateTimeInput`, `Dropdown`, `Editor`, `EmojiInput`, `MultiSelect`, `NumericInput`, `RadioButton`, `RadioGroup`, `Rating`, `Select`, `Slider`, `Switch`, `Tabs`, `TextArea`, `TextInput`, and `Tooltip` partially compatible with static server-side rendering
   - These controls now support most use cases even on static pages, and inputs should pass their value to submitted forms
   - Data binding, validation, and other features which operate exclusively in an interactive context will still not function on statically rendered pages
+- The `Editor` component has been heavily overhauled
+  - WYSIWYG support has been added for [Handlebars](https://handlebarsjs.com/)
+  - Syntax highlighting support has been added for Handlebars, XML, and YAML
+  - Syntax support has been dropped for Less, PHP, and Sass
 ### Removed
 - `RenderBodyWhenClosed` on `Collapse`
 - `LostFocus` and `ClearIcon` on `TextInput`

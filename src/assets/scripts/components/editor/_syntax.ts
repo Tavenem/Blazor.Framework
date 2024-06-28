@@ -9,7 +9,6 @@ import { python } from "@codemirror/lang-python";
 import { sql } from "@codemirror/lang-sql";
 import { Language, LanguageSupport, StreamLanguage } from "@codemirror/language";
 import { csharp, objectiveC } from "@codemirror/legacy-modes/mode/clike";
-import { sass } from "@codemirror/lang-sass";
 import { xml } from "@codemirror/lang-xml";
 import { yaml } from "@codemirror/lang-yaml";
 import { typescript } from "@codemirror/legacy-modes/mode/javascript";
@@ -30,7 +29,6 @@ export const syntaxes = <const>[
     'markdown',
     'objectivec',
     'python',
-    'sass',
     'sql',
     'typescript',
     'xml',
@@ -50,7 +48,6 @@ export const codeEditorLanguageMap: Record<EditorSyntax, LanguageSupport | Langu
     "json": json(),
     "markdown": markdown(),
     "python": python(),
-    "sass": sass(),
     "sql": sql(),
     "xml": xml(),
     "yaml": yaml(),
@@ -74,7 +71,6 @@ export const syntaxLabelMap: Record<EditorSyntax, string> = {
     "markdown": 'Markdown',
     "objectivec": 'Objective-C',
     "python": 'Python',
-    "sass": 'Sass',
     "sql": 'SQL',
     "typescript": 'TypeScript',
     "xml": 'XML',
@@ -95,7 +91,6 @@ export const syntaxTextMap: Record<EditorSyntax, string> = {
     "markdown": 'Markdown',
     "objectivec": 'Objective-C',
     "python": 'Python',
-    "sass": 'Sass',
     "sql": 'SQL',
     "typescript": 'TypeScript',
     "xml": 'XML',

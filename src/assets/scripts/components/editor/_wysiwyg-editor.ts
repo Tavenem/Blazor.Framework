@@ -247,7 +247,6 @@ export class TavenemWysiwygEditor implements Editor {
                 .parse(options?.syntax === 'handlebars'
                     ? preprocessHandlebars(div)
                     : div);
-                    //{ preserveWhitespace: 'full' });
         }
 
         const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline);
