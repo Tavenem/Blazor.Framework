@@ -27,8 +27,7 @@ class Renderer {
             const doc = (options.document || window.document);
             if (node.type.name === 'phrasing_wrapper') {
                 if (node.firstChild
-                    && node.firstChild.type.name === 'handlebars'
-                    && node.firstChild.attrs && node.firstChild.attrs['data-postfix-br'] != null) {
+                    && node.firstChild.type.name === 'hard_break') {
                     return this.serializeFragment(node.content, options);
                 } else {
                     const fragment = new DocumentFragment();
@@ -38,17 +37,31 @@ class Renderer {
                 }
             }
             if (node.type.name === 'handlebars') {
-                const fragment = new DocumentFragment();
-                if (node.attrs
-                    && node.attrs['data-prefix-br'] != null) {
-                    fragment.appendChild(doc.createTextNode('\n'));
+                return doc.createTextNode(`{{${node.textContent}}}`);
+            }
+            if (node.type.name === 'hard_break'
+                && node.attrs.class
+                && node.attrs.class.includes('handlebars-newline')) {
+                return doc.createTextNode('\n');
+            }
+            if (node.type.name === 'paragraph'
+                && node.childCount > 0) {
+                let skipRule = false;
+                for (let i = 0; i < node.childCount; i++) {
+                    if (node.child(i).type.name !== 'handlebars') {
+                        skipRule = true;
+                        break;
+                    }
                 }
-                fragment.appendChild(doc.createTextNode(`{{${node.textContent}}}`));
-                if (node.attrs
-                    && node.attrs['data-postfix-br'] != null) {
+                if (!skipRule) {
+                    const fragment = new DocumentFragment();
                     fragment.appendChild(doc.createTextNode('\n'));
+                    for (let i = 0; i < node.childCount; i++) {
+                        fragment.appendChild(doc.createTextNode(`{{${node.child(i).textContent}}}`));
+                    }
+                    fragment.appendChild(doc.createTextNode('\n'));
+                    return fragment;
                 }
-                return fragment;
             }
             if (typeof this.baseSerializeNodeInner === 'function') {
                 return this.baseSerializeNodeInner(node, options);

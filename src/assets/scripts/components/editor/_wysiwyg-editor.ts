@@ -3,7 +3,7 @@ import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
 import { DOMParser as PMDOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from "prosemirror-state";
-import { inputRules } from "prosemirror-inputrules";
+import { InputRule, inputRules } from "prosemirror-inputrules";
 import { buildInputRules, buildKeymap } from "prosemirror-example-setup";
 import { baseKeymap, chainCommands, deleteSelection, joinBackward, selectNodeBackward } from "prosemirror-commands";
 import { dropCursor } from "prosemirror-dropcursor";
@@ -17,7 +17,7 @@ import {
     mathPlugin,
     mathSerializer,
     REGEX_BLOCK_MATH_DOLLARS,
-    REGEX_INLINE_MATH_DOLLARS,
+    REGEX_INLINE_MATH_DOLLARS_ESCAPED,
 } from "@benrbray/prosemirror-math";
 import { CodeBlockView } from "./views/_code-block-view";
 import {
@@ -27,6 +27,7 @@ import {
     detailsBackspaceCommand,
     exitBlock,
     exitDiv,
+    handlebarsBackspaceCmd,
     phrasingWrapperBackspaceCommand,
 } from "./commands/_commands";
 import { Editor, EditorInfo, EditorOptions, UpdateInfo } from "./_editor-info";
@@ -139,6 +140,21 @@ const arrowHandlers = keymap({
     ArrowDown: arrowHandler("down"),
 });
 
+const handlebarsInputRule = new InputRule(/(?<!\\){{(.+)(?<!\\)}}$/, (state, match, start, end) => {
+    let $start = state.doc.resolve(start);
+    let index = $start.index();
+    let $end = state.doc.resolve(end);
+    if (!$start.parent.canReplaceWith(index, $end.index(), schema.nodes.handlebars)) {
+        return null;
+    }
+    return state.tr.replaceRangeWith(
+        start, end,
+        schema.nodes.handlebars.create(null, schema.text(match[1]))
+    );
+});
+
+const handlebarsPlugin = inputRules({ rules: [handlebarsInputRule] });
+
 interface WysiwygEditorInfo extends EditorInfo {
     commands: CommandSet;
     isMarkdown: boolean;
@@ -249,7 +265,7 @@ export class TavenemWysiwygEditor implements Editor {
                     : div);
         }
 
-        const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, schema.nodes.math_inline);
+        const inlineMathInputRule = makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS_ESCAPED, schema.nodes.math_inline);
         const blockMathInputRule = makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, schema.nodes.math_display);
 
         const commands = commonCommands(schema);
@@ -290,6 +306,7 @@ export class TavenemWysiwygEditor implements Editor {
                     phrasingWrapperBackspaceCommand,
                     detailsBackspaceCommand,
                     deleteSelection,
+                    handlebarsBackspaceCmd,
                     mathBackspaceCmd,
                     joinBackward,
                     selectNodeBackward),
@@ -309,6 +326,9 @@ export class TavenemWysiwygEditor implements Editor {
         ];
         if (options?.placeholder) {
             plugins.push(placeholder(options.placeholder));
+        }
+        if (options?.syntax === 'handlebars') {
+            plugins.unshift(handlebarsPlugin);
         }
 
         let state = EditorState.create({ doc, plugins });
@@ -349,7 +369,7 @@ export class TavenemWysiwygEditor implements Editor {
                 tfeditor: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
             },
             dispatchTransaction: this.onUpdate.bind(this),
-            handleDOMEvents: { 'blur': this.onBlur.bind(this) }
+            handleDOMEvents: { 'blur': this.onBlur.bind(this) },
         });
         this._editor = {
             commands: commands,
@@ -367,10 +387,25 @@ export class TavenemWysiwygEditor implements Editor {
             return;
         }
 
+        const oldSyntax = this._editor.options?.syntax;
+
         this._editor.isMarkdown = syntax === 'markdown';
 
         if (this._editor.options) {
             this._editor.options.syntax = syntax;
+        }
+
+        if (syntax === 'handlebars') {
+            const plugins = Array.from(this._editor.view.state.plugins);
+            plugins.unshift(handlebarsPlugin);
+            this._editor.view.updateState(this._editor.view.state.reconfigure({ plugins }));
+        } else if (oldSyntax === 'handlebars') {
+            const plugins = Array.from(this._editor.view.state.plugins);
+            const index = plugins.indexOf(handlebarsPlugin);
+            if (index !== -1) {
+                plugins.splice(index, 1);
+            }
+            this._editor.view.updateState(this._editor.view.state.reconfigure({ plugins }));
         }
     }
 

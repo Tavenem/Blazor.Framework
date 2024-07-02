@@ -48,7 +48,9 @@ function processTextNode(node: Text): Node {
         if (/^[ \t\r\n\u000c]*$/.test(prefix)) {
             if (!omitPrefixWhitespace) {
                 if (/[\r\n\u000c]/.test(prefix)) {
-                    tag.dataset.prefixBr = '';
+                    const br = document.createElement('br');
+                    br.classList.add('handlebars-newline');
+                    fragment.appendChild(br);
                 } else {
                     fragment.appendChild(new Text(prefix));
                 }
@@ -63,11 +65,18 @@ function processTextNode(node: Text): Node {
     if (closeOffset < node.nodeValue.length) {
         const postfix = node.nodeValue.substring(closeOffset);
         const postfixWhitespace = /^[ \t\r\n\u000c]*/.exec(postfix);
-        if (postfixWhitespace
-            && !omitPostfixWhitespace
-            && /[\r\n\u000c]/.test(postfixWhitespace[0])) {
-            tag.dataset.postfixBr = '';
-            if (postfix.length > postfixWhitespace.length) {
+        if (postfixWhitespace) {
+            if (!omitPostfixWhitespace) {
+                if (/[\r\n\u000c]/.test(postfixWhitespace[0])) {
+                    const br = document.createElement('br');
+                    br.classList.add('handlebars-newline');
+                    fragment.appendChild(br);
+
+                    fragment.appendChild(processTextNode(new Text(postfix.substring(postfixWhitespace[0].length))));
+                } else {
+                    fragment.appendChild(processTextNode(new Text(postfix)));
+                }
+            } else if (postfix.length > postfixWhitespace[0].length) {
                 fragment.appendChild(processTextNode(new Text(postfix.substring(postfixWhitespace[0].length))));
             }
         } else {

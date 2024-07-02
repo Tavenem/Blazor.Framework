@@ -1,5 +1,4 @@
 ﻿import * as esbuild from 'esbuild';
-import * as util from 'util';
 
 const args = process.argv.slice(2);
 

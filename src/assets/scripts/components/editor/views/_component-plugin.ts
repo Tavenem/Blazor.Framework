@@ -7,7 +7,10 @@ import { EditorView, NodeView, NodeViewConstructor } from 'prosemirror-view';
 import { TavenemCheckboxHtmlElement } from '../../_checkbox';
 import { TavenemInputHtmlElement } from '../../_input';
 
-interface ITavenemPluginState { prevCursorPos: number; }
+interface ITavenemPluginState {
+    prevCursorPos: number;
+    selectionDirection: number;
+}
 
 const TAVENEM_PLUGIN_KEY = new PluginKey<ITavenemPluginState>("tavenem");
 
@@ -644,18 +647,23 @@ class HandlebarsView implements NodeView {
         })
 
         // focus element
-        let innerState = this._innerView.state;
+        const innerState = this._innerView.state;
         this._innerView.focus();
 
         // request outer cursor position before node was selected
-        let maybePos = this.pluginKey.getState(this.view.state)?.prevCursorPos;
-        if (maybePos === null || maybePos === undefined) {
-            console.error("Error: Unable to fetch Tavenem plugin state from key.");
-        }
-        let prevCursorPos: number = maybePos ?? 0;
+        const state = this.pluginKey.getState(this.view.state);
+        const prevCursorPos = state?.prevCursorPos ?? 0;
+        const selectionDirection = state?.selectionDirection ?? 0;
 
         // compute position that cursor should appear within the expanded node
-        let innerPos = (prevCursorPos <= this.getPos()!) ? 0 : this.node.nodeSize - 2;
+        let innerPos = 0;
+        const pos = this.getPos();
+        if (pos != null
+            && (prevCursorPos > pos
+                || (prevCursorPos === pos
+                    && selectionDirection < 0))) {
+            innerPos = this.node.nodeSize - 2;
+        }
         this._innerView.dispatch(
             innerState.tr.setSelection(
                 TextSelection.create(innerState.doc, innerPos)
@@ -680,17 +688,32 @@ const tavenemPluginSpec: PluginSpec<ITavenemPluginState> = {
     key: TAVENEM_PLUGIN_KEY,
     state: {
         init(_config, _instance) {
-            return { prevCursorPos: 0 };
+            return {
+                prevCursorPos: 0,
+                selectionDirection: 0,
+            };
         },
-        apply(_tr, _value, oldState, _newState) {
-            return { prevCursorPos: oldState.selection.from };
+        apply(_tr, value, oldState, newState) {
+            return {
+                prevCursorPos: oldState.selection.from,
+                selectionDirection: newState.selection.from !== oldState.selection.from
+                    ? newState.selection.from - oldState.selection.from
+                    : newState.selection.to === oldState.selection.to
+                        ? value.selectionDirection
+                        : newState.selection.to - oldState.selection.to,
+            };
         },
-        toJSON(value) { return JSON.stringify(value.prevCursorPos); },
+        toJSON(value) {
+            return JSON.stringify(value);
+        },
         fromJSON(_config, value, _state) {
             const parsed = JSON.parse(value);
             return {
-                prevCursorPos: typeof parsed === 'number'
-                    ? parsed
+                prevCursorPos: typeof parsed.prevCursorPos === 'number'
+                    ? parsed.prevCursorPos
+                    : 0,
+                selectionDirection: typeof parsed.selectionDirection === 'number'
+                    ? parsed.selectionDirection
                     : 0,
             };
         },

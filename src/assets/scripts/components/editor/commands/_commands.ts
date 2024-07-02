@@ -681,6 +681,25 @@ export const exitDiv: Command = (state, dispatch) => {
     return true;
 }
 
+export const handlebarsBackspaceCmd: Command = (state, dispatch) => {
+    const { $from } = state.selection;
+    const nodeBefore = $from.nodeBefore;
+    if (!nodeBefore) {
+        return false;
+    }
+
+    if (nodeBefore.type.name === "handlebars") {
+        const index = $from.index($from.depth);
+        const $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
+        if (dispatch) {
+            dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
+        }
+        return true;
+    }
+
+    return false;
+}
+
 export function htmlWrapCommand(tag: string) {
     return wrapCommand(`<${tag}>`, `</${tag}>`);
 }

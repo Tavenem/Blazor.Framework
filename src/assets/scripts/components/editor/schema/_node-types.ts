@@ -2051,10 +2051,6 @@ export const commonNodes: { [name in string]: NodeSpec } = {
         toDOM(node) { return contentlessToDomWithCommonAttrs(node, "wbr") }
     },
     handlebars: {
-        attrs: {
-            'data-prefix-br': { default: null },
-            'data-postfix-br': { default: null },
-        },
         content: "text*",
         group: "phrasing",
         inline: true,
