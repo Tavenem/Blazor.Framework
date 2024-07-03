@@ -10,14 +10,6 @@
     page, and/or saved to the back-end using custom logic.
 </p>
 
-<p>
-    Note: this control cannot be used on static server-side rendered pages, since it relies on
-    interactivity to operate. If a static image source has been configured, a normal
-    <code>img</code> element will be displayed instead. When <em>pre</em>rendered server-side, the
-    <code>img</code> wil be shown during the prerender pass, then the full editor component will be
-    enabled when interactivity becomes available.
-</p>
-
 <h2>Basics</h2>
 
 <p>
@@ -230,75 +222,18 @@
     to 512000 (512KB).
 </p>
 
-<h2>Additional properties</h2>
-
-<p>
-    The <code>BrushColor</code> property indicates the currently selected drawing color, as a hex
-    string. This color applies to both freehand drawing and text. The property is not bindable (it
-    is read-only), but it can be set programmatically with the <code>SetBrushColorAsync</code>
-    method.
-</p>
-
-<p>
-    The <code>BrushSize</code> property indicates the thickness of freehand drawing, as a number of
-    pixels. It starts at 12 by default. The property is not bindable (it is read-only), but it can
-    be set programmatically with the <code>SetBrushSizeAsync</code> method.
-</p>
-
-<p>
-    The <code>DrawingMode</code> property indicates whether the editor is currently set to freehand
-    drawing or not. The property is not bindable (it is read-only), but it can be set
-    programmatically with the <code>SetDrawingModeAsync</code> method. This has no effect if the
-    control is not currently in edit mode.
-</p>
-
 <h2>Methods</h2>
 
 <p>
     The <code>ClearAsync</code> method will clear the current input text.
 </p>
 
-<p>
-    The <code>FocusAsync</code> method will give the editor focus.
-</p>
-
 <h2>Customization</h2>
-
-<p>
-    The <code>EditIcon</code> property can be used to change the icon used to toggle edit mode.
-</p>
 
 <p>
     You can disable the edit button by setting the <code>ShowEditButton</code> property to
     <code>false</code>.
 </p>
-
-<p>
-    The <code>ImageClass</code> and <code>ImageStyle</code> properties can be used to customize the
-    appearance of the image container. The standard <code>Class</code> and <code>Style</code>
-    properties will apply to the entire control, including the edit controls. The
-    <code>ImageClass</code> and <code>ImageStyle</code> properties, however, will apply more
-    specifically to the <code>img</code> or <code>canvas</code> element.
-</p>
-
-<p>
-    You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
-</p>
-
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ImageEditor Src="./images/rover.webp" ThemeColor="ThemeColor.Primary" />
-            <ImageEditor Src="./images/rover.webp" ThemeColor="ThemeColor.Secondary" />
-            <ImageEditor Src="./images/rover.webp" ThemeColor="ThemeColor.Tertiary" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ImageEditor Src=""./images/rover.webp"" ThemeColor=""ThemeColor.Primary"" />
-<ImageEditor Src=""./images/rover.webp"" ThemeColor=""ThemeColor.Secondary"" />
-<ImageEditor Src=""./images/rover.webp"" ThemeColor=""ThemeColor.Tertiary"" />")
-    </ChildContent>
-</Collapse>
 
 @code {
     private ImageEditor? _editor;

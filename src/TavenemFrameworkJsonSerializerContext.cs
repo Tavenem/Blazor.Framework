@@ -8,7 +8,7 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(DataGridRequest))]
-[JsonSerializable(typeof(CropBounds))]
+[JsonSerializable(typeof(CropEventArgs))]
 [JsonSerializable(typeof(PinchEventArgs))]
 [JsonSerializable(typeof(SwipeEventArgs))]
 [JsonSerializable(typeof(KeyListenerOptions))]

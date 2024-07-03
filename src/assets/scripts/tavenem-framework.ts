@@ -36,6 +36,7 @@ import {
     getPreferredTavenemColorScheme,
     ThemePreference,
 } from './_theme';
+import { TavenemImageEditorHtmlElement } from './components/image-editor/_image-editor-element';
 
 interface BlazorEvent extends Event { }
 
@@ -646,6 +647,8 @@ slot button {
         customElements.define('tf-emoji-input', TavenemEmojiPickerHTMLElement);
 
         customElements.define('tf-editor', TavenemEditorHtmlElement);
+
+        customElements.define('tf-image-editor', TavenemImageEditorHtmlElement);
 
         customElements.define('tf-slider', TavenemSliderHTMLElement);
 

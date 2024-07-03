@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Tavenem.Blazor.Framework.Components.ImageEditor;
+using System.Diagnostics.CodeAnalysis;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -9,9 +10,6 @@ namespace Tavenem.Blazor.Framework;
 /// </summary>
 public partial class ImageEditor : IAsyncDisposable
 {
-    private const string BrushColorDefault = "#000000";
-    private const double BrushSizeDefault = 12;
-
     private IJSObjectReference? _module;
 
     /// <summary>
@@ -39,16 +37,6 @@ public partial class ImageEditor : IAsyncDisposable
     [Parameter] public bool AllowSaving { get; set; } = true;
 
     /// <summary>
-    /// Gets the current brush color, as a hex string.
-    /// </summary>
-    public string? BrushColor { get; private set; } = BrushColorDefault;
-
-    /// <summary>
-    /// Gets the current brush width, in pixels.
-    /// </summary>
-    public double BrushSize { get; private set; } = BrushSizeDefault;
-
-    /// <summary>
     /// <para>
     /// The aspect ratio used when cropping an image.
     /// </para>
@@ -58,26 +46,6 @@ public partial class ImageEditor : IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public double? CropAspectRatio { get; set; }
-
-    /// <summary>
-    /// A callback invoked when the aspect ratio used when cropping an image changes.
-    /// </summary>
-    [Parameter] public EventCallback<double?> CropAspectRatioChanged { get; set; }
-
-    /// <summary>
-    /// Gets the current <see cref="Framework.DrawingMode"/> of the editor.
-    /// </summary>
-    public DrawingMode DrawingMode { get; private set; }
-
-    /// <summary>
-    /// <para>
-    /// The name of the Material Icon to use for the edit button.
-    /// </para>
-    /// <para>
-    /// Default is "edit"
-    /// </para>
-    /// </summary>
-    [Parameter] public string EditIcon { get; set; } = "edit";
 
     /// <summary>
     /// Gets or sets whether the editor is in edit mode (vs. image mode).
@@ -119,18 +87,6 @@ public partial class ImageEditor : IAsyncDisposable
     [Parameter] public string Id { get; set; } = Guid.NewGuid().ToHtmlId();
 
     /// <summary>
-    /// CSS class(es) to apply to the inner image container (which may contain an HTML <c>img</c> or
-    /// <c>canvas</c> element, depending on whether the image is currently being edited).
-    /// </summary>
-    [Parameter] public string? ImageClass { get; set; }
-
-    /// <summary>
-    /// CSS styles to apply to the inner image container (which may contain an HTML <c>img</c> or
-    /// <c>canvas</c> element, depending on whether the image is currently being edited).
-    /// </summary>
-    [Parameter] public string? ImageStyle { get; set; }
-
-    /// <summary>
     /// Gets a value determining if the component and associated services have been disposed.
     /// </summary>
     public bool IsDisposed { get; set; }
@@ -150,7 +106,22 @@ public partial class ImageEditor : IAsyncDisposable
     [Parameter] public long MaxAllowedStreamSize { get; set; }
 
     /// <summary>
-    /// An optional callback invoked when saving the image. Recevies a <see cref="Stream"/>
+    /// <para>
+    /// The quality of the output when exporting the image, for lossy formats.
+    /// </para>
+    /// <para>
+    /// Values should fall between <c>0</c> and <c>1</c>. Values outside this range will be ignored,
+    /// causing the browser to use a default quality.
+    /// </para>
+    /// <para>
+    /// When using a lossless <see cref="Format"/> (such as the default, "image/png"), this
+    /// parameter is ignored.
+    /// </para>
+    /// </summary>
+    [Parameter] public double? Quality { get; set; }
+
+    /// <summary>
+    /// An optional callback invoked when saving the image. Receives a <see cref="Stream"/>
     /// containing the current (edited) image.
     /// </summary>
     [Parameter] public Func<Stream, Task>? SaveCallback { get; set; }
@@ -191,18 +162,13 @@ public partial class ImageEditor : IAsyncDisposable
     [Parameter] public bool ShowRotateControls { get; set; } = true;
 
     /// <summary>
-    /// An image source to load initially.
+    /// An image source to load.
     /// </summary>
     /// <remarks>
     /// Any URL which would function as the <c>src</c> attribute for an HTML <c>img</c> element
     /// should work.
     /// </remarks>
     [Parameter] public string? Src { get; set; }
-
-    /// <summary>
-    /// A theme color for the edit controls.
-    /// </summary>
-    [Parameter] public ThemeColor ThemeColor { get; set; }
 
     /// <summary>
     /// <para>
@@ -219,87 +185,27 @@ public partial class ImageEditor : IAsyncDisposable
     /// The bounds are guaranteed to have a non-zero width and height. Attempted crop operations
     /// with zero dimensions will fail automatically, without invoking this function unnecessarily.
     /// </remarks>
-    [Parameter] public Func<ImageEditor, CropBounds, Task<bool>>? VerifyCrop { get; set; }
+    [Parameter] public Func<ImageEditor, CropEventArgs, Task<bool>>? VerifyCrop { get; set; }
 
-    /// <inheritdoc />
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("image-editor-wrapper")
-        .ToString();
-
-    /// <inheritdoc />
-    protected override string? CssStyle => new CssBuilder()
-        .AddStyle("position", "relative")
-        .AddStyle(Style)
-        .AddStyleFromDictionary(AdditionalAttributes)
-        .ToString();
-
-    private string InnerContainerId { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    private string? ContainerCssClass => new CssBuilder(ImageClass)
-        .Add("image-editor-container")
-        .ToString();
-
-    [Inject] private DialogService DialogService { get; set; } = default!;
-
-    private bool HasImage { get; set; }
-
-    private bool IsInteractive { get; set; }
-
-    private bool IsCropping { get; set; }
-
-    private bool IsErasing { get; set; }
-
-    private bool IsLoading { get; set; }
-
-    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
-
-    private bool RedoHistoryHasState { get; set; }
-
-    private string SaveGroupId { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    private ImageEditorInterop Interop { get; set; } = new();
-
-    private bool TextMode { get; set; }
-
-    private string? ThemeClass => ThemeColor.ToCSS();
-
-    private bool UndoHistoryHasState { get; set; }
+    [Inject, NotNull] private IJSRuntime? JSRuntime { get; set; }
 
     /// <inheritdoc />
     public override async Task SetParametersAsync(ParameterView parameters)
     {
         var wasEditing = Editing;
-        var aspectRatio = CropAspectRatio;
-        var src = Src;
 
         await base.SetParametersAsync(parameters);
 
-        if (_module is not null
-            && !string.Equals(Src, src, StringComparison.Ordinal))
-        {
-            await SetLoadingAsync();
-            await _module.InvokeVoidAsync("loadImage", InnerContainerId, Src);
-            HasImage = true;
-            await SetLoadingAsync(false);
-        }
-
-        var beganEdit = false;
         if (wasEditing != Editing)
         {
             if (Editing)
             {
                 await BeginEditAsync();
-                beganEdit = true;
             }
             else
             {
                 await CancelEditAsync();
             }
-        }
-
-        if (!beganEdit && CropAspectRatio != aspectRatio)
-        {
-            await SetCropAspectRatioAsync(CropAspectRatio);
         }
     }
 
@@ -317,37 +223,12 @@ public partial class ImageEditor : IAsyncDisposable
     /// <inheritdoc />
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
+        if (firstRender)
         {
-            return;
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/Tavenem.Blazor.Framework/tavenem-image-editor.js");
         }
-
-        _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
-            "import",
-            "./_content/Tavenem.Blazor.Framework/tavenem-image-editor.js");
-        Interop.Cancel += CancelOperations;
-        Interop.TextEdit += TextEdit;
-        Interop.RedoHistoryChanged += RedoHistoryChanged;
-        Interop.UndoHistoryChanged += UndoHistoryChanged;
-        if (!string.IsNullOrEmpty(Src))
-        {
-            await SetLoadingAsync();
-            await _module.InvokeVoidAsync("loadImage", InnerContainerId, Src);
-            HasImage = true;
-            IsInteractive = true;
-            await SetLoadingAsync(false);
-        }
-        else
-        {
-            IsInteractive = true;
-            StateHasChanged();
-        }
-    }
-
-    private void CancelOperations(object? sender, EventArgs e)
-    {
-        IsCropping = false;
-        StateHasChanged();
     }
 
     /// <inheritdoc />
@@ -360,37 +241,9 @@ public partial class ImageEditor : IAsyncDisposable
         IsDisposed = true;
         if (_module is not null)
         {
-            if (!string.IsNullOrEmpty(InnerContainerId))
-            {
-                await _module.InvokeVoidAsync("destroy", InnerContainerId, true);
-            }
             await _module.DisposeAsync();
         }
-        Interop.Dispose();
         GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Adds the given text to the image.
-    /// </summary>
-    /// <param name="text">The text to add.</param>
-    /// <remarks>
-    /// Causes the control to enter edit mode if it wasn't already.
-    /// </remarks>
-    public async Task AddTextAsync(string text)
-    {
-        if (IsDisposed)
-        {
-            return;
-        }
-        if (!Editing)
-        {
-            await BeginEditAsync();
-        }
-        if (_module is not null)
-        {
-            await _module.InvokeVoidAsync("addText", InnerContainerId, text);
-        }
     }
 
     /// <summary>
@@ -398,42 +251,10 @@ public partial class ImageEditor : IAsyncDisposable
     /// </summary>
     public async Task BeginEditAsync()
     {
-        if (IsDisposed || _module is null)
+        if (!IsDisposed && _module is not null)
         {
-            return;
+            await _module.InvokeVoidAsync("startEdit", Id);
         }
-        await SetLoadingAsync();
-        Editing = true;
-        if (EditingChanged.HasDelegate)
-        {
-            await EditingChanged.InvokeAsync(Editing);
-        }
-        await _module.InvokeVoidAsync("loadEditor", Interop.Reference, InnerContainerId, null, CropAspectRatio);
-        if (Math.Abs(BrushSize - BrushSizeDefault) > 0.00001)
-        {
-            await SetBrushSizeAsync();
-        }
-        if (BrushColor != BrushColorDefault)
-        {
-            await SetBrushColorAsync();
-        }
-        await SetLoadingAsync(false);
-    }
-
-    /// <summary>
-    /// Cancels an ongoing operation.
-    /// </summary>
-    public async Task CancelAsync()
-    {
-        if (IsDisposed)
-        {
-            return;
-        }
-        if (_module is not null)
-        {
-            await _module.InvokeVoidAsync("cancel", InnerContainerId);
-        }
-        IsCropping = false;
     }
 
     /// <summary>
@@ -441,18 +262,9 @@ public partial class ImageEditor : IAsyncDisposable
     /// </summary>
     public async Task CancelEditAsync()
     {
-        if (!Editing || IsDisposed || _module is null)
+        if (!IsDisposed && _module is not null)
         {
-            return;
-        }
-        await _module.InvokeVoidAsync("destroy", InnerContainerId);
-        IsCropping = false;
-        IsErasing = false;
-        Editing = false;
-        DrawingMode = DrawingMode.None;
-        if (EditingChanged.HasDelegate)
-        {
-            await EditingChanged.InvokeAsync(Editing);
+            await _module.InvokeVoidAsync("destroy", Id);
         }
     }
 
@@ -464,90 +276,10 @@ public partial class ImageEditor : IAsyncDisposable
     /// </remarks>
     public async Task ClearAsync()
     {
-        if (!Editing || IsDisposed || _module is null)
+        if (!IsDisposed && _module is not null)
         {
-            return;
+            await _module.InvokeVoidAsync("clear", Id);
         }
-        await _module.InvokeVoidAsync("clear", InnerContainerId);
-        IsCropping = false;
-    }
-
-    /// <summary>
-    /// Initiates a browser file download operation for the current state of the edited image.
-    /// </summary>
-    /// <param name="type">
-    /// <para>
-    /// The MIME type of the image to retrieve.
-    /// </para>
-    /// <para>
-    /// <c>image/png</c> should always be supported, and is the default if no value is provided.
-    /// </para>
-    /// <para>
-    /// <c>image/jpeg</c> and <c>image/webp</c> may also be supported.
-    /// </para>
-    /// <para>
-    /// If an unsupported format is specified, <c>image/png</c> will be used.
-    /// </para>
-    /// </param>
-    /// <param name="quality">
-    /// <para>
-    /// The quality of the output, for lossy formats.
-    /// </para>
-    /// <para>
-    /// Values should fall between <c>0</c> and <c>1</c>. Values outside this range will be ignored,
-    /// causing the browser to use a default quality (not necessarily the same as the parameter's
-    /// default value).
-    /// </para>
-    /// <para>
-    /// When using a lossless <paramref name="type"/> (such as the default, "image/png"), this
-    /// parameter is ignored.
-    /// </para>
-    /// </param>
-    public async Task ExportImageAsync(string? type = null, double? quality = 0.92)
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        await _module.InvokeVoidAsync("exportImage", InnerContainerId, type, quality);
-    }
-
-    /// <summary>
-    /// Flips the image horizontally.
-    /// </summary>
-    /// <remarks>
-    /// Causes the control to enter edit mode if it wasn't already.
-    /// </remarks>
-    public async Task FlipHorizontalAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        if (!Editing)
-        {
-            await BeginEditAsync();
-        }
-        await _module.InvokeVoidAsync("flipHorizontal", InnerContainerId);
-    }
-
-    /// <summary>
-    /// Flips the image vertically.
-    /// </summary>
-    /// <remarks>
-    /// Causes the control to enter edit mode if it wasn't already.
-    /// </remarks>
-    public async Task FlipVerticalAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        if (!Editing)
-        {
-            await BeginEditAsync();
-        }
-        await _module.InvokeVoidAsync("flipVertical", InnerContainerId);
     }
 
     /// <summary>
@@ -556,21 +288,10 @@ public partial class ImageEditor : IAsyncDisposable
     /// <param name="imageUrl">The URL to load. Should resolve as an image file.</param>
     public async Task LoadImageAsync(string? imageUrl = null)
     {
-        if (IsDisposed || _module is null)
+        if (!IsDisposed && _module is not null)
         {
-            return;
+            await _module.InvokeVoidAsync("setImage", Id, imageUrl);
         }
-        await SetLoadingAsync();
-        if (Editing)
-        {
-            await _module.InvokeVoidAsync("setBackgroundImage", InnerContainerId, imageUrl);
-        }
-        else
-        {
-            await _module.InvokeVoidAsync("loadImage", InnerContainerId, imageUrl);
-        }
-        HasImage = !string.IsNullOrEmpty(imageUrl);
-        await SetLoadingAsync(false);
     }
 
     /// <summary>
@@ -586,197 +307,11 @@ public partial class ImageEditor : IAsyncDisposable
     /// </param>
     public async Task LoadImageAsync(Stream stream)
     {
-        if (IsDisposed || _module is null)
+        if (!IsDisposed && _module is not null)
         {
-            return;
+            using var streamReference = new DotNetStreamReference(stream);
+            await _module.InvokeVoidAsync("setImageFromStream", Id, streamReference);
         }
-        await SetLoadingAsync();
-        using (var streamReference = new DotNetStreamReference(stream))
-        {
-            if (Editing)
-            {
-                await _module.InvokeVoidAsync("setBackgroundImageFromStream", InnerContainerId, streamReference);
-            }
-            else
-            {
-                await _module.InvokeVoidAsync("loadImageFromStream", InnerContainerId, streamReference);
-            }
-        }
-        HasImage = true;
-        await SetLoadingAsync(false);
-    }
-
-    /// <summary>
-    /// Rotate the image 90º clockwise.
-    /// </summary>
-    /// <remarks>
-    /// Causes the control to enter edit mode if it wasn't already.
-    /// </remarks>
-    public async Task RotateClockwiseAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        if (!Editing)
-        {
-            await BeginEditAsync();
-        }
-        await _module.InvokeVoidAsync("rotateClockwise", InnerContainerId);
-    }
-
-    /// <summary>
-    /// Rotate the image 90º counter-clockwise.
-    /// </summary>
-    /// <remarks>
-    /// Causes the control to enter edit mode if it wasn't already.
-    /// </remarks>
-    public async Task RotateCounterClockwiseAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        if (!Editing)
-        {
-            await BeginEditAsync();
-        }
-        await _module.InvokeVoidAsync("rotateCounterClockwise", InnerContainerId);
-    }
-
-    /// <summary>
-    /// Ends editing and saves the current image back to an HTML <c>img</c> element.
-    /// </summary>
-    /// <param name="type">
-    /// <para>
-    /// The MIME type of the image to save.
-    /// </para>
-    /// <para>
-    /// <c>image/png</c> should always be supported, and is the default if no value is provided.
-    /// </para>
-    /// <para>
-    /// <c>image/jpeg</c> and <c>image/webp</c> may also be supported.
-    /// </para>
-    /// <para>
-    /// If an unsupported format is specified, <c>image/png</c> will be used.
-    /// </para>
-    /// </param>
-    /// <param name="quality">
-    /// <para>
-    /// The quality of the output, for lossy formats.
-    /// </para>
-    /// <para>
-    /// Values should fall between <c>0</c> and <c>1</c>. Values outside this range will be ignored,
-    /// causing the browser to use a default quality (not necessarily the same as the parameter's
-    /// default value).
-    /// </para>
-    /// <para>
-    /// When using a lossless <paramref name="type"/> (such as the default, "image/png"), this
-    /// parameter is ignored.
-    /// </para>
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// Invokes <see cref="SaveCallback"/> if it has been defined.
-    /// </para>
-    /// <para>
-    /// Has no effect if the control is not currently in edit mode, and <see cref="SaveCallback"/>
-    /// is not defined.
-    /// </para>
-    /// </remarks>
-    public async Task SaveAsync(string? type = null, double? quality = 0.92)
-    {
-        if (IsDisposed
-            || _module is null
-            || (SaveCallback is null
-            && !Editing))
-        {
-            return;
-        }
-        await SetLoadingAsync();
-        var wasEditing = Editing;
-        if (SaveCallback is not null)
-        {
-            if (!Editing)
-            {
-                await _module.InvokeVoidAsync("loadEditor", Interop.Reference, InnerContainerId);
-            }
-            var streamReference = await _module.InvokeAsync<IJSStreamReference>("getStream", InnerContainerId, type, quality);
-            if (streamReference is null)
-            {
-                return;
-            }
-            await using var stream = await streamReference.OpenReadStreamAsync(MaxAllowedStreamSize <= 0
-                ? 512000
-                : MaxAllowedStreamSize);
-            await SaveCallback.Invoke(stream);
-        }
-        await _module.InvokeVoidAsync("save", InnerContainerId, type, quality);
-        Editing = false;
-        if (wasEditing)
-        {
-            await EditingChanged.InvokeAsync(Editing);
-        }
-        await SetLoadingAsync(false);
-    }
-
-    /// <summary>
-    /// Sets the current brush color to the given hex string.
-    /// </summary>
-    /// <param name="color">
-    /// A hex string representing a color. Or <see langword="null"/> or an empty string to reset to black.
-    /// </param>
-    public async Task SetBrushColorAsync(string? color)
-    {
-        BrushColor = ColorString(color);
-        await SetBrushColorAsync();
-    }
-
-    /// <summary>
-    /// Sets the current brush size.
-    /// </summary>
-    /// <param name="value">A number of pixels.</param>
-    public async Task SetBrushSizeAsync(double value)
-    {
-        BrushSize = Math.Max(1, value);
-        await SetBrushSizeAsync(BrushSize);
-    }
-
-    /// <summary>
-    /// Sets the cropping aspect ratio.
-    /// </summary>
-    /// <param name="ratio">
-    /// <para>
-    /// The aspect ratio for cropping.
-    /// </para>
-    /// <para>
-    /// Zero or <see langword="null"/> indicates free cropping.
-    /// </para>
-    /// <para>
-    /// A negative value indicates that the image's original aspect ratio should be used.
-    /// </para>
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// Only effective in edit mode. Does <em>not</em> cause the control to enter edit mode.
-    /// </para>
-    /// <para>
-    /// Invoking this method when not in edit mode has no effect.
-    /// </para>
-    /// <para>
-    /// The method <em>is</em> effective when in edit mode but not currently performing a crop
-    /// operation.
-    /// </para>
-    /// </remarks>
-    public async Task SetCropAspectRatioAsync(double? ratio = null)
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        CropAspectRatio = ratio;
-        await CropAspectRatioChanged.InvokeAsync();
-        await _module.InvokeVoidAsync("setCropAspectRatio", InnerContainerId, ratio);
     }
 
     /// <summary>
@@ -787,166 +322,50 @@ public partial class ImageEditor : IAsyncDisposable
     /// </remarks>
     public async Task StartCropAsync()
     {
-        if (IsDisposed || _module is null)
+        if (!IsDisposed && _module is not null)
+        {
+            await _module.InvokeVoidAsync("startCrop", Id);
+        }
+    }
+
+    private async Task OnCropAsync(CropEventArgs e)
+    {
+        if (IsDisposed || _module is null || VerifyCrop is null)
         {
             return;
         }
-        if (!Editing)
-        {
-            await BeginEditAsync();
-        }
-        IsCropping = true;
-        await _module.InvokeVoidAsync("startCrop", InnerContainerId);
-    }
 
-    private static string? ColorString(string? color = null)
-    {
-        if (string.IsNullOrEmpty(color)
-            || color[0] != '#')
+        if (!await VerifyCrop(this, e))
         {
-            return null;
-        }
-        if (color.Length is 4 or 7 or 9)
-        {
-            return color;
-        }
-        return null;
-    }
-
-    private async Task AddTextAsync()
-    {
-        var result = await DialogService.Show<Components.ImageEditor.Internal.TextDialog>("Add text").Result;
-        if (result.Choice == DialogChoice.Ok
-            && result.Data is string text
-            && !string.IsNullOrWhiteSpace(text))
-        {
-            await AddTextAsync(text);
+            await _module.InvokeVoidAsync("undo", Id);
         }
     }
 
-    private async Task CropAsync()
+    private async Task OnEditChangeAsync(ToggleEventArgs e)
     {
-        if (IsDisposed || _module is null)
+        if (Editing == (e.Value ?? false))
         {
             return;
         }
-        if (VerifyCrop is not null)
-        {
-            var bounds = await _module.InvokeAsync<CropBounds>("getCropBounds", InnerContainerId);
-            if (bounds.Width > 0 && bounds.Height > 0)
-            {
-                var verified = await VerifyCrop.Invoke(this, bounds);
-                if (!verified)
-                {
-                    await CancelAsync();
-                    return;
-                }
-            }
-        }
-        await _module.InvokeVoidAsync("crop", InnerContainerId);
-        IsCropping = false;
+        Editing = e.Value ?? false;
+        await EditingChanged.InvokeAsync(Editing);
     }
 
-    private string? GetAspectRatioClass(double? ratio) => new CssBuilder("btn btn-icon")
-        .Add("filled",
-            (!CropAspectRatio.HasValue && !ratio.HasValue)
-            || (CropAspectRatio.HasValue && ratio.HasValue
-            && Math.Abs(CropAspectRatio.Value - ratio.Value) < 0.00001))
-        .ToString();
-
-    private async Task RedoAsync()
+    private async Task OnSaveAsync(StreamEventArgs e)
     {
-        if (IsDisposed || _module is null)
+        if (SaveCallback is null
+            || e.Value is null)
         {
             return;
         }
-        await _module.InvokeVoidAsync("redo", InnerContainerId);
-    }
-
-    private void RedoHistoryChanged(object? sender, bool e)
-    {
-        RedoHistoryHasState = e;
-        StateHasChanged();
-    }
-
-    private async Task SetDrawingModeAsync(DrawingMode mode)
-    {
-        if (IsDisposed || _module is null || !Editing)
+        if (e.Value.Length > MaxAllowedStreamSize)
         {
+            Console.WriteLine($"Length of {nameof(ImageEditor)} {Id} save stream was {e.Value.Length}B, which exceeds the configured maximum of {(MaxAllowedStreamSize <= 0 ? 512000 : MaxAllowedStreamSize)}B");
             return;
         }
-        DrawingMode = mode;
-        await _module.InvokeVoidAsync("setDrawingMode", InnerContainerId, (int)DrawingMode);
-    }
-
-    private async Task SetIsErasingAsync(bool value)
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        IsErasing = value;
-        await _module.InvokeVoidAsync("setIsErasing", InnerContainerId, value);
-    }
-
-    private async Task SetLoadingAsync(bool value = true)
-    {
-        IsLoading = value;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task SetBrushColorAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        await _module.InvokeVoidAsync("setBrushColor", InnerContainerId, BrushColor);
-    }
-
-    private async Task SetBrushSizeAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        await _module.InvokeVoidAsync("setBrushSize", InnerContainerId, BrushSize);
-    }
-
-    private async void TextEdit(object? sender, string e)
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        var result = await DialogService.Show<Components.ImageEditor.Internal.TextDialog>("Edit text", new DialogParameters
-        {
-            { nameof(Components.ImageEditor.Internal.TextDialog.Text), e },
-        }).Result;
-        if (result.Choice == DialogChoice.Ok
-            && result.Data is string text
-            && !string.IsNullOrWhiteSpace(text))
-        {
-            await _module.InvokeVoidAsync("editText", InnerContainerId, text);
-        }
-        else
-        {
-            await _module.InvokeVoidAsync("editText", InnerContainerId, e);
-        }
-    }
-
-    private async Task UndoAsync()
-    {
-        if (IsDisposed || _module is null)
-        {
-            return;
-        }
-        await _module.InvokeVoidAsync("undo", InnerContainerId);
-    }
-
-    private void UndoHistoryChanged(object? sender, bool e)
-    {
-        UndoHistoryHasState = e;
-        StateHasChanged();
+        await using var stream = await e.Value.OpenReadStreamAsync(MaxAllowedStreamSize <= 0
+            ? 512000
+            : MaxAllowedStreamSize);
+        await SaveCallback.Invoke(stream);
     }
 }

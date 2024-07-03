@@ -1527,7 +1527,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             const buttonTooltip = document.createElement('tf-tooltip');
             buttonTooltip.textContent = definition.tooltip;
             colorInput.appendChild(buttonTooltip);
-            buttonTooltip.ariaLabel = definition.tooltip;
+            colorInput.ariaLabel = definition.tooltip;
         }
 
         controls.push(colorInput);
@@ -1670,6 +1670,10 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 const dropdownButtonTooltip = document.createElement('tf-tooltip');
                 dropdownButtonTooltip.textContent = (definition.dropdownTooltip || definition.tooltip)!;
                 button.appendChild(dropdownButtonTooltip);
+
+                if (!definition.text) {
+                    button.ariaLabel = (definition.dropdownTooltip || definition.tooltip)!;
+                }
             }
 
             control = document.createElement('div');
@@ -1721,7 +1725,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                     childIcon.outerHTML = childDefinition.icon;
 
                     if (childDefinition.label) {
-                        button.ariaLabel = childDefinition.label;
+                        span.ariaLabel = childDefinition.label;
                     }
                 } else if (childDefinition.text) {
                     span.innerHTML = childDefinition.text;

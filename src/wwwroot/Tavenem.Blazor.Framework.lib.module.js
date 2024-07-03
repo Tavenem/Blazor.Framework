@@ -13,6 +13,26 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             return {};
         }
     });
+    blazor.registerCustomEventType('crop', {
+        createEventArgs: (event) => {
+            if (event instanceof CustomEvent
+                && event.detail) {
+                return {
+                    x: event.detail.x == null ? 0 : event.detail.x,
+                    y: event.detail.y == null ? 0 : event.detail.y,
+                    width: event.detail.width == null ? 0 : event.detail.width,
+                    height: event.detail.height == null ? 0 : event.detail.height,
+                };
+            } else {
+                return {
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 0,
+                };
+            }
+        }
+    });
     blazor.registerCustomEventType('delete', {
         createEventArgs: (event) => {
             return {
@@ -52,6 +72,15 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
         }
     });
     blazor.registerCustomEventType('valueinput', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            };
+        }
+    });
+    blazor.registerCustomEventType('stream', {
         createEventArgs: (event) => {
             return {
                 value: event instanceof CustomEvent

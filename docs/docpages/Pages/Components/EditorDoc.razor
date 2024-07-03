@@ -121,9 +121,10 @@
 </Collapse>
 
 <p>
-    The HTML and Markdown syntaxes both offer a toolbar with a variety of common formatting options.
-    Controls which do not fit on a single line are hidden by default. The last button on the first
-    line of the toolbar toggles an expanded state that shows all available options.
+    The HTML, Markdown, and Handlebars syntaxes all offer a toolbar with a variety of common
+    formatting options. Controls which do not fit on a single line are hidden by default. The last
+    button on the first line of the toolbar toggles an expanded state that shows all available
+    options.
 </p>
 
 <p>
@@ -145,23 +146,25 @@
 
 <p>
     Note that when switching between most syntaxes, the source text remains unchanged. When
-    switching between HTML and Markdown, however, the editor will attempt to automatically convert
-    between the two formats.
+    switching between HTML (or Handlebars) and Markdown, however, the editor will attempt to
+    automatically convert between the two formats.
 </p>
 
 <p>
-    Switching between HTML and Markdown is not usually a reversible round-trip operation, even if
-    the content isn't edited in between. Rendering markdown to HTML, then parsing HTML as markdown
-    (or vice versa), does not always result in the original text. This is especially true if the
-    content contains any markup which can't be represented in basic markdown syntax.
+    Switching between HTML or Handlebars and Markdown is not usually a reversible round-trip
+    operation, even if the content isn't edited in between. Rendering markdown to HTML, then parsing
+    HTML as markdown (or vice versa), does not always result in the original text. This is
+    especially true if the content contains any markup which can't be represented in basic markdown
+    syntax.
 </p>
 
 <h2>WYSIWYG</h2>
 
 <p>
-    Both HTML and Markdown syntax offer a <abbr title="what you see is what you get">WYSIWYG</abbr>
-    mode (enabled by default). You can set the initial mode with the <code>EditorMode</code>
-    property, and change it programmatically with the <code>SetModeAsync</code> method.
+    HTML, Handlebars, and Markdown syntax offer a <abbr title="what you see is what you
+    get">WYSIWYG</abbr> mode (enabled by default). You can set the initial mode with the
+    <code>EditorMode</code> property, and change it programmatically with the
+    <code>SetModeAsync</code> method.
 </p>
 
 <Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">

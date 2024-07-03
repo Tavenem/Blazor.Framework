@@ -136,18 +136,6 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     public byte Lightness { get; private set; }
 
     /// <summary>
-    /// <para>
-    /// If set to <see langword="true"/> <see cref="string"/> output will always use hex notation
-    /// (either 6- or 8-digit).
-    /// </para>
-    /// <para>
-    /// Otherwise, 6-digit hex is used for colors without an alpha component, and rgba function
-    /// notation is used for colors with alpha.
-    /// </para>
-    /// </summary>
-    [Parameter] public bool OutputHexStrings { get; set; }
-
-    /// <summary>
     /// The red component of the currently selected color.
     /// </summary>
     public byte Red { get; private set; }

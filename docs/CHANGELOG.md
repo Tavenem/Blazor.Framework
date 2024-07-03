@@ -1,6 +1,8 @@
 # Changelog
 
 ## 3.0
+### Added
+- `Quality` parameter on `ImageEditor`
 ### Changed
 - Made `Checkbox`, `ColorInput`, `DateTimeInput`, `Dropdown`, `Editor`, `EmojiInput`, `MultiSelect`, `NumericInput`, `RadioButton`, `RadioGroup`, `Rating`, `Select`, `Slider`, `Switch`, `Tabs`, `TextArea`, `TextInput`, and `Tooltip` partially compatible with static server-side rendering
   - These controls now support most use cases even on static pages, and inputs should pass their value to submitted forms
@@ -17,10 +19,13 @@
 - `AddIcon`, `BackIcon`, and `ForwardIcon` on `Tabs`
 - `Icon` and `OutputHexStrings` on `ColorInput`
 - `Icon` on `DateTimeInput`
-- `SetModeAsync` on `Editor` (`EditorMode` is now responsive to dynamic updates)
+- `SetModeAsync` on `Editor`
+  - `EditorMode` now reacts to changes dynamically
 - `Origin` on `DialogOptions`
 - `FocusOut` on `Popover`
 - `IsOpenChanged` on `Dropdown`
+- `AddTextAsync`, `BrushColor`, `BrushSize`, `CancelAsync`, `CropAspectRatioChanged`, `DrawingMode`, `EditIcon`, `ExportImageAsync`, `FlipHorizontalAsync`, `FlipVerticalAsync`, `ImageClass`, `ImageStyle`, `RotateClockwiseAsync`, `RotateCounterClockwiseAsync`, `SetBrushColorAsync`, `SetBrushSizeAsync`, `SaveAsync`, `SetCropAspectRatioAsync` on `ImageEditor`
+  - `CropAspectRatio` now reacts to changes dynamically, but is no longer bindable
 
 ## 2.38
 ### Added
