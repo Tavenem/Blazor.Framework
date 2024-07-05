@@ -27,3 +27,23 @@ export function getPreferredTavenemColorScheme(): ThemePreference {
 
     return getNativePreferredColorScheme();
 }
+
+export function setPreferredTavenemColorScheme() {
+    setTavenemColorScheme(getPreferredTavenemColorScheme());
+}
+
+export function setTavenemColorScheme(theme: ThemePreference) {
+    if (theme == ThemePreference.Dark) {
+        document.documentElement.dataset.theme = 'dark';
+    } else {
+        document.documentElement.dataset.theme = 'light';
+    }
+
+    if (theme == getNativePreferredColorScheme()) {
+        localStorage.removeItem('tavenem-theme');
+    } else {
+        localStorage.setItem('tavenem-theme', theme.toString());
+    }
+
+    return;
+}

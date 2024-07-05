@@ -108,7 +108,6 @@ export class ImageEditor {
     private _brushTexture?: RenderTexture;
     private _cropRect?: Sprite;
     private _cropTransformer?: Transformer;
-    private _currentState?: string;
     private _drawing = false;
     private _drawn?: Sprite;
     private _editedText?: Text;
@@ -116,14 +115,14 @@ export class ImageEditor {
     private _isErasing = false;
     private _lastPosition?: { x: number, y: number };
     private _maxCount = 100;
-    private _redoStack: string[] = [];
+    private _redoStack: Function[] = [];
     private _spritePool = new SpritePool();
     private _textColor = "#000000";
     private _textTapped = false;
     private _textDialog?: HTMLDialogElement;
     private _textDoubleTapped?: number;
     private _textTransformer?: Transformer;
-    private _undoStack: string[] = [];
+    private _undoStack: Function[] = [];
     private _widthLimit?: number;
 
     constructor(
@@ -164,33 +163,7 @@ export class ImageEditor {
     }
 
     addText(text: string) {
-        if (this.editor.stage.children.length < 1) {
-            return;
-        }
-        this.cancelOngoingOperations();
-        const container = this.editor.stage.children[0] as Container;
-        const t = new Text(text, {
-            fill: this._textColor,
-            fontSize: this.editor.view.height,
-        });
-        t.anchor.set(0.5, 0.5);
-        t.x = this.editor.view.width / 2;
-        t.y = this.editor.view.height / 2;
-        t.scale.set(0.3);
-        t.eventMode = 'static';
-        t.on('pointertap', this.onTextPointerTap, this);
-        container.addChild(t);
-        this.saveState();
-        this._textTransformer = new Transformer({
-            boxRotationEnabled: true,
-            boxScalingEnabled: true,
-            boundingBoxes: 'groupOnly',
-            group: [t],
-            lockAspectRatio: true,
-            skewEnabled: true,
-        });
-        this._textTransformer.on('pointertap', this.onTextPointerTap, this);
-        this.editor.stage.addChild(this._textTransformer);
+        this.saveState(this.addTextInner.bind(this, text));
     }
 
     cancelOngoingOperations(withoutNotify?: boolean) {
@@ -215,8 +188,12 @@ export class ImageEditor {
         }
     }
 
-    clear() {
+    async clear() {
         this.cancelOngoingOperations();
+        if (this.backgroundImage
+            && this.backgroundImage.texture.baseTexture.resource.src) {
+            await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
+        }
         if (this.editor.stage.children.length > 0) {
             const container = this.editor.stage.children[0];
             container.destroy(true);
@@ -229,15 +206,6 @@ export class ImageEditor {
         this.resetContainer();
     }
 
-    clearHistory() {
-        this.cancelOngoingOperations();
-        this._redoStack = [];
-        this._undoStack = [];
-        this._currentState = this.snapshot();
-        this.updateRedo(false);
-        this.updateUndo(false);
-    }
-
     crop() {
         if (!this._cropRect
             || this._cropRect.height <= 0
@@ -245,33 +213,12 @@ export class ImageEditor {
             || this.editor.stage.children.length < 1) {
             return new Rectangle(0, 0, 0, 0);
         }
-        if (this._cropTransformer) {
-            this.editor.stage.removeChild(this._cropTransformer);
-            this._cropTransformer.destroy(true);
-            delete this._cropTransformer;
-        }
         const region = new Rectangle(
             this._cropRect.x - (this._cropRect.width / 2),
             this._cropRect.y - (this._cropRect.height / 2),
             this._cropRect.width,
             this._cropRect.height);
-        const texture = this.editor.renderer.generateTexture(this.editor.stage, {
-            region,
-        });
-        const canvas = this.editor.renderer.extract.canvas(texture) as HTMLCanvasElement;
-        this.clear();
-        const container = this.editor.stage.children[0] as Container;
-        this.backgroundImage = Sprite.from(canvas);
-        this.backgroundImage.eventMode = 'none';
-        this.editor.renderer.resize(this.backgroundImage.width, this.backgroundImage.height);
-        if (this._brushCanvasTexture) {
-            this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
-        }
-        container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
-        container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
-        this.backgroundImage.setParent(container);
-        texture.destroy(true);
-        this.saveState();
+        this.saveState(this.cropInner.bind(this, region));
         this.setCropping(false);
         return region;
     }
@@ -329,38 +276,7 @@ export class ImageEditor {
     }
 
     editText(text?: string) {
-        if (!this._editedText) {
-            if (text && text.length) {
-                this.addText(text);
-            }
-            return;
-        }
-        if (!text || text.length == 0) {
-            this._editedText.destroy(true);
-        } else {
-            this._editedText.text = text;
-        }
-        this.saveState();
-        if (text && text.length > 0) {
-            if (!this._textTransformer) {
-                this._textTransformer = new Transformer({
-                    boxRotationEnabled: true,
-                    boxScalingEnabled: true,
-                    boundingBoxes: 'groupOnly',
-                    group: [this._editedText],
-                    lockAspectRatio: true,
-                    skewEnabled: true,
-                });
-                this._textTransformer.on('pointertap', this.onTextPointerTap, this);
-                this.editor.stage.addChild(this._textTransformer);
-            } else if (!this._textTransformer.group.includes(this._editedText)) {
-                while (this._textTransformer.group.length > 0) {
-                    this._textTransformer.group.pop();
-                }
-                this._textTransformer.group.push(this._editedText);
-            }
-        }
-        delete this._editedText;
+        this.saveState(this.editTextInner.bind(this, text));
     }
 
     exportImage(type: string, quality?: number) {
@@ -375,18 +291,7 @@ export class ImageEditor {
     }
 
     flip(vertical?: boolean) {
-        this.cancelOngoingOperations();
-        if (this.editor.stage.children.length < 1) {
-            return;
-        }
-        const container = this.editor.stage.children[0] as Container;
-        if (container.angle % 180 != 0) {
-            vertical = !vertical;
-        }
-        container.scale.set(
-            vertical ? container.scale.x : -container.scale.x,
-            vertical ? -container.scale.y : container.scale.y);
-        this.saveState();
+        this.saveState(this.flipInner.bind(this, vertical));
     }
 
     getTextDialogResponse(text?: string | null) {
@@ -413,18 +318,16 @@ export class ImageEditor {
         this._textDialog.showModal();
     }
 
-    redo() {
+    async redo() {
         this.cancelOngoingOperations();
+
         if (this._redoStack.length === 0) {
             return;
         }
-        this._currentState = this._redoStack.pop();
-        const snapshot = this.snapshot();
-        if (snapshot) {
-            this._undoStack.push(snapshot);
-        }
 
-        this.restoreSnapshot(this._currentState!);
+        const step = this._redoStack.pop()!;
+        step();
+        this._undoStack.push(step);
 
         if (this._undoStack.length > 0) {
             this.updateUndo(true);
@@ -452,22 +355,7 @@ export class ImageEditor {
     }
 
     rotate(angle: number) {
-        this.cancelOngoingOperations();
-        if (this.editor.stage.children.length < 1) {
-            return;
-        }
-        const container = this.editor.stage.children[0] as Container;
-
-        const newAngle = (container.angle + angle) % 360;
-        if (Math.abs(newAngle - container.angle) % 180 == 90) {
-            this.editor.renderer.resize(this.editor.view.height, this.editor.view.width);
-            if (this._brushCanvasTexture) {
-                this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
-            }
-            container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
-        }
-        container.angle = newAngle;
-        this.saveState();
+        this.saveState(this.rotateInner.bind(this, angle));
     }
 
     async save(type?: string, quality?: number | null) {
@@ -492,6 +380,10 @@ export class ImageEditor {
         }
         const canvas = this.editor.renderer.extract.canvas(renderTexture) as HTMLCanvasElement;
         renderTexture.destroy(true);
+        if (this.backgroundImage
+            && this.backgroundImage.texture.baseTexture.resource.src) {
+            await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
+        }
         this.editor.destroy(true, true);
         delete this.backgroundImage;
         delete this._brushCursor;
@@ -501,9 +393,9 @@ export class ImageEditor {
         return await new Promise((resolve: BlobCallback) => canvas.toBlob(resolve, type, quality));
     }
 
-    async setBackgroundImage(imageUrl?: string | null) {
+    async setBackgroundImage(imageUrl?: string | null, preserveHistory: boolean = false) {
         this.cancelOngoingOperations();
-        this.clear();
+        await this.clear();
         const container = this.editor.stage.children[0] as Container;
 
         if (this.backgroundImage) {
@@ -547,7 +439,9 @@ export class ImageEditor {
             container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
             container.addChildAt(this.backgroundImage, 0);
         }
-        this.clearHistory();
+        if (!preserveHistory) {
+            this.clearHistory();
+        }
     }
 
     setBrushColor(color?: string) {
@@ -685,18 +579,21 @@ export class ImageEditor {
         this.setCropping(true);
     }
 
-    undo() {
-        this.cancelOngoingOperations();
+    async undo() {
         if (this._undoStack.length === 0) {
+            this.cancelOngoingOperations();
             return;
         }
-        this._currentState = this._undoStack.pop();
-        const snapshot = this.snapshot();
-        if (snapshot) {
-            this._redoStack.push(snapshot);
-        }
 
-        this.restoreSnapshot(this._currentState!);
+        await this.setBackgroundImage(this.originalSrc, true);
+        this.setDrawingMode(this.drawingMode);
+
+        this._redoStack.push(this._undoStack.pop()!);
+
+        for (let i = 0; i < this._undoStack.length; i++) {
+            const step = this._undoStack[i];
+            step();
+        }
 
         if (this._redoStack.length > 0) {
             this.updateRedo(true);
@@ -704,6 +601,67 @@ export class ImageEditor {
         if (this._undoStack.length === 0) {
             this.updateUndo(false);
         }
+    }
+
+    private addTextInner(text: string) {
+        this.cancelOngoingOperations();
+        if (this.editor.stage.children.length < 1) {
+            return;
+        }
+        const container = this.editor.stage.children[0] as Container;
+        const t = new Text(text, {
+            fill: this._textColor,
+            fontSize: this.editor.view.height,
+        });
+        t.anchor.set(0.5, 0.5);
+        t.x = this.editor.view.width / 2;
+        t.y = this.editor.view.height / 2;
+        t.scale.set(0.3);
+        t.eventMode = 'static';
+        t.on('pointertap', this.onTextPointerTap, this);
+        container.addChild(t);
+        this._textTransformer = new Transformer({
+            boxRotationEnabled: true,
+            boxScalingEnabled: true,
+            boundingBoxes: 'groupOnly',
+            group: [t],
+            lockAspectRatio: true,
+            skewEnabled: true,
+        });
+        this._textTransformer.on('pointertap', this.onTextPointerTap, this);
+        this.editor.stage.addChild(this._textTransformer);
+    }
+
+    private clearHistory() {
+        this.cancelOngoingOperations();
+        this._redoStack = [];
+        this._undoStack = [];
+        this.updateRedo(false);
+        this.updateUndo(false);
+    }
+
+    private async cropInner(region: Rectangle) {
+        if (this._cropTransformer) {
+            this.editor.stage.removeChild(this._cropTransformer);
+            this._cropTransformer.destroy(true);
+            delete this._cropTransformer;
+        }
+        const texture = this.editor.renderer.generateTexture(this.editor.stage, {
+            region,
+        });
+        const canvas = this.editor.renderer.extract.canvas(texture) as HTMLCanvasElement;
+        await this.clear();
+        const container = this.editor.stage.children[0] as Container;
+        this.backgroundImage = Sprite.from(canvas);
+        this.backgroundImage.eventMode = 'none';
+        this.editor.renderer.resize(this.backgroundImage.width, this.backgroundImage.height);
+        if (this._brushCanvasTexture) {
+            this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
+        }
+        container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
+        container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
+        this.backgroundImage.setParent(container);
+        texture.destroy(true);
     }
 
     private drawPoint(x: number, y: number) {
@@ -741,6 +699,54 @@ export class ImageEditor {
                 this.drawPoint(pos.x, pos.y);
             }
         }
+    }
+
+    private editTextInner(text?: string) {
+        if (!this._editedText) {
+            if (text && text.length) {
+                this.addText(text);
+            }
+            return;
+        }
+        if (!text || text.length == 0) {
+            this._editedText.destroy(true);
+        } else {
+            this._editedText.text = text;
+        }
+        if (text && text.length > 0) {
+            if (!this._textTransformer) {
+                this._textTransformer = new Transformer({
+                    boxRotationEnabled: true,
+                    boxScalingEnabled: true,
+                    boundingBoxes: 'groupOnly',
+                    group: [this._editedText],
+                    lockAspectRatio: true,
+                    skewEnabled: true,
+                });
+                this._textTransformer.on('pointertap', this.onTextPointerTap, this);
+                this.editor.stage.addChild(this._textTransformer);
+            } else if (!this._textTransformer.group.includes(this._editedText)) {
+                while (this._textTransformer.group.length > 0) {
+                    this._textTransformer.group.pop();
+                }
+                this._textTransformer.group.push(this._editedText);
+            }
+        }
+        delete this._editedText;
+    }
+
+    private flipInner(vertical?: boolean) {
+        this.cancelOngoingOperations();
+        if (this.editor.stage.children.length < 1) {
+            return;
+        }
+        const container = this.editor.stage.children[0] as Container;
+        if (container.angle % 180 != 0) {
+            vertical = !vertical;
+        }
+        container.scale.set(
+            vertical ? container.scale.x : -container.scale.x,
+            vertical ? -container.scale.y : container.scale.y);
     }
 
     private getDialog(text?: string | null) {
@@ -927,6 +933,7 @@ export class ImageEditor {
         if (this.editor.stage.children.length < 1) {
             return;
         }
+        this.simulateTap(e);
         let text: Text | undefined;
         if (e.target instanceof Text) {
             text = e.target;
@@ -993,51 +1000,94 @@ export class ImageEditor {
             clear: false,
         });
         this._brushBuffer.removeChildren();
-        if (!this._drawing) {
-            this.saveState();
-        }
-    }
 
-    private restoreSnapshot(snapshot: string) {
-        if (this.editor.stage.children.length < 1) {
+        if (this._drawing
+            || !this._brushCanvasTexture
+            || !this._drawn) {
             return;
         }
-        const children = JSON.parse(snapshot) as DisplayObject[];
-        this.clear();
-        const container = this.editor.stage.children[0] as Container;
-        for (const child of children) {
-            child.setParent(container);
-        }
-    }
 
-    private snapshot() {
-        if (this.editor.stage.children.length < 1) {
-            return;
-        }
-        const container = this.editor.stage.children[0] as Container;
-
-        return JSON.stringify(container.children, (key, value) => {
-            const exclude = ['scope', 'parent'];
-            if (key.substring(0, 1) !== '_'
-                && exclude.indexOf(key) === -1) {
-                return value;
-            }
+        const cloneTexture = RenderTexture.create({
+            width: this._brushCanvasTexture.width,
+            height: this._brushCanvasTexture.height,
         });
+        this.editor.renderer.render(this._drawn, { renderTexture: cloneTexture });
+        const cloneSprite = new Sprite(cloneTexture);
+        this.saveState(this.renderPointsInner.bind(this, cloneSprite));
+
+        this._brushCanvasTexture.destroy(true);
+        this._brushCanvasTexture = RenderTexture.create({
+            width: this.editor.view.width,
+            height: this.editor.view.height,
+        });
+        this._drawn.texture = this._brushCanvasTexture;
     }
 
-    private saveState() {
+    private renderPointsInner(drawn: Sprite) {
+        const container = this.editor.stage.children[0] as Container;
+
+        const cloneTexture = RenderTexture.create({
+            width: this.editor.view.width,
+            height: this.editor.view.height,
+        });
+        this.editor.renderer.render(drawn, { renderTexture: cloneTexture });
+        const cloneSprite = new Sprite(cloneTexture);
+
+        container.addChild(cloneSprite);
+    }
+
+    private rotateInner(angle: number) {
+        this.cancelOngoingOperations();
+        if (this.editor.stage.children.length < 1) {
+            return;
+        }
+        const container = this.editor.stage.children[0] as Container;
+
+        const newAngle = (container.angle + angle) % 360;
+        if (Math.abs(newAngle - container.angle) % 180 == 90) {
+            this.editor.renderer.resize(this.editor.view.height, this.editor.view.width);
+            if (this._brushCanvasTexture) {
+                this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
+            }
+            container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
+        }
+        container.angle = newAngle;
+    }
+
+    private saveState(step: Function, skipExecute: boolean = false) {
         if (this._undoStack.length >= this._maxCount) {
             this._undoStack.shift();
         }
-        if (this._currentState) {
-            this._undoStack.push(this._currentState);
-        }
-        this._currentState = this.snapshot();
+        this._undoStack.push(step);
         this._redoStack = [];
+
+        if (!skipExecute) {
+            step();
+        }
+
         this.updateRedo(false);
         if (this._undoStack.length > 0) {
             this.updateUndo(true);
         }
+    }
+
+    private simulatedTap(e: PointerEventInit) {
+        e.view = window;
+        this.editor.renderer.view.dispatchEvent(new PointerEvent('pointerdown', e));
+    }
+
+    private simulateTap(e: FederatedPointerEvent) {
+        const eventInitDict: PointerEventInit = {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            buttons: 1,
+            isPrimary: true,
+            pointerType: 'mouse',
+            clientX: e.clientX,
+            clientY: e.clientY,
+        };
+        this.saveState(this.simulatedTap.bind(this, eventInitDict), true);
     }
 
     private updateBrush() {

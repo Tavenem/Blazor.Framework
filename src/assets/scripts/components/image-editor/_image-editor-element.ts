@@ -1,6 +1,7 @@
 import { Rectangle } from "pixi.js";
 import { randomUUID } from "../../tavenem-utility";
 import { DrawingMode, ImageEditor } from "./_image-editor";
+import { elementStyle } from "./_element-style";
 
 interface DotNetStreamReference {
     arrayBuffer(): Promise<ArrayBuffer>;
@@ -45,424 +46,7 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
-        style.innerHTML = `
-:host {
-    display: flex;
-    flex-direction: column;
-    gap: .25rem;
-    position: relative;
-}
-
-* {
-    font-family: var(--tavenem-font-family);
-}
-
-svg {
-    fill: currentColor;
-    flex-shrink: 0;
-    height: 1em;
-    width: auto;
-}
-
-.overlay {
-    align-items: center;
-    animation: tf-fadein ease 0.15s;
-    -webkit-animation: tf-fadein ease 0.15s;
-    -moz-animation: tf-fadein ease 0.15s;
-    -o-animation: tf-fadein ease 0.15s;
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-    background-color: rgba(33, 33, 33, 0.5);
-    border-style: none;
-    border-radius: inherit;
-    bottom: 0;
-    display: none;
-    height: 100%;
-    left: 0;
-    margin: 0;
-    justify-content: center;
-    overflow: hidden;
-    padding: 1rem;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transition: .3s cubic-bezier(.25,.8,.5,1),z-index 1ms;
-    user-select: none;
-    width: 100%;
-    z-index: var(--tavenem-zindex-overlay);
-
-    &:hover {
-        cursor: default;
-    }
-
-    .show {
-        display: flex;
-    }
-
-    @media print {
-        display: none;
-    }
-}
-
-.vr {
-    align-self: stretch;
-    background-color: var(--tavenem-color-divider);
-    display: inline-block;
-    min-height: 1rem;
-    vertical-align: text-top;
-    width: 1px;
-
-    .dark {
-        background-color: var(--tavenem-light-color-divider);
-    }
-
-    .light {
-        background-color: var(--tavenem-dark-color-divider);
-    }
-}
-
-button {
-    align-items: center;
-    background-color: transparent;
-    border-color: var(--tavenem-color-border);
-    border-radius: 9999px;
-    border-style: none;
-    box-sizing: border-box;
-    color: inherit;
-    cursor: pointer;
-    display: inline-flex;
-    flex: 0 0 auto;
-    font-size: 1.5rem;
-    font-weight: var(--tavenem-font-weight-semibold);
-    gap: .25rem;
-    justify-content: center;
-    line-height: 1;
-    margin: 0;
-    min-width: calc(var(--tavenem-font-size-button) + 12px);
-    outline: 0;
-    overflow: hidden;
-    padding: 6px;
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    text-transform: var(--tavenem-texttransform-button);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    user-select: none;
-    vertical-align: middle;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-
-    &:after {
-        background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
-        background-position: 50%;
-        background-repeat: no-repeat;
-        content: "";
-        display: block;
-        height: 100%;
-        left: 0;
-        opacity: 0;
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        transform: scale(7,7);
-        transition: transform .3s,opacity 1s;
-        width: 100%;
-    }
-
-    &:focus:not(:focus-visible) {
-        outline: 0;
-    }
-
-    &:hover,
-    &:focus-visible {
-        background-color: var(--tavenem-color-action-hover-bg);
-    }
-
-    &:active:after {
-        transform: scale(0,0);
-        opacity: .1;
-        transition: 0s;
-    }
-
-    .active {
-        --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
-        --button-active-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0,0,0,.12);
-        --button-bg: var(--tavenem-theme-color, var(--tavenem-color-default));
-        --button-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
-        --button-hover-bg: var(--tavenem-theme-color-darken, var(--tavenem-color-default-darken));
-        --button-hover-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
-        --button-hover-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0,0,0,.12);
-        --button-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12);
-        background-color: var(--button-bg);
-        color: var(--button-color);
-
-        &:disabled, &.disabled, &[inert], [inert] & {
-            --button-bg: var(--tavenem-color-action-disabled-bg);
-            background-color: var(--tavenem-color-action-disabled-bg);
-        }
-    }
-}
-
-.button-group {
-    --button-inherited-active-shadow: none;
-    --button-inherited-bg: transparent;
-    --button-inherited-border-style: none;
-    --button-inherited-color: var(--tavenem-color-text);
-    --button-inherited-font-size: calc(var(--tavenem-font-size-button) - 1px);
-    --button-inherited-font-size-icon: 1.25rem;
-    --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-    --button-inherited-hover-color: var(--tavenem-color-action);
-    --button-inherited-hover-shadow: none;
-    --button-inherited-padding-x: 5px;
-    --button-inherited-padding-y: 4px;
-    --button-inherited-padding-y-icon: 5px;
-    --button-inherited-shadow: none;
-    background-color: transparent;
-    border-radius: var(--tavenem-border-radius);
-    display: inline-flex;
-
-    > button,
-    > tf-dropdown > button {
-        border-bottom-left-radius: inherit;
-        border-top-left-radius: inherit;
-
-        &:not(:last-child) {
-            border-bottom-right-radius: 0;
-            border-top-right-radius: 0;
-        }
-
-        &:last-child {
-            border-bottom-right-radius: inherit;
-            border-top-right-radius: inherit;
-        }
-
-        + button,
-        + tf-dropdown > button {
-            border-bottom-left-radius: 0;
-            border-top-left-radius: 0;
-            border-left-style: solid;
-            margin-left: -1px;
-        }
-    }
-}
-
-.list {
-    --list-active-bg: var(--tavenem-color-primary-hover);
-    --list-active-color: var(--tavenem-color-primary);
-    --list-active-hover-bg: var(--tavenem-color-primary-hover-bright);
-    --list-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
-    --list-hover-bg: var(--tavenem-color-primary-hover);
-    --tavenem-theme-color-bg-alt: var(--tavenem-theme-color-darken);
-    background-color: var(--tavenem-theme-color, var(--tavenem-color-default));
-    color: var(--list-color);
-    display: flex;
-    flex-direction: column;
-    list-style: none;
-    margin: 0;
-    overflow: auto;
-    padding-bottom: .25em;
-    padding-left: .75em;
-    padding-right: .75em;
-    padding-top: .25em;
-    position: relative;
-    scrollbar-gutter: stable;
-    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-
-    > * {
-        align-items: center;
-        background-color: transparent;
-        border: 0;
-        border-radius: 0;
-        box-sizing: border-box;
-        color: inherit;
-        column-gap: .5em;
-        cursor: pointer;
-        display: flex;
-        flex: 0 0 auto;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        list-style: none;
-        margin: 0;
-        outline: 0;
-        overflow: hidden;
-        padding-bottom: .25em;
-        padding-inline-end: .25em;
-        padding-inline-start: .25em;
-        padding-top: .25em;
-        position: relative;
-        text-align: start;
-        text-decoration: none;
-        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-        user-select: none;
-        vertical-align: middle;
-        -webkit-appearance: none;
-        -webkit-tap-highlight-color: transparent;
-
-        &:focus-visible, &:hover {
-            background-color: transparent;
-            color: inherit;
-        }
-
-        &:after {
-            background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
-            background-position: 50%;
-            background-repeat: no-repeat;
-            content: "";
-            display: block;
-            height: 100%;
-            left: 0;
-            opacity: 0;
-            pointer-events: none;
-            position: absolute;
-            top: 0;
-            transform: scale(10,10);
-            transition: transform .3s,opacity 1s;
-            width: 100%;
-        }
-
-        &:active:after {
-            transform: scale(0,0);
-            opacity: .1;
-            transition: 0s;
-        }
-
-        &.active {
-            border-inline-end: 1px solid var(--list-active-color);
-            padding-inline-end: calc(1em - 1px);
-        }
-
-        &:hover,
-        &:focus:not(.active) {
-            &:not(:disabled, .disabled) {
-                background-color: var(--list-hover-bg);
-
-                &.active {
-                    background-color: var(--list-active-hover-bg);
-                }
-            }
-        }
-    }
-
-    > .active {
-        background-color: var(--list-active-bg);
-        border-inline-end: 1px solid var(--list-active-color);
-        color: var(--list-active-color);
-        padding-inline-end: calc(1em - 1px);
-    }
-
-    svg {
-        font-size: 1.25em;
-    }
-
-    .selected-icon {
-        visibility: hidden;
-    }
-
-    .active > .selected-icon {
-        visibility: visible;
-    }
-}
-
-.image-edit-button {
-    opacity: .5;
-    position: absolute;
-    right: .25rem;
-    top: .25rem;
-}
-
-:host([data-hide-edit]) .image-edit-button,
-.image-edit-button.editing,
-:host(:not([data-edit-no-image])) .image-edit-button.no-image {
-    display: none;
-}
-
-.image-editor-container {
-    display: grid;
-    place-items: center;
-}
-
-.image-editor-controls {
-    display: none;
-    flex-direction: column;
-    flex-wrap: wrap;
-    gap: .5rem;
-}
-
-.image-editor-controls.editing {
-    display: flex;
-}
-
-.image-editor-toolbar {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: .5rem;
-    justify-content: space-between;
-}
-
-.cropping-tools {
-    display: none;
-}
-
-.cropping .cropping-tools {
-    display: flex;
-}
-
-.cropping > *:not(.cropping-tools) {
-    display: none;
-}
-
-.format svg.active {
-    display: none;
-}
-
-.format.active svg.active {
-    display: initial;
-}
-
-.brush-size-container {
-    align-items: center;
-    display: inline-flex;
-    gap: .5rem;
-}
-
-.drawing-tool {
-    display: none;
-}
-
-.text-tool {
-    display: none;
-}
-
-.erasing-tool {
-    display: none;
-}
-
-[data-drawing-mode="1"] .drawing-tool {
-    display: initial;
-}
-
-[data-erasing] .erasing-tool {
-    display: initial;
-}
-
-[data-text-mode] .text-tool {
-    display: initial;
-}
-
-[data-text-mode] :not(.text-tool) {
-    display: none;
-}
-
-[data-erasing] .non-erasing-tool {
-    display: none;
-}
-
-[data-drawing-mode="1"] :not(.drawing-tool) {
-    display: none;
-}
-`;
+        style.innerHTML = elementStyle;
         shadow.appendChild(style);
 
         const overlay = document.createElement('div');
@@ -496,11 +80,17 @@ button {
         croppingTools.ariaLabel = 'cropping toolbar';
         controls.appendChild(croppingTools);
 
+        const cropGroup = document.createElement('div');
+        cropGroup.classList.add('button-group');
+        cropGroup.role = 'group';
+        cropGroup.ariaLabel = 'crop group';
+        croppingTools.appendChild(cropGroup);
+
         const cropButton = document.createElement('button');
         cropButton.classList.add('crop-button');
         cropButton.ariaLabel = 'crop';
         cropButton.role = 'menuitem';
-        croppingTools.appendChild(cropButton);
+        cropGroup.appendChild(cropButton);
         cropButton.addEventListener('click', this.startCrop.bind(this));
 
         const cropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -511,17 +101,11 @@ button {
         cropTooltip.textContent = 'crop';
         cropButton.appendChild(cropTooltip);
 
-        const separator1 = document.createElement('div');
-        separator1.classList.add('vr');
-        separator1.role = 'separator';
-        separator1.ariaOrientation = 'vertical';
-        croppingTools.appendChild(separator1);
-
         const cancelCropButton = document.createElement('button');
         cropButton.classList.add('cancel-crop-button');
         cancelCropButton.ariaLabel = 'cancel crop';
         cancelCropButton.role = 'menuitem';
-        croppingTools.appendChild(cancelCropButton);
+        cropGroup.appendChild(cancelCropButton);
         cancelCropButton.addEventListener('click', this.cancel.bind(this));
 
         const cancelCropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -533,12 +117,6 @@ button {
         cancelCropButton.appendChild(cancelCropTooltip);
 
         if (!('hideAspectRatio' in this.dataset)) {
-            const separator2 = document.createElement('div');
-            separator2.classList.add('vr');
-            separator2.role = 'separator';
-            separator2.ariaOrientation = 'vertical';
-            croppingTools.appendChild(separator2);
-
             const aspectRatioGroup = document.createElement('div');
             aspectRatioGroup.classList.add('button-group');
             aspectRatioGroup.role = 'group';
@@ -733,12 +311,6 @@ button {
         redoTooltip.textContent = 'redo';
         redoButton.appendChild(redoTooltip);
 
-        const separator3 = document.createElement('div');
-        separator3.classList.add('vr');
-        separator3.role = 'separator';
-        separator3.ariaOrientation = 'vertical';
-        fileTools.appendChild(separator3);
-
         const saveGroup = document.createElement('div');
         const saveGroupId = randomUUID();
         saveGroup.id = saveGroupId;
@@ -767,7 +339,6 @@ button {
         const downloadButton = document.createElement('button');
         downloadButton.classList.add('download-button');
         downloadButton.ariaLabel = 'download';
-        downloadButton.disabled = true;
         downloadButton.role = 'menuitem';
         saveGroup.appendChild(downloadButton);
         downloadButton.addEventListener('click', this.exportImage.bind(this, null, null));
@@ -824,9 +395,8 @@ button {
             pngSpan.addEventListener('mouseup', this.setFormat.bind(this, "image/png"));
 
             const pngActiveIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            pngActiveIcon.classList.add('selected-icon');
             pngSpan.appendChild(pngActiveIcon);
-            pngActiveIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
+            pngActiveIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="selected-icon" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
 
             const pngInnerSpan = document.createElement('span');
             pngInnerSpan.textContent = 'PNG';
@@ -843,9 +413,8 @@ button {
             jpegSpan.addEventListener('mouseup', this.setFormat.bind(this, "image/jpeg"));
 
             const jpegActiveIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            jpegActiveIcon.classList.add('selected-icon');
             jpegSpan.appendChild(jpegActiveIcon);
-            jpegActiveIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
+            jpegActiveIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="selected-icon" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
 
             const jpegInnerSpan = document.createElement('span');
             jpegInnerSpan.textContent = 'JPEG';
@@ -862,20 +431,13 @@ button {
             webpSpan.addEventListener('mouseup', this.setFormat.bind(this, "image/webp"));
 
             const webpActiveIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
-            webpActiveIcon.classList.add('selected-icon');
             webpSpan.appendChild(webpActiveIcon);
-            webpActiveIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
+            webpActiveIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="selected-icon" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>`;
 
             const webpInnerSpan = document.createElement('span');
             webpInnerSpan.textContent = 'WebP';
             webpSpan.appendChild(webpInnerSpan);
         }
-
-        const separator4 = document.createElement('div');
-        separator4.classList.add('vr');
-        separator4.role = 'separator';
-        separator4.ariaOrientation = 'vertical';
-        fileTools.appendChild(separator4);
 
         const cancelEditButton = document.createElement('button');
         cancelEditButton.classList.add('cancel-edit-button');
@@ -973,15 +535,6 @@ button {
 
             if (!('hide-crop' in this.dataset)
                 || !('hide-drawing' in this.dataset)) {
-                if (!('hide-rotate' in this.dataset)
-                    || !('hide-flip' in this.dataset)) {
-                    const separator7 = document.createElement('div');
-                    separator7.classList.add('vr');
-                    separator7.role = 'separator';
-                    separator7.ariaOrientation = 'vertical';
-                    manipulationTools.appendChild(separator7);
-                }
-
                 if (!('hide-drawing' in this.dataset)) {
                     const drawingTools = document.createElement('div');
                     drawingTools.classList.add('image-editor-toolbar', 'drawing-toolbar');
@@ -990,7 +543,7 @@ button {
                     manipulationTools.appendChild(drawingTools);
 
                     const cancelEraseButton = document.createElement('button');
-                    cancelEraseButton.classList.add('cancel-erase-button', 'drawing-tool', 'erasing-tool');
+                    cancelEraseButton.classList.add('cancel-erase-button', 'tool', 'drawing-tool', 'erasing-tool');
                     cancelEraseButton.ariaLabel = 'draw';
                     cancelEraseButton.role = 'menuitem';
                     drawingTools.appendChild(cancelEraseButton);
@@ -1004,37 +557,30 @@ button {
                     cancelEraseTooltip.textContent = 'draw';
                     cancelEraseButton.appendChild(cancelEraseTooltip);
 
-                    const colorTools = document.createElement('div');
-                    colorTools.classList.add('image-editor-toolbar', 'drawing-tool', 'non-erasing-tool');
-                    colorTools.role = 'toolbar';
-                    colorTools.ariaLabel = 'color toolbar';
-                    drawingTools.appendChild(colorTools);
+                    const drawingGroup = document.createElement('div');
+                    drawingGroup.classList.add('button-group', 'tool', 'drawing-tool', 'non-erasing-tool');
+                    drawingGroup.role = 'group';
+                    drawingGroup.ariaLabel = 'drawing group';
+                    drawingTools.appendChild(drawingGroup);
 
                     const colorInput = document.createElement('tf-color-input');
-                    colorInput.classList.add('color-button', 'drawing-tool', 'non-erasing-tool');
+                    colorInput.classList.add('color-button', 'rounded', 'small');
                     colorInput.role = 'menuitem';
-                    colorInput.dataset.inputClass = 'rounded small';
                     colorInput.dataset.popoverContainer = '';
                     colorInput.ariaLabel = 'color';
                     colorInput.setAttribute('button', '');
-                    colorTools.appendChild(colorInput);
+                    drawingGroup.appendChild(colorInput);
                     colorInput.addEventListener('valuechange', this.onSetBrushColor.bind(this));
 
                     const colorTooltip = document.createElement('tf-tooltip');
                     colorTooltip.textContent = 'color';
                     colorInput.appendChild(colorTooltip);
 
-                    const separator8 = document.createElement('div');
-                    separator8.classList.add('vr', 'drawing-tool', 'non-erasing-tool');
-                    separator8.role = 'separator';
-                    separator8.ariaOrientation = 'vertical';
-                    drawingTools.appendChild(separator8);
-
                     const eraseButton = document.createElement('button');
-                    eraseButton.classList.add('erase-button', 'drawing-tool', 'non-erasing-tool');
+                    eraseButton.classList.add('erase-button');
                     eraseButton.ariaLabel = 'erase';
                     eraseButton.role = 'menuitem';
-                    colorTools.appendChild(eraseButton);
+                    drawingGroup.appendChild(eraseButton);
                     eraseButton.addEventListener('click', this.setIsErasing.bind(this, true));
 
                     const eraseButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -1045,14 +591,14 @@ button {
                     eraseTooltip.textContent = 'erase';
                     eraseButton.appendChild(eraseTooltip);
 
-                    const separator9 = document.createElement('div');
-                    separator9.classList.add('vr', 'drawing-tool');
-                    separator9.role = 'separator';
-                    separator9.ariaOrientation = 'vertical';
-                    drawingTools.appendChild(separator9);
+                    const separator1 = document.createElement('div');
+                    separator1.classList.add('vr', 'tool', 'drawing-tool');
+                    separator1.role = 'separator';
+                    separator1.ariaOrientation = 'vertical';
+                    drawingTools.appendChild(separator1);
 
                     const brushSizeContainer = document.createElement('div');
-                    brushSizeContainer.classList.add('brush-size-container', 'drawing-tool');
+                    brushSizeContainer.classList.add('brush-size-container', 'tool', 'drawing-tool');
                     drawingTools.appendChild(brushSizeContainer);
 
                     const brushSizeIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -1078,14 +624,14 @@ button {
                     brushSizeTooltip.textContent = 'brush size';
                     brushSizeContainer.appendChild(brushSizeTooltip);
 
-                    const separator10 = document.createElement('div');
-                    separator10.classList.add('vr', 'drawing-tool');
-                    separator10.role = 'separator';
-                    separator10.ariaOrientation = 'vertical';
-                    drawingTools.appendChild(separator10);
+                    const separator2 = document.createElement('div');
+                    separator2.classList.add('vr', 'tool', 'drawing-tool');
+                    separator2.role = 'separator';
+                    separator2.ariaOrientation = 'vertical';
+                    drawingTools.appendChild(separator2);
 
                     const doneDrawingButton = document.createElement('button');
-                    doneDrawingButton.classList.add('done-drawing-button', 'drawing-tool');
+                    doneDrawingButton.classList.add('done-drawing-button', 'tool', 'drawing-tool');
                     doneDrawingButton.ariaLabel = 'stop drawing';
                     doneDrawingButton.role = 'menuitem';
                     drawingTools.appendChild(doneDrawingButton);
@@ -1099,11 +645,11 @@ button {
                     doneDrawingTooltip.textContent = 'stop drawing';
                     doneDrawingButton.appendChild(doneDrawingTooltip);
 
-                    const textTools = document.createElement('div');
-                    textTools.classList.add('image-editor-toolbar', 'text-tool');
-                    textTools.role = 'toolbar';
-                    textTools.ariaLabel = 'text toolbar';
-                    drawingTools.appendChild(textTools);
+                    const textGroup = document.createElement('div');
+                    textGroup.classList.add('button-group', 'tool', 'text-tool');
+                    textGroup.role = 'group';
+                    textGroup.ariaLabel = 'text group';
+                    drawingTools.appendChild(textGroup);
 
                     const textColorInput = document.createElement('tf-color-input');
                     textColorInput.classList.add('text-color-button');
@@ -1112,24 +658,18 @@ button {
                     textColorInput.dataset.popoverContainer = '';
                     textColorInput.ariaLabel = 'color';
                     textColorInput.setAttribute('button', '');
-                    textTools.appendChild(textColorInput);
+                    textGroup.appendChild(textColorInput);
                     textColorInput.addEventListener('valuechange', this.onSetTextColor.bind(this));
 
                     const textColorTooltip = document.createElement('tf-tooltip');
                     textColorTooltip.textContent = 'color';
                     textColorInput.appendChild(textColorTooltip);
 
-                    const separator11 = document.createElement('div');
-                    separator11.classList.add('vr', 'text-tool');
-                    separator11.role = 'separator';
-                    separator11.ariaOrientation = 'vertical';
-                    textTools.appendChild(separator11);
-
                     const textButton = document.createElement('button');
                     textButton.classList.add('text-button');
                     textButton.ariaLabel = 'add text';
                     textButton.role = 'menuitem';
-                    textTools.appendChild(textButton);
+                    textGroup.appendChild(textButton);
                     textButton.addEventListener('click', this.startAddingText.bind(this));
 
                     const textButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -1140,17 +680,11 @@ button {
                     textTooltip.textContent = 'add text';
                     textButton.appendChild(textTooltip);
 
-                    const separator12 = document.createElement('div');
-                    separator12.classList.add('vr', 'text-tool');
-                    separator12.role = 'separator';
-                    separator12.ariaOrientation = 'vertical';
-                    textTools.appendChild(separator12);
-
                     const doneTextButton = document.createElement('button');
-                    doneTextButton.classList.add('done-text-button', 'text-tool');
+                    doneTextButton.classList.add('done-text-button');
                     doneTextButton.ariaLabel = 'stop adding text';
                     doneTextButton.role = 'menuitem';
-                    textTools.appendChild(doneTextButton);
+                    textGroup.appendChild(doneTextButton);
                     doneTextButton.addEventListener('click', this.setTextMode.bind(this, false));
 
                     const doneTextButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -1163,7 +697,7 @@ button {
                 }
 
                 const modeGroup = document.createElement('div');
-                modeGroup.classList.add('button-group');
+                modeGroup.classList.add('button-group', 'mode-group');
                 modeGroup.role = 'group';
                 modeGroup.ariaLabel = 'mode group';
                 manipulationTools.appendChild(modeGroup);
@@ -1458,9 +992,9 @@ button {
         }
     }
 
-    clear() {
+    async clear() {
         if (this._editor) {
-            this._editor.clear();
+            await this._editor.clear();
         }
         const root = this.shadowRoot;
         if (!root) {
@@ -1469,6 +1003,11 @@ button {
         const button = root.querySelector<HTMLButtonElement>('.image-edit-button');
         if (button) {
             button.classList.add('no-image');
+        }
+
+        const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+        if (saveButton) {
+            saveButton.disabled = true;
         }
     }
 
@@ -1654,6 +1193,11 @@ button {
         if (overlay) {
             overlay.classList.remove('show');
         }
+
+        const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+        if (saveButton) {
+            saveButton.disabled = true;
+        }
     }
 
     loadImage(imageUrl?: string | null) {
@@ -1702,6 +1246,11 @@ button {
 
         if (overlay) {
             overlay.classList.remove('show');
+        }
+
+        const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+        if (saveButton) {
+            saveButton.disabled = true;
         }
     }
 
@@ -1759,6 +1308,11 @@ button {
         if (overlay) {
             overlay.classList.remove('show');
         }
+
+        const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+        if (saveButton) {
+            saveButton.disabled = true;
+        }
     }
 
     async loadImageFromStream(imageStream?: DotNetStreamReference) {
@@ -1770,6 +1324,14 @@ button {
         const buffer: ArrayBuffer = await imageStream.arrayBuffer();
         const blob = new Blob([buffer]);
         await this.loadImageFromBlob(blob);
+
+        const root = this.shadowRoot;
+        if (root) {
+            const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+            if (saveButton) {
+                saveButton.disabled = true;
+            }
+        }
     }
 
     redo() {
@@ -1804,8 +1366,21 @@ button {
             }
         }
         const stream = await this._editor.save(type, quality);
-        this._editor.destroy();
         delete this._editor;
+
+        const root = this.shadowRoot;
+        if (root) {
+            const controls = root.querySelector<HTMLDivElement>('.image-editor-controls');
+            if (controls) {
+                controls.classList.remove('editing');
+            }
+
+            const button = root.querySelector<HTMLButtonElement>('.image-edit-button');
+            if (button) {
+                button.classList.remove('editing');
+            }
+        }
+
         this.dispatchEvent(TavenemImageEditorHtmlElement.newStreamEvent(stream));
         this.dispatchEvent(TavenemImageEditorHtmlElement.newToggleEvent(false));
         return stream;
@@ -1824,6 +1399,13 @@ button {
         if (overlay) {
             overlay.classList.remove('show');
         }
+
+        if (root) {
+            const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+            if (saveButton) {
+                saveButton.disabled = true;
+            }
+        }
     }
 
     async setBackgroundImageFromBlob(blob?: Blob | null) {
@@ -1831,12 +1413,22 @@ button {
             this.setBackgroundImage();
             return;
         }
-        if (this._editor) {
-            const imageUrl = URL.createObjectURL(blob);
+        if (!this._editor) {
+            return;
+        }
 
-            await this._editor.setBackgroundImage(imageUrl);
+        const imageUrl = URL.createObjectURL(blob);
 
-            URL.revokeObjectURL(imageUrl);
+        await this._editor.setBackgroundImage(imageUrl);
+
+        URL.revokeObjectURL(imageUrl);
+
+        const root = this.shadowRoot;
+        if (root) {
+            const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+            if (saveButton) {
+                saveButton.disabled = true;
+            }
         }
     }
 
@@ -2078,9 +1670,9 @@ button {
         }
     }
 
-    undo() {
+    async undo() {
         if (this._editor) {
-            this._editor.undo();
+            await this._editor.undo();
         }
     }
 
@@ -2104,6 +1696,13 @@ button {
         if (redo) {
             redo.disabled = !enabled;
         }
+
+        if (enabled) {
+            const saveButton = root.querySelector<HTMLButtonElement>('.save-button');
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+        }
     }
 
     private onDragOver(event: DragEvent) {
@@ -2113,7 +1712,7 @@ button {
         }
 
         if (event.dataTransfer.items.length > 0) {
-            [...event.dataTransfer.items].forEach((item, i) => {
+            [...event.dataTransfer.items].forEach(item => {
                 if (item.kind === "file") {
                     const file = item.getAsFile();
                     if (file && file.type.startsWith('image/')) {
@@ -2152,7 +1751,7 @@ button {
         }
 
         if (event.dataTransfer.items.length > 0) {
-            [...event.dataTransfer.items].forEach(async (item, i) => {
+            [...event.dataTransfer.items].forEach(async item => {
                 if (item.kind === "file") {
                     const file = item.getAsFile();
                     if (file && file.type.startsWith('image/')) {
@@ -2160,13 +1759,13 @@ button {
                         return;
                     }
                 } else {
-                    const url = event.dataTransfer.getData('URL');
+                    const url = event.dataTransfer!.getData('URL');
                     if (url && url.length) {
                         this.setImage(url);
                         return;
                     }
 
-                    const uris = event.dataTransfer.getData('text/uri-list');
+                    const uris = event.dataTransfer!.getData('text/uri-list');
                     if (uris && uris.length) {
                         const split = uris.split(/[\r\n]+/).filter(x => !x.startsWith('#'));
                         if (split.length > 0) {
@@ -2175,7 +1774,7 @@ button {
                         }
                     }
 
-                    const text = event.dataTransfer.getData('text/plain');
+                    const text = event.dataTransfer!.getData('text/plain');
                     if (text && text.length) {
                         this.setImage(text);
                     }

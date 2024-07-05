@@ -1,7 +1,7 @@
 import { documentPositionComparator, randomUUID } from '../../tavenem-utility'
 import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from '../_popover';
 import { TavenemInputHtmlElement } from '../_input';
-import { TavenemColorInputHtmlElement } from '../_color-input';
+import { TavenemColorInputHtmlElement } from '../color-input/_color-input';
 import { TavenemEmojiHTMLElement } from '../_emoji';
 import { Dialog, initialize as initializeDialog } from '../../tavenem-dialog';
 import { TavenemCheckboxHtmlElement } from '../_checkbox';
