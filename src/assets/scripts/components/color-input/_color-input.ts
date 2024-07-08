@@ -4,7 +4,7 @@ import { TavenemPickerHtmlElement } from '../_picker'
 import { randomUUID } from '../../tavenem-utility'
 import { TavenemInputFieldHtmlElement } from '../_input-field';
 import { elementStyle } from './_element-style';
-import { HSLA, HSLA, RGBA, hexToHsla, hslaToHex, rgbaToColorName } from './_color-conversion';
+import { HSLA, RGBA, hexToHsla, hexToRgba, hslaToHex, rgbaToColorName, rgbaToHsla } from './_color-conversion';
 
 const halfSelectorSize = 13;
 const overlayHeight = 250;
@@ -1156,7 +1156,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     private onHSLAChanged(newHue?: string, newSaturation?: string, newLightness?: string, newAlpha?: string) {
         let hsla: HSLA | null = null;
         if (this._value) {
-            const colors = TavenemColorInputHtmlElement.hexToHsla(this._value);
+            const colors = hexToHsla(this._value);
             if (colors) {
                 hsla = colors.hsla;
             }
@@ -1291,7 +1291,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     private onRGBChanged(newRed?: string, newGreen?: string, newBlue?: string) {
         let rgba: RGBA | null = null;
         if (this._value) {
-            rgba = TavenemColorInputHtmlElement.hexToRgba(this._value);
+            rgba = hexToRgba(this._value);
         }
         if (!rgba) {
             rgba = {
@@ -1317,7 +1317,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             rgba.blue = Math.max(0, Math.min(255, Number.isNaN(blue) ? 0 : blue));
         }
 
-        const hsla = TavenemColorInputHtmlElement.rgbaToHsla(rgba);
+        const hsla = rgbaToHsla(rgba);
         if (hsla) {
             this.setValueFromHSLA(hsla, rgba);
         }
@@ -1389,7 +1389,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             return;
         }
 
-        const colors = TavenemColorInputHtmlElement.hexToHsla(value);
+        const colors = hexToHsla(value);
         if (!colors) {
             this.clear();
 
@@ -1424,7 +1424,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         this._selectorY = (1 - (hsla.lightness / 100)) * overlayHeight;
 
         const hasAlpha = this.hasAttribute('alpha');
-        const hex = TavenemColorInputHtmlElement.hslaToHex(hsla, hasAlpha) || '';
+        const hex = hslaToHex(hsla, hasAlpha) || '';
         this._value = hex;
         this._internals.setFormValue(hex.length ? hex : null);
 
@@ -1437,7 +1437,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         this._settingValue = true;
 
         if (!rgba) {
-            rgba = TavenemColorInputHtmlElement.hexToRgba(hex)
+            rgba = hexToRgba(hex)
                 || {
                 red: 0,
                 green: 0,
@@ -1468,7 +1468,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         if (input) {
             input.value = hex;
 
-            const colorName = TavenemColorInputHtmlElement.rgbaToColorName(rgba);
+            const colorName = rgbaToColorName(rgba);
             if (colorName) {
                 input.display = colorName;
             }
@@ -1559,7 +1559,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
 
         let hue = 0, alpha = 1;
         if (this._value) {
-            const colors = TavenemColorInputHtmlElement.hexToHsla(this._value);
+            const colors = hexToHsla(this._value);
             if (colors) {
                 hue = colors.hsla.hue;
                 alpha = colors.hsla.alpha || 1;

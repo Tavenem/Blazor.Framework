@@ -1032,12 +1032,20 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
 
         const controls = root.querySelector<HTMLDivElement>('.image-editor-controls');
         if (controls) {
+            controls.classList.remove('cropping');
             controls.classList.remove('editing');
         }
 
         const button = root.querySelector<HTMLButtonElement>('.image-edit-button');
         if (button) {
             button.classList.remove('editing');
+        }
+
+        const drawingTools = root.querySelector<HTMLDivElement>('.drawing-toolbar');
+        if (drawingTools) {
+            delete drawingTools.dataset.drawingMode;
+            delete drawingTools.dataset.erasing;
+            delete drawingTools.dataset.textMode;
         }
 
         if (withRevoke) {
@@ -1129,7 +1137,7 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         const button = root.querySelector<HTMLButtonElement>('.image-edit-button');
         if (this._editor) {
             if (!imageUrl) {
-                this._editor.resetContainer();
+                await this._editor.clear();
             }
         } else {
             const editorContainer = root.querySelector('.image-editor-container');
@@ -1531,6 +1539,7 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         }
         if (mode == DrawingMode.None) {
             delete drawingTools.dataset.drawingMode;
+            delete drawingTools.dataset.erasing;
         } else {
             drawingTools.dataset.drawingMode = mode.toString();
         }
@@ -1631,6 +1640,7 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         }
         if (value) {
             drawingTools.dataset.textMode = '';
+            this.startAddingText();
         } else {
             delete drawingTools.dataset.textMode;
         }

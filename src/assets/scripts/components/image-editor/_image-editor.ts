@@ -86,8 +86,10 @@ class SpritePool {
     }
 
     destroy() {
-        for (let i = 0; i < this.sprites.length; i++)
+        for (let i = 0; i < this.sprites.length; i++) {
             this.sprites[i].destroy();
+        }
+        this.sprites.length = 0;
     }
 }
 
@@ -100,12 +102,15 @@ export class ImageEditor {
     originalSrc?: string;
     originalWidth: number;
     private _brushBuffer = new Container();
+    private _brushHistoryBuffer = new Container();
+    private _brushHistory: DisplayObject[] = [];
     private _brushCanvasTexture?: RenderTexture;
     private _brushColor = "#000000";
     private _brushCursor?: Sprite;
     private _brushGenerator: BrushGenerator;
     private _brushSize = 12;
     private _brushTexture?: RenderTexture;
+    private _container?: Container;
     private _cropRect?: Sprite;
     private _cropTransformer?: Transformer;
     private _drawing = false;
@@ -190,20 +195,33 @@ export class ImageEditor {
 
     async clear() {
         this.cancelOngoingOperations();
+
+        if (this._brushTexture) {
+            this._brushTexture.destroy(true);
+            delete this._brushTexture;
+        }
+
         if (this.backgroundImage
             && this.backgroundImage.texture.baseTexture.resource.src) {
             await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
         }
-        if (this.editor.stage.children.length > 0) {
-            const container = this.editor.stage.children[0];
-            container.destroy(true);
-            delete this.backgroundImage;
-            delete this._brushCanvasTexture;
-            delete this._drawn;
-            this._brushTexture?.destroy(true);
-            delete this._brushTexture;
+        delete this.backgroundImage;
+
+        if (this._container) {
+            this._container.destroy(true);
         }
-        this.resetContainer();
+
+        this._container = new Container();
+        this._container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
+        this._container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
+        this.editor.stage.addChildAt(this._container, 0);
+
+        this._brushCanvasTexture = RenderTexture.create({
+            width: this.editor.view.width,
+            height: this.editor.view.height,
+        });
+        this._drawn = new Sprite(this._brushCanvasTexture);
+        this._container.addChild(this._drawn);
     }
 
     crop() {
@@ -268,6 +286,7 @@ export class ImageEditor {
             await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
         }
         this.editor.destroy(true, true);
+        this._spritePool.destroy();
         delete this.backgroundImage;
         delete this._brushCursor;
         delete this._brushCanvasTexture;
@@ -337,23 +356,6 @@ export class ImageEditor {
         }
     }
 
-    resetContainer() {
-        const container = new Container();
-        container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
-        container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
-        this.editor.stage.addChild(container);
-
-        if (this._brushCanvasTexture) {
-            this._brushCanvasTexture.destroy(true);
-        }
-        this._brushCanvasTexture = RenderTexture.create({
-            width: this.editor.view.width,
-            height: this.editor.view.height,
-        });
-        this._drawn = new Sprite(this._brushCanvasTexture);
-        container.addChild(this._drawn);
-    }
-
     rotate(angle: number) {
         this.saveState(this.rotateInner.bind(this, angle));
     }
@@ -396,16 +398,10 @@ export class ImageEditor {
     async setBackgroundImage(imageUrl?: string | null, preserveHistory: boolean = false) {
         this.cancelOngoingOperations();
         await this.clear();
-        const container = this.editor.stage.children[0] as Container;
-
-        if (this.backgroundImage) {
-            container.removeChild(this.backgroundImage);
-            if (this.backgroundImage.texture.baseTexture.resource.src) {
-                await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
-            }
-            this.backgroundImage.destroy(true);
-            this.backgroundImage = undefined;
+        if (!this._container) {
+            return;
         }
+
         if (imageUrl) {
             this.originalSrc = imageUrl;
             let texture: Texture;
@@ -435,9 +431,9 @@ export class ImageEditor {
             if (this._brushCanvasTexture) {
                 this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
             }
-            container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
-            container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
-            container.addChildAt(this.backgroundImage, 0);
+            this._container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
+            this._container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
+            this._container.addChildAt(this.backgroundImage, 0);
         }
         if (!preserveHistory) {
             this.clearHistory();
@@ -478,9 +474,9 @@ export class ImageEditor {
             } else {
                 height = width / this.cropAspectRatio;
             }
-            const container = this.editor.stage.children[0] as Container;
-            if (height > container.height) {
-                height = container.height;
+            if (this._container
+                && height > this._container.height) {
+                height = this._container.height;
                 width = height * this.cropAspectRatio!;
             }
             this._cropRect.scale.set(width / 16, height / 16);
@@ -512,7 +508,7 @@ export class ImageEditor {
                 this._brushCursor.scale.set(this._brushSize / 200, this._brushSize / 200);
                 this._brushCursor.anchor.set(0.5, 0.5);
                 this.editor.stage.addChild(this._brushCursor);
-            } else {
+            } else if (this._brushCursor.parent != this.editor.stage) {
                 this.editor.stage.addChild(this._brushCursor);
             }
         } else {
@@ -521,6 +517,7 @@ export class ImageEditor {
             if (this._brushCursor) {
                 this.editor.stage.removeChild(this._brushCursor);
             }
+            this._isErasing = false;
         }
     }
 
@@ -605,10 +602,9 @@ export class ImageEditor {
 
     private addTextInner(text: string) {
         this.cancelOngoingOperations();
-        if (this.editor.stage.children.length < 1) {
+        if (!this._container) {
             return;
         }
-        const container = this.editor.stage.children[0] as Container;
         const t = new Text(text, {
             fill: this._textColor,
             fontSize: this.editor.view.height,
@@ -619,7 +615,7 @@ export class ImageEditor {
         t.scale.set(0.3);
         t.eventMode = 'static';
         t.on('pointertap', this.onTextPointerTap, this);
-        container.addChild(t);
+        this._container.addChild(t);
         this._textTransformer = new Transformer({
             boxRotationEnabled: true,
             boxScalingEnabled: true,
@@ -636,6 +632,9 @@ export class ImageEditor {
         this.cancelOngoingOperations();
         this._redoStack = [];
         this._undoStack = [];
+        this._brushHistory.forEach(x => x.destroy());
+        this._brushHistory = [];
+        this._spritePool.reset();
         this.updateRedo(false);
         this.updateUndo(false);
     }
@@ -651,16 +650,24 @@ export class ImageEditor {
         });
         const canvas = this.editor.renderer.extract.canvas(texture) as HTMLCanvasElement;
         await this.clear();
-        const container = this.editor.stage.children[0] as Container;
+        if (this.backgroundImage) {
+            if (this.backgroundImage.texture.baseTexture.resource.src) {
+                await Assets.unload(this.backgroundImage.texture.baseTexture.resource.src);
+            }
+            this.backgroundImage.destroy(true);
+        }
+        if (!this._container) {
+            return;
+        }
         this.backgroundImage = Sprite.from(canvas);
         this.backgroundImage.eventMode = 'none';
         this.editor.renderer.resize(this.backgroundImage.width, this.backgroundImage.height);
         if (this._brushCanvasTexture) {
             this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
         }
-        container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
-        container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
-        this.backgroundImage.setParent(container);
+        this._container.pivot = new Point(this.editor.view.width / 2, this.editor.view.height / 2);
+        this._container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
+        this.backgroundImage.setParent(this._container);
         texture.destroy(true);
     }
 
@@ -674,8 +681,6 @@ export class ImageEditor {
         sprite.texture = this._brushTexture!;
         if (this._isErasing) {
             sprite.blendMode = BLEND_MODES.ERASE;
-        } else {
-            sprite.blendMode = BLEND_MODES.NORMAL;
         }
         this._brushBuffer.addChild(sprite);
     }
@@ -737,16 +742,15 @@ export class ImageEditor {
 
     private flipInner(vertical?: boolean) {
         this.cancelOngoingOperations();
-        if (this.editor.stage.children.length < 1) {
+        if (!this._container) {
             return;
         }
-        const container = this.editor.stage.children[0] as Container;
-        if (container.angle % 180 != 0) {
+        if (this._container.angle % 180 != 0) {
             vertical = !vertical;
         }
-        container.scale.set(
-            vertical ? container.scale.x : -container.scale.x,
-            vertical ? -container.scale.y : container.scale.y);
+        this._container.scale.set(
+            vertical ? this._container.scale.x : -this._container.scale.x,
+            vertical ? -this._container.scale.y : this._container.scale.y);
     }
 
     private getDialog(text?: string | null) {
@@ -992,66 +996,52 @@ export class ImageEditor {
     }
 
     private renderPoints() {
-        if (this._brushBuffer.children.length === 0) {
+        if (this._drawing) {
+            if (this._brushBuffer.children.length === 0) {
+                return;
+            }
+            this.editor.renderer.render(this._brushBuffer, {
+                renderTexture: this._brushCanvasTexture,
+                clear: false,
+            });
+            this._brushBuffer.children.forEach(x => x.setParent(this._brushHistoryBuffer));
             return;
         }
-        this.editor.renderer.render(this._brushBuffer, {
+
+        this._brushBuffer.children.forEach(x => x.setParent(this._brushHistoryBuffer));
+
+        if (this._brushHistoryBuffer.children.length === 0) {
+            return;
+        }
+
+        this._brushHistory.push(this._brushHistoryBuffer);
+        this.saveState(this.renderPointsInner.bind(this, this._brushHistoryBuffer), true);
+        this._brushHistoryBuffer = new Container();
+        this.updateBrush();
+    }
+
+    private renderPointsInner(buffer: Container) {
+        this.editor.renderer.render(buffer, {
             renderTexture: this._brushCanvasTexture,
             clear: false,
         });
-        this._brushBuffer.removeChildren();
-
-        if (this._drawing
-            || !this._brushCanvasTexture
-            || !this._drawn) {
-            return;
-        }
-
-        const cloneTexture = RenderTexture.create({
-            width: this._brushCanvasTexture.width,
-            height: this._brushCanvasTexture.height,
-        });
-        this.editor.renderer.render(this._drawn, { renderTexture: cloneTexture });
-        const cloneSprite = new Sprite(cloneTexture);
-        this.saveState(this.renderPointsInner.bind(this, cloneSprite));
-
-        this._brushCanvasTexture.destroy(true);
-        this._brushCanvasTexture = RenderTexture.create({
-            width: this.editor.view.width,
-            height: this.editor.view.height,
-        });
-        this._drawn.texture = this._brushCanvasTexture;
-    }
-
-    private renderPointsInner(drawn: Sprite) {
-        const container = this.editor.stage.children[0] as Container;
-
-        const cloneTexture = RenderTexture.create({
-            width: this.editor.view.width,
-            height: this.editor.view.height,
-        });
-        this.editor.renderer.render(drawn, { renderTexture: cloneTexture });
-        const cloneSprite = new Sprite(cloneTexture);
-
-        container.addChild(cloneSprite);
     }
 
     private rotateInner(angle: number) {
         this.cancelOngoingOperations();
-        if (this.editor.stage.children.length < 1) {
+        if (!this._container) {
             return;
         }
-        const container = this.editor.stage.children[0] as Container;
 
-        const newAngle = (container.angle + angle) % 360;
-        if (Math.abs(newAngle - container.angle) % 180 == 90) {
+        const newAngle = (this._container.angle + angle) % 360;
+        if (Math.abs(newAngle - this._container.angle) % 180 == 90) {
             this.editor.renderer.resize(this.editor.view.height, this.editor.view.width);
             if (this._brushCanvasTexture) {
                 this._brushCanvasTexture.resize(this.editor.view.width, this.editor.view.height);
             }
-            container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
+            this._container.position.set(this.editor.view.width / 2, this.editor.view.height / 2);
         }
-        container.angle = newAngle;
+        this._container.angle = newAngle;
     }
 
     private saveState(step: Function, skipExecute: boolean = false) {
