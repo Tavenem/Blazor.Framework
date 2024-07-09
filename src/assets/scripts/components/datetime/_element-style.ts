@@ -23,7 +23,7 @@ input {
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-:host(:not([button])) {
+:host {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
     --field-active-label-color: var(--tavenem-color-primary);
@@ -31,6 +31,9 @@ input {
     --field-border-hover-color: var(--tavenem-color-action);
     --field-color: var(--tavenem-color-text);
     --field-label-color: var(--tavenem-color-text-secondary);
+}
+
+:host(:not([button])) {
     border: 0;
     color: var(--tavenem-color-text);
     display: flex;

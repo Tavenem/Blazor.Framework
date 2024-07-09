@@ -23,8 +23,8 @@
            style="@CssStyle"
            tabindex="@TabIndex"
            value="@CurrentValueAsString"
-           @searchinput="OnSearchInputAsync"
-           @valuechange="OnPickerValueChange">
+           @onsearchinput="OnSearchInputAsync"
+           @onvaluechange="OnPickerValueChange">
     @if (IsInvalidAndTouched)
     {
         <ul slot="helpers" class="mr-auto mb-0 pl-0">

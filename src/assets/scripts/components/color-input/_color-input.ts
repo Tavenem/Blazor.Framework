@@ -1048,6 +1048,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         this._internals.states.add('empty');
         this._internals.states.delete('has-value');
         this.setValidity();
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(''));
 
         this._settingValue = false;
     }
@@ -1427,6 +1428,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         const hex = hslaToHex(hsla, hasAlpha) || '';
         this._value = hex;
         this._internals.setFormValue(hex.length ? hex : null);
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(hex));
 
         const root = this.shadowRoot;
         if (!root) {

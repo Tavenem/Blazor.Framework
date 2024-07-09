@@ -25,8 +25,8 @@
            tabindex="@TabIndex"
            value="@Value"
            wysiwyg="@(EditorMode == EditorMode.WYSIWYG)"
-           @valueinput="OnInput"
-           @valuechange="OnChange">
+           @onvalueinput="OnInput"
+           @onvaluechange="OnChange">
     @ChildContent
     @if (CustomToolbarButtons is not null)
     {

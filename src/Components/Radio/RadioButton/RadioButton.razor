@@ -23,7 +23,7 @@
              style="@CssStyle"
              tabindex="@TabIndex"
              value="@Value?.ToString()"
-             @inputtoggle="OnToggleAsync">
+             @oninputtoggle="OnToggleAsync">
     @if (!string.IsNullOrEmpty(CheckedIcon))
     {
         <tf-icon slot="checked" class="@CheckedIconClass">@CheckedIcon</tf-icon>

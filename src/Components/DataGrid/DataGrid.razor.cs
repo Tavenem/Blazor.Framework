@@ -1179,9 +1179,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             if (!string.IsNullOrEmpty(quickFilter))
             {
                 (filterQueries ??= []).Add(new StringBuilder(Id)
-                    .Append(";quick;'")
+                    .Append("*!quick*")
                     .Append(quickFilter)
-                    .Append('\'')
                     .ToString());
             }
 
@@ -1193,35 +1192,31 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
                     var query = new StringBuilder(filter.Property);
                     if (filter.DateTimeFilterIsBefore)
                     {
-                        query.Append(";before");
+                        query.Append("*!before");
                     }
                     if (filter.ExactMatch)
                     {
-                        query.Append(";exact");
+                        query.Append("*!exact");
                     }
                     if (filter.BoolFilter.HasValue)
                     {
-                        query.Append(";'")
-                            .Append(filter.BoolFilter.Value)
-                            .Append('\'');
+                        query.Append('*')
+                            .Append(filter.BoolFilter.Value);
                     }
                     else if (filter.DateTimeFilter.HasValue)
                     {
-                        query.Append(";'")
-                            .Append(filter.DateTimeFilter.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture))
-                            .Append('\'');
+                        query.Append('*')
+                            .Append(filter.DateTimeFilter.Value.ToString(filter.DateFormat, CultureInfo.InvariantCulture));
                     }
                     else if (filter.NumberFilter.HasValue)
                     {
-                        query.Append(";'")
-                            .Append(filter.NumberFilter.Value)
-                            .Append('\'');
+                        query.Append('*')
+                            .Append(filter.NumberFilter.Value);
                     }
                     else if (!string.IsNullOrEmpty(filter.TextFilter))
                     {
-                        query.Append(";'")
-                            .Append(filter.TextFilter)
-                            .Append('\'');
+                        query.Append('*')
+                            .Append(filter.TextFilter);
                     }
                     (filterQueries ??= []).Add(query.ToString());
                 }
@@ -1964,34 +1959,29 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     {
         quickFilter = null;
 
-        var parts = filterString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        string? property = null;
+        var parts = filterString.Split('*', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var property = parts.Length > 0 ? parts[0] : null;
         string? value = null;
         var beforeFlag = false;
         var exactFlag = false;
         var quickFlag = false;
-        foreach (var part in parts)
+        foreach (var part in parts.Skip(1))
         {
-            if (part.StartsWith('\'')
-                && part.EndsWith('\''))
-            {
-                value = part[1..^1];
-            }
-            else if (part.Equals("before"))
+            if (part.Equals("!before"))
             {
                 beforeFlag = true;
             }
-            else if (part.Equals("exact"))
+            else if (part.Equals("!exact"))
             {
                 exactFlag = true;
             }
-            else if (part.Equals("quick"))
+            else if (part.Equals("!quick"))
             {
                 quickFlag = true;
             }
             else
             {
-                property = part;
+                value = part;
             }
         }
 

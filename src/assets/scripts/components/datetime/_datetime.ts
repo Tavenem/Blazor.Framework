@@ -1150,6 +1150,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         this._internals.states.delete('has-value');
         this.setValidity();
 
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(''));
+
         this._settingValue = false;
     }
 
@@ -2407,6 +2409,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         if (!preserveView) {
             this.setView(this._view);
         }
+
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(display.value));
 
         const root = this.shadowRoot;
         if (!root) {

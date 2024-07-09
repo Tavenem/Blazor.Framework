@@ -1329,8 +1329,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             return;
         }
 
-        const isWysiwygSyntax = syntax === 'handlebars' || syntax === 'html' || syntax === 'markdown';
-        this._options = this._options || this.getOptions(this._isWYSIWYG && isWysiwygSyntax, syntax);
+        const isWysiwygSyntax = value === 'handlebars' || value === 'html' || value === 'markdown';
+        this._options = this._options || this.getOptions(this._isWYSIWYG && isWysiwygSyntax, value);
         this._options.autoFocus = true;
         this._options.initialValue = this._activeEditor?.getContent();
         this._options.mode = this._isWYSIWYG && isWysiwygSyntax
@@ -1874,6 +1874,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 syntaxInput.setAttribute('disabled', '');
             }
             syntaxInput.setAttribute('size', '10');
+            syntaxInput.setAttribute('value', syntax);
+            syntaxInput.setAttribute('display', syntaxTextMap[syntax]);
             innerToolbar.appendChild(syntaxInput);
             syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
 
@@ -1897,9 +1899,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 label.innerHTML = syntaxLabelMap[syntax];
                 option.appendChild(label);
             }
-
-            syntaxInput.setAttribute('value', syntax);
-            syntaxInput.setAttribute('display', syntaxTextMap[syntax]);
         }
 
         const slot = document.createElement('slot');
@@ -1946,11 +1945,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     }
 
     private setActiveEditor(wysiwyg: boolean) {
-        if (this._activeEditor
-            && this._activeEditor.isWYSIWYG === wysiwyg) {
-            return false;
-        }
-
         const root = this.shadowRoot;
         if (!root) {
             return false;
@@ -1967,7 +1961,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             || this._options.syntax === 'html'
             || this._options.syntax === 'markdown';
 
-        if (wysiwyg && !isWysiwygSyntax) {
+        if (this._activeEditor
+            && this._activeEditor.isWYSIWYG === (wysiwyg && isWysiwygSyntax)) {
             return false;
         }
 

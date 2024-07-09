@@ -1542,8 +1542,14 @@ public class QueryStateService
                         {
                             propertyValues = [];
                         }
-                        propertyValues.AddRange(collection);
-                        AddPropertyChange(id, property, null, propertyValues);
+                        foreach (var value in collection)
+                        {
+                            if (!propertyValues.Contains(value))
+                            {
+                                propertyValues.Add(value);
+                                AddPropertyChange(id, property, null, propertyValues);
+                            }
+                        }
                     }
                 }
                 else
@@ -1642,6 +1648,6 @@ public class QueryStateService
                 false,
                 replace);
         }
-        catch (NavigationException) { } // may be thrown in non-interactive scenarios; ignore
+        catch { } // may be thrown in non-interactive scenarios; ignore
     }
 }

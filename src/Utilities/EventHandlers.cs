@@ -6,12 +6,12 @@ namespace Tavenem.Blazor.Framework.Utilities;
 /// <summary>
 /// Event handlers for <c>Tavenem.Blazor.Framework</c>.
 /// </summary>
-[EventHandler("crop", typeof(CropEventArgs))]
-[EventHandler("delete", typeof(ValueChangeEventArgs))]
-[EventHandler("enter", typeof(EventArgs))]
-[EventHandler("inputtoggle", typeof(ToggleEventArgs))]
-[EventHandler("searchinput", typeof(ValueChangeEventArgs))]
-[EventHandler("stream", typeof(StreamEventArgs))]
-[EventHandler("valuechange", typeof(ValueChangeEventArgs))]
-[EventHandler("valueinput", typeof(ValueChangeEventArgs))]
+[EventHandler("oncrop", typeof(CropEventArgs))]
+[EventHandler("ondelete", typeof(ValueChangeEventArgs))]
+[EventHandler("onenter", typeof(EventArgs))]
+[EventHandler("oninputtoggle", typeof(ToggleEventArgs))]
+[EventHandler("onsearchinput", typeof(ValueChangeEventArgs))]
+[EventHandler("onstream", typeof(StreamEventArgs))]
+[EventHandler("onvaluechange", typeof(ValueChangeEventArgs))]
+[EventHandler("onvalueinput", typeof(ValueChangeEventArgs))]
 public static class EventHandlers;

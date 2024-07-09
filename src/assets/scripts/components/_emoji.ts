@@ -1141,6 +1141,7 @@ button::-moz-focus-inner {
     protected clear() {
         this._value = '';
         this._internals.setFormValue(null);
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(''));
 
         const root = this.shadowRoot;
         if (!root) {
@@ -1575,6 +1576,7 @@ button::-moz-focus-inner {
 
         this._value = value;
         this._internals.setFormValue(value);
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(value));
 
         const root = this.shadowRoot;
         if (!root) {

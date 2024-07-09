@@ -7,7 +7,6 @@ export class TavenemPickerHtmlElement extends HTMLElement {
 
     private _closeCooldownTimer: number;
     private _closed: boolean;
-    private _validClick = false;
 
     static get observedAttributes() {
         return ['disabled', 'readonly'];
@@ -213,8 +212,6 @@ export class TavenemPickerHtmlElement extends HTMLElement {
     }
 
     private closeInner() {
-        this._validClick = false;
-
         if (!this._popover || !this._popover.matches(':popover-open')) {
             return;
         }
@@ -287,13 +284,13 @@ export class TavenemPickerHtmlElement extends HTMLElement {
             return;
         }
 
+        event.preventDefault();
+        event.stopPropagation();
+
         if (event.target !== this
             && (event.target instanceof HTMLElement
                 || event.target instanceof SVGElement)
             && TavenemPopover.nodeContains(this._popover, event.target)) {
-            event.preventDefault();
-            event.stopPropagation();
-
             if (!this._popover.matches(':popover-open')) {
                 return;
             }
@@ -313,20 +310,13 @@ export class TavenemPickerHtmlElement extends HTMLElement {
             }
 
             this.onSubmitOption(e);
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!this._popover.matches(':popover-open')
+        } else if (!this._popover.matches(':popover-open')
             || !this.hasAttribute('multiple')) {
             this.toggle();
         }
     }
 
     private openInner() {
-        this._validClick = false;
-
         if (this._closed) {
             return;
         }

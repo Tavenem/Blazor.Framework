@@ -962,6 +962,7 @@ slot {
         this._value = '';
         this._internals.setFormValue(null);
         this.display = null;
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(''));
 
         this.setValidity();
 
@@ -1780,6 +1781,8 @@ slot {
 
         this.setOptions(input, this._value, this.display);
 
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(this._value));
+
         this._settingValue = false;
     }
 
@@ -1959,6 +1962,8 @@ slot {
                     x.classList.add('active');
                 }
             });
+
+        this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(this._value));
 
         this._settingValue = false;
     }

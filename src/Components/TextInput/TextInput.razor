@@ -35,9 +35,9 @@
                tabindex="@TabIndex"
                type="@InputType.ToCSS()"
                value="@CurrentValue"
-               @valueinput="OnInputAsync"
-               @valuechange="OnChangeAsync"
-               @enter="OnEnterAsync">
+               @onvalueinput="OnInputAsync"
+               @onvaluechange="OnChangeAsync"
+               @onenter="OnEnterAsync">
         @if (PrefixContent is not null)
         {
             <div slot="prefix" style="display:content">
@@ -168,9 +168,9 @@ else
                     tabindex="@TabIndex"
                     type="@InputType.ToCSS()"
                     value="@CurrentValue"
-                    @valueinput="OnInputAsync"
-                    @valuechange="OnChangeAsync"
-                    @enter="OnEnterAsync">
+                    @onvalueinput="OnInputAsync"
+                    @onvaluechange="OnChangeAsync"
+                    @onenter="OnEnterAsync">
         @if (PrefixContent is not null)
         {
             <div slot="prefix" style="display:content">

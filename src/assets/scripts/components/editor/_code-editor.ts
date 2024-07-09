@@ -163,37 +163,35 @@ export class TavenemCodeEditor implements Editor {
         };
 
         if (this._editor.options) {
-            if (this._editor.options.syntax === syntax) {
-                return;
-            }
+            if (this._editor.options.syntax !== syntax) {
+                if ((this._editor.options.syntax === 'html'
+                    && syntax === 'markdown')
+                    || (this._editor.options.syntax === 'markdown'
+                        && syntax === 'html')) {
+                    let text;
+                    const div = document.createElement('div');
+                    if (this._editor.options.syntax === 'html'
+                        && syntax === 'markdown') {
+                        div.innerHTML = this._editor.view.state.doc.toString();
+                        const node = PMDOMParser
+                            .fromSchema(schema)
+                            .parse(div);
+                        text = tavenemMarkdownSerializer.serialize(node);
+                    } else {
+                        const node = tavenemMarkdownParser.parse(this._editor.view.state.doc.toString());
+                        div.appendChild(renderer.serializeFragment(node.content));
+                        text = div.innerHTML;
+                    }
 
-            if ((this._editor.options.syntax === 'html'
-                && syntax === 'markdown')
-                || (this._editor.options.syntax === 'markdown'
-                    && syntax === 'html')) {
-                let text;
-                const div = document.createElement('div');
-                if (this._editor.options.syntax === 'html'
-                    && syntax === 'markdown') {
-                    div.innerHTML = this._editor.view.state.doc.toString();
-                    const node = PMDOMParser
-                        .fromSchema(schema)
-                        .parse(div);
-                    text = tavenemMarkdownSerializer.serialize(node);
-                } else {
-                    const node = tavenemMarkdownParser.parse(this._editor.view.state.doc.toString());
-                    div.appendChild(renderer.serializeFragment(node.content));
-                    text = div.innerHTML;
+                    spec.changes = {
+                        from: 0,
+                        to: this._editor.view.state.doc.length,
+                        insert: text,
+                    };
                 }
 
-                spec.changes = {
-                    from: 0,
-                    to: this._editor.view.state.doc.length,
-                    insert: text,
-                };
+                this._editor.options.syntax = syntax;
             }
-
-            this._editor.options.syntax = syntax;
         } else {
             this._editor.options = {
                 autoFocus: false,

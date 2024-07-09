@@ -28,8 +28,8 @@
                   style="@CssStyle"
                   tabindex="@TabIndex"
                   value="@CurrentValueAsString"
-                  @valuechange="OnValueChange"
-                  @valueinput="OnValueInput">
+                  @onvaluechange="OnValueChange"
+                  @onvalueinput="OnValueInput">
     @if (PrefixContent is not null)
     {
         <div slot="prefix" style="display:contents">
