@@ -91,7 +91,7 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         cropButton.ariaLabel = 'crop';
         cropButton.role = 'menuitem';
         cropGroup.appendChild(cropButton);
-        cropButton.addEventListener('click', this.startCrop.bind(this));
+        cropButton.addEventListener('click', this.crop.bind(this));
 
         const cropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         cropButton.appendChild(cropButtonIcon);
@@ -1011,9 +1011,9 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         }
     }
 
-    crop() {
+    async crop() {
         const bounds = this._editor
-            ? this._editor.crop()
+            ? await this._editor.crop()
             : new Rectangle(0, 0, 0, 0);
         this.dispatchEvent(TavenemImageEditorHtmlElement.newCropEvent(bounds));
     }
@@ -1642,6 +1642,9 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             drawingTools.dataset.textMode = '';
             this.startAddingText();
         } else {
+            if (this._editor) {
+                this._editor.cancelOngoingOperations();
+            }
             delete drawingTools.dataset.textMode;
         }
     }

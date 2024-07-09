@@ -6,6 +6,7 @@ import {
     BlurFilter,
     Container,
     DisplayObject,
+    FederatedEventTarget,
     FederatedPointerEvent,
     Graphics,
     ICanvas,
@@ -20,9 +21,10 @@ import {
 } from 'pixi.js';
 import { Sprite as PictureSprite } from '@pixi/picture';
 import { Transformer, TransformerHandle } from '@pixi-essentials/transformer';
-import { Dialog, initialize as initializeDialog } from '../../tavenem-dialog';
+import { Dialog, initialize as initializeDialog, showModal } from '../../tavenem-dialog';
 import { TavenemInputFieldHtmlElement } from '../_input-field';
 import { randomUUID } from '../../tavenem-utility';
+import { Transform } from 'prosemirror-transform';
 
 export const DrawingMode = {
     None: 0,
@@ -158,7 +160,6 @@ export class ImageEditor {
         });
         this._brushGenerator = new BrushGenerator(this.editor.renderer);
         this.editor.stage.eventMode = 'static';
-        this.editor.stage.interactiveChildren = false;
         this.editor.stage.hitArea = this.editor.screen;
         this.editor.stage.cursor = 'crosshair';
         this.editor.stage.on('pointerdown', this.onPointerDown, this);
@@ -224,7 +225,7 @@ export class ImageEditor {
         this._container.addChild(this._drawn);
     }
 
-    crop() {
+    async crop() {
         if (!this._cropRect
             || this._cropRect.height <= 0
             || this._cropRect.width <= 0
@@ -236,7 +237,7 @@ export class ImageEditor {
             this._cropRect.y - (this._cropRect.height / 2),
             this._cropRect.width,
             this._cropRect.height);
-        this.saveState(this.cropInner.bind(this, region));
+        await this.saveStateAsync(this.cropInner.bind(this, region));
         this.setCropping(false);
         return region;
     }
@@ -319,8 +320,6 @@ export class ImageEditor {
         } else {
             const container = this._textDialog.closest<HTMLElement>('.dialog-container');
             if (container) {
-                container.style.display = 'initial';
-
                 const urlInput = container.querySelector<TavenemInputFieldHtmlElement>('.text-input');
                 if (urlInput) {
                     if (text) {
@@ -334,7 +333,7 @@ export class ImageEditor {
             }
         }
 
-        this._textDialog.showModal();
+        showModal(this._textDialog);
     }
 
     async redo() {
@@ -623,6 +622,7 @@ export class ImageEditor {
             group: [t],
             lockAspectRatio: true,
             skewEnabled: true,
+            stage: this.editor.stage,
         });
         this._textTransformer.on('pointertap', this.onTextPointerTap, this);
         this.editor.stage.addChild(this._textTransformer);
@@ -727,6 +727,7 @@ export class ImageEditor {
                     group: [this._editedText],
                     lockAspectRatio: true,
                     skewEnabled: true,
+                    stage: this.editor.stage,
                 });
                 this._textTransformer.on('pointertap', this.onTextPointerTap, this);
                 this.editor.stage.addChild(this._textTransformer);
@@ -808,11 +809,6 @@ export class ImageEditor {
                 this.editText(value);
             }
             form.reset();
-
-            const container = ev.target.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'none';
-            }
         });
 
         const dialogInner = document.createElement('div');
@@ -890,7 +886,7 @@ export class ImageEditor {
         okButton.setAttribute('form', form.id);
         buttons.appendChild(okButton);
 
-        initializeDialog(dialog.id);
+        initializeDialog(dialog);
         return dialog;
     }
 
@@ -956,7 +952,15 @@ export class ImageEditor {
                 this.editor.stage.addChild(this._textTransformer);
             }
         } else {
-            const transformer = e.target as unknown as Transformer;
+            let transformer: Transformer | null = null;
+            let current: FederatedEventTarget | undefined = e.target;
+            while (transformer == null && current) {
+                if (current instanceof Transformer) {
+                    transformer = current;
+                } else {
+                    current = current.parent;
+                }
+            }
             if (transformer && transformer.group.length) {
                 text = transformer.group.find(x => x instanceof Text) as Text | undefined;
             }
@@ -1053,6 +1057,23 @@ export class ImageEditor {
 
         if (!skipExecute) {
             step();
+        }
+
+        this.updateRedo(false);
+        if (this._undoStack.length > 0) {
+            this.updateUndo(true);
+        }
+    }
+
+    private async saveStateAsync(step: () => Promise<void>, skipExecute: boolean = false) {
+        if (this._undoStack.length >= this._maxCount) {
+            this._undoStack.shift();
+        }
+        this._undoStack.push(step);
+        this._redoStack = [];
+
+        if (!skipExecute) {
+            await step();
         }
 
         this.updateRedo(false);

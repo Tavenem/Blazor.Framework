@@ -10,8 +10,7 @@ export interface Dialog extends HTMLDialogElement {
 
 let draggedDialog: Dialog | undefined;
 
-export function initialize(elementId: string) {
-    const dialog = document.getElementById(elementId) as Dialog;
+export function initialize(dialog: HTMLDialogElement) {
     if (!dialog) {
         return;
     }
@@ -25,16 +24,12 @@ export function initialize(elementId: string) {
     headers[0].addEventListener('pointerdown', onPointerDown);
     document.addEventListener('pointerup', stopDragging);
     document.addEventListener('pointermove', drag);
+    position(dialog);
+}
 
-    const boundingRect = dialog.getBoundingClientRect();
-    dialog.dragFinalX = (window.visualViewport?.offsetLeft || window.document.documentElement.offsetLeft)
-        + ((window.visualViewport?.width || window.document.documentElement.clientWidth) / 2)
-        - (boundingRect.width / 2);
-    dialog.dragFinalY = (window.visualViewport?.offsetTop || window.document.documentElement.offsetTop)
-        + ((window.visualViewport?.height || window.document.documentElement.clientHeight) / 2)
-        - (boundingRect.height / 2);
-    dialog.style.left = `${dialog.dragFinalX}px`;
-    dialog.style.top = `${dialog.dragFinalY}px`;
+export function showModal(dialog: HTMLDialogElement) {
+    dialog.showModal();
+    position(dialog);
 }
 
 function drag(e: PointerEvent) {
@@ -100,6 +95,22 @@ function onPointerDown(e: PointerEvent) {
     draggedDialog = e.currentTarget.parentElement.parentElement as Dialog;
     draggedDialog.dragStartX = e.clientX;
     draggedDialog.dragStartY = e.clientY;
+}
+
+function position(dialog: HTMLDialogElement) {
+    if (!dialog) {
+        return;
+    }
+    const d = dialog as Dialog;
+    const boundingRect = d.getBoundingClientRect();
+    d.dragFinalX = (window.visualViewport?.offsetLeft || window.document.documentElement.offsetLeft)
+        + ((window.visualViewport?.width || window.document.documentElement.clientWidth) / 2)
+        - (boundingRect.width / 2);
+    d.dragFinalY = (window.visualViewport?.offsetTop || window.document.documentElement.offsetTop)
+        + ((window.visualViewport?.height || window.document.documentElement.clientHeight) / 2)
+        - (boundingRect.height / 2);
+    d.style.left = `${d.dragFinalX}px`;
+    d.style.top = `${d.dragFinalY}px`;
 }
 
 function stopDragging() {

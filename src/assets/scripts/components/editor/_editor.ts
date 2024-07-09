@@ -3,7 +3,7 @@ import { TavenemDropdownHTMLElement, TavenemTooltipHTMLElement } from '../_popov
 import { TavenemInputHtmlElement } from '../_input';
 import { TavenemColorInputHtmlElement } from '../color-input/_color-input';
 import { TavenemEmojiHTMLElement } from '../_emoji';
-import { Dialog, initialize as initializeDialog } from '../../tavenem-dialog';
+import { Dialog, initialize as initializeDialog, showModal } from '../../tavenem-dialog';
 import { TavenemCheckboxHtmlElement } from '../_checkbox';
 import { TavenemInputFieldHtmlElement } from '../_input-field';
 import { TavenemSelectInputHtmlElement } from '../_select';
@@ -593,14 +593,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getAudioDialogResponse() {
         if (!this._audioDialog) {
             this._audioDialog = this.getAudioDialog();
-        } else {
-            const container = this._audioDialog.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'initial';
-            }
         }
 
-        this._audioDialog.showModal();
+        showModal(this._audioDialog);
     }
 
     private getFontSizeDialog() {
@@ -754,14 +749,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getFontSizeDialogResponse() {
         if (!this._fontSizeDialog) {
             this._fontSizeDialog = this.getFontSizeDialog();
-        } else {
-            const container = this._fontSizeDialog.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'initial';
-            }
         }
 
-        this._fontSizeDialog.showModal();
+        showModal(this._fontSizeDialog);
     }
 
     private getImageDialog() {
@@ -869,14 +859,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getImageDialogResponse() {
         if (!this._imageDialog) {
             this._imageDialog = this.getImageDialog();
-        } else {
-            const container = this._imageDialog.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'initial';
-            }
         }
 
-        this._imageDialog.showModal();
+        showModal(this._imageDialog);
     }
 
     private getLineHeightDialog() {
@@ -1002,14 +987,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getLineHeightDialogResponse() {
         if (!this._lineHeightDialog) {
             this._lineHeightDialog = this.getLineHeightDialog();
-        } else {
-            const container = this._lineHeightDialog.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'initial';
-            }
         }
 
-        this._lineHeightDialog.showModal();
+        showModal(this._lineHeightDialog);
     }
 
     private getLinkDialog() {
@@ -1104,14 +1084,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getLinkDialogResponse() {
         if (!this._linkDialog) {
             this._linkDialog = this.getLinkDialog();
-        } else {
-            const container = this._linkDialog.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'initial';
-            }
         }
 
-        this._linkDialog.showModal();
+        showModal(this._linkDialog);
     }
 
     private getOptions(isWysiwyg?: boolean, syntax?: EditorSyntax): EditorOptions {
@@ -1236,14 +1211,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     private getVideoDialogResponse() {
         if (!this._videoDialog) {
             this._videoDialog = this.getVideoDialog();
-        } else {
-            const container = this._videoDialog.closest<HTMLElement>('.dialog-container');
-            if (container) {
-                container.style.display = 'initial';
-            }
         }
 
-        this._videoDialog.showModal();
+        showModal(this._videoDialog);
     }
 
     private onColorSelected(control: ToolbarControl, event: Event) {
@@ -2153,11 +2123,6 @@ function getDialog(
         if (form) {
             form.reset();
         }
-
-        const container = ev.target.closest<HTMLElement>('.dialog-container');
-        if (container) {
-            container.style.display = 'none';
-        }
     });
 
     const dialogInner = document.createElement('div');
@@ -2248,7 +2213,7 @@ function getDialog(
     okButton.setAttribute('form', form.id);
     buttons.appendChild(okButton);
 
-    initializeDialog(dialog.id);
+    initializeDialog(dialog);
     return dialog;
 }
 

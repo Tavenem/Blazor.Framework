@@ -30,6 +30,10 @@
 
     > .overlay {
         z-index: calc(var(--tavenem-zindex-dialog) + 1);
+
+        &:not(:has(~ dialog[open])) {
+            display: none;
+        }
     }
 
     > dialog {
@@ -42,7 +46,7 @@
         border-style: none;
         box-shadow: 0px 11px 15px -7px rgba(0,0,0,0.2), 0px 24px 38px 3px rgba(0,0,0,0.14), 0px 9px 46px 8px rgba(0,0,0,0.12);
         color: var(--tavenem-color-text);
-        display: flex;
+        display: none;
         flex-direction: column;
         margin: 0;
         max-height: calc(100vh - 4rem);
@@ -54,6 +58,10 @@
         position: relative;
         width: 50vw;
         z-index: calc(var(--tavenem-zindex-dialog) + 2);
+
+        &[open] {
+            display: flex;
+        }
 
         &.resizable {
             resize: both;
