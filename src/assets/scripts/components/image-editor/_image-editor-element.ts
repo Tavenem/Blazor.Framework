@@ -354,7 +354,6 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         if (!('hide-formats' in this.dataset)) {
             const formatDropdown = document.createElement('tf-dropdown');
             formatDropdown.dataset.activation = '1'; // left-click
-            formatDropdown.dataset.popoverContainer = '';
             saveGroup.appendChild(formatDropdown);
 
             const dropdownButton = document.createElement('button');
@@ -372,8 +371,9 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             dropdownButton.appendChild(dropdownButtonTooltip);
 
             const dropdownPopover = document.createElement('tf-popover');
-            dropdownPopover.classList.add('top-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
-            dropdownPopover.classList.add('anchor-bottom-left');
+            dropdownPopover.classList.add('flip-onopen', 'select-popover', 'filled', 'match-width');
+            dropdownPopover.dataset.origin = 'top-left';
+            dropdownPopover.dataset.anchorOrigin = 'bottom-left';
             dropdownPopover.dataset.anchorId = saveGroupId;
             dropdownPopover.style.maxHeight = 'min(300px,90vh)';
             dropdownPopover.style.overflowY = 'auto';
@@ -566,7 +566,6 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     const colorInput = document.createElement('tf-color-input');
                     colorInput.classList.add('color-button', 'rounded', 'small');
                     colorInput.role = 'menuitem';
-                    colorInput.dataset.popoverContainer = '';
                     colorInput.ariaLabel = 'color';
                     colorInput.setAttribute('button', '');
                     drawingGroup.appendChild(colorInput);
@@ -655,7 +654,6 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     textColorInput.classList.add('text-color-button');
                     textColorInput.role = 'menuitem';
                     textColorInput.dataset.inputClass = 'rounded small';
-                    textColorInput.dataset.popoverContainer = '';
                     textColorInput.ariaLabel = 'color';
                     textColorInput.setAttribute('button', '');
                     textGroup.appendChild(textColorInput);

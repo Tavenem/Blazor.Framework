@@ -16,7 +16,7 @@
     class to color it.
 </p>
 
-<CodeExample Id="ce-1" Code="@(@"<span class=""chip"">Example</span>
+<CodeExample Code="@(@"<span class=""chip"">Example</span>
 <span class=""chip primary"">Primary</span>
 <span class=""chip secondary"">Secondary</span>
 <span class=""chip tertiary"">Tertiary</span>
@@ -31,7 +31,7 @@
     To indicate that a non-button chip is interactive, add the <code>clickable</code> class.
 </p>
 
-<CodeExample Id="ce-2" IsOpen="false" Code="@(@"<span class=""chip clickable"">Example</span>
+<CodeExample Code="@(@"<span class=""chip clickable"">Example</span>
 <span class=""chip clickable primary"">Primary</span>
 <span class=""chip clickable secondary"">Secondary</span>
 <span class=""chip clickable tertiary"">Tertiary</span>
@@ -50,7 +50,7 @@
     rather than using the usual disabled colors.
 </p>
 
-<CodeExample Id="ce-3" IsOpen="false" Code="@(@"<span class=""chip disabled"">Example</span>
+<CodeExample Code="@(@"<span class=""chip disabled"">Example</span>
 <span class=""chip disabled primary"">Primary</span>
 <span class=""chip disabled secondary"">Secondary</span>
 <span class=""chip disabled tertiary"">Tertiary</span>
@@ -67,7 +67,7 @@
     The size of a chip can be adjusted with the <code>small</code> and <code>large</code> classes.
 </p>
 
-<CodeExample Id="ce-4" IsOpen="false" RowClass="align-items-center" Code="@(@"<span class=""chip small primary"">Small</span>
+<CodeExample RowClass="align-items-center" Code="@(@"<span class=""chip small primary"">Small</span>
 <span class=""chip primary"">Normal</span>
 <span class=""chip large primary"">Large</span>")" />
 
@@ -76,7 +76,7 @@
     class.
 </p>
 
-<CodeExample Id="ce-5" IsOpen="false" Code="@(@"<span class=""chip chip-text"">Example</span>
+<CodeExample Code="@(@"<span class=""chip chip-text"">Example</span>
 <span class=""chip chip-text primary"">Primary</span>
 <span class=""chip chip-text secondary"">Secondary</span>
 <span class=""chip chip-text tertiary"">Tertiary</span>
@@ -91,7 +91,7 @@
     Chips can also be <code>outlined</code>.
 </p>
 
-<CodeExample Id="ce-6" IsOpen="false" Code="@(@"<span class=""chip outlined"">Example</span>
+<CodeExample Code="@(@"<span class=""chip outlined"">Example</span>
 <span class=""chip outlined primary"">Primary</span>
 <span class=""chip outlined secondary"">Secondary</span>
 <span class=""chip outlined tertiary"">Tertiary</span>
@@ -107,7 +107,7 @@
     of a chip.
 </p>
 
-<CodeExample Id="ce-7" IsOpen="false" Code="@(@"<span class=""chip square primary"">Primary</span>
+<CodeExample Code="@(@"<span class=""chip square primary"">Primary</span>
 <span class=""chip rounded secondary"">Secondary</span>")" />
 
 <h2>Component</h2>
@@ -130,20 +130,13 @@
     template is provided, with the <code>ToString</code> method of the items.
 </p>
 
-<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" SelectionType="SelectionType.Single" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" SelectionType="SelectionType.Single" />
+</CodeExample>
 
 <p>
     Note that the <code>SelectedItem</code> property is read-only (i.e. not two-way bindable). You
@@ -160,20 +153,13 @@
     time may be selected. If set to <code>Multiple</code> any number of items may be selected.
 </p>
 
-<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Multiple"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Multiple"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" SelectionType="SelectionType.Multiple" />
+</CodeExample>
 
 <p>
     Note that the <code>SelectedItems</code> property is read-only (i.e. not two-way bindable). You
@@ -191,20 +177,13 @@
     forced.
 </p>
 
-<Collapse Id="ce-10" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" SelectionType="SelectionType.Single" Required="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" Required=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" Required=""true"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" SelectionType="SelectionType.Single" Required="true" />
+</CodeExample>
 
 <h3>Closing</h3>
 
@@ -219,20 +198,13 @@
     pressed.
 </p>
 
-<Collapse Id="ce-11" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" AutoClose="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" AutoClose=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" AutoClose=""true"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" AutoClose="true" />
+</CodeExample>
 
 <h3>Drag and Drop</h3>
 
@@ -253,20 +225,13 @@
     set its <code>IsDropTarget</code> property to <code>true</code>.
 </p>
 
-<Collapse Id="ce-12" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_dragChips" IsDragStart="true" IsDropTarget="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" IsDragStart=""true"" IsDropTarget=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" IsDragStart=""true"" IsDropTarget=""true"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_dragChips" IsDragStart="true" IsDropTarget="true" />
+</CodeExample>
 
 <p>
     Individual chips can disable dragging by returning <code>false</code> from a function assigned
@@ -313,20 +278,13 @@
     <code>IconClass</code> property can be used to customize the class of the icon.
 </p>
 
-<Collapse Id="ce-13" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
+</CodeExample>
 
 <p>
     You can insert a separator before or after any chip by setting the <code>SeparatorBefore</code>
@@ -334,20 +292,13 @@
     appropriate items.
 </p>
 
-<Collapse Id="ce-14" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" SeparatorBefore="@(i => i == "Chip 2")" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SeparatorBefore=""@(i => i == ""Chip 2"")"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" SeparatorBefore=""@(i => i == ""Chip 2"")"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" SeparatorBefore="@(i => i == "Chip 2")" />
+</CodeExample>
 
 <h3>Customization</h3>
 
@@ -363,20 +314,13 @@
     itself, rather than their own theme, to make it clear that they are currently selected.
 </p>
 
-<Collapse Id="ce-15" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet Items="_chips" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet Items="_chips" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
+</CodeExample>
 
 <h3>Clicking</h3>
 
@@ -386,14 +330,7 @@
     <code>OnItemClick</code> callback.
 </p>
 
-<Collapse Id="ce-16" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ChipSet Items=""_chips"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Secondary)"" />
+<CodeExample IsOpen="true" Code="@(@"<ChipSet Items=""_chips"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""@(_ => _theme = ThemeColor.Secondary)"" />
 
 @code {
     private List<string> _chips = new() { ""Chip 1"", ""Chip 2"", ""Chip 3"" };
@@ -402,9 +339,9 @@
     private void OnClick(string? _) => _theme = _theme == ThemeColor.None
         ? ThemeColor.Secondary
         : ThemeColor.None;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ChipSet TChip="string" Items="_chips" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
+</CodeExample>
 
 @code {
     private List<string> _chips = new() { "Chip 1", "Chip 2", "Chip 3" };

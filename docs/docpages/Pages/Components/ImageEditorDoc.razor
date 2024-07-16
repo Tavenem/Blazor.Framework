@@ -18,16 +18,9 @@
     editor.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ImageEditor Src="./images/rover.webp" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ImageEditor Src=""./images/rover.webp"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample Code="@(@"<ImageEditor Src=""./images/rover.webp"" />")">
+    <ImageEditor Src="./images/rover.webp" />
+</CodeExample>
 
 <p>
     In addition to setting the <code>Src</code> property, you can also dynamically call the
@@ -36,18 +29,7 @@
     element should be supported.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ImageEditor @ref="_editor" />
-            <div class="row justify-content-center">
-                <InputFile @key="@_key" OnChange="OnFileChange" />
-                <button class="btn primary" @onclick="OnUploadAsync" disabled="@(_file is null)">Upload</button>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ImageEditor @ref=""_editor"" />
+<CodeExample Code="@(@"<ImageEditor @ref=""_editor"" />
 <div class=""row justify-content-center"">
     <InputFile @key=""@_key"" OnChange=""OnFileChange"" />
     <button class=""btn primary"" @onclick=""OnUploadAsync"" disabled=""@(_file is null)"">Upload</button>
@@ -72,9 +54,13 @@
         _file = null;
         _key = Guid.NewGuid().ToString();
     }
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ImageEditor @ref="_editor" />
+    <div class="row justify-content-center">
+        <InputFile @key="@_key" OnChange="OnFileChange" />
+        <button class="btn primary" @onclick="OnUploadAsync" disabled="@(_file is null)">Upload</button>
+    </div>
+</CodeExample>
 
 <p>
     Editing can be initiated programmatically with the <code>BeginEditAsync</code> method, and

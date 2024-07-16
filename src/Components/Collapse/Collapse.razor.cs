@@ -260,6 +260,7 @@ public partial class Collapse : PersistentComponentBase
                 {
                     await SetOpenAsync(true);
                 }
+                StateHasChanged();
             }
         }
     }

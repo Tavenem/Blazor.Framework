@@ -57,11 +57,6 @@ public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
     /// </summary>
     [Parameter] public string? UncheckedIcon { get; set; }
 
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add(ThemeColor.ToCSS())
-        .ToString();
-
     private string? CheckedIconClass => IsCheckedIconOutlined ? "outlined" : null;
 
     private string? IndeterminateIconClass => IsIndeterminateIconOutlined ? "outlined" : null;

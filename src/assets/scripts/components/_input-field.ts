@@ -3,165 +3,7 @@ import { randomUUID } from '../tavenem-utility'
 
 export class TavenemInputFieldHtmlElement extends HTMLElement {
     static formAssociated = true;
-
-    private _display: string | null | undefined;
-    private _initialDisplay: string | null | undefined;
-    private _initialValue: string | null | undefined;
-    private _internals: ElementInternals;
-    private _settingValue = false;
-    private _value = '';
-
-    static get observedAttributes() {
-        return [
-            'data-input-class',
-            'data-input-style',
-            'display',
-            'readonly',
-            'required',
-            'value',
-        ];
-    }
-
-    get display() {
-        return this._display && this._display.length
-            ? this._display
-            : this._value;
-    }
-    set display(value: string | null | undefined) {
-        this._display = value;
-
-        let newValue = value;
-        if (value == null || !value.length) {
-            const padLength = parseInt(this.dataset.padLength || '');
-            if (Number.isFinite(padLength)
-                && padLength > this._value.length) {
-                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
-            } else {
-                newValue = this._value;
-            }
-        }
-
-        if (newValue!.length) {
-            this._internals.states.delete('empty');
-            this._internals.states.add('has-value');
-        } else {
-            this._internals.states.add('empty');
-            this._internals.states.delete('has-value');
-        }
-
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.display = newValue;
-        }
-    }
-
-    get form() { return this._internals.form; }
-
-    get name() { return this.getAttribute('name'); }
-
-    get required() { return this.hasAttribute('required'); }
-    set required(value: boolean) {
-        if (value) {
-            this.setAttribute('required', '');
-        } else {
-            this.removeAttribute('required');
-        }
-    }
-
-    get suggestion() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            return input.suggestion;
-        }
-
-        return null;
-    }
-    set suggestion(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.suggestion = value;
-        }
-    }
-
-    get suggestionDisplay() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            return input.suggestionDisplay;
-        }
-
-        return null;
-    }
-    set suggestionDisplay(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.suggestionDisplay = value;
-        }
-    }
-
-    get suggestionValue() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            return input.suggestionValue;
-        }
-
-        return null;
-    }
-    set suggestionValue(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.suggestionValue = value;
-        }
-    }
-
-    get type() { return this.localName; }
-
-    get validity() { return this._internals.validity; }
-    get validationMessage() { return this._internals.validationMessage; }
-
-    get value() { return this._value; }
-    set value(v: string) { this.setValue(v); }
-
-    get willValidate() { return this._internals.willValidate; }
-
-    constructor() {
-        super();
-
-        this._internals = this.attachInternals();
-    }
-
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
-
-        const style = document.createElement('style');
-        style.textContent = `:host {
+    static style = `:host {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
     --field-active-label-color: var(--tavenem-color-primary);
@@ -174,7 +16,6 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
     display: flex;
     flex-basis: auto;
     flex-direction: column;
-    flex-grow: 1;
     flex-shrink: 1;
     margin-bottom: .5rem;
     margin-left: 0;
@@ -230,6 +71,10 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 
 :host(:not(.filled, .outlined)) > tf-input:has(~ label) {
     margin-top: 1rem;
+}
+
+:host > tf-input {
+    flex-grow: 1;
 }
 
 :host(:not(.outlined)) > tf-input {
@@ -304,6 +149,7 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 
 :host(.outlined) > tf-input {
     background-color: var(--tavenem-color-bg-alt);
+    border-color: var(--tavenem-border-color);
     border-style: solid;
     border-width: 1px;
     padding-bottom: 5px;
@@ -627,6 +473,165 @@ slot {
     border-radius: inherit;
 }
 `;
+
+    private _display: string | null | undefined;
+    private _initialDisplay: string | null | undefined;
+    private _initialValue: string | null | undefined;
+    private _internals: ElementInternals;
+    private _settingValue = false;
+    private _value = '';
+
+    static get observedAttributes() {
+        return [
+            'data-input-class',
+            'data-input-style',
+            'display',
+            'readonly',
+            'required',
+            'value',
+        ];
+    }
+
+    get display() {
+        return this._display && this._display.length
+            ? this._display
+            : this._value;
+    }
+    set display(value: string | null | undefined) {
+        this._display = value;
+
+        let newValue = value;
+        if (value == null || !value.length) {
+            const padLength = parseInt(this.dataset.padLength || '');
+            if (Number.isFinite(padLength)
+                && padLength > this._value.length) {
+                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
+            } else {
+                newValue = this._value;
+            }
+        }
+
+        if (newValue!.length) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
+        } else {
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.display = newValue;
+        }
+    }
+
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get suggestion() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            return input.suggestion;
+        }
+
+        return null;
+    }
+    set suggestion(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.suggestion = value;
+        }
+    }
+
+    get suggestionDisplay() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            return input.suggestionDisplay;
+        }
+
+        return null;
+    }
+    set suggestionDisplay(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.suggestionDisplay = value;
+        }
+    }
+
+    get suggestionValue() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            return input.suggestionValue;
+        }
+
+        return null;
+    }
+    set suggestionValue(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.suggestionValue = value;
+        }
+    }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
+    }
+
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+
+        const style = document.createElement('style');
+        style.textContent = TavenemInputFieldHtmlElement.style;
         shadow.appendChild(style);
 
         const inputId = randomUUID();

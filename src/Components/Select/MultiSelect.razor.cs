@@ -12,7 +12,7 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The type of bound value.
 /// </typeparam>
-public partial class MultiSelect<TValue>
+public partial class MultiSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
 {
     private readonly object _selectAll = new();
 
@@ -184,20 +184,28 @@ public partial class MultiSelect<TValue>
             result = [];
 
             var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(value));
-            if (JsonDocument.TryParseValue(ref reader, out var doc)
-                && doc.RootElement.ValueKind == JsonValueKind.Array)
+            if (JsonDocument.TryParseValue(ref reader, out var doc))
             {
-                var list = new List<TValue>();
-                foreach (var item in doc.RootElement.EnumerateArray())
+                if (doc.RootElement.ValueKind == JsonValueKind.Array)
                 {
-                    if (Converter.TryGetValue(item.ToString(), out var itemResult)
-                        && itemResult is not null)
+                    var list = new List<TValue>();
+                    foreach (var item in doc.RootElement.EnumerateArray())
                     {
-                        list.Add(itemResult);
+                        if (Converter.TryGetValue(item.ToString(), out var itemResult)
+                            && itemResult is not null)
+                        {
+                            list.Add(itemResult);
+                        }
                     }
+                    result = list;
+                    success = true;
                 }
-                result = list;
-                success = true;
+                else if (Converter.TryGetValue(doc.RootElement.ToString(), out var itemResult)
+                    && itemResult is not null)
+                {
+                    result = [itemResult];
+                    success = true;
+                }
             }
         }
         else if (value.TryParseSelectableValue(out result))
@@ -206,7 +214,36 @@ public partial class MultiSelect<TValue>
         }
         else
         {
-            validationErrorMessage = GetConversionValidationMessage();
+            result = [];
+
+            var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(value));
+            if (JsonDocument.TryParseValue(ref reader, out var doc))
+            {
+                if (doc.RootElement.ValueKind == JsonValueKind.Array)
+                {
+                    var list = new List<TValue>();
+                    foreach (var item in doc.RootElement.EnumerateArray())
+                    {
+                        if (item.ToString().TryParseSelectableValue<TValue>(out var itemResult)
+                            && itemResult is not null)
+                        {
+                            list.Add(itemResult);
+                        }
+                    }
+                    result = list;
+                    success = true;
+                }
+                else if (doc.RootElement.ToString().TryParseSelectableValue<TValue>(out var itemResult)
+                    && itemResult is not null)
+                {
+                    result = [itemResult];
+                    success = true;
+                }
+            }
+            else
+            {
+                validationErrorMessage = GetConversionValidationMessage();
+            }
         }
 
         HasConversionError = !success;

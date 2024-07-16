@@ -17,7 +17,7 @@
     <code>role="list"</code>, or <code>role="navigation"</code> for lists of links.
 </p>
 
-<CodeExample Id="ce-1" Code="@(@"<ul class=""list"">
+<CodeExample Code="@(@"<ul class=""list"">
     <li>Item 1</li>
     <li>Item 2</li>
     <li>Item 3</li>
@@ -32,7 +32,7 @@
     An active item can be indicated with the <code>active</code> class.
 </p>
 
-<CodeExample Id="ce-2" Code="@(@"<ul class=""list clickable"">
+<CodeExample Code="@(@"<ul class=""list clickable"">
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
     <li>Item 3</li>
@@ -48,7 +48,7 @@
     a solid color background.
 </p>
 
-<CodeExample Id="ce-3" Code="@(@"<ul class=""list clickable secondary"">
+<CodeExample Code="@(@"<ul class=""list clickable secondary"">
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
     <li>Item 3</li>
@@ -68,7 +68,7 @@
     Use the <code>highlight-start</code> class to modify the active indicator's position.
 </p>
 
-<CodeExample Id="ce-4" Code="@(@"<ul class=""list highlight-start"">
+<CodeExample Code="@(@"<ul class=""list highlight-start"">
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
     <li>Item 3</li>
@@ -80,7 +80,7 @@
     top of a list which is scrolled past the header's position.
 </p>
 
-<CodeExample Id="ce-5" Code="@(@"<ul class=""list"">
+<CodeExample Code="@(@"<ul class=""list"">
     <li class=""subheader"">Subheader</li>
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
@@ -93,7 +93,7 @@
     Note, however, that this does not actually disable any list items such as buttons or links.
 </p>
 
-<CodeExample Id="ce-6" Code="@(@"<ul class=""list disabled"">
+<CodeExample Code="@(@"<ul class=""list disabled"">
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
     <li>Item 3</li>
@@ -103,7 +103,7 @@
     The internal padding of a list can be minimized with the <code>dense</code> class.
 </p>
 
-<CodeExample Id="ce-7" IsOpen="false" Code="@(@"<ul class=""list dense"">
+<CodeExample IsOpen="false" Code="@(@"<ul class=""list dense"">
     <li>Item 1</li>
     <li class=""active"">Item 2</li>
     <li>Item 3</li>
@@ -129,20 +129,13 @@
     each item, or if no template is provided, with the <code>ToString</code> method of the items.
 </p>
 
-<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" SelectionType="SelectionType.Single" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" SelectionType="SelectionType.Single" />
+</CodeExample>
 
 <h3>Multiselect</h3>
 
@@ -152,20 +145,13 @@
     time may be selected. If set to <code>Multiple</code> any number of items may be selected.
 </p>
 
-<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" SelectionType="SelectionType.Multiple" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Multiple"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" SelectionType="SelectionType.Multiple" />
+</CodeExample>
 
 <p>
     Note that the <code>SelectedItems</code> property is read-only (i.e. not two-way bindable). You
@@ -183,20 +169,13 @@
     forced.
 </p>
 
-<Collapse Id="ce-10" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" SelectionType="SelectionType.Single" Required="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" Required=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" Required=""true"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" SelectionType="SelectionType.Single" Required="true" />
+</CodeExample>
 
 <h3>Tiered Lists</h3>
 
@@ -208,21 +187,7 @@
     collapse.
 </p>
 
-<Collapse Id="ce-11" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
-                <Template>
-                    <span>@context</span>
-                </Template>
-                <CollapsibleTemplate>
-                    <ElementList Items="_items" />
-                </CollapsibleTemplate>
-            </ElementList>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
     <Template>
         <span>@context</span>
     </Template>
@@ -233,9 +198,16 @@
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
+        <Template>
+            <span>@context</span>
+        </Template>
+        <CollapsibleTemplate>
+            <ElementList Items="_items" />
+        </CollapsibleTemplate>
+    </ElementList>
+</CodeExample>
 
 <p>
     Note that the <code>ItemIsCollapsible</code> and <code>CollapsibleTemplate</code> properties can
@@ -247,21 +219,7 @@
     of collapsible sublists, moving the expansion icon to the beginning and rotating it.
 </p>
 
-<Collapse Id="ce-12" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Class="tree" Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
-                <Template>
-                    <span>@context</span>
-                </Template>
-                <CollapsibleTemplate>
-                    <ElementList Items="_items" />
-                </CollapsibleTemplate>
-            </ElementList>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Class=""tree"" Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
+<CodeExample IsOpen="true" Code="@(@"<ElementList Class=""tree"" Items=""_items"" ItemIsCollapsible=""@(i => i == ""Item 2"")"">
     <Template>
         <span>@context</span>
     </Template>
@@ -272,9 +230,16 @@
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Class="tree" Items="_items" ItemIsCollapsible="@(i => i == "Item 2")">
+        <Template>
+            <span>@context</span>
+        </Template>
+        <CollapsibleTemplate>
+            <ElementList Items="_items" />
+        </CollapsibleTemplate>
+    </ElementList>
+</CodeExample>
 
 <h3>Drag and Drop</h3>
 
@@ -295,20 +260,13 @@
     set its <code>IsDropTarget</code> property to <code>true</code>.
 </p>
 
-<Collapse Id="ce-13" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_dragItems" IsDragStart="true" IsDropTarget="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" IsDragStart=""true"" IsDropTarget=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" IsDragStart=""true"" IsDropTarget=""true"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_dragItems" IsDragStart="true" IsDropTarget="true" />
+</CodeExample>
 
 <p>
     Individual items can disable dragging by returning <code>false</code> from a function assigned
@@ -354,20 +312,13 @@
     <code>IconClass</code> property can be used to customize the class of the icon.
 </p>
 
-<Collapse Id="ce-14" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" Icon=""@(_ => ""info"")"" IconClass=""@(_ => ""info"")"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" Icon="@(_ => "info")" IconClass="@(_ => "info")" />
+</CodeExample>
 
 <p>
     You can insert a separator before or after any item by setting the <code>SeparatorBefore</code>
@@ -375,20 +326,13 @@
     appropriate items.
 </p>
 
-<Collapse Id="ce-15" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" SeparatorBefore="@(i => i == "Item 2")" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SeparatorBefore=""@(i => i == ""Item 2"")"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" SeparatorBefore=""@(i => i == ""Item 2"")"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" SeparatorBefore="@(i => i == "Item 2")" />
+</CodeExample>
 
 <h3>Customization</h3>
 
@@ -404,20 +348,13 @@
     itself, rather than their own theme, to make it clear that they are currently selected.
 </p>
 
-<Collapse Id="ce-16" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList TListItem=""string"" Items=""_items"" SelectionType=""SelectionType.Single"" ShowSelectionIcon=""true"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList TListItem="string" Items="_items" SelectionType="SelectionType.Single" ShowSelectionIcon="true" />
+</CodeExample>
 
 <p>
     If you set the <code>SelectionIcons</code> property to <code>true</code>, both the selected and
@@ -426,20 +363,13 @@
     your items, or when they require their own interactions.
 </p>
 
-<Collapse Id="ce-17" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items" SelectionType="SelectionType.Single" SelectionIcons="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" SelectionIcons=""true"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" SelectionType=""SelectionType.Single"" SelectionIcons=""true"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items" SelectionType="SelectionType.Single" SelectionIcons="true" />
+</CodeExample>
 
 <h3>Clicking</h3>
 
@@ -449,14 +379,7 @@
     <code>OnItemClick</code> callback.
 </p>
 
-<Collapse Id="ce-18" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""OnClick"" />
+<CodeExample IsOpen="true" Code="@(@"<ElementList Items=""_items"" ItemThemeColor=""@(_ => _theme)"" OnItemClick=""OnClick"" />
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
@@ -465,9 +388,9 @@
     private void OnClick(string? _) => _theme = _theme == ThemeColor.None
         ? ThemeColor.Secondary
         : ThemeColor.None;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList TListItem="string" Items="_items" ItemThemeColor="@(_ => _theme)" OnItemClick="OnClick" />
+</CodeExample>
 
 @code {
     private List<string> _items = new() { "Item 1", "Item 2", "Item 3" };

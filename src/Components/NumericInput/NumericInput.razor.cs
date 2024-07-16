@@ -142,7 +142,7 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     [Parameter] public TValue? Step { get; set; }
 
     /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.Class)
+    protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("clearable", _isClearable)
         .ToString();
 

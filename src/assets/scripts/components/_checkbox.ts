@@ -2,6 +2,318 @@ import { documentPositionComparator, randomUUID } from "../tavenem-utility";
 
 export class TavenemCheckboxHtmlElement extends HTMLElement {
     static formAssociated = true;
+    static style = `
+:host {
+    --button-inherited-padding-y-icon: 6px;
+    border: 0;
+    color: var(--tavenem-color-text);
+    display: inline-flex;
+    flex-basis: auto;
+    flex-direction: column;
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin: 0;
+    max-width: 100%;
+    padding: 0;
+    position: relative;
+    vertical-align: top;
+}
+
+:host(:has(:focus-visible):not(.disabled, [inert])) {
+    background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
+}
+
+:host(.small) {
+    --button-inherited-font-size-icon: 1.25rem;
+    --button-inherited-padding-y-icon: 5px;
+}
+
+:host(.large) {
+    --button-inherited-font-size-icon: 2rem;
+    --button-inherited-padding-y-icon: 5px;
+}
+
+:host(.dense) {
+    --button-inherited-padding-y-icon: 2px;
+}
+
+:host(:where(
+    .primary,
+    .secondary,
+    .tertiary,
+    .danger,
+    .dark,
+    .default,
+    .info,
+    .success,
+    .warning)) {
+    --checkbox-inherited-active-color: var(--tavenem-theme-color);
+    --checkbox-inherited-active-hover-bg: var(--tavenem-theme-color-hover);
+    color: var(--tavenem-color-action);
+}
+
+:host(:disabled, [inert]) {
+    --checkbox-inherited-color: var(--tavenem-color-action-disabled);
+    --checkbox-inherited-active-color: var(--tavenem-color-action-disabled);
+    --checkbox-inherited-hover-bg: transparent;
+    --checkbox-inherited-active-hover-bg: transparent;
+}
+
+:host([readonly], [readonly]:hover) {
+    --checkbox-inherited-hover-bg: transparent;
+    cursor: default;
+    pointer-events: none;
+
+    * {
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+:host(:invalid:state(touched)) {
+    --checkbox-inherited-color: var(--tavenem-color-error);
+    --checkbox-inherited-active-color: var(--tavenem-color-error);
+    --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
+    --checkbox-inherited-active-hover-bg: var(--tavenem-color-error-hover);
+}
+
+:host(:state(checked)),
+:host(:state(indeterminate)) {
+    --checkbox-inherited-color: var(--checkbox-inherited-active-color);
+    --checkbox-inherited-hover-bg: var(--checkbox-inherited-active-hover-bg);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+.checkbox {
+    align-items: center;
+    box-sizing: border-box;
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
+    cursor: pointer;
+    display: inline-flex;
+    pointer-events: auto;
+    position: relative;
+    transform: none;
+    vertical-align: middle;
+    z-index: auto;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: none;
+    border: none;
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: none;
+    box-sizing: content-box;
+    color: currentColor;
+    cursor: inherit;
+    display: block;
+    font: inherit;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    min-height: calc(1.25rem + 10px);
+    min-width: 0;
+    opacity: var(--tavenem-field-input-opacity, unset);
+    overflow: visible;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    width: 100%;
+    z-index: 1;
+    -webkit-tap-highlight-color: transparent;
+
+    &:focus {
+        outline: 0;
+    }
+
+    &:disabled,
+    &[readonly] {
+        opacity: 1;
+    }
+}
+
+input:-webkit-autofill {
+    border-radius: inherit;
+}
+
+::-moz-focus-inner {
+    padding: 0;
+    border-style: none;
+}
+
+.btn {
+    --button-hover-bg: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
+    --button-hover-color: inherit;
+    --button-padding-x: 6px;
+    --button-padding-y: 6px;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    border-radius: 9999px;
+    box-sizing: border-box;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    font-weight: var(--tavenem-font-weight-semibold);
+    gap: .25rem;
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+    min-width: calc(1.5rem + (var(--button-padding-x) * 2));
+    outline: 0;
+    overflow: hidden;
+    padding: var(--button-padding-y) var(--button-padding-x);
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+    text-transform: var(--tavenem-texttransform-button);
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    user-select: none;
+    vertical-align: middle;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:after {
+        background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
+        background-position: 50%;
+        background-repeat: no-repeat;
+        content: "";
+        display: block;
+        height: 100%;
+        left: 0;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        transform: scale(7,7);
+        transition: transform .3s,opacity 1s;
+        width: 100%;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background-color: var(--button-hover-bg);
+        color: var(--button-hover-color);
+    }
+
+    &:active:after {
+        transform: scale(0,0);
+        opacity: .1;
+        transition: 0s;
+    }
+}
+.btn::-moz-focus-inner {
+    border-style: none;
+}
+
+::slotted(tf-icon) {
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action)) !important;
+    font-size: inherit !important;
+
+    &:hover {
+        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg)) !important;
+    }
+}
+
+svg {
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
+    height: 1.5em;
+    fill: currentColor;
+    flex-shrink: 0;
+    max-height: 1em;
+    width: auto;
+
+    &:hover {
+        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
+    }
+}
+
+slot[name="checked"],
+slot[name="indeterminate"] {
+    display: none;
+}
+
+:host(:state(checked)) {
+    slot[name="checked"] {
+        display: contents;
+    }
+
+    slot[name="unchecked"] {
+        display: none;
+    }
+}
+
+:host(:state(indeterminate)) {
+    slot[name="indeterminate"] {
+        display: contents;
+    }
+
+    slot[name="unchecked"] {
+        display: none;
+    }
+}
+
+label {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.field-helpers {
+    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
+    display: none;
+    font-size: 0.75rem;
+    font-weight: var(--tavenem-font-weight);
+    line-height: 1.66;
+    margin-top: 3px;
+    overflow: hidden;
+    padding-inline-start: var(--button-inherited-padding-y-icon);
+    text-align: start;
+
+    :has(slot::slotted(*)) {
+        display: flex;
+    }
+}
+
+:host([readonly]) {
+    cursor: default;
+    pointer-events: none;
+
+    * {
+        cursor: default;
+        pointer-events: none;
+    }
+}
+
+:host([required]) label:after {
+    color: var(--tavenem-color-error);
+    content: " *";
+}
+
+:host([disabled]), :host([inert]) {
+    background-color: transparent;
+    color: var(--tavenem-color-action-disabled);
+    cursor: default;
+
+    * {
+        background-color: transparent;
+        color: var(--tavenem-color-text-disabled);
+        cursor: default;
+    }
+
+    svg,
+    ::slotted(tf-icon) {
+        color: var(--tavenem-color-action-disabled) !important;
+    }
+}`;
 
     private _checked = false;
     private _indeterminate = false;
@@ -42,6 +354,10 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
         return false;
     }
     set checked(value: boolean | null) {
+        if (this._settingValue) {
+            return;
+        }
+
         const root = this.shadowRoot;
         if (!root) {
             return;
@@ -163,6 +479,10 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
         return 'false';
     }
     set value(v: string) {
+        if (this._settingValue) {
+            return;
+        }
+
         this._value = v || '';
 
         const isRadio = this.hasAttribute('radio');
@@ -260,320 +580,7 @@ export class TavenemCheckboxHtmlElement extends HTMLElement {
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
-        style.textContent = `
-:host {
-    --button-inherited-padding-y-icon: 6px;
-    border: 0;
-    color: var(--tavenem-color-text);
-    display: inline-flex;
-    flex-basis: auto;
-    flex-direction: column;
-    flex-grow: 0;
-    flex-shrink: 0;
-    margin: 0;
-    max-width: 100%;
-    padding: 0;
-    position: relative;
-    vertical-align: top;
-}
-
-:host(:has(:focus-visible):not(.disabled, [inert])) {
-    background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
-}
-
-:host(.small) {
-    --button-inherited-font-size-icon: 1.25rem;
-    --button-inherited-padding-y-icon: 5px;
-}
-
-:host(.large) {
-    --button-inherited-font-size-icon: 2rem;
-    --button-inherited-padding-y-icon: 5px;
-}
-
-:host(.dense) {
-    --button-inherited-padding-y-icon: 2px;
-}
-
-:host(:disabled, [inert]) {
-    --checkbox-inherited-color: var(--tavenem-color-action-disabled);
-    --checkbox-inherited-hover-bg: transparent;
-}
-
-:host([readonly], [readonly]:hover) {
-    --checkbox-inherited-hover-bg: transparent;
-    cursor: default;
-    pointer-events: none;
-
-    * {
-        cursor: default;
-        pointer-events: none;
-    }
-}
-
-:host(:invalid:state(touched)) {
-    --checkbox-inherited-color: var(--tavenem-color-error);
-    --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
-}
-
-:host(:where(
-    .primary,
-    .secondary,
-    .tertiary,
-    .danger,
-    .dark,
-    .default,
-    .info,
-    .success,
-    .warning)) {
-    --checkbox-inherited-color: var(--tavenem-theme-color);
-    --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
-    color: var(--tavenem-color-action);
-}
-
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
-.checkbox {
-    align-items: center;
-    box-sizing: border-box;
-    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
-    cursor: pointer;
-    display: inline-flex;
-    pointer-events: auto;
-    position: relative;
-    transform: none;
-    vertical-align: middle;
-    z-index: auto;
-    -webkit-tap-highlight-color: transparent;
-}
-
-input {
-    -webkit-appearance: none;
-    appearance: none;
-    background: none;
-    border: none;
-    border-radius: var(--tavenem-border-radius);
-    box-shadow: none;
-    box-sizing: content-box;
-    color: currentColor;
-    cursor: inherit;
-    display: block;
-    font: inherit;
-    height: 100%;
-    left: 0;
-    margin: 0;
-    min-height: calc(1.25rem + 10px);
-    min-width: 0;
-    opacity: var(--tavenem-field-input-opacity, unset);
-    overflow: visible;
-    padding: 0;
-    position: absolute;
-    top: 0;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    width: 100%;
-    z-index: 1;
-    -webkit-tap-highlight-color: transparent;
-
-    &:focus {
-        outline: 0;
-    }
-
-    &:disabled,
-    &[readonly] {
-        opacity: 1;
-    }
-}
-
-input:-webkit-autofill {
-    border-radius: inherit;
-}
-
-::-moz-focus-inner {
-    padding: 0;
-    border-style: none;
-}
-
-.btn {
-    --button-hover-bg: var(--tavenem-color-action-hover-bg);
-    --button-hover-color: inherit;
-    --button-padding-x: 6px;
-    --button-padding-y: 6px;
-    align-items: center;
-    background-color: transparent;
-    border: none;
-    border-radius: 9999px;
-    box-sizing: border-box;
-    color: inherit;
-    cursor: pointer;
-    display: inline-flex;
-    flex: 0 0 auto;
-    font-size: 1.5rem;
-    font-weight: var(--tavenem-font-weight-semibold);
-    gap: .25rem;
-    justify-content: center;
-    line-height: 1;
-    margin: 0;
-    min-width: calc(1.5rem + (var(--button-padding-x) * 2));
-    outline: 0;
-    overflow: hidden;
-    padding: var(--button-padding-y) var(--button-padding-x);
-    position: relative;
-    text-align: center;
-    text-decoration: none;
-    text-transform: var(--tavenem-texttransform-button);
-    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-    user-select: none;
-    vertical-align: middle;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-
-    &:after {
-        background-image: radial-gradient(circle,#000 10%,transparent 10.01%);
-        background-position: 50%;
-        background-repeat: no-repeat;
-        content: "";
-        display: block;
-        height: 100%;
-        left: 0;
-        opacity: 0;
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        transform: scale(7,7);
-        transition: transform .3s,opacity 1s;
-        width: 100%;
-    }
-
-    &:hover,
-    &:focus-visible {
-        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
-        color: var(--button-hover-color);
-    }
-
-    &:active:after {
-        transform: scale(0,0);
-        opacity: .1;
-        transition: 0s;
-    }
-
-    :host(.primary) &,
-    :host(.secondary) &,
-    :host(.tertiary) &,
-    :host(.danger) &,
-    :host(.dark) &,
-    :host(.default) &,
-    :host(.info) &,
-    :host(.success) &,
-    :host(.warning) & {
-        --button-hover-bg: var(--tavenem-theme-color-hover);
-        --button-hover-color: var(--tavenem-theme-color);
-    }
-}
-.btn::-moz-focus-inner {
-    border-style: none;
-}
-
-::slotted(tf-icon) {
-    color: var(--checkbox-inherited-color, var(--tavenem-color-action)) !important;
-    font-size: inherit !important;
-
-    &:hover {
-        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg)) !important;
-    }
-}
-
-svg {
-    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
-    height: 1.5em;
-    fill: currentColor;
-    flex-shrink: 0;
-    max-height: 1em;
-    width: auto;
-
-    &:hover {
-        background-color: var(--checkbox-inherited-hover-bg, var(--tavenem-color-action-hover-bg));
-    }
-}
-
-slot[name="checked"],
-slot[name="indeterminate"] {
-    display: none;
-}
-
-:host(:state(checked)) {
-    slot[name="checked"] {
-        display: contents;
-    }
-
-    slot[name="unchecked"] {
-        display: none;
-    }
-}
-
-:host(:state(indeterminate)) {
-    slot[name="indeterminate"] {
-        display: contents;
-    }
-
-    slot[name="unchecked"] {
-        display: none;
-    }
-}
-
-label {
-    display: inline-block;
-}
-
-.field-helpers {
-    color: var(--checkbox-inherited-color, var(--tavenem-color-action));
-    display: none;
-    font-size: 0.75rem;
-    font-weight: var(--tavenem-font-weight);
-    line-height: 1.66;
-    margin-top: 3px;
-    overflow: hidden;
-    padding-inline-start: var(--button-inherited-padding-y-icon);
-    text-align: start;
-
-    :has(slot::slotted(*)) {
-        display: flex;
-    }
-}
-
-:host([readonly]) {
-    cursor: default;
-    pointer-events: none;
-
-    * {
-        cursor: default;
-        pointer-events: none;
-    }
-}
-
-:host([required]) label:after {
-    color: var(--tavenem-color-error);
-    content: " *";
-}
-
-:host([disabled]), :host([inert]) {
-    background-color: transparent;
-    color: var(--tavenem-color-action-disabled);
-    cursor: default;
-
-    * {
-        background-color: transparent;
-        color: var(--tavenem-color-text-disabled);
-        cursor: default;
-    }
-
-    svg,
-    ::slotted(tf-icon) {
-        color: var(--tavenem-color-action-disabled) !important;
-    }
-}`;
+        style.textContent = TavenemCheckboxHtmlElement.style;
         shadow.appendChild(style);
 
         const field = document.createElement('div');
@@ -762,9 +769,11 @@ label {
         const isRadio = this.hasAttribute('radio');
 
         if (name === 'checked') {
-            this.checked = !!newValue;
+            if (!this._settingValue && newValue != null) {
+                this.checked = true;
+            }
         } else if (name === 'data-allow-null') {
-            if (!!newValue
+            if ((newValue != null)
                 && this.hasAttribute('indeterminate')
                 && !this.hasAttribute('checked')) {
                 this._settingValue = true;
@@ -787,7 +796,7 @@ label {
         } else if (name === 'data-input-style') {
             input.style.cssText = newValue || '';
         } else if (name === 'indeterminate') {
-            if (input.indeterminate != !!newValue) {
+            if (input.indeterminate != (newValue != null)) {
                 this._settingValue = true;
                 if (newValue) {
                     this._checked = false;
@@ -829,9 +838,9 @@ label {
                 this._settingValue = false;
             }
         } else if (name === 'readonly') {
-            input.readOnly = !!newValue;
+            input.readOnly = (newValue != null);
         } else if (name === 'required') {
-            if (!!newValue
+            if ((newValue != null)
                 && (this._indeterminate
                     || ('requiresTrue' in this.dataset
                         && !this._checked))) {
@@ -862,7 +871,7 @@ label {
 
     formResetCallback() { this.reset(); }
 
-    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+    formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete') {
         if (typeof state === 'string') {
             this.value = state;
         } else if (state == null) {

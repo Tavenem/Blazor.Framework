@@ -19,18 +19,7 @@
     <code>RadioButton</code> children.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value1">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -38,26 +27,19 @@
 
 @code {
     private int _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value1">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <p>
     You can add the <code>inline</code> class to place the radio buttons horizontally.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value2" Class="inline">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -65,31 +47,19 @@
 
 @code {
     private int _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value2" Class="inline">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <p>
     You can add the <code>dense</code> class to reduce the space between radio buttons.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value3" Class="dense">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-            <RadioGroup @bind-Value="_value4" Class="inline dense">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Class=""dense"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value1"" Class=""dense"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -102,31 +72,24 @@
 
 @code {
     private int _value1, _value2;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value3" Class="dense">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+    <RadioGroup @bind-Value="_value4" Class="inline dense">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <p>
     You can add a label to the group as a whole with the <code>Label</code> property.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value5" Label="Label">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-            <RadioGroup @bind-Value="_value6" Label="Label" Class="inline">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Label=""Label"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value1"" Label=""Label"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -139,9 +102,18 @@
 
 @code {
     private int _value1, _value2;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value5" Label="Label">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+    <RadioGroup @bind-Value="_value6" Label="Label" Class="inline">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <p>
     A <code>RadioGroup</code>'s <code>Value</code> property can be bound to a single expression,
@@ -153,19 +125,7 @@
     for that particular component.
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value7" Class="inline">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-            <span>Bound value: @_value7</span>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -174,9 +134,14 @@
 
 @code {
     private int _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value7" Class="inline">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+    <span>Bound value: @_value7</span>
+</CodeExample>
 
 <p>
     Note that prior to selecting a button, the bound value contains a default value when the bound
@@ -184,19 +149,7 @@
     user has not yet selected a button:
 </p>
 
-<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value8" Class="inline">
-                <RadioButton TValue="int?" Value="1" Label="One" />
-                <RadioButton TValue="int?" Value="2" Label="Two" />
-                <RadioButton TValue="int?" Value="3" Label="Three" />
-            </RadioGroup>
-            <span>Bound value: @(_value8.HasValue ? _value8.ToString() : "null")</span>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value"" Class=""inline"">
     <RadioButton TValue=""int?"" Value=""1"" Label=""One"" />
     <RadioButton TValue=""int?"" Value=""2"" Label=""Two"" />
     <RadioButton TValue=""int?"" Value=""3"" Label=""Three"" />
@@ -205,9 +158,14 @@
 
 @code {
     private int? _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value8" Class="inline">
+        <RadioButton TValue="int?" Value="1" Label="One" />
+        <RadioButton TValue="int?" Value="2" Label="Two" />
+        <RadioButton TValue="int?" Value="3" Label="Three" />
+    </RadioGroup>
+    <span>Bound value: @(_value8.HasValue ? _value8.ToString() : "null")</span>
+</CodeExample>
 
 <p>
     The <code>CheckedIcon</code> and <code>UncheckedIcon</code> properties can be used to customize
@@ -224,18 +182,7 @@
     <code>RadioButton</code>s.
 </p>
 
-<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value9" Class="inline" CheckedIcon="done" UncheckedIcon="highlight_off">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" CheckedIcon="thumb_up" UncheckedIcon="thumb_down" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Class=""inline"" CheckedIcon=""done"" UncheckedIcon=""highlight_off"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value"" Class=""inline"" CheckedIcon=""done"" UncheckedIcon=""highlight_off"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" CheckedIcon=""thumb_up"" UncheckedIcon=""thumb_down"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -243,9 +190,13 @@
 
 @code {
     private int _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value9" Class="inline" CheckedIcon="done" UncheckedIcon="highlight_off">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" CheckedIcon="thumb_up" UncheckedIcon="thumb_down" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <h2>Dynamic radio buttons</h2>
 
@@ -255,39 +206,21 @@
     item in the set will produce a dynamic radio button with its value set to that item.
 </p>
 
-<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value10" Values="_values1" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Values=""_values"" />
+<CodeExample IsOpen="true" Code="@(@"<RadioGroup @bind-Value=""_value"" Values=""_values"" />
 
 @code {
     private int _value;
     private int[] _values = new[] { 1, 2, 3 };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value10" Values="_values1" />
+</CodeExample>
 
 <p>
     If you provide a <code>RenderFragment</code> for the <code>LabelTemplate</code> property, you
     can control the label generated for each item.
 </p>
 
-<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value11" Values="_values1">
-                <LabelTemplate>
-                    Option @context
-                </LabelTemplate>
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Values=""_values"">
+<CodeExample IsOpen="true" Code="@(@"<RadioGroup @bind-Value=""_value"" Values=""_values"">
     <LabelTemplate>
         Option @context
     </LabelTemplate>
@@ -296,9 +229,13 @@
 @code {
     private int _value;
     private int[] _values = new[] { 1, 2, 3 };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value11" Values="_values1">
+        <LabelTemplate>
+            Option @context
+        </LabelTemplate>
+    </RadioGroup>
+</CodeExample>
 
 <p>
     You can also assign a collection of <code>KeyValuePair&lt;TValue, string?></code> objects to the
@@ -306,21 +243,14 @@
     buttons, and the values will be used as their labels.
 </p>
 
-<Collapse Id="ce-10" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value12" ValuePairs="_values2" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" ValuePairs=""_values"" />
+<CodeExample IsOpen="true" Code="@(@"<RadioGroup @bind-Value=""_value"" ValuePairs=""_values"" />
 
 @code {
     private int _value;
     private List<KeyValuePair<int, string?>> _values = new() { new(1, ""One""), new(2, ""Two""), new(3, ""Three"") };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value12" ValuePairs="_values2" />
+</CodeExample>
 
 <p>
     Note that all three options can be used in combination: explicit <code>RadioButton</code>
@@ -328,16 +258,7 @@
     work together (and will appear in that order).
 </p>
 
-<Collapse Id="ce-11" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value13" Values="_values1" ValuePairs="_values3">
-                <RadioButton Value="0" Label="Zero" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Values=""_values1"" ValuePairs=""_values2"">
+<CodeExample IsOpen="true" Code="@(@"<RadioGroup @bind-Value=""_value"" Values=""_values1"" ValuePairs=""_values2"">
     <RadioButton Value=""0"" Label=""Zero"" />
 </RadioGroup>
 
@@ -345,9 +266,11 @@
     private int _value;
     private int[] _values1 = new[] { 1, 2, 3 };
     private List<KeyValuePair<int, string?>> _values2 = new() { new(4, ""Four""), new(5, ""Five""), new(6, ""Six"") };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value13" Values="_values1" ValuePairs="_values3">
+        <RadioButton Value="0" Label="Zero" />
+    </RadioGroup>
+</CodeExample>
 
 <h2>Name</h2>
 
@@ -372,23 +295,7 @@
     The group can be set as disabled or read-only by setting the properties of the same names.
 </p>
 
-<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_disabled" Label="Disabled" Disabled="true">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-            <RadioGroup @bind-Value="_disabled" Label="Read-only" ReadOnly="true">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_disabled"" Disabled=""true"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_disabled"" Disabled=""true"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -401,9 +308,18 @@
 
 @code {
     private int _disabled = 2;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_disabled" Label="Disabled" Disabled="true">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+    <RadioGroup @bind-Value="_disabled" Label="Read-only" ReadOnly="true">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <h2>Required</h2>
 
@@ -420,18 +336,7 @@
     will be set accordingly.
 </p>
 
-<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value14" Label="Required" Required="true">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value"" Label=""Label"" Required=""true"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value"" Label=""Label"" Required=""true"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -439,9 +344,13 @@
 
 @code {
     private int _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value14" Label="Required" Required="true">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <h2>Tab index</h2>
 
@@ -495,23 +404,7 @@
     <code>RadioButton</code>s can also be assigned an overriding theme.
 </p>
 
-<Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <RadioGroup @bind-Value="_value15" Class="inline" ThemeColor="ThemeColor.Primary">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" ThemeColor="ThemeColor.Secondary" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-            <RadioGroup @bind-Value="_value16" Class="inline" ThemeColor="ThemeColor.Tertiary">
-                <RadioButton Value="1" Label="One" />
-                <RadioButton Value="2" Label="Two" ThemeColor="ThemeColor.Success" />
-                <RadioButton Value="3" Label="Three" />
-            </RadioGroup>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<RadioGroup @bind-Value=""_value1"" Class=""inline"" ThemeColor=""ThemeColor.Primary"">
+<CodeExample Code="@(@"<RadioGroup @bind-Value=""_value1"" Class=""inline"" ThemeColor=""ThemeColor.Primary"">
     <RadioButton Value=""1"" Label=""One"" />
     <RadioButton Value=""2"" Label=""Two"" ThemeColor=""ThemeColor.Secondary"" />
     <RadioButton Value=""3"" Label=""Three"" />
@@ -524,9 +417,18 @@
 
 @code {
     private int _value1, _value2;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <RadioGroup @bind-Value="_value15" Class="inline" ThemeColor="ThemeColor.Primary">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" ThemeColor="ThemeColor.Secondary" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+    <RadioGroup @bind-Value="_value16" Class="inline" ThemeColor="ThemeColor.Tertiary">
+        <RadioButton Value="1" Label="One" />
+        <RadioButton Value="2" Label="Two" ThemeColor="ThemeColor.Success" />
+        <RadioButton Value="3" Label="Three" />
+    </RadioGroup>
+</CodeExample>
 
 <p>
     The <code>InputClass</code> and <code>InputStyle</code> properties of <code>RadioButton</code>

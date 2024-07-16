@@ -424,8 +424,8 @@
                 <DateTimeInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
             </div>
             <div class="row mt-3 fill align-items-center gap-2">
-                <DateTimeInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Inline="true" />
-                <DateTimeInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Inline="true" />
+                <DateTimeInput @bind-Value="_disabled" Label="Disabled" Disabled="true" DisplayType="PickerDisplayType.Inline" />
+                <DateTimeInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" DisplayType="PickerDisplayType.Inline" />
             </div>
         </div>
     </TitleContent>
@@ -441,8 +441,8 @@
     <DateTimeInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Class=""outlined"" />
 </div>
 <div class=""row mt-3 fill align-items-center gap-2"">
-    <DateTimeInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Inline=""true"" />
-    <DateTimeInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" Inline=""true"" />
+    <DateTimeInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" DisplayType=""PickerDisplayType.Inline"" />
+    <DateTimeInput @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" DisplayType=""PickerDisplayType.Inline"" />
 </div>
 
 @code {

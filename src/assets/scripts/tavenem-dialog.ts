@@ -27,6 +27,13 @@ export function initialize(dialog: HTMLDialogElement) {
     position(dialog);
 }
 
+export function initializeId(id: string) {
+    const dialog = document.getElementById(id);
+    if (dialog instanceof HTMLDialogElement) {
+        initialize(dialog);
+    }
+}
+
 export function showModal(dialog: HTMLDialogElement) {
     dialog.showModal();
     position(dialog);

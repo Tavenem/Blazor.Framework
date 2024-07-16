@@ -111,11 +111,12 @@
 .button-group {
     box-shadow: var(--tavenem-shadow-1);
     --button-inherited-active-shadow: var(--tavenem-shadow-2);
-    --button-inherited-bg: var(--tavenem-color-default);
-    --button-inherited-color: var(--tavenem-color-default-text);
+    --button-inherited-bg: var(--tavenem-theme-color, var(--tavenem-color-default));
+    --button-inherited-border-color: var(--tavenem-theme-color-text);
+    --button-inherited-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
     --button-inherited-font-size-icon: 1.5rem;
-    --button-inherited-hover-bg: var(--tavenem-color-default-darken);
-    --button-inherited-hover-color: var(--tavenem-color-default-text);
+    --button-inherited-hover-bg: var(--tavenem-theme-color-darken, var(--tavenem-color-default-darken));
+    --button-inherited-hover-color: var(--tavenem-theme-color-text, var(--tavenem-color-default-text));
     --button-inherited-hover-shadow: var(--tavenem-shadow-2);
     --button-inherited-padding-x: 16px;
     --button-inherited-padding-y: 6px;
@@ -146,10 +147,11 @@
         box-shadow: none;
         --button-inherited-active-shadow: none;
         --button-inherited-bg: transparent;
+        --button-inherited-border-color: var(--tavenem-theme-color);
         --button-inherited-border-style: solid;
-        --button-inherited-color: var(--tavenem-color-text);
-        --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-        --button-inherited-hover-color: var(--tavenem-color-action);
+        --button-inherited-color: var(--tavenem-theme-color, var(--tavenem-color-text));
+        --button-inherited-hover-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-action-hover-bg));
+        --button-inherited-hover-color: var(--tavenem-theme-color, var(--tavenem-color-action));
         --button-inherited-hover-shadow: none;
         --button-inherited-padding-x: 15px;
         --button-inherited-padding-y: 5px;
@@ -177,39 +179,16 @@
         --button-inherited-bg: var(--tavenem-theme-color);
         --button-inherited-hover-bg: var(--tavenem-theme-color-darken);
     }
-
-    &.primary,
-    &.secondary,
-    &.tertiary,
-    &.danger,
-    &.dark,
-    &.default,
-    &.info,
-    &.success,
-    &.warning {
-        --button-inherited-bg: var(--tavenem-theme-color);
-        --button-inherited-border-color: var(--tavenem-theme-color-text);
-        --button-inherited-color: var(--tavenem-theme-color-text);
-        --button-inherited-hover-bg: var(--tavenem-theme-color-darken);
-        --button-inherited-hover-color: var(--tavenem-theme-color-text);
-
-        &.outlined {
-            --button-inherited-bg: transparent;
-            --button-inherited-border-color: var(--tavenem-theme-color);
-            --button-inherited-color: var(--tavenem-theme-color);
-            --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
-            --button-inherited-hover-color: var(--tavenem-theme-color);
-        }
-    }
 }
 
 .button-group-text {
     box-shadow: none;
     --button-inherited-active-shadow: none;
     --button-inherited-bg: transparent;
-    --button-inherited-color: var(--tavenem-color-text);
-    --button-inherited-hover-bg: var(--tavenem-color-action-hover-bg);
-    --button-inherited-hover-color: var(--tavenem-color-action);
+    --button-inherited-border-color: var(--tavenem-theme-color);
+    --button-inherited-color: var(--tavenem-theme-color, var(--tavenem-color-text));
+    --button-inherited-hover-bg: var(--tavenem-theme-color-hover, var(--tavenem-color-action-hover-bg));
+    --button-inherited-hover-color: var(--tavenem-theme-color, var(--tavenem-color-action));
     --button-inherited-hover-shadow: none;
     --button-inherited-padding-x: 8px;
     --button-inherited-padding-y: 6px;
@@ -257,22 +236,6 @@
     }
 
     &.darken, &.lighten {
-        --button-inherited-color: var(--tavenem-theme-color);
-        --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
-        --button-inherited-hover-color: var(--tavenem-theme-color);
-    }
-
-    &.primary,
-    &.secondary,
-    &.tertiary,
-    &.danger,
-    &.dark,
-    &.default,
-    &.info,
-    &.success,
-    &.warning {
-        --button-inherited-bg: transparent;
-        --button-inherited-border-color: var(--tavenem-theme-color);
         --button-inherited-color: var(--tavenem-theme-color);
         --button-inherited-hover-bg: var(--tavenem-theme-color-hover);
         --button-inherited-hover-color: var(--tavenem-theme-color);

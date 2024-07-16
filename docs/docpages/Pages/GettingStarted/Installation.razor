@@ -20,14 +20,7 @@
     </pre>
 </pre>
 
-<h2 data-heading-title="Add CSS Link">3. Add CSS Link</h2>
-<p>
-    Add the following link to your HTML head in either <code>index.html</code> (WebAssembly standalone)
-    or <code>App.razor</code> (Web App).
-</p>
-<pre class="codeblock pre-razor-code">
-    @CodeFormatter.CodeToMarkup(@"<link href=""_content/Tavenem.Blazor.Framework/framework.css"" rel=""stylesheet"">", true)
-</pre>
+<h2 data-heading-title="Add CSS Link">3. Remove template boilerplate</h2>
 <p>
     If you started your project with the default Blazor template, delete the references to
     Bootstrap, and all the pregenerated content in the <code>app.css</code> file (you can delete
@@ -56,6 +49,20 @@
     This should be done in the <code>Program.cs</code> of both the client project and the server
     project (for prerendering support) in Web Apps.
 </p>
+
+<p>
+    Additionally, add the following to the server project's <code>Program.cs</code> to ensure that
+    utility classes used by the Framework get (de)serialized properly when using AOT compilation,
+    and as efficiently as possible in all scenarios:
+</p>
+<pre class="codeblock pre-razor-code">
+    <pre class="user-select-all">
+        <span class="pre-attribute">builder</span><span class="pre-operator">.</span><span>Services</span><span class="pre-operator">.</span><span class="pre-method">ConfigureHttpJsonOptions</span>(<span class="pre-attribute">options</span>
+    <span class="pre-operator">=></span> <span class="pre-attribute">options</span><span class="pre-operator">.</span>SerializerOptions<span class="pre-operator">.</span>TypeInfoResolverChain<span class="pre-operator">.</span><span class="pre-method">Insert</span>(
+        <span class="pre-value">0</span><span class="pre-operator">,</span>
+        <span class="pre-class">TavenemFrameworkJsonSerializerContext</span><span class="pre-operator">.</span>Default));
+    </pre>
+</pre>
 
 <h2 data-heading-title="Set up the Framework">5. Set up the Framework (optional, but strongly recommended)</h2>
 <p>Add a <code>FrameworkLayout</code> component to your <code>MainLayout.razor</code> file.</p>

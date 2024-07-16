@@ -269,5 +269,7 @@ a.warning:not(.disabled, :disabled) {
 
 .outlined {
     background-color: transparent;
-    border: 1px solid var(--tavenem-color-border);
+    border-color: var(--tavenem-color-border);
+    border-style: solid;
+    border-width: 1px;
 }

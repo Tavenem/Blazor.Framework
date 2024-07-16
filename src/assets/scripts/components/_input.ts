@@ -2,194 +2,7 @@ import { randomUUID } from "../tavenem-utility";
 
 export class TavenemInputHtmlElement extends HTMLElement {
     static formAssociated = true;
-
-    private _display: string | null | undefined;
-    private _initialDisplay: string | null | undefined;
-    private _initialValue: string | null | undefined;
-    private _inputDebounce: number = -1;
-    private _internals: ElementInternals;
-    private _value = '';
-
-    static get observedAttributes() {
-        return [
-            'data-input-class',
-            'data-input-style',
-            'display',
-            'readonly',
-            'required',
-            'value',
-        ];
-    }
-
-    private static newEnterEvent() {
-        return new CustomEvent('enter', { bubbles: true, composed: true });
-    }
-
-    private static newValueChangeEvent(value: string) {
-        return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
-    private static newValueInputEvent(value: string) {
-        return new CustomEvent('valueinput', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
-    get display() {
-        return this._display && this._display.length
-            ? this._display
-            : this._value;
-    }
-    set display(value: string | null | undefined) {
-        this._display = value;
-
-        let newValue = value;
-        if (value == null || !value.length) {
-            const padLength = parseInt(this.dataset.padLength || '');
-            if (Number.isFinite(padLength)
-                && padLength > this._value.length) {
-                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
-            } else {
-                newValue = this._value;
-            }
-        }
-
-        if (newValue!.length) {
-            this._internals.states.delete('empty');
-            this._internals.states.add('has-value');
-        } else {
-            this._internals.states.add('empty');
-            this._internals.states.delete('has-value');
-        }
-
-        const root = this.shadowRoot;
-        if (root) {
-            const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
-            if (input) {
-                input.value = newValue!;
-            }
-        }
-    }
-
-    get form() { return this._internals.form; }
-
-    get name() { return this.getAttribute('name'); }
-
-    get required() { return this.hasAttribute('required'); }
-    set required(value: boolean) {
-        if (value) {
-            this.setAttribute('required', '');
-        } else {
-            this.removeAttribute('required');
-        }
-    }
-
-    get suggestion() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-
-        const suggestion = root.querySelector('.suggestion');
-        if (suggestion instanceof HTMLElement
-            && suggestion.textContent) {
-            return suggestion.textContent;
-        }
-
-        return null;
-    }
-    set suggestion(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const suggestion = root.querySelector('.suggestion');
-        if (suggestion instanceof HTMLElement) {
-            suggestion.textContent = value || null;
-            delete suggestion.dataset.display;
-            delete suggestion.dataset.value;
-        }
-    }
-
-    get suggestionDisplay() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-
-        const suggestion = root.querySelector('.suggestion');
-        if (suggestion instanceof HTMLElement
-            && suggestion.dataset.display
-            && suggestion.dataset.display.length) {
-            return suggestion.dataset.display;
-        }
-
-        return null;
-    }
-    set suggestionDisplay(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const suggestion = root.querySelector('.suggestion');
-        if (suggestion instanceof HTMLElement) {
-            if (!value || !value.length) {
-                delete suggestion.dataset.display;
-            } else {
-                suggestion.dataset.display = value;
-            }
-        }
-    }
-
-    get suggestionValue() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-
-        const suggestion = root.querySelector('.suggestion');
-        if (suggestion instanceof HTMLElement
-            && suggestion.dataset.value
-            && suggestion.dataset.value.length) {
-            return suggestion.dataset.value;
-        }
-
-        return null;
-    }
-    set suggestionValue(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const suggestion = root.querySelector('.suggestion');
-        if (suggestion instanceof HTMLElement) {
-            if (!value || !value.length) {
-                delete suggestion.dataset.value;
-            } else {
-                suggestion.dataset.value = value;
-            }
-        }
-    }
-
-    get type() { return this.localName; }
-
-    get validity() { return this._internals.validity; }
-    get validationMessage() { return this._internals.validationMessage; }
-
-    get value() { return this._value; }
-    set value(v: string) { this.setValue(v); }
-
-    get willValidate() { return this._internals.willValidate; }
-
-    constructor() {
-        super();
-
-        this._internals = this.attachInternals();
-    }
-
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
-
-        const style = document.createElement('style');
-        style.textContent = `
+    static style = `
 :host {
     align-items: center;
     border-color: var(--field-border-color);
@@ -199,7 +12,6 @@ export class TavenemInputHtmlElement extends HTMLElement {
     column-gap: 8px;
     cursor: text;
     display: inline-flex;
-    flex-grow: 1;
     font-size: var(--field-font-size, 1rem);
     font-weight: var(--tavenem-font-weight);
     line-height: calc(1.1875 * var(--field-font-size, 1rem));
@@ -247,7 +59,6 @@ input {
 
     &:disabled,
     &[readonly] {
-        background-color: var(--tavenem-color-bg-alt);
         opacity: 1;
     }
 
@@ -445,7 +256,7 @@ button.clear {
     }
 
     :host(:disabled) &,
-    :host([readonly]):not(.clearable-readonly) &,
+    :host([readonly]:not(.clearable-readonly)) &,
     :host(:required) &,
     :host(:state(empty)) & {
         display: none;
@@ -454,6 +265,194 @@ button.clear {
 button.clear::-moz-focus-inner {
     border-style: none;
 }`;
+
+    private _display: string | null | undefined;
+    private _initialDisplay: string | null | undefined;
+    private _initialValue: string | null | undefined;
+    private _inputDebounce: number = -1;
+    private _internals: ElementInternals;
+    private _value = '';
+
+    static get observedAttributes() {
+        return [
+            'data-input-class',
+            'data-input-style',
+            'display',
+            'readonly',
+            'required',
+            'value',
+        ];
+    }
+
+    private static newEnterEvent() {
+        return new CustomEvent('enter', { bubbles: true, composed: true });
+    }
+
+    private static newValueChangeEvent(value: string) {
+        return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
+    private static newValueInputEvent(value: string) {
+        return new CustomEvent('valueinput', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
+    get display() {
+        return this._display && this._display.length
+            ? this._display
+            : this._value;
+    }
+    set display(value: string | null | undefined) {
+        this._display = value;
+
+        let newValue = value;
+        if (value == null || !value.length) {
+            const padLength = parseInt(this.dataset.padLength || '');
+            if (Number.isFinite(padLength)
+                && padLength > this._value.length) {
+                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
+            } else {
+                newValue = this._value;
+            }
+        }
+
+        if (newValue!.length) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
+        } else {
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
+        }
+
+        const root = this.shadowRoot;
+        if (root) {
+            const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+            if (input) {
+                input.value = newValue!;
+            }
+        }
+    }
+
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get suggestion() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement
+            && suggestion.textContent) {
+            return suggestion.textContent;
+        }
+
+        return null;
+    }
+    set suggestion(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement) {
+            suggestion.textContent = value || null;
+            delete suggestion.dataset.display;
+            delete suggestion.dataset.value;
+        }
+    }
+
+    get suggestionDisplay() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement
+            && suggestion.dataset.display
+            && suggestion.dataset.display.length) {
+            return suggestion.dataset.display;
+        }
+
+        return null;
+    }
+    set suggestionDisplay(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement) {
+            if (!value || !value.length) {
+                delete suggestion.dataset.display;
+            } else {
+                suggestion.dataset.display = value;
+            }
+        }
+    }
+
+    get suggestionValue() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement
+            && suggestion.dataset.value
+            && suggestion.dataset.value.length) {
+            return suggestion.dataset.value;
+        }
+
+        return null;
+    }
+    set suggestionValue(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const suggestion = root.querySelector('.suggestion');
+        if (suggestion instanceof HTMLElement) {
+            if (!value || !value.length) {
+                delete suggestion.dataset.value;
+            } else {
+                suggestion.dataset.value = value;
+            }
+        }
+    }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
+    }
+
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+
+        const style = document.createElement('style');
+        style.textContent = TavenemInputHtmlElement.style;
         shadow.appendChild(style);
 
         const prefixSlot = document.createElement('slot');
@@ -632,7 +631,7 @@ button.clear::-moz-focus-inner {
                 this.display = newValue;
             }
         } else if (name === 'readonly') {
-            input.readOnly = !!newValue;
+            input.readOnly = (newValue != null);
         } else if (name === 'required') {
             this.setValidity();
         } else if (name === 'value') {
@@ -664,7 +663,7 @@ button.clear::-moz-focus-inner {
 
     formResetCallback() { this.reset(); }
 
-    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+    formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete') {
         if (typeof state === 'string') {
             this.value = state;
         } else if (state == null) {

@@ -40,7 +40,7 @@ export class TavenemPickerHtmlElement extends HTMLElement {
         document.removeEventListener('mousedown', this.onDocMouseDown.bind(this));
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+    attributeChangedCallback(name: string, _oldValue: string | null | undefined, newValue: string | null | undefined) {
         if ((name === 'disabled'
             || name === 'readonly')
             && newValue) {
@@ -310,6 +310,11 @@ export class TavenemPickerHtmlElement extends HTMLElement {
             }
 
             this.onSubmitOption(e);
+
+            if (this._popover.matches(':popover-open')
+                && !this.hasAttribute('multiple')) {
+                this.toggle();
+            }
         } else if (!this._popover.matches(':popover-open')
             || !this.hasAttribute('multiple')) {
             this.toggle();

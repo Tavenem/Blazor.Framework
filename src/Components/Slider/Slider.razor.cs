@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -17,9 +18,6 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     private static readonly TValue _maxDefault, _maxType, _minDefault, _minType, _zero;
     private static readonly bool _isFloatingPoint;
 
-    private readonly AdjustableTimer _timer;
-
-    private bool _disposedValue;
     private int _tickCount;
 
     /// <summary>
@@ -35,29 +33,9 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     [Parameter] public override string ConversionValidationMessage { get; set; } = "{0} must be a number";
 
     /// <summary>
-    /// The format string to use for conversion.
-    /// </summary>
-    [Parameter] public string? Format { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// The <see cref="IFormatProvider"/> to use for conversion.
-    /// </para>
-    /// <para>
-    /// Default is <see cref="CultureInfo.CurrentCulture"/>.
-    /// </para>
-    /// </summary>
-    [Parameter] public IFormatProvider? FormatProvider { get; set; }
-
-    /// <summary>
     /// An optional list of labels for hash marks.
     /// </summary>
     [Parameter] public List<string?>? HashLabels { get; set; }
-
-    /// <summary>
-    /// Custom HTML attributes for the input element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
 
     /// <summary>
     /// <para>
@@ -91,51 +69,15 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     [Parameter] public TValue? Step { get; set; }
 
     /// <summary>
-    /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the
-    /// value changes (rather than on blur or when the enter key is pressed).
-    /// </summary>
-    [Parameter] public bool UpdateOnInput { get; set; }
-
-    /// <summary>
-    /// <para>
-    /// When <see cref="UpdateOnInput"/> is true, this can be set to a number of milliseconds that
-    /// the component will wait before updating the bound <see
-    /// cref="InputBase{TValue}.Value"/>.
-    /// </para>
-    /// <para>
-    /// Even when a debounce is used, the component will always update immediately on blur and when
-    /// the enter key is pressed.
-    /// </para>
+    /// This can be set to a number of milliseconds that the component will wait before updating the
+    /// bound <see cref="InputBase{TValue}.Value"/>.
     /// </summary>
     [Parameter] public int? UpdateOnInputDebounce { get; set; }
 
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("field")
-        .Add("disabled", Disabled)
-        .Add("read-only", ReadOnly)
-        .Add("required", Required)
-        .Add("no-label", string.IsNullOrEmpty(Label))
-        .Add("modified", IsTouched)
-        .Add("valid", IsValid)
-        .Add("invalid", IsInvalidAndTouched)
-        .Add("slider")
         .Add("hash-labels", HashLabels?.Count > 0)
         .ToString();
-
-    /// <inheritdoc/>
-    protected override string? InputCssClass => new CssBuilder(InputClass)
-        .AddClassFromDictionary(InputAttributes)
-        .ToString();
-
-    /// <inheritdoc/>
-    protected override string? InputCssStyle => new CssBuilder(InputStyle)
-        .AddStyleFromDictionary(InputAttributes)
-        .ToString();
-
-    private double BarWidth { get; set; }
-
-    private string? InputValue { get; set; }
 
     private double MaxDouble { get; set; }
 
@@ -284,8 +226,6 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     /// </summary>
     public Slider()
     {
-        _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
-
         Max = _maxDefault;
         Min = _minDefault;
     }
@@ -325,8 +265,6 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
             CurrentValue = Max;
         }
 
-        InputValue = CurrentValueAsString;
-
         MaxDouble = Convert.ToDouble(Max);
         MinDouble = Convert.ToDouble(Min);
         var step = Step is null ? 1 : Convert.ToDouble(Step);
@@ -335,24 +273,6 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
         {
             _tickCount /= 2;
         }
-
-        BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(Value) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
-    {
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                _timer.Dispose();
-            }
-
-            _disposedValue = true;
-        }
-
-        base.Dispose(disposing);
     }
 
     /// <inheritdoc/>
@@ -381,14 +301,10 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
         validationErrorMessage = null;
-        var success = value.TryParseValue(Min, Max, out result, FormatProvider);
+        var success = value.TryParseValue(Min, Max, out result);
 
         HasConversionError = !success;
-        if (success)
-        {
-            BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(result) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
-        }
-        else
+        if (!success)
         {
             validationErrorMessage = GetConversionValidationMessage();
         }
@@ -396,60 +312,11 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
         return success;
     }
 
-    private void OnInput(ChangeEventArgs e)
+    private void OnChange(ValueChangeEventArgs e)
     {
-        InputValue = e.Value as string;
-        if (string.Equals(CurrentValueAsString, InputValue))
+        if (!string.Equals(CurrentValueAsString, e.Value, StringComparison.Ordinal))
         {
-            return;
+            CurrentValueAsString = e.Value;
         }
-
-        if (!UpdateOnInput)
-        {
-            if (InputValue.TryParseValue(Min, Max, out var result))
-            {
-                BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(result) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
-            }
-
-            return;
-        }
-
-        if (UpdateOnInputDebounce > 0)
-        {
-            if (InputValue.TryParseValue(Min, Max, out var result))
-            {
-                BarWidth = Math.Clamp(100.0 * (Convert.ToDouble(result) - MinDouble) / (MaxDouble - MinDouble), 0, 100);
-            }
-
-            _timer.Change(UpdateOnInputDebounce.Value);
-        }
-        else
-        {
-            CurrentValueAsString = InputValue;
-        }
-    }
-
-    private async Task OnChangeAsync(ChangeEventArgs e)
-    {
-        _timer.Cancel();
-
-        var str = e.Value as string;
-        CurrentValueAsString = str;
-        if (CurrentValueAsString != str)
-        {
-            var x = CurrentValueAsString;
-            CurrentValueAsString = EqualityComparer<TValue>.Default.Equals(Value, _zero)
-                ? "1"
-                : "0";
-            await Task.Delay(1);
-
-            CurrentValueAsString = x;
-        }
-    }
-
-    private void OnTimer()
-    {
-        CurrentValueAsString = InputValue;
-        StateHasChanged();
     }
 }

@@ -24,9 +24,9 @@ input {
 }
 
 :host {
-    --field-active-border-color: var(--tavenem-color-primary);
-    --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
-    --field-active-label-color: var(--tavenem-color-primary);
+    --field-active-border-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
+    --field-active-border-hover-color: var(--tavenem-theme-color-lighten, var(--tavenem-color-primary-lighten));
+    --field-active-label-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
     --field-border-color: var(--tavenem-color-border-input);
     --field-border-hover-color: var(--tavenem-color-action);
     --field-color: var(--tavenem-color-text);
@@ -39,7 +39,6 @@ input {
     display: flex;
     flex-basis: auto;
     flex-direction: column;
-    flex-grow: 1;
     flex-shrink: 1;
     margin: 0;
     max-width: 100%;
@@ -215,14 +214,12 @@ tf-input svg {
     border-color: var(--field-border-hover-color);
 }
 
-:host([inline]:not(.filled, .outlined)) > label,
 :host(:focus-within:not(.filled, .outlined)) > label,
 :host([placeholder]:not(.filled, .outlined)) > label,
 :host(:state(has-value):not(.filled, .outlined)) > label {
     transform: translate(0, 1.5px) scale(.75);
 }
 
-:host([inline].filled) > label,
 :host(.filled:focus-within) > label,
 :host([placeholder].filled) > label,
 :host(.filled:state(has-value)) > label {
@@ -233,7 +230,6 @@ tf-input svg {
     }
 }
 
-:host([inline].outlined) > label,
 :host(.outlined:focus-within) > label,
 :host([placeholder].outlined) > label,
 :host(.outlined:state(has-value)) > label {
@@ -256,6 +252,10 @@ tf-input svg {
     > label {
         transform: translate(0, calc(1.25rem + 8px)) scale(1);
     }
+}
+
+:host([inline].dense) {
+    margin-top: 1rem;
 }
 
 :host(.dense.filled) {
@@ -301,14 +301,12 @@ tf-input svg {
     padding-top: 2.5px;
 }
 
-:host([inline].dense:not(.filled, .outlined)) > label,
 :host(.dense:focus-within:not(.filled, .outlined)) > label,
 :host([placeholder].dense:not(.filled, .outlined)) > label,
 :host(.dense:not(.filled, .outlined):state(has-value)) > label {
     transform: translate(0, 1.5px) scale(.75);
 }
 
-:host([inline].dense.filled) > label,
 :host(.dense.filled:focus-within) > label,
 :host([placeholder].dense.filled) > label,
 :host(.dense.filled:state(has-value)) > label {
@@ -319,7 +317,6 @@ tf-input svg {
     }
 }
 
-:host([inline].dense.outlined) > label,
 :host(.dense.outlined:focus-within) > label,
 :host([placeholder].dense.outlined) > label,
 :host(.dense.outlined:state(has-value)) > label {
@@ -328,6 +325,10 @@ tf-input svg {
     *[dir="rtl"] & {
         transform: translate(-5px, -6px) scale(.75);
     }
+}
+
+:host([inline]) > label {
+    transform: translate(0, -1rem) scale(.75) !important;
 }
 
 input::placeholder {
@@ -487,11 +488,9 @@ button, .btn {
 
     &:disabled, &[inert], [inert] & {
         --button-active-shadow: none;
-        --button-bg: var(--tavenem-color-action-disabled-bg);
         --button-color: var(--tavenem-color-text-disabled);
         --button-hover-shadow: none;
         --button-shadow: none;
-        background-color: var(--tavenem-color-action-disabled-bg);
         border-color: var(--tavenem-color-action-disabled-bg);
         color: var(--tavenem-color-text-disabled);
         cursor: default;
@@ -524,6 +523,7 @@ button::-moz-focus-inner,
 .picker-btn {
     align-self: center;
     border-radius: inherit;
+    color: var(--tavenem-theme-color, inherit);
 }
 
 .input-content {

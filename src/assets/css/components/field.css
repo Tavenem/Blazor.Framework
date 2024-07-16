@@ -1,7 +1,7 @@
 .field {
-    --field-active-border-color: var(--tavenem-color-primary);
-    --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
-    --field-active-label-color: var(--tavenem-color-primary);
+    --field-active-border-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
+    --field-active-border-hover-color: var(--tavenem-theme-color-lighten, var(--tavenem-color-primary-lighten));
+    --field-active-label-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
     --field-border-color: var(--tavenem-color-border-input);
     --field-border-hover-color: var(--tavenem-color-action);
     --field-color: var(--tavenem-color-text);
@@ -351,40 +351,26 @@
         background-color: transparent;
     }
 
-    &.primary,
-    &.secondary,
-    &.tertiary,
-    &.danger,
-    &.dark,
-    &.default,
-    &.info,
-    &.success,
-    &.warning {
-        &:not(.invalid, :invalid, .disabled, :disabled, [inert]) {
-            --field-active-border-color: var(--tavenem-theme-color);
-            --field-active-border-hover-color: var(--tavenem-theme-color-lighten);
-            --field-active-label-color: var(--tavenem-theme-color);
-            --field-border-color: var(--tavenem-theme-color);
-            --field-border-hover-color: var(--tavenem-theme-color-lighten);
-            --field-label-color: var(--tavenem-theme-color);
-        }
-
-        > .input {
-        }
-
-        &.filled {
-            background-color: transparent;
+    &.primary.filled,
+    &.secondary.filled,
+    &.tertiary.filled,
+    &.danger.filled,
+    &.dark.filled,
+    &.default.filled,
+    &.info.filled,
+    &.success.filled,
+    &.warning.filled {
+        background-color: transparent;
             
-            > .input {
-                background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), .09);
+        > .input {
+            background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), .09);
 
-                &:hover {
-                    background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), 0.13);
-                }
+            &:hover {
+                background-color: hsla(var(--tavenem-theme-color-hue), var(--tavenem-theme-color-saturation), var(--tavenem-theme-color-lightness), 0.13);
+            }
 
-                &:disabled, &[inert], [inert] & {
-                    background-color: var(--tavenem-theme-color-hover-bright);
-                }
+            &:disabled, &[inert], [inert] & {
+                background-color: var(--tavenem-theme-color-hover-bright);
             }
         }
     }

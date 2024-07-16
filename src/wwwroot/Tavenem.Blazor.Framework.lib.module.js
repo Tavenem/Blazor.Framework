@@ -8,11 +8,6 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
     }
     afterStartedComplete = true;
 
-    blazor.registerCustomEventType('enter', {
-        createEventArgs: () => {
-            return {};
-        }
-    });
     blazor.registerCustomEventType('crop', {
         createEventArgs: (event) => {
             if (event instanceof CustomEvent
@@ -43,13 +38,9 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
             };
         }
     });
-    blazor.registerCustomEventType('searchinput', {
-        createEventArgs: (event) => {
-            return {
-                value: event instanceof CustomEvent
-                    && event.detail
-                    && event.detail.value
-            };
+    blazor.registerCustomEventType('enter', {
+        createEventArgs: () => {
+            return {};
         }
     });
     blazor.registerCustomEventType('inputtoggle', {
@@ -59,6 +50,34 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
                     && event.detail
                     ? event.detail.value
                     : null
+            };
+        }
+    });
+    blazor.registerCustomEventType('lastpage', {
+        createEventArgs: () => {
+            return {};
+        }
+    });
+    blazor.registerCustomEventType('nextpage', {
+        createEventArgs: () => {
+            return {};
+        }
+    });
+    blazor.registerCustomEventType('searchinput', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            };
+        }
+    });
+    blazor.registerCustomEventType('stream', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
             };
         }
     });
@@ -72,15 +91,6 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
         }
     });
     blazor.registerCustomEventType('valueinput', {
-        createEventArgs: (event) => {
-            return {
-                value: event instanceof CustomEvent
-                    && event.detail
-                    && event.detail.value
-            };
-        }
-    });
-    blazor.registerCustomEventType('stream', {
         createEventArgs: (event) => {
             return {
                 value: event instanceof CustomEvent

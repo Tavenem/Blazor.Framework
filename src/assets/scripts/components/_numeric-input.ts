@@ -195,7 +195,6 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
     display: flex;
     flex-basis: auto;
     flex-direction: column;
-    flex-grow: 1;
     flex-shrink: 1;
     margin-bottom: .5rem;
     margin-left: 0;
@@ -315,6 +314,7 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
 
 :host(.outlined) > .input {
     background-color: var(--tavenem-color-bg-alt);
+    border-color: var(--tavenem-border-color);
     border-style: solid;
     border-width: 1px;
     padding-bottom: 5px;
@@ -1128,7 +1128,7 @@ button::-moz-focus-inner {
         } else if (name === 'min') {
             this.setMin(newValue);
         } else if (name === 'readonly') {
-            input.readOnly = !!newValue;
+            input.readOnly = (newValue != null);
         } else if (name === 'required') {
             this.setValidity();
         } else if (name === 'value') {

@@ -1,10 +1,8 @@
-﻿<Collapse Id="@Id" IsInitiallyOpen="IsOpen" Class="align-self-stretch outlined align-self-stretch mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="@RowCssClass">
-            @CodeFragment
-        </div>
-    </TitleContent>
-    <ChildContent>
+﻿<div id="@Id" class="align-self-stretch outlined mb-3">
+    <div class="@RowCssClass">
+        @ChildContent
+    </div>
+    <Collapse Id="@Id" Title="Show/hide code sample" IsInitiallyOpen="IsOpen" Class="align-self-stretch outlined" BodyClass="codeblock pre-razor-code">
         @CodeFormatter.CodeToMarkup(Code)
-    </ChildContent>
-</Collapse>
+    </Collapse>
+</div>

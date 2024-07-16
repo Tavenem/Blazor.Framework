@@ -1,57 +1,48 @@
 ﻿@namespace Tavenem.Blazor.Framework
 
 @typeparam TValue
-
 @inherits FormComponentBase<TValue>
 
-<div @attributes="AdditionalAttributes" class="@CssClass" style="@CssStyle">
-    @if (!string.IsNullOrEmpty(Label))
-    {
-        <label for="@Id">@Label</label>
-    }
-    <tf-slider data-value="@CurrentValueAsString">
-        <div class="input">
-            <div class="hashes">
-                @for (var i = 0; i < _tickCount; i++)
+<tf-slider @ref="ElementReference"
+           @attributes="AdditionalAttributes"
+           id="@Id"
+           autofocus="@AutoFocus"
+           class="@CssClass"
+           data-input-debounce="@UpdateOnInputDebounce"
+           data-label="@Label"
+           data-value="@CurrentValueAsString"
+           disabled="@Disabled"
+           max="@MaxString"
+           min="@MinString"
+           name="@NameValue"
+           readonly="@ReadOnly"
+           required="@Required"
+           step="@StepString"
+           style="@CssStyle"
+           tabindex="@TabIndex"
+           value="@CurrentValueAsString"
+           @onvaluechange="OnChange">
+    <div class="hashes" slot="hashes">
+        @for (var i = 0; i < _tickCount; i++)
+        {
+            var index = i;
+            <div>
+                <span />
+                @if (HashLabels?.Count > index)
                 {
-                    var index = i;
-                    <div>
-                        <span />
-                        @if (HashLabels?.Count > index)
-                        {
-                            <span>@HashLabels[index]</span>
-                        }
-                    </div>
+                    <span>@HashLabels[index]</span>
                 }
             </div>
-            <input @ref="ElementReference"
-                   @attributes="InputAttributes"
-                   id="@Id"
-                   type="range"
-                   class="@InputCssClass"
-                   style="@InputCssStyle"
-                   autofocus="@AutoFocus"
-                   disabled="@(Disabled || ReadOnly)"
-                   max="@MaxString"
-                   min="@MinString"
-                   name="@NameValue"
-                   step="@StepString"
-                   tabindex="@TabIndex"
-                   value="@CurrentValueAsString"
-                   @oninput="OnInput"
-                   @onchange="OnChangeAsync" />
-        </div>
-    </tf-slider>
+        }
+    </div>
+    @ChildContent
     @if (IsInvalidAndTouched)
     {
-        <div class="field-helpers">
-            <ul class="mr-auto mb-0 pl-0">
-                @foreach (var message in GetValidationMessages())
-                {
-                    <li>@message</li>
-                }
-            </ul>
-        </div>
+        <ul slot="helpers" class="mr-auto mb-0 pl-0">
+            @foreach (var message in GetValidationMessages())
+            {
+                <li>@message</li>
+            }
+        </ul>
     }
-    @ChildContent
-</div>
+</tf-slider>

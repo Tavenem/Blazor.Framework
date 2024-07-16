@@ -25,24 +25,7 @@
     the <code>IsOpen</code> bindable public property reflects its current state.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-1-1" Title="Click here">This is the body</Collapse>
-            <Collapse Id="c-1-2">
-                <TitleContent>
-                    <div class="d-flex align-items-center">
-                        <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
-                    </div>
-                </TitleContent>
-                <ChildContent>
-                    This is the body
-                </ChildContent>
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"">This is the body</Collapse>
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Title=""Click here"">This is the body</Collapse>
 <Collapse>
     <TitleContent>
         <div class=""d-flex align-items-center"">
@@ -52,9 +35,19 @@
     <ChildContent>
         This is the body
     </ChildContent>
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Title="Click here">This is the body</Collapse>
+    <Collapse>
+        <TitleContent>
+            <div class="d-flex align-items-center">
+                <tf-icon>info</tf-icon><span>&nbsp;Click the arrow to the right</span>
+            </div>
+        </TitleContent>
+        <ChildContent>
+            This is the body
+        </ChildContent>
+    </Collapse>
+</CodeExample>
 
 <h2>Footer</h2>
 
@@ -63,30 +56,23 @@
     by adding it to the <code>FooterContent RenderFragment</code>.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-3" Title="Click here">
-                <ChildContent>
-                    This is the body
-                </ChildContent>
-                <FooterContent>
-                    This is a footer
-                </FooterContent>
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Title=""Click here"">
     <ChildContent>
         This is the body
     </ChildContent>
     <FooterContent>
         This is a footer
     </FooterContent>
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Title="Click here">
+        <ChildContent>
+            This is the body
+        </ChildContent>
+        <FooterContent>
+            This is a footer
+        </FooterContent>
+    </Collapse>
+</CodeExample>
 
 <h2>Disabled</h2>
 
@@ -97,20 +83,13 @@
     close a collapse which is already open.
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-4" Title="Disabled" Disabled="true">
-                This is the body
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Disabled=""true"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Title=""Click here"" Disabled=""true"">
     This is the body
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Title="Disabled" Disabled="true">
+        This is the body
+    </Collapse>
+</CodeExample>
 
 <h2>Navigation</h2>
 
@@ -132,20 +111,13 @@
     but this one will stay open.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="cpd1" Title="Persistent" PersistState="true">
-                This is the body
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Id=""cpd1"" Title=""Persistent"" PersistState=""true"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Id=""cpd1"" Title=""Persistent"" PersistState=""true"">
     This is the body
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Id="cpd1" Title="Persistent" PersistState="true">
+        This is the body
+    </Collapse>
+</CodeExample>
 
 <p>
     When turning on this feature, it is strongly recommended that the collapse be assigned a unique,
@@ -172,79 +144,43 @@
     You can also apply the <code>dense</code> class to the collapse itself to reduce padding.
 </p>
 
-<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-5" Title="Click here" Class="dense">
-                This is the body
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""dense"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Title=""Click here"" Class=""dense"">
     This is the body
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Title="Click here" Class="dense">
+        This is the body
+    </Collapse>
+</CodeExample>
 
 <p>
     The <code>outlined</code> utility class not only gives the collapse an external border (as
     usual), but also gives it internal borders between the header, body, and footer.
 </p>
 
-<Collapse Id="ce-7" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-6" Title="Click here" Class="align-self-stretch outlined">
-                <ChildContent>
-                    This is the body
-                </ChildContent>
-                <FooterContent>
-                    This is a footer
-                </FooterContent>
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""dense"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Title=""Click here"" Class=""dense"">
     <ChildContent>
         This is the body
     </ChildContent>
     <FooterContent>
         This is a footer
     </FooterContent>
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Title="Click here" Class="align-self-stretch outlined">
+        <ChildContent>
+            This is the body
+        </ChildContent>
+        <FooterContent>
+            This is a footer
+        </FooterContent>
+    </Collapse>
+</CodeExample>
 
 <p>
     The <a href="./getting-started/themes">theme utility classes</a> can all be used to customize
     the appearance of a collapse.
 </p>
 
-<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse Id="c-7-1" Title="Click here" Class="align-self-stretch outlined primary">
-                <ChildContent>
-                    This is the body
-                </ChildContent>
-                <FooterContent>
-                    This is a footer
-                </FooterContent>
-            </Collapse>
-            <Collapse Id="c-7-2" Title="Click here" Class="secondary filled">
-                <ChildContent>
-                    This is the body
-                </ChildContent>
-                <FooterContent>
-                    This is a footer
-                </FooterContent>
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse Title=""Click here"" Class=""outlined primary"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse Title=""Click here"" Class=""outlined primary"">
     <ChildContent>
         This is the body
     </ChildContent>
@@ -259,9 +195,24 @@
     <FooterContent>
         This is a footer
     </FooterContent>
-</Collapse>")
-    </ChildContent>
-</Collapse>
+</Collapse>")">
+    <Collapse Title="Click here" Class="align-self-stretch outlined primary">
+        <ChildContent>
+            This is the body
+        </ChildContent>
+        <FooterContent>
+            This is a footer
+        </FooterContent>
+    </Collapse>
+    <Collapse Title="Click here" Class="secondary filled">
+        <ChildContent>
+            This is the body
+        </ChildContent>
+        <FooterContent>
+            This is a footer
+        </FooterContent>
+    </Collapse>
+</CodeExample>
 
 <h2>Events</h2>
 
@@ -273,23 +224,7 @@
     <code>true</code>.
 </p>
 
-<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Collapse @ref="_collapse" Id="c-8" Title="Click here" OnOpening="LoadAsync">
-                @if (_collapse?.IsLoading == true)
-                {
-                    <span>Loading...</span>
-                }
-                else
-                {
-                    <span>Loaded</span>
-                }
-            </Collapse>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Collapse @ref=""_collapse"" Title=""Click here"" OnOpening=""LoadAsync"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Collapse @ref=""_collapse"" Title=""Click here"" OnOpening=""LoadAsync"">
     @if (_collapse?.IsLoading == true)
     {
         <span>Loading...</span>
@@ -304,9 +239,18 @@
     private string _asyncBody = string.Empty;
     private Collapse? _collapse;
     private Task LoadAsync() => Task.Delay(3000);
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Collapse @ref="_collapse" Title="Click here" OnOpening="LoadAsync">
+        @if (_collapse?.IsLoading == true)
+        {
+            <span>Loading...</span>
+        }
+        else
+        {
+            <span>Loaded</span>
+        }
+    </Collapse>
+</CodeExample>
 
 @code {
     private string _asyncBody = string.Empty;

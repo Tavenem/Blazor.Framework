@@ -92,17 +92,15 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value6" Label="@($"On Change: {_value6}")" />
-                <Slider @bind-Value="_value7" UpdateOnInput="true" Label="@($"On Input: {_value7}")" />
-                <Slider @bind-Value="_value8" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="@($"Debounced: {_value8}")" />
+                <Slider @bind-Value="_value6" Label="@($"On Input: {_value6}")" />
+                <Slider @bind-Value="_value8" UpdateOnInputDebounce="500" Label="@($"Debounced: {_value8}")" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value1"" Label=""@($""On Change: {_value1}"")"" />
-    <Slider @bind-Value=""_value2"" UpdateOnInput=""true"" Label=""@($""On Input: {_value2}"")"" />
-    <Slider @bind-Value=""_value3"" UpdateOnInput=""true"" UpdateOnInputDebounce=""500"" Label=""@($""Debounced: {_value3}"")"" />
+    <Slider @bind-Value=""_value1"" Label=""@($""On Input: {_value1}"")"" />
+    <Slider @bind-Value=""_value3"" UpdateOnInputDebounce=""500"" Label=""@($""Debounced: {_value3}"")"" />
 </div>
 
 @code {
@@ -124,13 +122,13 @@
     <TitleContent>
         <div class="row justify-content-center">
             <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value9" UpdateOnInput="true" Label="@($"Value: {_value9:F1}")" Min="5" Max="8" />
+                <Slider @bind-Value="_value9" Label="@($"Value: {_value9:F1}")" Min="5" Max="8" />
             </div>
         </div>
     </TitleContent>
     <ChildContent>
         @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value"" UpdateOnInput=""true"" Label=""@($""Value: {_value}"")"" Min=""5"" Max=""8"" />
+    <Slider @bind-Value=""_value"" Label=""@($""Value: {_value}"")"" Min=""5"" Max=""8"" />
 </div>
 
 @code {

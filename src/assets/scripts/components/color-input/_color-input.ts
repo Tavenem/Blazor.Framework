@@ -97,7 +97,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         let input: HTMLInputElement | TavenemInputHtmlElement;
         if (this.hasAttribute('button')) {
             anchorId = randomUUID();
-            anchorOrigin = 'anchor-center-center';
+            anchorOrigin = 'center-center';
 
             const button = document.createElement('button');
             button.type = 'button';
@@ -168,7 +168,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             }
         } else {
             anchorId = randomUUID();
-            anchorOrigin = 'anchor-bottom-left';
+            anchorOrigin = 'bottom-left';
 
             input = document.createElement('tf-input') as TavenemInputHtmlElement;
             input.id = anchorId;
@@ -258,8 +258,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             controlContainer = shadow;
         } else {
             const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
-            popover.classList.add('filled', 'top-left', 'flip-onopen', anchorOrigin);
+            popover.classList.add('filled', 'flip-onopen');
             popover.dataset.anchorId = anchorId;
+            popover.dataset.anchorOrigin = anchorOrigin;
+            popover.dataset.origin = 'top-left';
             shadow.appendChild(popover);
             controlContainer = popover;
             this._popover = popover;

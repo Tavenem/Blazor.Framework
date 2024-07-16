@@ -2,147 +2,17 @@
 
 @inherits PersistentComponentBase
 
-@ChildContent
-<nav @ref="ElementReference"
-     @attributes="AdditionalAttributes"
-     id="@Id"
-     role="navigation"
-     class="@CssClass"
-     style="@CssStyle"
-     tabindex="-1">
-    <ol>
-        <li>
-            @if (PersistState && !IsInteractive)
-            {
-                <a href="@GetFirstPageUrl()" class="@PageCssClassControl">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/><path d="M24 24H0V0h24v24z" fill="none"/></svg>
-                </a>
-            }
-            else if (IsInteractive || Disabled || CurrentPage == 0)
-            {
-                <button @onclick="OnFirstAsync"
-                        class="@PageCssClassControl"
-                        disabled="@(Disabled || CurrentPage == 0)">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/><path d="M24 24H0V0h24v24z" fill="none"/></svg>
-                </button>
-            }
-            else
-            {
-                <button class="@PageCssClassControl" disabled>
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"/><path d="M24 24H0V0h24v24z" fill="none"/></svg>
-                </button>
-            }
-        </li>
-        <li>
-            @if (PersistState && !IsInteractive)
-            {
-                <a href="@GetPreviousPageUrl()" class="@PageCssClassControl">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                </a>
-            }
-            else if (IsInteractive || Disabled || CurrentPage == 0)
-            {
-                <button @onclick="OnPreviousAsync"
-                        class="@PageCssClassControl"
-                        disabled="@(Disabled || CurrentPage == 0)">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                </button>
-            }
-            else
-            {
-                <button class="@PageCssClassControl" disabled>
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                </button>
-            }
-        </li>
-        @if (FirstPage > 0)
-        {
-            <li>&hellip;</li>
-        }
-        @for (ulong i = FirstPage; i <= LastPage; i++)
-        {
-            var index = i;
-            @if (index == CurrentPage)
-            {
-                <li @key="index" class="active">
-                    <div class="@PageCssClass">@((index + 1).ToString("N0"))</div>
-                </li>
-            }
-            else
-            {
-                <li @key="index">
-                    @if (PersistState && !IsInteractive)
-                    {
-                        <a href="@GetPageUrl(index)" class="@PageCssClass">
-                            @((index + 1).ToString("N0"))
-                        </a>
-                    }
-                    else if (IsInteractive || Disabled)
-                    {
-                        <button @onclick="@(_ => OnSetPageAsync(index))" class="@PageCssClass" disabled="@Disabled">
-                            @((index + 1).ToString("N0"))
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="@PageCssClass" disabled>
-                            @((index + 1).ToString("N0"))
-                        </button>
-                    }
-                </li>
-            }
-        }
-        @if (PageCount.HasValue && LastPage < PageCount.Value - 1)
-        {
-            <li>&hellip;</li>
-        }
-        <li>
-            @if (PersistState && !IsInteractive)
-            {
-                <a href="@GetNextPageUrl()" class="@PageCssClassControl">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                </a>
-            }
-            else if (IsInteractive || Disabled || CurrentPage == PageCount - 1)
-            {
-                <button @onclick="OnNextAsync"
-                        class="@PageCssClassControl"
-                        disabled="@(Disabled || CurrentPage == PageCount - 1)">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                </button>
-            }
-            else
-            {
-                <button class="@PageCssClassControl" disabled>
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-                </button>
-            }
-        </li>
-        <li>
-            @if (PersistState && !IsInteractive)
-            {
-                <a href="@GetLastPageUrl()" class="@PageCssClassControl">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/></svg>
-                </a>
-            }
-            else if (IsInteractive || Disabled || CurrentPage == PageCount - 1)
-            {
-                <button @ref="LastPageElement"
-                        @onclick="OnLastAsync"
-                        class="@PageCssClassControl"
-                        disabled="@(Disabled || CurrentPage == PageCount - 1)">
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/></svg>
-                </button>
-            }
-            else
-            {
-                <button @ref="LastPageElement"
-                        class="@PageCssClassControl"
-                        disabled>
-                    <svg class="svg-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"/></svg>
-                </button>
-            }
-        </li>
-    </ol>
+<tf-pagination @attributes="AdditionalAttributes"
+               id="@Id"
+               class="@CssClass"
+               data-links="@(PersistState && !IsInteractive)"
+               data-max-pages="@MaxPagesDisplayed"
+               data-page-count="@PageCount"
+               disabled="@Disabled"
+               style="@CssStyle"
+               value="@CurrentPage"
+               @onlastpage="OnLastAsync"
+               @onnextpage="OnNextAsync"
+               @onvaluechange="OnSetPageAsync">
     @ChildContent
-</nav>
+</tf-pagination>

@@ -176,8 +176,6 @@ public partial class Popover
     /// </summary>
     protected override string? CssClass => new CssBuilder(Class)
         .AddClassFromDictionary(AdditionalAttributes)
-        .Add(PopoverOrigin.ToCSS())
-        .Add($"anchor-{AnchorOrigin.ToCSS()}")
         .Add(FlipBehavior.ToCSS())
         .Add(ThemeColor.ToCSS())
         .Add("limit-width", LimitWidth)

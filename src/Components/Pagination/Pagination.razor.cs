@@ -1,4 +1,9 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -12,14 +17,14 @@ public partial class Pagination : PersistentComponentBase
 
     /// <summary>
     /// <para>
-    /// The zero-based index of the current page.
+    /// The 1-based index of the current page.
     /// </para>
     /// <para>
     /// Cannot be set to a value greater than <see cref="PageCount"/> if <see cref="PageCount"/> is
     /// non-<see langword="null"/>.
     /// </para>
     /// </summary>
-    [Parameter] public ulong CurrentPage { get; set; }
+    [Parameter] public ulong CurrentPage { get; set; } = 1;
 
     /// <summary>
     /// Invoked when <see cref="CurrentPage"/> has changed.
@@ -92,11 +97,6 @@ public partial class Pagination : PersistentComponentBase
     [Parameter] public EventCallback NextRequested { get; set; }
 
     /// <summary>
-    /// Custom CSS class(es) for the page button elements.
-    /// </summary>
-    [Parameter] public string? PageClass { get; set; }
-
-    /// <summary>
     /// <para>
     /// The total number of pages.
     /// </para>
@@ -112,11 +112,6 @@ public partial class Pagination : PersistentComponentBase
     [Parameter] public ulong? PageCount { get; set; }
 
     /// <summary>
-    /// Custom CSS style(s) for the page button elements.
-    /// </summary>
-    [Parameter] public string? PageStyle { get; set; }
-
-    /// <summary>
     /// One of the built-in color themes.
     /// </summary>
     [Parameter] public ThemeColor ThemeColor { get; set; }
@@ -126,75 +121,15 @@ public partial class Pagination : PersistentComponentBase
     /// values and anything assigned by the user in <see
     /// cref="TavenemComponentBase.AdditionalAttributes"/>.
     /// </summary>
-    protected override string? CssClass => new CssBuilder("pagination")
-        .Add(Class)
+    protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add(ThemeColor.ToCSS())
-        .Add("disabled", Disabled)
-        .AddClassFromDictionary(AdditionalAttributes)
         .ToString();
 
-    private ElementReference ElementReference { get; set; }
-
-    private ulong FirstPage
-    {
-        get
-        {
-            if (MaxPagesDisplayed.HasValue)
-            {
-                var half = (ulong)Math.Truncate(MaxPagesDisplayed.Value / 2.0);
-                var start = half >= CurrentPage
-                    ? 0
-                    : CurrentPage - half - 1;
-
-                if (start > 0
-                    && PageCount.HasValue
-                    && CurrentPage + half >= PageCount.Value)
-                {
-                    start -= CurrentPage + half - PageCount.Value;
-                }
-
-                return Math.Max(start, 0);
-            }
-
-            return 0;
-        }
-    }
-
-    private int FocusSkipFirst => CurrentPage == 0 ? 0 : 1;
-
-    private int FocusSkipFirstPrev => CurrentPage == 0 ? 0 : 2;
+    private ulong DefaultCurrentPage { get; set; }
 
     private bool IsInteractive { get; set; }
 
-    private ulong LastPage
-    {
-        get
-        {
-            if (MaxPagesDisplayed.HasValue)
-            {
-                if (PageCount.HasValue)
-                {
-                    return Math.Min(
-                        FirstPage + (ulong)MaxPagesDisplayed.Value - 1,
-                        PageCount.Value - 1);
-                }
-
-                return CurrentPage;
-            }
-
-            return PageCount ?? CurrentPage;
-        }
-    }
-
-    private ElementReference LastPageElement { get; set; }
-
-    private string? PageCssClass => new CssBuilder("btn btn-text")
-        .Add(PageClass)
-        .ToString();
-
-    private string? PageCssClassControl => new CssBuilder("btn btn-icon")
-        .Add(PageClass)
-        .ToString();
+    [Inject, NotNull] NavigationManager? NavigationManager { get; set; }
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -215,9 +150,9 @@ public partial class Pagination : PersistentComponentBase
         }
 
         if (PageCount.HasValue
-            && CurrentPage >= PageCount.Value)
+            && CurrentPage > PageCount.Value)
         {
-            CurrentPage = PageCount.Value - 1;
+            CurrentPage = PageCount.Value;
             currentChanged = true;
         }
         else if (CurrentPage != oldCurrent)
@@ -245,18 +180,10 @@ public partial class Pagination : PersistentComponentBase
             PageCount = pageCount;
         }
 
-        var currentPages = QueryStateService.RegisterProperty(
-            Id,
-            CurrentPageQueryParamName,
-            OnCurrentPageQueryChangedAsync,
-            CurrentPage + 1);
-        if (currentPages?.Count > 0
-            && ulong.TryParse(currentPages[0], out var currentPage))
-        {
-            CurrentPage = PageCount.HasValue
-                ? Math.Min(PageCount.Value - 1, Math.Max(0, currentPage - 1))
-                : Math.Max(0, currentPage - 1);
-        }
+        DefaultCurrentPage = CurrentPage;
+        SetCurrentPageFromQuery();
+
+        NavigationManager.LocationChanged += OnLocationChanged;
     }
 
     /// <inheritdoc/>
@@ -269,86 +196,33 @@ public partial class Pagination : PersistentComponentBase
         }
     }
 
-    private string GetFirstPageUrl()
-        => QueryStateService.GetUriWithPropertyValue(Id, CurrentPageQueryParamName, 1);
-
-    private string GetLastPageUrl() => QueryStateService.GetUriWithPropertyValue(
-        Id,
-        CurrentPageQueryParamName,
-        PageCount ?? CurrentPage + 2);
-
-    private string GetNextPageUrl() => QueryStateService.GetUriWithPropertyValue(
-        Id,
-        CurrentPageQueryParamName,
-        PageCount.HasValue
-            ? Math.Min(PageCount.Value, CurrentPage + 2)
-            : CurrentPage + 2);
-
-    private string GetPageUrl(ulong value) => QueryStateService.GetUriWithPropertyValue(
-        Id,
-        CurrentPageQueryParamName,
-        value + 1);
-
-    private string GetPreviousPageUrl() => QueryStateService.GetUriWithPropertyValue(
-        Id,
-        CurrentPageQueryParamName,
-        Math.Max(1, CurrentPage));
-
-    private Task OnCurrentPageQueryChangedAsync(QueryChangeEventArgs args)
+    private void SetCurrentPageFromQuery()
     {
-        if (ulong.TryParse(args.Value, out var currentPage))
+        if (Uri.TryCreate(NavigationManager.Uri, UriKind.Absolute, out var uri)
+            && QueryHelpers
+            .ParseQuery(uri.Query)
+            .TryGetValue($"{Id}-p", out var queryValues)
+            && queryValues.Last(x => !string.IsNullOrEmpty(x)) is string value
+            && ulong.TryParse(value, out var currentPage))
         {
             CurrentPage = PageCount.HasValue
-                ? Math.Min(PageCount.Value - 1, Math.Max(0, currentPage - 1))
-                : Math.Max(0, currentPage - 1);
+                ? Math.Min(PageCount.Value, Math.Max(0, currentPage))
+                : Math.Max(0, currentPage);
         }
-        return Task.CompletedTask;
-    }
-
-    private async Task OnFirstAsync()
-    {
-        if (CurrentPage > 0)
-        {
-            CurrentPage = 0;
-            await ElementReference.FocusFirstAsync(FocusSkipFirstPrev);
-            await CurrentPageChanged.InvokeAsync(CurrentPage);
-            SetCurrentPage();
-        }
-    }
-
-    private async Task OnNextAsync()
-    {
-        if (PageCount.HasValue)
-        {
-            CurrentPage++;
-            await CurrentPageChanged.InvokeAsync(CurrentPage);
-        }
-        else
-        {
-            await NextRequested.InvokeAsync();
-        }
-        if (CurrentPage == PageCount - 1)
-        {
-            await ElementReference.FocusFirstAsync(1);
-        }
-        SetCurrentPage();
     }
 
     private async Task OnLastAsync()
     {
-        if (PageCount.HasValue)
-        {
-            CurrentPage = PageCount.Value - 1;
-        }
-        else
-        {
-            await LastRequested.InvokeAsync();
-        }
-        await ElementReference.FocusFirstAsync(FocusSkipFirst);
-        if (PageCount.HasValue)
-        {
-            await CurrentPageChanged.InvokeAsync(CurrentPage);
-        }
+        await LastRequested.InvokeAsync();
+        SetCurrentPage();
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+        => SetCurrentPageFromQuery();
+
+    private async Task OnNextAsync()
+    {
+        await NextRequested.InvokeAsync();
         SetCurrentPage();
     }
 
@@ -361,37 +235,28 @@ public partial class Pagination : PersistentComponentBase
         return Task.CompletedTask;
     }
 
-    private async Task OnPreviousAsync()
+    private async Task OnSetPageAsync(ValueChangeEventArgs e)
     {
-        if (CurrentPage == 0)
+        if (ulong.TryParse(e.Value, out var value))
         {
-            return;
+            CurrentPage = value;
+            await CurrentPageChanged.InvokeAsync(CurrentPage);
+            SetCurrentPage();
         }
-        CurrentPage--;
-        if (CurrentPage == 0)
-        {
-            await ElementReference.FocusLastAsync(1);
-        }
-        await CurrentPageChanged.InvokeAsync(CurrentPage);
-        SetCurrentPage();
-    }
-
-    private async Task OnSetPageAsync(ulong value)
-    {
-        CurrentPage = value;
-        await ElementReference.FocusFirstAsync(FocusSkipFirstPrev + (int)(CurrentPage - FirstPage));
-        await CurrentPageChanged.InvokeAsync(CurrentPage);
-        SetCurrentPage();
     }
 
     private void SetCurrentPage()
     {
         if (PersistState)
         {
-            QueryStateService.SetPropertyValue(
-                Id,
-                CurrentPageQueryParamName,
-                CurrentPage + 1);
+            NavigationManager.NavigateTo(
+                NavigationManager.GetUriWithQueryParameter(
+                    $"{Id}-p",
+                    CurrentPage == DefaultCurrentPage
+                        ? null
+                        : CurrentPage.ToString(CultureInfo.InvariantCulture)),
+                false,
+                true);
             QueryStateService.SetPropertyValue(
                 Id,
                 PageCountQueryParamName,

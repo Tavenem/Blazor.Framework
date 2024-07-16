@@ -15,27 +15,7 @@
     rely on interactivity to operate.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded" OnDrop="@(e => Drop(_items1, e))">
-                <h6>Drop Target 1</h6>
-                @foreach (var item in _items1)
-                {
-                    <Draggable Item="item" OnDropped="@(e => Drag(_items1, item, e))" DragEffectAllowed="DragEffect.CopyMove">@item</Draggable>
-                }
-            </DropTarget>
-            <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded ms-3" OnDrop="@(e => Drop(_items2, e))">
-                <h6>Drop Target 2</h6>
-                @foreach (var item in _items2)
-                {
-                    <Draggable Item="item" OnDropped="@(e => Drag(_items2, item, e))" DragEffectAllowed="DragEffect.CopyMove">@item</Draggable>
-                }
-            </DropTarget>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DropTarget TDropItem=""string"" Class=""flex-grow-1 align-self-stretch bg-alt p-2 rounded"" OnDrop=""@(e => Drop(_items1, e))"">
+<CodeExample RowClass="align-items-center" Code="@(@"<DropTarget TDropItem=""string"" Class=""flex-grow-1 align-self-stretch bg-alt p-2 rounded"" OnDrop=""@(e => Drop(_items1, e))"">
     <h6>Drop Target 1</h6>
     @foreach (var item in _items1)
     {
@@ -71,9 +51,22 @@
     }
     private void Drop(List<string> items, DropEventArgs<string> e)
         => items.Add(e.Data?.FirstOrDefault().Value ?? ""Error"");
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded" OnDrop="@(e => Drop(_items1, e))">
+        <h6>Drop Target 1</h6>
+        @foreach (var item in _items1)
+        {
+            <Draggable Item="item" OnDropped="@(e => Drag(_items1, item, e))" DragEffectAllowed="DragEffect.CopyMove">@item</Draggable>
+        }
+    </DropTarget>
+    <DropTarget TDropItem="string" Class="flex-grow-1 align-self-stretch bg-alt p-2 rounded ms-3" OnDrop="@(e => Drop(_items2, e))">
+        <h6>Drop Target 2</h6>
+        @foreach (var item in _items2)
+        {
+            <Draggable Item="item" OnDropped="@(e => Drag(_items2, item, e))" DragEffectAllowed="DragEffect.CopyMove">@item</Draggable>
+        }
+    </DropTarget>
+</CodeExample>
 
 <h2>Draggable</h2>
 
@@ -121,7 +114,7 @@
     Dragged string data will set the "text/plain" data type on the dragged data, and will be
     droppable into most drop targets. Dragged <code>Uri</code> objects, and strings which parse as
     valid, absolute URIs will set "text/uri-list" data, as well as a "text/plain" fallback. Other
-    data types are serializaed as JSON and set as "application/json" data. A string representation
+    data types are serialized as JSON and set as "application/json" data. A string representation
     (obtained with the <code>object.ToString</code> method) will also be set as a "text/plain"
     fallback.
 </p>
@@ -130,7 +123,7 @@
     Your dragged <code>Item</code> may implement the <code>IDraggable</code> interface to provide
     more control over its dragged representation. <code>IDraggable</code> provides three methods:
     <code>ToDraggedJson</code> and <code>ToDraggedString</code>. Both of these methods have default
-    implementaions, however these replicate the default behavior for items which don't implement the
+    implementations, however these replicate the default behavior for items which don't implement the
     interface at all, so it is only worthwhile to implement the interface if at least one of the
     methods is overridden.
 </p>

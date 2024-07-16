@@ -595,8 +595,10 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         else if (_baseType == typeof(DateTime))
         {
             newValue = DateTime.TryParseExact(
-                value,
-                "O",
+                value.EndsWith(']') && value.Contains('[')
+                    ? value[..value.IndexOf('[')]
+                    : value,
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.RoundtripKind,
                 out var result)
@@ -605,9 +607,12 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         }
         else if (_baseType == typeof(DateTimeOffset))
         {
+            var truncated = value.EndsWith(']') && value.Contains('[')
+                    ? value[..value.IndexOf('[')]
+                    : value;
             newValue = DateTimeOffset.TryParseExact(
-                value,
-                "O",
+                truncated,
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFzzz",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.RoundtripKind,
                 out var result)
@@ -616,25 +621,57 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
         }
         else if (_baseType == typeof(DateOnly))
         {
-            newValue = DateOnly.TryParseExact(
+            if (DateOnly.TryParseExact(
                 value,
                 "yyyy'-'MM'-'dd",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.RoundtripKind,
-                out var result)
-                ? (TValue)(object)result
-                : default;
+                out var result1))
+            {
+                newValue = (TValue)(object)result1;
+            }
+            else if (DateTimeOffset.TryParseExact(
+                value.EndsWith(']') && value.Contains('[')
+                    ? value[..value.IndexOf('[')]
+                    : value,
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFzzz",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind,
+                out var result2))
+            {
+                newValue = (TValue)(object)DateOnly.FromDateTime(result2.DateTime);
+            }
+            else
+            {
+                newValue = default;
+            }
         }
         else if (_baseType == typeof(TimeOnly))
         {
-            newValue = TimeOnly.TryParseExact(
+            if (TimeOnly.TryParseExact(
                 value,
                 "HH':'mm':'ss",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.RoundtripKind,
-                out var result)
-                ? (TValue)(object)result
-                : default;
+                out var result1))
+            {
+                newValue = (TValue)(object)result1;
+            }
+            else if (DateTimeOffset.TryParseExact(
+                value.EndsWith(']') && value.Contains('[')
+                    ? value[..value.IndexOf('[')]
+                    : value,
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFzzz",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.RoundtripKind,
+                out var result2))
+            {
+                newValue = (TValue)(object)TimeOnly.FromTimeSpan(result2.TimeOfDay);
+            }
+            else
+            {
+                newValue = default;
+            }
         }
         else
         {

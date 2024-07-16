@@ -795,6 +795,8 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     /// <inheritdoc/>
     protected override async Task OnParametersSetAsync()
     {
+        await base.OnParametersSetAsync();
+
         if (LoadItems is not null)
         {
             return;
@@ -831,7 +833,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         "AOT",
         "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
         Justification = "Dynamic code not reachable with AOT")]
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         if (_columns.Count == 0
             && System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)

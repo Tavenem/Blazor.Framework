@@ -12,15 +12,14 @@ public partial class CodeExample
 
     [Parameter] public string? RowClass { get; set; }
 
-    private RenderFragment? CodeFragment { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    private string? RowCssClass => new CssBuilder("row justify-content-center")
+    private string? RowCssClass => new CssBuilder("row justify-content-center p-3")
         .Add(RowClass)
         .ToString();
 
     private RenderFragment AddContent()
         => builder => builder.AddMarkupContent(1, Code);
 
-    protected override void OnInitialized()
-        => CodeFragment = AddContent();
+    protected override void OnInitialized() => ChildContent ??= AddContent();
 }

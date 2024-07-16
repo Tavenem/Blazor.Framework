@@ -20,16 +20,9 @@
     user-supplied content.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <MarkdownRenderer Value="This is *markdown*-formatted text, translated to **HTML**." />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<MarkdownRenderer Value=""This is *markdown*-formatted text, translated to **HTML**."" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" Code="@(@"<MarkdownRenderer Value=""This is *markdown*-formatted text, translated to **HTML**."" />")">
+    <MarkdownRenderer Value="This is *markdown*-formatted text, translated to **HTML**." />
+</CodeExample>
 
 <p>
     The renderer uses the excellent <a href="https://github.com/xoofx/markdig">Markdig</a> library

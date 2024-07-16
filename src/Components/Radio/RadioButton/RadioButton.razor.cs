@@ -95,7 +95,7 @@ public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessed
         {
             SetValue(e.Value);
         }
-        else
+        else if (e.Value == true)
         {
             await Context.ChangeEventCallback.InvokeAsync(new ChangeEventArgs { Value = Value?.ToString() });
         }

@@ -22,24 +22,17 @@
     elements in a <code>tf-accordion</code> element.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <tf-accordion>
-                <Collapse Id="a-1-c1" Title="Collapse #1">Collapsed content #1</Collapse>
-                <details><summary>Details #2</summary>Collapsed content #2</details>
-                <Collapse Id="a-1-c3" Title="Collapse #3">Collapsed content #3</Collapse>
-            </tf-accordion>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-accordion>
+<CodeExample IsOpen="true" Code="@(@"<tf-accordion>
     <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
     <details><summary>Details #2</summary>Collapsed content #2</details>
     <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
-</tf-accordion>")
-    </ChildContent>
-</Collapse>
+</tf-accordion>")">
+    <tf-accordion>
+        <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+        <details><summary>Details #2</summary>Collapsed content #2</details>
+        <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+    </tf-accordion>
+</CodeExample>
 
 <h2>Only one open</h2>
 
@@ -47,24 +40,17 @@
     To enforce just one collapse being open at once, add the <code>data-only-one</code> attribute.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <tf-accordion data-only-one>
-                <Collapse Id="a-2-c1" Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Id="a-2-c2" Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Id="a-2-c3" Title="Collapse #3">Collapsed content #3</Collapse>
-            </tf-accordion>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-accordion data-only-one>
+<CodeExample IsOpen="true" Code="@(@"<tf-accordion data-only-one>
     <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
-    <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
+    <details><summary>Details #2</summary>Collapsed content #2</details>
     <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
-        </tf-accordion>")
-    </ChildContent>
-</Collapse>
+</tf-accordion>")">
+    <tf-accordion data-only-one>
+        <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+        <details><summary>Details #2</summary>Collapsed content #2</details>
+        <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+    </tf-accordion>
+</CodeExample>
 
 <h2>Dense</h2>
 
@@ -73,24 +59,17 @@
     directly to the accordion itself.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <tf-accordion class="dense">
-                <Collapse Id="a-3-c1" Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Id="a-3-c2" Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Id="a-3-c3" Title="Collapse #3">Collapsed content #3</Collapse>
-            </tf-accordion>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-accordion class=""dense"">
+<CodeExample Code="@(@"<tf-accordion class=""dense"">
     <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
     <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
     <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
-</tf-accordion>")
-    </ChildContent>
-</Collapse>
+</tf-accordion>")">
+    <tf-accordion class="dense">
+        <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+        <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+        <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+    </tf-accordion>
+</CodeExample>
 
 <h2>Flush</h2>
 
@@ -98,28 +77,21 @@
     Use the <code>flush</code> class to remove the rounded corners and the shadow.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="outlined">
-                <tf-accordion class="flush">
-                    <Collapse Id="a-4-c1" Title="Collapse #1">Collapsed content #1</Collapse>
-                    <Collapse Id="a-4-c2" Title="Collapse #2">Collapsed content #2</Collapse>
-                    <Collapse Id="a-4-c3" Title="Collapse #3">Collapsed content #3</Collapse>
-                </tf-accordion>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-accordion class=""outlined"">
+<CodeExample Code="@(@"<tf-accordion class=""outlined"">
     <div class=""flush"">
         <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
         <Collapse Title=""Collapse #2"">Collapsed content #2</Collapse>
         <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
     </div>
-</tf-accordion>")
-    </ChildContent>
-</Collapse>
+</tf-accordion>")">
+    <div class="outlined">
+        <tf-accordion class="flush">
+            <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+            <Collapse Title="Collapse #2">Collapsed content #2</Collapse>
+            <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+        </tf-accordion>
+    </div>
+</CodeExample>
 
 <h2>Disabled</h2>
 
@@ -129,21 +101,14 @@
     programmatically. It only prevents user interaction.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <tf-accordion disabled>
-                <Collapse Id="a-5-c1" Title="Collapse #1">Collapsed content #1</Collapse>
-                <Collapse Id="a-5-c2" IsInitiallyOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
-                <Collapse Id="a-5-c3" Title="Collapse #3">Collapsed content #3</Collapse>
-            </tf-accordion>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-accordion disabled>
+<CodeExample IsOpen="true" Code="@(@"<tf-accordion disabled>
     <Collapse Title=""Collapse #1"">Collapsed content #1</Collapse>
     <Collapse IsOpen=""true"" Title=""Collapse #2"">Collapsed content #2</Collapse>
     <Collapse Title=""Collapse #3"">Collapsed content #3</Collapse>
-</tf-accordion>")
-    </ChildContent>
-</Collapse>
+</tf-accordion>")">
+    <tf-accordion disabled>
+        <Collapse Title="Collapse #1">Collapsed content #1</Collapse>
+        <Collapse IsInitiallyOpen="true" Title="Collapse #2">Collapsed content #2</Collapse>
+        <Collapse Title="Collapse #3">Collapsed content #3</Collapse>
+    </tf-accordion>
+</CodeExample>

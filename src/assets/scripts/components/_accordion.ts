@@ -12,10 +12,16 @@ export class TavenemAccordionHTMLElement extends HTMLElement {
             for (const mutation of mutations) {
                 if (mutation.type === 'childList') {
                     for (const node of mutation.removedNodes) {
-                        if (!(node instanceof HTMLDetailsElement)) {
+                        const details = node instanceof HTMLDetailsElement
+                            ? node
+                            : (node instanceof HTMLElement
+                                && node.classList.contains('collapse')
+                                ? node.querySelector<HTMLDetailsElement>(':scope > details')
+                                : null);
+                        if (!details) {
                             continue;
                         }
-                        const index = this._details.indexOf(node);
+                        const index = this._details.indexOf(details);
                         if (index >= 0) {
                             node.removeEventListener('toggle', this.toggle.bind(this));
                             this._details.splice(index, 1);
@@ -23,19 +29,19 @@ export class TavenemAccordionHTMLElement extends HTMLElement {
                         }
                     }
                     for (const node of mutation.addedNodes) {
-                        if (!(node instanceof HTMLElement)
-                            || !node.classList.contains('collapse')) {
+                        const details = node instanceof HTMLDetailsElement
+                            ? node
+                            : (node instanceof HTMLElement
+                                && node.classList.contains('collapse')
+                                ? node.querySelector<HTMLDetailsElement>(':scope > details')
+                                : null);
+                        if (!details) {
                             continue;
                         }
-                        const details = Array.from(node.getElementsByTagName('details'))
-                            .filter(y => y.parentNode === node);
-                        if (!details || !details.length) {
-                            continue;
-                        }
-                        const index = this._details.indexOf(details[0]);
+                        const index = this._details.indexOf(details);
                         if (index == -1) {
-                            details[0].addEventListener('toggle', this.toggle.bind(this));
-                            this._details.push(details[0]);
+                            details.addEventListener('toggle', this.toggle.bind(this));
+                            this._details.push(details);
                             updated = true;
                         }
                     }

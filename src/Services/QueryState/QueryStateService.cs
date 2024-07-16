@@ -1398,24 +1398,11 @@ public class QueryStateService
 
     private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        if (!Uri.TryCreate(e.Location, UriKind.Absolute, out var uri))
-        {
-            return;
-        }
-
-        if (!QueryHelpers
+        if (!Uri.TryCreate(e.Location, UriKind.Absolute, out var uri)
+            || !QueryHelpers
             .ParseQuery(uri.Query)
             .TryGetValue(QueryParameterName, out var queryValues))
         {
-            var queryParameter = GetQueryParameterString(_componentProperties);
-            if (!string.IsNullOrEmpty(queryParameter))
-            {
-                _navigationManager.NavigateTo(
-                    _navigationManager.GetUriWithQueryParameters(
-                        GetQueryParameter(queryParameter)),
-                    false,
-                    true);
-            }
             return;
         }
 

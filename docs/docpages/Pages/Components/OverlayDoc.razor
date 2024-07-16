@@ -30,19 +30,7 @@
     prevent interaction with most other elements.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center py-5">
-            <button @onclick="@(_ => _showOverlay = true)" class="btn primary">Show overlay</button>
-
-            @if (_showOverlay)
-            {
-                <div @onclick="@(_ => _showOverlay = false)" class="overlay" />
-            }
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
+<CodeExample IsOpen="true" RowClass="align-items-center py-5" Code="@(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
 
 @if (_showOverlay)
 {
@@ -51,9 +39,14 @@
 
 @code {
     private bool _showOverlay;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button @onclick="@(_ => _showOverlay = true)" class="btn primary">Show overlay</button>
+
+    @if (_showOverlay)
+    {
+        <div @onclick="@(_ => _showOverlay = false)" class="overlay" />
+    }
+</CodeExample>
 
 <p>
     Drawers, <a href="./components/appbar">AppBars</a>, dialogs, <a
@@ -72,19 +65,7 @@
     rest of a page clear.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center py-5">
-            <button @onclick="@(_ => _showOverlay2 = true)" class="btn primary">Show overlay</button>
-
-            @if (_showOverlay2)
-            {
-                <div @onclick="@(_ => _showOverlay2 = false)" class="overlay local" />
-            }
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
+<CodeExample IsOpen="true" RowClass="align-items-center py-5" Code="@(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
 
 @if (_showOverlay)
 {
@@ -93,9 +74,14 @@
 
 @code {
     private bool _showOverlay;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button @onclick="@(_ => _showOverlay2 = true)" class="btn primary">Show overlay</button>
+
+    @if (_showOverlay2)
+    {
+        <div @onclick="@(_ => _showOverlay2 = false)" class="overlay local" />
+    }
+</CodeExample>
 
 <h2>Customization</h2>
 
@@ -104,19 +90,7 @@
     rather than dimming it.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center py-5">
-            <button @onclick="@(_ => _showOverlay3 = true)" class="btn primary">Show overlay</button>
-
-            @if (_showOverlay3)
-            {
-                <div @onclick="@(_ => _showOverlay3 = false)" class="overlay light" />
-            }
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
+<CodeExample IsOpen="true" RowClass="align-items-center py-5" Code="@(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
 
 @if (_showOverlay)
 {
@@ -125,28 +99,21 @@
 
 @code {
     private bool _showOverlay;
-}", true)
-    </ChildContent>
-</Collapse>
+}")">
+    <button @onclick="@(_ => _showOverlay3 = true)" class="btn primary">Show overlay</button>
+
+    @if (_showOverlay3)
+    {
+        <div @onclick="@(_ => _showOverlay3 = false)" class="overlay light" />
+    }
+</CodeExample>
 
 <p>
     You can use the <code>transparent</code> class to create an overlay that does not alter the
     background at all, but still prevents interacting with anything beneath it.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center py-5">
-            <button @onclick="@(_ => _showOverlay4 = true)" class="btn primary">Show overlay</button>
-
-            @if (_showOverlay4)
-            {
-                <div @onclick="@(_ => _showOverlay4 = false)" class="overlay transparent" />
-            }
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
+<CodeExample IsOpen="true" RowClass="align-items-center py-5" Code="@(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
 
 @if (_showOverlay)
 {
@@ -155,29 +122,20 @@
 
 @code {
     private bool _showOverlay;
-}", true)
-    </ChildContent>
-</Collapse>
+}")">
+    <button @onclick="@(_ => _showOverlay4 = true)" class="btn primary">Show overlay</button>
+
+    @if (_showOverlay4)
+    {
+        <div @onclick="@(_ => _showOverlay4 = false)" class="overlay transparent" />
+    }
+</CodeExample>
 
 <p>
     An overlay can contain any content you wish.
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center py-5">
-            <button @onclick="@(_ => _showOverlay5 = true)" class="btn primary">Show overlay</button>
-
-            @if (_showOverlay5)
-            {
-                <div @onclick="@(_ => _showOverlay5 = false)" class="overlay">
-                    Click here to dismiss this overlay
-                </div>
-            }
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
+<CodeExample IsOpen="true" RowClass="align-items-center py-5" Code="@(@"<button @onclick=""@(_ => _showOverlay = true)"" class=""btn primary"">Show overlay</button>
 
 @if (_showOverlay)
 {
@@ -188,9 +146,16 @@
 
 @code {
     private bool _showOverlay;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button @onclick="@(_ => _showOverlay5 = true)" class="btn primary">Show overlay</button>
+
+    @if (_showOverlay5)
+    {
+        <div @onclick="@(_ => _showOverlay5 = false)" class="overlay">
+            Click here to dismiss this overlay
+        </div>
+    }
+</CodeExample>
 
 @code {
     private bool _showOverlay,  _showOverlay2,  _showOverlay3,  _showOverlay4, _showOverlay5;

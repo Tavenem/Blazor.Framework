@@ -10,6 +10,8 @@ namespace Tavenem.Blazor.Framework.Utilities;
 [EventHandler("ondelete", typeof(ValueChangeEventArgs))]
 [EventHandler("onenter", typeof(EventArgs))]
 [EventHandler("oninputtoggle", typeof(ToggleEventArgs))]
+[EventHandler("onlastpage", typeof(EventArgs))]
+[EventHandler("onnextpage", typeof(EventArgs))]
 [EventHandler("onsearchinput", typeof(ValueChangeEventArgs))]
 [EventHandler("onstream", typeof(StreamEventArgs))]
 [EventHandler("onvaluechange", typeof(ValueChangeEventArgs))]

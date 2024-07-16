@@ -429,6 +429,10 @@ button::-moz-focus-inner {
 
 .picker-btn {
     padding: 0;
+
+    &:has(svg) {
+        color: var(--tavenem-theme-color, inherit);
+    }
 }
 
 :host(.nested) {
@@ -781,7 +785,9 @@ button::-moz-focus-inner {
         shadow.appendChild(input);
 
         const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
-        popover.classList.add('filled', 'top-left', 'flip-onopen', 'anchor-center-center');
+        popover.classList.add('filled', 'flip-onopen');
+        popover.dataset.origin = 'top-left';
+        popover.dataset.anchorOrigin = 'center-center';
         popover.dataset.anchorId = anchorId;
         shadow.appendChild(popover);
         this._popover = popover;
@@ -851,7 +857,9 @@ button::-moz-focus-inner {
         skinTonesButton.appendChild(skinToneTooltip);
 
         const skinTonePopover = document.createElement('tf-popover');
-        skinTonePopover.classList.add('skin-tone-popover', 'top-center', 'anchor-bottom-center', 'flip-onopen', 'filled');
+        skinTonePopover.classList.add('skin-tone-popover', 'flip-onopen', 'filled');
+        skinTonePopover.dataset.origin = 'top-center';
+        skinTonePopover.dataset.anchorOrigin = 'bottom-center';
         skinTonesPicker.appendChild(skinTonePopover);
 
         const skinTonePopoverContainer = document.createElement('div');

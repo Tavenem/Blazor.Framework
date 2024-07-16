@@ -5,171 +5,7 @@ import { documentPositionComparator, randomUUID } from '../tavenem-utility'
 
 export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
     static formAssociated = true;
-
-    private _display: string | null | undefined;
-    private _initialDisplay: string | null | undefined;
-    private _initialValue: string | null | undefined;
-    private _internals: ElementInternals;
-    private _searchText: string | null | undefined;
-    private _searchTimer: number = -1;
-    private _settingValue = false;
-    private _value = '';
-
-    static get observedAttributes() {
-        return [
-            'data-input-class',
-            'data-input-style',
-            'display',
-            'readonly',
-            'required',
-            'value',
-        ];
-    }
-
-    private static newSearchInputEvent(value: string) {
-        return new CustomEvent('searchinput', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
-    get display() {
-        return this._display && this._display.length
-            ? this._display
-            : this._value;
-    }
-    set display(value: string | null | undefined) {
-        this._display = value;
-
-        let newValue = value;
-        if (value == null || !value.length) {
-            const padLength = parseInt(this.dataset.padLength || '');
-            if (Number.isFinite(padLength)
-                && padLength > this._value.length) {
-                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
-            } else {
-                newValue = this._value;
-            }
-        }
-
-        if (newValue!.length) {
-            this._internals.states.delete('empty');
-            this._internals.states.add('has-value');
-        } else {
-            this._internals.states.add('empty');
-            this._internals.states.delete('has-value');
-        }
-
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.display = newValue;
-        }
-    }
-
-    get form() { return this._internals.form; }
-
-    get name() { return this.getAttribute('name'); }
-
-    get required() { return this.hasAttribute('required'); }
-    set required(value: boolean) {
-        if (value) {
-            this.setAttribute('required', '');
-        } else {
-            this.removeAttribute('required');
-        }
-    }
-
-    get suggestion() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            return input.suggestion;
-        }
-
-        return null;
-    }
-    set suggestion(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.suggestion = value;
-        }
-    }
-
-    get suggestionDisplay() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            return input.suggestionDisplay;
-        }
-
-        return null;
-    }
-    set suggestionDisplay(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.suggestionDisplay = value;
-        }
-    }
-
-    get suggestionValue() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return null;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            return input.suggestionValue;
-        }
-
-        return null;
-    }
-    set suggestionValue(value: string | null | undefined) {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
-        if (input) {
-            input.suggestionValue = value;
-        }
-    }
-
-    get type() { return this.localName; }
-
-    get validity() { return this._internals.validity; }
-    get validationMessage() { return this._internals.validationMessage; }
-
-    get value() { return this._value; }
-    set value(v: string) { this.setValue(v); }
-
-    get willValidate() { return this._internals.willValidate; }
-
-    constructor() {
-        super();
-
-        this._internals = this.attachInternals();
-    }
-
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
-
-        const style = document.createElement('style');
-        style.textContent = `:host {
+    static style = `:host {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
     --field-active-label-color: var(--tavenem-color-primary);
@@ -182,7 +18,6 @@ export class TavenemSelectInputHtmlElement extends TavenemPickerHtmlElement {
     display: flex;
     flex-basis: auto;
     flex-direction: column;
-    flex-grow: 1;
     flex-shrink: 1;
     margin-bottom: .5rem;
     margin-left: 0;
@@ -655,6 +490,203 @@ slot {
     border-radius: inherit;
 }
 `;
+
+    private _display: string | null | undefined;
+    private _initialDisplay: string | null | undefined;
+    private _initialValue: string | null | undefined;
+    private _internals: ElementInternals;
+    private _mutationObserver: MutationObserver;
+    private _searchText: string | null | undefined;
+    private _searchTimer: number = -1;
+    private _settingValue = false;
+    private _value = '';
+
+    static get observedAttributes() {
+        return [
+            'data-input-class',
+            'data-input-style',
+            'display',
+            'readonly',
+            'required',
+            'value',
+        ];
+    }
+
+    private static newSearchInputEvent(value: string) {
+        return new CustomEvent('searchinput', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
+    get display() {
+        return this._display && this._display.length
+            ? this._display
+            : this._value;
+    }
+    set display(value: string | null | undefined) {
+        this._display = value;
+
+        let newValue = value;
+        if (value == null || !value.length) {
+            const padLength = parseInt(this.dataset.padLength || '');
+            if (Number.isFinite(padLength)
+                && padLength > this._value.length) {
+                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
+            } else {
+                newValue = this._value;
+            }
+        }
+
+        if (newValue!.length) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
+        } else {
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
+        }
+
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.display = newValue;
+        }
+    }
+
+    get form() { return this._internals.form; }
+
+    get name() { return this.getAttribute('name'); }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get suggestion() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            return input.suggestion;
+        }
+
+        return null;
+    }
+    set suggestion(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.suggestion = value;
+        }
+    }
+
+    get suggestionDisplay() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            return input.suggestionDisplay;
+        }
+
+        return null;
+    }
+    set suggestionDisplay(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.suggestionDisplay = value;
+        }
+    }
+
+    get suggestionValue() {
+        const root = this.shadowRoot;
+        if (!root) {
+            return null;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            return input.suggestionValue;
+        }
+
+        return null;
+    }
+    set suggestionValue(value: string | null | undefined) {
+        const root = this.shadowRoot;
+        if (!root) {
+            return;
+        }
+        const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+        if (input) {
+            input.suggestionValue = value;
+        }
+    }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
+
+        this._mutationObserver = new MutationObserver(mutations => {
+            let addedAny = false;
+            for (const mutation of mutations) {
+                if (mutation.type !== 'childList') {
+                    continue;
+                }
+                for (const node of mutation.addedNodes) {
+                    const options = node instanceof Element
+                        ? node.querySelectorAll('option, [data-close-picker-value]')
+                        : [];
+                    if (options.length) {
+                        addedAny = true;
+                        break;
+                    }
+                }
+            }
+            if (!addedAny) {
+                return;
+            }
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const input = root.querySelector<TavenemInputHtmlElement>('tf-input');
+            if (input) {
+                this.setOptions(input, this._value, this._display);
+            }
+        });
+    }
+
+    connectedCallback() {
+        this.dataset.popoverContainer = '';
+
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+
+        const style = document.createElement('style');
+        style.textContent = TavenemSelectInputHtmlElement.style;
         shadow.appendChild(style);
 
         const anchorId = randomUUID();
@@ -670,6 +702,9 @@ slot {
         input.classList.add('input');
         if (this.classList.contains('clearable')) {
             input.classList.add('clearable');
+        }
+        if (this.classList.contains('clearable-readonly')) {
+            input.classList.add('clearable-readonly');
         }
         if ('inputClass' in this.dataset) {
             input.dataset.inputClass = this.dataset.inputClass;
@@ -782,7 +817,9 @@ slot {
         shadow.appendChild(slot);
 
         const popover = document.createElement('tf-popover') as TavenemPopoverHTMLElement;
-        popover.classList.add('filled', 'top-left', 'flip-onopen', 'anchor-bottom-left', 'match-width');
+        popover.classList.add('filled', 'flip-onopen', 'match-width');
+        popover.dataset.origin = 'top-left';
+        popover.dataset.anchorOrigin = 'bottom-left';
         popover.dataset.anchorId = anchorId;
         popover.popover = 'manual';
         if ('popoverLimitHeight' in this.dataset) {
@@ -810,6 +847,8 @@ slot {
         this.addEventListener('keyup', this.onKeyUp.bind(this));
 
         document.addEventListener('mousedown', this.onDocMouseDown.bind(this));
+
+        this._mutationObserver.observe(this, { childList: true });
     }
 
     disconnectedCallback() {
@@ -899,7 +938,7 @@ slot {
 
     formResetCallback() { this.reset(); }
 
-    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+    formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete') {
         if (typeof state === 'string') {
             this.value = state;
         } else if (state == null) {
@@ -1779,7 +1818,7 @@ slot {
 
         this.display = display;
 
-        this.setOptions(input, this._value, this.display);
+        this.setOptions(input, this._value, display);
 
         this.dispatchEvent(TavenemPickerHtmlElement.newValueChangeEvent(this._value));
 

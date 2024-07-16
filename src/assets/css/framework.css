@@ -28,11 +28,9 @@
 @import "components/drawer.css" layer(tavenem-framework.components);
 @import "components/list.css" layer(tavenem-framework.components);
 @import "components/meter.css" layer(tavenem-framework.components);
-@import "components/pagination.css" layer(tavenem-framework.components);
 @import "components/radiogroup.css" layer(tavenem-framework.components);
 @import "components/rating.css" layer(tavenem-framework.components);
 @import "components/skeleton.css" layer(tavenem-framework.components);
-@import "components/slider.css" layer(tavenem-framework.components);
 @import "components/snackbar.css" layer(tavenem-framework.components);
 @import "components/steps.css" layer(tavenem-framework.components);
 @import "components/switch.css" layer(tavenem-framework.components);

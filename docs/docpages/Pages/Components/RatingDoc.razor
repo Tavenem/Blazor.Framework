@@ -17,33 +17,19 @@
     input icons, and defaults to 5.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating Value="3" />
-            <Rating Value="6" MaxValue="10" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" />
-<Rating Value=""6"" MaxValue=""10"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="flex-column center-items" Code="@(@"<Rating Value=""3"" />
+<Rating Value=""6"" MaxValue=""10"" />")">
+    <Rating Value="3" />
+    <Rating Value="6" MaxValue="10" />
+</CodeExample>
 
 <p>
     The <code>Label</code> property can be used to add a description or instructions.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating Value="3" Label="Please rate:" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" Label=""Please rate:"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" Code="@(@"<Rating Value=""3"" Label=""Please rate:"" />")">
+    <Rating Value="3" Label="Please rate:" />
+</CodeExample>
 
 <p>
     You can set the <code>Disabled</code> property to <code>true</code> to disable the component, or
@@ -51,18 +37,11 @@
     without the dimmed color of a disabled control.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating Value="4" Disabled="true" />
-            <Rating Value="2" ReadOnly="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""4"" Disabled=""true"" />
-<Rating Value=""2"" ReadOnly=""true"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="flex-column center-items" Code="@(@"<Rating Value=""4"" Disabled=""true"" />
+<Rating Value=""2"" ReadOnly=""true"" />")">
+    <Rating Value="4" Disabled="true" />
+    <Rating Value="2" ReadOnly="true" />
+</CodeExample>
 
 <h2>Required</h2>
 
@@ -80,16 +59,9 @@
     will be set accordingly.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Rating Value="4" Required="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""4"" Required=""true"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample Code="@(@"<Rating Value=""4"" Required=""true"" />")">
+    <Rating Value="4" Required="true" />
+</CodeExample>
 
 <h2>Hover binding</h2>
 
@@ -98,15 +70,7 @@
     hovering over, and can be bound.
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating @bind-HoveredValue="_hoverRating" />
-            <span>@GetRating(_hoverRating)</span>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating @bind-HoveredValue=""_hoverRating"" />
+<CodeExample RowClass="flex-column center-items" Code="@(@"<Rating @bind-HoveredValue=""_hoverRating"" />
 <span>@GetRating(_hoverRating)</span>
 
 @code {
@@ -120,9 +84,10 @@
         5 => ""Terrific!"",
         _ => ""Please select a rating"",
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Rating @bind-HoveredValue="_hoverRating" />
+    <span>@GetRating(_hoverRating)</span>
+</CodeExample>
 
 <h2>Name</h2>
 
@@ -155,22 +120,7 @@
     You can set a color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating Value="3" ThemeColor="ThemeColor.Primary" />
-            <Rating Value="3" ThemeColor="ThemeColor.Secondary" />
-            <Rating Value="3" ThemeColor="ThemeColor.Tertiary" />
-            <Rating Value="3" ThemeColor="ThemeColor.Dark" />
-            <Rating Value="3" ThemeColor="ThemeColor.Default" />
-            <Rating Value="3" ThemeColor="ThemeColor.Info" />
-            <Rating Value="3" ThemeColor="ThemeColor.Success" />
-            <Rating Value="3" ThemeColor="ThemeColor.Warning" />
-            <Rating Value="3" ThemeColor="ThemeColor.Danger" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Primary"" />
+<CodeExample IsOpen="true" RowClass="flex-column center-items" Code="@(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Primary"" />
 <Rating Value=""3"" ThemeColor=""ThemeColor.Secondary"" />
 <Rating Value=""3"" ThemeColor=""ThemeColor.Tertiary"" />
 <Rating Value=""3"" ThemeColor=""ThemeColor.Dark"" />
@@ -178,28 +128,29 @@
 <Rating Value=""3"" ThemeColor=""ThemeColor.Info"" />
 <Rating Value=""3"" ThemeColor=""ThemeColor.Success"" />
 <Rating Value=""3"" ThemeColor=""ThemeColor.Warning"" />
-<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" />")
-    </ChildContent>
-</Collapse>
+<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" />")">
+    <Rating Value="3" ThemeColor="ThemeColor.Primary" />
+    <Rating Value="3" ThemeColor="ThemeColor.Secondary" />
+    <Rating Value="3" ThemeColor="ThemeColor.Tertiary" />
+    <Rating Value="3" ThemeColor="ThemeColor.Dark" />
+    <Rating Value="3" ThemeColor="ThemeColor.Default" />
+    <Rating Value="3" ThemeColor="ThemeColor.Info" />
+    <Rating Value="3" ThemeColor="ThemeColor.Success" />
+    <Rating Value="3" ThemeColor="ThemeColor.Warning" />
+    <Rating Value="3" ThemeColor="ThemeColor.Danger" />
+</CodeExample>
 
 <p>
     You can use the <code>small</code> or <code>large</code> classes to adjust the size of the controls.
 </p>
 
-<Collapse Id="ce-7" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating Value="3" Class="small" />
-            <Rating Value="3" />
-            <Rating Value="3" Class="large" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" Class=""small"" />
+<CodeExample IsOpen="true" RowClass="flex-column center-items" Code="@(@"<Rating Value=""3"" Class=""small"" />
 <Rating Value=""3"" />
-<Rating Value=""3"" Class=""large"" />")
-    </ChildContent>
-</Collapse>
+<Rating Value=""3"" Class=""large"" />")">
+    <Rating Value="3" Class="small" />
+    <Rating Value="3" />
+    <Rating Value="3" Class="large" />
+</CodeExample>
 
 <p>
     The <code>ActiveIcon</code> and <code>InactiveIcon</code> properties can be used to control the
@@ -212,16 +163,9 @@
     class, respectively. <code>IsInactiveOutlined</code> is <code>true</code> by default.
 </p>
 
-<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row flex-column center-items">
-            <Rating Value="3" ThemeColor="ThemeColor.Danger" ActiveIcon="favorite" InactiveIcon="heart_broken" IsInactiveOutlined="false" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" ActiveIcon=""favorite"" InactiveIcon=""heart_broken"" IsInactiveOutlined=""false"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" Code="@(@"<Rating Value=""3"" ThemeColor=""ThemeColor.Danger"" ActiveIcon=""favorite"" InactiveIcon=""heart_broken"" IsInactiveOutlined=""false"" />")">
+    <Rating Value="3" ThemeColor="ThemeColor.Danger" ActiveIcon="favorite" InactiveIcon="heart_broken" IsInactiveOutlined="false" />
+</CodeExample>
 
 <p>
     You can use the <code>RatingItemClass</code> and <code>RatingItemStyle</code> properties to

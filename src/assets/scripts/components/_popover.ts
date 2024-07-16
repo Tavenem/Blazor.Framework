@@ -15,43 +15,37 @@ interface IPopoverPosition {
 }
 
 export namespace TavenemPopover {
-    const flipClassReplacements: Record<string, Record<string, string>> = {
+    const anchorOriginFlipClassReplacements: Record<string, Record<string, string>> = {
+        'top': { 'bottom-center': 'top-center' },
+        'left': { 'center-right': 'center-left' },
+        'right': { 'center-left': 'center-right' },
+        'bottom': { 'top-center': 'bottom-center' },
+    };
+    const originFlipClassReplacements: Record<string, Record<string, string>> = {
         'top': {
             'top-left': 'bottom-left',
             'top-center': 'bottom-center',
-            'anchor-bottom-center': 'anchor-top-center',
             'top-right': 'bottom-right',
         },
         'left': {
             'top-left': 'top-right',
             'center-left': 'center-right',
-            'anchor-center-right': 'anchor-center-left',
             'bottom-left': 'bottom-right',
         },
         'right': {
             'top-right': 'top-left',
             'center-right': 'center-left',
-            'anchor-center-left': 'anchor-center-right',
             'bottom-right': 'bottom-left',
         },
         'bottom': {
             'bottom-left': 'top-left',
             'bottom-center': 'top-center',
-            'anchor-top-center': 'anchor-bottom-center',
             'bottom-right': 'top-right',
         },
-        'top-and-left': {
-            'top-left': 'bottom-right',
-        },
-        'top-and-right': {
-            'top-right': 'bottom-left',
-        },
-        'bottom-and-left': {
-            'bottom-left': 'top-right',
-        },
-        'bottom-and-right': {
-            'bottom-right': 'top-left',
-        },
+        'top-and-left': { 'top-left': 'bottom-right' },
+        'top-and-right': { 'top-right': 'bottom-left' },
+        'bottom-and-left': { 'bottom-left': 'top-right' },
+        'bottom-and-right': { 'bottom-right': 'top-left' },
     };
     const resizeObserver = new ResizeObserver(function () {
         placePopovers();
@@ -136,7 +130,8 @@ export namespace TavenemPopover {
 
         const selfRect = popoverNode.getBoundingClientRect();
         const classList = popoverNode.classList;
-        const classListArray = Array.from(popoverNode.classList);
+        const origin = popoverNode.dataset.origin;
+        const anchorOrigin = popoverNode.dataset.anchorOrigin;
 
         let positionX = 0;
         let positionY = 0;
@@ -156,7 +151,8 @@ export namespace TavenemPopover {
         let left = 0, top = 0, offsetX = 0, offsetY = 0;
         if (positionX === 0 && positionY === 0) {
             ({ left, top, offsetX, offsetY } = calculatePopoverPosition(
-                classListArray,
+                origin,
+                anchorOrigin,
                 boundingRect,
                 selfRect));
         }
@@ -189,7 +185,7 @@ export namespace TavenemPopover {
             let flipSelector = originalFlipSelector;
 
             if (!flipSelector) {
-                if (classList.contains('top-left')) {
+                if (origin === 'top-left') {
                     if (proposedBottom < 0 && proposedRight < 0 && proposedTop >= selfRect.height && proposedLeft >= selfRect.width) {
                         flipSelector = 'top-and-left';
                     } else if (proposedBottom < 0 && proposedTop >= selfRect.height) {
@@ -197,11 +193,11 @@ export namespace TavenemPopover {
                     } else if (proposedRight < 0 && proposedLeft >= selfRect.width) {
                         flipSelector = 'left';
                     }
-                } else if (classList.contains('top-center')) {
+                } else if (origin === 'top-center') {
                     if (proposedBottom < 0 && proposedTop >= selfRect.height) {
                         flipSelector = 'top';
                     }
-                } else if (classList.contains('top-right')) {
+                } else if (origin === 'top-right') {
                     if (proposedBottom < 0 && proposedLeft < 0 && proposedTop >= selfRect.height && proposedRight >= selfRect.width) {
                         flipSelector = 'top-and-right';
                     } else if (proposedBottom < 0 && proposedTop >= selfRect.height) {
@@ -209,15 +205,15 @@ export namespace TavenemPopover {
                     } else if (proposedLeft < 0 && proposedRight >= selfRect.width) {
                         flipSelector = 'right';
                     }
-                } else if (classList.contains('center-left')) {
+                } else if (origin === 'center-left') {
                     if (proposedRight < 0 && proposedLeft >= selfRect.width) {
                         flipSelector = 'left';
                     }
-                } else if (classList.contains('center-right')) {
+                } else if (origin === 'center-right') {
                     if (proposedLeft < 0 && proposedRight >= selfRect.width) {
                         flipSelector = 'right';
                     }
-                } else if (classList.contains('bottom-left')) {
+                } else if (origin === 'bottom-left') {
                     if (proposedTop < 0 && proposedRight < 0 && proposedBottom >= 0 && proposedLeft >= selfRect.width) {
                         flipSelector = 'bottom-and-left';
                     } else if (proposedTop < 0 && proposedBottom >= 0) {
@@ -225,11 +221,11 @@ export namespace TavenemPopover {
                     } else if (proposedRight < 0 && proposedLeft >= selfRect.width) {
                         flipSelector = 'left';
                     }
-                } else if (classList.contains('bottom-center')) {
+                } else if (origin === 'bottom-center') {
                     if (proposedTop < 0 && proposedBottom >= 0) {
                         flipSelector = 'bottom';
                     }
-                } else if (classList.contains('bottom-right')) {
+                } else if (origin === 'bottom-right') {
                     if (proposedTop < 0 && proposedLeft < 0 && proposedBottom >= 0 && proposedRight >= selfRect.width) {
                         flipSelector = 'bottom-and-right';
                     } else if (proposedTop < 0 && proposedBottom >= 0) {
@@ -242,7 +238,8 @@ export namespace TavenemPopover {
 
             if (flipSelector && flipSelector != 'none') {
                 ({ left, top, offsetX, offsetY } = getPositionForFlippedPopver(
-                    classListArray,
+                    origin,
+                    anchorOrigin,
                     flipSelector,
                     boundingRect,
                     selfRect));
@@ -302,48 +299,49 @@ export namespace TavenemPopover {
     }
 
     function calculatePopoverPosition(
-        list: string[],
+        origin: string | null | undefined,
+        anchorOrigin: string | null | undefined,
         boundingRect: DOMRect,
         selfRect: DOMRect): IPopoverPosition {
         let left = boundingRect.left;
         let top = boundingRect.top;
-        if (list.indexOf('anchor-top-center') >= 0
-            || list.indexOf('anchor-center-center') >= 0
-            || list.indexOf('anchor-bottom-center') >= 0) {
+        if (anchorOrigin === 'top-center'
+            || anchorOrigin === 'center-center'
+            || anchorOrigin === 'bottom-center') {
             left += boundingRect.width / 2;
-        } else if (list.indexOf('anchor-top-right') >= 0
-            || list.indexOf('anchor-center-right') >= 0
-            || list.indexOf('anchor-bottom-right') >= 0) {
+        } else if (anchorOrigin === 'top-right'
+            || anchorOrigin === 'center-right'
+            || anchorOrigin === 'bottom-right') {
             left += boundingRect.width;
         }
-        if (list.indexOf('anchor-center-left') >= 0
-            || list.indexOf('anchor-center-center') >= 0
-            || list.indexOf('anchor-center-right') >= 0) {
+        if (anchorOrigin === 'center-left'
+            || anchorOrigin === 'center-center'
+            || anchorOrigin === 'center-right') {
             top += boundingRect.height / 2;
-        } else if (list.indexOf('anchor-bottom-left') >= 0
-            || list.indexOf('anchor-bottom-center') >= 0
-            || list.indexOf('anchor-bottom-right') >= 0) {
+        } else if (anchorOrigin === 'bottom-left'
+            || anchorOrigin === 'bottom-center'
+            || anchorOrigin === 'bottom-right') {
             top += boundingRect.height;
         }
 
         let offsetX = 0;
         let offsetY = 0;
-        if (list.indexOf('top-center') >= 0
-            || list.indexOf('center-center') >= 0
-            || list.indexOf('bottom-center') >= 0) {
+        if (origin === 'top-center'
+            || origin === 'center-center'
+            || origin === 'bottom-center') {
             offsetX = -selfRect.width / 2;
-        } else if (list.indexOf('top-right') >= 0
-            || list.indexOf('center-right') >= 0
-            || list.indexOf('bottom-right') >= 0) {
+        } else if (origin === 'top-right'
+            || origin === 'center-right'
+            || origin === 'bottom-right') {
             offsetX = -selfRect.width;
         }
-        if (list.indexOf('center-left') >= 0
-            || list.indexOf('center-center') >= 0
-            || list.indexOf('center-right') >= 0) {
+        if (origin === 'center-left'
+            || origin === 'center-center'
+            || origin === 'center-right') {
             offsetY = -selfRect.height / 2;
-        } else if (list.indexOf('bottom-left') >= 0
-            || list.indexOf('bottom-center') >= 0
-            || list.indexOf('bottom-right') >= 0) {
+        } else if (origin === 'bottom-left'
+            || origin === 'bottom-center'
+            || origin === 'bottom-right') {
             offsetY = -selfRect.height;
         }
 
@@ -351,99 +349,25 @@ export namespace TavenemPopover {
     }
 
     function getPositionForFlippedPopver(
-        inputArray: string[],
+        origin: string | null | undefined,
+        anchorOrigin: string | null | undefined,
         selector: string,
         boundingRect: DOMRect,
         selfRect: DOMRect): IPopoverPosition {
-        const classList = [];
-        for (let i = 0; i < inputArray.length; i++) {
-            const item = inputArray[i];
-            const replacments = flipClassReplacements[selector][item];
-            if (replacments) {
-                classList.push(replacments);
-            }
-            else {
-                classList.push(item);
-            }
-        }
-
         return calculatePopoverPosition(
-            classList,
+            origin == null
+                ? null
+                : originFlipClassReplacements[selector][origin],
+            anchorOrigin == null
+                ? null
+                : anchorOriginFlipClassReplacements[selector][anchorOrigin],
             boundingRect,
             selfRect);
     }
 }
 
 export class TavenemPopoverHTMLElement extends HTMLElement {
-    private _anchor: Element | null | undefined;
-    private _mouseOver: boolean;
-    private _mutationObserver: MutationObserver;
-    private _parentResizeObserver: ResizeObserver;
-    private _resizeObserver: ResizeObserver;
-
-    static get observedAttributes() {
-        return ['data-offset-x', 'data-offset-y', 'data-position-x', 'data-position-y'];
-    }
-
-    get anchor() { return this._anchor; }
-    set anchor(value: Element | null | undefined) { this._anchor = value; }
-
-    get mouseOver() { return this._mouseOver; }
-    set mouseOver(value: boolean) { this._mouseOver = value; }
-
-    constructor() {
-        super();
-
-        this._mouseOver = false;
-
-        this._mutationObserver = new MutationObserver(mutations => {
-            for (const mutation of mutations) {
-                if (mutation.type === 'attributes'
-                    && mutation.target instanceof HTMLElement) {
-                    if (mutation.target.classList.contains('flip-onopen')) {
-                        delete mutation.target.dataset.popoverFlipped;
-                        delete mutation.target.dataset.popoverFlip;
-                    }
-
-                    TavenemPopover.placePopover(mutation.target);
-                }
-            }
-        });
-
-        this._parentResizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                const target = entry.target;
-
-                for (let i = 0; i < target.childNodes.length; i++) {
-                    const childNode = target.childNodes[i];
-                    if (childNode instanceof HTMLElement
-                        && childNode.tagName === 'TF-POPOVER') {
-                        TavenemPopover.placePopover(childNode);
-                    }
-                }
-            }
-        });
-
-        this._resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                let target = entry.target;
-                if (target instanceof HTMLElement
-                    && target.tagName === 'TF-POPOVER') {
-                    TavenemPopover.placePopover(target);
-                }
-            }
-        });
-    }
-
-    connectedCallback() {
-        if (!this.hasAttribute('popover')) {
-            this.setAttribute('popover', 'auto');
-        }
-
-        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
-
-        const style = document.createElement('style');
-        style.innerHTML = `:host {
+    static style = `:host {
     --popover-color: var(--tavenem-color-text);
     --popover-color-bg: var(--tavenem-color-bg-surface);
     --tavenem-theme-color: var(--tavenem-color-bg-alt);
@@ -512,6 +436,82 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
     --popover-color: var(--tavenem-theme-color-text, var(--tavenem-color-text));
     --popover-color-bg: var(--tavenem-theme-color, var(--tavenem-color-bg-alt));
 }`;
+
+    private _anchor: Element | null | undefined;
+    private _mouseOver: boolean;
+    private _mutationObserver: MutationObserver;
+    private _parentResizeObserver: ResizeObserver;
+    private _resizeObserver: ResizeObserver;
+
+    static get observedAttributes() {
+        return [
+            'data-anchor-origin',
+            'data-offset-x', 'data-offset-y',
+            'data-open',
+            'data-origin',
+            'data-position-x', 'data-position-y'
+        ];
+    }
+
+    get anchor() { return this._anchor; }
+    set anchor(value: Element | null | undefined) { this._anchor = value; }
+
+    get mouseOver() { return this._mouseOver; }
+    set mouseOver(value: boolean) { this._mouseOver = value; }
+
+    constructor() {
+        super();
+
+        this._mouseOver = false;
+
+        this._mutationObserver = new MutationObserver(mutations => {
+            for (const mutation of mutations) {
+                if (mutation.type === 'attributes'
+                    && mutation.target instanceof HTMLElement) {
+                    if (mutation.target.classList.contains('flip-onopen')) {
+                        delete mutation.target.dataset.popoverFlipped;
+                        delete mutation.target.dataset.popoverFlip;
+                    }
+
+                    TavenemPopover.placePopover(mutation.target);
+                }
+            }
+        });
+
+        this._parentResizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const target = entry.target;
+
+                for (let i = 0; i < target.childNodes.length; i++) {
+                    const childNode = target.childNodes[i];
+                    if (childNode instanceof HTMLElement
+                        && childNode.tagName === 'TF-POPOVER') {
+                        TavenemPopover.placePopover(childNode);
+                    }
+                }
+            }
+        });
+
+        this._resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                let target = entry.target;
+                if (target instanceof HTMLElement
+                    && target.tagName === 'TF-POPOVER') {
+                    TavenemPopover.placePopover(target);
+                }
+            }
+        });
+    }
+
+    connectedCallback() {
+        if (!this.hasAttribute('popover')) {
+            this.setAttribute('popover', 'auto');
+        }
+
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+
+        const style = document.createElement('style');
+        style.innerHTML = TavenemPopoverHTMLElement.style;
         shadow.appendChild(style);
 
         const slot = document.createElement('slot');
@@ -560,10 +560,19 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
             return;
         }
 
-        if (name === 'data-offset-x') {
+        if (name === 'data-anchor-origin'
+            || name === 'data-origin') {
+            this.position();
+        } else if (name === 'data-offset-x') {
             this.changeOffsetX(oldValue, newValue);
         } else if (name === 'data-offset-y') {
             this.changeOffsetY(oldValue, newValue);
+        } else if (name === 'data-open') {
+            if (newValue == null) {
+                this.hide();
+            } else {
+                this.show();
+            }
         } else if (name === 'data-position-x') {
             this.changePositionX(newValue);
         } else if (name === 'data-position-y') {
@@ -572,24 +581,28 @@ export class TavenemPopoverHTMLElement extends HTMLElement {
     }
 
     hide() {
-        if (this.matches(":popover-open")) {
+        if ((this.parentNode != null || this.shadowRoot?.host?.parentNode != null)
+            && this.matches(":popover-open")) {
             this.hidePopover();
         }
     }
 
     show() {
-        if (!this.matches(":popover-open")) {
+        if ((this.parentNode != null || this.shadowRoot?.host?.parentNode != null)
+            && !this.matches(":popover-open")) {
             TavenemPopover.placePopover(this);
             this.showPopover();
         }
     }
 
     toggle() {
-        if (this.matches(":popover-open")) {
-            this.hidePopover();
-        } else {
-            TavenemPopover.placePopover(this);
-            this.showPopover();
+        if (this.parentNode != null || this.shadowRoot?.host?.parentNode != null) {
+            if (this.matches(":popover-open")) {
+                this.hidePopover();
+            } else {
+                TavenemPopover.placePopover(this);
+                this.showPopover();
+            }
         }
     }
 
@@ -684,6 +697,13 @@ export class TavenemTooltipHTMLElement extends HTMLElement {
     private _mouseOver: boolean;
     private _popover: TavenemPopoverHTMLElement | undefined;
     private _showTimer: number;
+
+    static get observedAttributes() {
+        return [
+            'data-anchor-origin',
+            'data-origin'
+        ];
+    }
 
     constructor() {
         super();
@@ -923,19 +943,19 @@ tf-popover {
             && this.dataset.popoverClass.length) {
             popover.classList.add(...this.dataset.popoverClass.split(' '));
         }
-        if ('popoverOrigin' in this.dataset
-            && this.dataset.popoverOrigin
-            && this.dataset.popoverOrigin.length) {
-            popover.classList.add(this.dataset.popoverOrigin);
+        if ('origin' in this.dataset
+            && this.dataset.origin
+            && this.dataset.origin.length) {
+            popover.dataset.origin = this.dataset.origin;
         } else {
-            popover.classList.add('top-center');
+            popover.dataset.origin = 'top-center';
         }
         if ('anchorOrigin' in this.dataset
             && this.dataset.anchorOrigin
             && this.dataset.anchorOrigin.length) {
-            popover.classList.add('anchor-' + this.dataset.anchorOrigin);
+            popover.dataset.anchorOrigin = this.dataset.anchorOrigin;
         } else {
-            popover.classList.add('anchor-bottom-center');
+            popover.dataset.anchorOrigin = 'bottom-center';
         }
         popover.classList.add('flip-always');
         if ('arrow' in this.dataset) {
@@ -1012,6 +1032,27 @@ tf-popover {
             button.removeEventListener('focusout', this.onAttentionOutTarget.bind(this));
             button.removeEventListener('mouseover', this.onAttentionOnButton.bind(this));
             button.removeEventListener('mouseleave', this.onAttentionOutTarget.bind(this));
+        }
+    }
+
+    attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (newValue == oldValue
+            || !this._popover) {
+            return;
+        }
+
+        if (name === 'data-anchor-origin') {
+            if (newValue == null) {
+                delete this._popover.dataset.anchorOrigin;
+            } else {
+                this._popover.dataset.anchorOrigin = newValue;
+            }
+        } else if (name === 'data-origin') {
+            if (newValue == null) {
+                delete this._popover.dataset.origin;
+            } else {
+                this._popover.dataset.origin = newValue;
+            }
         }
     }
 
@@ -1253,6 +1294,8 @@ export class TavenemDropdownHTMLElement extends HTMLElement {
     }
 
     connectedCallback() {
+        this.dataset.popoverContainer = '';
+
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         const style = document.createElement('style');
@@ -1285,8 +1328,8 @@ slot {
         this.removeEventListener('mouseup', this.toggle.bind(this));
     }
 
-    attributeChangedCallback(name: string, oldValue: string | null | undefined, newValue: string | null | undefined) {
-        if (name === 'disabled' && newValue) {
+    attributeChangedCallback(name: string, _oldValue: string | null | undefined, newValue: string | null | undefined) {
+        if (name === 'disabled' && newValue != null) {
             this.close();
         }
     }

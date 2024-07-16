@@ -29,24 +29,7 @@
     see that documentation for more details and additional capabilities.)
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center py-5">
-            <Popover Id="example_popover" IsOpen="_isOpen" AnchorOrigin="Origin.Top_Left" PopoverOrigin="Origin.Top_Left">
-                <div class="d-flex flex-column p-4">
-                    <p>Popovers can contain any content.</p>
-                    <button popovertarget="example_popover" class="btn btn-text danger ms-auto mb-n3">Close</button>
-                </div>
-            </Popover>
-            <button popovertarget="example_popover" class="btn primary">Toggle</button>
-            <Switch @bind-Value="_isOpen" ThemeColor="ThemeColor.Primary" />
-            <button @onclick="Toggle" class="btn btn-icon primary">
-                <tf-icon>@ToggleIcon</tf-icon>
-            </button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Popover Id=""example_popover"" AnchorOrigin=""Origin.Top_Left"" PopoverOrigin=""Origin.Top_Left"">
+<CodeExample IsOpen="true" RowClass="align-items-center py-5" Code="@(@"<Popover Id=""example_popover"" AnchorOrigin=""Origin.Top_Left"" PopoverOrigin=""Origin.Top_Left"">
     <div class=""d-flex flex-column p-4"">
         <p>Popovers can contain any content.</p>
         <button popovertarget=""example_popover"" class=""btn btn-text danger ms-auto mb-n3"">Close</button>
@@ -62,9 +45,19 @@
     private bool _isOpen;
     private string ToggleIcon => _isOpen ? ""fullscreen_exit"" : ""fullscreen"";
     private void Toggle() => _isOpen = !_isOpen;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Popover Id="example_popover" IsOpen="_isOpen" AnchorOrigin="Origin.Top_Left" PopoverOrigin="Origin.Top_Left">
+        <div class="d-flex flex-column p-4">
+            <p>Popovers can contain any content.</p>
+            <button popovertarget="example_popover" class="btn btn-text danger ms-auto mb-n3">Close</button>
+        </div>
+    </Popover>
+    <button popovertarget="example_popover" class="btn primary">Toggle</button>
+    <Switch @bind-Value="_isOpen" ThemeColor="ThemeColor.Primary" />
+    <button @onclick="Toggle" class="btn btn-icon primary">
+        <tf-icon>@ToggleIcon</tf-icon>
+    </button>
+</CodeExample>
 
 <h2>Anchoring</h2>
 
@@ -124,33 +117,26 @@
     exceeding screen width.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="d-flex rounded outlined center-items p-4">
-                <div id="popover-anchor-demo" class="primary filled px-3 py-2">Anchored to this</div>
-                <Popover AnchorId="popover-anchor-demo" LimitWidth="true" MatchWidth="true" AnchorOrigin="Origin.Bottom_Center" PopoverOrigin="Origin.Top_Center" IsOpen="true">
-                    <div class="p-2">I am anchored to an element.</div>
-                </Popover>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""d-flex rounded outlined center-items p-4"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<div class=""d-flex rounded outlined center-items p-4"">
     <div id=""popover-anchor-demo"" class=""primary filled px-3 py-2"">Anchored to this</div>
     <Popover AnchorId=""popover-anchor-demo"" LimitWidth=""true"" MatchWidth=""true""
     AnchorOrigin=""Origin.Bottom_Center"" PopoverOrigin=""Origin.Top_Center"" IsOpen=""true"">
         <div class=""p-2"">I am anchored to an element.</div>
     </Popover>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="d-flex rounded outlined center-items p-4">
+        <div id="popover-anchor-demo" class="primary filled px-3 py-2">Anchored to this</div>
+        <Popover AnchorId="popover-anchor-demo" LimitWidth="true" MatchWidth="true" AnchorOrigin="Origin.Bottom_Center" PopoverOrigin="Origin.Top_Center" IsOpen="true">
+            <div class="p-2">I am anchored to an element.</div>
+        </Popover>
+    </div>
+</CodeExample>
 
 <h2>Flipping</h2>
 
 <p>
     Popovers can automatically flip to stay in view, when possible. Set the
-    <code>FlipBehavior</code> property to <code>Filp_OnOpen</code> to change the direction the
+    <code>FlipBehavior</code> property to <code>Flip_OnOpen</code> to change the direction the
     popover opens (the default), or to <code>Flip_Always</code> to also flip anytime the window
     scrolls or resizes, if the popover would no longer be fully in view. You can also set it to
     <code>Flip_Never</code> to prevent the flipping behavior and always open in the direction
@@ -173,21 +159,7 @@
     Popovers can have other popovers inside them.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center p-5">
-            <Popover IsOpen="true" AnchorOrigin="Origin.Center_Center" PopoverOrigin="Origin.Center_Center">
-                <div class="d-flex flex-column p-4">
-                    <button popovertarget="example_nested_popover" class="btn btn-text primary ms-auto">Toggle</button>
-                </div>
-                <Popover Id="example_nested_popover" AnchorOrigin="Origin.Center_Right" PopoverOrigin="Origin.Center_Left">
-                    <div class="p-4">Nested content</div>
-                </Popover>
-            </Popover>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Popover IsOpen=""true"" AnchorOrigin=""Origin.Center_Center"" PopoverOrigin=""Origin.Center_Center"">
+<CodeExample IsOpen="true" RowClass="align-items-center p-5" Code="@(@"<Popover IsOpen=""true"" AnchorOrigin=""Origin.Center_Center"" PopoverOrigin=""Origin.Center_Center"">
     <div class=""d-flex flex-column p-4"">
         <button popovertarget=""example_nested_popover"" class=""btn btn-text primary ms-auto"">Toggle</button>
     </div>
@@ -201,9 +173,16 @@
 @code {
     private bool _isOpen;
     private void Toggle() => _isOpen = !_isOpen;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Popover IsOpen="true" AnchorOrigin="Origin.Center_Center" PopoverOrigin="Origin.Center_Center">
+        <div class="d-flex flex-column p-4">
+            <button popovertarget="example_nested_popover" class="btn btn-text primary ms-auto">Toggle</button>
+        </div>
+        <Popover Id="example_nested_popover" AnchorOrigin="Origin.Center_Right" PopoverOrigin="Origin.Center_Left">
+            <div class="p-4">Nested content</div>
+        </Popover>
+    </Popover>
+</CodeExample>
 
 @code {
     private Origin _anchorOrigin = Origin.Top_Left, _popoverOrigin = Origin.Top_Left;

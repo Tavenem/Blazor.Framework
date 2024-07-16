@@ -21,24 +21,17 @@
     <code>ChildContent</code> of the menu inside a <a href="./components/list">List</a>.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Dropdown Text="Click me">
-                <span>First choice</span>
-                <span>Second choice</span>
-                <span>Third choice</span>
-            </Dropdown>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Click me"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Dropdown Text=""Click me"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
-</Dropdown>")
-    </ChildContent>
-</Collapse>
+</Dropdown>")">
+    <Dropdown Text="Click me">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+</CodeExample>
 
 <h3>Activation</h3>
 
@@ -52,28 +45,7 @@
     mouseover and click events interact.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Dropdown Text="Right-click me" ActivationType="MouseEvent.RightClick" ThemeColor="ThemeColor.Primary">
-                <span>First choice</span>
-                <span>Second choice</span>
-                <span>Third choice</span>
-            </Dropdown>
-            <Dropdown Text="Hover over me" ActivationType="MouseEvent.MouseOver" ThemeColor="ThemeColor.Secondary">
-                <span>First choice</span>
-                <span>Second choice</span>
-                <span>Third choice</span>
-            </Dropdown>
-            <Dropdown Text="Click or hover over me" ActivationType="MouseEvent.Any" ThemeColor="ThemeColor.Tertiary">
-                <span>First choice</span>
-                <span>Second choice</span>
-                <span>Third choice</span>
-            </Dropdown>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Click me"" ActivationType=""MouseEvent.RightClick"" ThemeColor=""ThemeColor.Primary"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Dropdown Text=""Click me"" ActivationType=""MouseEvent.RightClick"" ThemeColor=""ThemeColor.Primary"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
@@ -87,33 +59,40 @@
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
-</Dropdown>")
-    </ChildContent>
-</Collapse>
+</Dropdown>")">
+    <Dropdown Text="Right-click me" ActivationType="MouseEvent.RightClick" ThemeColor="ThemeColor.Primary">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+    <Dropdown Text="Hover over me" ActivationType="MouseEvent.MouseOver" ThemeColor="ThemeColor.Secondary">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+    <Dropdown Text="Click or hover over me" ActivationType="MouseEvent.Any" ThemeColor="ThemeColor.Tertiary">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+</CodeExample>
 
 <p>
     When using <code>MouseEvent.MouseOver</code> you can also specify the <code>Delay</code>
     property to a number of milliseconds by which to delay the dropdown opening.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Dropdown Text="Hover and wait" ActivationType="MouseEvent.MouseOver" Delay="750">
-                <span>First choice</span>
-                <span>Second choice</span>
-                <span>Third choice</span>
-            </Dropdown>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown Text=""Hover and wait"" ActivationType=""MouseEvent.MouseOver"" Delay=""750"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Dropdown Text=""Hover and wait"" ActivationType=""MouseEvent.MouseOver"" Delay=""750"">
     <span>First choice</span>
     <span>Second choice</span>
     <span>Third choice</span>
-</Dropdown>")
-    </ChildContent>
-</Collapse>
+</Dropdown>")">
+    <Dropdown Text="Hover and wait" ActivationType="MouseEvent.MouseOver" Delay="750">
+        <span>First choice</span>
+        <span>Second choice</span>
+        <span>Third choice</span>
+    </Dropdown>
+</CodeExample>
 
 <p>
     You can set the <code>IsDisabled</code> property to <code>true</code> to disable the menu, which
@@ -137,21 +116,7 @@
     still cause the dropdown to close when the mouse leaves it.
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div @onclick="Toggle" class="dark filled p-3 position-relative d-flex center-items" style="height:10rem;width:10rem">
-                <div>Click anywhere in this box</div>
-                <Dropdown @ref="_dropdown" HideButton="true">
-                    <span>First choice</span>
-                    <span>Second choice</span>
-                    <span>Third choice</span>
-                </Dropdown>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div @onclick=""Toggle"" class=""dark filled p-3 position-relative d-flex center-items"" style=""height:10rem;width:10rem"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<div @onclick=""Toggle"" class=""dark filled p-3 position-relative d-flex center-items"" style=""height:10rem;width:10rem"">
     <div>Click anywhere in this box</div>
     <Dropdown @ref=""_dropdown"" HideButton=""true"">
         <span>First choice</span>
@@ -170,9 +135,16 @@
             await _dropdown.ToggleAsync(e);
         }
     }
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <div @onclick="Toggle" class="dark filled p-3 position-relative d-flex center-items" style="height:10rem;width:10rem">
+        <div>Click anywhere in this box</div>
+        <Dropdown @ref="_dropdown" HideButton="true">
+            <span>First choice</span>
+            <span>Second choice</span>
+            <span>Third choice</span>
+        </Dropdown>
+    </div>
+</CodeExample>
 
 <p>
     The <code>TriggerContent</code> <code>RenderFragment</code> property can be set to any content
@@ -189,24 +161,7 @@
     events on your custom content.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Dropdown>
-                <TriggerContent>
-                    <div class="dark filled p-3 d-flex center-items"
-                         style="height:10rem;width:10rem">Click anywhere in this box</div>
-                </TriggerContent>
-                <ChildContent>
-                    <span>First choice</span>
-                    <span>Second choice</span>
-                    <span>Third choice</span>
-                </ChildContent>
-            </Dropdown>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown>
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Dropdown>
     <TriggerContent>
         <div class=""dark filled p-3 d-flex center-items""
              style=""height:10rem;width:10rem"">Click anywhere in this box</div>
@@ -216,9 +171,19 @@
         <span>Second choice</span>
         <span>Third choice</span>
     </ChildContent>
-</Dropdown>")
-    </ChildContent>
-</Collapse>
+</Dropdown>")">
+    <Dropdown>
+        <TriggerContent>
+            <div class="dark filled p-3 d-flex center-items"
+                    style="height:10rem;width:10rem">Click anywhere in this box</div>
+        </TriggerContent>
+        <ChildContent>
+            <span>First choice</span>
+            <span>Second choice</span>
+            <span>Third choice</span>
+        </ChildContent>
+    </Dropdown>
+</CodeExample>
 
 <p>
     The <code>OpenAtPointer</code> property, if set to <code>true</code>, will cause the popover to
@@ -228,26 +193,7 @@
     can be used to provide a rich context menu for any content.
 </p>
 
-<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Dropdown ActivationType="MouseEvent.RightClick"
-                      HideButton="true"
-                      OpenAtPointer="true">
-                <TriggerContent>
-                    <div class="dark filled p-3 d-flex center-items"
-                            style="height:10rem;width:10rem">Right-click anywhere in this box</div>
-                </TriggerContent>
-                <ChildContent>
-                    <span>First choice</span>
-                    <span>Second choice</span>
-                    <span>Third choice</span>
-                </ChildContent>
-            </Dropdown>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Dropdown ActivationType=""MouseEvent.RightClick""
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Dropdown ActivationType=""MouseEvent.RightClick""
             HideButton=""true""
             OpenAtPointer=""true"">
     <TriggerContent>
@@ -259,9 +205,21 @@
         <span>Second choice</span>
         <span>Third choice</span>
     </ChildContent>
-</Dropdown>")
-    </ChildContent>
-</Collapse>
+</Dropdown>")">
+    <Dropdown ActivationType="MouseEvent.RightClick"
+                HideButton="true"
+                OpenAtPointer="true">
+        <TriggerContent>
+            <div class="dark filled p-3 d-flex center-items"
+                    style="height:10rem;width:10rem">Right-click anywhere in this box</div>
+        </TriggerContent>
+        <ChildContent>
+            <span>First choice</span>
+            <span>Second choice</span>
+            <span>Third choice</span>
+        </ChildContent>
+    </Dropdown>
+</CodeExample>
 
 <h2>Customization</h2>
 

@@ -15,26 +15,17 @@
     class to give it a shaded background. Add the <code>outlined</code> class to use a full outline.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <Select Options="_options" Label="Normal" />
-            <Select Options="_options" Label="Filled" Class="filled" />
-            <Select Options="_options" Label="Outlined" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" Label=""Normal"" />
-    <Select Options=""_options"" Label=""Filled"" Class=""filled"" />
-    <Select Options=""_options"" Label=""Outlined"" Class=""outlined"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Select Options=""_options"" Label=""Normal"" />
+<Select Options=""_options"" Label=""Filled"" Class=""filled"" />
+<Select Options=""_options"" Label=""Outlined"" Class=""outlined"" />
 
 @code {
     private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Select Options="_options" Label="Normal" />
+    <Select Options="_options" Label="Filled" Class="filled" />
+    <Select Options="_options" Label="Outlined" Class="outlined" />
+</CodeExample>
 
 <p>
     The <code>Value</code> property can be bound to any data type. Most native data types are
@@ -45,25 +36,16 @@
     for that particular component.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <Select Options="_options" @bind-Value="_value" Label="Bound" Class="w-100" />
-            <span>Bound value: @_value</span>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" @bind-Value=""_value"" Label=""Bound"" Class=""w-100"" />
-    <span>Bound value: @_value</span>
-</div>
+<CodeExample RowClass="flex-column" Code="@(@"<Select Options=""_options"" @bind-Value=""_value"" Label=""Bound"" />
+<span>Bound value: @_value</span>
 
 @code {
     private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
     private string? _value = ""Option 1"";
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Select Options="_options" @bind-Value="_value" Label="Bound" />
+    <span>Bound value: @_value</span>
+</CodeExample>
 
 <h2>Options</h2>
 
@@ -79,28 +61,21 @@
     (which receives the current value as a context parameter) to set the displayed content.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Select TValue="int">
-                <Option Value="1" Label="Option 1" />
-                <Option Value="2" Label="Option 2" />
-                <Option Value="3" Label="Option 3">
-                    Option <strong>3</strong>
-                </Option>
-            </Select>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select TValue=""int"">
+<CodeExample IsOpen="true" Code="@(@"<Select TValue=""int"" Value=""1"">
     <Option Value=""1"" Label=""Option 1"" />
     <Option Value=""2"" Label=""Option 2"" />
     <Option Value=""3"" Label=""Option 3"">
         Option <strong>3</strong>
     </Option>
-</Select>")
-    </ChildContent>
-</Collapse>
+</Select>")">
+    <Select TValue="int" Value="1">
+        <Option Value="1" Label="Option 1" />
+        <Option Value="2" Label="Option 2" />
+        <Option Value="3" Label="Option 3">
+            Option <strong>3</strong>
+        </Option>
+    </Select>
+</CodeExample>
 
 <p>
     Note: even when using <code>ChildContent</code> to define the label for the option list, you
@@ -118,29 +93,22 @@
     You can disable a manual option with its <code>Disabled</code> property.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Select TValue="int">
-                <Option Value="1" Label="Option 1" SeparatorAfter="true" />
-                <Option Value="2" Label="Option 2" />
-                <Option Value="3" Label="Option 3" Disabled="true" />
-            </Select>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select TValue=""int"">
+<CodeExample Code="@(@"<Select TValue=""int"" Value=""1"">
     <Option Value=""1"" Label=""Option 1"" SeparatorAfter=""true"" />
     <Option Value=""2"" Label=""Option 2"" />
     <Option Value=""3"" Label=""Option 3"" Disabled=""true"" />
-</Select>")
-    </ChildContent>
-</Collapse>
+</Select>")">
+    <Select TValue="int" Value="1">
+        <Option Value="1" Label="Option 1" SeparatorAfter="true" />
+        <Option Value="2" Label="Option 2" />
+        <Option Value="3" Label="Option 3" Disabled="true" />
+    </Select>
+</CodeExample>
 
 <h3>Options property</h3>
 
 <p>
-    You can also assign an enumertaion of values to the <code>Options</code> property. You should
+    You can also assign an enumeration of values to the <code>Options</code> property. You should
     also supply a function for the <code>Labels</code> property, which will retrieve a label for
     each option based on its value. If no <code>Labels</code> function is provided,
     <code>ToString</code> will be called on the values. If you provide a <code>RenderFragment</code>
@@ -148,18 +116,7 @@
     render the values in the option list.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Select Options="_options1" Labels="@(x => $"Option {x}")">
-                <OptionTemplate>
-                    Option @context
-                </OptionTemplate>
-            </Select>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select Options=""_options"" Labels=""@(x => $""Option {x}"")"">
+<CodeExample IsOpen="true" Code="@(@"<Select Options=""_options"" Labels=""@(x => $""Option {x}"")"" Value=""1"">
     <OptionTemplate>
         Option @context
     </OptionTemplate>
@@ -167,32 +124,29 @@
 
 @code {
     private int[] _options = Enumerable.Range(1, 25).ToArray();
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Select Options="_options1" Labels="@(x => $"Option {x}")" Value="1">
+        <OptionTemplate>
+            Option @context
+        </OptionTemplate>
+    </Select>
+</CodeExample>
 
 <h3>OptionPairs property</h3>
 
 <p>
-    Finally, you can assign an enumertaion of <code>KeyValuePair&lt;TOption, string></code> to the
+    Finally, you can assign an enumeration of <code>KeyValuePair&lt;TOption, string></code> to the
     <code>OptionPairs</code> property. The <code>Key</code> of each item should contain the value of
     each option, and the <code>Value</code> should contain its label.
 </p>
 
-<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Select OptionPairs="_options2" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select OptionPairs=""_options"" />
+<CodeExample IsOpen="true" Code="@(@"<Select OptionPairs=""_options"" Value=""1"" />
 
 @code {
     private List<KeyValuePair<int, string>> _options = new() { new(1, ""Option 1""), new(2, ""Option 2""), new(3, ""Option 3"") };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Select OptionPairs="_options2" Value="1" />
+</CodeExample>
 
 <p>
     Note that all three potential option sources work together. You can have manual
@@ -241,19 +195,7 @@
     for static pages when the potential number of options is high.
 </p>
 
-<Collapse Id="ce-7" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowsPerPage="10" RowValue="@(x => x)">
-                <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
-                <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
-                <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
-                <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" IsShown="false" />
-            </DataGridSelect>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowsPerPage=""10"" RowValue=""@(x => x)"">
+<CodeExample IsOpen="true" Code="@(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowsPerPage=""10"" RowValue=""@(x => x)"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"" />
@@ -279,9 +221,14 @@
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
         new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <DataGridSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowsPerPage="10" RowValue="@(x => x)">
+        <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
+        <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
+        <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
+        <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" IsShown="false" />
+    </DataGridSelect>
+</CodeExample>
 
 <h2>Multiselect</h2>
 
@@ -295,18 +242,7 @@
     selects all other available options.
 </p>
 
-<Collapse Id="ce-8" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <MultiSelect Options="_options1" Labels="@(x => $"Option {x}")">
-                <OptionTemplate>
-                    Option @context
-                </OptionTemplate>
-            </MultiSelect>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<MultiSelect Options=""_options"" Labels=""@(x => $""Option {x}"")"">
+<CodeExample IsOpen="true" Code="@(@"<MultiSelect Options=""_options"" Labels=""@(x => $""Option {x}"")"">
     <OptionTemplate>
         Option @context
     </OptionTemplate>
@@ -314,28 +250,20 @@
 
 @code {
     private int[] _options = Enumerable.Range(1, 25).ToArray();
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <MultiSelect Options="_options1" Labels="@(x => $"Option {x}")">
+        <OptionTemplate>
+            Option @context
+        </OptionTemplate>
+    </MultiSelect>
+</CodeExample>
 
 <p>
     You can use the <code>DataGridMultiSelect</code> component for multiple selection with a nested
     <code>DataGrid</code>.
 </p>
 
-<Collapse Id="ce-9" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <DataGridMultiSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
-                <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
-                <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
-                <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
-                <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" IsShown="false" />
-            </DataGridMultiSelect>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowValue=""@(x => x)"">
+<CodeExample IsOpen="true" Code="@(@"<DataGridSelect Items=""_items"" ItemLabel=""@(x => $""{x.LastName}, {x.FirstName}"")"" RowValue=""@(x => x)"">
     <Column Label=""First"" Value=""@(x => x.FirstName)"" IsQuickFilter=""true"" />
     <Column Label=""Last"" Value=""@(x => x.LastName)"" IsQuickFilter=""true"" />
     <Column Label=""Exec?"" Value=""@(x => x.IsExecutive)"" CanSort=""false"" />
@@ -361,9 +289,14 @@
         new DataItem { Id = 5, FirstName = ""Jennifer"", LastName = ""Garcia"", IsExecutive = false, HireDate = DateTime.Now - TimeSpan.FromDays(160) },
         new DataItem { Id = 6, FirstName = ""Michael"", LastName = ""Miller"", IsExecutive = true, HireDate = DateTime.Now - TimeSpan.FromDays(1495) },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <DataGridMultiSelect Items="_items" ItemLabel="@(x => $"{x.LastName}, {x.FirstName}")" RowValue="@(x => x)">
+        <Column Label="First" Value="@(x => x.FirstName)" IsQuickFilter="true" />
+        <Column Label="Last" Value="@(x => x.LastName)" IsQuickFilter="true" />
+        <Column Label="Exec?" Value="@(x => x.IsExecutive)" CanSort="false" />
+        <Column Label="Hire date" Value="@(x => x.HireDate)" Format="d" CanFilter="false" IsShown="false" />
+    </DataGridMultiSelect>
+</CodeExample>
 
 <h2>Disabled & read-only</h2>
 
@@ -371,23 +304,7 @@
     The select can be set as disabled or read-only by setting the properties of the same names.
 </p>
 
-<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" />
-                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
-                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
-            </div>
-            <div class="row mt-3 fill align-items-center gap-2">
-                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
-                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
-                <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+<CodeExample Code="@(@"<div class=""row fill align-items-center gap-2"">
     <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
     <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
     <Select OptionPairs=""_options"" @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
@@ -401,9 +318,18 @@
 @code {
     private int _disabled = 2;
     private List<KeyValuePair<int, string>> _options = new() { new(1, ""Option 1""), new(2, ""Option 2""), new(3, ""Option 3"") };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <div class="row fill align-items-center gap-2">
+        <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+        <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+        <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+    </div>
+    <div class="row mt-3 fill align-items-center gap-2">
+        <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+        <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+        <Select OptionPairs="_options2" @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+    </div>
+</CodeExample>
 
 <h2>Label</h2>
 
@@ -433,22 +359,13 @@
     The <code>Placeholder</code> property assigns a placeholder to the select.
 </p>
 
-<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <Select Options="_options" Label="Normal" Placeholder="Placeholder" />
-            <Select Options="_options" Label="Filled" Placeholder="Placeholder" Class="filled" />
-            <Select Options="_options" Label="Outlined" Placeholder="Placeholder" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" Label=""Normal"" Placeholder=""Placeholder"" />
-    <Select Options=""_options"" Label=""Filled"" Placeholder=""Placeholder"" Class=""filled"" />
-    <Select Options=""_options"" Label=""Outlined"" Placeholder=""Placeholder"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Select Options=""_options"" Label=""Normal"" Placeholder=""Placeholder"" />
+<Select Options=""_options"" Label=""Filled"" Placeholder=""Placeholder"" Class=""filled"" />
+<Select Options=""_options"" Label=""Outlined"" Placeholder=""Placeholder"" Class=""outlined"" />")">
+    <Select Options="_options" Label="Normal" Placeholder="Placeholder" />
+    <Select Options="_options" Label="Filled" Placeholder="Placeholder" Class="filled" />
+    <Select Options="_options" Label="Outlined" Placeholder="Placeholder" Class="outlined" />
+</CodeExample>
 
 <h2>Help text</h2>
 
@@ -456,22 +373,13 @@
     You can supply help text for the field with the <code>HelpText</code> property.
 </p>
 
-<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <Select Options="_options" Label="Normal" HelpText="Some help text" />
-            <Select Options="_options" Label="Filled" HelpText="Some help text" Class="filled" />
-            <Select Options="_options" Label="Outlined" HelpText="Some help text" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" Label=""Normal"" HelpText=""Some help text"" />
-    <Select Options=""_options"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
-    <Select Options=""_options"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Select Options=""_options"" Label=""Normal"" HelpText=""Some help text"" />
+<Select Options=""_options"" Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+<Select Options=""_options"" Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />")">
+    <Select Options="_options" Label="Normal" HelpText="Some help text" />
+    <Select Options="_options" Label="Filled" HelpText="Some help text" Class="filled" />
+    <Select Options="_options" Label="Outlined" HelpText="Some help text" Class="outlined" />
+</CodeExample>
 
 <p>
     Note that help text is replaced by any field validation errors.
@@ -492,22 +400,13 @@
     <code>select</code> will be set accordingly.
 </p>
 
-<Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <Select Options="_options" Label="Required" Required="true" />
-            <Select Options="_options" Label="Required" Required="true" Class="filled" />
-            <Select Options="_options" Label="Required" Required="true" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" Label=""Required"" Required=""true"" />
-    <Select Options=""_options"" Label=""Required"" Required=""true"" Class=""filled"" />
-    <Select Options=""_options"" Label=""Required"" Required=""true"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Select Options=""_options"" Label=""Required"" Required=""true"" />
+<Select Options=""_options"" Label=""Required"" Required=""true"" Class=""filled"" />
+<Select Options=""_options"" Label=""Required"" Required=""true"" Class=""outlined"" />")">
+    <Select Options="_options" Label="Required" Required="true" />
+    <Select Options="_options" Label="Required" Required="true" Class="filled" />
+    <Select Options="_options" Label="Required" Required="true" Class="outlined" />
+</CodeExample>
 
 <h2>Tab index</h2>
 
@@ -524,24 +423,17 @@
     is currently a selected value, and it is not disabled, read-only, or required.
 </p>
 
-<Collapse Id="ce-15" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Select TValue="int?">
-                <Option TValue="int?" Value="1" Label="Option 1" />
-                <Option TValue="int?" Value="2" Label="Option 2" />
-                <Option TValue="int?" Value="3" Label="Option 3" />
-            </Select>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select TValue=""int?"">
+<CodeExample IsOpen="true" Code="@(@"<Select TValue=""int?"">
     <Option TValue=""int?"" Value=""1"" Label=""Option 1"" />
     <Option TValue=""int?"" Value=""2"" Label=""Option 2"" />
     <Option TValue=""int?"" Value=""3"" Label=""Option 3"" />
-</Select>")
-    </ChildContent>
-</Collapse>
+</Select>")">
+    <Select TValue="int?">
+        <Option TValue="int?" Value="1" Label="Option 1" />
+        <Option TValue="int?" Value="2" Label="Option 2" />
+        <Option TValue="int?" Value="3" Label="Option 3" />
+    </Select>
+</CodeExample>
 
 <h2>Name</h2>
 
@@ -578,28 +470,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-16" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
-                <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
-                <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
-            </div>
-            <div class="row fill align-items-center gap-2">
-                <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
-                <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
-                <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
-            </div>
-            <div class="row fill align-items-center gap-2">
-                <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
-                <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
-                <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+<CodeExample Code="@(@"<div class=""row fill align-items-center gap-2"">
     <Select Options=""_options"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
     <Select Options=""_options"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
     <Select Options=""_options"" Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
@@ -613,34 +484,39 @@
     <Select Options=""_options"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
     <Select Options=""_options"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
     <Select Options=""_options"" Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="row fill align-items-center gap-2">
+        <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
+        <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
+        <Select Options="_options" Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
+    </div>
+    <div class="row fill align-items-center gap-2">
+        <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
+        <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
+        <Select Options="_options" Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
+    </div>
+    <div class="row fill align-items-center gap-2">
+        <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
+        <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
+        <Select Options="_options" Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
+    </div>
+</CodeExample>
 
 <p>
     You can add the <code>dense</code> class to any variant to reduce the margins and padding.
 </p>
 
-<Collapse Id="ce-17" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <Select Options="_options" Label="Normal" Class="dense" />
-            <Select Options="_options" Label="Filled" Class="filled dense" />
-            <Select Options="_options" Label="Outlined" Class="outlined dense" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Select Options=""_options"" Label=""Normal"" Class=""dense"" />
-    <Select Options=""_options"" Label=""Filled"" Class=""filled dense"" />
-    <Select Options=""_options"" Label=""Outlined"" Class=""outlined dense"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Select Options=""_options"" Label=""Normal"" Class=""dense"" />
+<Select Options=""_options"" Label=""Filled"" Class=""filled dense"" />
+<Select Options=""_options"" Label=""Outlined"" Class=""outlined dense"" />
 
 @code {
     private string[] _options = new[] { ""Option 1"", ""Option 2"", ""Option 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Select Options="_options" Label="Normal" Class="dense" />
+    <Select Options="_options" Label="Filled" Class="filled dense" />
+    <Select Options="_options" Label="Outlined" Class="outlined dense" />
+</CodeExample>
 
 <p>
     The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the

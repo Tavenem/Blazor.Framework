@@ -64,6 +64,10 @@
     }
 
     &.disabled, &[inert], [inert] & {
+        --checkbox-inherited-color: var(--tavenem-color-action-disabled);
+        --checkbox-inherited-active-color: var(--tavenem-color-action-disabled);
+        --checkbox-inherited-hover-bg: transparent;
+        --checkbox-inherited-active-hover-bg: transparent;
         legend {
             color: var(--tavenem-color-text-disabled);
         }
@@ -89,7 +93,9 @@
 
     &.invalid {
         --checkbox-inherited-color: var(--tavenem-color-error);
+        --checkbox-inherited-active-color: var(--tavenem-color-error);
         --checkbox-inherited-hover-bg: var(--tavenem-color-error-hover);
+        --checkbox-inherited-active-hover-bg: var(--tavenem-color-error-hover);
         --radio-group-text-color: var(--tavenem-color-error);
     }
 
@@ -103,8 +109,8 @@
         .info,
         .success,
         .warning) {
-        --checkbox-inherited-color: var(--tavenem-theme-color);
-        --checkbox-inherited-hover-bg: var(--tavenem-theme-color-hover);
+        --checkbox-inherited-active-color: var(--tavenem-theme-color);
+        --checkbox-inherited-active-hover-bg: var(--tavenem-theme-color-hover);
         --radio-group-text-color: var(--tavenem-theme-color);
         color: var(--tavenem-color-action);
     }

@@ -109,7 +109,7 @@ public partial class DialogInstance
                 _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "import",
                     "./_content/Tavenem.Blazor.Framework/tavenem-dialog.js");
-                await _module.InvokeVoidAsync("initialize", Id);
+                await _module.InvokeVoidAsync("initializeId", Id);
             }
         }
     }

@@ -254,7 +254,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
             const wasReadonly = input.readOnly;
             if (name === 'readonly') {
-                input.readOnly = !!newValue || this.matches(':disabled');
+                input.readOnly = (newValue != null) || this.matches(':disabled');
             }
             if (input.readOnly != wasReadonly) {
                 this.update({});
@@ -268,7 +268,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
             const input = root.querySelector('textarea');
             if (input) {
-                input.required = !!newValue;
+                input.required = (newValue != null);
             }
             this.setValidity();
         } else if (name === 'value' && newValue) {
@@ -1446,7 +1446,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         emojiInput.role = 'menuitem';
         emojiInput.classList.add('field', 'small');
         emojiInput.dataset.inputClass = 'rounded small';
-        emojiInput.dataset.popoverContainer = '';
         emojiInput.tabIndex = -1;
         if (disabledOrReadonly) {
             emojiInput.setAttribute('disabled', '');
@@ -1482,7 +1481,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             colorInput.dataset.icon = new Option(definition.icon).innerHTML;
         }
         colorInput.dataset.inputClass = 'rounded small';
-        colorInput.dataset.popoverContainer = '';
         colorInput.setAttribute('alpha', '');
         colorInput.setAttribute('button', '');
         if (disabledOrReadonly) {
@@ -1603,7 +1601,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         } else {
             dropdown.dataset.activation = '1'; // left-click
         }
-        dropdown.dataset.popoverContainer = '';
         if (disabled) {
             dropdown.setAttribute('disabled', '');
         }
@@ -1611,11 +1608,12 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         dropdown.appendChild(button);
 
         const dropdownPopover = document.createElement('tf-popover');
-        dropdownPopover.classList.add('top-left', 'flip-onopen', 'select-popover', 'filled', 'match-width');
+        dropdownPopover.classList.add('flip-onopen', 'select-popover', 'filled', 'match-width');
+        dropdownPopover.dataset.origin = 'top-left';
         if (child) {
-            dropdownPopover.classList.add('anchor-top-right');
+            dropdownPopover.dataset.anchorOrigin = 'top-right';
         } else {
-            dropdownPopover.classList.add('anchor-bottom-left');
+            dropdownPopover.dataset.anchorOrigin = 'bottom-left';
         }
         dropdownPopover.style.maxHeight = 'min(300px,90vh)';
         dropdownPopover.style.overflowY = 'auto';
@@ -1976,7 +1974,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         const modeButtonIcon = modeButton?.querySelector('svg');
         const modeButtonTooltipPopover = modeButton?.querySelector('.tooltip');
 
-        if (wysiwyg) {
+        if (wysiwyg && isWysiwygSyntax) {
             this._wysiwygEditor.initializeEditor(
                 this,
                 editorElement,

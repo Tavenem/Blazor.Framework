@@ -19,9 +19,9 @@ svg {
 }
 
 :host(:not([button])) {
-    --field-active-border-color: var(--tavenem-color-primary);
-    --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
-    --field-active-label-color: var(--tavenem-color-primary);
+    --field-active-border-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
+    --field-active-border-hover-color: var(--tavenem-theme-color-lighten, var(--tavenem-color-primary-lighten));
+    --field-active-label-color: var(--tavenem-theme-color, var(--tavenem-color-primary));
     --field-border-color: var(--tavenem-color-border-input);
     --field-border-hover-color: var(--tavenem-color-action);
     --field-color: var(--tavenem-color-text);
@@ -31,7 +31,6 @@ svg {
     display: flex;
     flex-basis: auto;
     flex-direction: column;
-    flex-grow: 1;
     flex-shrink: 1;
     margin-bottom: .5rem;
     margin-left: 0;
@@ -420,11 +419,15 @@ svg:not(.color-selector) {
 }
 
 .inputs-container {
-    align-items: flex-start;
+    align-items: center;
     display: flex;
     flex: 1 1 auto;
     gap: .25rem;
     margin-top: .25rem;
+
+    > tf-input-field {
+        flex-grow: 1;
+    }
 }
 
 :host([data-input-mode="hex"]) .alpha {
@@ -682,6 +685,10 @@ button::-moz-focus-inner {
 
 :host(.invalid) > .picker-btn {
     border-color: var(--tavenem-color-error);
+}
+
+.picker-btn:not(:has(.swatch-fill)) {
+    color: var(--tavenem-theme-color, inherit);
 }
 
 .picker-btn:has(.swatch-fill) {

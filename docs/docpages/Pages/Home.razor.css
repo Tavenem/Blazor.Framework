@@ -1,4 +1,4 @@
-﻿.background-gradient {
+.background-gradient {
     background: linear-gradient(transparent, transparent 25%, var(--tavenem-color-primary) 50%, var(--tavenem-color-success) 60%, transparent 69%, transparent),
         linear-gradient(to right, transparent, var(--tavenem-color-secondary), transparent);
     bottom: 0;

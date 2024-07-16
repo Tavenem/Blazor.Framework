@@ -81,8 +81,7 @@ public abstract class PersistentComponentBase : TavenemComponentBase, IDisposabl
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        await base.SetParametersAsync(parameters);
-
+        parameters.SetParameterProperties(this);
         if (string.IsNullOrEmpty(Id)
             || string.Equals(Id, _defaultId))
         {
@@ -97,6 +96,7 @@ public abstract class PersistentComponentBase : TavenemComponentBase, IDisposabl
                 Id = IdService.GenerateId(GetType().Name);
             }
         }
+        await base.SetParametersAsync(parameters);
     }
 
     /// <inheritdoc/>
