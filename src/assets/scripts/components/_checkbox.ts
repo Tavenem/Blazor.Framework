@@ -328,6 +328,7 @@ label {
             'data-allow-null',
             'data-input-class',
             'data-input-style',
+            'data-label',
             'indeterminate',
             'readonly',
             'value',
@@ -647,6 +648,9 @@ label {
             input.value = 'false';
         }
 
+        input.addEventListener('change', this.onChange.bind(this));
+        input.addEventListener('input', this.onChange.bind(this));
+
         span.appendChild(input);
 
         const checkedSlot = document.createElement('slot');
@@ -730,9 +734,6 @@ label {
         }
 
         this.setValidity(input);
-
-        input.addEventListener('change', this.onChange.bind(this));
-        input.addEventListener('input', this.onChange.bind(this));
 
         if (isRadio) {
             this.addEventListener('keypress', this.onKeyPress.bind(this));
@@ -853,6 +854,30 @@ label {
         } else if (name === 'value') {
             if (newValue && newValue.length) {
                 this.value = newValue || '';
+            }
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    const labelSlot = document.createElement('slot');
+                    labelSlot.name = 'label'
+                    label.replaceWith(labelSlot);
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const labelSlot = root.querySelector('slot[name="label"]');
+                if (input && labelSlot) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.textContent = newValue;
+                    labelSlot.replaceWith(label);
+                }
             }
         }
     }

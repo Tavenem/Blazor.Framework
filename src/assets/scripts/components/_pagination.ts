@@ -499,10 +499,10 @@ li {
             button.classList.add('btn-icon');
             button.disabled = this._currentPage <= 1;
             control = button;
-            first.appendChild(button);
             if (this._currentPage > 1) {
                 button.addEventListener('click', this.setCurrentPage.bind(this, 1));
             }
+            first.appendChild(button);
         }
 
         const firstIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -527,10 +527,10 @@ li {
             button.classList.add('btn-icon');
             button.disabled = this._currentPage <= 1;
             control = button;
-            previous.appendChild(button);
             if (this._currentPage > 1) {
                 button.addEventListener('click', this.setCurrentPage.bind(this, this._currentPage - 1));
             }
+            previous.appendChild(button);
         }
 
         const previousIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -588,8 +588,8 @@ li {
                 const button = document.createElement('button');
                 button.classList.add('btn-text');
                 button.textContent = i.toFixed(0);
-                item.appendChild(button);
                 button.addEventListener('click', this.setCurrentPage.bind(this, i));
+                item.appendChild(button);
             }
 
             nodes.push(item);
@@ -620,11 +620,11 @@ li {
             button.disabled = this._pageCount != null
                 && this._currentPage >= this._pageCount;
             control = button;
-            next.appendChild(button);
             if (this._pageCount == null
                 || this._currentPage <= this._pageCount) {
                 button.addEventListener('click', this.onNextPage.bind(this));
             }
+            next.appendChild(button);
         }
 
         const nextIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -652,11 +652,11 @@ li {
             button.disabled = this._pageCount != null
                 && this._currentPage >= this._pageCount;
             control = button;
-            last.appendChild(button);
             if (this._pageCount != null
                 && this._currentPage < this._pageCount) {
                 button.addEventListener('click', this.setCurrentPage.bind(this, this._pageCount));
             }
+            last.appendChild(button);
         }
 
         const lastIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');

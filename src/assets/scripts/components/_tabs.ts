@@ -221,8 +221,8 @@ export class TavenemTabHTMLElement extends HTMLElement {
 
         if ('canClose' in this.dataset) {
             const closeButton = document.createElement('tf-close');
-            shadow.appendChild(closeButton);
             closeButton.addEventListener('click', this.onClose.bind(this));
+            shadow.appendChild(closeButton);
         }
 
         this.configureForPanel();

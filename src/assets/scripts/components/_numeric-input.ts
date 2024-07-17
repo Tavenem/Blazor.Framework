@@ -2,185 +2,7 @@ import { randomUUID } from "../tavenem-utility";
 
 export class TavenemNumericInputHtmlElement extends HTMLElement {
     static formAssociated = true;
-
-    private _display: string | null | undefined;
-    private _initialDisplay: string | null | undefined;
-    private _initialValue: number | null | undefined;
-    private _inputDebounce: number = -1;
-    private _internals: ElementInternals;
-    private _max: number | null | undefined;
-    private _min: number | null | undefined;
-    private _numericValue: number | null | undefined;
-    private _step: number | null | undefined;
-    private _value = '';
-
-    static get observedAttributes() {
-        return [
-            'data-input-class',
-            'data-input-style',
-            'display',
-            'max',
-            'min',
-            'readonly',
-            'value'
-        ];
-    }
-
-    private static newEnterEvent() {
-        return new CustomEvent('enter', { bubbles: true, composed: true });
-    }
-
-    private static newValueChangeEvent(value: string) {
-        return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
-    private static newValueInputEvent(value: string) {
-        return new CustomEvent('valueinput', { bubbles: true, composed: true, detail: { value: value } });
-    }
-
-    get display() {
-        return this._display && this._display.length
-            ? this._display
-            : this._value;
-    }
-    set display(value: string | null | undefined) {
-        this._display = value;
-
-        let newValue = value;
-        if (value == null || !value.length) {
-            const padLength = parseInt(this.dataset.padLength || '');
-            if (Number.isFinite(padLength)
-                && padLength > this._value.length) {
-                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
-            } else {
-                newValue = this._value;
-            }
-        }
-
-        if (newValue!.length) {
-            this._internals.states.delete('empty');
-            this._internals.states.add('has-value');
-        } else {
-            this._internals.states.add('empty');
-            this._internals.states.delete('has-value');
-        }
-
-        const root = this.shadowRoot;
-        if (root) {
-            const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
-            if (input) {
-                input.value = newValue!;
-            }
-        }
-    }
-
-    get form() { return this._internals.form; }
-
-    get max() { return this._max; }
-    set max(value: number | null | undefined) {
-        this._max = value;
-        this.setValidity();
-    }
-
-    get min() { return this._min; }
-    set min(value: number | null | undefined) {
-        this._min = value;
-        this.setValidity();
-    }
-
-    get name() { return this.getAttribute('name'); }
-
-    get numericValue() { return this._numericValue; }
-    set numericValue(value: number | null | undefined) {
-        if (value == null) {
-            if (this._numericValue == null) {
-                return;
-            }
-        } else if (this._numericValue === value) {
-            return;
-        }
-
-        this._numericValue = value;
-
-        const newValue = this._numericValue == null
-            ? ''
-            : this._numericValue.toString();
-
-        if (this._value === newValue) {
-            return;
-        }
-
-        this._value = newValue;
-
-        if (newValue.length) {
-            this._internals.setFormValue(newValue);
-        } else {
-            this._internals.setFormValue(null);
-        }
-
-        this.display = null;
-
-        this.setValidity();
-
-        const root = this.shadowRoot;
-        if (root) {
-            const hiddenInput = root.querySelector<HTMLInputElement>('input[type="hidden"]');
-            if (hiddenInput) {
-                hiddenInput.value = newValue;
-            }
-
-            if (!this.matches(':disabled')) {
-                const spinUpButton = root.querySelector<HTMLButtonElement>('.spin-up');
-                if (spinUpButton) {
-                    spinUpButton.disabled = this._numericValue == null
-                        || !Number.isFinite(this._numericValue)
-                        || (this._max != null && this._numericValue >= this._max);
-                }
-                const spinDownButton = root.querySelector<HTMLButtonElement>('.spin-down');
-                if (spinDownButton) {
-                    spinDownButton.disabled = this._numericValue == null
-                        || !Number.isFinite(this._numericValue)
-                        || (this._min != null && this._numericValue <= this._min);
-                }
-            }
-        }
-
-        this.dispatchEvent(TavenemNumericInputHtmlElement.newValueInputEvent(newValue));
-    }
-
-    get required() { return this.hasAttribute('required'); }
-    set required(value: boolean) {
-        if (value) {
-            this.setAttribute('required', '');
-        } else {
-            this.removeAttribute('required');
-        }
-    }
-
-    get step() { return this._step; }
-    set step(value: number | null | undefined) { this._step = value; }
-
-    get type() { return this.localName; }
-
-    get validity() { return this._internals.validity; }
-    get validationMessage() { return this._internals.validationMessage; }
-
-    get value() { return this._value; }
-    set value(v: string) { this.setValue(v); }
-
-    get willValidate() { return this._internals.willValidate; }
-
-    constructor() {
-        super();
-
-        this._internals = this.attachInternals();
-    }
-
-    connectedCallback() {
-        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
-
-        const style = document.createElement('style');
-        style.textContent = `
+    static style = `
 :host {
     --field-active-border-color: var(--tavenem-color-primary);
     --field-active-border-hover-color: var(--tavenem-color-primary-lighten);
@@ -905,6 +727,186 @@ button::-moz-focus-inner {
     pointer-events: none;
 }
 `;
+
+    private _display: string | null | undefined;
+    private _initialDisplay: string | null | undefined;
+    private _initialValue: number | null | undefined;
+    private _inputDebounce: number = -1;
+    private _internals: ElementInternals;
+    private _max: number | null | undefined;
+    private _min: number | null | undefined;
+    private _numericValue: number | null | undefined;
+    private _step: number | null | undefined;
+    private _value = '';
+
+    static get observedAttributes() {
+        return [
+            'data-input-class',
+            'data-input-style',
+            'data-label',
+            'display',
+            'max',
+            'min',
+            'readonly',
+            'value'
+        ];
+    }
+
+    private static newEnterEvent() {
+        return new CustomEvent('enter', { bubbles: true, composed: true });
+    }
+
+    private static newValueChangeEvent(value: string) {
+        return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
+    private static newValueInputEvent(value: string) {
+        return new CustomEvent('valueinput', { bubbles: true, composed: true, detail: { value: value } });
+    }
+
+    get display() {
+        return this._display && this._display.length
+            ? this._display
+            : this._value;
+    }
+    set display(value: string | null | undefined) {
+        this._display = value;
+
+        let newValue = value;
+        if (value == null || !value.length) {
+            const padLength = parseInt(this.dataset.padLength || '');
+            if (Number.isFinite(padLength)
+                && padLength > this._value.length) {
+                newValue = this._value.padStart(padLength, this.dataset.paddingChar);
+            } else {
+                newValue = this._value;
+            }
+        }
+
+        if (newValue!.length) {
+            this._internals.states.delete('empty');
+            this._internals.states.add('has-value');
+        } else {
+            this._internals.states.add('empty');
+            this._internals.states.delete('has-value');
+        }
+
+        const root = this.shadowRoot;
+        if (root) {
+            const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+            if (input) {
+                input.value = newValue!;
+            }
+        }
+    }
+
+    get form() { return this._internals.form; }
+
+    get max() { return this._max; }
+    set max(value: number | null | undefined) {
+        this._max = value;
+        this.setValidity();
+    }
+
+    get min() { return this._min; }
+    set min(value: number | null | undefined) {
+        this._min = value;
+        this.setValidity();
+    }
+
+    get name() { return this.getAttribute('name'); }
+
+    get numericValue() { return this._numericValue; }
+    set numericValue(value: number | null | undefined) {
+        if (value == null) {
+            if (this._numericValue == null) {
+                return;
+            }
+        } else if (this._numericValue === value) {
+            return;
+        }
+
+        this._numericValue = value;
+
+        const newValue = this._numericValue == null
+            ? ''
+            : this._numericValue.toString();
+
+        if (this._value === newValue) {
+            return;
+        }
+
+        this._value = newValue;
+
+        if (newValue.length) {
+            this._internals.setFormValue(newValue);
+        } else {
+            this._internals.setFormValue(null);
+        }
+
+        this.display = null;
+
+        this.setValidity();
+
+        const root = this.shadowRoot;
+        if (root) {
+            const hiddenInput = root.querySelector<HTMLInputElement>('input[type="hidden"]');
+            if (hiddenInput) {
+                hiddenInput.value = newValue;
+            }
+
+            if (!this.matches(':disabled')) {
+                const spinUpButton = root.querySelector<HTMLButtonElement>('.spin-up');
+                if (spinUpButton) {
+                    spinUpButton.disabled = this._numericValue == null
+                        || !Number.isFinite(this._numericValue)
+                        || (this._max != null && this._numericValue >= this._max);
+                }
+                const spinDownButton = root.querySelector<HTMLButtonElement>('.spin-down');
+                if (spinDownButton) {
+                    spinDownButton.disabled = this._numericValue == null
+                        || !Number.isFinite(this._numericValue)
+                        || (this._min != null && this._numericValue <= this._min);
+                }
+            }
+        }
+
+        this.dispatchEvent(TavenemNumericInputHtmlElement.newValueInputEvent(newValue));
+    }
+
+    get required() { return this.hasAttribute('required'); }
+    set required(value: boolean) {
+        if (value) {
+            this.setAttribute('required', '');
+        } else {
+            this.removeAttribute('required');
+        }
+    }
+
+    get step() { return this._step; }
+    set step(value: number | null | undefined) { this._step = value; }
+
+    get type() { return this.localName; }
+
+    get validity() { return this._internals.validity; }
+    get validationMessage() { return this._internals.validationMessage; }
+
+    get value() { return this._value; }
+    set value(v: string) { this.setValue(v); }
+
+    get willValidate() { return this._internals.willValidate; }
+
+    constructor() {
+        super();
+
+        this._internals = this.attachInternals();
+    }
+
+    connectedCallback() {
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
+
+        const style = document.createElement('style');
+        style.textContent = TavenemNumericInputHtmlElement.style;
         shadow.appendChild(style);
 
         const outerInput = document.createElement('div');
@@ -979,11 +981,16 @@ button::-moz-focus-inner {
         input.style.cssText = this.dataset.inputStyle || '';
         input.type = 'text';
 
+        input.addEventListener('change', this.onChange.bind(this));
+        input.addEventListener('input', this.onInput.bind(this));
+        input.addEventListener('keydown', this.onKeyDown.bind(this));
         outerInput.appendChild(input);
 
         const clear = document.createElement('button');
         clear.classList.add('clear');
         clear.tabIndex = -1;
+        clear.addEventListener('mouseup', this.onButtonMouseUp.bind(this));
+        clear.addEventListener('click', this.onClear.bind(this));
         outerInput.appendChild(clear);
 
         const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -1006,9 +1013,9 @@ button::-moz-focus-inner {
             spinUpButton.classList.add('spin-up');
             spinUpButton.disabled = true;
             spinUpButton.tabIndex = -1;
-            spinButtons.appendChild(spinUpButton);
             spinUpButton.addEventListener('mouseup', this.onButtonMouseUp.bind(this));
             spinUpButton.addEventListener('click', this.increment.bind(this));
+            spinButtons.appendChild(spinUpButton);
 
             const spinUpIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             spinUpButton.appendChild(spinUpIcon);
@@ -1018,9 +1025,9 @@ button::-moz-focus-inner {
             spinDownButton.classList.add('spin-down');
             spinDownButton.disabled = true;
             spinDownButton.tabIndex = -1;
-            spinButtons.appendChild(spinDownButton);
             spinDownButton.addEventListener('mouseup', this.onButtonMouseUp.bind(this));
             spinDownButton.addEventListener('click', this.decrement.bind(this));
+            spinButtons.appendChild(spinDownButton);
 
             const spinDownIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             spinDownButton.appendChild(spinDownIcon);
@@ -1065,12 +1072,6 @@ button::-moz-focus-inner {
 
         this.display = this.getAttribute('display');
         this._initialDisplay = this._display;
-
-        input.addEventListener('change', this.onChange.bind(this));
-        input.addEventListener('input', this.onInput.bind(this));
-        input.addEventListener('keydown', this.onKeyDown.bind(this));
-        clear.addEventListener('mouseup', this.onButtonMouseUp.bind(this));
-        clear.addEventListener('click', this.onClear.bind(this));
     }
 
     disconnectedCallback() {
@@ -1133,6 +1134,28 @@ button::-moz-focus-inner {
             this.setValidity();
         } else if (name === 'value') {
             this.setValue(newValue);
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    label.remove();
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const slot = root.querySelector('slot[name="helpers"]');
+                if (input && slot) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.innerText = newValue;
+                    root.insertBefore(label, slot.nextSibling);
+                }
+            }
         }
     }
 

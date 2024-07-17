@@ -101,8 +101,8 @@ export class CodeBlockView implements NodeView {
             syntaxInput.setAttribute('disabled', '');
         }
         syntaxInput.setAttribute('size', '10');
-        div.appendChild(syntaxInput);
         syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
+        div.appendChild(syntaxInput);
 
         const list = document.createElement('div');
         list.classList.add('list');

@@ -97,12 +97,14 @@ class SpritePool {
 
 export class ImageEditor {
     readonly editor: Application;
+
     backgroundImage?: Sprite;
     cropAspectRatio?: number | null;
     drawingMode: DrawingMode = DrawingMode.None;
     originalHeight: number;
     originalSrc?: string;
     originalWidth: number;
+
     private _brushBuffer = new Container();
     private _brushHistoryBuffer = new Container();
     private _brushHistory: DisplayObject[] = [];
@@ -775,15 +777,14 @@ export class ImageEditor {
 
         const overlay = document.createElement('div');
         overlay.classList.add('overlay');
-        container.appendChild(overlay);
         overlay.addEventListener('click', close);
+        container.appendChild(overlay);
 
         const dialog = document.createElement('dialog') as Dialog;
         dialog.id = randomUUID();
         dialog.classList.add('resizable');
         dialog.style.minWidth = 'fit-content';
         dialog.style.width = '50vw';
-        container.appendChild(dialog);
         dialog.addEventListener('close', ev => {
             if (!(ev.target instanceof HTMLDialogElement)) {
                 return;
@@ -810,6 +811,7 @@ export class ImageEditor {
             }
             form.reset();
         });
+        container.appendChild(dialog);
 
         const dialogInner = document.createElement('div');
         dialog.appendChild(dialogInner);
@@ -823,8 +825,8 @@ export class ImageEditor {
         header.appendChild(heading);
 
         const closeButton = document.createElement('tf-close');
-        header.appendChild(closeButton);
         closeButton.addEventListener('click', close);
+        header.appendChild(closeButton);
 
         const body = document.createElement('div');
         body.classList.add('body');
@@ -859,9 +861,9 @@ export class ImageEditor {
         if (text) {
             urlInput.setAttribute('value', text);
         }
-        form.appendChild(urlInput);
         urlInput.addEventListener('valueinput', validate);
         urlInput.addEventListener('valuechange', validate);
+        form.appendChild(urlInput);
 
         const footer = document.createElement('div');
         footer.classList.add('footer');
@@ -874,8 +876,8 @@ export class ImageEditor {
         const cancelButton = document.createElement('button');
         cancelButton.classList.add('btn', 'btn-text');
         cancelButton.textContent = 'Cancel';
-        buttons.appendChild(cancelButton);
         cancelButton.addEventListener('click', close);
+        buttons.appendChild(cancelButton);
 
         const okButton = document.createElement('button');
         okButton.classList.add('btn', 'btn-text', 'primary', 'ok-button');

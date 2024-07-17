@@ -59,8 +59,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         const editButton = document.createElement('button');
         editButton.classList.add('image-edit-button');
         editButton.ariaLabel = 'edit';
-        shadow.appendChild(editButton);
         editButton.addEventListener('click', this.startEdit.bind(this));
+        shadow.appendChild(editButton);
 
         const editButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         editButton.appendChild(editButtonIcon);
@@ -90,8 +90,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         cropButton.classList.add('crop-button');
         cropButton.ariaLabel = 'crop';
         cropButton.role = 'menuitem';
-        cropGroup.appendChild(cropButton);
         cropButton.addEventListener('click', this.crop.bind(this));
+        cropGroup.appendChild(cropButton);
 
         const cropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         cropButton.appendChild(cropButtonIcon);
@@ -105,8 +105,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         cropButton.classList.add('cancel-crop-button');
         cancelCropButton.ariaLabel = 'cancel crop';
         cancelCropButton.role = 'menuitem';
-        cropGroup.appendChild(cancelCropButton);
         cancelCropButton.addEventListener('click', this.cancel.bind(this));
+        cropGroup.appendChild(cancelCropButton);
 
         const cancelCropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         cancelCropButton.appendChild(cancelCropButtonIcon);
@@ -127,8 +127,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             freeCropButton.classList.add('aspect-ratio-button', 'free-crop-button', 'active');
             freeCropButton.ariaLabel = 'free crop';
             freeCropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(freeCropButton);
             freeCropButton.addEventListener('click', this.setCropAspectRatio.bind(this, null));
+            aspectRatioGroup.appendChild(freeCropButton);
 
             const freeCropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             freeCropButton.appendChild(freeCropButtonIcon);
@@ -143,8 +143,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             originalCropButton.dataset.aspectRatio = '-1';
             originalCropButton.ariaLabel = 'original aspect ratio';
             originalCropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(originalCropButton);
             originalCropButton.addEventListener('click', this.setCropAspectRatio.bind(this, -1));
+            aspectRatioGroup.appendChild(originalCropButton);
 
             const originalCropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             originalCropButton.appendChild(originalCropButtonIcon);
@@ -159,8 +159,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             squareCropButton.dataset.aspectRatio = '1';
             squareCropButton.ariaLabel = 'square';
             squareCropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(squareCropButton);
             squareCropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 1));
+            aspectRatioGroup.appendChild(squareCropButton);
 
             const squareCropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             squareCropButton.appendChild(squareCropButtonIcon);
@@ -175,8 +175,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             five4CropButton.dataset.aspectRatio = '1.25';
             five4CropButton.ariaLabel = '5:4 aspect ratio';
             five4CropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(five4CropButton);
             five4CropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 1.25));
+            aspectRatioGroup.appendChild(five4CropButton);
 
             const five4CropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             five4CropButton.appendChild(five4CropButtonIcon);
@@ -191,8 +191,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             four3CropButton.dataset.aspectRatio = '1.333333';
             four3CropButton.ariaLabel = '4:3 aspect ratio';
             four3CropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(four3CropButton);
             four3CropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 4 / 3));
+            aspectRatioGroup.appendChild(four3CropButton);
 
             const four3CropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             four3CropButton.appendChild(four3CropButtonIcon);
@@ -207,8 +207,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             three2CropButton.dataset.aspectRatio = '1.5';
             three2CropButton.ariaLabel = '3:2 aspect ratio';
             three2CropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(three2CropButton);
             three2CropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 1.5));
+            aspectRatioGroup.appendChild(three2CropButton);
 
             const three2CropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             three2CropButton.appendChild(three2CropButtonIcon);
@@ -223,8 +223,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             sixteen9CropButton.dataset.aspectRatio = '1.777778';
             sixteen9CropButton.ariaLabel = '16:9 aspect ratio';
             sixteen9CropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(sixteen9CropButton);
             sixteen9CropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 16 / 9));
+            aspectRatioGroup.appendChild(sixteen9CropButton);
 
             const sixteen9CropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             sixteen9CropButton.appendChild(sixteen9CropButtonIcon);
@@ -239,8 +239,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             seven5CropButton.dataset.aspectRatio = '1.4';
             seven5CropButton.ariaLabel = '7:5 aspect ratio';
             seven5CropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(seven5CropButton);
             seven5CropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 1.4));
+            aspectRatioGroup.appendChild(seven5CropButton);
 
             const seven5CropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             seven5CropButton.appendChild(seven5CropButtonIcon);
@@ -255,8 +255,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             three4CropButton.dataset.aspectRatio = '0.75';
             three4CropButton.ariaLabel = '3:4 aspect ratio';
             three4CropButton.role = 'menuitem';
-            aspectRatioGroup.appendChild(three4CropButton);
             three4CropButton.addEventListener('click', this.setCropAspectRatio.bind(this, 0.75));
+            aspectRatioGroup.appendChild(three4CropButton);
 
             const three4CropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             three4CropButton.appendChild(three4CropButtonIcon);
@@ -284,8 +284,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         undoButton.ariaLabel = 'undo';
         undoButton.disabled = true;
         undoButton.role = 'menuitem';
-        historyGroup.appendChild(undoButton);
         undoButton.addEventListener('click', this.undo.bind(this));
+        historyGroup.appendChild(undoButton);
 
         const undoButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         undoButton.appendChild(undoButtonIcon);
@@ -300,8 +300,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         redoButton.ariaLabel = 'redo';
         redoButton.disabled = true;
         redoButton.role = 'menuitem';
-        historyGroup.appendChild(redoButton);
         redoButton.addEventListener('click', this.redo.bind(this));
+        historyGroup.appendChild(redoButton);
 
         const redoButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         redoButton.appendChild(redoButtonIcon);
@@ -324,8 +324,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             saveButton.classList.add('save-button');
             saveButton.ariaLabel = 'save';
             saveButton.disabled = true;
-            saveGroup.appendChild(saveButton);
             saveButton.addEventListener('click', this.save.bind(this, null, null));
+            saveGroup.appendChild(saveButton);
 
             const saveButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             saveButton.appendChild(saveButtonIcon);
@@ -340,8 +340,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         downloadButton.classList.add('download-button');
         downloadButton.ariaLabel = 'download';
         downloadButton.role = 'menuitem';
-        saveGroup.appendChild(downloadButton);
         downloadButton.addEventListener('click', this.exportImage.bind(this, null, null));
+        saveGroup.appendChild(downloadButton);
 
         const downloadButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         downloadButton.appendChild(downloadButtonIcon);
@@ -390,9 +390,9 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             pngSpan.tabIndex = -1;
             pngSpan.role = 'menuitem';
             pngSpan.ariaLabel = 'PNG';
-            list.appendChild(pngSpan);
             pngSpan.addEventListener('mousedown', this.preventDefault);
             pngSpan.addEventListener('mouseup', this.setFormat.bind(this, "image/png"));
+            list.appendChild(pngSpan);
 
             const pngActiveIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             pngSpan.appendChild(pngActiveIcon);
@@ -408,9 +408,9 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             jpegSpan.tabIndex = -1;
             jpegSpan.role = 'menuitem';
             jpegSpan.ariaLabel = 'JPEG';
-            list.appendChild(jpegSpan);
             jpegSpan.addEventListener('mousedown', this.preventDefault);
             jpegSpan.addEventListener('mouseup', this.setFormat.bind(this, "image/jpeg"));
+            list.appendChild(jpegSpan);
 
             const jpegActiveIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             jpegSpan.appendChild(jpegActiveIcon);
@@ -426,9 +426,9 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
             webpSpan.tabIndex = -1;
             webpSpan.role = 'menuitem';
             webpSpan.ariaLabel = 'WebP';
-            list.appendChild(webpSpan);
             webpSpan.addEventListener('mousedown', this.preventDefault);
             webpSpan.addEventListener('mouseup', this.setFormat.bind(this, "image/webp"));
+            list.appendChild(webpSpan);
 
             const webpActiveIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             webpSpan.appendChild(webpActiveIcon);
@@ -443,8 +443,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
         cancelEditButton.classList.add('cancel-edit-button');
         cancelEditButton.ariaLabel = 'cancel edit';
         cancelEditButton.role = 'menuitem';
-        fileTools.appendChild(cancelEditButton);
         cancelEditButton.addEventListener('click', this.destroy.bind(this, false));
+        fileTools.appendChild(cancelEditButton);
 
         const cancelEditButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         cancelEditButton.appendChild(cancelEditButtonIcon);
@@ -476,8 +476,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     const rotateLeftButton = document.createElement('button');
                     rotateLeftButton.classList.add('rotate-left-button');
                     rotateLeftButton.ariaLabel = 'rotate left';
-                    transformGroup.appendChild(rotateLeftButton);
                     rotateLeftButton.addEventListener('click', this.rotateCounterClockwise.bind(this));
+                    transformGroup.appendChild(rotateLeftButton);
 
                     const rotateLeftButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     rotateLeftButton.appendChild(rotateLeftButtonIcon);
@@ -490,8 +490,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     const rotateRightButton = document.createElement('button');
                     rotateRightButton.classList.add('rotate-right-button');
                     rotateRightButton.ariaLabel = 'rotate right';
-                    transformGroup.appendChild(rotateRightButton);
                     rotateRightButton.addEventListener('click', this.rotateClockwise.bind(this));
+                    transformGroup.appendChild(rotateRightButton);
 
                     const rotateRightButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     rotateRightButton.appendChild(rotateRightButtonIcon);
@@ -506,8 +506,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     const flipHorizontalButton = document.createElement('button');
                     flipHorizontalButton.classList.add('flip-horizontal-button');
                     flipHorizontalButton.ariaLabel = 'flip horizontally';
-                    transformGroup.appendChild(flipHorizontalButton);
                     flipHorizontalButton.addEventListener('click', this.flipHorizontal.bind(this));
+                    transformGroup.appendChild(flipHorizontalButton);
 
                     const flipHorizontalButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     flipHorizontalButton.appendChild(flipHorizontalButtonIcon);
@@ -520,8 +520,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     const flipVerticalButton = document.createElement('button');
                     flipVerticalButton.classList.add('flip-vertical-button');
                     flipVerticalButton.ariaLabel = 'flip vertically';
-                    transformGroup.appendChild(flipVerticalButton);
                     flipVerticalButton.addEventListener('click', this.flipVertical.bind(this));
+                    transformGroup.appendChild(flipVerticalButton);
 
                     const flipVerticalButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     flipVerticalButton.appendChild(flipVerticalButtonIcon);
@@ -546,8 +546,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     cancelEraseButton.classList.add('cancel-erase-button', 'tool', 'drawing-tool', 'erasing-tool');
                     cancelEraseButton.ariaLabel = 'draw';
                     cancelEraseButton.role = 'menuitem';
-                    drawingTools.appendChild(cancelEraseButton);
                     cancelEraseButton.addEventListener('click', this.setIsErasing.bind(this, false));
+                    drawingTools.appendChild(cancelEraseButton);
 
                     const cancelEraseButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     cancelEraseButton.appendChild(cancelEraseButtonIcon);
@@ -568,8 +568,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     colorInput.role = 'menuitem';
                     colorInput.ariaLabel = 'color';
                     colorInput.setAttribute('button', '');
-                    drawingGroup.appendChild(colorInput);
                     colorInput.addEventListener('valuechange', this.onSetBrushColor.bind(this));
+                    drawingGroup.appendChild(colorInput);
 
                     const colorTooltip = document.createElement('tf-tooltip');
                     colorTooltip.textContent = 'color';
@@ -579,8 +579,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     eraseButton.classList.add('erase-button');
                     eraseButton.ariaLabel = 'erase';
                     eraseButton.role = 'menuitem';
-                    drawingGroup.appendChild(eraseButton);
                     eraseButton.addEventListener('click', this.setIsErasing.bind(this, true));
+                    drawingGroup.appendChild(eraseButton);
 
                     const eraseButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     eraseButton.appendChild(eraseButtonIcon);
@@ -605,19 +605,14 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     brushSizeIcon.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M120-160v-40h720v40H120Zm0-120v-80h720v80H120Zm0-160v-120h720v120H120Zm0-200v-160h720v160H120Z"/></svg>`;
 
                     const brushSizeSlider = document.createElement('tf-slider');
-                    brushSizeSlider.dataset.value = TavenemImageEditorHtmlElement._brushSizeDefault.toString();
+                    brushSizeSlider.ariaLabel = 'brush size';
+                    brushSizeSlider.classList.add('brush-size-input');
+                    brushSizeSlider.setAttribute('min', '1');
+                    brushSizeSlider.setAttribute('max', '100');
+                    brushSizeSlider.setAttribute('step', '0.1');
+                    brushSizeSlider.setAttribute('value', TavenemImageEditorHtmlElement._brushSizeDefault.toString());
+                    brushSizeSlider.addEventListener('valuechange', this.onSetBrushSize.bind(this));
                     brushSizeContainer.appendChild(brushSizeSlider);
-
-                    const brushSizeInput = document.createElement('input');
-                    brushSizeInput.classList.add('brush-size-input');
-                    brushSizeInput.type = 'range';
-                    brushSizeInput.min = '1';
-                    brushSizeInput.max = '100';
-                    brushSizeInput.step = '0.1';
-                    brushSizeInput.value = TavenemImageEditorHtmlElement._brushSizeDefault.toString();
-                    brushSizeInput.ariaLabel = 'brush size';
-                    brushSizeSlider.appendChild(brushSizeInput);
-                    brushSizeInput.addEventListener('input', this.onSetBrushSize.bind(this));
 
                     const brushSizeTooltip = document.createElement('tf-tooltip');
                     brushSizeTooltip.textContent = 'brush size';
@@ -633,8 +628,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     doneDrawingButton.classList.add('done-drawing-button', 'tool', 'drawing-tool');
                     doneDrawingButton.ariaLabel = 'stop drawing';
                     doneDrawingButton.role = 'menuitem';
-                    drawingTools.appendChild(doneDrawingButton);
                     doneDrawingButton.addEventListener('click', this.setDrawingMode.bind(this, DrawingMode.None));
+                    drawingTools.appendChild(doneDrawingButton);
 
                     const doneDrawingButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     doneDrawingButton.appendChild(doneDrawingButtonIcon);
@@ -656,8 +651,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     textColorInput.dataset.inputClass = 'rounded small';
                     textColorInput.ariaLabel = 'color';
                     textColorInput.setAttribute('button', '');
-                    textGroup.appendChild(textColorInput);
                     textColorInput.addEventListener('valuechange', this.onSetTextColor.bind(this));
+                    textGroup.appendChild(textColorInput);
 
                     const textColorTooltip = document.createElement('tf-tooltip');
                     textColorTooltip.textContent = 'color';
@@ -667,8 +662,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     textButton.classList.add('text-button');
                     textButton.ariaLabel = 'add text';
                     textButton.role = 'menuitem';
-                    textGroup.appendChild(textButton);
                     textButton.addEventListener('click', this.startAddingText.bind(this));
+                    textGroup.appendChild(textButton);
 
                     const textButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     textButton.appendChild(textButtonIcon);
@@ -682,8 +677,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     doneTextButton.classList.add('done-text-button');
                     doneTextButton.ariaLabel = 'stop adding text';
                     doneTextButton.role = 'menuitem';
-                    textGroup.appendChild(doneTextButton);
                     doneTextButton.addEventListener('click', this.setTextMode.bind(this, false));
+                    textGroup.appendChild(doneTextButton);
 
                     const doneTextButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     doneTextButton.appendChild(doneTextButtonIcon);
@@ -705,8 +700,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     drawButton.classList.add('draw-button');
                     drawButton.ariaLabel = 'draw';
                     drawButton.role = 'menuitem';
-                    modeGroup.appendChild(drawButton);
                     drawButton.addEventListener('click', this.setDrawingMode.bind(this, DrawingMode.Brush));
+                    modeGroup.appendChild(drawButton);
 
                     const drawButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     drawButton.appendChild(drawButtonIcon);
@@ -720,8 +715,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     addTextButton.classList.add('add-text-button');
                     addTextButton.ariaLabel = 'add text';
                     addTextButton.role = 'menuitem';
-                    modeGroup.appendChild(addTextButton);
                     addTextButton.addEventListener('click', this.setTextMode.bind(this, true));
+                    modeGroup.appendChild(addTextButton);
 
                     const addTextButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     addTextButton.appendChild(addTextButtonIcon);
@@ -736,8 +731,8 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
                     const cropButton = document.createElement('button');
                     cropButton.classList.add('start-crop-button');
                     cropButton.ariaLabel = 'crop';
-                    modeGroup.appendChild(cropButton);
                     cropButton.addEventListener('click', this.startCrop.bind(this));
+                    modeGroup.appendChild(cropButton);
 
                     const cropButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
                     cropButton.appendChild(cropButtonIcon);
@@ -923,7 +918,7 @@ export class TavenemImageEditorHtmlElement extends HTMLElement {
 
         const brushSizeInput = root.querySelector('.brush-size-input');
         if (brushSizeInput) {
-            brushSizeInput.removeEventListener('input', this.onSetBrushSize.bind(this));
+            brushSizeInput.removeEventListener('valuechange', this.onSetBrushSize.bind(this));
         }
 
         const doneDrawingButton = root.querySelector('.done-drawing-button');

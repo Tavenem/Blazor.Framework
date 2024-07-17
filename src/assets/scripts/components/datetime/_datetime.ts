@@ -104,7 +104,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
     private _yearStep: number = 1;
 
     static get observedAttributes() {
-        return ['max', 'min', 'readonly', 'value'];
+        return ['data-label', 'max', 'min', 'readonly', 'value'];
     }
 
     get form() { return this._internals.form; }
@@ -443,8 +443,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 input.dataset.inputStyle = this.dataset.inputStyle;
             }
             input.dataset.pickerNoToggle = '';
-            shadow.appendChild(input);
+            input.addEventListener('valueinput', this.onInput.bind(this));
             input.addEventListener('valuechange', this.onInput.bind(this));
+            shadow.appendChild(input);
             if (this._value) {
                 input.value = display.value;
                 if (display.display) {
@@ -594,9 +595,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 select.dataset.inputStyle = `min-width: ${calendars.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
                 select.dataset.popoverLimitHeight = '';
                 select.style.backgroundColor = 'var(--tavenem-color-bg-input)';
-                calendarContainer.appendChild(select);
                 select.addEventListener('valuechange', this.onCalendarChange.bind(this));
                 select.addEventListener('valueinput', this.stopEvent.bind(this));
+                calendarContainer.appendChild(select);
                 select.value = calendar.identifier;
                 select.display = dn.of(calendar.identifier);
 
@@ -618,8 +619,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                     const allCalendarsCheckbox = document.createElement('tf-checkbox');
                     allCalendarsCheckbox.dataset.label = 'Show All';
                     allCalendarsCheckbox.classList.add('all-calendars-input');
-                    calendarContainer.appendChild(allCalendarsCheckbox);
                     allCalendarsCheckbox.addEventListener('inputtoggle', this.onShowAllCalendars.bind(this));
+                    calendarContainer.appendChild(allCalendarsCheckbox);
                 }
             }
 
@@ -636,9 +637,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 select.dataset.inputStyle = `min-width: ${timeZones.map(x => x.length).reduce((x, y) => Math.max(x, y), -Infinity)}ch`;
                 select.dataset.popoverLimitHeight = '';
                 select.style.backgroundColor = 'var(--tavenem-color-bg-input)';
-                timeZoneContainer.appendChild(select);
                 select.addEventListener('valuechange', this.onTimeZoneChange.bind(this));
                 select.addEventListener('valueinput', this.stopEvent.bind(this));
+                timeZoneContainer.appendChild(select);
                 select.value = timeZone;
 
                 const list = document.createElement('div');
@@ -658,8 +659,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                     const allTimeZonesCheckbox = document.createElement('tf-checkbox');
                     allTimeZonesCheckbox.dataset.label = 'Show All';
                     allTimeZonesCheckbox.classList.add('all-time-zones-input');
-                    timeZoneContainer.appendChild(allTimeZonesCheckbox);
                     allTimeZonesCheckbox.addEventListener('inputtoggle', this.onShowAllTimeZones.bind(this));
+                    timeZoneContainer.appendChild(allTimeZonesCheckbox);
                 }
             }
         }
@@ -698,16 +699,16 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             yearButton.type = 'button';
             yearButton.classList.add('btn-text', 'year-button');
             yearButton.textContent = getLocaleString(valueOrNow, locale, timeZone, calendarName, { era: 'short', year: 'numeric' });
-            currentDateSection.appendChild(yearButton);
             yearButton.addEventListener('click', this.setView.bind(this, DateTimeViewType.year, 1));
+            currentDateSection.appendChild(yearButton);
 
             if (this._type != DateTimeType.Year) {
                 const currentButton = document.createElement('button');
                 currentButton.type = 'button';
                 currentButton.classList.add('btn-text', 'current-date-button');
                 currentButton.textContent = display.currentDate || '';
-                currentDateSection.appendChild(currentButton);
                 currentButton.addEventListener('click', this.onShowNow.bind(this));
+                currentDateSection.appendChild(currentButton);
             }
         }
 
@@ -739,8 +740,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 hourInput.setAttribute('value', this._displayedTime.hour.toString());
             }
             hourInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
-            currentTime.appendChild(hourInput);
             hourInput.addEventListener('valueinput', this.onHourInput.bind(this));
+            hourInput.addEventListener('valuechange', this.onHourInput.bind(this));
+            currentTime.appendChild(hourInput);
 
             const timeSeparator = document.createElement('span');
             timeSeparator.classList.add('centered-grid');
@@ -758,8 +760,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             minuteInput.dataset.paddingChar = '0';
             minuteInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
             minuteInput.setAttribute('value', this._displayedTime.minute.toString());
-            currentTime.appendChild(minuteInput);
             minuteInput.addEventListener('valueinput', this.onMinuteInput.bind(this));
+            minuteInput.addEventListener('valuechange', this.onMinuteInput.bind(this));
+            currentTime.appendChild(minuteInput);
 
             if (this.hasAttribute('seconds')) {
                 const secondSeparator = document.createElement('span');
@@ -778,8 +781,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 secondInput.dataset.paddingChar = '0';
                 secondInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
                 secondInput.setAttribute('value', this._displayedTime.second.toString());
-                currentTime.appendChild(secondInput);
                 secondInput.addEventListener('valueinput', this.onSecondInput.bind(this));
+                secondInput.addEventListener('valuechange', this.onSecondInput.bind(this));
+                currentTime.appendChild(secondInput);
             }
 
             if (hour12) {
@@ -793,8 +797,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                     amButton.classList.add('inactive');
                 }
                 amButton.textContent = this.dataset.am || 'am';
-                dayPeriodContainer.appendChild(amButton);
                 amButton.addEventListener('click', this.onAM.bind(this));
+                dayPeriodContainer.appendChild(amButton);
 
                 const pmButton = document.createElement('button');
                 pmButton.classList.add('pm-button', 'btn-text');
@@ -802,8 +806,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                     pmButton.classList.add('inactive');
                 }
                 pmButton.textContent = this.dataset.pm || 'pm';
-                dayPeriodContainer.appendChild(pmButton);
                 pmButton.addEventListener('click', this.onPM.bind(this));
+                dayPeriodContainer.appendChild(pmButton);
             }
         }
 
@@ -819,8 +823,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             const previous = document.createElement('button');
             previous.type = 'button';
             previous.classList.add('previous');
-            nav.appendChild(previous);
             previous.addEventListener('click', this.onPrevious.bind(this));
+            nav.appendChild(previous);
 
             const previousIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             previous.appendChild(previousIcon);
@@ -829,14 +833,14 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             const expandViewButton = document.createElement('button');
             expandViewButton.type = 'button';
             expandViewButton.classList.add('btn-text', 'outlined', 'expand-view');
-            nav.appendChild(expandViewButton);
             expandViewButton.addEventListener('click', this.onExpandView.bind(this));
+            nav.appendChild(expandViewButton);
 
             const next = document.createElement('button');
             next.type = 'button';
             next.classList.add('next');
-            nav.appendChild(next);
             next.addEventListener('click', this.onNext.bind(this));
+            nav.appendChild(next);
 
             const nextIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             next.appendChild(nextIcon);
@@ -881,8 +885,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         } else if (this._value instanceof Time) {
             nowButton.disabled = this._value.compare(nowTime) === 0;
         }
-        nowContainer.appendChild(nowButton);
         nowButton.addEventListener('click', this.onNow.bind(this));
+        nowContainer.appendChild(nowButton);
 
         const nowIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         nowButton.appendChild(nowIcon);
@@ -898,14 +902,14 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             clearButton.textContent = "Clear";
             clearButton.disabled = this.hasAttribute('disabled')
                 || this.hasAttribute('readonly');
-            buttonsDiv.appendChild(clearButton);
             clearButton.addEventListener('click', this.onClearButton.bind(this));
+            buttonsDiv.appendChild(clearButton);
 
             const okButton = document.createElement('button');
             okButton.classList.add('ok');
             okButton.textContent = "Ok";
-            buttonsDiv.appendChild(okButton);
             okButton.addEventListener('click', this.onOk.bind(this));
+            buttonsDiv.appendChild(okButton);
         }
 
         switch (this._type) {
@@ -944,6 +948,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
 
         const input = root.querySelector('.input');
         if (input) {
+            input.removeEventListener('valueinput', this.onInput.bind(this));
             input.removeEventListener('valuechange', this.onInput.bind(this));
         }
         const calendarSelect = root.querySelector('.calendar-select');
@@ -973,14 +978,17 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         const hourInput = root.querySelector('.hour-input');
         if (hourInput) {
             hourInput.removeEventListener('valueinput', this.onHourInput.bind(this));
+            hourInput.removeEventListener('valuechange', this.onHourInput.bind(this));
         }
         const minuteInput = root.querySelector('.minute-input');
         if (minuteInput) {
             minuteInput.removeEventListener('valueinput', this.onMinuteInput.bind(this));
+            minuteInput.removeEventListener('valuechange', this.onMinuteInput.bind(this));
         }
         const secondInput = root.querySelector('.second-input');
         if (secondInput) {
             secondInput.removeEventListener('valueinput', this.onSecondInput.bind(this));
+            secondInput.removeEventListener('valuechange', this.onSecondInput.bind(this));
         }
         const amButton = root.querySelector('.am-button');
         if (amButton) {
@@ -1069,6 +1077,28 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         } else if (name === 'value'
             && newValue) {
             this.setValue(newValue);
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    label.remove();
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const slot = root.querySelector('slot');
+                if (input && slot) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.innerText = newValue;
+                    root.insertBefore(label, slot);
+                }
+            }
         }
     }
 
@@ -1530,6 +1560,13 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 this.setDateTimeValue(this._displayedTime.set({ hour: value + 24 }));
             }
         } else if (this._value) {
+            if ((this._value instanceof CalendarDateTime
+                || this._value instanceof ZonedDateTime
+                || this._value instanceof Time)
+                && this._value.hour === value) {
+                this._settingValue = false;
+                return;
+            }
             this.setDateTimeValue(this._value.set({ hour: value }));
         } else if (this.hasAttribute('date')) {
             const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
@@ -1580,6 +1617,13 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 this.setDateTimeValue(this._displayedTime.set({ minute: value + 60 }));
             }
         } else if (this._value) {
+            if ((this._value instanceof CalendarDateTime
+                || this._value instanceof ZonedDateTime
+                || this._value instanceof Time)
+                && this._value.minute === value) {
+                this._settingValue = false;
+                return;
+            }
             this.setDateTimeValue(this._value.set({ minute: value }));
         } else if (this.hasAttribute('date')) {
             const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
@@ -1602,14 +1646,14 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
     private onOuterMouseUp(event: Event) { this.onMouseUp(event as MouseEvent); }
 
     private onInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (this._settingValue
             || !(event instanceof CustomEvent)
             || !event.detail) {
             return;
         }
-
-        event.preventDefault();
-        event.stopPropagation();
 
         this._internals.states.add('touched');
         this.setValue(event.detail.value);
@@ -1727,6 +1771,13 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         this._settingValue = true;
         if (value >= 60) {
             if (this._value) {
+                if ((this._value instanceof CalendarDateTime
+                    || this._value instanceof ZonedDateTime
+                    || this._value instanceof Time)
+                    && this._value.second === value) {
+                    this._settingValue = false;
+                    return;
+                }
                 this.setDateTimeValue(this._value.add({ minutes: 1 }).set({ second: value - 60 }));
             } else if (this.hasAttribute('date')) {
                 const dateTime = toZoned(toCalendarDateTime(this._displayedDate, this._displayedTime), this.getOptions().timeZone);
@@ -2156,8 +2207,8 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                     dateButton.disabled = (!(this._min instanceof Time) && displayedDate.compare(this._min) < 0)
                         || (!(this._max instanceof Time) && displayedDate.compare(this._max) > 0);
                     dateButton.textContent = getLocaleString(displayedDate, locale, timeZone, calendar, { day: 'numeric' });
-                    selection.appendChild(dateButton);
                     dateButton.addEventListener('click', this.onSelectDate.bind(this, displayedDate));
+                    selection.appendChild(dateButton);
                 }
                 
                 const newDisplayedDate = displayedDate.add({ days: 1 });
@@ -2230,12 +2281,12 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             monthButton.disabled = (!(this._min instanceof Time) && monthEnd.compare(this._min) < 0)
                 || (!(this._max instanceof Time) && monthDate.compare(this._max) > 0);
             monthButton.textContent = getLocaleString(monthDate, locale, timeZone, calendar, { month: 'short' });
-            selection.appendChild(monthButton);
             if (this._type === DateTimeType.Month) {
                 monthButton.addEventListener('click', this.onSelectDate.bind(this, monthDate));
             } else {
                 monthButton.addEventListener('click', this.onSelectViewDate.bind(this, monthDate, DateTimeViewType.date, 1));
             }
+            selection.appendChild(monthButton);
 
             const newMonth = monthDate.add({ months: 1 });
             if (newMonth.month === monthDate.month) {
@@ -2298,7 +2349,6 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             periodButton.textContent = displayedEndDate.year > displayedDate.year
                 ? `${getLocaleString(displayedDate, locale, timeZone, calendar, { year: 'numeric' })}-${getLocaleString(displayedEndDate, locale, timeZone, calendar, { year: 'numeric' })}`
                 : getLocaleString(displayedDate, locale, timeZone, calendar, { year: 'numeric' });
-            selection.appendChild(periodButton);
             if (this._yearStep === 1) {
                 if (this._type === DateTimeType.Year) {
                     periodButton.addEventListener('click', this.onSelectDate.bind(this, displayedDate));
@@ -2308,6 +2358,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             } else {
                 periodButton.addEventListener('click', this.onSelectViewDate.bind(this, displayedDate, DateTimeViewType.year, getDividedByTen(this._yearStep)));
             }
+            selection.appendChild(periodButton);
 
             const newDisplayedDate = displayedDate.add({ years: this._yearStep - (displayedDate.year % this._yearStep) });
             if (newDisplayedDate.year === displayedEndDate.year) {

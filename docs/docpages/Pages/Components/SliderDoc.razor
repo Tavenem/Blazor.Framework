@@ -15,60 +15,38 @@
     use when the relative value is more relevant to the user than the precise numeric value.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value1" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value"" />
-</div>
+<CodeExample IsOpen="true" Code="@(@"<Slider @bind-Value=""_value"" />
 
 @code {
     private int _value = 50;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value1" />
+</CodeExample>
 
 <p>
     Bind the input value to any numeric value with the <code>Value</code> property. All standard
     numeric types are valid, as well as their nullable counterparts.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value3" Label="Int" />
-                <span>Bound value: @_value3</span>
-                <Slider @bind-Value="_value4" Label="Double" Class="mt-3" />
-                <span>Bound value: @_value4</span>
-                <Slider @bind-Value="_value5" Label="Byte" Class="mt-3" />
-                <span>Bound value: @_value5</span>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value1"" Label=""Int"" />
-    <span>Bound value: @_value1</span>
-    <Slider @bind-Value=""_value2"" Label=""Double"" Class=""mt-3"" />
-    <span>Bound value: @_value2</span>
-    <Slider @bind-Value=""_value3"" Label=""Byte"" Class=""mt-3"" />
-    <span>Bound value: @_value3</span>
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Slider @bind-Value=""_value1"" Label=""Int"" />
+<span>Bound value: @_value1</span>
+<Slider @bind-Value=""_value2"" Label=""Double"" Class=""mt-3"" />
+<span>Bound value: @_value2</span>
+<Slider @bind-Value=""_value3"" Label=""Byte"" Class=""mt-3"" />
+<span>Bound value: @_value3</span>
 
 @code {
     private int _value1 = 33;
     private double _value2 = 50;
     private byte _value3 = 75;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value3" Label="Int" />
+    <span>Bound value: @_value3</span>
+    <Slider @bind-Value="_value4" Label="Double" Class="mt-3" />
+    <span>Bound value: @_value4</span>
+    <Slider @bind-Value="_value5" Label="Byte" Class="mt-3" />
+    <span>Bound value: @_value5</span>
+</CodeExample>
 
 <p>
     Note that it is possible to bind to a nullable type, but the input will automatically convert a
@@ -88,28 +66,16 @@
     component will wait before updating the bound value.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value6" Label="@($"On Input: {_value6}")" />
-                <Slider @bind-Value="_value8" UpdateOnInputDebounce="500" Label="@($"Debounced: {_value8}")" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value1"" Label=""@($""On Input: {_value1}"")"" />
-    <Slider @bind-Value=""_value3"" UpdateOnInputDebounce=""500"" Label=""@($""Debounced: {_value3}"")"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Slider @bind-Value=""_value1"" Label=""@($""On Input: {_value1}"")"" />
+<Slider @bind-Value=""_value2"" UpdateOnInputDebounce=""500"" Label=""@($""Debounced: {_value3}"")"" />
 
 @code {
     private int _value1;
     private int _value2;
-    private int _value3;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value6" Label="@($"On Input: {_value6}")" />
+    <Slider @bind-Value="_value8" UpdateOnInputDebounce="500" Label="@($"Debounced: {_value8}")" />
+</CodeExample>
 
 <h2>Min & Max</h2>
 
@@ -118,24 +84,9 @@
     When unset, zero and 100 are used.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value9" Label="@($"Value: {_value9:F1}")" Min="5" Max="8" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value"" Label=""@($""Value: {_value}"")"" Min=""5"" Max=""8"" />
-</div>
-
-@code {
-    private double _value;
-}")
-    </ChildContent>
-</Collapse>
+<CodeExample Code="@(@"<Slider @bind-Value=""_value"" Label=""@($""Value: {_value:F1}"")"" Min=""5"" Max=""8"" />")">
+    <Slider @bind-Value="_value9" Label="@($"Value: {_value9:F1}")" Min="5" Max="8" />
+</CodeExample>
 
 <h2>Step</h2>
 
@@ -146,27 +97,16 @@
     the bound value will change by increments only of the given amount.
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value10" Label="@($"Default double: {_value10}")" />
-                <Slider @bind-Value="_value11" Label="@($"Step 0.1: {_value11}")" Step="0.1" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value1"" Label=""@($""Default double: {_value1}"")"" />
-    <Slider @bind-Value=""_value2"" Label=""@($""Step 0.1: {_value2}"")"" Step=""0.1"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Slider @bind-Value=""_value1"" Label=""@($""Default double: {_value1}"")"" />
+<Slider @bind-Value=""_value2"" Label=""@($""Step 0.1: {_value2}"")"" Step=""0.1"" />
 
 @code {
     private double _value1 = 71.628;
     private double _value2 = 22.3;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value10" Label="@($"Default double: {_value10}")" />
+    <Slider @bind-Value="_value11" Label="@($"Step 0.1: {_value11}")" Step="0.1" />
+</CodeExample>
 
 <p>
     If your <code>Min</code> value is set to a non-integral number, it will be used as the basis to
@@ -187,24 +127,13 @@
     cluttering the UI and DOM.
 </p>
 
-<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value12" Step="10" Class="hashmarks" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value"" Step=""10"" Class=""hashmarks"" />
-</div>
+<CodeExample Code="@(@"<Slider @bind-Value=""_value"" Step=""10"" Class=""hashmarks"" />
 
 @code {
     private int _value = 50;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value12" Step="10" Class="hashmarks" />
+</CodeExample>
 
 <p>
     You can assign labels to the hash marks by assigning a list of <code>string</code>s to the
@@ -212,24 +141,13 @@
     hash with the same index.
 </p>
 
-<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider TValue="int" Step="20" HashLabels="_labels" Class="hashmarks" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider TValue=""int"" Step=""20"" HashLabels=""_labels"" Class=""hashmarks"" />
-</div>
+<CodeExample Code="@(@"<Slider TValue=""int"" Step=""20"" HashLabels=""_labels"" Class=""hashmarks"" />
 
 @code {
     private List<string?> _labels = new() { ""Empty"", ""20%"", ""40%"", ""60%"", ""80%"", ""Full"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider TValue="int" Step="20" HashLabels="_labels" Class="hashmarks" />
+</CodeExample>
 
 <p>
     Note that the list does not need to have the same length as the number of hash marks. If it is
@@ -242,27 +160,16 @@
 
 <p>
     If you add the <code>show-value</code> class, the thumb will have a floating label which
-    displays the value of its current position when it's active.
+    displays the value of its current position when it has focus.
 </p>
 
-<Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value13" Class="show-value" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value"" Class=""show-value"" />
-</div>
+<CodeExample Code="@(@"<Slider @bind-Value=""_value"" Class=""show-value"" />
 
 @code {
     private int _value = 50;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value13" Class="show-value" />
+</CodeExample>
 
 <h2>Disabled & read-only</h2>
 
@@ -270,30 +177,15 @@
     The input can be set as disabled or read-only by setting the properties of the same names.
 </p>
 
-<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_disabled" Label="Disabled" Disabled="true" />
-            </div>
-            <div class="row mt-3 fill align-items-center gap-2">
-                <Slider @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
-</div>
-<div class=""row mt-3 fill align-items-center gap-2"">
-    <Slider @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Slider @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
+<Slider @bind-Value=""_disabled"" Label=""Read-only"" ReadOnly=""true"" />
 
 @code {
     private int _disabled = 50;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+    <Slider @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+</CodeExample>
 
 <h2>Label</h2>
 
@@ -301,20 +193,9 @@
     The <code>Label</code> property assigns a label to the input.
 </p>
 
-<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider TValue="int" Label="Label" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider TValue=""int"" Label=""Label"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample Code="@(@"<Slider TValue=""int"" Label=""Label"" />")">
+    <Slider TValue="int" Label="Label" />
+</CodeExample>
 
 <h2>Required</h2>
 
@@ -330,20 +211,9 @@
     will be set accordingly.
 </p>
 
-<Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider TValue="int" Label="Required" Required="true" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider TValue=""int"" Label=""Required"" Required=""true"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample Code="@(@"<Slider TValue=""int"" Label=""Required"" Required=""true"" />")">
+    <Slider TValue="int" Label="Required" Required="true" />
+</CodeExample>
 
 <h2>Tab index</h2>
 
@@ -383,59 +253,37 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value15" Label="Primary" ThemeColor="ThemeColor.Primary" />
-                <Slider @bind-Value="_value16" Label="Secondary" ThemeColor="ThemeColor.Secondary" />
-                <Slider @bind-Value="_value17" Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value1"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
-    <Slider @bind-Value=""_value2"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
-    <Slider @bind-Value=""_value3"" Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Slider @bind-Value=""_value1"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
+<Slider @bind-Value=""_value2"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
+<Slider @bind-Value=""_value3"" Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />
 
 @code {
     private int _value1 = 25;
     private int _value2 = 50;
     private int _value3 = 80;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value15" Label="Primary" ThemeColor="ThemeColor.Primary" />
+    <Slider @bind-Value="_value16" Label="Secondary" ThemeColor="ThemeColor.Secondary" />
+    <Slider @bind-Value="_value17" Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
+</CodeExample>
 
 <p>
     Add the <code>filled</code> class to show a bar before the thumb.
 </p>
 
-<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Slider @bind-Value="_value18" Class="filled" />
-                <Slider @bind-Value="_value19" Label="Primary" ThemeColor="ThemeColor.Primary" Class="filled" />
-                <Slider @bind-Value="_value20" Label="Secondary" ThemeColor="ThemeColor.Secondary" Class="filled" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Slider @bind-Value=""_value1"" Class=""filled"" />
-    <Slider @bind-Value=""_value2"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
-    <Slider @bind-Value=""_value3"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
-</div>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Slider @bind-Value=""_value1"" Class=""filled"" />
+<Slider @bind-Value=""_value2"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
+<Slider @bind-Value=""_value3"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" Class=""filled"" />
 
 @code {
     private int _value1 = 25;
     private int _value2 = 50;
     private int _value3 = 80;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Slider @bind-Value="_value18" Class="filled" />
+    <Slider @bind-Value="_value19" Label="Primary" ThemeColor="ThemeColor.Primary" Class="filled" />
+    <Slider @bind-Value="_value20" Label="Secondary" ThemeColor="ThemeColor.Secondary" Class="filled" />
+</CodeExample>
 
 <p>
     The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
@@ -458,7 +306,6 @@
     private double _value4 = 50;
     private byte _value5 = 75;
     private int _value6;
-    private int _value7;
     private int _value8;
     private double _value9 = 6;
     private double _value10 = 71.628;

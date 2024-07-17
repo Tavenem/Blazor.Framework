@@ -538,11 +538,16 @@ button.clear::-moz-focus-inner {
             input.type = this.getAttribute('type') || 'text';
         }
 
+        input.addEventListener('change', this.onChange.bind(this));
+        input.addEventListener('input', this.onInput.bind(this));
+        input.addEventListener('keydown', this.onKeyDown.bind(this));
         shadow.appendChild(input);
 
         const clear = document.createElement('button');
         clear.classList.add('clear');
         clear.tabIndex = -1;
+        clear.addEventListener('mouseup', this.onClearMouseUp.bind(this));
+        clear.addEventListener('click', this.onClear.bind(this));
         shadow.appendChild(clear);
 
         const icon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
@@ -557,8 +562,8 @@ button.clear::-moz-focus-inner {
             emoji.classList.add('nested');
             emoji.style.margin = '0';
             emoji.tabIndex = -1;
-            shadow.appendChild(emoji);
             emoji.addEventListener('valuechange', this.onEmoji.bind(this));
+            shadow.appendChild(emoji);
 
             const emojiTooltip = document.createElement('tf-tooltip');
             emojiTooltip.textContent = 'insert emoji';
@@ -577,12 +582,6 @@ button.clear::-moz-focus-inner {
             this.display = this.getAttribute('display');
             this._initialDisplay = this._display;
         }
-
-        input.addEventListener('change', this.onChange.bind(this));
-        input.addEventListener('input', this.onInput.bind(this));
-        input.addEventListener('keydown', this.onKeyDown.bind(this));
-        clear.addEventListener('mouseup', this.onClearMouseUp.bind(this));
-        clear.addEventListener('click', this.onClear.bind(this));
     }
 
     disconnectedCallback() {

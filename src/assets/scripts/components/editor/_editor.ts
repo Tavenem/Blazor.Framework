@@ -51,6 +51,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
     static get observedAttributes() {
         return [
+            'data-label',
             'data-syntax',
             'readonly',
             'required',
@@ -279,6 +280,28 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             }
         } else if (name === 'wysiwyg') {
             this.onSetWysiwygMode(newValue != null);
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    label.remove();
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const toolbar = root.querySelector('.editor-toolbar');
+                if (input && toolbar) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.innerText = newValue;
+                    root.insertBefore(label, toolbar);
+                }
+            }
         }
     }
 
@@ -1217,6 +1240,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     }
 
     private onColorSelected(control: ToolbarControl, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!control._disabled
             && control._definition.type
             && event instanceof CustomEvent
@@ -1232,6 +1258,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             && event.button !== 0) {
             return;
         }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         if (control._disabled
             || !control._definition.type) {
@@ -1276,6 +1305,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
     }
 
     private onEmojiSelected(control: ToolbarControl, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!control._disabled
             && control._definition.type
             && event instanceof CustomEvent
@@ -1622,8 +1654,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
 
         const list = document.createElement('div');
         list.classList.add('list');
-        dropdownPopover.appendChild(list);
         list.addEventListener('keydown', this.onToolbarKeyDown.bind(this, list, true));
+        dropdownPopover.appendChild(list);
 
         if (definition.style === ToolbarControlStyle.ButtonGroup) {
             if (disabled) {
@@ -1874,8 +1906,9 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             syntaxInput.setAttribute('size', '10');
             syntaxInput.setAttribute('value', syntax);
             syntaxInput.setAttribute('display', syntaxTextMap[syntax]);
-            innerToolbar.appendChild(syntaxInput);
+            syntaxInput.addEventListener('valueinput', this.onSyntaxSelect.bind(this));
             syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
+            innerToolbar.appendChild(syntaxInput);
 
             const list = document.createElement('div');
             list.classList.add('list');
@@ -1909,8 +1942,8 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             const showAll = document.createElement('button');
             showAll.classList.add('btn', 'btn-icon', 'rounded', 'small', 'editor-toolbar-show-all-btn');
             showAll.tabIndex = -1;
-            nodes.push(showAll);
             showAll.addEventListener('click', this.onShowAll.bind(this));
+            nodes.push(showAll);
 
             const showAllIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             showAll.appendChild(showAllIcon);
@@ -2087,15 +2120,14 @@ function getDialog(
 
     const overlay = document.createElement('div');
     overlay.classList.add('overlay');
-    container.appendChild(overlay);
     overlay.addEventListener('click', close);
+    container.appendChild(overlay);
 
     const dialog = document.createElement('dialog') as Dialog;
     dialog.id = randomUUID();
     dialog.classList.add('resizable');
     dialog.style.minWidth = 'fit-content';
     dialog.style.width = '50vw';
-    container.appendChild(dialog);
     dialog.addEventListener('close', ev => {
         if (!(ev.target instanceof HTMLDialogElement)) {
             return;
@@ -2117,6 +2149,7 @@ function getDialog(
             form.reset();
         }
     });
+    container.appendChild(dialog);
 
     const dialogInner = document.createElement('div');
     dialog.appendChild(dialogInner);
@@ -2130,8 +2163,8 @@ function getDialog(
     header.appendChild(heading);
 
     const closeButton = document.createElement('tf-close');
-    header.appendChild(closeButton);
     closeButton.addEventListener('click', close);
+    header.appendChild(closeButton);
 
     const body = document.createElement('div');
     body.classList.add('body');
@@ -2158,7 +2191,6 @@ function getDialog(
         }
     };
 
-    form.append(...content);
     for (const node of content) {
         if ((node instanceof TavenemInputHtmlElement
             || node instanceof TavenemInputFieldHtmlElement
@@ -2182,6 +2214,7 @@ function getDialog(
             }
         }
     }
+    form.append(...content);
 
     const footer = document.createElement('div');
     footer.classList.add('footer');
@@ -2194,8 +2227,8 @@ function getDialog(
     const cancelButton = document.createElement('button');
     cancelButton.classList.add('btn', 'btn-text');
     cancelButton.textContent = 'Cancel';
-    buttons.appendChild(cancelButton);
     cancelButton.addEventListener('click', close);
+    buttons.appendChild(cancelButton);
 
     const okButton = document.createElement('button');
     okButton.classList.add('btn', 'btn-text', 'primary', 'ok-button');

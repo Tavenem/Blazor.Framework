@@ -505,6 +505,7 @@ slot {
         return [
             'data-input-class',
             'data-input-style',
+            'data-label',
             'display',
             'readonly',
             'required',
@@ -773,9 +774,9 @@ slot {
             input.setAttribute('type', this.getAttribute('type') || 'text');
         }
 
-        shadow.appendChild(input);
         input.addEventListener('valuechange', this.onValueChange.bind(this));
         input.addEventListener('valueinput', this.onValueInput.bind(this));
+        shadow.appendChild(input);
 
         const prefixSlot = document.createElement('slot');
         prefixSlot.name = 'prefix';
@@ -917,6 +918,28 @@ slot {
                 }
             }
             this.setValidity();
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    label.remove();
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const slot = root.querySelector('slot[name="helpers"]');
+                if (input && slot) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.innerText = newValue;
+                    root.insertBefore(label, slot.nextSibling);
+                }
+            }
         }
     }
 

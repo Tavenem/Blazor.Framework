@@ -5,6 +5,7 @@ import { randomUUID } from '../../tavenem-utility'
 import { TavenemInputFieldHtmlElement } from '../_input-field';
 import { elementStyle } from './_element-style';
 import { HSLA, RGBA, hexToHsla, hexToRgba, hslaToHex, rgbaToColorName, rgbaToHsla } from './_color-conversion';
+import { TavenemSliderHTMLElement } from '../_slider';
 
 const halfSelectorSize = 13;
 const overlayHeight = 250;
@@ -46,7 +47,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     get willValidate() { return this._internals.willValidate; }
 
     static get observedAttributes() {
-        return ['readonly', 'value'];
+        return ['data-label', 'readonly', 'value'];
     }
 
     constructor() {
@@ -204,6 +205,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             }
             input.dataset.inputClass = this.dataset.inputClass;
             input.dataset.inputStyle = this.dataset.inputStyle;
+            input.addEventListener('valueinput', this.onHexValueChange.bind(this));
             input.addEventListener('valuechange', this.onHexValueChange.bind(this));
             shadow.appendChild(input);
 
@@ -280,10 +282,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
 
         const overlayDetector = document.createElement('div');
         overlayDetector.classList.add('color-overlay-detector');
-        overlay.appendChild(overlayDetector);
         overlayDetector.addEventListener('mousedown', this.onOverlayMouseDown.bind(this));
         overlayDetector.addEventListener('mousemove', this.onOverlayInteract.bind(this));
         overlayDetector.addEventListener('mouseup', this.onOverlayMouseUp.bind(this));
+        overlay.appendChild(overlayDetector);
 
         const selectorContainer = document.createElement('div');
         overlayDetector.appendChild(selectorContainer);
@@ -335,42 +337,39 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
 
         const hueSlider = document.createElement('tf-slider');
         hueSlider.classList.add('hue');
-        hueSlider.dataset.value = hsla.hue.toString();
-        colorSliders.appendChild(hueSlider);
-
-        const hueSliderInput = document.createElement('input');
-        hueSliderInput.classList.add('hue');
-        hueSliderInput.disabled = this.hasAttribute('disabled')
-            || this.hasAttribute('readonly');
-        hueSliderInput.max = '359';
-        hueSliderInput.min = '0';
-        hueSliderInput.step = '1';
-        hueSliderInput.type = 'range';
-        hueSliderInput.value = hsla.hue.toString();
         if (this.hasAttribute('inline')) {
-            hueSliderInput.autofocus = this.hasAttribute('autofocus');
+            hueSlider.autofocus = this.hasAttribute('autofocus');
         }
-        hueSlider.appendChild(hueSliderInput);
-        hueSliderInput.addEventListener('input', this.onHueInput.bind(this));
+        if (this.hasAttribute('disabled')) {
+            hueSlider.setAttribute('disabled', '');
+        }
+        hueSlider.setAttribute('max', '1');
+        hueSlider.setAttribute('min', '0');
+        if (this.hasAttribute('readonly')) {
+            hueSlider.setAttribute('readonly', '');
+        }
+        hueSlider.setAttribute('step', '0');
+        hueSlider.setAttribute('value', hsla.hue.toString());
+        hueSlider.addEventListener('valuechange', this.onHueInput.bind(this));
+        colorSliders.appendChild(hueSlider);
 
         if (hasAlpha) {
             const alphaSlider = document.createElement('tf-slider');
             alphaSlider.classList.add('alpha');
             alphaSlider.dataset.value = '1';
+            if (this.hasAttribute('disabled')) {
+                alphaSlider.setAttribute('disabled', '');
+            }
+            alphaSlider.setAttribute('max', '1');
+            alphaSlider.setAttribute('min', '0');
+            if (this.hasAttribute('readonly')) {
+                alphaSlider.setAttribute('readonly', '');
+            }
+            alphaSlider.setAttribute('step', 'any');
+            alphaSlider.style.setProperty('--alpha-background', 'linear-gradient(to right, transparent, hsl(0 100 50))');
+            alphaSlider.setAttribute('value', (hsla.alpha || 0).toString());
+            alphaSlider.addEventListener('valuechange', this.onAlphaInput.bind(this));
             colorSliders.appendChild(alphaSlider);
-
-            const alphaSliderInput = document.createElement('input');
-            alphaSliderInput.classList.add('alpha');
-            alphaSliderInput.disabled = this.hasAttribute('disabled')
-                || this.hasAttribute('readonly');
-            alphaSliderInput.max = '1';
-            alphaSliderInput.min = '0';
-            alphaSliderInput.step = 'any';
-            alphaSliderInput.style.setProperty('--alpha-background', 'linear-gradient(to right, transparent, hsl(0 100 50))');
-            alphaSliderInput.type = 'range';
-            alphaSliderInput.value = (hsla.alpha || 0).toString();
-            alphaSlider.appendChild(alphaSliderInput);
-            alphaSliderInput.addEventListener('input', this.onAlphaInput.bind(this));
         }
 
         const inputsContainer = document.createElement('div');
@@ -388,9 +387,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         }
         hexInput.setAttribute('size', '1');
         hexInput.setAttribute('type', 'text');
-        inputsContainer.appendChild(hexInput);
-        hexInput.value = this._value;
+        hexInput.setAttribute('value', this._value);
+        hexInput.addEventListener('valueinput', this.onHexValueChange.bind(this));
         hexInput.addEventListener('valuechange', this.onHexValueChange.bind(this));
+        inputsContainer.appendChild(hexInput);
 
         const hexInputFieldHelpers = document.createElement('div');
         hexInputFieldHelpers.classList.add('help-text');
@@ -412,9 +412,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         hueInput.setAttribute('min', '0');
         hueInput.setAttribute('size', '1');
         hueInput.setAttribute('step', '1');
-        inputsContainer.appendChild(hueInput);
-        hueInput.value = hsla.hue.toString();
+        hueInput.setAttribute('value', hsla.hue.toString());
         hueInput.addEventListener('valueinput', this.onHueValueInput.bind(this));
+        hueInput.addEventListener('valuechange', this.onHueValueInput.bind(this));
+        inputsContainer.appendChild(hueInput);
 
         const hueInputFieldHelpers = document.createElement('div');
         hueInputFieldHelpers.classList.add('help-text');
@@ -436,9 +437,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         saturationInput.setAttribute('min', '0');
         saturationInput.setAttribute('size', '1');
         saturationInput.setAttribute('step', '1');
-        inputsContainer.appendChild(saturationInput);
-        saturationInput.value = hsla.saturation.toString();
+        saturationInput.setAttribute('value', hsla.saturation.toString());
         saturationInput.addEventListener('valueinput', this.onSaturationValueInput.bind(this));
+        saturationInput.addEventListener('valuechange', this.onSaturationValueInput.bind(this));
+        inputsContainer.appendChild(saturationInput);
 
         const saturationInputFieldHelpers = document.createElement('div');
         saturationInputFieldHelpers.classList.add('help-text');
@@ -460,9 +462,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         lightnessInput.setAttribute('min', '0');
         lightnessInput.setAttribute('size', '1');
         lightnessInput.setAttribute('step', '1');
-        inputsContainer.appendChild(lightnessInput);
-        lightnessInput.value = hsla.lightness.toString();
+        lightnessInput.setAttribute('value', hsla.lightness.toString());
         lightnessInput.addEventListener('valueinput', this.onLightnessValueInput.bind(this));
+        lightnessInput.addEventListener('valuechange', this.onLightnessValueInput.bind(this));
+        inputsContainer.appendChild(lightnessInput);
 
         const lightnessInputFieldHelpers = document.createElement('div');
         lightnessInputFieldHelpers.classList.add('help-text');
@@ -484,9 +487,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         redInput.setAttribute('min', '0');
         redInput.setAttribute('size', '1');
         redInput.setAttribute('step', '1');
-        inputsContainer.appendChild(redInput);
-        redInput.value = rgba.red.toString();
+        redInput.setAttribute('value', rgba.red.toString());
         redInput.addEventListener('valueinput', this.onRedValueInput.bind(this));
+        redInput.addEventListener('valuechange', this.onRedValueInput.bind(this));
+        inputsContainer.appendChild(redInput);
 
         const redInputFieldHelpers = document.createElement('div');
         redInputFieldHelpers.classList.add('help-text');
@@ -508,9 +512,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         greenInput.setAttribute('min', '0');
         greenInput.setAttribute('size', '1');
         greenInput.setAttribute('step', '1');
-        inputsContainer.appendChild(greenInput);
-        greenInput.value = rgba.green.toString();
+        greenInput.setAttribute('value', rgba.green.toString());
         greenInput.addEventListener('valueinput', this.onGreenValueInput.bind(this));
+        greenInput.addEventListener('valuechange', this.onGreenValueInput.bind(this));
+        inputsContainer.appendChild(greenInput);
 
         const greenInputFieldHelpers = document.createElement('div');
         greenInputFieldHelpers.classList.add('help-text');
@@ -532,9 +537,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         blueInput.setAttribute('min', '0');
         blueInput.setAttribute('size', '1');
         blueInput.setAttribute('step', '1');
-        inputsContainer.appendChild(blueInput);
-        blueInput.value = rgba.blue.toString();
+        blueInput.setAttribute('value', rgba.blue.toString());
         blueInput.addEventListener('valueinput', this.onBlueValueInput.bind(this));
+        blueInput.addEventListener('valuechange', this.onBlueValueInput.bind(this));
+        inputsContainer.appendChild(blueInput);
 
         const blueInputFieldHelpers = document.createElement('div');
         blueInputFieldHelpers.classList.add('help-text');
@@ -557,9 +563,10 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             alphaInput.setAttribute('min', '0');
             alphaInput.setAttribute('size', '1');
             alphaInput.setAttribute('step', '0.01');
-            inputsContainer.appendChild(alphaInput);
-            alphaInput.value = (hsla.alpha || 0).toString();
+            alphaInput.setAttribute('value', (hsla.alpha || 0).toString());
             alphaInput.addEventListener('valueinput', this.onAlphaValueInput.bind(this));
+            alphaInput.addEventListener('valuechange', this.onAlphaValueInput.bind(this));
+            inputsContainer.appendChild(alphaInput);
 
             const alphaInputFieldHelpers = document.createElement('div');
             alphaInputFieldHelpers.classList.add('help-text');
@@ -570,8 +577,8 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
 
         const modeButton = document.createElement('button');
         modeButton.classList.add('mode-button');
-        inputsContainer.appendChild(modeButton);
         modeButton.addEventListener('click', this.onCycleMode.bind(this));
+        inputsContainer.appendChild(modeButton);
 
         const modeButtonIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         modeButton.appendChild(modeButtonIcon);
@@ -587,14 +594,14 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             clearButton.textContent = "Clear";
             clearButton.disabled = this.hasAttribute('disabled')
                 || this.hasAttribute('readonly');
-            buttonsDiv.appendChild(clearButton);
             clearButton.addEventListener('click', this.onClearButton.bind(this));
+            buttonsDiv.appendChild(clearButton);
 
             const okButton = document.createElement('button');
             okButton.classList.add('ok');
             okButton.textContent = "Ok";
-            buttonsDiv.appendChild(okButton);
             okButton.addEventListener('click', this.onOk.bind(this));
+            buttonsDiv.appendChild(okButton);
         }
 
         this.setValidity();
@@ -620,6 +627,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
 
         const input = root.querySelector<TavenemInputHtmlElement>('.input');
         if (input) {
+            input.removeEventListener('valueinput', this.onHexValueChange.bind(this));
             input.removeEventListener('valuechange', this.onHexValueChange.bind(this));
         }
 
@@ -633,13 +641,13 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         if (selector) {
             selector.removeEventListener('click', this.onSelectorClick.bind(this));
         }
-        const hueSlider = root.querySelector('input.hue');
+        const hueSlider = root.querySelector('tf-slider.hue');
         if (hueSlider) {
-            hueSlider.removeEventListener('input', this.onHueInput.bind(this));
+            hueSlider.removeEventListener('valuechange', this.onHueInput.bind(this));
         }
-        const alphaSlider = root.querySelector('input.alpha');
+        const alphaSlider = root.querySelector('tf-slider.alpha');
         if (alphaSlider) {
-            alphaSlider.removeEventListener('input', this.onAlphaInput.bind(this));
+            alphaSlider.removeEventListener('valuechange', this.onAlphaInput.bind(this));
         }
         if (window.isSecureContext && window.EyeDropper) {
             const dropper = root.querySelector('.dropper');
@@ -649,35 +657,43 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         }
         const hexInput = root.querySelector('.hex') as HTMLElement;
         if (hexInput) {
+            hexInput.removeEventListener('valueinput', this.onHexValueChange.bind(this));
             hexInput.removeEventListener('valuechange', this.onHexValueChange.bind(this));
         }
         const hueInput = root.querySelector('tf-input-field.hue') as HTMLElement;
         if (hueInput) {
             hueInput.removeEventListener('valueinput', this.onHueValueInput.bind(this));
+            hueInput.removeEventListener('valuechange', this.onHueValueInput.bind(this));
         }
         const saturationInput = root.querySelector('.saturation') as HTMLElement;
         if (saturationInput) {
             saturationInput.removeEventListener('valueinput', this.onSaturationValueInput.bind(this));
+            saturationInput.removeEventListener('valuechange', this.onSaturationValueInput.bind(this));
         }
         const lightnessInput = root.querySelector('.lightness') as HTMLElement;
         if (lightnessInput) {
             lightnessInput.removeEventListener('valueinput', this.onLightnessValueInput.bind(this));
+            lightnessInput.removeEventListener('valuechange', this.onLightnessValueInput.bind(this));
         }
         const redInput = root.querySelector('.red') as HTMLElement;
         if (redInput) {
             redInput.removeEventListener('valueinput', this.onRedValueInput.bind(this));
+            redInput.removeEventListener('valuechange', this.onRedValueInput.bind(this));
         }
         const greenInput = root.querySelector('.green') as HTMLElement;
         if (greenInput) {
             greenInput.removeEventListener('valueinput', this.onGreenValueInput.bind(this));
+            greenInput.removeEventListener('valuechange', this.onGreenValueInput.bind(this));
         }
         const blueInput = root.querySelector('.blue') as HTMLElement;
         if (blueInput) {
             blueInput.removeEventListener('valueinput', this.onBlueValueInput.bind(this));
+            blueInput.removeEventListener('valuechange', this.onBlueValueInput.bind(this));
         }
         const alphaInput = root.querySelector('tf-input-field.alpha') as HTMLElement;
         if (alphaInput) {
             alphaInput.removeEventListener('valueinput', this.onAlphaValueInput.bind(this));
+            alphaInput.removeEventListener('valuechange', this.onAlphaValueInput.bind(this));
         }
         const modeButton = root.querySelector('.mode-button');
         if (modeButton) {
@@ -703,25 +719,25 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 return;
             }
 
-            const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
+            const hueSlider = root.querySelector('tf-slider.hue');
             if (hueSlider) {
                 if (newValue) {
-                    hueSlider.disabled = true;
+                    hueSlider.setAttribute('readonly', '');
                 } else {
-                    hueSlider.disabled = this.matches(':disabled');
+                    hueSlider.removeAttribute('readonly');
                 }
             }
 
-            const alphaSlider = root.querySelector('input.alpha') as HTMLInputElement;
+            const alphaSlider = root.querySelector('tf-slider.alpha');
             if (alphaSlider) {
                 if (newValue) {
-                    alphaSlider.disabled = true;
+                    alphaSlider.setAttribute('readonly', '');
                 } else {
-                    alphaSlider.disabled = this.matches(':disabled');
+                    alphaSlider.removeAttribute('readonly');
                 }
             }
 
-            const hexInput = root.querySelector('input.hex') as TavenemInputHtmlElement;
+            const hexInput = root.querySelector('input.hex');
             if (hexInput) {
                 if (newValue) {
                     hexInput.setAttribute('readonly', '');
@@ -730,7 +746,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const hueInput = root.querySelector('input.hue') as TavenemInputHtmlElement;
+            const hueInput = root.querySelector('tf-input-field.hue');
             if (hueInput) {
                 if (newValue) {
                     hueInput.setAttribute('readonly', '');
@@ -739,7 +755,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const saturationInput = root.querySelector('input.saturation') as TavenemInputHtmlElement;
+            const saturationInput = root.querySelector('input.saturation');
             if (saturationInput) {
                 if (newValue) {
                     saturationInput.setAttribute('readonly', '');
@@ -748,7 +764,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const lightnessInput = root.querySelector('input.lightness') as TavenemInputHtmlElement;
+            const lightnessInput = root.querySelector('input.lightness');
             if (lightnessInput) {
                 if (newValue) {
                     lightnessInput.setAttribute('readonly', '');
@@ -757,7 +773,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const redInput = root.querySelector('input.red') as TavenemInputHtmlElement;
+            const redInput = root.querySelector('input.red');
             if (redInput) {
                 if (newValue) {
                     redInput.setAttribute('readonly', '');
@@ -766,7 +782,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const greenInput = root.querySelector('input.green') as TavenemInputHtmlElement;
+            const greenInput = root.querySelector('input.green');
             if (greenInput) {
                 if (newValue) {
                     greenInput.setAttribute('readonly', '');
@@ -775,7 +791,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const blueInput = root.querySelector('input.blue') as TavenemInputHtmlElement;
+            const blueInput = root.querySelector('input.blue');
             if (blueInput) {
                 if (newValue) {
                     blueInput.setAttribute('readonly', '');
@@ -784,7 +800,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
                 }
             }
 
-            const alphaInput = root.querySelector('input.alpha') as TavenemInputHtmlElement;
+            const alphaInput = root.querySelector('tf-input-field.alpha');
             if (alphaInput) {
                 if (newValue) {
                     alphaInput.setAttribute('readonly', '');
@@ -806,6 +822,28 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         } else if (name === 'value'
             && newValue) {
             this.setValue(newValue);
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    label.remove();
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const slot = root.querySelector('slot');
+                if (input && slot) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.innerText = newValue;
+                    root.insertBefore(label, slot);
+                }
+            }
         }
     }
 
@@ -824,21 +862,21 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             }
         }
 
-        const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
+        const hueSlider = root.querySelector('tf-slider.hue');
         if (hueSlider) {
             if (disabled) {
-                hueSlider.disabled = true;
+                hueSlider.setAttribute('disabled', '');
             } else {
-                hueSlider.disabled = this.hasAttribute('readonly');
+                hueSlider.removeAttribute('disabled');
             }
         }
 
-        const alphaSlider = root.querySelector('input.alpha') as HTMLInputElement;
+        const alphaSlider = root.querySelector('tf-slider.alpha');
         if (alphaSlider) {
             if (disabled) {
-                alphaSlider.disabled = true;
+                alphaSlider.setAttribute('disabled', '');
             } else {
-                alphaSlider.disabled = this.hasAttribute('readonly');
+                alphaSlider.removeAttribute('disabled');
             }
         }
 
@@ -967,12 +1005,12 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
 
         this._settingValue = true;
 
-        const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
+        const hueSlider = root.querySelector('tf-slider.hue') as TavenemSliderHTMLElement;
         if (hueSlider) {
             hueSlider.value = '0';
         }
 
-        const alphaSlider = root.querySelector('input.alpha') as HTMLInputElement;
+        const alphaSlider = root.querySelector('tf-slider.alpha') as TavenemSliderHTMLElement;
         if (alphaSlider) {
             alphaSlider.value = '0';
         }
@@ -1058,6 +1096,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     protected stringValue() { return this._value; }
 
     private onAlphaInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (this._settingValue
             || !(event.target instanceof HTMLInputElement)) {
             return;
@@ -1071,6 +1112,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onAlphaValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1084,6 +1128,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onBlueValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1123,13 +1170,13 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onDropperClick(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (this.hasAttribute('disabled')
             || this.hasAttribute('readonly')) {
             return;
         }
-        event.preventDefault();
-        event.stopPropagation();
-
         new EyeDropper()
             .open()
             .then((result) => {
@@ -1139,6 +1186,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onGreenValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1148,6 +1198,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onHexValueChange(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue) {
             this._internals.states.add('touched');
             this.setValue(event instanceof CustomEvent
@@ -1206,6 +1259,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onHueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event.target instanceof HTMLInputElement) {
             this._internals.states.add('touched');
@@ -1214,6 +1270,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onHueValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1223,6 +1282,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onLightnessValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1250,6 +1312,7 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
             || !(event.target instanceof Element)) {
             return;
         }
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -1283,6 +1346,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onRedValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1327,6 +1393,9 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
     }
 
     private onSaturationValueInput(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this._settingValue
             && event instanceof CustomEvent
             && event.detail) {
@@ -1451,13 +1520,13 @@ export class TavenemColorInputHtmlElement extends TavenemPickerHtmlElement {
         }
 
         const hue = hsla.hue.toString();
-        const hueSlider = root.querySelector('input.hue') as HTMLInputElement;
+        const hueSlider = root.querySelector('tf-slider.hue') as TavenemSliderHTMLElement;
         if (hueSlider && hueSlider.value != hue) {
             hueSlider.value = hue;
         }
 
         const alpha = (hsla.alpha || 0).toString();
-        const alphaSlider = root.querySelector('input.alpha') as HTMLInputElement;
+        const alphaSlider = root.querySelector('tf-slider.alpha') as TavenemSliderHTMLElement;
         if (alphaSlider && alphaSlider.value != alpha) {
             alphaSlider.style.setProperty('--alpha-background', `linear-gradient(to right, transparent, hsl(${hsla.hue} 100 50))`);
             alphaSlider.value = alpha;

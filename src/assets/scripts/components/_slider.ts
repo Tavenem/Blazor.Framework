@@ -36,6 +36,10 @@ export class TavenemSliderHTMLElement extends HTMLElement {
     width: 100%;
 }
 
+:host(.filled) {
+    background: transparent !important;
+}
+
 :host(.hash-labels) {
     padding-bottom: calc(.25em + 6px);
 }
@@ -44,7 +48,7 @@ export class TavenemSliderHTMLElement extends HTMLElement {
     --output-display: block;
 }
 
-:host(:not(:disabled, [readonly], [inert]):has(input:active)) {
+:host(:not(:disabled, [readonly], [inert])) .input:focus-within + output {
     --output-opacity: 1;
 }
 
@@ -82,7 +86,7 @@ export class TavenemSliderHTMLElement extends HTMLElement {
     display: flex;
 }
 
-:host(:has(label)) > .slider {
+label + .slider {
     margin-top: 1rem;
 }
 
@@ -101,51 +105,6 @@ export class TavenemSliderHTMLElement extends HTMLElement {
     padding: 0;
     position: relative;
     width: 100%;
-}
-
-.hashes {
-    align-items: center;
-    display: none;
-    flex-grow: 1;
-    height: 100%;
-    justify-content: space-between;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-
-    div {
-        display: flex;
-        flex-direction: column;
-        position: relative;
-
-        span:first-child {
-            background-color: var(--thumb-color);
-            border-radius: 9999px;
-            height: 2px;
-            width: 2px;
-        }
-
-        span + span {
-            left: 0;
-            padding-top: .25em;
-            position: absolute;
-            top: 0;
-            transform: translate(-50%, 50%);
-        }
-
-        &:first-child span + span {
-            transform: translate(0, 50%);
-        }
-
-        &:last-child span + span {
-            transform: translate(-100%, 50%);
-        }
-    }
-}
-
-:host(.hashmarks) .hashes {
-    display: flex;
 }
 
 input {
@@ -545,18 +504,17 @@ slot[name="helpers"]::slotted(.onfocus) {
 }
 `;
 
-    _max = 100;
-    _min = 0;
-    _value = 0;
-
     private _formValue = '0';
     private _initialValue: string | null | undefined;
     private _inputDebounce: number = -1;
     private _internals: ElementInternals;
+    private _max = 100;
+    private _min = 0;
     private _settingValue = false;
+    private _value = 0;
 
     static get observedAttributes() {
-        return ['max', 'min', 'value'];
+        return ['data-label', 'max', 'min', 'readonly', 'value'];
     }
 
     private static newValueChangeEvent(value: string) {
@@ -584,18 +542,8 @@ slot[name="helpers"]::slotted(.onfocus) {
     }
 
     connectedCallback() {
-        this._max = Number.parseFloat(this.dataset.max || '100') || 100;
-        this._min = Number.parseFloat(this.dataset.min || '0') || 0;
-
-        this._initialValue = this.dataset.value;
-        if (this._initialValue != null) {
-            const value = parseFloat(this._initialValue);
-            if (Number.isFinite(value)) {
-                this._value = value;
-            }
-        }
-
-        this._value = Math.max(this._min, Math.min(this._max, this._value));
+        this._max = Number.parseFloat(this.getAttribute('max') || '100') || 100;
+        this._min = Number.parseFloat(this.getAttribute('min') || '0') || 0;
 
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
@@ -610,10 +558,15 @@ slot[name="helpers"]::slotted(.onfocus) {
             const label = document.createElement('label');
             label.htmlFor = inputId;
             label.innerText = this.dataset.label;
+            shadow.appendChild(label);
         }
 
         const slider = document.createElement('div');
         slider.classList.add('slider');
+        if (this.matches(':disabled')
+            || this.hasAttribute('readonly')) {
+            slider.inert = true;
+        }
         shadow.appendChild(slider);
 
         const filler = document.createElement('div');
@@ -630,13 +583,14 @@ slot[name="helpers"]::slotted(.onfocus) {
 
         const input = document.createElement('input');
         input.id = inputId;
-        input.type = 'range';
         input.max = this._max.toString();
         input.min = this._min.toString();
         if (this.hasAttribute('step')) {
             input.step = this.getAttribute('step') || '';
         }
+        input.type = 'range';
         input.value = this._formValue;
+        input.addEventListener('input', this.onInput.bind(this));
         div.appendChild(input);
 
         const output = document.createElement('output');
@@ -645,9 +599,10 @@ slot[name="helpers"]::slotted(.onfocus) {
         const slot = document.createElement('slot');
         shadow.appendChild(slot);
 
-        this.setValue(this._value);
-
-        input.addEventListener('input', this.onInput.bind(this));
+        if ('value' in this.dataset) {
+            this.setTextValue(this.dataset.value);
+            this._initialValue = this._formValue;
+        }
     }
 
     disconnectedCallback() {
@@ -678,6 +633,38 @@ slot[name="helpers"]::slotted(.onfocus) {
             if (this._value < this._min) {
                 this.setValue(this._min);
             }
+        } else if (name === 'readonly') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+
+            const slider = root.querySelector<HTMLElement>('.slider');
+            if (slider) {
+                slider.inert = (newValue != null) || this.matches(':disabled');
+            }
+        } else if (name === 'data-label') {
+            const root = this.shadowRoot;
+            if (!root) {
+                return;
+            }
+            const label = root.querySelector('label');
+            if (label) {
+                if (newValue != null && newValue.length) {
+                    label.textContent = newValue;
+                } else {
+                    label.remove();
+                }
+            } else if (newValue != null && newValue.length) {
+                const input = root.querySelector('input');
+                const slider = root.querySelector('.slider');
+                if (input && slider) {
+                    const label = document.createElement('label');
+                    label.htmlFor = input.id;
+                    label.innerText = newValue;
+                    root.insertBefore(label, slider);
+                }
+            }
         }
     }
 
@@ -687,9 +674,9 @@ slot[name="helpers"]::slotted(.onfocus) {
             return;
         }
 
-        const input = root.querySelector<HTMLInputElement>('input');
-        if (input) {
-            input.disabled = disabled;
+        const slider = root.querySelector<HTMLElement>('.slider');
+        if (slider) {
+            slider.inert = disabled || this.hasAttribute('readonly');
         }
     }
 
@@ -709,23 +696,12 @@ slot[name="helpers"]::slotted(.onfocus) {
 
     reset() { this.setTextValue(this._initialValue); }
 
-    private onInput(e: Event) {
-        if (!(e.target instanceof HTMLInputElement)
-            || !this.contains(e.target)) {
-            return;
-        }
+    private onInput(event: Event) {
+        event.stopPropagation();
 
-        if ('inputDebounce' in this.dataset) {
-            const debounce = parseInt(this.dataset.inputDebounce || '');
-            if (Number.isFinite(debounce)
-                && debounce > 0) {
-                clearTimeout(this._inputDebounce);
-                this._inputDebounce = setTimeout(this.updateInputDebounced.bind(this), debounce);
-                return;
-            }
+        if (event.target instanceof HTMLInputElement) {
+            this.setTextValue(event.target.value);
         }
-
-        this.setTextValue(e.target.value);
     }
 
     private setTextValue(value?: string | null) {
@@ -754,6 +730,8 @@ slot[name="helpers"]::slotted(.onfocus) {
         if (!root) {
             return;
         }
+
+        const original = this._formValue;
 
         this._settingValue = true;
 
@@ -800,21 +778,30 @@ slot[name="helpers"]::slotted(.onfocus) {
             output.innerText = outputValue;
         }
 
-        this.dispatchEvent(TavenemSliderHTMLElement.newValueChangeEvent(this._formValue));
+        const input = root.querySelector<HTMLInputElement>('input');
+        if (input) {
+            input.value = this._formValue;
+        }
+
+        if (this._formValue !== original
+            && this._inputDebounce === -1) {
+            let debounce = 'inputDebounce' in this.dataset
+                ? parseInt(this.dataset.inputDebounce || '')
+                : 100;
+            if (!Number.isFinite(debounce) || debounce < 100) {
+                debounce = 100;
+            }
+            this._inputDebounce = setTimeout(this.updateInputDebounced.bind(this), debounce);
+        }
 
         this._settingValue = false;
     }
 
     private updateInputDebounced() {
-        const root = this.shadowRoot;
-        if (!root) {
-            return;
-        }
-        const input = root.querySelector('input');
-        if (input instanceof HTMLInputElement
-            && this._formValue !== input.value) {
-            this.setTextValue(input.value);
-        }
+        clearTimeout(this._inputDebounce);
+        this._inputDebounce = -1;
+
+        this.dispatchEvent(TavenemSliderHTMLElement.newValueChangeEvent(this._formValue));
     }
 }
 

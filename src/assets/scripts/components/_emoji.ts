@@ -809,8 +809,8 @@ button::-moz-focus-inner {
             categoryButton.classList.add('category-button');
             categoryButton.disabled = this.hasAttribute('disabled');
             categoryButton.dataset.categoryId = emojiCategories[i].id;
-            category.appendChild(categoryButton);
             categoryButton.addEventListener('click', this.onCategoryClick.bind(this, emojiCategories[i].id));
+            category.appendChild(categoryButton);
 
             const categoryIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
             categoryButton.appendChild(categoryIcon);
@@ -833,8 +833,8 @@ button::-moz-focus-inner {
         searchInput.type = 'search';
         searchInput.classList.add('search');
         searchInput.placeholder = 'Search';
-        searchBar.appendChild(searchInput);
         searchInput.addEventListener('input', this.onSearch.bind(this));
+        searchBar.appendChild(searchInput);
 
         const skinTonesPicker = document.createElement('tf-picker');
         skinTonesPicker.dataset.popoverContainer = '';
@@ -845,8 +845,8 @@ button::-moz-focus-inner {
         skinTonesButton.type = 'button';
         skinTonesButton.classList.add('skin-tones-button');
         skinTonesButton.dataset.popoverContainer = '';
-        skinTonesPicker.appendChild(skinTonesButton);
         skinTonesButton.addEventListener('click', this.onToggleSkinTones.bind(this));
+        skinTonesPicker.appendChild(skinTonesButton);
 
         const skinToneIcon = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         skinTonesButton.appendChild(skinToneIcon);
@@ -876,8 +876,8 @@ button::-moz-focus-inner {
             if (i === 0) {
                 skinToneButton.classList.add('active');
             }
-            skinTones1.appendChild(skinToneButton);
             skinToneButton.addEventListener('click', this.onSkinTone1.bind(this));
+            skinTones1.appendChild(skinToneButton);
         }
 
         const skinTones2 = document.createElement('div');
@@ -891,8 +891,8 @@ button::-moz-focus-inner {
             if (i === 0) {
                 skinToneButton.classList.add('active');
             }
-            skinTones2.appendChild(skinToneButton);
             skinToneButton.addEventListener('click', this.onSkinTone2.bind(this));
+            skinTones2.appendChild(skinToneButton);
         }
 
         const emojiCategoryLists = document.createElement('div');
@@ -909,15 +909,15 @@ button::-moz-focus-inner {
         clearButton.type = 'button';
         clearButton.disabled = this.hasAttribute('disabled')
             || this.hasAttribute('readonly');
-        buttonsDiv.appendChild(clearButton);
         clearButton.addEventListener('click', this.onClearButton.bind(this));
+        buttonsDiv.appendChild(clearButton);
 
         const cancelButton = document.createElement('button');
         cancelButton.classList.add('cancel', 'btn-text');
         cancelButton.textContent = "Cancel";
         cancelButton.type = 'button';
-        buttonsDiv.appendChild(cancelButton);
         cancelButton.addEventListener('click', this.onCancel.bind(this));
+        buttonsDiv.appendChild(cancelButton);
         
         shadow.addEventListener('mousedown', this.onOuterMouseDown.bind(this));
         shadow.addEventListener('mouseup', this.onOuterMouseUp.bind(this));
