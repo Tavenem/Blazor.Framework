@@ -8,23 +8,95 @@ function tavenemBlazorFrameworkAfterStarted(blazor, web) {
     }
     afterStartedComplete = true;
 
-    blazor.registerCustomEventType('focuslost', {
+    blazor.registerCustomEventType('crop', {
         createEventArgs: (event) => {
-            return {
-                parentId: event instanceof CustomEvent
-                    && event.detail
-                    ? event.detail.parentId
-                    : undefined
+            if (event instanceof CustomEvent
+                && event.detail) {
+                return {
+                    x: event.detail.x == null ? 0 : event.detail.x,
+                    y: event.detail.y == null ? 0 : event.detail.y,
+                    width: event.detail.width == null ? 0 : event.detail.width,
+                    height: event.detail.height == null ? 0 : event.detail.height,
+                };
+            } else {
+                return {
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 0,
+                };
             }
         }
-});
-    blazor.registerCustomEventType('dropdowntoggle', {
+    });
+    blazor.registerCustomEventType('delete', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    ? event.detail.value
+                    : undefined
+            };
+        }
+    });
+    blazor.registerCustomEventType('enter', {
+        createEventArgs: () => {
+            return {};
+        }
+    });
+    blazor.registerCustomEventType('inputtoggle', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    ? event.detail.value
+                    : null
+            };
+        }
+    });
+    blazor.registerCustomEventType('lastpage', {
+        createEventArgs: () => {
+            return {};
+        }
+    });
+    blazor.registerCustomEventType('nextpage', {
+        createEventArgs: () => {
+            return {};
+        }
+    });
+    blazor.registerCustomEventType('searchinput', {
         createEventArgs: (event) => {
             return {
                 value: event instanceof CustomEvent
                     && event.detail
                     && event.detail.value
-            }
+            };
+        }
+    });
+    blazor.registerCustomEventType('stream', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            };
+        }
+    });
+    blazor.registerCustomEventType('valuechange', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            };
+        }
+    });
+    blazor.registerCustomEventType('valueinput', {
+        createEventArgs: (event) => {
+            return {
+                value: event instanceof CustomEvent
+                    && event.detail
+                    && event.detail.value
+            };
         }
     });
 }
@@ -67,7 +139,7 @@ function addHeadContent() {
     const style = document.createElement('link');
     style.rel = 'stylesheet';
     style.type = 'text/css';
-    style.href = "_content/Tavenem.Blazor.Framework/css/framework.css";
+    style.href = "_content/Tavenem.Blazor.Framework/tavenem-framework.css";
     document.head.appendChild(style);
 
     const script = document.createElement('script');

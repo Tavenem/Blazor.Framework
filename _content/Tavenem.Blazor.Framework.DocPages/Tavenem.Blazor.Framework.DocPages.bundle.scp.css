@@ -15,3 +15,16 @@ dt[b-21wvxx4oge] {
     vertical-align: text-top;
     width: 1rem;
 }
+/* _content/Tavenem.Blazor.Framework.DocPages/Pages/Home.razor.rz.scp.css */
+.background-gradient[b-pdzm598ywm] {
+    background: linear-gradient(transparent, transparent 25%, var(--tavenem-color-primary) 50%, var(--tavenem-color-success) 60%, transparent 69%, transparent),
+        linear-gradient(to right, transparent, var(--tavenem-color-secondary), transparent);
+    bottom: 0;
+    left: 0;
+    -webkit-mask-image: linear-gradient(transparent, transparent 25%, black 50%, black 66%, transparent 72%, transparent);
+    mask-image: linear-gradient(transparent, transparent 25%, black 50%, black 66%, transparent 72%, transparent);
+    opacity: .5;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
