@@ -80,7 +80,7 @@ jobs:
 
       - name: Deploy
         if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true' && steps.nbgv.outputs.PrereleaseVersion == ''
-        uses: JamesIves/github-pages-deploy-action@4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: docs/docsite/publish/wwwroot
