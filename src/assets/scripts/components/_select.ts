@@ -707,6 +707,9 @@ slot {
         if (this.classList.contains('clearable-readonly')) {
             input.classList.add('clearable-readonly');
         }
+        if (this.classList.contains('prefixed')) {
+            input.classList.add('prefixed');
+        }
         if ('inputClass' in this.dataset) {
             input.dataset.inputClass = this.dataset.inputClass;
         }

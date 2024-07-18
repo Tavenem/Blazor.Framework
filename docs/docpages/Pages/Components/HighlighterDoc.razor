@@ -18,18 +18,7 @@
     the match will be case sensitive, and is <code>false</code> by default.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items">
-                <Template>
-                    <Highlighter Text="@context" HighlightedText="em" />
-                </Template>
-            </ElementList>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"">
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<ElementList Items=""_items"">
     <Template>
         <Highlighter Text=""@context"" HighlightedText=""em"" />
     </Template>
@@ -37,25 +26,22 @@
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items">
+        <Template>
+            <Highlighter Text="@context" HighlightedText="em" />
+        </Template>
+    </ElementList>
+</CodeExample>
 
 <p>
     The <code>HighlightWholeWord</code> property indicates whether to highlight an entire word, if
     the search text is found within it. It is <code>false</code> by default.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Highlighter Text="Highlight the entire word found" HighlightedText="ou" HighlightWholeWord="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Highlighter Text=""Highlight the entire word found"" HighlightedText=""ou"" HighlightWholeWord=""true"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<Highlighter Text=""Highlight the entire word found"" HighlightedText=""ou"" HighlightWholeWord=""true"" />")">
+    <Highlighter Text="Highlight the entire word found" HighlightedText="ou" HighlightWholeWord="true" />
+</CodeExample>
 
 <p>
     The <code>WholeWord</code> property indicates whether to match <em>only</em> entire words. If
@@ -63,32 +49,18 @@
     word matches are no longer possible).
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Highlighter Text="Match the word found but not the word unfound" HighlightedText="found" WholeWord="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Highlighter Text=""Match the word found but not the word unfound"" HighlightedText=""found"" WholeWord=""true"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<Highlighter Text=""Match the word found but not the word unfound"" HighlightedText=""found"" WholeWord=""true"" />")">
+    <Highlighter Text="Match the word found but not the word unfound" HighlightedText="found" WholeWord="true" />
+</CodeExample>
 
 <p>
     The <code>IsRegex</code> property indicates <code>HighlightedText</code> is a regular
     expression, and can produce powerful matching behavior.
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <Highlighter Text="Match the words cat and bat, but not rat" HighlightedText="[cb]at" IsRegex="true" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Highlighter Text=""Match the words cat and bat, but not rat"" HighlightedText=""[cb]at"" IsRegex=""true"" />")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<Highlighter Text=""Match the words cat and bat, but not rat"" HighlightedText=""[cb]at"" IsRegex=""true"" />")">
+    <Highlighter Text="Match the words cat and bat, but not rat" HighlightedText="[cb]at" IsRegex="true" />
+</CodeExample>
 
 <h2>Customization</h2>
 
@@ -97,18 +69,7 @@
     sections.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <ElementList Items="_items">
-                <Template>
-                    <Highlighter Text="@context" HighlightedText="it" Class="primary" Style="background-color:transparent" />
-                </Template>
-            </ElementList>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<ElementList Items=""_items"">
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<ElementList Items=""_items"">
     <Template>
         <Highlighter Text=""@context"" HighlightedText=""it"" Class=""primary"" Style=""background-color:transparent"" />
     </Template>
@@ -116,9 +77,13 @@
 
 @code {
     private List<string> _items = new() { ""Item 1"", ""Item 2"", ""Item 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <ElementList Items="_items">
+        <Template>
+            <Highlighter Text="@context" HighlightedText="it" Class="primary" Style="background-color:transparent" />
+        </Template>
+    </ElementList>
+</CodeExample>
 
 @code {
     private List<string> _items = new() { "Item 1", "Item 2", "Item 3" };

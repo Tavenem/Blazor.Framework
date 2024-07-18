@@ -1,4 +1,5 @@
 import { randomUUID } from "../tavenem-utility";
+import { TavenemPickerHtmlElement } from "./_picker";
 
 export class TavenemInputHtmlElement extends HTMLElement {
     static formAssociated = true;
@@ -731,9 +732,7 @@ button.clear::-moz-focus-inner {
         }
 
         const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement
-            && this._value !== input.value
-            && this._display !== input.value) {
+        if (input instanceof HTMLInputElement) {
             this.dispatchEvent(TavenemInputHtmlElement.newValueChangeEvent(input.value));
         }
     }
@@ -859,6 +858,14 @@ button.clear::-moz-focus-inner {
             delete suggestion.dataset.display;
             delete suggestion.dataset.value;
             suggestion.textContent = null;
+
+            const parent = root.host?.parentElement
+                ?? (root.host?.parentNode instanceof ShadowRoot
+                    ? root.host.parentNode.host
+                    : null);
+            if (parent instanceof TavenemPickerHtmlElement) {
+                parent.setOpen(false);
+            }
             return;
         }
     }
@@ -935,6 +942,11 @@ button.clear::-moz-focus-inner {
             const hiddenInput = root.querySelector<HTMLInputElement>('input[type="hidden"]');
             if (hiddenInput) {
                 hiddenInput.value = this._value;
+            }
+
+            const input = root.querySelector<HTMLInputElement>('input:not([type="hidden"])');
+            if (input) {
+                input.value = this._value;
             }
         }
 

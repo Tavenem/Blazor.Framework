@@ -39,6 +39,7 @@ import { TavenemDarkModeToggleHtmlElement } from './components/_darkmode-toggle'
 import { TavenemDrawerCloseButtonHtmlElement } from './components/drawer/_drawer-close-button';
 import { TavenemDrawerOverlayHtmlElement } from './components/drawer/_drawer-overlay';
 import { TavenemPaginationHtmlElement } from './components/_pagination';
+import { TavenemSwitchHtmlElement } from './components/_switch';
 
 interface BlazorEvent extends Event { }
 
@@ -151,6 +152,8 @@ namespace Tavenem {
         customElements.define('tf-pagination', TavenemPaginationHtmlElement);
 
         customElements.define('tf-slider', TavenemSliderHTMLElement);
+
+        customElements.define('tf-switch', TavenemSwitchHtmlElement);
 
         customElements.define('tf-syntax-highlight', TavenemHighlightHTMLElement);
 

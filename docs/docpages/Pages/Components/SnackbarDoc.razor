@@ -1,4 +1,5 @@
 ﻿@page "/components/snackbar"
+@using System.Diagnostics.CodeAnalysis
 @rendermode InteractiveWebAssembly
 
 <PageTitle>Snackbar - Tavenem Blazor Framework</PageTitle>
@@ -24,40 +25,26 @@
     call one of the <code>Add</code> method overloads:
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <button class="btn primary" @onclick="@(_ => SnackbarService.Add("This is a snackbar"))">Show snackbar</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(""This is a snackbar""))"">Show snackbar</button>
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(""This is a snackbar""))"">Show snackbar</button>
 
 @code {
-    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
-}")
-    </ChildContent>
-</Collapse>
+    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
+}")">
+    <button class="btn primary" @onclick="@(_ => SnackbarService.Add("This is a snackbar"))">Show snackbar</button>
+</CodeExample>
 
 <p>
     The message can contain HTML as a <code>MarkupString</code>:
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <button class="btn primary" @onclick="@(_ => SnackbarService.Add(_message))">Show snackbar</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(_message))"">Show snackbar</button>
+<CodeExample Code="@(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(_message))"">Show snackbar</button>
 
 @code {
     private MarkupString _message = (MarkupString)""This is a <strong class=\""info\"">snackbar</strong>"";
-    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
-}")
-    </ChildContent>
-</Collapse>
+    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
+}")">
+    <button class="btn primary" @onclick="@(_ => SnackbarService.Add(_message))">Show snackbar</button>
+</CodeExample>
 
 <h2>Options</h2>
 
@@ -165,22 +152,7 @@
     The icon of a snackbar is set automatically based on the theme.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <button class="btn primary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Primary", ThemeColor = ThemeColor.Primary }))">Primary</button>
-            <button class="btn secondary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Secondary", ThemeColor = ThemeColor.Secondary }))">Secondary</button>
-            <button class="btn tertiary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Tertiary", ThemeColor = ThemeColor.Tertiary }))">Tertiary</button>
-            <button class="btn danger" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Danger", ThemeColor = ThemeColor.Danger }))">Danger</button>
-            <button class="btn dark" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Dark", ThemeColor = ThemeColor.Dark }))">Dark</button>
-            <button class="btn default" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Default", ThemeColor = ThemeColor.Default }))">Default</button>
-            <button class="btn info" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Info", ThemeColor = ThemeColor.Info }))">Info</button>
-            <button class="btn success" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Success", ThemeColor = ThemeColor.Success }))">Success</button>
-            <button class="btn warning" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Warning", ThemeColor = ThemeColor.Warning }))">Warning</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Primary"", ThemeColor = ThemeColor.Primary }))"">Primary</button>
+<CodeExample Code="@(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Primary"", ThemeColor = ThemeColor.Primary }))"">Primary</button>
 <button class=""btn secondary"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Secondary"", ThemeColor = ThemeColor.Secondary }))"">Secondary</button>
 <button class=""btn tertiary"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Tertiary"", ThemeColor = ThemeColor.Tertiary }))"">Tertiary</button>
 <button class=""btn danger"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Danger"", ThemeColor = ThemeColor.Danger }))"">Danger</button>
@@ -191,30 +163,31 @@
 <button class=""btn warning"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Warning"", ThemeColor = ThemeColor.Warning }))"">Warning</button>
 
 @code {
-    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
-}")
-    </ChildContent>
-</Collapse>
+    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
+}")">
+    <button class="btn primary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Primary", ThemeColor = ThemeColor.Primary }))">Primary</button>
+    <button class="btn secondary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Secondary", ThemeColor = ThemeColor.Secondary }))">Secondary</button>
+    <button class="btn tertiary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Tertiary", ThemeColor = ThemeColor.Tertiary }))">Tertiary</button>
+    <button class="btn danger" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Danger", ThemeColor = ThemeColor.Danger }))">Danger</button>
+    <button class="btn dark" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Dark", ThemeColor = ThemeColor.Dark }))">Dark</button>
+    <button class="btn default" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Default", ThemeColor = ThemeColor.Default }))">Default</button>
+    <button class="btn info" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Info", ThemeColor = ThemeColor.Info }))">Info</button>
+    <button class="btn success" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Success", ThemeColor = ThemeColor.Success }))">Success</button>
+    <button class="btn warning" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Warning", ThemeColor = ThemeColor.Warning }))">Warning</button>
+</CodeExample>
 
 <p>
     You can suppress the icon by setting the <code>AutoIcon</code> property to <code>false</code>.
     You may include your own custom icon, in any position you wish:
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <button class="btn primary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Icon after the text <tf-icon>lightbulb</tf-icon>", AutoIcon = false }))">Show snackbar</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Icon after the text <tf-icon>lightbulb</tf-icon>"", AutoIcon = false }))"">Show snackbar</button>
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn primary"" @onclick=""@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)""Icon after the text <tf-icon>lightbulb</tf-icon>"", AutoIcon = false }))"">Show snackbar</button>
 
 @code {
-    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
-}")
-    </ChildContent>
-</Collapse>
+    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
+}")">
+    <button class="btn primary" @onclick="@(_ => SnackbarService.Add(new SnackbarOptions { Message = (MarkupString)"Icon after the text <tf-icon>lightbulb</tf-icon>", AutoIcon = false }))">Show snackbar</button>
+</CodeExample>
 
 <h3>Standalone</h3>
 
@@ -239,5 +212,5 @@
 
 @code {
     private MarkupString _message = (MarkupString)"This is a <strong class=\"info\">snackbar</strong>";
-    [Inject] private SnackbarService SnackbarService { get; set; } = default!;
+    [Inject, NotNull] private SnackbarService? SnackbarService { get; set; }
 }

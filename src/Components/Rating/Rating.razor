@@ -24,11 +24,9 @@
                        type="radio"
                        autofocus="@AutoFocus"
                        checked="@(Value == 1)"
-                       class="@InputCssClass"
                        disabled="@Disabled"
                        name="@NameValue"
                        readonly="@ReadOnly"
-                       style="@InputCssStyle"
                        tabindex="@(Disabled ? -1 : TabIndex)"
                        value="1" />
                 @if (!string.IsNullOrEmpty(ActiveIcon))
@@ -58,11 +56,9 @@
                        @onmouseover="@(_ => OnMouseOverAsync(index))">
                     <input type="radio"
                            checked="@(index == Value - 1)"
-                           class="@InputCssClass"
                            disabled="@Disabled"
                            name="@NameValue"
                            readonly="@ReadOnly"
-                           style="@InputCssStyle"
                            tabindex="@(Disabled ? -1 : TabIndex)"
                            value="@(index + 1)" />
                         @if (!string.IsNullOrEmpty(ActiveIcon))

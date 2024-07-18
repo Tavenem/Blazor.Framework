@@ -28,28 +28,7 @@
     <code>Step</code> other than the first, to ensure that the steps are completed in order.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Steps Id="s-1">
-                <Step Title="First step">
-                    <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory">
-                        <Option Label="Category 1" Value="1" />
-                        <Option Label="Category 2" Value="2" />
-                        <Option Label="Category 3" Value="3" />
-                    </Select>
-                </Step>
-                <Step Title="Second step" Disabled="@(_selectedCategory < 1)">
-                    <NumericInput Label="Enter a value" Required="true" @bind-Value="_value" UpdateOnInput="true" />
-                </Step>
-                <Step Title="Third step" Disabled="@(_value is null or < 1)">
-                    <TextInput Label="Word" HelpText="Write a word" />
-                </Step>
-            </Steps>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Steps>
+<CodeExample IsOpen="true" Code="@(@"<Steps>
     <Step Title=""First step"">
         <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
             <Option Label=""Category 1"" Value=""1"" />
@@ -68,9 +47,23 @@
 @code {
     private int _selectedCategory;
     private int? _value;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Steps>
+        <Step Title="First step">
+            <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory">
+                <Option Label="Category 1" Value="1" />
+                <Option Label="Category 2" Value="2" />
+                <Option Label="Category 3" Value="3" />
+            </Select>
+        </Step>
+        <Step Title="Second step" Disabled="@(_selectedCategory < 1)">
+            <NumericInput Label="Enter a value" Required="true" @bind-Value="_value" UpdateOnInput="true" />
+        </Step>
+        <Step Title="Third step" Disabled="@(_value is null or < 1)">
+            <TextInput Label="Word" HelpText="Write a word" />
+        </Step>
+    </Steps>
+</CodeExample>
 
 <p>
     The number or title of a step can be clicked to skip directly to that step (if it's enabled).
@@ -95,36 +88,7 @@
     navigation away from the step will hide it again.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Steps @ref="_steps" Id="s-2">
-                <Step Title="Category">
-                    <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory2">
-                        <Option Label="Category 1" Value="1" />
-                        <Option Label="Category 2" Value="2" />
-                        <Option Label="Category 3" Value="3" />
-                    </Select>
-                </Step>
-                <Step @ref="_toggleStep" Title="Toggle" IsVisible="_toggleStepVisible">
-                    <p>Choose a toggle state:</p>
-                    <Switch Label="On" UncheckedLabel="Off" />
-                </Step>
-                <Step Title="Value" Disabled="@(_selectedCategory2 < 1)">
-                    <NumericInput Label="Enter a value" Required="true" @bind-Value="_value2" UpdateOnInput="true" />
-                    @if (!_toggleStepVisible)
-                    {
-                        <button class="btn warning" @onclick="RevealHiddenStep">Show hidden step</button>
-                    }
-                </Step>
-                <Step Title="Word" Disabled="@(_value2 is not > 1)">
-                    <TextInput Label="Word" HelpText="Write a word" />
-                </Step>
-            </Steps>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Steps @ref=""_steps"">
+<CodeExample IsOpen="true" Code="@(@"<Steps @ref=""_steps"">
     <Step Title=""Category"">
         <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
             <Option Label=""Category 1"" Value=""1"" />
@@ -160,9 +124,31 @@
         _toggleStepVisible = true;
         await _steps!.ActivateStepAsync(_toggleStep!);
     }
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Steps @ref="_steps">
+        <Step Title="Category">
+            <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory2">
+                <Option Label="Category 1" Value="1" />
+                <Option Label="Category 2" Value="2" />
+                <Option Label="Category 3" Value="3" />
+            </Select>
+        </Step>
+        <Step @ref="_toggleStep" Title="Toggle" IsVisible="_toggleStepVisible">
+            <p>Choose a toggle state:</p>
+            <Switch Label="On" UncheckedLabel="Off" />
+        </Step>
+        <Step Title="Value" Disabled="@(_selectedCategory2 < 1)">
+            <NumericInput Label="Enter a value" Required="true" @bind-Value="_value2" UpdateOnInput="true" />
+            @if (!_toggleStepVisible)
+            {
+                <button class="btn warning" @onclick="RevealHiddenStep">Show hidden step</button>
+            }
+        </Step>
+        <Step Title="Word" Disabled="@(_value2 is not > 1)">
+            <TextInput Label="Word" HelpText="Write a word" />
+        </Step>
+    </Steps>
+</CodeExample>
 
 <h2>Finishing</h2>
 
@@ -174,48 +160,22 @@
     text.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="w-100">
-                <Steps Id="s-3" Finish="OnSubmit" FinishButtonDisabled="@(string.IsNullOrEmpty(_word))">
-                    <Step Title="First step">
-                        <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory3">
-                            <Option Label="Category 1" Value="1" />
-                            <Option Label="Category 2" Value="2" />
-                            <Option Label="Category 3" Value="3" />
-                        </Select>
-                    </Step>
-                    <Step Title="Second step" Disabled="@(_selectedCategory3 < 1)">
-                        <NumericInput Label="Enter a value" Required="true" @bind-Value="_value3" UpdateOnInput="true" />
-                    </Step>
-                    <Step Title="Third step" Disabled="@(_value3 is null or < 1)">
-                        <TextInput Label="Word" HelpText="Write a word" @bind-Value="_word" UpdateOnInput="true" />
-                    </Step>
-                </Steps>
-                <p class="mt-4 success">@_result</p>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""w-100"">
-    <Steps Finish=""OnSubmit"" FinishButtonDisabled=""@(string.IsNullOrEmpty(_word))"">
-        <Step Title=""First step"">
-            <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
-                <Option Label=""Category 1"" Value=""1"" />
-                <Option Label=""Category 2"" Value=""2"" />
-                <Option Label=""Category 3"" Value=""3"" />
-            </Select>
-        </Step>
-        <Step Title=""Second step"" Disabled=""@(_selectedCategory < 1)"">
-            <NumericInput Label=""Enter a value"" Required=""true"" @bind-Value=""_value"" UpdateOnInput=""true"" />
-        </Step>
-        <Step Title=""Third step"" Disabled=""@(_value is not > 1)"">
-            <TextInput Label=""Word"" HelpText=""Write a word"" @bind-Value=""_word"" UpdateOnInput=""true"" />
-        </Step>
-    </Steps>
-    <p class=""mt-4 success"">@_result</p>
-</div>
+<CodeExample IsOpen="true" RowClass="fill flex-column" Code="@(@"<Steps Finish=""OnSubmit"" FinishButtonDisabled=""@(string.IsNullOrEmpty(_word))"">
+    <Step Title=""First step"">
+        <Select Label=""Category"" Placeholder=""Choose a category..."" Required=""true"" @bind-Value=""_selectedCategory"">
+            <Option Label=""Category 1"" Value=""1"" />
+            <Option Label=""Category 2"" Value=""2"" />
+            <Option Label=""Category 3"" Value=""3"" />
+        </Select>
+    </Step>
+    <Step Title=""Second step"" Disabled=""@(_selectedCategory < 1)"">
+        <NumericInput Label=""Enter a value"" Required=""true"" @bind-Value=""_value"" UpdateOnInput=""true"" />
+    </Step>
+    <Step Title=""Third step"" Disabled=""@(_value is not > 1)"">
+        <TextInput Label=""Word"" HelpText=""Write a word"" @bind-Value=""_word"" UpdateOnInput=""true"" />
+    </Step>
+</Steps>
+<p class=""mt-4 success"">@_result</p>
 
 @code {
     private string? _result;
@@ -224,9 +184,24 @@
     private string? _word;
 
     private void OnSubmit() => _result = ""Success!"";
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Steps Finish="OnSubmit" FinishButtonDisabled="@(string.IsNullOrEmpty(_word))">
+        <Step Title="First step">
+            <Select Label="Category" Placeholder="Choose a category..." Required="true" @bind-Value="_selectedCategory3">
+                <Option Label="Category 1" Value="1" />
+                <Option Label="Category 2" Value="2" />
+                <Option Label="Category 3" Value="3" />
+            </Select>
+        </Step>
+        <Step Title="Second step" Disabled="@(_selectedCategory3 < 1)">
+            <NumericInput Label="Enter a value" Required="true" @bind-Value="_value3" UpdateOnInput="true" />
+        </Step>
+        <Step Title="Third step" Disabled="@(_value3 is null or < 1)">
+            <TextInput Label="Word" HelpText="Write a word" @bind-Value="_word" UpdateOnInput="true" />
+        </Step>
+    </Steps>
+    <p class="mt-4 success">@_result</p>
+</CodeExample>
 
 <h2>Methods</h2>
 
@@ -284,102 +259,91 @@
     selection list.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="w-100">
-                <Steps Id="s-4" ThemeColor="ThemeColor.Primary">
-                    <Step Title="First step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Second step">
-                        <p>Content</p>
-                    </Step>
-                </Steps>
-                <Steps ThemeColor="ThemeColor.Secondary">
-                    <Step Title="First step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Second step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Third step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Fourth step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Fifth step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Sixth step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Seventh step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Eighth step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Ninth step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Tenth step">
-                        <p>Content</p>
-                    </Step>
-                </Steps>
-                <Steps ThemeColor="ThemeColor.Tertiary">
-                    <Step Title="First step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Second step">
-                        <p>Content</p>
-                    </Step>
-                    <Step Title="Third step">
-                        <p>Content</p>
-                    </Step>
-                </Steps>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""w-100"">
-    <Steps ThemeColor=""ThemeColor.Primary"">
-        <Step Title=""First step"">
+<CodeExample RowClass="fill flex-column" Code="@(@"<Steps ThemeColor=""ThemeColor.Primary"">
+    <Step Title=""First step"">
+        <p>Content</p>
+    </Step>
+    <Step Title=""Second step"">
+        <p>Content</p>
+    </Step>
+    <Step Title=""Third step"">
+        <p>Content</p>
+    </Step>
+</Steps>
+<Steps ThemeColor=""ThemeColor.Secondary"">
+    <Step Title=""First step"">
+        <p>Content</p>
+    </Step>
+    <Step Title=""Second step"">
+        <p>Content</p>
+    </Step>
+    <Step Title=""Third step"">
+        <p>Content</p>
+    </Step>
+</Steps>
+<Steps ThemeColor=""ThemeColor.Tertiary"">
+    <Step Title=""First step"">
+        <p>Content</p>
+    </Step>
+    <Step Title=""Second step"">
+        <p>Content</p>
+    </Step>
+    <Step Title=""Third step"">
+        <p>Content</p>
+    </Step>
+</Steps>")">
+    <Steps ThemeColor="ThemeColor.Primary">
+        <Step Title="First step">
             <p>Content</p>
         </Step>
-        <Step Title=""Second step"">
-            <p>Content</p>
-        </Step>
-        <Step Title=""Third step"">
+        <Step Title="Second step">
             <p>Content</p>
         </Step>
     </Steps>
-    <Steps ThemeColor=""ThemeColor.Secondary"">
-        <Step Title=""First step"">
+    <Steps ThemeColor="ThemeColor.Secondary">
+        <Step Title="First step">
             <p>Content</p>
         </Step>
-        <Step Title=""Second step"">
+        <Step Title="Second step">
             <p>Content</p>
         </Step>
-        <Step Title=""Third step"">
+        <Step Title="Third step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Fourth step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Fifth step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Sixth step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Seventh step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Eighth step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Ninth step">
+            <p>Content</p>
+        </Step>
+        <Step Title="Tenth step">
             <p>Content</p>
         </Step>
     </Steps>
-    <Steps ThemeColor=""ThemeColor.Tertiary"">
-        <Step Title=""First step"">
+    <Steps ThemeColor="ThemeColor.Tertiary">
+        <Step Title="First step">
             <p>Content</p>
         </Step>
-        <Step Title=""Second step"">
+        <Step Title="Second step">
             <p>Content</p>
         </Step>
-        <Step Title=""Third step"">
+        <Step Title="Third step">
             <p>Content</p>
         </Step>
     </Steps>
-</div>")
-    </ChildContent>
-</Collapse>
+</CodeExample>
 
 <h2>Events</h2>
 

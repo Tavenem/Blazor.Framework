@@ -3,4 +3,9 @@
 
 <PageTitle>Test</PageTitle>
 
-<Pagination Id="pd1" CurrentPage="3" PageCount="5" PersistState="true" />
+<TextInput @bind-Value="_value" Label="Bound" Class="align-self-stretch" />
+<span>Bound value: @_value</span>
+
+@code {
+    private string? _value = "Example";
+}

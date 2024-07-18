@@ -58,7 +58,7 @@
 </p>
 
 <p>
-    The <code>Touches</code> parameter indicates the number of touches currenty involved in the
+    The <code>Touches</code> parameter indicates the number of touches currently involved in the
     interaction (i.e. how many fingertips are touching the interactive surface). Note that this may
     change during a pinch interaction, but if it drops below 2 the <code>OnPinch</code> callback
     will not be invoked (since a single point of movement is not a pinch).
@@ -67,25 +67,11 @@
 <h2>Example</h2>
 
 <p>
-    Pinch and swipe in the exmaple area below on a touch-enabled device to see the events that are
+    Pinch and swipe in the example area below on a touch-enabled device to see the events that are
     raised.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="primary filled" style="height:15rem;width:20rem">
-                <TouchTarget OnPinch="@OnPinch" OnSwipe="OnSwipe" Style="height:100%;width:100%">
-                    @foreach (var msg in _messages)
-                    {
-                        <span>@msg</span><br>
-                    }
-                </TouchTarget>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""primary filled"" style=""height:15rem;width:20rem"">
+<CodeExample Code="@(@"<div class=""primary filled"" style=""height:15rem;width:20rem"">
     <TouchTarget OnPinch=""@OnPinch"" OnSwipe=""OnSwipe"" Style=""height:100%;width:100%"">
         @foreach (var msg in _messages)
         {
@@ -114,9 +100,16 @@
         }
         _messages.Enqueue($""Swipe {(Enum.IsDefined(e.Direction) ? e.Direction.ToString() : ""multiple directions"")} with {e.Touches} fingers"");
     }
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <div class="primary filled" style="height:15rem;width:20rem">
+        <TouchTarget OnPinch="@OnPinch" OnSwipe="OnSwipe" Style="height:100%;width:100%">
+            @foreach (var msg in _messages)
+            {
+                <span>@msg</span><br>
+            }
+        </TouchTarget>
+    </div>
+</CodeExample>
 
 @code {
     private Queue<string> _messages = new();

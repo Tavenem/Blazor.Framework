@@ -101,6 +101,7 @@ export class CodeBlockView implements NodeView {
             syntaxInput.setAttribute('disabled', '');
         }
         syntaxInput.setAttribute('size', '10');
+        syntaxInput.addEventListener('valueinput', this.onStopEvent.bind(this));
         syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
         div.appendChild(syntaxInput);
 
@@ -390,6 +391,11 @@ export class CodeBlockView implements NodeView {
         };
 
         this._cm.dispatch(spec);
+    }
+
+    private onStopEvent(event: Event) {
+        event.preventDefault();
+        event.preventDefault();
     }
 }
 

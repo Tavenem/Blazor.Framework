@@ -16,34 +16,7 @@
     The basic <code>table</code> class provides a simple, clean style.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <table class="table">
-                <thead>
-                    <tr>
-                        @foreach (var heading in _headings)
-                        {
-                            <th>@heading</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in _rows)
-                    {
-                        <tr>
-                            @foreach (var data in row)
-                            {
-                                <td>@data</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<table class=""table"">
+<CodeExample RowClass="center-items gap-2" Code="@(@"<table class=""table"">
     <thead>
         <tr>
             @foreach (var heading in _headings)
@@ -77,42 +50,35 @@
         new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
         new[] { ""6"", ""Miller, Michael"", ""CDO"" },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <table class="table">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</CodeExample>
 
 <p>
     You can add the <code>dense</code> class to reduce padding.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <table class="table dense">
-                <thead>
-                    <tr>
-                        @foreach (var heading in _headings)
-                        {
-                            <th>@heading</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in _rows)
-                    {
-                        <tr>
-                            @foreach (var data in row)
-                            {
-                                <td>@data</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<table class=""table dense"">
+<CodeExample RowClass="center-items gap-2" Code="@(@"<table class=""table dense"">
     <thead>
         <tr>
             @foreach (var heading in _headings)
@@ -146,42 +112,35 @@
         new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
         new[] { ""6"", ""Miller, Michael"", ""CDO"" },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <table class="table dense">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</CodeExample>
 
 <p>
     The <code>border</code> class will add both external and internal lines.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <table class="table border">
-                <thead>
-                    <tr>
-                        @foreach (var heading in _headings)
-                        {
-                            <th>@heading</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in _rows)
-                    {
-                        <tr>
-                            @foreach (var data in row)
-                            {
-                                <td>@data</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<table class=""table border"">
+<CodeExample RowClass="center-items gap-2" Code="@(@"<table class=""table border"">
     <thead>
         <tr>
             @foreach (var heading in _headings)
@@ -215,43 +174,36 @@
         new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
         new[] { ""6"", ""Miller, Michael"", ""CDO"" },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <table class="table border">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</CodeExample>
 
 <p>
     The <code>striped</code> class will add an alternate background color to every other row, while
     the <code>hover</code> class will change the background color of hovered rows.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <table class="table striped hover">
-                <thead>
-                    <tr>
-                        @foreach (var heading in _headings)
-                        {
-                            <th>@heading</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in _rows)
-                    {
-                        <tr>
-                            @foreach (var data in row)
-                            {
-                                <td>@data</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<table class=""table striped hover"">
+<CodeExample RowClass="center-items gap-2" Code="@(@"<table class=""table striped hover"">
     <thead>
         <tr>
             @foreach (var heading in _headings)
@@ -285,9 +237,29 @@
         new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
         new[] { ""6"", ""Miller, Michael"", ""CDO"" },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <table class="table striped hover">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</CodeExample>
 
 <p>
     Add the <code>sticky-header</code> class to make the <code>thead</code> stay visible when
@@ -295,44 +267,7 @@
     <code>tfoot</code>.
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="w-100" style="height:300px;overflow:auto">
-                <table class="table dense sticky-header sticky-footer">
-                    <thead>
-                        <tr>
-                            @foreach (var heading in _headings)
-                            {
-                                <th>@heading</th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var row in _rows2)
-                        {
-                            <tr>
-                                @foreach (var data in row)
-                                {
-                                    <td>@data</td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            @foreach (var heading in _headings)
-                            {
-                                <th>@heading</th>
-                            }
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""w-100"" style=""height:300px;overflow:auto"">
+<CodeExample RowClass="center-items gap-2" Code="@(@"<div style=""height:300px;overflow:auto"">
     <table class=""table dense sticky-header sticky-footer"">
         <thead>
             <tr>
@@ -383,9 +318,39 @@
         new[] { ""12"", ""Gonzales, Richard"", ""CXO"" },
         new[] { ""13"", ""Wilson, Susan"", ""CHRO"" },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <div class="w-100" style="height:300px;overflow:auto">
+        <table class="table dense sticky-header sticky-footer">
+            <thead>
+                <tr>
+                    @foreach (var heading in _headings)
+                    {
+                        <th>@heading</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in _rows2)
+                {
+                    <tr>
+                        @foreach (var data in row)
+                        {
+                            <td>@data</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    @foreach (var heading in _headings)
+                    {
+                        <th>@heading</th>
+                    }
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</CodeExample>
 
 <h2>Customization</h2>
 
@@ -393,55 +358,7 @@
     You can add any theme color class to customize the color scheme.
 </p>
 
-<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <table class="table primary striped hover">
-                <thead>
-                    <tr>
-                        @foreach (var heading in _headings)
-                        {
-                            <th>@heading</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in _rows)
-                    {
-                        <tr>
-                            @foreach (var data in row)
-                            {
-                                <td>@data</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <table class="table secondary striped hover">
-                <thead>
-                    <tr>
-                        @foreach (var heading in _headings)
-                        {
-                            <th>@heading</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in _rows)
-                    {
-                        <tr>
-                            @foreach (var data in row)
-                            {
-                                <td>@data</td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<table class=""table primary striped hover"">
+<CodeExample RowClass="center-items gap-2" Code="@(@"<table class=""table primary striped hover"">
     <thead>
         <tr>
             @foreach (var heading in _headings)
@@ -496,9 +413,50 @@
         new[] { ""5"", ""Garcia, Jennifer"", ""CIO"" },
         new[] { ""6"", ""Miller, Michael"", ""CDO"" },
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <table class="table primary striped hover">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    <table class="table secondary striped hover">
+        <thead>
+            <tr>
+                @foreach (var heading in _headings)
+                {
+                    <th>@heading</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in _rows)
+            {
+                <tr>
+                    @foreach (var data in row)
+                    {
+                        <td>@data</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</CodeExample>
 
 @code {
     string[] _headings = { "ID", "Name", "Title" };

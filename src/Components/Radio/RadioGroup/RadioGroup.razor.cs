@@ -129,16 +129,6 @@ public partial class RadioGroup<[DynamicallyAccessedMembers(DynamicallyAccessedM
         .Add("radio-group")
         .ToString();
 
-    /// <inheritdoc/>
-    protected override string? InputCssClass => new CssBuilder(InputClass)
-        .AddClassFromDictionary(InputAttributes)
-        .ToString();
-
-    /// <inheritdoc/>
-    protected override string? InputCssStyle => new CssBuilder(InputStyle)
-        .AddStyleFromDictionary(InputAttributes)
-        .ToString();
-
     [CascadingParameter] private RadioContext<TValue>? CascadingContext { get; set; }
 
     private ElementReference FieldSet { get; set; }

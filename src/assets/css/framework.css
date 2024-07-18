@@ -33,7 +33,6 @@
 @import "components/skeleton.css" layer(tavenem-framework.components);
 @import "components/snackbar.css" layer(tavenem-framework.components);
 @import "components/steps.css" layer(tavenem-framework.components);
-@import "components/switch.css" layer(tavenem-framework.components);
 @import "components/table.css" layer(tavenem-framework.components);
 @import "components/tabs.css" layer(tavenem-framework.components);
 @import "components/timeline.css" layer(tavenem-framework.components);

@@ -40,6 +40,16 @@ public abstract class DataGridSelectBase<
     [Parameter] public InputValueConverter<TValueItem>? Converter { get; set; }
 
     /// <summary>
+    /// Custom CSS class(es) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputClass { get; set; }
+
+    /// <summary>
+    /// Custom CSS style(s) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputStyle { get; set; }
+
+    /// <summary>
     /// <para>
     /// A function to obtain a label from a data item.
     /// </para>
@@ -112,8 +122,15 @@ public abstract class DataGridSelectBase<
         .Add("clearable-readonly", ShowClear)
         .ToString();
 
-    /// <inheritdoc />
-    protected override string? InputCssStyle => new CssBuilder(base.InputCssStyle)
+    /// <summary>
+    /// The final value assigned to the input element's class attribute, including component values.
+    /// </summary>
+    protected virtual string? InputCssClass => InputClass;
+
+    /// <summary>
+    /// The final value assigned to the input element's style attribute.
+    /// </summary>
+    protected virtual string? InputCssStyle => new CssBuilder(InputStyle)
         .AddStyle(
             "min-width",
             $"{Size ?? 0}ch",

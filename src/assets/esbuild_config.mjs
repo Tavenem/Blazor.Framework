@@ -23,7 +23,6 @@ await esbuild.build({
         "scripts/tavenem-dragdrop.ts",
         "scripts/tavenem-drawer.ts",
         "scripts/tavenem-editor.ts",
-        "scripts/tavenem-keylistener.ts",
         "scripts/tavenem-resize.ts",
         "scripts/tavenem-scroll.ts",
         "scripts/tavenem-framework.ts",

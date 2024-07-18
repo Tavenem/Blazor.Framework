@@ -326,8 +326,6 @@ label {
         return [
             'checked',
             'data-allow-null',
-            'data-input-class',
-            'data-input-style',
             'data-label',
             'indeterminate',
             'readonly',
@@ -617,21 +615,12 @@ label {
             this._internals.states.delete('checked');
             this._internals.states.delete('indeterminate');
         }
-        input.className = this.dataset.inputClass || '';
         input.disabled = this.hasAttribute('disabled');
 
         const inputId = randomUUID();
         input.id = inputId;
 
         input.readOnly = this.hasAttribute('readonly');
-        input.style.cssText = this.dataset.inputStyle || '';
-        if (this.hasAttribute('tabindex')) {
-            const tabIndexValue = this.getAttribute('tabindex');
-            if (tabIndexValue) {
-                const tabIndex = parseInt(tabIndexValue);
-                input.tabIndex = tabIndex;
-            }
-        }
 
         input.type = isRadio ? 'radio' : 'checkbox';
 
@@ -792,10 +781,6 @@ label {
 
                 this.setValidity(input);
             }
-        } else if (name === 'data-input-class') {
-            input.className = newValue || '';
-        } else if (name === 'data-input-style') {
-            input.style.cssText = newValue || '';
         } else if (name === 'indeterminate') {
             if (input.indeterminate != (newValue != null)) {
                 this._settingValue = true;

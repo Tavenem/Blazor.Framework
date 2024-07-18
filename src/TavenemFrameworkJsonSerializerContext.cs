@@ -11,7 +11,5 @@ namespace Tavenem.Blazor.Framework;
 [JsonSerializable(typeof(CropEventArgs))]
 [JsonSerializable(typeof(PinchEventArgs))]
 [JsonSerializable(typeof(SwipeEventArgs))]
-[JsonSerializable(typeof(KeyListenerOptions))]
-[JsonSerializable(typeof(KeyOptions))]
 [JsonSerializable(typeof(ValueChangeEventArgs))]
 public partial class TavenemFrameworkJsonSerializerContext : JsonSerializerContext;

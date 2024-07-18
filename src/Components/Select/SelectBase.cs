@@ -39,6 +39,16 @@ public abstract class SelectBase<TValue, TOption>
     [Parameter] public InputValueConverter<TOption>? Converter { get; set; }
 
     /// <summary>
+    /// Custom CSS class(es) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputClass { get; set; }
+
+    /// <summary>
+    /// Custom CSS style(s) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputStyle { get; set; }
+
+    /// <summary>
     /// A function to retrieve labels for the values in <see cref="Options"/>.
     /// </summary>
     [Parameter] public Func<TOption?, string?>? Labels { get; set; }
@@ -141,6 +151,16 @@ public abstract class SelectBase<TValue, TOption>
         .Add("clearable", ShowClear)
         .Add("clearable-readonly", ShowClear)
         .ToString();
+
+    /// <summary>
+    /// The final value assigned to the input element's class attribute, including component values.
+    /// </summary>
+    protected virtual string? InputCssClass => InputClass;
+
+    /// <summary>
+    /// The final value assigned to the input element's style attribute.
+    /// </summary>
+    protected virtual string? InputCssStyle => InputStyle;
 
     /// <summary>
     /// Whether this select allows multiple selections.

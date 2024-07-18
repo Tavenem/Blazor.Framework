@@ -61,10 +61,6 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 
 :host([inert]) {
     --field-border-color: var(--tavenem-color-action-disabled);
-}
-
-:host([readonly]),
-:host([inert]) {
     cursor: default;
     pointer-events: none;
 }
@@ -191,14 +187,16 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 :host([inline]:not(.filled, .outlined)) > label,
 :host(:focus-within:not(.filled, .outlined)) > label,
 :host([placeholder]:not(.filled, .outlined)) > label,
-:host(:state(has-value):not(.filled, .outlined)) > label {
+:host(:state(has-value):not(.filled, .outlined)) > label,
+:host(.prefixed:not(.filled, .outlined)) > label {
     transform: translate(0, 1.5px) scale(.75);
 }
 
 :host([inline].filled) > label,
 :host(.filled:focus-within) > label,
 :host([placeholder].filled) > label,
-:host(.filled:state(has-value)) > label {
+:host(.filled:state(has-value)) > label,
+:host(.prefixed.filled) > label {
     transform: translate(12px, 10px) scale(.75);
 
     *[dir="rtl"] & {
@@ -209,7 +207,8 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 :host([inline].outlined) > label,
 :host(.outlined:focus-within) > label,
 :host([placeholder].outlined) > label,
-:host(.outlined:state(has-value)) > label {
+:host(.outlined:state(has-value)) > label,
+:host(.prefixed.outlined) > label {
     transform: translate(14px, -6px) scale(.75);
 
     *[dir="rtl"] & {
@@ -277,14 +276,16 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 :host([inline].dense:not(.filled, .outlined)) > label,
 :host(.dense:focus-within:not(.filled, .outlined)) > label,
 :host([placeholder].dense:not(.filled, .outlined)) > label,
-:host(.dense:not(.filled, .outlined):state(has-value)) > label {
+:host(.dense:not(.filled, .outlined):state(has-value)) > label,
+:host(.prefixed.dense:not(.filled, .outlined)) > label {
     transform: translate(0, 1.5px) scale(.75);
 }
 
 :host([inline].dense.filled) > label,
 :host(.dense.filled:focus-within) > label,
 :host([placeholder].dense.filled) > label,
-:host(.dense.filled:state(has-value)) > label {
+:host(.dense.filled:state(has-value)) > label,
+:host(.prefixed.dense.filled) > label {
     transform: translate(3px, 4px) scale(.75);
 
     *[dir="rtl"] & {
@@ -295,7 +296,8 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 :host([inline].dense.outlined) > label,
 :host(.dense.outlined:focus-within) > label,
 :host([placeholder].dense.outlined) > label,
-:host(.dense.outlined:state(has-value)) > label {
+:host(.dense.outlined:state(has-value)) > label,
+:host(.prefixed.dense.outlined) > label {
     transform: translate(5px, -6px) scale(.75);
 
     *[dir="rtl"] & {
@@ -306,8 +308,6 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
 :host(:disabled) tf-input,
 :host([readonly]) tf-input,
 :host([inert]) tf-input {
-    cursor: default;
-
     > svg {
         cursor: default;
         pointer-events: none;
@@ -316,6 +316,11 @@ export class TavenemInputFieldHtmlElement extends HTMLElement {
     input {
         opacity: 1;
     }
+}
+
+:host(:disabled) tf-input,
+:host([inert]) tf-input {
+    cursor: default;
 }
 
 :host(.filled:disabled) tf-input,
@@ -753,7 +758,20 @@ slot {
         shadow.appendChild(slot);
 
         if (this.hasAttribute('value')) {
-            this.setValue(this.getAttribute('value'), this.getAttribute('display'));
+            this._value = this.getAttribute('value') || '';
+
+            if (this._value.length) {
+                this._internals.setFormValue(this._value);
+            } else {
+                this._internals.setFormValue(null);
+            }
+
+            this.display = this.getAttribute('display');
+
+            this.setValidity();
+
+            input.value = this._value;
+
             this._initialValue = this._value;
             this._initialDisplay = this._display;
         } else if (this.hasAttribute('display')) {

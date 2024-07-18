@@ -268,6 +268,11 @@ public partial class TextInput : InputComponentBase<string>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("clearable", Clearable)
+        .Add(
+            "prefixed",
+            PrefixContent is not null
+                || !string.IsNullOrEmpty(PrefixIcon)
+                || !string.IsNullOrEmpty(PrefixText))
         .ToString();
 
     /// <summary>

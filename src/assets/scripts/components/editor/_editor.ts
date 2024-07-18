@@ -1477,7 +1477,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         const emojiInput = document.createElement('tf-emoji-input');
         emojiInput.role = 'menuitem';
         emojiInput.classList.add('field', 'small');
-        emojiInput.dataset.inputClass = 'rounded small';
         emojiInput.tabIndex = -1;
         if (disabledOrReadonly) {
             emojiInput.setAttribute('disabled', '');
@@ -1512,7 +1511,6 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         if (definition.icon) {
             colorInput.dataset.icon = new Option(definition.icon).innerHTML;
         }
-        colorInput.dataset.inputClass = 'rounded small';
         colorInput.setAttribute('alpha', '');
         colorInput.setAttribute('button', '');
         if (disabledOrReadonly) {
@@ -1906,7 +1904,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             syntaxInput.setAttribute('size', '10');
             syntaxInput.setAttribute('value', syntax);
             syntaxInput.setAttribute('display', syntaxTextMap[syntax]);
-            syntaxInput.addEventListener('valueinput', this.onSyntaxSelect.bind(this));
+            syntaxInput.addEventListener('valueinput', this.stopEvent.bind(this));
             syntaxInput.addEventListener('valuechange', this.onSyntaxSelect.bind(this));
             innerToolbar.appendChild(syntaxInput);
 
@@ -2079,6 +2077,11 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 return li;
             }));
         }
+    }
+
+    private stopEvent(event: Event) {
+        event.preventDefault();
+        event.preventDefault();
     }
 
     private themeChange(mutations: MutationRecord[]) {

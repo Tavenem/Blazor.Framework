@@ -15,24 +15,7 @@
     <code>TimelineItem</code> child components inside it to construct a timeline.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="timeline">
-                <TimelineItem>
-                    First event
-                </TimelineItem>
-                <TimelineItem ThemeColor="ThemeColor.Primary">
-                    Second event
-                </TimelineItem>
-                <TimelineItem>
-                    Third event
-                </TimelineItem>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""timeline"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""timeline"">
     <TimelineItem>
         First event
     </TimelineItem>
@@ -42,9 +25,19 @@
     <TimelineItem>
         Third event
     </TimelineItem>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="timeline">
+        <TimelineItem>
+            First event
+        </TimelineItem>
+        <TimelineItem ThemeColor="ThemeColor.Primary">
+            Second event
+        </TimelineItem>
+        <TimelineItem>
+            Third event
+        </TimelineItem>
+    </div>
+</CodeExample>
 
 <p>
     Add the <code>horizontal</code> class to a timeline to display items horizontally rather than
@@ -56,24 +49,7 @@
     either before or after the line itself. By default, they will alternate.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="timeline horizontal align-end">
-                <TimelineItem>
-                    First event
-                </TimelineItem>
-                <TimelineItem ThemeColor="ThemeColor.Primary">
-                    Second event
-                </TimelineItem>
-                <TimelineItem>
-                    Third event
-                </TimelineItem>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""timeline horizontal align-end"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""timeline horizontal align-end"">
     <TimelineItem>
         First event
     </TimelineItem>
@@ -83,48 +59,26 @@
     <TimelineItem>
         Third event
     </TimelineItem>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="timeline horizontal align-end">
+        <TimelineItem>
+            First event
+        </TimelineItem>
+        <TimelineItem ThemeColor="ThemeColor.Primary">
+            Second event
+        </TimelineItem>
+        <TimelineItem>
+            Third event
+        </TimelineItem>
+    </div>
+</CodeExample>
 
 <p>
     Add content to the <code>OppositeContent RenderFragment</code> to display it on the opposite
     side of the timeline.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="timeline">
-                <TimelineItem>
-                    <ChildContent>
-                        First event
-                    </ChildContent>
-                    <OppositeContent>
-                        1st
-                    </OppositeContent>
-                </TimelineItem>
-                <TimelineItem ThemeColor="ThemeColor.Primary">
-                    <ChildContent>
-                        Second event
-                    </ChildContent>
-                    <OppositeContent>
-                        2nd
-                    </OppositeContent>
-                </TimelineItem>
-                <TimelineItem>
-                    <ChildContent>
-                        Third event
-                    </ChildContent>
-                    <OppositeContent>
-                        3rd
-                    </OppositeContent>
-                </TimelineItem>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""timeline"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""timeline"">
     <TimelineItem>
         <ChildContent>
             First event
@@ -149,9 +103,34 @@
             3rd
         </OppositeContent>
     </TimelineItem>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="timeline">
+        <TimelineItem>
+            <ChildContent>
+                First event
+            </ChildContent>
+            <OppositeContent>
+                1st
+            </OppositeContent>
+        </TimelineItem>
+        <TimelineItem ThemeColor="ThemeColor.Primary">
+            <ChildContent>
+                Second event
+            </ChildContent>
+            <OppositeContent>
+                2nd
+            </OppositeContent>
+        </TimelineItem>
+        <TimelineItem>
+            <ChildContent>
+                Third event
+            </ChildContent>
+            <OppositeContent>
+                3rd
+            </OppositeContent>
+        </TimelineItem>
+    </div>
+</CodeExample>
 
 <p>
     Note that <code>OppositeContent</code> is ignored when the timeline is aligned with the
@@ -163,30 +142,7 @@
     Cards added to a timeline item get special formatting:
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="timeline">
-                <TimelineItem>
-                    <div class="card p-3">
-                        First event
-                    </div>
-                </TimelineItem>
-                <TimelineItem ThemeColor="ThemeColor.Primary">
-                    <div class="card p-3">
-                        Second event
-                    </div>
-                </TimelineItem>
-                <TimelineItem>
-                    <div class="card p-3">
-                        Third event
-                    </div>
-                </TimelineItem>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""timeline"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""timeline"">
     <TimelineItem>
         <div class=""card p-3"">
             First event
@@ -202,9 +158,25 @@
             Third event
         </div>
     </TimelineItem>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="timeline">
+        <TimelineItem>
+            <div class="card p-3">
+                First event
+            </div>
+        </TimelineItem>
+        <TimelineItem ThemeColor="ThemeColor.Primary">
+            <div class="card p-3">
+                Second event
+            </div>
+        </TimelineItem>
+        <TimelineItem>
+            <div class="card p-3">
+                Third event
+            </div>
+        </TimelineItem>
+    </div>
+</CodeExample>
 
 <h2>Customization</h2>
 
@@ -215,24 +187,7 @@
     clicked.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="timeline">
-                <TimelineItem>
-                    First event
-                </TimelineItem>
-                <TimelineItem Icon="schedule" Class="large">
-                    Second event
-                </TimelineItem>
-                <TimelineItem>
-                    Third event
-                </TimelineItem>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""timeline"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""timeline"">
     <TimelineItem>
         First event
     </TimelineItem>
@@ -242,9 +197,19 @@
     <TimelineItem>
         Third event
     </TimelineItem>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="timeline">
+        <TimelineItem>
+            First event
+        </TimelineItem>
+        <TimelineItem Icon="schedule" Class="large">
+            Second event
+        </TimelineItem>
+        <TimelineItem>
+            Third event
+        </TimelineItem>
+    </div>
+</CodeExample>
 
 <p>
     Add the <code>align-start</code> or <code>align-end</code> class to a <code>TimelineItem</code>
@@ -253,24 +218,7 @@
     <code>start</code> or <code>end</code> class, all items will be aligned the same way.
 </p>
 
-<Collapse Id="ce-6" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <div class="timeline">
-                <TimelineItem>
-                    First event
-                </TimelineItem>
-                <TimelineItem Class="align-end">
-                    Second event
-                </TimelineItem>
-                <TimelineItem>
-                    Third event
-                </TimelineItem>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""timeline"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""timeline"">
     <TimelineItem>
         First event
     </TimelineItem>
@@ -280,6 +228,16 @@
     <TimelineItem>
         Third event
     </TimelineItem>
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="timeline">
+        <TimelineItem>
+            First event
+        </TimelineItem>
+        <TimelineItem Class="align-end">
+            Second event
+        </TimelineItem>
+        <TimelineItem>
+            Third event
+        </TimelineItem>
+    </div>
+</CodeExample>

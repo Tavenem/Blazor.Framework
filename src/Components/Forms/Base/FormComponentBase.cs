@@ -112,16 +112,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     public TValue? InitialValue { get; private set; }
 
     /// <summary>
-    /// Custom CSS class(es) for the inner input element (may be a hidden element).
-    /// </summary>
-    [Parameter] public string? InputClass { get; set; }
-
-    /// <summary>
-    /// Custom CSS style(s) for the inner input element (may be a hidden element).
-    /// </summary>
-    [Parameter] public string? InputStyle { get; set; }
-
-    /// <summary>
     /// Whether this field's value has been changed.
     /// </summary>
     [Parameter] public bool IsTouched { get; set; }
@@ -338,16 +328,6 @@ public abstract class FormComponentBase<TValue> : InputBase<TValue>, IFormCompon
     /// The <see cref="Framework.Form"/> in which this component is located.
     /// </summary>
     [CascadingParameter] protected Form? Form { get; set; }
-
-    /// <summary>
-    /// The final value assigned to the input element's class attribute, including component values.
-    /// </summary>
-    protected virtual string? InputCssClass => InputClass;
-
-    /// <summary>
-    /// The final value assigned to the input element's style attribute.
-    /// </summary>
-    protected virtual string? InputCssStyle => InputStyle;
 
     /// <summary>
     /// <para>

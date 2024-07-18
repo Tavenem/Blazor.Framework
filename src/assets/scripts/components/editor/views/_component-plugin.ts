@@ -387,7 +387,7 @@ class TavenemInputView implements NodeView {
 
     destroy() {
         if (this.dom) {
-            this.dom.removeEventListener('valuechange', this.onChange.bind(this));
+            this.dom.removeEventListener('valuechange', this.onStopEvent.bind(this));
             this.dom.removeEventListener('valueinput', this.onChange.bind(this));
         }
     }
@@ -403,7 +403,7 @@ class TavenemInputView implements NodeView {
             }
             element.setAttribute(a, node.attrs[a]);
         }
-        element.addEventListener('valuechange', this.onChange.bind(this));
+        element.addEventListener('valuechange', this.onStopEvent.bind(this));
         element.addEventListener('valueinput', this.onChange.bind(this));
         return element;
     }
@@ -426,6 +426,11 @@ class TavenemInputView implements NodeView {
                     value: event.target.value,
                 }));
         }
+    }
+
+    private onStopEvent(event: Event) {
+        event.preventDefault();
+        event.preventDefault();
     }
 }
 

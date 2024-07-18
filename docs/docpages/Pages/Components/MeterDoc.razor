@@ -20,7 +20,7 @@
     replaced with styles that better align with the rest of the Tavenem Blazor Framework's appearance.
 </p>
 
-<CodeExample Id="ce-1" IsOpen="true" Code="@(@"<div class=""meter"">
+<CodeExample IsOpen="true" Code="@(@"<div class=""meter"">
     <meter value=""0.5"">half</meter>
 </div>
 <div class=""meter"">
@@ -37,30 +37,19 @@
     is hovered.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Meter Value="_value1" Label="Int" />
-                <Meter Value="_value2" Label="Double" />
-                <Meter Value="_value3" Label="Byte" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Meter Value=""_value1"" Label=""Int"" />
-    <Meter Value=""_value2"" Label=""Double"" />
-    <Meter Value=""_value3"" Label=""Byte"" />
-</div>
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<Meter Value=""_value1"" Label=""Int"" />
+<Meter Value=""_value2"" Label=""Double"" />
+<Meter Value=""_value3"" Label=""Byte"" />
 
 @code {
     private int _value1 = 33;
     private double _value2 = 0.5;
     private byte _value3 = 75;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Meter Value="_value1" Label="Int" />
+    <Meter Value="_value2" Label="Double" />
+    <Meter Value="_value3" Label="Byte" />
+</CodeExample>
 
 <p>
     Note that it is possible to assign a nullable type, but the component will automatically convert
@@ -77,20 +66,9 @@
     while 1 is used for the maximum of floating-point types.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Meter Min="5" Max="8" Value="6" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Meter Min=""5"" Max=""8"" Value=""6"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="fill" Code="@(@"<Meter Min=""5"" Max=""8"" Value=""6"" />")">
+    <Meter Min="5" Max="8" Value="6" />
+</CodeExample>
 
 <h3>Low & High</h3>
 
@@ -125,28 +103,17 @@
     optimal range. Take a look at the examples below:
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="50" />
-                <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="20" />
-                <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="80" />
-                <Meter Min="0" Optimum="20" Low="25" High="75" Max="100" Value="80" />
-                <Meter Min="0" Low="25" High="75" Optimum="80" Max="100" Value="20" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""50"" />
-    <Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""20"" />
-    <Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""80"" />
-    <Meter Min=""0"" Optimum=""20"" Low=""25"" High=""75"" Max=""100"" Value=""80"" />
-    <Meter Min=""0"" Low=""25"" High=""75"" Optimum=""80"" Max=""100"" Value=""20"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="fill align-items-center gap-2" Code="@(@"<Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""50"" />
+<Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""20"" />
+<Meter Min=""0"" Low=""25"" Optimum=""50"" High=""75"" Max=""100"" Value=""80"" />
+<Meter Min=""0"" Optimum=""20"" Low=""25"" High=""75"" Max=""100"" Value=""80"" />
+<Meter Min=""0"" Low=""25"" High=""75"" Optimum=""80"" Max=""100"" Value=""20"" />")">
+    <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="50" />
+    <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="20" />
+    <Meter Min="0" Low="25" Optimum="50" High="75" Max="100" Value="80" />
+    <Meter Min="0" Optimum="20" Low="25" High="75" Max="100" Value="80" />
+    <Meter Min="0" Low="25" High="75" Optimum="80" Max="100" Value="20" />
+</CodeExample>
 
 <h2>Label</h2>
 
@@ -154,20 +121,9 @@
     The <code>Label</code> property assigns a label to the meter.
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Meter Value="50" Label="Label" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Meter Value=""50"" Label=""Label"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill" Code="@(@"<Meter Value=""50"" Label=""Label"" />")">
+    <Meter Value="50" Label="Label" />
+</CodeExample>
 
 <h2>Customization</h2>
 
@@ -175,47 +131,25 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Meter Value="25" Label="Primary" ThemeColor="ThemeColor.Primary" />
-                <Meter Value="50" Label="Secondary" ThemeColor="ThemeColor.Secondary" />
-                <Meter Value="80" Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Meter Value=""25"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
-    <Meter Value=""50"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
-    <Meter Value=""80"" Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Meter Value=""25"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" />
+<Meter Value=""50"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" />
+<Meter Value=""80"" Label=""Tertiary"" ThemeColor=""ThemeColor.Tertiary"" />")">
+    <Meter Value="25" Label="Primary" ThemeColor="ThemeColor.Primary" />
+    <Meter Value="50" Label="Secondary" ThemeColor="ThemeColor.Secondary" />
+    <Meter Value="80" Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
+</CodeExample>
 
 <p>
     Add the <code>bg-alt</code> class to darken the background of the empty portion of the bar.
 </p>
 
-<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <Meter Value="25" Class="bg-alt" />
-                <Meter Value="50" Label="Primary" ThemeColor="ThemeColor.Primary" Class="bg-alt" />
-                <Meter Value="80" Label="Secondary" ThemeColor="ThemeColor.Secondary" Class="bg-alt" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <Meter Value=""25"" Class=""bg-alt"" />
-    <Meter Value=""50"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" Class=""bg-alt"" />
-    <Meter Value=""80"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" Class=""bg-alt"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<Meter Value=""25"" Class=""bg-alt"" />
+<Meter Value=""50"" Label=""Primary"" ThemeColor=""ThemeColor.Primary"" Class=""bg-alt"" />
+<Meter Value=""80"" Label=""Secondary"" ThemeColor=""ThemeColor.Secondary"" Class=""bg-alt"" />")">
+    <Meter Value="25" Class="bg-alt" />
+    <Meter Value="50" Label="Primary" ThemeColor="ThemeColor.Primary" Class="bg-alt" />
+    <Meter Value="80" Label="Secondary" ThemeColor="ThemeColor.Secondary" Class="bg-alt" />
+</CodeExample>
 
 <p>
     The <code>MeterClass</code> and <code>MeterStyle</code> properties can be used to control the

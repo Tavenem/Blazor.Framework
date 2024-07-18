@@ -15,15 +15,15 @@ export function initialize(dialog: HTMLDialogElement) {
         return;
     }
     const headers = dialog.getElementsByClassName('header');
-    if (!headers
-        || !headers.length
-        || !(headers[0] instanceof HTMLElement)) {
-        return;
+    if (headers
+        && headers.length
+        && headers[0] instanceof HTMLElement) {
+        headers[0].addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('pointerup', stopDragging);
+        document.addEventListener('pointermove', drag);
     }
 
-    headers[0].addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('pointerup', stopDragging);
-    document.addEventListener('pointermove', drag);
+    dialog.addEventListener('keydown', onKeyDown.bind(dialog));
     position(dialog);
 }
 
@@ -79,6 +79,14 @@ function drag(e: PointerEvent) {
 
     draggedDialog.style.left = left + 'px';
     draggedDialog.style.top = top + 'px';
+}
+
+function onKeyDown(this: HTMLDialogElement, event: KeyboardEvent) {
+    if (event.key === "Escape" && this.open) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.close();
+    }
 }
 
 function onPointerDown(e: PointerEvent) {

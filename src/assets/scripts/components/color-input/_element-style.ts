@@ -6,13 +6,6 @@ export const elementStyle = `:host {
     font-family: var(--tavenem-font-family);
 }
 
-svg {
-    fill: currentColor;
-    flex-shrink: 0;
-    height: 1em;
-    width: auto;
-}
-
 :host([button]) {
     border-radius: 9999px;
     margin: 0;
@@ -404,6 +397,7 @@ input {
 
 svg:not(.color-selector) {
     fill: currentColor;
+    flex-shrink: 0;
     height: 1em;
     width: auto;
 }
@@ -430,7 +424,7 @@ svg:not(.color-selector) {
     }
 }
 
-:host([data-input-mode="hex"]) .alpha {
+:host([data-input-mode="hex"]) tf-input-field.alpha {
     display: none;
 }
 
@@ -638,7 +632,7 @@ button::-moz-focus-inner {
     gap: .5rem;
     margin-left: 1rem;
 
-    input.hue {
+    tf-slider.hue {
         background: linear-gradient(90deg, #f00, #ff0 16.66%, #0f0 33.33%, #0ff 50%, #00f 66.66%, #f0f 83.33%, #f00);
     }
 
@@ -648,8 +642,8 @@ button::-moz-focus-inner {
         background-size: 10px 10px;
     }
 
-    input.alpha {
-        background-image: var(--alpha-background);
+    tf-slider.alpha {
+        background: var(--alpha-background);
     }
 }
 

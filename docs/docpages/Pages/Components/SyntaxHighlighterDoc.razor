@@ -32,46 +32,16 @@
     <li>JavaScript</li>
     <li>JSON</li>
     <li><span style="font-family:'CMU Serif',cmr10,LMRoman10-Regular,'Latin Modern Math','Nimbus Roman No9 L','Times New Roman',Times,serif;">L<span style="text-transform:uppercase;font-size:.75em;vertical-align:.25em;margin-left:-.36em;margin-right:-.15em;line-height:1ex;">a</span>T<span style="text-transform:uppercase;vertical-align:-.25em;margin-left:-.1667em;margin-right:-.125em;line-height:1ex;">e</span>X</span></li>
-    <li>Less</li>
     <li>Markdown</li>
     <li>Objective-C <span class="text-muted">language-objectivec</span></li>
-    <li>PHP</li>
     <li>Python</li>
-    <li>Sass</li>
     <li>SQL</li>
     <li>TypeScript</li>
+    <li>XML</li>
+    <li>YAML</li>
 </ul>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <tf-syntax-highlight>
-                <pre class="codeblock">
-                    <code class="language-csharp">
-using System.IO.Compression;
-
-#pragma warning disable 414, 3021
-
-namespace MyApplication
-{
-    [Obsolete("...")]
-    class Program : IInterface
-    {
-        public static List&lt;int&gt; JustDoIt(int count)
-        {
-            Span&lt;int> numbers = stackalloc int[length];
-            Console.WriteLine($"Hello {Name}!");
-            return new List&lt;int&gt;(new int[] { 1, 2, 3 })
-        }
-    }
-}
-                    </code>
-                </pre>
-            </tf-syntax-highlight>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<tf-syntax-highlight>
+<CodeExample RowClass="fill" Code="@(@"<tf-syntax-highlight>
     <pre class=""codeblock"">
         <code class=""language-csharp"">
 using System.IO.Compression;
@@ -93,9 +63,31 @@ namespace MyApplication
 }
         </code>
     </pre>
-</tf-syntax-highlight>")
-    </ChildContent>
-</Collapse>
+</tf-syntax-highlight>")">
+    <tf-syntax-highlight>
+        <pre class="codeblock">
+            <code class="language-csharp">
+using System.IO.Compression;
+
+#pragma warning disable 414, 3021
+
+namespace MyApplication
+{
+    [Obsolete("...")]
+    class Program : IInterface
+    {
+        public static List&lt;int&gt; JustDoIt(int count)
+        {
+            Span&lt;int> numbers = stackalloc int[length];
+            Console.WriteLine($"Hello {Name}!");
+            return new List&lt;int&gt;(new int[] { 1, 2, 3 })
+        }
+    }
+}
+            </code>
+        </pre>
+    </tf-syntax-highlight>
+</CodeExample>
 
 <p>
     You may include multiple <code>&lt;pre&gt;&lt;code&gt;</code> blocks, with varying syntaxes, in

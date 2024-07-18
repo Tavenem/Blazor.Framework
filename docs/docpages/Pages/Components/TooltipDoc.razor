@@ -21,22 +21,15 @@
     component inside the element which is expected to trigger it.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn btn-icon">
-                <tf-icon>delete</tf-icon>
-                <Tooltip>Delete</Tooltip>
-            </button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn btn-icon"">
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn btn-icon"">
     <tf-icon>delete</tf-icon>
     <Tooltip>Delete</Tooltip>
-</button>")
-    </ChildContent>
-</Collapse>
+</button>")">
+    <button class="btn btn-icon">
+        <tf-icon>delete</tf-icon>
+        <Tooltip>Delete</Tooltip>
+    </button>
+</CodeExample>
 
 <p>
     You can also specify a <code>Tooltip</code> by its <code>Id</code> using the
@@ -51,18 +44,11 @@
     <code>Tooltip</code> component's container from also acting as a trigger.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button data-tooltip-id="tooltip-1" class="btn btn-icon"><tf-icon>add</tf-icon></button>
-            <Tooltip Id="tooltip-1" IsContainerTrigger="false">Add</Tooltip>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button data-tooltip-id=""tooltip-1"" class=""btn btn-icon""><tf-icon>add</tf-icon></button>
-<Tooltip Id=""tooltip-1"" IsContainerTrigger=""false"">Add</Tooltip>")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" Code="@(@"<button data-tooltip-id=""tooltip-1"" class=""btn btn-icon""><tf-icon>add</tf-icon></button>
+<Tooltip Id=""tooltip-1"" IsContainerTrigger=""false"">Add</Tooltip>")">
+    <button data-tooltip-id="tooltip-1" class="btn btn-icon"><tf-icon>add</tf-icon></button>
+    <Tooltip Id="tooltip-1" IsContainerTrigger="false">Add</Tooltip>
+</CodeExample>
 
 <p>
     You can also set the <code>IsButton</code> property to <code>true</code> to render the
@@ -71,16 +57,9 @@
     <code>Id</code>, but they will not respond to interactions with their containing element.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tooltip IsButton="true">This is a tooltip for a help icon</Tooltip>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tooltip IsButton=""true"">This is a tooltip for a help icon</Tooltip>")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" Code="@(@"<Tooltip IsButton=""true"">This is a tooltip for a help icon</Tooltip>")">
+    <Tooltip IsButton="true">This is a tooltip for a help icon</Tooltip>
+</CodeExample>
 
 <h2>Content</h2>
 
@@ -88,30 +67,23 @@
     You can provide any content in a tooltip.
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn btn-icon">
-                <tf-icon>help</tf-icon>
-                <Tooltip>
-                    <h6>Tooltip title</h6>
-                    <p>Tooltip content</p>
-                    <p><tf-icon class="success">thumb_up</tf-icon></p>
-                </Tooltip>
-            </button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn btn-icon"">
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn btn-icon"">
     <tf-icon>help</tf-icon>
     <Tooltip>
         <h6>Tooltip title</h6>
         <p>Tooltip content</p>
         <p><tf-icon class=""success"">thumb_up</tf-icon></p>
     </Tooltip>
-</button>")
-    </ChildContent>
-</Collapse>
+</button>")">
+    <button class="btn btn-icon">
+        <tf-icon>help</tf-icon>
+        <Tooltip>
+            <h6>Tooltip title</h6>
+            <p>Tooltip content</p>
+            <p><tf-icon class="success">thumb_up</tf-icon></p>
+        </Tooltip>
+    </button>
+</CodeExample>
 
 <h2>Triggering</h2>
 
@@ -156,23 +128,7 @@
     property.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn btn-icon success">
-                <tf-icon>add</tf-icon>
-                <Tooltip Arrow="false"
-                         Delay="0"
-                         DismissOnTap="true"
-                         Side="Side.Right"
-                         ThemeColor="ThemeColor.Secondary">
-                    Add
-                </Tooltip>
-            </button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn btn-icon success"">
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn btn-icon success"">
     <tf-icon>add</tf-icon>
     <Tooltip Arrow=""false""
              Delay=""0""
@@ -181,6 +137,15 @@
              ThemeColor=""ThemeColor.Secondary"">
         Add
     </Tooltip>
-</button>")
-    </ChildContent>
-</Collapse>
+</button>")">
+    <button class="btn btn-icon success">
+        <tf-icon>add</tf-icon>
+        <Tooltip Arrow="false"
+                 Delay="0"
+                 DismissOnTap="true"
+                 Side="Side.Right"
+                 ThemeColor="ThemeColor.Secondary">
+            Add
+        </Tooltip>
+    </button>
+</CodeExample>

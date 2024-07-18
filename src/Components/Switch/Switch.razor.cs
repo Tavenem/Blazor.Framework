@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Tavenem.Blazor.Framework.Components.Forms;
+using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework;
 
@@ -16,11 +16,6 @@ public partial class Switch : BoolInputComponentBase<bool>
 
     /// <inheritdoc/>
     public override bool HasValue => IsChecked == true;
-
-    /// <summary>
-    /// Custom HTML attributes for the input element.
-    /// </summary>
-    [Parameter] public Dictionary<string, object> InputAttributes { get; set; } = [];
 
     /// <summary>
     /// Whether to use an outlined variant of the <see cref="CheckedIcon"/>.
@@ -42,92 +37,9 @@ public partial class Switch : BoolInputComponentBase<bool>
     /// </summary>
     [Parameter] public string? UncheckedLabel { get; set; }
 
-    /// <inheritdoc/>
-    protected override string? CssClass => new CssBuilder(base.CssClass)
-        .Add("field")
-        .Add("disabled", Disabled)
-        .Add("read-only", ReadOnly)
-        .Add("required", Required)
-        .Add("no-label", string.IsNullOrEmpty(Label))
-        .Add("modified", IsTouched)
-        .Add("valid", IsValid)
-        .Add("invalid", IsInvalidAndTouched)
-        .Add("switch")
-        .Add("checked", IsChecked == true)
-        .ToString();
+    private string? CheckedIconClass => IsCheckedIconOutlined ? "outlined" : null;
 
-    /// <inheritdoc/>
-    protected override string? InputCssClass => new CssBuilder(InputClass)
-        .AddClassFromDictionary(InputAttributes)
-        .ToString();
+    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "outlined" : null;
 
-    /// <inheritdoc/>
-    protected override string? InputCssStyle => new CssBuilder(InputStyle)
-        .AddStyleFromDictionary(InputAttributes)
-        .ToString();
-
-    private string? ButtonClass => new CssBuilder("btn btn-icon")
-        .Add(ThemeColor.ToCSS())
-        .ToString();
-
-    private protected string ButtonId { get; set; } = Guid.NewGuid().ToHtmlId();
-
-    private string? CheckedIconClass => IsCheckedIconOutlined ? "checked outlined" : "checked";
-
-    [Inject] private protected IKeyListener KeyListener { get; set; } = default!;
-
-    private protected virtual List<KeyOptions> KeyOptions { get; set; } =
-    [
-        new()
-        {
-            Key = "/ArrowLeft|ArrowRight| |Enter/",
-            SubscribeDown = true,
-            PreventDown = "key+none",
-        }
-    ];
-
-    private string? UncheckedIconClass => IsUncheckedIconOutlined ? "unchecked outlined" : "unchecked";
-
-    /// <inheritdoc/>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await KeyListener.ConnectAsync(ButtonId, new()
-            {
-                Keys = KeyOptions,
-            });
-            KeyListener.KeyDown += OnKeyDown;
-        }
-    }
-
-    private void OnChange(ChangeEventArgs e) => Toggle();
-
-    private protected void OnKeyDown(KeyboardEventArgs e)
-    {
-        if (Disabled || ReadOnly)
-        {
-            return;
-        }
-
-        switch (e.Key)
-        {
-            case "ArrowLeft":
-                if (Value)
-                {
-                    Toggle();
-                }
-                break;
-            case "ArrowRight":
-                if (!Value)
-                {
-                    Toggle();
-                }
-                break;
-            case " ":
-            case "Enter":
-                Toggle();
-                break;
-        }
-    }
+    private void OnToggle(ToggleEventArgs e) => SetValue(e.Value);
 }

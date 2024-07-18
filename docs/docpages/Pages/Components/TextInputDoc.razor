@@ -17,42 +17,25 @@
     use a full outline.
 </p>
 
-<Collapse Id="ce-1" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-baseline gap-2">
-            <TextInput Label="Normal" />
-            <TextInput Label="Filled" Class="filled" />
-            <TextInput Label="Outlined" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-baseline gap-2"">
-    <TextInput Label=""Normal"" />
-    <TextInput Label=""Filled"" Class=""filled"" />
-    <TextInput Label=""Outlined"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" />
+<TextInput Label=""Filled"" Class=""filled"" />
+<TextInput Label=""Outlined"" Class=""outlined"" />")">
+    <TextInput Label="Normal" />
+    <TextInput Label="Filled" Class="filled" />
+    <TextInput Label="Outlined" Class="outlined" />
+</CodeExample>
+
 <p>
     You can also add the <code>dense</code> class to any variant to reduce the margins and padding.
 </p>
 
-<Collapse Id="ce-2" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-baseline gap-2">
-            <TextInput Label="Normal" Class="dense" />
-            <TextInput Label="Filled" Class="filled dense" />
-            <TextInput Label="Outlined" Class="outlined dense" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-baseline gap-2"">
-    <TextInput Label=""Normal"" Class=""dense"" />
-    <TextInput Label=""Filled"" Class=""filled dense"" />
-    <TextInput Label=""Outlined"" Class=""outlined dense"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" Class=""dense"" />
+<TextInput Label=""Filled"" Class=""filled dense"" />
+<TextInput Label=""Outlined"" Class=""outlined dense"" />")">
+    <TextInput Label="Normal" Class="dense" />
+    <TextInput Label="Filled" Class="filled dense" />
+    <TextInput Label="Outlined" Class="outlined dense" />
+</CodeExample>
 
 <p>
     Bind the input value to any <code>string</code> with the <code>Value</code> property. You should
@@ -61,24 +44,15 @@
     depending on the situation.
 </p>
 
-<Collapse Id="ce-3" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput @bind-Value="_value" Label="Bound" Class="w-100" />
-            <span>Bound value: @_value</span>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput @bind-Value=""_value"" Label=""Bound"" Class=""w-100"" />
-    <span>Bound value: @_value</span>
-</div>
+<CodeExample RowClass="fill flex-column" Code="@(@"<TextInput @bind-Value=""_value"" Label=""Bound"" />
+<span>Bound value: @_value</span>
 
 @code {
     private string? _value = ""Example"";
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <TextInput @bind-Value="_value" Label="Bound" />
+    <span>Bound value: @_value</span>
+</CodeExample>
 
 <p>
     Normally binding updates occur in response to the input element's <code>onchange</code> event,
@@ -93,28 +67,19 @@
     wait before updating the bound value.
 </p>
 
-<Collapse Id="ce-4" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput @bind-Value="_value2" Label="On Change" HelpText="@_value2" />
-            <TextInput @bind-Value="_value3" UpdateOnInput="true" Label="On Input" HelpText="@_value3" />
-            <TextInput @bind-Value="_value4" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="Debounced" HelpText="@_value4" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput @bind-Value=""_value1"" Label=""On Change"" HelpText=""@_value1"" />
-    <TextInput @bind-Value=""_value2"" UpdateOnInput=""true"" Label=""On Input"" HelpText=""@_value2"" />
-    <TextInput @bind-Value=""_value3"" UpdateOnInput=""true"" UpdateOnInputDebounce=""500"" Label=""Debounced"" HelpText=""@_value3"" />
-</div>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput @bind-Value=""_value1"" Label=""On Change"" HelpText=""@_value1"" />
+<TextInput @bind-Value=""_value2"" UpdateOnInput=""true"" Label=""On Input"" HelpText=""@_value2"" />
+<TextInput @bind-Value=""_value3"" UpdateOnInput=""true"" UpdateOnInputDebounce=""500"" Label=""Debounced"" HelpText=""@_value3"" />
 
 @code {
     private string? _value1 = ""Start typing..."";
     private string? _value2 = ""Start typing..."";
     private string? _value3 = ""Start typing..."";
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <TextInput @bind-Value="_value2" Label="On Change" HelpText="@_value2" />
+    <TextInput @bind-Value="_value3" UpdateOnInput="true" Label="On Input" HelpText="@_value3" />
+    <TextInput @bind-Value="_value4" UpdateOnInput="true" UpdateOnInputDebounce="500" Label="Debounced" HelpText="@_value4" />
+</CodeExample>
 
 <h2>Input types</h2>
 
@@ -146,22 +111,7 @@
     </dl>
 </p>
 
-<Collapse Id="ce-5" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <TextInput Label="Email" InputType="InputType.Email" />
-                <TextInput Label="Password" InputType="InputType.Password" />
-            </div>
-            <div class="row mt-3 fill align-items-center gap-2">
-                <TextInput Label="Search" InputType="InputType.Search" />
-                <TextInput Label="Tel" InputType="InputType.Tel" />
-                <TextInput Label="Url" InputType="InputType.Url" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+<CodeExample Code="@(@"<div class=""row fill align-items-center gap-2"">
     <TextInput Label=""Email"" InputType=""InputType.Email"" />
     <TextInput Label=""Password"" InputType=""InputType.Password"" />
 </div>
@@ -169,9 +119,17 @@
     <TextInput Label=""Search"" InputType=""InputType.Search"" />
     <TextInput Label=""Tel"" InputType=""InputType.Tel"" />
     <TextInput Label=""Url"" InputType=""InputType.Url"" />
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="row fill align-items-center gap-2">
+        <TextInput Label="Email" InputType="InputType.Email" />
+        <TextInput Label="Password" InputType="InputType.Password" />
+    </div>
+    <div class="row mt-3 fill align-items-center gap-2">
+        <TextInput Label="Search" InputType="InputType.Search" />
+        <TextInput Label="Tel" InputType="InputType.Tel" />
+        <TextInput Label="Url" InputType="InputType.Url" />
+    </div>
+</CodeExample>
 
 <p>
     The other HTML input types are represented by separate components, and can't be used with the
@@ -184,23 +142,7 @@
     The input can be set as disabled or read-only by setting the properties of the same names.
 </p>
 
-<Collapse Id="ce-6" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <TextInput @bind-Value="_disabled" Label="Disabled" Disabled="true" />
-                <TextInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
-                <TextInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
-            </div>
-            <div class="row mt-3 fill align-items-center gap-2">
-                <TextInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
-                <TextInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
-                <TextInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+<CodeExample Code="@(@"<div class=""row fill align-items-center gap-2"">
     <TextInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" />
     <TextInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""filled"" />
     <TextInput @bind-Value=""_disabled"" Label=""Disabled"" Disabled=""true"" Class=""outlined"" />
@@ -213,9 +155,18 @@
 
 @code {
     private string _disabled = ""Can select but not edit"";
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <div class="row fill align-items-center gap-2">
+        <TextInput @bind-Value="_disabled" Label="Disabled" Disabled="true" />
+        <TextInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="filled" />
+        <TextInput @bind-Value="_disabled" Label="Disabled" Disabled="true" Class="outlined" />
+    </div>
+    <div class="row mt-3 fill align-items-center gap-2">
+        <TextInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" />
+        <TextInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="filled" />
+        <TextInput @bind-Value="_disabled" Label="Read-only" ReadOnly="true" Class="outlined" />
+    </div>
+</CodeExample>
 
 <h2>Label</h2>
 
@@ -224,20 +175,11 @@
     input like a placeholder when it is empty, does not have focus, and has no explicit placeholder.
 </p>
 
-<Collapse Id="ce-7" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Label" />
-            <TextInput Label="Label" Placeholder="Placeholder" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Label"" />
-    <TextInput Label=""Label"" Placeholder=""Placeholder"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Label"" />
+<TextInput Label=""Label"" Placeholder=""Placeholder"" />")">
+    <TextInput Label="Label" />
+    <TextInput Label="Label" Placeholder="Placeholder" />
+</CodeExample>
 
 <h2>Placeholder</h2>
 
@@ -245,22 +187,13 @@
     The <code>Placeholder</code> property assigns a placeholder to the input.
 </p>
 
-<Collapse Id="ce-8" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Normal" Placeholder="Placeholder" />
-            <TextInput Label="Filled" Placeholder="Placeholder" Class="filled" />
-            <TextInput Label="Outlined" Placeholder="Placeholder" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Normal"" Placeholder=""Placeholder"" />
-    <TextInput Label=""Filled"" Placeholder=""Placeholder"" Class=""filled"" />
-    <TextInput Label=""Outlined"" Placeholder=""Placeholder"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" Placeholder=""Placeholder"" />
+<TextInput Label=""Filled"" Placeholder=""Placeholder"" Class=""filled"" />
+<TextInput Label=""Outlined"" Placeholder=""Placeholder"" Class=""outlined"" />")">
+    <TextInput Label="Normal" Placeholder="Placeholder" />
+    <TextInput Label="Filled" Placeholder="Placeholder" Class="filled" />
+    <TextInput Label="Outlined" Placeholder="Placeholder" Class="outlined" />
+</CodeExample>
 
 <h2>Help text</h2>
 
@@ -268,66 +201,39 @@
     You can supply help text for the field with the <code>HelpText</code> property.
 </p>
 
-<Collapse Id="ce-9" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Normal" HelpText="Some help text" />
-            <TextInput Label="Filled" HelpText="Some help text" Class="filled" />
-            <TextInput Label="Outlined" HelpText="Some help text" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Normal"" HelpText=""Some help text"" />
-    <TextInput Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
-    <TextInput Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" HelpText=""Some help text"" />
+<TextInput Label=""Filled"" HelpText=""Some help text"" Class=""filled"" />
+<TextInput Label=""Outlined"" HelpText=""Some help text"" Class=""outlined"" />")">
+    <TextInput Label="Normal" HelpText="Some help text" />
+    <TextInput Label="Filled" HelpText="Some help text" Class="filled" />
+    <TextInput Label="Outlined" HelpText="Some help text" Class="outlined" />
+</CodeExample>
 
 <p>
     You can provide markup content for the help text by using the <code>HelpTextContent</code>
     property instead (which overrides <code>HelpText</code>).
 </p>
 
-<Collapse Id="ce-10" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Normal" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" />
-            <TextInput Label="Filled" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="filled" />
-            <TextInput Label="Outlined" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Normal"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" />
-    <TextInput Label=""Filled"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" Class=""filled"" />
-    <TextInput Label=""Outlined"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" />
+<TextInput Label=""Filled"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" Class=""filled"" />
+<TextInput Label=""Outlined"" HelpTextContent=""@(new MarkupString(""See the <a href=\""./\"">doc page</a>""))"" Class=""outlined"" />")">
+    <TextInput Label="Normal" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" />
+    <TextInput Label="Filled" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="filled" />
+    <TextInput Label="Outlined" HelpTextContent="@(new MarkupString("See the <a href=\"./\">doc page</a>"))" Class="outlined" />
+</CodeExample>
 
 <p>
     You can hide the help text until the input has focus by setting the
     <code>DisplayHelpTextOnFocus</code> property to <code>true</code>.
 </p>
 
-<Collapse Id="ce-11" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true" />
-            <TextInput Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled" />
-            <TextInput Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Normal"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" />
-    <TextInput Label=""Filled"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""filled"" />
-    <TextInput Label=""Outlined"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" />
+<TextInput Label=""Filled"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""filled"" />
+<TextInput Label=""Outlined"" HelpText=""Some help text"" DisplayHelpTextOnFocus=""true"" Class=""outlined"" />")">
+    <TextInput Label="Normal" HelpText="Some help text" DisplayHelpTextOnFocus="true" />
+    <TextInput Label="Filled" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="filled" />
+    <TextInput Label="Outlined" HelpText="Some help text" DisplayHelpTextOnFocus="true" Class="outlined" />
+</CodeExample>
 
 <p>
     Note that help text is replaced by any field validation errors.
@@ -346,22 +252,13 @@
     works as expected.
 </p>
 
-<Collapse Id="ce-12" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Normal" MaxLength="12" ShowLength="true" />
-            <TextInput Label="Filled" MaxLength="12" ShowLength="true" Class="filled" />
-            <TextInput Label="Outlined" MaxLength="12" ShowLength="true" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Normal"" MaxLength=""12"" ShowLength=""true"" />
-    <TextInput Label=""Filled"" MaxLength=""12"" ShowLength=""true"" Class=""filled"" />
-    <TextInput Label=""Outlined"" MaxLength=""12"" ShowLength=""true"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" MaxLength=""12"" ShowLength=""true"" />
+<TextInput Label=""Filled"" MaxLength=""12"" ShowLength=""true"" Class=""filled"" />
+<TextInput Label=""Outlined"" MaxLength=""12"" ShowLength=""true"" Class=""outlined"" />")">
+    <TextInput Label="Normal" MaxLength="12" ShowLength="true" />
+    <TextInput Label="Filled" MaxLength="12" ShowLength="true" Class="filled" />
+    <TextInput Label="Outlined" MaxLength="12" ShowLength="true" Class="outlined" />
+</CodeExample>
 
 <h2>Required</h2>
 
@@ -378,22 +275,13 @@
     will be set accordingly.
 </p>
 
-<Collapse Id="ce-13" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Required" Required="true" />
-            <TextInput Label="Required" Required="true" Class="filled" />
-            <TextInput Label="Required" Required="true" Class="outlined" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Required"" Required=""true"" />
-    <TextInput Label=""Required"" Required=""true"" Class=""filled"" />
-    <TextInput Label=""Required"" Required=""true"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Required"" Required=""true"" />
+<TextInput Label=""Required"" Required=""true"" Class=""filled"" />
+<TextInput Label=""Required"" Required=""true"" Class=""outlined"" />")">
+    <TextInput Label="Required" Required="true" />
+    <TextInput Label="Required" Required="true" Class="filled" />
+    <TextInput Label="Required" Required="true" Class="outlined" />
+</CodeExample>
 
 <h2>Tab index</h2>
 
@@ -411,20 +299,11 @@
     clearing is not available on static server-side rendered pages.
 </p>
 
-<Collapse Id="ce-14" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Normal" />
-            <TextInput Label="Not clearable" Clearable="false" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Normal"" />
-    <TextInput Label=""Not clearable"" Clearable=""false"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill align-items-center" Code="@(@"<TextInput Label=""Normal"" />
+<TextInput Label=""Not clearable"" Clearable=""false"" />")">
+    <TextInput Label="Normal" />
+    <TextInput Label="Not clearable" Clearable="false" />
+</CodeExample>
 
 <h2>Name</h2>
 
@@ -461,16 +340,7 @@
     displayed as autocomplete suggestions when the input has focus.
 </p>
 
-<Collapse Id="ce-15" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" Suggestions="_suggestions" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" Suggestions=""_suggestions"" />
-</div>
+<CodeExample RowClass="fill" Code="@(@"<TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" Suggestions=""_suggestions"" />
 
 @code {
     private List<string> _suggestions = new()
@@ -479,9 +349,9 @@
         ""Second suggestion"",
         ""Third suggestion"",
     };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" Suggestions="_suggestions" />
+</CodeExample>
 
 <p>
     If you set the <code>ShowAllSuggestions</code> to <code>true</code>, all suggestions will be
@@ -499,32 +369,23 @@
     render each value. If not, <code>ToString</code> will be called on the values.
 </p>
 
-<Collapse Id="ce-16" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" SuggestionValues="_suggestedValues">
-                <SuggestionTemplate>
-                    <span>Suggestion #@context</span>
-                </SuggestionTemplate>
-            </TextInput>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" SuggestionValues=""_suggestions"">
-        <SuggestionTemplate>
-            <span>Suggestion #@context</span>
-        </SuggestionTemplate>
-    </TextInput>
-</div>
+<CodeExample RowClass="fill" Code="@(@"<TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" SuggestionValues=""_suggestions"">
+    <SuggestionTemplate>
+        <span>Suggestion #@context</span>
+    </SuggestionTemplate>
+</TextInput>
 
 @code {
     private IEnumerable<KeyValuePair<string, object>> _suggestions = Enumerable
         .Range(1, 5)
         .Select(x => new KeyValuePair<string, object>($""Suggestion {x}"", x));
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" SuggestionValues="_suggestedValues">
+        <SuggestionTemplate>
+            <span>Suggestion #@context</span>
+        </SuggestionTemplate>
+    </TextInput>
+</CodeExample>
 
 <p>
     Finally, you can also assign a function to <code>LoadSuggestions</code> the property. The
@@ -565,18 +426,9 @@
     the assigned regular expression.
 </p>
 
-<Collapse Id="ce-17" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Pattern" Placeholder="a-z" Pattern="[a-z]*" HelpText="Lowercase letters only" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Pattern"" Placeholder=""a-z"" Pattern=""[a-z]*"" HelpText=""Lowercase letters only"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample RowClass="fill" Code="@(@"<TextInput Label=""Pattern"" Placeholder=""a-z"" Pattern=""[a-z]*"" HelpText=""Lowercase letters only"" />")">
+    <TextInput Label="Pattern" Placeholder="a-z" Pattern="[a-z]*" HelpText="Lowercase letters only" />
+</CodeExample>
 
 <p>
     Note that this property does not contribute to any model-based validation rules. It is strictly
@@ -667,31 +519,24 @@
     This allows partial input to be cleaned.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <TextInput @bind-Value="_masked" Label="US Phone" Mask="_mask" Placeholder="(000)-000-0000" HelpText="(000)-000-0000" />
-            </div>
-            <div class="row fill align-items-center gap-2">
-                <span>Bound value: @_masked</span>
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+<CodeExample Code="@(@"<div class=""row fill"">
     <TextInput @bind-Value=""_masked"" Label=""US Phone"" Mask=""_mask"" Placeholder=""(000)-000-0000"" HelpText=""(000)-000-0000"" />
 </div>
-<div class=""row fill align-items-center gap-2"">
+<div class=""row"">
     <span>Bound value: @_masked</span>
 </div>
 
 @code {
     private InputMask _mask = new(""(000)-000-0000"");
     private string? _masked;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <div class="row fill">
+        <TextInput @bind-Value="_masked" Label="US Phone" Mask="_mask" Placeholder="(000)-000-0000" HelpText="(000)-000-0000" />
+    </div>
+    <div class="row">
+        <span>Bound value: @_masked</span>
+    </div>
+</CodeExample>
 
 <h3>Mask options</h3>
 
@@ -703,35 +548,26 @@
     mask an input in different ways depending on the input.
 </p>
 
-<Collapse Id="ce-19" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Credit card" Mask="_mask2" Pattern="[\s0-9]*" HelpText="14-16 digits" Class="w-100" />
-            <p>
-                (American Express numbers start with 34 or 37 and are 15 digits long<br />
-                Diners Club numbers start with 300-305 or 309 and are 14 digits long<br />
-                They are both grouped differently than standard credit card numbers)
-            </p>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Credit card"" Mask=""_mask"" Pattern=""[\s0-9]*"" HelpText=""14-16 digits"" Class=""w-100"" />
-    <p>
-        (American Express numbers start with 34 or 37 and are 15 digits long<br />
-        Diners Club numbers start with 300-305 or 309 and are 14 digits long<br />
-        They are both grouped differently than standard credit card numbers)
-    </p>
-</div>
+<CodeExample IsOpen="true" RowClass="fill flex-column gap-2" Code="@(@"<TextInput Label=""Credit card"" Mask=""_mask"" Pattern=""[\s0-9]*"" HelpText=""14-16 digits"" />
+<p>
+    (American Express numbers start with 34 or 37 and are 15 digits long<br />
+    Diners Club numbers start with 300-305 or 309 and are 14 digits long<br />
+    They are both grouped differently than standard credit card numbers)
+</p>
 
 @code {
     private InputMask _mask = new(
         ""0000 0000 0000 0000"",
         new MaskOption(""0000 000000 00000"", 15, ""^(34|37)""),
         new MaskOption(""0000 000000 0000"", 14, ""^(30[0-5]|309)""))
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <TextInput Label="Credit card" Mask="_mask2" Pattern="[\s0-9]*" HelpText="14-16 digits" />
+    <p>
+        (American Express numbers start with 34 or 37 and are 15 digits long<br />
+        Diners Club numbers start with 300-305 or 309 and are 14 digits long<br />
+        They are both grouped differently than standard credit card numbers)
+    </p>
+</CodeExample>
 
 <h2>Emoji</h2>
 
@@ -745,18 +581,9 @@
     Note that the emoji picker is not available on static server-side rendered pages.
 </p>
 
-<Collapse Id="ce-20" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput ShowEmoji="true" Class="w-100" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput ShowEmoji=""true"" Class=""w-100"" />
-</div>")
-    </ChildContent>
-</Collapse>
+<CodeExample IsOpen="true" RowClass="fill" Code="@(@"<TextInput ShowEmoji=""true"" />")">
+    <TextInput ShowEmoji="true" />
+</CodeExample>
 
 <h2>Methods</h2>
 
@@ -784,25 +611,16 @@
     submission-type logic for text inputs, without duplicating validation logic.
 </p>
 
-<Collapse Id="ce-21" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput @bind-Value="_value5" Label="Type something and hit Enter" OnValidEnter="OnEnterAsync" />
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-        <TextInput @bind-Value=""_value"" Label=""Type something and hit Enter"" OnValidEnter=""OnEnterAsync"" />
-</div>
+<CodeExample RowClass="fill" Code="@(@"<TextInput @bind-Value=""_value"" Label=""Type something and hit Enter"" OnValidEnter=""OnEnterAsync"" />
 
 @code {
     [Inject, NotNull] private DialogService? DialogService { get; set; }
     private string? _value5;
     private async Task OnEnterAsync()
         => await DialogService.ShowMessageBox(""You entered..."", new() { Message = new(_value5 ?? string.Empty) });
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <TextInput @bind-Value="_value5" Label="Type something and hit Enter" OnValidEnter="OnEnterAsync" />
+</CodeExample>
 
 <h2>Customization</h2>
 
@@ -810,28 +628,7 @@
     You can set the color scheme to any theme color with the <code>ThemeColor</code> property.
 </p>
 
-<Collapse Id="ce-22" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row justify-content-center">
-            <div class="row fill align-items-center gap-2">
-                <TextInput Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
-                <TextInput Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
-                <TextInput Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
-            </div>
-            <div class="row fill align-items-center gap-2">
-                <TextInput Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
-                <TextInput Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
-                <TextInput Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
-            </div>
-            <div class="row fill align-items-center gap-2">
-                <TextInput Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
-                <TextInput Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
-                <TextInput Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
-            </div>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
+<CodeExample Code="@(@"<div class=""row fill align-items-center gap-2"">
     <TextInput Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" />
     <TextInput Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""filled"" />
     <TextInput Label=""Primary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Primary"" Class=""outlined"" />
@@ -845,9 +642,23 @@
     <TextInput Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" />
     <TextInput Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""filled"" />
     <TextInput Label=""Tertiary"" HelpText=""Some help text"" ThemeColor=""ThemeColor.Tertiary"" Class=""outlined"" />
-</div>")
-    </ChildContent>
-</Collapse>
+</div>")">
+    <div class="row fill align-items-center gap-2">
+        <TextInput Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" />
+        <TextInput Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="filled" />
+        <TextInput Label="Primary" HelpText="Some help text" ThemeColor="ThemeColor.Primary" Class="outlined" />
+    </div>
+    <div class="row fill align-items-center gap-2">
+        <TextInput Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" />
+        <TextInput Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="filled" />
+        <TextInput Label="Secondary" HelpText="Some help text" ThemeColor="ThemeColor.Secondary" Class="outlined" />
+    </div>
+    <div class="row fill align-items-center gap-2">
+        <TextInput Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" />
+        <TextInput Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="filled" />
+        <TextInput Label="Tertiary" HelpText="Some help text" ThemeColor="ThemeColor.Tertiary" Class="outlined" />
+    </div>
+</CodeExample>
 
 <p>
     The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
@@ -877,34 +688,25 @@
     <code>PrefixContent</code>, <code>PrefixText</code> and <code>PrefixIcon</code> are ignored.
 </p>
 
-<Collapse Id="ce-23" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Idea" PrefixIcon="lightbulb" />
-            <TextInput Label="Amount" PrefixText="$" />
-            <TextInput Label="Custom Icon" HelpText="Type the name of a Material Icon">
-                <PrefixContent>
-                    <button class="btn btn-icon">
-                        <tf-icon>@(context ?? "question_mark")</tf-icon>
-                    </button>
-                </PrefixContent>
-            </TextInput>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Idea"" PrefixIcon=""lightbulb"" />
-    <TextInput Label=""Amount"" PrefixText=""$"" />
-    <TextInput Label=""Custom Icon"" HelpText=""Type the name of a Material Icon"">
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<TextInput Label=""Idea"" PrefixIcon=""lightbulb"" />
+<TextInput Label=""Amount"" PrefixText=""$"" />
+<TextInput Label=""Custom Icon"" HelpText=""Type the name of a Material Icon"">
+    <PrefixContent>
+        <button class=""btn btn-icon"">
+            <tf-icon>@(context ?? ""question_mark"")</tf-icon>
+        </button>
+    </PrefixContent>
+</TextInput>")">
+    <TextInput Label="Idea" PrefixIcon="lightbulb" />
+    <TextInput Label="Amount" PrefixText="$" />
+    <TextInput Label="Custom Icon" HelpText="Type the name of a Material Icon">
         <PrefixContent>
-            <button class=""btn btn-icon"">
-                <tf-icon>@(context ?? ""question_mark"")</tf-icon>
+            <button class="btn btn-icon">
+                <tf-icon>@(context ?? "question_mark")</tf-icon>
             </button>
         </PrefixContent>
     </TextInput>
-</div>")
-    </ChildContent>
-</Collapse>
+</CodeExample>
 
 <h3>Postfix</h3>
 
@@ -928,38 +730,29 @@
     <code>PostfixContent</code>, <code>PostfixText</code> and <code>PostfixIcon</code> are ignored.
 </p>
 
-<Collapse Id="ce-24" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row fill align-items-center gap-2">
-            <TextInput Label="Idea" PostfixIcon="lightbulb" />
-            <TextInput Label="Program" PostfixText=".exe" />
-            <TextInput Label="Click">
-                <PostfixContent>
-                    <button class="@_class" @onclick="@(_ => _class = "btn btn-icon success")">
-                        <tf-icon>verified</tf-icon>
-                    </button>
-                </PostfixContent>
-            </TextInput>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<div class=""row fill align-items-center gap-2"">
-    <TextInput Label=""Idea"" PostfixIcon=""lightbulb"" />
-    <TextInput Label=""Program"" PostfixText="".exe"" />
-    <TextInput Label=""Click"">
+<CodeExample RowClass="fill align-items-center gap-2" Code="@(@"<TextInput Label=""Idea"" PostfixIcon=""lightbulb"" />
+<TextInput Label=""Program"" PostfixText="".exe"" />
+<TextInput Label=""Click"">
+    <PostfixContent>
+        <button class=""@_class"" @onclick=""@(_ => _class = ""btn btn-icon success"")"">
+            <tf-icon>verified</tf-icon>
+        </button>
+    </PostfixContent>
+</TextInput>
+
+@code {
+    private string _class = ""btn btn-icon"";
+}")">
+    <TextInput Label="Idea" PostfixIcon="lightbulb" />
+    <TextInput Label="Program" PostfixText=".exe" />
+    <TextInput Label="Click">
         <PostfixContent>
-            <button class=""@_class"" @onclick=""@(_ => _class = ""btn btn-icon success"")"">
+            <button class="@_class" @onclick="@(_ => _class = "btn btn-icon success")">
                 <tf-icon>verified</tf-icon>
             </button>
         </PostfixContent>
     </TextInput>
-</div>
-
-@code {
-    private string _class = ""btn btn-icon"";
-}")
-    </ChildContent>
-</Collapse>
+</CodeExample>
 
 <h2>Validation</h2>
 

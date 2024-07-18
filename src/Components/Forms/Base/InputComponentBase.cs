@@ -63,6 +63,16 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     [Parameter] public MarkupString? HelpTextContent { get; set; }
 
     /// <summary>
+    /// Custom CSS class(es) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputClass { get; set; }
+
+    /// <summary>
+    /// Custom CSS style(s) for the inner input element (may be a hidden element).
+    /// </summary>
+    [Parameter] public string? InputStyle { get; set; }
+
+    /// <summary>
     /// Whether the bound <see cref="InputBase{TValue}.Value"/> should update whenever the value
     /// changes (rather than on blur or when the enter key is pressed).
     /// </summary>
@@ -86,6 +96,16 @@ public abstract class InputComponentBase<TValue> : FormComponentBase<TValue>
     protected string? HelpersClass => new CssBuilder("field-helpers")
         .Add("onfocus", DisplayHelpTextOnFocus)
         .ToString();
+
+    /// <summary>
+    /// The final value assigned to the input element's class attribute, including component values.
+    /// </summary>
+    protected virtual string? InputCssClass => InputClass;
+
+    /// <summary>
+    /// The final value assigned to the input element's style attribute.
+    /// </summary>
+    protected virtual string? InputCssStyle => InputStyle;
 
     /// <inheritdoc/>
     protected override void OnParametersSet()

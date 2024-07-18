@@ -651,7 +651,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         }
     }
 
-    private ulong CurrentPage { get; set; }
+    private ulong CurrentPage { get; set; } = 1;
 
     private IEnumerable<TDataItem> CurrentPageItems => LoadItems is not null
         ? CurrentDataPage?.Items ?? Enumerable.Empty<TDataItem>()
@@ -1258,12 +1258,12 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         else if (value < CurrentPage)
         {
             CurrentPage = value;
-            Offset = RowsPerPage * value;
+            Offset = RowsPerPage * (value - 1);
         }
         else if (PageCount.HasValue)
         {
-            CurrentPage = Math.Min(PageCount.Value, value) - 1;
-            Offset = RowsPerPage * CurrentPage;
+            CurrentPage = Math.Min(PageCount.Value, value);
+            Offset = RowsPerPage * (CurrentPage - 1);
         }
         else if (CurrentDataPage?.HasMore != false)
         {
@@ -1838,7 +1838,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             && last.Equals(SelectedItem))
         {
             var hasNext = (PageCount.HasValue
-                && CurrentPage < PageCount - 1)
+                && CurrentPage < PageCount)
                 || CurrentDataPage?.HasMore == true;
             if (hasNext)
             {
@@ -1883,7 +1883,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (first is not null
             && first.Equals(SelectedItem))
         {
-            if (CurrentPage > 0)
+            if (CurrentPage > 1)
             {
                 await SetPageAsync(CurrentPage - 1);
                 StateHasChanged();
@@ -2644,7 +2644,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         RowsPerPage = value;
 
-        CurrentPage = Offset / value;
+        CurrentPage = (Offset / value) + 1;
         if (Offset % value == 0)
         {
             CurrentPage--;
@@ -2771,18 +2771,18 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (LoadItems is null)
         {
             CurrentPage = PageCount > 0
-                ? PageCount.Value - 1
-                : 0;
-            Offset = CurrentPage * RowsPerPage;
+                ? PageCount.Value
+                : 1;
+            Offset = (CurrentPage - 1) * RowsPerPage;
         }
         else if (CurrentDataPage?.HasMore != false)
         {
             if (CurrentDataPage!.TotalCount.HasValue)
             {
                 CurrentPage = PageCount > 0
-                    ? PageCount.Value - 1
-                    : 0;
-                Offset = CurrentPage * RowsPerPage;
+                    ? PageCount.Value
+                    : 1;
+                Offset = (CurrentPage - 1) * RowsPerPage;
             }
             else if (CurrentDataPage?.HasMore != false)
             {
@@ -2832,7 +2832,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             && Offset != value)
         {
             Offset = value;
-            CurrentPage = Offset / value;
+            CurrentPage = (Offset / value) + 1;
             if (Offset % value == 0)
             {
                 CurrentPage--;
@@ -2853,7 +2853,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
     private async Task OnPageChangedAsync(ulong value)
     {
         CurrentPage = value;
-        Offset = CurrentPage * RowsPerPage;
+        Offset = (CurrentPage - 1) * RowsPerPage;
         if (LoadItems is not null)
         {
             await LoadItemsAsync();
@@ -3004,7 +3004,7 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
         if (Offset > itemCount)
         {
             Offset = 0;
-            CurrentPage = 0;
+            CurrentPage = 1;
         }
 
         PageCount = itemCount / RowsPerPage;

@@ -15,35 +15,7 @@
     components inside for each available tab.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tabs Id="t-1" TTabItem="string">
-                <TabPanel Title="Tab One">
-                    <div class="p-4">
-                        Content for Tab One
-                    </div>
-                </TabPanel>
-                <TabPanel Title="Tab Two">
-                    <div class="p-4">
-                        Content for Tab Two
-                    </div>
-                </TabPanel>
-                <TabPanel Title="Tab Three">
-                    <div class="p-4">
-                        Content for Tab Three
-                    </div>
-                </TabPanel>
-                <TabPanel Title="Disabled Tab" Disabled="true">
-                    <div class="p-4">
-                        Content for Disabled Tab
-                    </div>
-                </TabPanel>
-            </Tabs>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tabs TTabItem=""string"">
+<CodeExample IsOpen="true" Code="@(@"<Tabs TTabItem=""string"">
     <TabPanel Title=""Tab One"">
         <div class=""p-4"">
             Content for Tab One
@@ -64,9 +36,30 @@
             Content for Disabled Tab
         </div>
     </TabPanel>
-</Tabs>")
-    </ChildContent>
-</Collapse>
+</Tabs>")">
+    <Tabs TTabItem="string">
+        <TabPanel Title="Tab One">
+            <div class="p-4">
+                Content for Tab One
+            </div>
+        </TabPanel>
+        <TabPanel Title="Tab Two">
+            <div class="p-4">
+                Content for Tab Two
+            </div>
+        </TabPanel>
+        <TabPanel Title="Tab Three">
+            <div class="p-4">
+                Content for Tab Three
+            </div>
+        </TabPanel>
+        <TabPanel Title="Disabled Tab" Disabled="true">
+            <div class="p-4">
+                Content for Disabled Tab
+            </div>
+        </TabPanel>
+    </Tabs>
+</CodeExample>
 
 <p>
     Any tab can be disabled by setting its <code>Disabled</code> property to <code>true</code>. A
@@ -77,24 +70,7 @@
     If there are more tabs than will fit, a scrollbar will appear.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tabs Id="t-2" TTabItem="string">
-                @for (var i = 0; i < 15; i++)
-                {
-                    var index = i;
-                    <TabPanel Title="@($"Tab {index + 1}")">
-                        <div class="p-4">
-                            Content for Tab @(index + 1)
-                        </div>
-                    </TabPanel>
-                }
-            </Tabs>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tabs TTabItem=""string"">
+<CodeExample IsOpen="true" Code="@(@"<Tabs TTabItem=""string"">
     @for (var i = 0; i < 15; i++)
     {
         var index = i;
@@ -104,44 +80,25 @@
             </div>
         </TabPanel>
     }
-</Tabs>")
-    </ChildContent>
-</Collapse>
+</Tabs>")">
+    <Tabs TTabItem="string">
+        @for (var i = 0; i < 15; i++)
+        {
+            var index = i;
+            <TabPanel Title="@($"Tab {index + 1}")">
+                <div class="p-4">
+                    Content for Tab @(index + 1)
+                </div>
+            </TabPanel>
+        }
+    </Tabs>
+</CodeExample>
 
 <p>
     The tabs can be positioned on any side of the panels using the <code>TabSide</code> property.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Select TValue="Side" @bind-Value="Side" Label="Side" Class="dense" Style="max-width:200px">
-                <Option Value="Side.Top" Label="Top" />
-                <Option Value="Side.Bottom" Label="Bottom" />
-                <Option Value="Side.Left" Label="Left" />
-                <Option Value="Side.Right" Label="Right" />
-            </Select>
-            <Tabs Id="t-3" TTabItem="string" TabSide="Side" Class="flex-grow-1">
-                <TabPanel Title="Tab One">
-                    <div class="p-4">
-                        Content for Tab One
-                    </div>
-                </TabPanel>
-                <TabPanel Title="Tab Two">
-                    <div class="p-4">
-                        Content for Tab Two
-                    </div>
-                </TabPanel>
-                <TabPanel Title="Tab Three">
-                    <div class="p-4">
-                        Content for Tab Three
-                    </div>
-                </TabPanel>
-            </Tabs>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Select TValue=""Side"" @bind-Value=""Side"" Label=""Side"" Class=""dense"" Style=""max-width:200px"">
+<CodeExample IsOpen="true" RowClass="align-items-center" Code="@(@"<Select TValue=""Side"" @bind-Value=""Side"" Label=""Side"" Class=""dense"" Style=""max-width:200px"">
     <Option Value=""Side.Top"" Label=""Top"" />
     <Option Value=""Side.Bottom"" Label=""Bottom"" />
     <Option Value=""Side.Left"" Label=""Left"" />
@@ -167,9 +124,31 @@
 
 @code {
     private Side Side { get; set; } = Side.Left;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Select TValue="Side" @bind-Value="Side" Label="Side" Class="dense" Style="max-width:200px">
+        <Option Value="Side.Top" Label="Top" />
+        <Option Value="Side.Bottom" Label="Bottom" />
+        <Option Value="Side.Left" Label="Left" />
+        <Option Value="Side.Right" Label="Right" />
+    </Select>
+    <Tabs TTabItem="string" TabSide="Side" Class="flex-grow-1">
+        <TabPanel Title="Tab One">
+            <div class="p-4">
+                Content for Tab One
+            </div>
+        </TabPanel>
+        <TabPanel Title="Tab Two">
+            <div class="p-4">
+                Content for Tab Two
+            </div>
+        </TabPanel>
+        <TabPanel Title="Tab Three">
+            <div class="p-4">
+                Content for Tab Three
+            </div>
+        </TabPanel>
+    </Tabs>
+</CodeExample>
 
 <h2>Binding</h2>
 
@@ -186,20 +165,7 @@
     provides rich tab content).
 </p>
 
-<Collapse Id="ce-4" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tabs Id="t-4" Items="_items" TabTitle="@(i => (MarkupString)i)">
-                <PanelTemplate>
-                    <div class="p-4">
-                        @context
-                    </div>
-                </PanelTemplate>
-            </Tabs>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tabs Items=""_items"" TabTitle=""@(i => (MarkupString)i)"">
+<CodeExample IsOpen="true" Code="@(@"<Tabs Items=""_items"" TabTitle=""@(i => (MarkupString)i)"">
     <PanelTemplate>
         <div class=""p-4"">
             @context
@@ -209,9 +175,15 @@
 
 @code {
     private string[] _items = new[] { ""Tab 1"", ""Tab 2"", ""Tab 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Tabs Items="_items" TabTitle="@(i => (MarkupString)i)">
+        <PanelTemplate>
+            <div class="p-4">
+                @context
+            </div>
+        </PanelTemplate>
+    </Tabs>
+</CodeExample>
 
 <h2>Dynamic tabs</h2>
 
@@ -238,25 +210,7 @@
     Dynamic panels are automatically removed from the <code>Items</code> collection when closed.
 </p>
 
-<Collapse Id="ce-5" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <Tabs Id="t-5"
-                  Items="_items2"
-                  TabTitle="@(i => (MarkupString)i)"
-                  OnAdd="@(() => $"Tab {_items2.Count + 1}")"
-                  CanCloseTabs="true"
-                  Class="flex-grow-1">
-                <PanelTemplate>
-                    <div class="p-4">
-                        @context
-                    </div>
-                </PanelTemplate>
-            </Tabs>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<Tabs Items=""_items2""
+<CodeExample IsOpen="true" Code="@(@"<Tabs Items=""_items2""
       TabTitle=""@(i => (MarkupString)i)""
       OnAdd=""@(_ => $""Tab {_items2.Count + 1}"")""
       CanCloseTabs=""true""
@@ -270,9 +224,19 @@
 
 @code {
     private string[] _items = new[] { ""Tab 1"", ""Tab 2"", ""Tab 3"" };
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <Tabs Items="_items2"
+          TabTitle="@(i => (MarkupString)i)"
+          OnAdd="@(() => $"Tab {_items2.Count + 1}")"
+          CanCloseTabs="true"
+          Class="flex-grow-1">
+        <PanelTemplate>
+            <div class="p-4">
+                @context
+            </div>
+        </PanelTemplate>
+    </Tabs>
+</CodeExample>
 
 <h2>Persistent State</h2>
 

@@ -34,21 +34,14 @@
     the properties of the dialog.
 </p>
 
-<Collapse Id="ce-1" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn primary" @onclick="ShowMessageBox">Open</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowMessageBox"">Open</button>
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn primary"" @onclick=""ShowMessageBox"">Open</button>
 
 @code {
-    [Inject] private DialogService DialogService { get; set; } = default!;
+    [Inject, NotNull] private DialogService? DialogService { get; set; }
     private void ShowMessageBox() => DialogService.ShowMessageBox(MessageBoxOptions.Ok(""Example dialog""));
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button class="btn primary" @onclick="ShowMessageBox">Open</button>
+</CodeExample>
 
 <p>
     The <code>MessageBoxOptions</code> class has the following properties:
@@ -107,23 +100,15 @@
     one of the <code>Show</code> overloads on <code>DialogService</code>.
 </p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn primary" @onclick="ShowDialog">Open</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>
 
 @code {
-    [Inject] private DialogService DialogService { get; set; } = default!;
+    [Inject, NotNull] private DialogService? DialogService { get; set; }
     private void ShowDialog() => DialogService.Show<ExampleDialog>(""Example"");
-}")
-        <p class="mt-3 mb-1">
-            And in <code>ExampleDialog.razor</code>:
-        </p>
-        @CodeFormatter.CodeToMarkup(@"<Dialog>
+}
+
+// Example.razor:
+<Dialog>
     <ChildContent>
         Example dialog content.
     </ChildContent>
@@ -135,9 +120,9 @@
 
 @code {
     [CascadingParameter] private DialogInstance? Dialog { get; set; }
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button class="btn primary" @onclick="ShowDialog">Open</button>
+</CodeExample>
 
 <p>
     The <code>Show</code> overloads all accept a component as a generic type
@@ -201,21 +186,14 @@
 
 <p>For example, this shows a non-modal dialog which allows interaction with the rest of the page while open:</p>
 
-<Collapse Id="ce-2" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn primary" @onclick="ShowNonModalDialog">Open</button>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn primary"" @onclick=""ShowDialog"">Open</button>
 
 @code {
-    [Inject] private DialogService DialogService { get; set; } = default!;
+    [Inject, NotNull] private DialogService? DialogService { get; set; }
     private void ShowDialog() => DialogService.Show<ExampleDialog>(""Non-Modal Example"", new DialogOptions { NonModal = true });
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button class="btn primary" @onclick="ShowNonModalDialog">Open</button>
+</CodeExample>
 
 <h3>Inline</h3>
 
@@ -232,26 +210,7 @@
     the Dialog component to control the inline dialog's behavior.
 </p>
 
-<Collapse Id="ce-3" IsInitiallyOpen="true" Class="align-self-stretch outlined mb-3" BodyClass="codeblock pre-razor-code">
-    <TitleContent>
-        <div class="row align-items-center justify-content-center">
-            <button class="btn primary" @onclick="@(_ => _isVisible = true)">Open</button>
-
-            <Dialog @bind-IsVisible="_isVisible">
-                <TitleContent>
-                    <h6>Title</h6>
-                </TitleContent>
-                <ChildContent>
-                    <p>This is an inline dialog.</p>
-                </ChildContent>
-                <FooterContent>
-                    <button class="btn btn-text" @onclick="@(_ => _isVisible = false)">Close</button>
-                </FooterContent>
-            </Dialog>
-        </div>
-    </TitleContent>
-    <ChildContent>
-        @CodeFormatter.CodeToMarkup(@"<button class=""btn primary"" @onclick=""@(_ => _isVisible = true)"">Open</button>
+<CodeExample IsOpen="true" Code="@(@"<button class=""btn primary"" @onclick=""@(_ => _isVisible = true)"">Open</button>
 
 <Dialog @bind-IsVisible=""_isVisible"">
     <TitleContent>
@@ -267,9 +226,21 @@
 
 @code {
     private bool _isVisible;
-}")
-    </ChildContent>
-</Collapse>
+}")">
+    <button class="btn primary" @onclick="@(_ => _isVisible = true)">Open</button>
+
+    <Dialog @bind-IsVisible="_isVisible">
+        <TitleContent>
+            <h6>Title</h6>
+        </TitleContent>
+        <ChildContent>
+            <p>This is an inline dialog.</p>
+        </ChildContent>
+        <FooterContent>
+            <button class="btn btn-text" @onclick="@(_ => _isVisible = false)">Close</button>
+        </FooterContent>
+    </Dialog>
+</CodeExample>
 
 <p>
     Note that the <code>IsVisible</code> property is ignored by dialogs which

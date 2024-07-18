@@ -177,13 +177,15 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
 
 :host(:focus-within:not(.filled, .outlined)) > label,
 :host([placeholder]:not(.filled, .outlined)) > label,
-:host(:state(has-value):not(.filled, .outlined)) > label {
+:host(:state(has-value):not(.filled, .outlined)) > label,
+:host(.prefixed:not(.filled, .outlined)) > label {
     transform: translate(0, 1.5px) scale(.75);
 }
 
 :host(.filled:focus-within) > label,
 :host([placeholder].filled) > label,
-:host(.filled:state(has-value)) > label {
+:host(.filled:state(has-value)) > label,
+:host(.filled.prefixed) > label {
     transform: translate(12px, 10px) scale(.75);
 
     *[dir="rtl"] & {
@@ -193,7 +195,8 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
 
 :host(.outlined:focus-within) > label,
 :host([placeholder].outlined) > label,
-:host(.outlined:state(has-value)) > label {
+:host(.outlined:state(has-value)) > label,
+:host(.outlined.prefixed) > label {
     transform: translate(14px, -6px) scale(.75);
 
     *[dir="rtl"] & {
@@ -260,13 +263,15 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
 
 :host(.dense:focus-within:not(.filled, .outlined)) > label,
 :host([placeholder].dense:not(.filled, .outlined)) > label,
-:host(.dense:not(.filled, .outlined):state(has-value)) > label {
+:host(.dense:not(.filled, .outlined):state(has-value)) > label,
+:host(.dense.prefixed:not(.filled, .outlined)) > label {
     transform: translate(0, 1.5px) scale(.75);
 }
 
 :host(.dense.filled:focus-within) > label,
 :host([placeholder].dense.filled) > label,
-:host(.dense.filled:state(has-value)) > label {
+:host(.dense.filled:state(has-value)) > label,
+:host(.dense.filled.prefixed) > label {
     transform: translate(3px, 4px) scale(.75);
 
     *[dir="rtl"] & {
@@ -276,7 +281,8 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
 
 :host(.dense.outlined:focus-within) > label,
 :host([placeholder].dense.outlined) > label,
-:host(.dense.outlined:state(has-value)) > label {
+:host(.dense.outlined:state(has-value)) > label,
+:host(.dense.outlined.prefixed) > label {
     transform: translate(5px, -6px) scale(.75);
 
     *[dir="rtl"] & {
@@ -287,8 +293,6 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
 :host(:disabled) .input,
 :host([readonly]) .input,
 :host([inert]) .input {
-    cursor: default;
-
     > svg {
         cursor: default;
         pointer-events: none;
@@ -297,6 +301,11 @@ export class TavenemNumericInputHtmlElement extends HTMLElement {
     input {
         opacity: 1;
     }
+}
+
+:host(:disabled) .input,
+:host([inert]) .input {
+    cursor: default;
 }
 
 :host(.filled:disabled) .input,
@@ -509,7 +518,6 @@ input {
 
     &:disabled,
     &[readonly] {
-        background-color: var(--tavenem-color-bg-alt);
         opacity: 1;
     }
 
@@ -713,16 +721,13 @@ button::-moz-focus-inner {
     }
 }
 
+:host(:disabled) .spin-buttons,
 :host([readonly]) .spin-buttons {
     display: none;
 }
 
 :host([inert]) {
     --field-border-color: var(--tavenem-color-action-disabled);
-}
-
-:host([readonly]),
-:host([inert]) {
     cursor: default;
     pointer-events: none;
 }
@@ -1198,7 +1203,7 @@ button::-moz-focus-inner {
 
     formResetCallback() { this.reset(); }
 
-    formStateRestoreCallback(state: string | File | FormData | null, mode: 'restore' | 'autocomplete') {
+    formStateRestoreCallback(state: string | File | FormData | null, _mode: 'restore' | 'autocomplete') {
         if (typeof state === 'string') {
             this.value = state;
         } else if (state == null) {
@@ -1270,7 +1275,7 @@ button::-moz-focus-inner {
             return 0;
         }
 
-        let [i, p, d, e, n] = value.toString().split(/(\.|[eE][\-+])/g);
+        let [_i, p, d, e, n] = value.toString().split(/(\.|[eE][\-+])/g);
         if (e) {
             e = e.toLowerCase();
         }
@@ -1291,23 +1296,18 @@ button::-moz-focus-inner {
         event.stopPropagation();
     }
 
-    private onChange(event: Event) {
-        if (event instanceof InputEvent
-            && event.isComposing) {
-            return;
-        }
-
+    private onChange() {
         const root = this.shadowRoot;
         if (!root) {
             return;
         }
 
         const input = root.querySelector('input:not([type="hidden"])');
-        if (input instanceof HTMLInputElement
-            && this._value !== input.value
-            && this._display !== input.value) {
-            this._internals.states.add('touched');
-            this.value = input.value;
+        if (input instanceof HTMLInputElement) {
+            if (this._value !== input.value) {
+                this._internals.states.add('touched');
+                this.value = input.value;
+            }
             this.dispatchEvent(TavenemNumericInputHtmlElement.newValueChangeEvent(this._value));
         }
     }
@@ -1365,7 +1365,7 @@ button::-moz-focus-inner {
         } else if (event.key === "Enter") {
             event.preventDefault();
             event.stopPropagation();
-            this.onChange(event);
+            this.onChange();
             this.dispatchEvent(TavenemNumericInputHtmlElement.newEnterEvent());
         }
     }
@@ -1509,6 +1509,8 @@ button::-moz-focus-inner {
         if (event) {
             this._internals.states.add('touched');
         }
+
+        this.dispatchEvent(TavenemNumericInputHtmlElement.newValueChangeEvent(this._value));
     }
 
     private updateInputDebounced() {

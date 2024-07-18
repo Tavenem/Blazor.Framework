@@ -386,9 +386,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             const button = document.createElement('button');
             button.type = 'button';
             button.id = anchorId;
-            button.className = this.dataset.inputClass || '';
             button.classList.add('picker-btn', 'btn');
-            button.style.cssText = this.dataset.inputStyle || '';
             button.disabled = this.hasAttribute('disabled')
                 || this.hasAttribute('readonly');
             shadow.appendChild(button);
@@ -436,15 +434,9 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             if (this.hasAttribute('inline')) {
                 input.style.display = 'none';
             }
-            if ('inputClass' in this.dataset) {
-                input.dataset.inputClass = this.dataset.inputClass;
-            }
-            if ('inputStyle' in this.dataset) {
-                input.dataset.inputStyle = this.dataset.inputStyle;
-            }
             input.dataset.pickerNoToggle = '';
             input.addEventListener('valueinput', this.onInput.bind(this));
-            input.addEventListener('valuechange', this.onInput.bind(this));
+            input.addEventListener('valuechange', this.stopEvent.bind(this));
             shadow.appendChild(input);
             if (this._value) {
                 input.value = display.value;
@@ -741,7 +733,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             }
             hourInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
             hourInput.addEventListener('valueinput', this.onHourInput.bind(this));
-            hourInput.addEventListener('valuechange', this.onHourInput.bind(this));
+            hourInput.addEventListener('valuechange', this.stopEvent.bind(this));
             currentTime.appendChild(hourInput);
 
             const timeSeparator = document.createElement('span');
@@ -761,7 +753,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
             minuteInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
             minuteInput.setAttribute('value', this._displayedTime.minute.toString());
             minuteInput.addEventListener('valueinput', this.onMinuteInput.bind(this));
-            minuteInput.addEventListener('valuechange', this.onMinuteInput.bind(this));
+            minuteInput.addEventListener('valuechange', this.stopEvent.bind(this));
             currentTime.appendChild(minuteInput);
 
             if (this.hasAttribute('seconds')) {
@@ -782,7 +774,7 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
                 secondInput.style.backgroundColor = 'var(--tavenem-color-bg-input)';
                 secondInput.setAttribute('value', this._displayedTime.second.toString());
                 secondInput.addEventListener('valueinput', this.onSecondInput.bind(this));
-                secondInput.addEventListener('valuechange', this.onSecondInput.bind(this));
+                secondInput.addEventListener('valuechange', this.stopEvent.bind(this));
                 currentTime.appendChild(secondInput);
             }
 
@@ -949,14 +941,16 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         const input = root.querySelector('.input');
         if (input) {
             input.removeEventListener('valueinput', this.onInput.bind(this));
-            input.removeEventListener('valuechange', this.onInput.bind(this));
+            input.removeEventListener('valuechange', this.stopEvent.bind(this));
         }
         const calendarSelect = root.querySelector('.calendar-select');
         if (calendarSelect) {
+            calendarSelect.removeEventListener('valueinput', this.stopEvent.bind(this));
             calendarSelect.removeEventListener('valuechange', this.onCalendarChange.bind(this));
         }
         const timezoneSelect = root.querySelector('.timezone-select');
         if (timezoneSelect) {
+            timezoneSelect.removeEventListener('valueinput', this.stopEvent.bind(this));
             timezoneSelect.removeEventListener('valuechange', this.onTimeZoneChange.bind(this));
         }
         const allCalendarsCheckboxInput = root.querySelector('.all-calendars-input');
@@ -978,17 +972,17 @@ export class TavenemDateTimeInputHtmlElement extends TavenemPickerHtmlElement {
         const hourInput = root.querySelector('.hour-input');
         if (hourInput) {
             hourInput.removeEventListener('valueinput', this.onHourInput.bind(this));
-            hourInput.removeEventListener('valuechange', this.onHourInput.bind(this));
+            hourInput.removeEventListener('valuechange', this.stopEvent.bind(this));
         }
         const minuteInput = root.querySelector('.minute-input');
         if (minuteInput) {
             minuteInput.removeEventListener('valueinput', this.onMinuteInput.bind(this));
-            minuteInput.removeEventListener('valuechange', this.onMinuteInput.bind(this));
+            minuteInput.removeEventListener('valuechange', this.stopEvent.bind(this));
         }
         const secondInput = root.querySelector('.second-input');
         if (secondInput) {
             secondInput.removeEventListener('valueinput', this.onSecondInput.bind(this));
-            secondInput.removeEventListener('valuechange', this.onSecondInput.bind(this));
+            secondInput.removeEventListener('valuechange', this.stopEvent.bind(this));
         }
         const amButton = root.querySelector('.am-button');
         if (amButton) {

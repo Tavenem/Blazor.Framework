@@ -42,9 +42,18 @@
     private bool? _value2;
     private bool? _value3;
 }")">
-    <Checkbox @bind-Value="_value1" Label="Bool" />
-    <Checkbox @bind-Value="_value2" Label="Bool?" />
-    <Checkbox @bind-Value="_value3" Label="Bool? + AllowNull" AllowNull="true" />
+    <div class="d-flex flex-column">
+        <Checkbox @bind-Value="_value1" Label="Bool" />
+        <span>@_value1</span>
+    </div>
+    <div class="d-flex flex-column">
+        <Checkbox @bind-Value="_value2" Label="Bool?" />
+        <span>@(_value2 is null ? "null" : _value2.ToString())</span>
+    </div>
+    <div class="d-flex flex-column">
+        <Checkbox @bind-Value="_value3" Label="Bool? + AllowNull" AllowNull="true" />
+        <span>@(_value3 is null ? "null" : _value3.ToString())</span>
+    </div>
 </CodeExample>
 
 <p>
@@ -189,12 +198,6 @@
     <Checkbox TValue="bool?" Label="Secondary" ThemeColor="ThemeColor.Secondary" />
     <Checkbox TValue="bool?" Label="Tertiary" ThemeColor="ThemeColor.Tertiary" />
 </CodeExample>
-
-<p>
-    The <code>InputClass</code> and <code>InputStyle</code> properties can be used to control the
-    CSS attributes of the input itself, while the <code>InputAttributes</code> property can be used
-    to assign arbitrary attributes to it.
-</p>
 
 <h2>Validation</h2>
 

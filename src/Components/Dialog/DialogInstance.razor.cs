@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 
@@ -80,8 +79,6 @@ public partial class DialogInstance
 
     [Inject, NotNull] IJSRuntime? JSRuntime { get; set; }
 
-    [Inject, NotNull] private IKeyListener? KeyListener { get; set; }
-
     [CascadingParameter] private DialogContainer? Parent { get; set; }
 
     /// <inheritdoc/>
@@ -89,28 +86,10 @@ public partial class DialogInstance
     {
         if (firstRender)
         {
-            if (!Options.DisableCloseOnEscape)
-            {
-                await KeyListener.ConnectAsync(_elementId, new()
-                {
-                    Keys =
-                {
-                    new()
-                    {
-                        Key = "Escape",
-                        SubscribeDown = true,
-                    }
-                },
-                });
-                KeyListener.KeyDown += OnEscapeKeyDown;
-            }
-            if (Options.IsDraggable && !Options.HideHeader)
-            {
-                _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "import",
-                    "./_content/Tavenem.Blazor.Framework/tavenem-dialog.js");
-                await _module.InvokeVoidAsync("initializeId", Id);
-            }
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/Tavenem.Blazor.Framework/tavenem-dialog.js");
+            await _module.InvokeVoidAsync("initializeId", Id);
         }
     }
 
@@ -154,15 +133,6 @@ public partial class DialogInstance
         Style = dialog.Style;
         TitleContent = dialog.TitleContent;
         StateHasChanged();
-    }
-
-    private void OnEscapeKeyDown(KeyboardEventArgs args)
-    {
-        if (!Options.DisableCloseOnEscape
-            && args.Key == "Escape")
-        {
-            Close(DialogResult.DefaultCancel);
-        }
     }
 
     private void OnOverlayClick()

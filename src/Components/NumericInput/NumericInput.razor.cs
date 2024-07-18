@@ -144,6 +144,11 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("clearable", _isClearable)
+        .Add(
+            "prefixed",
+            PrefixContent is not null
+                || !string.IsNullOrEmpty(PrefixIcon)
+                || !string.IsNullOrEmpty(PrefixText))
         .ToString();
 
     /// <summary>
