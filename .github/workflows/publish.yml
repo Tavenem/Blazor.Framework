@@ -8,22 +8,22 @@ jobs:
     name: build, pack, publish, and release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
 
-      - uses: dotnet/nbgv@v0.4.0
+      - uses: dotnet/nbgv@v0.4.2
         id: nbgv
       
       - name: Setup .NET 8
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           # Semantic version range syntax or exact version of a dotnet version
           dotnet-version: '8.0.x'
           include-prerelease: true
       
       - name: Use Node.js 20.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 20.x
 
@@ -43,7 +43,7 @@ jobs:
         run: dotnet test --configuration Release --no-build --verbosity normal
         working-directory: ./src
 
-      - uses: mukunku/tag-exists-action@v1.0.0
+      - uses: mukunku/tag-exists-action@v1.6.0
         id: checkTag
         with: 
           tag: 'v${{ steps.nbgv.outputs.Version }}'
@@ -80,7 +80,7 @@ jobs:
 
       - name: Deploy
         if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true' && steps.nbgv.outputs.PrereleaseVersion == ''
-        uses: JamesIves/github-pages-deploy-action@4.1.7
+        uses: JamesIves/github-pages-deploy-action@4.6.3
         with:
           branch: gh-pages
           folder: docs/docsite/publish/wwwroot
@@ -96,13 +96,10 @@ jobs:
       - name: Release
         if: steps.nbgv.outputs.PublicRelease && steps.checkTag.outputs.exists != 'true'
         id: create_release
-        uses: softprops/action-gh-release@v0.1.14
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.nbgv.outputs.Version }}
           name: Release v${{ steps.nbgv.outputs.Version }}
           draft: false
           prerelease: ${{ steps.nbgv.outputs.PrereleaseVersion != '' }}
           body: See [changelog](docs/CHANGELOG.md)
-          files: docs/docsite/publish/wwwroot/_content/Tavenem.Blazor.Framework/framework.css
