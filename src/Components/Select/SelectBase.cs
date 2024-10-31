@@ -145,6 +145,17 @@ public abstract class SelectBase<TValue, TOption>
     /// </remarks>
     [Parameter] public int? Size { get; set; }
 
+    /// <summary>
+    /// Whether the containing HTML form element (if any) should be submitted when a value is
+    /// selected. Default is <see langword="false"/>.
+    /// </summary>
+    /// <remarks>
+    /// Even when <see langword="true"/>, the form will not be submitted if the value of the
+    /// selected option is null or empty. This prevents unintended form submissions when selecting a
+    /// placeholder option (e.g. "Pick a value").
+    /// </remarks>
+    [Parameter] public bool SubmitOnSelect { get; set; }
+
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("select")

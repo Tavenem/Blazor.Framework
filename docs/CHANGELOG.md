@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1
+### Fixed
+- Select submission on select
+- Tab initialization
+
 ## 3.0
 ### Added
 - `Quality` parameter on `ImageEditor`

@@ -31,12 +31,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.102.2" />
-    <PackageReference Include="HtmlSanitizer" Version="8.0.843" />
-    <PackageReference Include="Markdig" Version="0.36.2" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.104.1" />
+    <PackageReference Include="HtmlSanitizer" Version="8.1.870" />
+    <PackageReference Include="Markdig" Version="0.38.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+    <PackageReference Include="System.IO.Packaging" Version="8.0.1" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -63,6 +64,10 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
     <ClientAssetsInputs Include="$(ClientAssetsDirectory)esbuild_config.mjs;$(ClientAssetsDirectory)scripts\**\*.ts" Exclude="$(DefaultItemExcludes);$(ClientAssetsDirectory)scripts\**\*.d.ts;$(ClientAssetsDirectory)scripts\**\_*.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="package-lock.json" />
   </ItemGroup>
 
   <Target Name="ClientAssetsRestore" BeforeTargets="$(ClientAssetsRestoreBeforeTargets)" Inputs="$(ClientAssetsRestoreInputs)" Outputs="$(ClientAssetsRestoreOutputs)">

@@ -278,8 +278,10 @@ export class TavenemTabHTMLElement extends HTMLElement {
 
         if (!this.hasAttribute('disabled')
             && (this.classList.contains('active')
-            || !tabs.querySelector('tf-tab[tabindex="0"]'))) {
-            tabs.activate(this.id);
+                || !tabs.querySelector('tf-tab[tabindex="0"]'))) {
+            if (typeof tabs.activate === 'function') {
+                tabs.activate(this.id);
+            }
         } else {
             this.classList.remove('active');
             panel.hidden = true;

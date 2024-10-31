@@ -1548,6 +1548,12 @@ slot {
 
         this.setValue(value, display);
         this._internals.states.add('touched');
+
+
+        if (this._internals.form
+            && 'submitOnSelect' in this.dataset) {
+            this._internals.form.requestSubmit();
+        }
     }
 
     private onValueChange(event: Event) {
