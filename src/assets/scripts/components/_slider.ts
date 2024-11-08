@@ -504,6 +504,7 @@ slot[name="helpers"]::slotted(.onfocus) {
 }
 `;
 
+    private _assigningValue = false;
     private _formValue = '0';
     private _initialValue: string | null | undefined;
     private _inputDebounce: number = -1;
@@ -600,8 +601,10 @@ slot[name="helpers"]::slotted(.onfocus) {
         shadow.appendChild(slot);
 
         if ('value' in this.dataset) {
+            this._assigningValue = true;
             this.setTextValue(this.dataset.value);
             this._initialValue = this._formValue;
+            this._assigningValue = false;
         }
     }
 
@@ -783,7 +786,8 @@ slot[name="helpers"]::slotted(.onfocus) {
             input.value = this._formValue;
         }
 
-        if (this._formValue !== original
+        if (!this._assigningValue
+            && this._formValue !== original
             && this._inputDebounce === -1) {
             let debounce = 'inputDebounce' in this.dataset
                 ? parseInt(this.dataset.inputDebounce || '')

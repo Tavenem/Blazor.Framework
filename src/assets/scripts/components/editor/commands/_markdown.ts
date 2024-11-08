@@ -1047,7 +1047,7 @@ class MarkdownSerializerState {
      */
     esc(str: string, startOfLine = false) {
         str = str.replace(
-            /[`*\\~\[\]_]/g,
+            /[`*\\~_]/g,
             (m, i) => m == "_"
                 && i > 0
                 && i + 1 < str.length
@@ -1553,6 +1553,7 @@ export const tavenemMarkdownSerializer = new MarkdownSerializer({
     code_block(state, node) {
         state.write("```" + (node.attrs.syntax || ""));
         writeCommonAttributes(state, node, true);
+        state.ensureNewLine();
         state.text(node.textContent, false);
         state.ensureNewLine();
         state.write("```", true);

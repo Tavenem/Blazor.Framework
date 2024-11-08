@@ -15,16 +15,246 @@ export const elementStyle = `
 
 * {
     font-family: var(--tavenem-font-family);
+    font-variation-settings: "MONO" var(--tavenem-mono), "CASL" var(--tavenem-casl);
+}
+
+hr {
+    background-color: var(--tavenem-color-divider);
+    border: 0;
+    color: inherit;
+    flex-shrink: 0;
+    margin: 1rem 0;
+    width: 100%;
+
+    &:not([size]) {
+        height: 1px;
+    }
+
+    .dark {
+        background-color: var(--tavenem-light-color-divider);
+    }
+
+    .light {
+        background-color: var(--tavenem-dark-color-divider);
+    }
 }
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: var(--tavenem-font-family-title);
+    line-height: var(--tavenem-lineheight-heading);
+    margin-bottom: .5rem;
+    margin-top: 0;
+}
+h1, .h1 {
+    font-size: var(--tavenem-font-size-h1);
+    font-weight: var(--tavenem-font-weight-semibold);
+
+    &:not(:first-child) {
+        margin-top: 1rem;
+    }
+}
+h2, .h2 {
+    font-size: var(--tavenem-font-size-h2);
+    font-weight: var(--tavenem-font-weight-semibold);
+
+    &:not(:first-child) {
+        margin-top: 1rem;
+    }
+}
+h3, .h3 {
+    font-size: var(--tavenem-font-size-h3);
+    font-weight: var(--tavenem-font-weight-medium-bold);
+
+    &:not(:first-child) {
+        margin-top: .5rem;
+    }
+}
+h4, .h4 {
+    font-size: var(--tavenem-font-size-h4);
+    font-weight: var(--tavenem-font-weight-medium-bold);
+
+    &:not(:first-child) {
+        margin-top: .5rem;
+    }
+}
+h5, .h5 {
+    font-size: var(--tavenem-font-size-h5);
+    font-weight: var(--tavenem-font-weight-bold);
+}
+h6, .h6 {
+    font-size: var(--tavenem-font-size-h6);
+    font-weight: var(--tavenem-font-weight-bold);
+}
+
+p {
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+abbr[title] {
+    cursor: help;
+    text-decoration: underline dotted;
+    text-decoration-skip-ink: none;
+}
+
+address {
+    font-style: normal;
+    line-height: inherit;
+    margin-bottom: 1rem;
+}
+
+ol, ul, menu {
+    padding-left: 2rem;
+}
+
+ol, ul, menu, dl {
+    margin-bottom: 1rem;
+    margin-top: 0;
+}
+
+:is(ul, menu, ol) :is(ul, menu, ol) {
+    margin-bottom: 0;
+}
+
+ul, menu {
+    list-style: none;
+}
+
+dt {
+    font-weight: var(--tavenem-font-weight-bold);
+}
+
+dd {
+    margin-bottom: .5rem;
+    margin-left: .5rem;
+}
+
+blockquote {
+    margin: 1rem 2.5rem;
+}
+
+b, strong {
+    font-weight: bolder;
+}
+
+small {
+    font-size: var(--tavenem-font-size-sm);
+    line-height: var(--tavenem-lineheight-small);
+}
+
+mark {
+    padding: .2em;
+    background-color: var(--tavenem-color-yellow-bg);
+}
+
+sub, sup {
+    font-size: var(--tavenem-font-size-subsup);
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sub {
+    bottom: -.25em;
+}
+
+sup {
+    top: -.5em;
 }
 
 pre, code, kbd, samp {
     --tavenem-mono: 1;
     font-family: var(--tavenem-font-family-monospace);
+}
+
+pre {
+    display: block;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    max-width: 100%;
+    overflow: auto;
+
+    code {
+        color: inherit;
+        font-size: inherit;
+        line-height: inherit;
+        word-break: normal;
+    }
+}
+
+code {
+    color: var(--tavenem-color-tertiary);
+    word-wrap: break-word;
+
+    a > & {
+        color: inherit;
+    }
+}
+
+kbd {
+    background-color: var(--tavenem-color-keyboard-bg);
+    border: 1px solid var(--tavenem-color-border);
+    border-radius: var(--tavenem-border-radius);
+    box-shadow: 0 1px 1px rgb(0 0 0 / 20%), 0 2px 0 0 rgba(var(--tavenem-color-base-rgb), 70%) inset;
+    color: var(--tavenem-color-keyboard);
+    font-weight: var(--tavenem-font-weight-semibold);
+    padding: 2px 4px;
+
+    > *:first-child {
+        border-top-left-radius: inherit;
+        border-top-right-radius: inherit;
+    }
+
+    > *:last-child {
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+    }
+
+    > *:only-child {
+        border-radius: inherit;
+    }
+
+    kbd {
+        border: 0;
+        box-shadow: none;
+        font-weight: var(--tavenem-font-weight-medium-bold);
+        line-height: var(--tavenem-lineheight-body);
+        padding: 0;
+    }
+}
+
+a {
+    color: var(--tavenem-color-link);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--tavenem-color-link-hover);
+    }
+
+    &.underline {
+        text-decoration: underline;
+    }
+
+    &:not([href]),
+    &:not([href]):hover,
+    &:not([href]):focus-visible {
+        color: inherit;
+    }
+
+    &:disabled, &.disabled {
+        color: var(--tavenem-color-action-disabled) !important;
+        cursor: default;
+        pointer-events: none;
+        text-decoration: none;
+    }
+}
+a[aria-disabled="true"] {
+    color: var(--tavenem-color-action-disabled) !important;
+    cursor: default;
+    pointer-events: none;
+    text-decoration: none;
 }
 
 :host {
@@ -95,16 +325,6 @@ pre, code, kbd, samp {
     .success.filled,
     .warning.filled) {
     background-color: transparent !important;
-}
-
-hr {
-    background-color: var(--tavenem-color-divider);
-    border: 0;
-    color: inherit;
-    flex-shrink: 0;
-    height: 1px;
-    margin: 1rem 0;
-    width: 100%;
 }
 
 .vr {
@@ -809,6 +1029,7 @@ svg {
     border-top-right-radius: var(--tavenem-border-radius);
     border-width: 1px;
     margin-top: .5rem;
+    min-height: calc(1.75rem + 12px);
     overflow: hidden;
     position: relative;
 
@@ -826,7 +1047,6 @@ svg {
         display: flex;
         flex-wrap: wrap;
         height: calc(1.75rem + 12px);
-        min-height: calc(1.75rem + 12px);
         padding: .25rem calc(2.75rem + 10px) .25rem 1rem;
         row-gap: .25rem;
 
@@ -1153,6 +1373,10 @@ svg {
 
 :host(:state(touched)) .validation-messages {
     display: initial;
+}
+
+.code-block-view {
+    position: relative;
 }
 
 .math-node {

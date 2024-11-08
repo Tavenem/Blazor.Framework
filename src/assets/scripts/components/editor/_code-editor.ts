@@ -31,9 +31,9 @@ export class TavenemCodeEditor implements Editor {
         }
         let command: ParamStateCommand | undefined;
         if (this._syntax === 'html') {
-            command = htmlCommands[CommandType.InsertAudio];
+            command = htmlCommands[type];
         } else if (this._syntax === 'markdown') {
-            command = markdownCommands[CommandType.InsertAudio];
+            command = markdownCommands[type];
         } else if (type === CommandType.Undo) {
             command = _ => undo;
         } else if (type === CommandType.Redo) {
@@ -119,6 +119,7 @@ export class TavenemCodeEditor implements Editor {
             readOnlyCompartment.of(EditorState.readOnly.of(options?.readOnly || false)),
             EditorView.updateListener.of(this.onUpdate.bind(this)),
             EditorView.domEventHandlers({ 'blur': this.onBlur.bind(this) }),
+            EditorView.lineWrapping,
         ]);
         if (options?.placeholder
             && options.placeholder.length) {

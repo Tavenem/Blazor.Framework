@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2
+### Fixed
+- Editor styles
+
 ## 3.1
 ### Fixed
 - Select submission on select

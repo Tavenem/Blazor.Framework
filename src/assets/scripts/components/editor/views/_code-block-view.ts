@@ -70,6 +70,7 @@ export class CodeBlockView implements NodeView {
                     }
                     return null;
                 }),
+                EditorView.lineWrapping,
             ]);
         this._cm = new EditorView({
             state: EditorState.create({
