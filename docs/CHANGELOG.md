@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3
+### Fixed
+- Missing image editor file
+
 ## 3.2
 ### Fixed
 - Editor styles
