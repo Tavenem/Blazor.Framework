@@ -26,6 +26,7 @@
                         {
                             <RadioButton @ref="FirstButton"
                                          @key="Values[0]"
+                                         TValue="TValue"
                                          Id="@Id"
                                          Value="Values[0]"
                                          Label="@Values[0]?.ToString()"
@@ -39,6 +40,7 @@
                             {
                                 var index = i;
                                 <RadioButton @key="Values[index]"
+                                             TValue="TValue"
                                              Value="Values[index]"
                                              Label="@Values[index]?.ToString()"
                                              AdditionalAttributes="InputAttributes"
@@ -52,6 +54,7 @@
                         {
                             <RadioButton @ref="FirstButton"
                                          @key="Values[0]"
+                                         TValue="TValue"
                                          Id="@Id"
                                          Value="Values[0]"
                                          Label="@Values[0]?.ToString()"
@@ -69,6 +72,7 @@
                             {
                                 var index = i;
                                 <RadioButton @key="Values[index]"
+                                             TValue="TValue"
                                              Value="Values[index]"
                                              Label="@Values[index]?.ToString()"
                                              AdditionalAttributes="InputAttributes"
@@ -90,6 +94,7 @@
                         {
                             <RadioButton @ref="FirstButton"
                                          @key="ValuePairs[0].Key"
+                                         TValue="TValue"
                                          Id="@Id"
                                          Value="ValuePairs[0].Key"
                                          Label="@ValuePairs[0].Value"
@@ -104,6 +109,7 @@
                         {
                             var index = i;
                             <RadioButton @key="ValuePairs[index].Key"
+                                         TValue="TValue"
                                          Value="ValuePairs[index].Key"
                                          Label="@ValuePairs[index].Value"
                                          AdditionalAttributes="InputAttributes"

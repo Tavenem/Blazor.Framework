@@ -125,28 +125,28 @@
 </CodeExample>
 
 <p>
-    The <code>Show</code> overloads all accept a component as a generic type
-    parameter. This component should have a single <code>Dialog</code> component
-    as its only top-level element. It accepts a <code>CascadingParameter</code>
-    of type <code>DialogInstance</code>, which provides the methods for
-    controlling the state of the dialog and its return values.
+    There are <code>Show</code> overloads which accept a <code>RenderFragment</code> to display
+    inside an auto-generated <code>Dialog</code> component. It receives a
+    <code>CascadingParameter</code> of type <code>DialogInstance</code>, which provides the methods
+    for controlling the state of the dialog and its return values.
 </p>
 
 <p>
-    There are <code>Show</code> overloads which also accept an instance of
-    <code>DialogParameters</code>. This is a specialized collection of key-value
-    pairs which can be used to pass parameters to your <code>Dialog</code>
-    component. Each entry has a string key which should exactly match the name
-    of a public parameter (using the <code>nameof</code> feature is
-    recommended), and accepts an <code>object</code> which should be of the
-    correct type to assign to that parameter.
+    There are also <code>Show</code> overloads which accept a component as a generic type parameter
+    or explicit <code>Type</code> parameter. This component should have a <code>Dialog</code>
+    component as its only top-level element, also also receives the <code>CascadingParameter</code>
+    of type <code>DialogInstance</code>. These overloads can also accept an instance of
+    <code>DialogParameters</code>. This is a specialized collection of key-value pairs which can be
+    used to pass parameters to your <code>Dialog</code> component. Each entry has a string key which
+    should exactly match the name of a public parameter (using the <code>nameof</code> feature is
+    recommended), and accepts an <code>object</code> which should be of the correct type to assign
+    to that parameter.
 </p>
 
 <p>
-    There are also <code>Show</code> overloads which accept an instance of
-    <code>DialogOptions</code>. This object allows you to control the behavior
-    of the dialog. The <code>DialogOptions</code> class has the following
-    properties:
+    The <code>Show</code> overloads can also accept an instance of <code>DialogOptions</code>. This
+    object allows you to control the behavior of the dialog. The <code>DialogOptions</code> class
+    has the following properties:
 
     <dl class="ml-3">
         <dt><code>Breakpoint</code></dt>

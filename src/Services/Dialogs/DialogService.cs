@@ -29,6 +29,106 @@ public class DialogService
     /// <summary>
     /// Display a dialog.
     /// </summary>
+    /// <param name="renderFragment">
+    /// The <see cref="RenderFragment"/> to display as a dialog.
+    /// </param>
+    /// <param name="title">The title to show in the header.</param>
+    /// <param name="options">The options to configure the dialog.</param>
+    /// <returns>A reference to the dialog.</returns>
+    public DialogReference Show(
+        RenderFragment renderFragment,
+        string? title = null,
+        DialogOptions? options = null)
+    {
+        var reference = new DialogReference(this);
+        var instance = new RenderFragment(builder =>
+        {
+            builder.OpenComponent<DialogInstance>(0);
+            builder.SetKey(reference.Id);
+            builder.AddAttribute(1, nameof(DialogInstance.Id), reference.Id);
+            builder.AddAttribute(2, nameof(DialogInstance.Options), options ?? new());
+            builder.AddAttribute(3, nameof(DialogInstance.Title), title);
+            builder.AddAttribute(4, nameof(DialogInstance.ChildContent), renderFragment);
+            builder.CloseComponent();
+        });
+        reference.InjectRenderFragment(instance);
+
+        OnDialogAdded?.Invoke(reference);
+
+        return reference;
+    }
+
+    /// <summary>
+    /// Display a dialog.
+    /// </summary>
+    /// <param name="renderFragment">
+    /// The <see cref="RenderFragment"/> to display as a dialog.
+    /// </param>
+    /// <param name="options">The options to configure the dialog.</param>
+    /// <returns>A reference to the dialog.</returns>
+    public DialogReference Show(
+        RenderFragment renderFragment,
+        DialogOptions options)
+        => Show(renderFragment, null, options);
+
+    /// <summary>
+    /// Display a dialog.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of the context parameter for the <paramref name="renderFragment"/>.
+    /// </typeparam>
+    /// <param name="renderFragment">
+    /// The <see cref="RenderFragment{T}"/> to display as a dialog.
+    /// </param>
+    /// <param name="value">The context parameter for the <paramref name="renderFragment"/>.</param>
+    /// <param name="title">The title to show in the header.</param>
+    /// <param name="options">The options to configure the dialog.</param>
+    /// <returns>A reference to the dialog.</returns>
+    public DialogReference Show<T>(
+        RenderFragment<T> renderFragment,
+        T value,
+        string? title = null,
+        DialogOptions? options = null)
+    {
+        var reference = new DialogReference(this);
+        var instance = new RenderFragment(builder =>
+        {
+            builder.OpenComponent<DialogInstance>(0);
+            builder.SetKey(reference.Id);
+            builder.AddAttribute(1, nameof(DialogInstance.Id), reference.Id);
+            builder.AddAttribute(2, nameof(DialogInstance.Options), options ?? new());
+            builder.AddAttribute(3, nameof(DialogInstance.Title), title);
+            builder.AddAttribute(4, nameof(DialogInstance.ChildContent), renderFragment(value));
+            builder.CloseComponent();
+        });
+        reference.InjectRenderFragment(instance);
+
+        OnDialogAdded?.Invoke(reference);
+
+        return reference;
+    }
+
+    /// <summary>
+    /// Display a dialog.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of the context parameter for the <paramref name="renderFragment"/>.
+    /// </typeparam>
+    /// <param name="renderFragment">
+    /// The <see cref="RenderFragment{T}"/> to display as a dialog.
+    /// </param>
+    /// <param name="value">The context parameter for the <paramref name="renderFragment"/>.</param>
+    /// <param name="options">The options to configure the dialog.</param>
+    /// <returns>A reference to the dialog.</returns>
+    public DialogReference Show<T>(
+        RenderFragment<T> renderFragment,
+        T value,
+        DialogOptions options)
+        => Show(renderFragment, value, null, options);
+
+    /// <summary>
+    /// Display a dialog.
+    /// </summary>
     /// <typeparam name="TComponent">
     /// The type of component to display as a dialog.
     /// </typeparam>
@@ -46,34 +146,26 @@ public class DialogService
         var reference = new DialogReference(this);
         var content = new RenderFragment(builder =>
         {
-            var i = 0;
-            builder.OpenComponent(i++, typeof(TComponent));
-            if (parameters is not null)
+            builder.OpenComponent(5, typeof(TComponent));
+            if (parameters is not null && !reference.AreParametersRendered)
             {
-                if (!reference.AreParametersRendered)
+                foreach (var parameter in parameters)
                 {
-                    foreach (var parameter in parameters)
-                    {
-                        builder.AddAttribute(i++, parameter.Key, parameter.Value);
-                    }
-                    reference.AreParametersRendered = true;
+                    builder.AddAttribute(6, parameter.Key, parameter.Value);
                 }
-                else
-                {
-                    i += parameters.Count;
-                }
+                reference.AreParametersRendered = true;
             }
-            builder.AddComponentReferenceCapture(i++, component => reference.InjectDialog(component));
+            builder.AddComponentReferenceCapture(7, component => reference.InjectDialog(component));
             builder.CloseComponent();
         });
         var instance = new RenderFragment(builder =>
         {
             builder.OpenComponent<DialogInstance>(0);
             builder.SetKey(reference.Id);
-            builder.AddAttribute(1, nameof(DialogInstance.ChildContent), content);
-            builder.AddAttribute(2, nameof(DialogInstance.Id), reference.Id);
-            builder.AddAttribute(3, nameof(DialogInstance.Options), options ?? new());
-            builder.AddAttribute(4, nameof(DialogInstance.Title), title);
+            builder.AddAttribute(1, nameof(DialogInstance.Id), reference.Id);
+            builder.AddAttribute(2, nameof(DialogInstance.Options), options ?? new());
+            builder.AddAttribute(3, nameof(DialogInstance.Title), title);
+            builder.AddAttribute(4, nameof(DialogInstance.ChildContent), content);
             builder.CloseComponent();
         });
         reference.InjectRenderFragment(instance);
@@ -106,34 +198,26 @@ public class DialogService
         var reference = new DialogReference(this);
         var content = new RenderFragment(builder =>
         {
-            var i = 0;
-            builder.OpenComponent(i++, type);
-            if (parameters is not null)
+            builder.OpenComponent(5, type);
+            if (parameters is not null && !reference.AreParametersRendered)
             {
-                if (!reference.AreParametersRendered)
+                foreach (var parameter in parameters)
                 {
-                    foreach (var parameter in parameters)
-                    {
-                        builder.AddAttribute(i++, parameter.Key, parameter.Value);
-                    }
-                    reference.AreParametersRendered = true;
+                    builder.AddAttribute(6, parameter.Key, parameter.Value);
                 }
-                else
-                {
-                    i += parameters.Count;
-                }
+                reference.AreParametersRendered = true;
             }
-            builder.AddComponentReferenceCapture(i++, component => reference.InjectDialog(component));
+            builder.AddComponentReferenceCapture(7, component => reference.InjectDialog(component));
             builder.CloseComponent();
         });
         var instance = new RenderFragment(builder =>
         {
             builder.OpenComponent<DialogInstance>(0);
             builder.SetKey(reference.Id);
-            builder.AddAttribute(1, nameof(DialogInstance.ChildContent), content);
-            builder.AddAttribute(2, nameof(DialogInstance.Id), reference.Id);
-            builder.AddAttribute(3, nameof(DialogInstance.Options), options ?? new());
-            builder.AddAttribute(4, nameof(DialogInstance.Title), title);
+            builder.AddAttribute(1, nameof(DialogInstance.Id), reference.Id);
+            builder.AddAttribute(2, nameof(DialogInstance.Options), options ?? new());
+            builder.AddAttribute(3, nameof(DialogInstance.Title), title);
+            builder.AddAttribute(4, nameof(DialogInstance.ChildContent), content);
             builder.CloseComponent();
         });
         reference.InjectRenderFragment(instance);
@@ -183,7 +267,7 @@ public class DialogService
     /// <returns>A reference to the dialog.</returns>
     public DialogReference Show<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TComponent>(
         DialogOptions options) where TComponent : ComponentBase
-        => Show<TComponent>(null, null, options);
+        => Show<TComponent>(title: null, null, options);
 
     /// <summary>
     /// Displays a dialog which presents the user with a message and returns a

@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.0
+### Added
+- `RenderFragment` support to `DialogService.Show`
+### Changed
+- Update to .NET 9, with multitargeting for .NET 8
+- `DataGrid.AddDialog` and `DataGrid.EditDialog` now expect a `RenderFragment` and `RenderFragment<TDataItem>`, respectively, to better support AOT compilation and trimming
+- `DataGrid.AddDialogParamaters` and `DataGrid.EditDialogParamaters` have been replaced by `DataGrid.AddDialogCallback` and `DataGrid.EditDialogCallback`, which do not return a value. Since the dialog properties are now `RenderFragment`s, they no longer support or require component parameters, but if you previously took advantage of these function properties to perform lazy loading of data, that behavior can be migrated to the new callbacks.
+### Fixed
+- `DateTime` and `DateTimeOffset` binding in `DateTimeInput`
+
 ## 3.3
 ### Fixed
 - Missing image editor file

@@ -83,8 +83,6 @@ public partial class MessageBox
 
     [CascadingParameter] private DialogInstance? DialogInstance { get; set; }
 
-    [Inject] private DialogService DialogService { get; set; } = default!;
-
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {

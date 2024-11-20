@@ -1,0 +1,24 @@
+<Dialog>
+    <ChildContent>
+        <TextInput @bind-Value="Item.FirstName" Label="First Name" />
+        <TextInput @bind-Value="Item.LastName" Label="Last Name" />
+        <Checkbox @bind-Value="Item.IsExecutive" Label="Executive" />
+        <DateTimeInput @bind-Value="Item.HireDate" Label="Hire Date" Format="d" />
+    </ChildContent>
+    <FooterContent>
+        <div class="message-box-buttons">
+            <button @onclick="OnCancelClicked" class="btn btn-text">Cancel</button>
+            <button @onclick="OnOkClicked" class="btn btn-text primary">Ok</button>
+        </div>
+    </FooterContent>
+</Dialog>
+
+@code {
+    [Parameter] public DataItem Item { get; set; } = new();
+
+    [CascadingParameter] private DialogInstance? DialogInstance { get; set; }
+
+    private void OnCancelClicked() => DialogInstance?.Close(DialogResult.DefaultCancel);
+
+    private void OnOkClicked() => DialogInstance?.Close(Item);
+}

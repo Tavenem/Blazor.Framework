@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using Tavenem.Blazor.Framework.Components.DataGrid;
@@ -418,6 +419,12 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// <summary>
     /// A function which retrieves the value of this column for a given data item (row).
     /// </summary>
+    /// <remarks>
+    /// Note: if this expression includes a cast or conversion (e.g. <c>x => (int)x.y</c>), it is
+    /// possible when using trimming with AOT compilation that a required type may be trimmed. If
+    /// this is found to be the case, the trimmer should be configured to ensure the required
+    /// type(s) and member(s) remain untrimmed.
+    /// </remarks>
     [Parameter] public Expression<Func<TDataItem, TValue?>>? Value { get; set; }
 
     private Action<TDataItem, TValue?>? ActualSetValue => SetValue ?? _defaultSetValue;
@@ -437,6 +444,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
     /// </summary>
     public Column() { }
 
+    [RequiresDynamicCode("Calls System.Linq.Expressions.Expression.GetFuncType(params Type[])")]
     internal Column(PropertyInfo property)
     {
         IsDefault = true;
@@ -518,6 +526,7 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         ParseValue(Value);
     }
 
+    [RequiresDynamicCode("Calls System.Linq.Expressions.Expression.GetFuncType(params Type[])")]
     internal Column(FieldInfo field)
     {
         IsDefault = true;
@@ -954,6 +963,10 @@ public class Column<TDataItem, TValue> : ComponentBase, IColumn<TDataItem>
         }
     }
 
+    [UnconditionalSuppressMessage(
+        "AOT",
+        "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+        Justification = "Occurs only with cast and convert expressions in Value, which is noted in comments.")]
     private void ParseValue(Expression<Func<TDataItem, TValue?>>? value)
     {
         _defaultSetValue = null;

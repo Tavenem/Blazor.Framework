@@ -59,32 +59,24 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     /// <summary>
     /// <para>
-    /// The type of a component to use as the add dialog.
+    /// The <see cref="RenderFragment"/> to use as the add dialog.
     /// </para>
     /// <para>
-    /// Must descend from <see cref="ComponentBase"/>.
+    /// Should consist of a single <see cref="Dialog"/> component, and when closed with an <see
+    /// cref="DialogChoice.Ok"/> result, <see cref="DialogResult.Data"/> should contain a new object
+    /// of type <typeparamref name="TDataItem"/>.
     /// </para>
     /// <para>
     /// When omitted, the <see cref="EditDialog"/> is used, if <see cref="AllowAdd"/> is <see
     /// langword="true"/>.
     /// </para>
     /// </summary>
-    [Parameter]
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-    public Type? AddDialog { get; set; }
+    [Parameter] public RenderFragment? AddDialog { get; set; }
 
     /// <summary>
-    /// <para>
-    /// If provided, this callback is used to fetch the parameters used for the <see
-    /// cref="AddDialog"/>.
-    /// </para>
-    /// <para>
-    /// The dialog also receives a parameter named "Item" which contains the edited item, unless the
-    /// dialog is being used to create a new item. This parameter is added to the result of this
-    /// callback, if it exists, or to a new <see cref="DialogParameters"/> instance if not.
-    /// </para>
+    /// If provided, this callback is invoked before showing the <see cref="AddDialog"/>.
     /// </summary>
-    [Parameter] public Func<Task<DialogParameters>>? AddDialogParameters { get; set; }
+    [Parameter] public Func<Task>? AddDialogCallback { get; set; }
 
     /// <summary>
     /// If provided, these options are used to configure the <see cref="AddDialog"/>.
@@ -222,38 +214,36 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
     /// <summary>
     /// <para>
-    /// The type of a component to use as the edit dialog for a row.
+    /// A <see cref="RenderFragment{TDataItem}"/> to use as the edit dialog for a row.
     /// </para>
     /// <para>
-    /// Must descend from <see cref="ComponentBase"/>.
+    /// Should consist of a single <see cref="Dialog"/> component. When closed with an <see
+    /// cref="DialogChoice.Ok"/> result, <see cref="DialogResult.Data"/> may contain a new object of
+    /// type <typeparamref name="TDataItem"/> which is to replace the edited item. If not, the
+    /// original row's data is presumed to have been updated in place.
     /// </para>
     /// <para>
-    /// Should have an optional (i.e. nullable) parameter of type <typeparamref name="TDataItem"/>
-    /// with the name "Item" which receives the item to be edited. This parameter is expected to be
-    /// <see langword="null"/> when the dialog is used to create a new item (if <see
-    /// cref="AllowAdd"/> is <see langword="true"/>).
+    /// The row's <typeparamref name="TDataItem"/> will be provided as a context parameter. This
+    /// parameter is expected to be <see langword="null"/> when the dialog is used to create a new
+    /// item (if <see cref="AllowAdd"/> is <see langword="true"/>).
     /// </para>
     /// <para>
-    /// If a component is provided, inline editing is disabled. Initiating a row edit will display
-    /// this component as a dialog.
+    /// If provided, inline editing is disabled. Initiating a row edit will display this fragment as
+    /// a dialog.
     /// </para>
     /// </summary>
-    [Parameter]
-    [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-    public Type? EditDialog { get; set; }
+    [Parameter] public RenderFragment<TDataItem>? EditDialog { get; set; }
 
     /// <summary>
     /// <para>
-    /// If provided, this callback is used to fetch the parameters used for the <see
-    /// cref="EditDialog"/>.
+    /// If provided, this callback is invoked before opening the <see cref="EditDialog"/>.
     /// </para>
     /// <para>
-    /// The dialog also receives a parameter named "Item" which contains the edited item, unless the
-    /// dialog is being used to create a new item. This parameter is added to the result of this
-    /// callback, if it exists, or to a new <see cref="DialogParameters"/> instance if not.
+    /// The callback receives the edited item as a parameter, which may be <see langword="null"/> if
+    /// the dialog is being used to create a new item.
     /// </para>
     /// </summary>
-    [Parameter] public Func<TDataItem?, Task<DialogParameters>>? EditDialogParameters { get; set; }
+    [Parameter] public Func<TDataItem?, Task>? EditDialogCallback { get; set; }
 
     /// <summary>
     /// If provided, these options are used to configure the <see cref="EditDialog"/>.
@@ -1633,48 +1623,57 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
 
         if (EditDialog is not null)
         {
-            DialogOptions? options = null;
-            if (EditDialogOptions is not null)
+            if (EditDialogCallback is not null)
             {
-                options = EditDialogOptions;
+                await EditDialogCallback.Invoke(row.Item);
             }
-            options ??= new();
-
-            DialogParameters? parameters = null;
-            if (EditDialogParameters is not null)
-            {
-                parameters = await EditDialogParameters.Invoke(row.Item);
-            }
-            (parameters ??= []).Add(nameof(Row<TDataItem>.Item), row.Item);
             var result = await DialogService.Show(
                 EditDialog,
+                row.Item,
                 "Edit",
-                parameters,
-                options).Result;
-            if (result.Choice == DialogChoice.Ok
-                && result.Data is TDataItem item)
+                EditDialogOptions ?? new()).Result;
+            if (result.Choice == DialogChoice.Ok)
             {
                 var success = true;
-                if (ItemSaved is not null)
+                if (result.Data is TDataItem item)
                 {
-                    success = await ItemSaved.Invoke(item);
-                }
-                if (success)
-                {
-                    if (LoadItems is null)
+                    if (ItemSaved is not null)
                     {
-                        Items.Remove(row.Item);
-                        Items.Add(item);
+                        success = await ItemSaved.Invoke(item);
                     }
-                    else if (CurrentDataPage is null)
+                    if (success)
+                    {
+                        if (LoadItems is null)
+                        {
+                            Items.Remove(row.Item);
+                            Items.Add(item);
+                        }
+                        else if (CurrentDataPage is null)
+                        {
+                            await LoadItemsAsync();
+                        }
+                        else if (CurrentDataPage.Items.Contains(row.Item))
+                        {
+                            CurrentDataPage.Items.Remove(row.Item);
+                            CurrentDataPage.Items.Add(item);
+                        }
+                    }
+                }
+                else
+                {
+                    if (ItemSaved is not null)
+                    {
+                        success = await ItemSaved.Invoke(row.Item);
+                    }
+                    if (success
+                        && LoadItems is not null
+                        && CurrentDataPage is null)
                     {
                         await LoadItemsAsync();
                     }
-                    else if (CurrentDataPage.Items.Contains(row.Item))
-                    {
-                        CurrentDataPage.Items.Remove(row.Item);
-                        CurrentDataPage.Items.Add(item);
-                    }
+                }
+                if (success)
+                {
                     await InvokeAsync(StateHasChanged);
                 }
             }
@@ -2552,36 +2551,54 @@ public partial class DataGrid<[DynamicallyAccessedMembers(
             }
         }
 
-        if (AddDialog is not null
-            || EditDialog is not null)
+        if (AddDialog is not null)
         {
-            DialogParameters? parameters = null;
-            if (AddDialogParameters is not null)
+            if (AddDialogCallback is not null)
             {
-                parameters = await AddDialogParameters.Invoke();
+                await AddDialogCallback.Invoke();
             }
-            else if (EditDialogParameters is not null)
-            {
-                parameters = await EditDialogParameters.Invoke(default);
-            }
-            parameters ??= [];
-
-            DialogOptions? options = null;
-            if (AddDialogOptions is not null)
-            {
-                options = AddDialogOptions;
-            }
-            else if (EditDialogOptions is not null)
-            {
-                options = EditDialogOptions;
-            }
-            options ??= new();
 
             var result = await DialogService.Show(
-                (AddDialog ?? EditDialog)!,
+                AddDialog,
                 "Add",
-                parameters,
-                options).Result;
+                AddDialogOptions ?? new()).Result;
+            if (result.Choice == DialogChoice.Ok
+                && result.Data is TDataItem item)
+            {
+                var success = true;
+                if (ItemAdded is not null)
+                {
+                    success = await ItemAdded.Invoke(item);
+                }
+                if (success)
+                {
+                    if (LoadItems is null)
+                    {
+                        Items.Add(item);
+                    }
+                    else if (CurrentDataPage is null)
+                    {
+                        await LoadItemsAsync();
+                    }
+                    else
+                    {
+                        CurrentDataPage.Items.Add(item);
+                    }
+                }
+            }
+        }
+        else if (EditDialog is not null)
+        {
+            if (EditDialogCallback is not null)
+            {
+                await EditDialogCallback.Invoke(default);
+            }
+
+            var result = await DialogService.Show(
+                EditDialog!,
+                default,
+                "Add",
+                EditDialogOptions ?? new()).Result;
             if (result.Choice == DialogChoice.Ok
                 && result.Data is TDataItem item)
             {

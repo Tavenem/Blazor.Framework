@@ -11,17 +11,16 @@ jobs:
         with:
           fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
       
-      - name: Setup .NET 8
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
           # Semantic version range syntax or exact version of a dotnet version
-          dotnet-version: '8.0.x'
-          include-prerelease: true
+          dotnet-version: '9.0.x'
       
-      - name: Use Node.js 20.x
+      - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
 
       - name: Install dependencies
         run: dotnet restore
