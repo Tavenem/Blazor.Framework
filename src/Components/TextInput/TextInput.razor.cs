@@ -476,8 +476,12 @@ public partial class TextInput : InputComponentBase<string>
         try
         {
             LoadedSuggestions = await LoadSuggestions(CurrentInput);
+            StateHasChanged();
         }
-        catch { }
+        catch
+        {
+            Console.WriteLine("Tavenem Blazor Framework: Error loading suggestions");
+        }
     }
 
     private async Task OnChangeAsync(ValueChangeEventArgs e)

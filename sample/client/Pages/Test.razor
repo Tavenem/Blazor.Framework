@@ -3,9 +3,27 @@
 
 <PageTitle>Test</PageTitle>
 
-<TextInput @bind-Value="_value" Label="Bound" Class="align-self-stretch" />
-<span>Bound value: @_value</span>
+<CodeExample RowClass="fill" Code="@(@"<TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" LoadSuggestions=""LoadSuggestedValues"">
+    <SuggestionTemplate>
+        <span>Suggestion #@context</span>
+    </SuggestionTemplate>
+</TextInput>
 
 @code {
-    private string? _value = "Example";
+    private Task<IEnumerable<KeyValuePair<string, object>>> LoadSuggestedValues(string value) => Task.FromResult(Enumerable
+        .Range(1, 5)
+        .Select(x => new KeyValuePair<string, object>($""Suggestion {x}"", x)));
+}")">
+    <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" LoadSuggestions="LoadSuggestedValues">
+        <SuggestionTemplate>
+            <span>Suggestion #@context</span>
+        </SuggestionTemplate>
+    </TextInput>
+</CodeExample>
+
+@code {
+    private Task<IEnumerable<KeyValuePair<string, object>>> LoadSuggestedValues(string value) => Task.FromResult(Enumerable
+        .Range(1, 5)
+        .Select(x => new KeyValuePair<string, object>($"Suggestion {x}", x))
+        .Where(x => x.Key.Contains(value, StringComparison.OrdinalIgnoreCase)));
 }

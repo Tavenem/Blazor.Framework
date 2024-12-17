@@ -395,6 +395,25 @@
     asynchronously.
 </p>
 
+<CodeExample RowClass="fill" Code="@(@"<TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" LoadSuggestions=""LoadSuggestedValues"">
+    <SuggestionTemplate>
+        <span>Suggestion #@context</span>
+    </SuggestionTemplate>
+</TextInput>
+
+@code {
+    private Task<IEnumerable<KeyValuePair<string, object>>> LoadSuggestedValues(string value) => Task.FromResult(Enumerable
+        .Range(1, 5)
+        .Select(x => new KeyValuePair<string, object>($""Suggestion {x}"", x))
+        .Where(x => x.Key.Contains(value, StringComparison.OrdinalIgnoreCase)));
+}")">
+    <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" LoadSuggestions="LoadSuggestedValues">
+        <SuggestionTemplate>
+            <span>Suggestion #@context</span>
+        </SuggestionTemplate>
+    </TextInput>
+</CodeExample>
+
 <p>
     Note that all three potential suggestion sources work together. You can have
     <code>Suggestions</code>, <code>SuggestionValues</code>, <em>and</em> load suggestions with
@@ -785,6 +804,10 @@
     private string? _value4 = "Start typing...";
     [Inject, System.Diagnostics.CodeAnalysis.NotNull] private DialogService? DialogService { get; set; }
     private string? _value5;
+    private Task<IEnumerable<KeyValuePair<string, object>>> LoadSuggestedValues(string value) => Task.FromResult(Enumerable
+        .Range(1, 5)
+        .Select(x => new KeyValuePair<string, object>($"Suggestion {x}", x))
+        .Where(x => x.Key.Contains(value, StringComparison.OrdinalIgnoreCase)));
     private async Task OnEnterAsync()
         => await DialogService.ShowMessageBox("You entered...", new() { Message = new(_value5 ?? string.Empty) });
 }

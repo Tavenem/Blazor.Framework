@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1
+### Fixed
+- `TextInput.LoadSuggestions`
+
 ## 4.0
 ### Added
 - `RenderFragment` support to `DialogService.Show`
