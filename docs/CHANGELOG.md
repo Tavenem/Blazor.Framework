@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2
+### Changed
+- Improved `ElementList` style
+
 ## 4.1
 ### Fixed
 - `TextInput.LoadSuggestions`

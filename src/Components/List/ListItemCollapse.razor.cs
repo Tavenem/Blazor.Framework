@@ -64,10 +64,6 @@ public partial class ListItemCollapse<TListItem>
         && ElementList?.ItemIsDisabled?.Invoke(ListItem.Item) == true);
 #pragma warning restore RCS1146 // Use conditional access.
 
-    private string? HeaderClass => new CssBuilder("header flex-wrap")
-        .Add("no-drag", ListItem?.IsListDraggable == true && !IsDraggable)
-        .ToString();
-
     private string HeaderId { get; set; } = Guid.NewGuid().ToHtmlId();
 
     private bool IsDraggable => ListItem?.GetIsDraggable() == true;
@@ -211,16 +207,6 @@ public partial class ListItemCollapse<TListItem>
     }
 
     private async Task OnClickAsync()
-    {
-        if (ListItem is not null
-            && ElementList is not null
-            && ElementList.SelectionType != SelectionType.None)
-        {
-            await ElementList.OnToggleItemSelectionAsync(ListItem.Item);
-        }
-    }
-
-    private protected async Task OnClickIconAsync()
     {
         if (ListItem is not null
             && ElementList is not null

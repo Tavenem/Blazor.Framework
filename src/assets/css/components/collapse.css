@@ -27,6 +27,7 @@
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
             display: flex;
+            flex-wrap: wrap;
             font-size: .9375rem;
             justify-content: space-between;
             list-style: none;
