@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.2
+## 4.2-4.3
 ### Changed
 - Improved `ElementList` style
 
