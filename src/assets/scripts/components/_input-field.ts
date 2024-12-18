@@ -492,6 +492,7 @@ slot {
             'data-input-style',
             'data-label',
             'display',
+            'placeholder',
             'readonly',
             'required',
             'value',
@@ -821,6 +822,14 @@ slot {
         } else if (name === 'data-input-style') {
             if (input) {
                 input.setAttribute('data-input-style', newValue || '');
+            }
+        } else if (name === 'placeholder') {
+            if (newValue) {
+                if (input) {
+                    input.setAttribute('placeholder', newValue);
+                }
+            } else if (input) {
+                input.removeAttribute('placeholder');
             }
         } else if (name === 'readonly') {
             if (input) {

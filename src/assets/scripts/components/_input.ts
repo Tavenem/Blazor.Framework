@@ -279,6 +279,7 @@ button.clear::-moz-focus-inner {
             'data-input-class',
             'data-input-style',
             'display',
+            'placeholder',
             'readonly',
             'required',
             'value',
@@ -630,6 +631,8 @@ button.clear::-moz-focus-inner {
             if (this._display !== newValue) {
                 this.display = newValue;
             }
+        } else if (name === 'placeholder') {
+            input.placeholder = newValue || '';
         } else if (name === 'readonly') {
             input.readOnly = (newValue != null);
         } else if (name === 'required') {
