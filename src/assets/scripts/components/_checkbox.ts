@@ -759,9 +759,81 @@ label {
         const isRadio = this.hasAttribute('radio');
 
         if (name === 'checked') {
-            if (!this._settingValue && newValue != null) {
-                this.checked = true;
+            if (this._settingValue) {
+                return;
             }
+            if (newValue != null) {
+                if (input.checked) {
+                    return;
+                }
+                this._settingValue = true;
+                this._checked = true;
+                input.checked = true;
+                this._indeterminate = false;
+                input.indeterminate = false;
+                this._internals.setFormValue(isRadio ? this._value : 'true');
+                this._internals.ariaChecked = 'true';
+                this._internals.states.add('checked');
+                this._internals.states.delete('indeterminate');
+                if (isRadio) {
+                    if (this.tabIndex < 0) {
+                        this.tabIndex = this._tabIndex;
+                    }
+                } else {
+                    input.value = 'true';
+                }
+            } else if (!isRadio && this._indeterminate) {
+                if (input.indeterminate) {
+                    return;
+                }
+                this._settingValue = true;
+                this._checked = false;
+                input.checked = false;
+                this._indeterminate = true;
+                input.indeterminate = true;
+                this._internals.setFormValue(null);
+                this._internals.ariaChecked = 'mixed';
+                this._internals.states.delete('checked');
+                this._internals.states.add('indeterminate');
+                input.value = '';
+            } else {
+                if (!input.checked && !input.indeterminate) {
+                    return;
+                }
+                this._settingValue = true;
+                this._checked = false;
+                input.checked = false;
+                this._indeterminate = false;
+                input.indeterminate = false;
+                this._internals.setFormValue(isRadio ? null : 'false');
+                this._internals.ariaChecked = 'false';
+                this._internals.states.delete('checked');
+                this._internals.states.delete('indeterminate');
+                if (isRadio) {
+                    if (this.tabIndex >= 0) {
+                        this.tabIndex = -1;
+                    }
+                } else {
+                    input.value = 'false';
+                }
+            }
+
+            this.setValidity(input);
+
+            if (this._checked && isRadio && this.hasAttribute('name')) {
+                const name = this.getAttribute('name');
+                if (name) {
+                    document
+                        .querySelectorAll<TavenemCheckboxHtmlElement>(`tf-checkbox[name="${name}"]`)
+                        .forEach(x => {
+                            if (x.checked && x != this) {
+                                x.checked = false;
+                            }
+                        });
+                }
+            }
+
+            this._settingValue = false;
         } else if (name === 'data-allow-null') {
             if ((newValue != null)
                 && this.hasAttribute('indeterminate')
@@ -784,7 +856,7 @@ label {
         } else if (name === 'indeterminate') {
             if (input.indeterminate != (newValue != null)) {
                 this._settingValue = true;
-                if (newValue) {
+                if (newValue != null) {
                     this._checked = false;
                     input.checked = false;
                     this._indeterminate = true;
@@ -841,10 +913,6 @@ label {
                 this.value = newValue || '';
             }
         } else if (name === 'data-label') {
-            const root = this.shadowRoot;
-            if (!root) {
-                return;
-            }
             const label = root.querySelector('label');
             if (label) {
                 if (newValue != null && newValue.length) {

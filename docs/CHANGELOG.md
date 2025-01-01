@@ -1,6 +1,10 @@
 # Changelog
 
-## 4.2-4.4
+## 4.5
+### Fixed
+- Checkbox binding
+
+## 4.4
 ### Changed
 - Make `placeholder` attribute responsive to binding changes
 

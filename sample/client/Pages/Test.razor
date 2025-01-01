@@ -3,27 +3,11 @@
 
 <PageTitle>Test</PageTitle>
 
-<CodeExample RowClass="fill" Code="@(@"<TextInput Label=""Suggestions"" HelpText=""Start typing to get suggestions"" LoadSuggestions=""LoadSuggestedValues"">
-    <SuggestionTemplate>
-        <span>Suggestion #@context</span>
-    </SuggestionTemplate>
-</TextInput>
+<Checkbox @bind-Value="value" Label="Value" />
+<button @onclick="() => value = false">False</button>
+<button @onclick="() => value = null">Null</button>
+<button @onclick="() => value = true">True</button>
 
 @code {
-    private Task<IEnumerable<KeyValuePair<string, object>>> LoadSuggestedValues(string value) => Task.FromResult(Enumerable
-        .Range(1, 5)
-        .Select(x => new KeyValuePair<string, object>($""Suggestion {x}"", x)));
-}")">
-    <TextInput Label="Suggestions" HelpText="Start typing to get suggestions" LoadSuggestions="LoadSuggestedValues">
-        <SuggestionTemplate>
-            <span>Suggestion #@context</span>
-        </SuggestionTemplate>
-    </TextInput>
-</CodeExample>
-
-@code {
-    private Task<IEnumerable<KeyValuePair<string, object>>> LoadSuggestedValues(string value) => Task.FromResult(Enumerable
-        .Range(1, 5)
-        .Select(x => new KeyValuePair<string, object>($"Suggestion {x}", x))
-        .Where(x => x.Key.Contains(value, StringComparison.OrdinalIgnoreCase)));
+    private bool? value = null;
 }
