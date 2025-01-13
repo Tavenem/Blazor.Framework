@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.6
+### Changed
+- Added `popup` parameter to `UtilityService.OpenUrlAsync`
+
 ## 4.5
 ### Fixed
 - Checkbox binding

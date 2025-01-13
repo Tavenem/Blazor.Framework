@@ -235,22 +235,33 @@ public class UtilityService(IJSRuntime jsRuntime) : IAsyncDisposable
     /// langword="true"/>; the value of the <paramref name="noopener"/> parameter is ignored.
     /// </para>
     /// </param>
+    /// <param name="popup">
+    /// By default, this opens the page in a new tab. If <paramref name="popup"/> is set to <see
+    /// langword="true"/>, it requests that a minimal popup window be used. The UI features included
+    /// in the popup window will be automatically decided by the browser, generally including an
+    /// address bar only.
+    /// </param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     public async ValueTask OpenUrlAsync(
         string? url,
         string? target = null,
         bool noopener = false,
         bool noreferrer = false,
+        bool popup = false,
         CancellationToken cancellationToken = default)
     {
         string? features = null;
         if (noreferrer)
         {
-            features = "noreferrer";
+            features = popup ? "noreferrer,popup" : "noreferrer";
         }
         else if (noopener)
         {
-            features = "noopener";
+            features = popup ? "noopener,popup" : "noopener";
+        }
+        else if (popup)
+        {
+            features = "popup";
         }
 
         try
