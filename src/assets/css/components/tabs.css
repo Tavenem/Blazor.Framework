@@ -146,6 +146,10 @@ tf-tab {
         width: 100%;
     }
 
+    &.icon {
+        min-width: 0;
+    }
+
     &:active:after {
         transform: scale(0,0);
         opacity: .1;

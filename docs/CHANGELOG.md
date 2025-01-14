@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.7
+### Added
+- Icon tabs
+
 ## 4.6
 ### Changed
 - Added `popup` parameter to `UtilityService.OpenUrlAsync`
