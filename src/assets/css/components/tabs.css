@@ -24,7 +24,7 @@
             display: flex;
             flex-grow: 1;
 
-            tf-tabpanbel {
+            tf-tabpanel {
                 flex-grow: 1;
             }
         }
