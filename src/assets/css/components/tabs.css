@@ -23,6 +23,10 @@
         .tab-panels {
             display: flex;
             flex-grow: 1;
+
+            tf-tabpanbel {
+                flex-grow: 1;
+            }
         }
     }
 

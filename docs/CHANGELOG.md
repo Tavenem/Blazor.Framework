@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.9
+### Changed
+- Improve tab styles when docked left or right
+
 ## 4.8
 ### Added
 - Allow styling tabs with `TabPanel` declaration
