@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.8
+### Added
+- Allow styling tabs with `TabPanel` declaration
+
 ## 4.7
 ### Added
 - Icon tabs

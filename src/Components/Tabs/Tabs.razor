@@ -25,9 +25,11 @@
                         {
                             var index = i;
                             <Tab @key="@_panels[index].Id"
+                                 Class="@_panels[index].Class"
                                  Id="@_panels[index].Id"
                                  IsDraggable="false"
                                  IsDropTarget="false"
+                                 Style="@_panels[index].Style"
                                  TabPanel="_panels[index]" />
                         }
                         @if (Items is not null
