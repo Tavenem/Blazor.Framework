@@ -13,7 +13,8 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The numeric type bound to the input value.
 /// </typeparam>
-public partial class NumericInput<TValue> : InputComponentBase<TValue>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
+public partial class NumericInput<TValue>() : InputComponentBase<TValue>
 {
     private static readonly bool _isClearable, _isFloatingPoint;
     private static readonly TValue _maxDefault, _minDefault, _one, _zero;
@@ -52,7 +53,7 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// Defaults to the maximum for <typeparamref name="TValue"/>.
     /// </para>
     /// </summary>
-    [Parameter] public TValue Max { get; set; }
+    [Parameter] public TValue Max { get; set; } = _maxDefault;
 
     /// <summary>
     /// <para>
@@ -62,7 +63,7 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
     /// Defaults to the minimum for <typeparamref name="TValue"/>.
     /// </para>
     /// </summary>
-    [Parameter] public TValue Min { get; set; }
+    [Parameter] public TValue Min { get; set; } = _minDefault;
 
     /// <summary>
     /// Displayed after the input.
@@ -314,15 +315,6 @@ public partial class NumericInput<TValue> : InputComponentBase<TValue>
         {
             throw new InvalidOperationException($"Type {targetType.Name} is not supported");
         }
-    }
-
-    /// <summary>
-    /// Constructs a new instance of <see cref="NumericInput{TValue}"/>.
-    /// </summary>
-    public NumericInput()
-    {
-        Max = _maxDefault;
-        Min = _minDefault;
     }
 
     /// <inheritdoc/>

@@ -10,7 +10,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A rich text editor which supports any content type.
 /// </summary>
-public partial class Editor : FormComponentBase<string>, IAsyncDisposable
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
+public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
 {
     private IJSObjectReference? _module;
 

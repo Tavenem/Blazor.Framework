@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Services;
 
@@ -8,7 +9,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A checkbox input component.
 /// </summary>
-public partial class Checkbox<TValue> : BoolInputComponentBase<TValue>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ToggleEventArgs))]
+public partial class Checkbox<TValue>() : BoolInputComponentBase<TValue>
 {
     /// <summary>
     /// The icon to use for the checked state.

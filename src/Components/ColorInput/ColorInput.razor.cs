@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Services;
@@ -165,6 +166,7 @@ public partial class ColorInput<TValue> : PickerComponentBase<TValue>
     /// <summary>
     /// Constructs a new instance of <see cref="ColorInput{TValue}"/>.
     /// </summary>
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
     public ColorInput()
     {
         _nullableType = Nullable.GetUnderlyingType(typeof(TValue));

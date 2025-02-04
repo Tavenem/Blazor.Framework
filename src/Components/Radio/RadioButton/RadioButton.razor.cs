@@ -9,7 +9,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A radio button input component.
 /// </summary>
-public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ToggleEventArgs))]
+public partial class RadioButton<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TValue>()
     : BoolInputComponentBase<TValue>
 {
     /// <summary>

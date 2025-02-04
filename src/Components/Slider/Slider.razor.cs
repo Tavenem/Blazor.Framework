@@ -13,7 +13,11 @@ namespace Tavenem.Blazor.Framework;
 /// <typeparam name="TValue">
 /// The numeric type bound to the input value.
 /// </typeparam>
-public partial class Slider<TValue> : FormComponentBase<TValue>
+/// <remarks>
+/// Constructs a new instance of <see cref="Slider{TValue}"/>.
+/// </remarks>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
+public partial class Slider<TValue>() : FormComponentBase<TValue>
 {
     private static readonly TValue _maxDefault, _maxType, _minDefault, _minType, _zero;
     private static readonly bool _isFloatingPoint;
@@ -45,7 +49,7 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     /// Defaults to 100.
     /// </para>
     /// </summary>
-    [Parameter] public TValue Max { get; set; }
+    [Parameter] public TValue Max { get; set; } = _maxDefault;
 
     /// <summary>
     /// <para>
@@ -55,7 +59,7 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
     /// Defaults to zero.
     /// </para>
     /// </summary>
-    [Parameter] public TValue Min { get; set; }
+    [Parameter] public TValue Min { get; set; } = _minDefault;
 
     /// <summary>
     /// <para>
@@ -219,15 +223,6 @@ public partial class Slider<TValue> : FormComponentBase<TValue>
         {
             throw new InvalidOperationException($"Type {targetType.Name} is not supported");
         }
-    }
-
-    /// <summary>
-    /// Constructs a new instance of <see cref="Slider{TValue}"/>.
-    /// </summary>
-    public Slider()
-    {
-        Max = _maxDefault;
-        Min = _minDefault;
     }
 
     /// <inheritdoc/>

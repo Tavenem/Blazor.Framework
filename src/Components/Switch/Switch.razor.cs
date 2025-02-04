@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Services;
 
@@ -7,7 +8,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A boolean toggle input component.
 /// </summary>
-public partial class Switch : BoolInputComponentBase<bool>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ToggleEventArgs))]
+public partial class Switch() : BoolInputComponentBase<bool>
 {
     /// <summary>
     /// An optional icon to display in the checked state.

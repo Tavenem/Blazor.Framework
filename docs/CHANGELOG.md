@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.11
+### Fixed
+- Prevent trimmer from removing EventArgs derived types
+
 ## 4.9-10
 ### Changed
 - Improve tab styles when docked left or right

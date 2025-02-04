@@ -9,7 +9,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A tab control component.
 /// </summary>
-public partial class Tabs<TTabItem> : PersistentComponentBase
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
+public partial class Tabs<TTabItem>() : PersistentComponentBase
 {
     private const string ActivePanelQueryParamName = "t";
 

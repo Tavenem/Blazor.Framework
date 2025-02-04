@@ -14,13 +14,14 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// <typeparam name="TDataItem">The type of data item.</typeparam>
 /// <typeparam name="TValue">The type of bound value.</typeparam>
 /// <typeparam name="TValueItem">The type of individual bound value items.</typeparam>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
 public abstract class DataGridSelectBase<
     [DynamicallyAccessedMembers(
         DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
         | DynamicallyAccessedMemberTypes.PublicFields
         | DynamicallyAccessedMemberTypes.PublicProperties)] TDataItem,
     TValue,
-    TValueItem>
+    TValueItem>()
     : PickerComponentBase<TValue>, IDataGridSelect<TDataItem>
 {
     private protected readonly List<IColumn<TDataItem>> _columns = [];

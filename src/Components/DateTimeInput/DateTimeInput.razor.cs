@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Tavenem.Blazor.Framework.Components.Forms;
 using Tavenem.Blazor.Framework.Services;
@@ -342,6 +343,7 @@ public partial class DateTimeInput<TValue> : PickerComponentBase<TValue>
     /// <summary>
     /// Constructs a new instance of <see cref="DateTimeInput{TValue}"/>.
     /// </summary>
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
     public DateTimeInput()
     {
         _nullableType = Nullable.GetUnderlyingType(typeof(TValue));

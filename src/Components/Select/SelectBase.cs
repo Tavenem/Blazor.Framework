@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Services;
 
 namespace Tavenem.Blazor.Framework.Components.Forms;
@@ -12,7 +13,8 @@ namespace Tavenem.Blazor.Framework.Components.Forms;
 /// <typeparam name="TOption">
 /// The type of option values.
 /// </typeparam>
-public abstract class SelectBase<TValue, TOption>
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
+public abstract class SelectBase<TValue, TOption>()
     : PickerComponentBase<TValue>, ISelect<TOption>
 {
     private protected readonly List<Option<TOption>> _options = [];

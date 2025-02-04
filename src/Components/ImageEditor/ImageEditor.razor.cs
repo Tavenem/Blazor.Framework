@@ -8,7 +8,10 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// An image editor component.
 /// </summary>
-public partial class ImageEditor : IAsyncDisposable
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(CropEventArgs))]
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(StreamEventArgs))]
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ToggleEventArgs))]
+public partial class ImageEditor() : IAsyncDisposable
 {
     private IJSObjectReference? _module;
 

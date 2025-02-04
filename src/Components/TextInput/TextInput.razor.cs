@@ -367,6 +367,7 @@ public partial class TextInput : InputComponentBase<string>
     /// <summary>
     /// Constructs a new instance of <see cref="TextInput"/>.
     /// </summary>
+    [method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
     public TextInput() => _suggestionTimer = new(GetSuggestionsAsync, 300);
 
     /// <inheritdoc/>

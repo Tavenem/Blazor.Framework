@@ -10,7 +10,8 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// Displays controls to navigate between pages.
 /// </summary>
-public partial class Pagination : PersistentComponentBase
+[method: DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ValueChangeEventArgs))]
+public partial class Pagination() : PersistentComponentBase
 {
     private const string CurrentPageQueryParamName = "p";
     private const string PageCountQueryParamName = "c";
