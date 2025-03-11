@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.12
+### Fixed
+- Respond properly to null binding change
+
 ## 4.11
 ### Fixed
 - Prevent trimmer from removing EventArgs derived types

@@ -272,7 +272,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 input.required = (newValue != null);
             }
             this.setValidity();
-        } else if (name === 'value' && newValue) {
+        } else if (name === 'value') {
             this.setValue(newValue);
         } else if (name === 'data-syntax') {
             if (newValue && syntaxes.includes(newValue as any)) {

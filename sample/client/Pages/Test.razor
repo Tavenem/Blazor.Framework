@@ -3,11 +3,14 @@
 
 <PageTitle>Test</PageTitle>
 
-<Checkbox @bind-Value="value" Label="Value" />
-<button @onclick="() => value = false">False</button>
+<TextInput @bind-Value="@value" Label="Value" />
+<button @onclick="SetTest">test</button>
 <button @onclick="() => value = null">Null</button>
-<button @onclick="() => value = true">True</button>
 
 @code {
-    private bool? value = null;
+    private string? value = null;
+    private void SetTest()
+    {
+        value = "test";
+    }
 }

@@ -884,8 +884,7 @@ slot {
                 this.display = newValue;
             }
             return;
-        } else if (name === 'value'
-            && newValue) {
+        } else if (name === 'value') {
             this.setValue(newValue);
             return;
         }
