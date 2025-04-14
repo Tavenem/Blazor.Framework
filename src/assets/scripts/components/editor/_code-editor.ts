@@ -83,9 +83,17 @@ export class TavenemCodeEditor implements Editor {
 
     getSelectedText() {
         if (this._editor) {
-            return this._editor.view.state.sliceDoc(
-                this._editor.view.state.selection.ranges.map(v => v.from).reduce((p, v) => (p < v ? p : v)),
-                this._editor.view.state.selection.ranges.map(v => v.to).reduce((p, v) => (p > v ? p : v)));
+            const position = this._editor.view.state.selection.main.from;
+            return {
+                position,
+                rawTextFrom: position,
+                rawTextTo: this._editor.view.state.selection.main.to,
+                text: this._editor.view.state.sliceDoc(
+                    this._editor.view.state.selection.ranges.map(v => v.from).reduce((p, v) => (p < v ? p : v)),
+                    this._editor.view.state.selection.ranges.map(v => v.to).reduce((p, v) => (p > v ? p : v))),
+            };
+        } else {
+            return { position: -1, rawTextFrom: -1, rawTextTo: -1, text: null };
         }
     }
 

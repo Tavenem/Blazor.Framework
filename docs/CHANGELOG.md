@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.13
+### Changed
+- Custom editor buttons now receive richer status information.
+
 ## 4.12
 ### Fixed
 - Respond properly to null binding change

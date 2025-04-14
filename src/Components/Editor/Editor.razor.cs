@@ -243,24 +243,25 @@ public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
             return;
         }
 
-        string? value = null;
+        SelectedEditorText value = new();
         try
         {
-            value = await _module.InvokeAsync<string?>("getSelectedText", Id);
+            value = await _module.InvokeAsync<SelectedEditorText>("getSelectedText", Id);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }
         catch (TaskCanceledException) { }
         catch (ObjectDisposedException) { }
 
+        string? newValue = null;
         if (button.Action is not null)
         {
-            value = button.Action.Invoke(value);
+            newValue = button.Action.Invoke(value);
         }
 
         if (button.AsyncAction is not null)
         {
-            value = await button.AsyncAction.Invoke(value);
+            newValue = await button.AsyncAction.Invoke(value);
         }
 
         try
@@ -268,7 +269,7 @@ public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
             await _module.InvokeVoidAsync(
                 "updateSelectedText",
                 Id,
-                value);
+                newValue);
         }
         catch (JSException) { }
         catch (JSDisconnectedException) { }

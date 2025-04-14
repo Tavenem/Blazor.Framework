@@ -196,11 +196,6 @@ const isBlock: (node: HTMLElement) => boolean = (node) => {
 export const commonNodes: { [name in string]: NodeSpec } = {
     doc: { content: "(flow | form | address_content | headerfooter | heading_content | main_text | main | sectioning)+ | html", whitespace: "pre" },
     text: { group: "phrasing" },
-    phrasing_wrapper: {
-        content: "(text | phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
-        group: "flow",
-        toDOM() { return ['phrasing-wrapper', 0]; },
-    },
     paragraph: {
         attrs: commonAttrs,
         content: "(phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
@@ -208,6 +203,11 @@ export const commonNodes: { [name in string]: NodeSpec } = {
         //whitespace: "pre",
         parseDOM: [{ tag: "p", getAttrs: getCommonAttrs }],
         toDOM(node) { return nodeToDomWithCommonAttrs(node, "p"); }
+    },
+    phrasing_wrapper: {
+        content: "(text | phrasing | audio | button | input_content | video | progress | meter | output | label | image)*",
+        group: "flow",
+        toDOM() { return ['phrasing-wrapper', 0]; },
     },
     blockquote_text: {
         alternate: 'blockquote',

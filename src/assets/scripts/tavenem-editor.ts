@@ -6,11 +6,13 @@
     }
 }
 
-export function getSelectedText(elementId: string): string | undefined {
+export function getSelectedText(elementId: string): { position: number, rawTextPosition: number, text: string | null } {
     const editor = document.getElementById(elementId) as any;
     if (editor
         && typeof editor.getSelectedText === 'function') {
         return editor.getSelectedText();
+    } else {
+        return { position: -1, rawTextPosition: -1, text: null };
     }
 }
 

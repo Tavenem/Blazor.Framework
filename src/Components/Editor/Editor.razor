@@ -26,7 +26,7 @@
            @onvalueinput="OnInput"
            @onvaluechange="OnChange">
     @ChildContent
-    @if (CustomToolbarButtons is not null)
+    @if (CustomToolbarButtons is not null && IsInteractive)
     {
         foreach (var customButton in CustomToolbarButtons)
         {

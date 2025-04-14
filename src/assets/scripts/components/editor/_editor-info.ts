@@ -37,6 +37,13 @@ export interface EditorInfo {
     update: (data: UpdateInfo) => void;
 }
 
+export interface SelectedText {
+    position: number;
+    rawTextFrom: number;
+    rawTextTo: number;
+    text: string | null;
+}
+
 export interface Editor {
     get isWYSIWYG(): boolean;
 
@@ -46,7 +53,7 @@ export interface Editor {
     dispose(): void;
     focus(): void;
     getContent(): string | undefined;
-    getSelectedText(): string | undefined;
+    getSelectedText(): SelectedText;
     initializeEditor(
         root: Element,
         element: HTMLElement,

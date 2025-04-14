@@ -1,8 +1,8 @@
-import { html_beautify } from "js-beautify";
+﻿import { html_beautify } from "js-beautify";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
-import { DOMParser as PMDOMParser, Node } from 'prosemirror-model';
-import { EditorState, Plugin, Selection, Transaction } from "prosemirror-state";
+import { DOMParser as PMDOMParser, Node, Fragment, Slice } from 'prosemirror-model';
+import { EditorState, Plugin, Selection, TextSelection, Transaction } from "prosemirror-state";
 import { InputRule, inputRules } from "prosemirror-inputrules";
 import { buildInputRules, buildKeymap } from "prosemirror-example-setup";
 import { baseKeymap, chainCommands, deleteSelection, joinBackward, selectNodeBackward } from "prosemirror-commands";
@@ -155,6 +155,8 @@ const handlebarsInputRule = new InputRule(/(?<!\\){{(.+)(?<!\\)}}$/, (state, mat
 
 const handlebarsPlugin = inputRules({ rules: [handlebarsInputRule] });
 
+const MARKER = '█';
+
 interface WysiwygEditorInfo extends EditorInfo {
     commands: CommandSet;
     isMarkdown: boolean;
@@ -226,7 +228,15 @@ export class TavenemWysiwygEditor implements Editor {
     getSelectedText() {
         if (this._editor) {
             const { from, to } = this._editor.view.state.selection;
-            return this._editor.view.state.doc.textBetween(from, to, " ");
+            const rawTextPosition = this.projectToMarkdown(this._editor.view.state.doc, from, to);
+            return {
+                position: from,
+                rawTextFrom: rawTextPosition.from,
+                rawTextTo: rawTextPosition.to,
+                text: this._editor.view.state.doc.textBetween(from, to, " "),
+            };
+        } else {
+            return { position: -1, rawTextFrom: -1, rawTextTo: -1, text: null };
         }
     }
 
@@ -414,7 +424,7 @@ export class TavenemWysiwygEditor implements Editor {
             return;
         }
         if (value) {
-            let content;
+            let content: Node;
             if (this._editor.isMarkdown) {
                 content = tavenemMarkdownParser.parse(value);
             } else {
@@ -424,12 +434,15 @@ export class TavenemWysiwygEditor implements Editor {
                     .fromSchema(this._editor.view.state.schema)
                     .parse(div);
             }
+            const { $anchor, $head } = this._editor.view.state.selection;
+            const tr = this._editor.view.state.tr;
+            tr.replaceRangeWith(
+                0,
+                this._editor.view.state.doc.content.size,
+                content);
+            tr.setSelection(TextSelection.create(tr.doc, $anchor.pos, $head.pos));
             this._editor.view.updateState(
-                this._editor.view.state.apply(
-                    this._editor.view.state.tr.replaceRangeWith(
-                        0,
-                        this._editor.view.state.doc.content.size,
-                        content)));
+                this._editor.view.state.apply(tr));
         } else {
             this._editor.view.updateState(
                 this._editor.view.state.apply(
@@ -447,9 +460,43 @@ export class TavenemWysiwygEditor implements Editor {
         if (!value || !value.length) {
             deleteSelection(this._editor.view.state, this._editor.view.dispatch);
         } else {
-            const node = this._editor.view.state.schema.text(value);
+            let content: Node;
+            if (this._editor.isMarkdown) {
+                content = tavenemMarkdownParser.parse(value);
+            } else {
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                content = PMDOMParser
+                    .fromSchema(this._editor.view.state.schema)
+                    .parse(div);
+            }
+            const stack = [];
+            while (content.childCount === 1
+                && content.firstChild
+                && !content.firstChild.isInline) {
+                stack.push(content.firstChild);
+                content = content.firstChild;
+            }
+            const $from = this._editor.view.state.selection.$from;
+            const contentMatch = $from.parent.contentMatchAt($from.index());
+            while (stack.length > 0 && !contentMatch.findWrapping(content.type)) {
+                content = stack.pop()!;
+            }
+            let replacement: Node | readonly Node[] = content;
+            if (content.type === $from.parent.type
+                && content.childCount > 0) {
+                const children: Node[] = [];
+                for (let i = 0; i < content.childCount; i++) {
+                    children.push(content.child(i));
+                }
+                replacement = children;
+            }
             const newState = this._editor.view.state.apply(
-                this._editor.view.state.tr.replaceSelectionWith(node));
+                this._editor.view.state.tr.replaceWith(
+                    this._editor.view.state.selection.from,
+                    this._editor.view.state.selection.to,
+                    replacement));
+                //this._editor.view.state.tr.replaceSelectionWith(content));
             this._editor.view.updateState(newState);
         }
 
@@ -490,6 +537,40 @@ export class TavenemWysiwygEditor implements Editor {
         }
 
         this._editor.debounce = setTimeout(this.onInput.bind(this), 500);
+    }
+
+    private projectToMarkdown(node: Node, from: number, to: number): { from: number, to: number } {
+        const posFrom = node.resolve(from);// + 1); // prosemirror counts position from "1"
+        const posTo = node.resolve(to);// + 1);
+
+        const markerFrom = Fragment.from(schema.text(MARKER, posFrom.marks()));
+        const markerTo = Fragment.from(schema.text(MARKER, posTo.marks()));
+
+        let withMarkers: Node = node;
+        if (node.canReplace(posFrom.index(), posFrom.index(), markerFrom, posFrom.pos, posFrom.pos)) {
+            if (node.canReplace(posTo.index(), posTo.index(), markerTo, posTo.pos, posTo.pos)) {
+                withMarkers = node
+                    .replace(posTo.pos, posTo.pos, new Slice(markerTo, 0, 0));
+            }
+            withMarkers = withMarkers
+                .replace(posFrom.pos, posFrom.pos, new Slice(markerFrom, 0, 0));
+        }
+
+        const markdown = tavenemMarkdownSerializer.serialize(withMarkers);
+        const fromIndex = markdown.indexOf(MARKER);
+        if (fromIndex < 0) {
+            return { from: -1, to: -1 };
+        };
+        let toIndex = markdown.indexOf(MARKER, fromIndex + 1);
+        if (toIndex < 0) {
+            toIndex = fromIndex;
+        } else {
+            toIndex--;
+        }
+        return {
+            from: fromIndex,
+            to: toIndex,
+        };
     }
 }
 

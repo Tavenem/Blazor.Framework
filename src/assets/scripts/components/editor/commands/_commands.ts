@@ -1201,9 +1201,6 @@ function wrapOrInsert(
                     return true;
                 }
 
-                const fromIndex = $from.index(),
-                    toIndex = $to.index();
-
                 if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
                     if (range.parent.type.name == nodeType.name) {
                         const content = nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
@@ -1219,7 +1216,7 @@ function wrapOrInsert(
                         }
                     }
 
-                    if (range.parent.canReplaceWith($from.index(), $to.index(), nodeType, $from.parent.marks)) {
+                    if (range.parent.canReplaceWith(range.startIndex, range.endIndex, nodeType, $from.parent.marks)) {
                         const content = nodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
                         if (content) {
                             if (dispatch) {
@@ -1235,7 +1232,7 @@ function wrapOrInsert(
                 }
 
                 if ($from.pos === $to.pos
-                    && $from.parent.canReplaceWith(fromIndex, toIndex, nodeType)) {
+                    && $from.parent.canReplaceWith($from.index(), $to.index(), nodeType)) {
                     if (dispatch) {
                         dispatch(state.tr.replaceWith(
                             $from.pos,
@@ -1287,9 +1284,6 @@ function wrapOrInsertInlinePhrasingOrFlow(
                     return true;
                 }
 
-                const fromIndex = $from.index(),
-                    toIndex = $to.index();
-
                 if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
                     if (range.parent.type.name == flowNodeType.name) {
                         const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
@@ -1305,7 +1299,7 @@ function wrapOrInsertInlinePhrasingOrFlow(
                         }
                     }
 
-                    if (range.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType, $from.parent.marks)) {
+                    if (range.parent.canReplaceWith(range.startIndex, range.endIndex, phrasingNodeType, $from.parent.marks)) {
                         const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
                         if (content) {
                             if (dispatch) {
@@ -1319,7 +1313,7 @@ function wrapOrInsertInlinePhrasingOrFlow(
                         }
                     }
 
-                    if (range.parent.canReplaceWith(fromIndex, toIndex, flowNodeType, $from.parent.marks)) {
+                    if (range.parent.canReplaceWith(range.startIndex, range.endIndex, flowNodeType, $from.parent.marks)) {
                         const content = flowNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
                         if (content) {
                             if (dispatch) {
@@ -1335,6 +1329,9 @@ function wrapOrInsertInlinePhrasingOrFlow(
                 }
 
                 if ($from.pos === $to.pos) {
+                    const fromIndex = $from.index(),
+                        toIndex = $to.index();
+
                     if ($from.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType)) {
                         const content = phrasingNodeType.createAndFill(attrs, state.schema.text(' '));
                         if (content) {
@@ -1371,7 +1368,7 @@ function wrapOrInsertInlinePhrasingOrFlow(
                         ? state.schema.nodes[$from.parent.type.spec.alternate]
                         : null;
                     if (alternate
-                        && range.parent.canReplaceWith(fromIndex, toIndex, alternate, $from.parent.marks)) {
+                        && range.parent.canReplaceWith(range.startIndex, range.endIndex, alternate, $from.parent.marks)) {
                         if ($from.parent.content.size === 0) {
                             if (alternate.contentMatch.matchType(phrasingNodeType)) {
                                 const node = alternate.createAndFill(attrs, phrasingNodeType.createAndFill(attrs, state.schema.text(' ')), $from.parent.marks);
@@ -1484,9 +1481,6 @@ function wrapOrInsertPhrasingOrFlow(
                     return true;
                 }
 
-                const fromIndex = $from.index(),
-                    toIndex = $to.index();
-
                 if ($from.parent.type.name == state.schema.nodes.paragraph.name) {
                     if (range.parent.type.name == flowNodeType.name) {
                         const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
@@ -1502,7 +1496,7 @@ function wrapOrInsertPhrasingOrFlow(
                         }
                     }
 
-                    if (range.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType, $from.parent.marks)) {
+                    if (range.parent.canReplaceWith(range.startIndex, range.endIndex, phrasingNodeType, $from.parent.marks)) {
                         const content = phrasingNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
                         if (content) {
                             if (dispatch) {
@@ -1516,7 +1510,7 @@ function wrapOrInsertPhrasingOrFlow(
                         }
                     }
 
-                    if (range.parent.canReplaceWith(fromIndex, toIndex, flowNodeType, $from.parent.marks)) {
+                    if (range.parent.canReplaceWith(range.startIndex, range.endIndex, flowNodeType, $from.parent.marks)) {
                         const content = flowNodeType.createAndFill(attrs, $from.parent.content, $from.parent.marks);
                         if (content) {
                             if (dispatch) {
@@ -1532,6 +1526,9 @@ function wrapOrInsertPhrasingOrFlow(
                 }
 
                 if ($from.pos === $to.pos) {
+                    const fromIndex = $from.index(),
+                        toIndex = $to.index();
+
                     if ($from.parent.canReplaceWith(fromIndex, toIndex, phrasingNodeType)) {
                         const content = phrasingNodeType.createAndFill(attrs);
                         if (content) {
@@ -1568,7 +1565,7 @@ function wrapOrInsertPhrasingOrFlow(
                         ? state.schema.nodes[$from.parent.type.spec.alternate]
                         : null;
                     if (alternate
-                        && range.parent.canReplaceWith(fromIndex, toIndex, alternate, $from.parent.marks)) {
+                        && range.parent.canReplaceWith(range.startIndex, range.endIndex, alternate, $from.parent.marks)) {
                         if ($from.parent.content.size === 0) {
                             if (alternate.contentMatch.matchType(phrasingNodeType)) {
                                 const node = alternate.createAndFill(attrs, phrasingNodeType.createAndFill(attrs), $from.parent.marks);

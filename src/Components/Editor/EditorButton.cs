@@ -21,7 +21,7 @@ public class EditorButton
     /// cref="Action"/> as its input, and the result will be used to update the
     /// editor.
     /// </remarks>
-    public Func<string?, string?>? Action { get; set; }
+    public Func<SelectedEditorText, string?>? Action { get; set; }
 
     /// <summary>
     /// <para>
@@ -39,7 +39,7 @@ public class EditorButton
     /// cref="Action"/> as its input, and the result will be used to update the
     /// editor.
     /// </remarks>
-    public Func<string?, Task<string?>>? AsyncAction { get; set; }
+    public Func<SelectedEditorText, Task<string?>>? AsyncAction { get; set; }
 
     /// <summary>
     /// <para>

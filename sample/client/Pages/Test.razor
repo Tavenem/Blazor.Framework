@@ -3,14 +3,6 @@
 
 <PageTitle>Test</PageTitle>
 
-<TextInput @bind-Value="@value" Label="Value" />
-<button @onclick="SetTest">test</button>
-<button @onclick="() => value = null">Null</button>
-
-@code {
-    private string? value = null;
-    private void SetTest()
-    {
-        value = "test";
-    }
-}
+<Editor @bind-Value="@value" Syntax="EditorSyntax.Markdown" CustomToolbarButtons="buttons" />
+<MarkdownRenderer Value="@PriorContent" />
+<MarkdownRenderer Value="@PostContent" />
