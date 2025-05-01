@@ -180,6 +180,6 @@ function onEnhancedLoad() {
     scrollToTopOnLoad();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+if (Blazor && typeof Blazor.addEventListener === 'function') {
     Blazor.addEventListener('enhancedload', onEnhancedLoad);
-});
+}
