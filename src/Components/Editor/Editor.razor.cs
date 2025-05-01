@@ -234,6 +234,49 @@ public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
         catch (TaskCanceledException) { }
     }
 
+    /// <summary>
+    /// Gets the currently selected text in the editor.
+    /// </summary>
+    /// <returns>An <see cref="SelectedEditorText"/> record.</returns>
+    public async Task<SelectedEditorText> GetSelectedTextAsync()
+    {
+        if (_module is null)
+        {
+            return default;
+        }
+        try
+        {
+            return await _module.InvokeAsync<SelectedEditorText>("getSelectedText", Id);
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
+        return default;
+    }
+
+    /// <summary>
+    /// Overwrites the currently selected text in the editor, or inserts text at the cursor position
+    /// (when the selection is empty).
+    /// </summary>
+    /// <param name="value">The text with which to replace the current selection.</param>
+    public async Task SetSelectedTextAsync(string? value)
+    {
+        if (_module is null)
+        {
+            return;
+        }
+        try
+        {
+            await _module.InvokeVoidAsync("updateSelectedText", Id, value);
+            StateHasChanged();
+        }
+        catch (JSException) { }
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        catch (ObjectDisposedException) { }
+    }
+
     private async Task OnCustomButtonAsync(EditorButton button)
     {
         if (_module is null
