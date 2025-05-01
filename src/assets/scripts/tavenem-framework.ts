@@ -83,11 +83,13 @@ namespace Tavenem {
             const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
             colorSchemeQuery.addEventListener('change', setPreferredTavenemColorScheme);
         }
-        Blazor.addEventListener('enhancedload', () => {
-            if (!('theme' in document.documentElement.dataset)) {
-                setPreferredTavenemColorScheme();
-            }
-        });
+        if (Blazor && typeof Blazor.addEventListener === 'function') {
+            Blazor.addEventListener('enhancedload', () => {
+                if (!('theme' in document.documentElement.dataset)) {
+                    setPreferredTavenemColorScheme();
+                }
+            });
+        }
         themeObserver.observe(document.documentElement, { attributes: true });
     }
 
