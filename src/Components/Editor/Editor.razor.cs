@@ -87,6 +87,11 @@ public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
     [Parameter] public string? MaxHeight { get; set; }
 
     /// <summary>
+    /// Invoked when the enter key is pressed, and the input is valid.
+    /// </summary>
+    [Parameter] public EventCallback OnValidEnter { get; set; }
+
+    /// <summary>
     /// The placeholder value.
     /// </summary>
     /// <remarks>
@@ -108,6 +113,16 @@ public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
     /// </para>
     /// </summary>
     [Parameter] public bool? Spellcheck { get; set; }
+
+    /// <summary>
+    /// If <see langword="true"/>, pressing the Enter key will have no effect unless the Shift key
+    /// is also pressed.
+    /// </summary>
+    /// <remarks>
+    /// This is especially useful in combination with <see cref="OnValidEnter"/> when the Enter key
+    /// is expected to submit the content of the editor, without adding a newline to the text.
+    /// </remarks>
+    [Parameter] public bool SuppressEnter { get; set; }
 
     /// <summary>
     /// <para>
@@ -325,6 +340,19 @@ public partial class Editor() : FormComponentBase<string>, IAsyncDisposable
         if (!string.Equals(CurrentValueAsString, e.Value, StringComparison.Ordinal))
         {
             CurrentValueAsString = e.Value;
+        }
+    }
+
+    private async Task OnEnterAsync()
+    {
+        if (!OnValidEnter.HasDelegate)
+        {
+            return;
+        }
+        await ValidateAsync();
+        if (IsValid)
+        {
+            await OnValidEnter.InvokeAsync();
         }
     }
 

@@ -244,6 +244,7 @@ export class TavenemWysiwygEditor implements Editor {
         _root: Element,
         element: HTMLElement,
         onChange: (value?: string | null) => void,
+        onEnter: (event?: KeyboardEvent | null) => void,
         onInput: (value?: string | null) => void,
         update: (data: UpdateInfo) => void,
         options?: EditorOptions) {
@@ -379,6 +380,7 @@ export class TavenemWysiwygEditor implements Editor {
                 tfeditor: (node, view, getPos, _) => new ForbiddenView(node, view, getPos),
             },
             dispatchTransaction: this.onUpdate.bind(this),
+            handleKeyDown: this.onKeyDown.bind(this),
             handleDOMEvents: { 'blur': this.onBlur.bind(this) },
         });
         this._editor = {
@@ -386,6 +388,7 @@ export class TavenemWysiwygEditor implements Editor {
             isMarkdown,
             view,
             onChange,
+            onEnter,
             onInput,
             options,
             update,
@@ -515,6 +518,19 @@ export class TavenemWysiwygEditor implements Editor {
         if (this._editor) {
             this._editor.onInput(this.getContent());
         }
+    }
+
+    private onKeyDown(_view: EditorView, event: KeyboardEvent) {
+        if (event.key === "Enter" && !event.shiftKey && this._editor) {
+            // ensure bound value is up to date first
+            this._editor.onChange(this.getContent());
+
+            this._editor.onEnter(event);
+            if (this._editor.options?.suppressEnter) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private onUpdate(tr: Transaction) {

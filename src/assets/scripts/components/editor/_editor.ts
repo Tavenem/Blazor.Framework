@@ -60,6 +60,10 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         ];
     }
 
+    private static newEnterEvent() {
+        return new CustomEvent('enter', { bubbles: true, composed: true });
+    }
+
     private static newValueChangeEvent(value: string) {
         return new CustomEvent('valuechange', { bubbles: true, composed: true, detail: { value: value } });
     }
@@ -195,6 +199,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 this,
                 editor,
                 this.onChange.bind(this),
+                this.onEnter.bind(this),
                 this.onInput.bind(this),
                 this.update.bind(this),
                 this._options);
@@ -204,6 +209,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 this,
                 editor,
                 this.onChange.bind(this),
+                this.onEnter.bind(this),
                 this.onInput.bind(this),
                 this.update.bind(this),
                 this._options);
@@ -353,6 +359,17 @@ export class TavenemEditorHtmlElement extends HTMLElement {
         this._internals.states.add('touched');
         this.assignValue(value);
         this.dispatchEvent(TavenemEditorHtmlElement.newValueChangeEvent(value || ''));
+    }
+
+    onEnter(event?: KeyboardEvent | null) {
+        if (!event
+            || event.isComposing
+            || event.key !== "Enter"
+            || event.shiftKey) {
+            return;
+        }
+        event.stopPropagation();
+        this.dispatchEvent(TavenemEditorHtmlElement.newEnterEvent());
     }
 
     onInput(value?: string | null) {
@@ -1131,6 +1148,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
             updateOnInput: 'updateOnInput' in this.dataset,
             initialValue: this._value.length ? this._value : undefined,
             placeholder: this.getAttribute('placeholder') || undefined,
+            suppressEnter: this.hasAttribute('suppressEnter'),
         };
     }
 
@@ -2010,6 +2028,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 this,
                 editorElement,
                 this.onChange.bind(this),
+                this.onEnter.bind(this),
                 this.onInput.bind(this),
                 this.update.bind(this),
                 this._options);
@@ -2027,6 +2046,7 @@ export class TavenemEditorHtmlElement extends HTMLElement {
                 this,
                 editorElement,
                 this.onChange.bind(this),
+                this.onEnter.bind(this),
                 this.onInput.bind(this),
                 this.update.bind(this),
                 this._options);

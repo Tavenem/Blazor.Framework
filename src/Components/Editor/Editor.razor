@@ -20,11 +20,13 @@
            required="@Required"
            spellcheck="@SpellcheckValue"
            style="@CssStyle"
+           suppressEnter="@SuppressEnter"
            tabindex="@TabIndex"
            value="@Value"
            wysiwyg="@(EditorMode == EditorMode.WYSIWYG)"
            @onvalueinput="OnInput"
-           @onvaluechange="OnChange">
+           @onvaluechange="OnChange"
+           @onenter="OnEnterAsync">
     @ChildContent
     @if (CustomToolbarButtons is not null && IsInteractive)
     {

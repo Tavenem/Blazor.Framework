@@ -101,6 +101,7 @@ export class TavenemCodeEditor implements Editor {
         root: Element,
         element: HTMLElement,
         onChange: (value?: string | null) => void,
+        onEnter: (event?: KeyboardEvent | null) => void,
         onInput: (value?: string | null) => void,
         update: (data: UpdateInfo) => void,
         options?: EditorOptions) {
@@ -126,7 +127,10 @@ export class TavenemCodeEditor implements Editor {
             languageCompartment.of(languageExtension),
             readOnlyCompartment.of(EditorState.readOnly.of(options?.readOnly || false)),
             EditorView.updateListener.of(this.onUpdate.bind(this)),
-            EditorView.domEventHandlers({ 'blur': this.onBlur.bind(this) }),
+            EditorView.domEventHandlers({
+                'keydown': this.onKeyDown.bind(this),
+                'blur': this.onBlur.bind(this),
+            }),
             EditorView.lineWrapping,
         ]);
         if (options?.placeholder
@@ -147,6 +151,7 @@ export class TavenemCodeEditor implements Editor {
             view,
             language: languageCompartment,
             onChange,
+            onEnter,
             onInput,
             options,
             readOnly: readOnlyCompartment,
@@ -206,6 +211,7 @@ export class TavenemCodeEditor implements Editor {
                 autoFocus: false,
                 mode: EditorMode.Text,
                 readOnly: false,
+                suppressEnter: false,
                 syntax: syntax,
                 updateOnInput: false,
             };
@@ -253,6 +259,7 @@ export class TavenemCodeEditor implements Editor {
         if (this._editor) {
             this._editor.onChange(this._editor.view.state.doc.toString());
         }
+        return false;
     }
 
     private onInput() {
@@ -283,6 +290,19 @@ export class TavenemCodeEditor implements Editor {
         if (this._editor.options?.updateOnInput) {
             this._editor.onInput(this._editor.view.state.doc.toString());
         }
+    }
+
+    private onKeyDown(event: KeyboardEvent, _view: EditorView) {
+        if (event.key === "Enter" && !event.shiftKey && this._editor) {
+            // ensure bound value is up to date first
+            this._editor.onChange(this._editor.view.state.doc.toString());
+
+            this._editor.onEnter(event);
+            if (this._editor.options?.suppressEnter) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private onUpdate(update: ViewUpdate) {
