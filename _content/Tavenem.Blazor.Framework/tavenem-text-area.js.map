@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../src/assets/scripts/tavenem-text-area.ts"],
+  "sourcesContent": ["\uFEFFexport function init(id: string, dotNetHelper: { invokeMethodAsync: (methodName: string) => void }) {\n    const textArea = document.getElementById(id) as HTMLTextAreaElement;\n    if (textArea) {\n        textArea.addEventListener('keydown', onKeyDown.bind(dotNetHelper));\n    }\n}\n\n/**\n * Handles the 'keydown' event for the text area.\n * @param {KeyboardEvent} event - The keyboard event.\n * @this {{ invokeMethodAsync: (methodName: string, event: KeyboardEvent) => void }}\n */\nfunction onKeyDown(this: { invokeMethodAsync: (methodName: string) => void }, event: KeyboardEvent) {\n    if (event.key === 'Enter' && !event.shiftKey) {\n        const suppressEnter = (event.currentTarget as HTMLTextAreaElement)?.hasAttribute('suppressEnter') ?? false;\n        if (suppressEnter) {\n            event.preventDefault();\n            event.stopPropagation();\n        }\n        (event.currentTarget as HTMLTextAreaElement)?.blur();\n        return this.invokeMethodAsync('OnEnterAsync');\n    }\n}"],
+  "mappings": "AAAQ,SAASA,EAAKC,EAAYC,EAAmE,CACjG,IAAMC,EAAW,SAAS,eAAeF,CAAE,EACvCE,GACAA,EAAS,iBAAiB,UAAWC,EAAU,KAAKF,CAAY,CAAC,CAEzE,CAOA,SAASE,EAAqEC,EAAsB,CAChG,GAAIA,EAAM,MAAQ,SAAW,CAACA,EAAM,SAEhC,OADuBA,EAAM,eAAuC,aAAa,eAAe,GAAK,MAEjGA,EAAM,eAAe,EACrBA,EAAM,gBAAgB,GAEzBA,EAAM,eAAuC,KAAK,EAC5C,KAAK,kBAAkB,cAAc,CAEpD",
+  "names": ["init", "id", "dotNetHelper", "textArea", "onKeyDown", "event"]
+}
