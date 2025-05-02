@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using Tavenem.Blazor.Framework.Components.Forms;
 
@@ -7,12 +8,14 @@ namespace Tavenem.Blazor.Framework;
 /// <summary>
 /// A textarea input component.
 /// </summary>
-public partial class TextArea : InputComponentBase<string>
+public partial class TextArea : InputComponentBase<string>, IAsyncDisposable
 {
     private readonly AdjustableTimer _timer;
 
     private bool _disposedValue;
+    private IJSObjectReference? _module;
     private string? _newValue;
+    private DotNetObjectReference<TextArea>? _objRef;
 
     /// <summary>
     /// <para>
@@ -58,6 +61,11 @@ public partial class TextArea : InputComponentBase<string>
     [Parameter] public int Rows { get; set; } = 2;
 
     /// <summary>
+    /// Invoked when the enter key is pressed, and the input is valid.
+    /// </summary>
+    [Parameter] public EventCallback OnValidEnter { get; set; }
+
+    /// <summary>
     /// The placeholder value.
     /// </summary>
     [Parameter] public string? Placeholder { get; set; }
@@ -92,6 +100,16 @@ public partial class TextArea : InputComponentBase<string>
     /// </summary>
     [Parameter] public bool? Spellcheck { get; set; }
 
+    /// <summary>
+    /// If <see langword="true"/>, pressing the Enter key will have no effect unless the Shift key
+    /// is also pressed.
+    /// </summary>
+    /// <remarks>
+    /// This is especially useful in combination with <see cref="OnValidEnter"/> when the Enter key
+    /// is expected to submit the content of the textarea, without adding a newline to the text.
+    /// </remarks>
+    [Parameter] public bool SuppressEnter { get; set; }
+
     /// <inheritdoc/>
     protected override string? CssClass => new CssBuilder(base.CssClass)
         .Add("field")
@@ -110,6 +128,8 @@ public partial class TextArea : InputComponentBase<string>
     protected override string? InputCssClass => new CssBuilder(base.InputCssClass)
         .Add("has-placeholder", !string.IsNullOrEmpty(Placeholder))
         .ToString();
+
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
 
     private string? AutocompleteValue
     {
@@ -141,6 +161,19 @@ public partial class TextArea : InputComponentBase<string>
     /// Constructs a new instance of <see cref="TextArea"/>.
     /// </summary>
     public TextArea() => _timer = new(OnTimer, UpdateOnInputDebounce ?? 0);
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _objRef = DotNetObjectReference.Create(this);
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/Tavenem.Blazor.Framework/tavenem-text-area.js");
+            await _module.InvokeVoidAsync("init", Id, _objRef);
+        }
+    }
 
     /// <inheritdoc/>
     protected override void OnParametersSet()
@@ -190,12 +223,35 @@ public partial class TextArea : InputComponentBase<string>
             if (disposing)
             {
                 _timer.Dispose();
+                _objRef?.Dispose();
             }
 
             _disposedValue = true;
         }
 
         base.Dispose(disposing);
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore().ConfigureAwait(false);
+
+        Dispose(disposing: false);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting
+    /// unmanaged resources asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    protected virtual async ValueTask DisposeAsyncCore()
+    {
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
     }
 
     /// <inheritdoc/>
@@ -228,6 +284,23 @@ public partial class TextArea : InputComponentBase<string>
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Invoked by JavaScript.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnEnterAsync()
+    {
+        if (!OnValidEnter.HasDelegate)
+        {
+            return;
+        }
+        await ValidateAsync();
+        if (IsValid)
+        {
+            await OnValidEnter.InvokeAsync();
+        }
     }
 
     private void OnInput(ChangeEventArgs e)

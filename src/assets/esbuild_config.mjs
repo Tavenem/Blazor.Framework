@@ -26,6 +26,7 @@ await esbuild.build({
         "scripts/tavenem-image-editor.ts",
         "scripts/tavenem-resize.ts",
         "scripts/tavenem-scroll.ts",
+        "scripts/tavenem-text-area.ts",
         "scripts/tavenem-framework.ts",
     ],
     bundle: true,

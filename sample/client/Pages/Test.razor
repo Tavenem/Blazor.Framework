@@ -3,4 +3,5 @@
 
 <PageTitle>Test</PageTitle>
 
-<Editor @bind-Value="@Value" Syntax="EditorSyntax.Markdown" />
+<TextArea @bind-Value="@Value" SuppressEnter="true" OnValidEnter="OnEnter" />
+<pre>@Submitted</pre>
