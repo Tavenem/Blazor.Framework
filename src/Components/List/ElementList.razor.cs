@@ -150,6 +150,11 @@ public partial class ElementList<TListItem>
     [Parameter] public EventCallback<List<TListItem>?> ItemsChanged { get; set; }
 
     /// <summary>
+    /// Raised when an item is removed from the list.
+    /// </summary>
+    [Parameter] public EventCallback<TListItem?> ItemRemoved { get; set; }
+
+    /// <summary>
     /// A function which returns any CSS style(s) for an item.
     /// </summary>
     [Parameter] public Func<TListItem, string?>? ItemStyle { get; set; }
@@ -631,6 +636,7 @@ public partial class ElementList<TListItem>
             await SelectedItemsChanged.InvokeAsync(SelectedItems);
         }
         ListItems.Remove(item);
+        await ItemRemoved.InvokeAsync(item.Item);
         if (Items is not null)
         {
             Items.Remove(item.Item);
