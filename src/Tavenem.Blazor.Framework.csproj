@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -38,19 +38,11 @@
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
-    <PackageReference Include="Markdig" Version="0.41.2" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
-    <PackageReference Include="System.IO.Packaging" Version="9.0.6" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.17" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.17" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.6" />
+    <PackageReference Include="Markdig" Version="0.41.3" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0-preview.7.25380.108" />
+    <PackageReference Include="System.IO.Packaging" Version="10.0.0-preview.7.25380.108" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0-preview.7.25380.108" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="10.0.0-preview.7.25380.108" />
   </ItemGroup>
 	
   <ItemGroup>
@@ -68,7 +60,7 @@
     <ClientAssetsRestoreOutputs>$(ClientAssetsDirectory)node_modules\.package-lock.json</ClientAssetsRestoreOutputs>
 
     <!-- Run restore only once for multi targeting builds -->
-    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net8.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
+    <ClientAssetsRestoreBeforeTargets Condition="'$(TargetFramework)' == 'net10.0'">DispatchToInnerBuilds</ClientAssetsRestoreBeforeTargets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -88,14 +80,14 @@
     <Exec Command="npm install" WorkingDirectory="$(ClientAssetsDirectory)" />
     <Exec Command="npm dedupe" WorkingDirectory="$(ClientAssetsDirectory)" />
   </Target>
-  
+
   <Target Name="ClientAssetsBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
     <PropertyGroup>
       <_ClientAssetsOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)clientassets'))/</_ClientAssetsOutputFullPath>
     </PropertyGroup>
 
     <MakeDir Directories="$(_ClientAssetsOutputFullPath)" />
-    
+
     <Message Importance="high" Text="Running npm run build..." />
     <Exec Command="npm run build -- -o $(_ClientAssetsOutputFullPath)" WorkingDirectory="$(ClientAssetsDirectory)" />
 
@@ -105,13 +97,13 @@
 
     <WriteLinesToFile File="$(IntermediateOutputPath)clientassetsbuild.complete.txt" Lines="@(_ClientAssetsBuildOutput)" />
   </Target>
-  
+
   <Target Name="DefineClientAssets" AfterTargets="ClientAssetsBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
     <ItemGroup>
       <FileWrites Include="@(_ClientAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)clientassetsbuild.complete.txt" />
     </ItemGroup>
-    
+
     <DefineStaticWebAssets CandidateAssets="@(_ClientAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_ClientAssetsOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>

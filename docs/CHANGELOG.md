@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0-preview.1
+### Changed
+- Update to .NET 10
+  - Dropped support for .NET 8 and .NET 9
+  - To continue using this library with older versions of .NET, please continue using version 4.x of the library.
+
 ## 4.13
 ### Changed
 - Custom editor buttons now receive richer status information.
