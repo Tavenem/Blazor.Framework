@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.0-preview.1
+## 5.0
 ### Changed
 - Update to .NET 10
   - Dropped support for .NET 8 and .NET 9
