@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.1
+### Changed
+- Dependency updates
+
 ## 5.0
 ### Changed
 - Update to .NET 10
