@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0
+### Changed
+- Multitarget .NET 10 & 11
+- Use ASP.NET Core 10 dependencies on .NET 10 and ASP.NET Core 11 dependencies on .NET 11.
+
 ## 5.1
 ### Changed
 - Dependency updates
